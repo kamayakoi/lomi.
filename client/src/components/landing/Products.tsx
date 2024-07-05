@@ -6,9 +6,9 @@
 //   CardHeader,
 //   CardTitle,
 // } from "@/components/ui/card";
-// import image from "../assets/growth.png";
-// import image3 from "../assets/reflecting.png";
-// import image4 from "../assets/looking-ahead.png";
+// import image from "../growth.png";
+// import image3 from "../reflecting.png";
+// import image4 from "../looking-ahead.png";
 
 // interface ProductProps {
 //   title: string;
