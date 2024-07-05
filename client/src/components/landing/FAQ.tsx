@@ -70,7 +70,7 @@ export const FAQ = () => {
         Still have questions?{" "}
         <a
           rel="noreferrer noopener"
-          href="https://lomi-africa.gitbook.io/resources/" // Updated link
+          href="https://developers.lomi.africa/" // Updated link
           className="text-primary transition-all border-primary hover:border-b-2"
         >
           Visit our Support Center

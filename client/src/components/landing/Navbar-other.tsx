@@ -32,7 +32,7 @@ const routeList: RouteProps[] = [
     label: "About",
   },
   {
-    href: "https://lomi-africa.gitbook.io/resources/",
+    href: "https://developers.lomi.africa/",
     label: "Resources",
   },
   {

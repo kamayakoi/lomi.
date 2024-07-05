@@ -28,7 +28,7 @@ export const Hero = () => {
           <Button
             className="w-full md:w-1/3"
             variant="outline"
-            onClick={() => window.location.href = "https://lomi-africa.gitbook.io/resources"} // Redirect to the resources URL
+            onClick={() => window.location.href = "https://developers.lomi.africa/"} // Redirect to the resources URL
           >
             Resources
           </Button>
