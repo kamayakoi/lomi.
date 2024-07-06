@@ -1,0 +1,21 @@
+{
+  "name": "lomi.africa",
+  "short_name": "lomi",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "Your gateway to seamless online payments in West Africa. Accept payments via bank, mobile money, card, cash, and more.",
+  "icons": [
+    {
+      "src": "/client/public/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/client/public/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
