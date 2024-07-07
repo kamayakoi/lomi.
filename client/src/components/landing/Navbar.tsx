@@ -52,7 +52,7 @@ export const Navbar = () => {
           <div className="flex items-center flex-grow">
             <NavigationMenuItem className="font-bold flex items-center">
               <a
-                rel="noreferrer noopener"
+                rel="lomi.africa"
                 href="/"
                 className="ml-2 font-bold text-xl flex items-center"
               >
@@ -120,7 +120,7 @@ export const Navbar = () => {
               onClick={() => setIsFormOpen(true)}
               className={`border ${buttonVariants({ variant: "secondary" })}`}
             >
-              Contact Sales
+              Contact sales
             </button>
 
             <ModeToggle />

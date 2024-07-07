@@ -120,7 +120,7 @@ export const Navbar = () => {
               onClick={() => setIsFormOpen(true)}
               className={`border ${buttonVariants({ variant: "secondary" })}`}
             >
-              Contact Sales
+              Contact sales
             </button>
 
             <ModeToggle />
