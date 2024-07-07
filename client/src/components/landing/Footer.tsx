@@ -6,7 +6,7 @@ export const Footer = () => {
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         {/* Logo and Location */}
         <div className="flex flex-col gap-4 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
-          <a href="/" className="flex items-center gap-2">
+          <a href="/" className="flex items-center gap-1">
             <LogoIcon />
             <span className="text-xl font-bold text-black dark:text-white"> {/* Add dark mode text color */}
               lomi.africa
@@ -19,7 +19,7 @@ export const Footer = () => {
 
         {/* Company Section */}
         <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
-          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"> {/* Add dark mode text color and increase bottom margin */}
+          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-1">
             Company
           </h4>
           <nav className="grid gap-1">
@@ -29,18 +29,18 @@ export const Footer = () => {
             <a href="/products" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
               Products
             </a>
+            <a href="/solutions" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+              Solutions
+            </a>
             <a href="/careers" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
               Careers
-            </a>
-            <a href="/contact" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
-              Contact sales
             </a>
           </nav>
         </div>
 
         {/* Resources Section */}
         <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
-          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"> {/* Add dark mode text color and increase bottom margin */}
+          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
             Resources
           </h4>
           <nav className="grid gap-1">
@@ -53,40 +53,44 @@ export const Footer = () => {
             <a href="/support" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
               Support
             </a>
-            <div className="h-6"></div> {/* Empty div to maintain equal height */}
+            <a href="/contact" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+              Contact
+            </a>
           </nav>
         </div>
 
         {/* Community Section */}
         <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
-          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2"> {/* Add dark mode text color and increase bottom margin */}
+          <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
             Community
           </h4>
           <nav className="grid gap-1">
-            <a href="https://github.com/princemuichkine" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://github.com/princemuichkine" className="hover:underline text-gray-600 dark:text-gray-300">
               Github
             </a>
-            <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-600 dark:text-gray-300">
               LinkedIn
             </a>
-            <a href="https://x.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
-              X (Twitter)
+            <a href="https://wa.me/687533993" className="hover:underline text-gray-600 dark:text-gray-300">
+              WhatsApp
             </a>
-            <div className="h-6"></div> {/* Empty div to maintain equal height */}
+            <a href="https://x.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300">
+              X | Twitter
+            </a>
           </nav>
         </div>
       </div>
 
       <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
-        <div className="flex items-center gap-4 ml-[-2px]"> {/* Align with logo and add space between items */}
-          <p>&copy; 2024 lomi.africa, Inc. All rights reserved.</p> {/* Align with logo */}
+        <div className="flex items-center gap-4 ml-[-2px]">
+          <p>&copy; 2024 lomi.africa, Inc. </p> {/*All rights reserved.*/}
           <a className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
-            Les Perles — Abidjan, Côte d'Ivoire
+            Abidjan, Côte d'Ivoire
           </a>
-          <a href="/privacy-policy" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+          <a href="/privacy-policy" className="hover:underline text-gray-600 dark:text-gray-300">
             Privacy Policy
           </a>
-          <a href="/terms-of-service" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+          <a href="/terms-of-service" className="hover:underline text-gray-600 dark:text-gray-300">
             Terms of Service
           </a>
         </div>

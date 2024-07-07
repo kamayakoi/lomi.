@@ -54,7 +54,7 @@ export const Navbar = () => {
               <a
                 rel="lomi.africa"
                 href="/"
-                className="ml-2 font-bold text-xl flex items-center"
+                className=" flex items-center gap-1 ml-2 font-bold text-xl"
               >
                 <LogoIcon />
                 lomi.africa
