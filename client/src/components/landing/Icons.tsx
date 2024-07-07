@@ -1,12 +1,23 @@
-import icon from "/icon.png" // Import the image
+import { useState, useEffect } from 'react';
+import icon from "/icon.png"; // Import the light mode image
+import iconDark from "/icon_dark.png"; // Import the dark mode image
+import { useTheme } from '../../lib/useTheme'; // Import the custom useTheme hook
 
 export const LogoIcon = () => {
+  const { theme } = useTheme(); // Get the current theme from the custom hook
+  const [currentIcon, setCurrentIcon] = useState(icon);
+
+  useEffect(() => {
+    // Update the icon based on the theme
+    setCurrentIcon(theme === 'dark' ? iconDark : icon);
+  }, [theme]);
+
   return (
     <img
-      src={icon} // Use the imported image
+      src={currentIcon} // Use the current icon based on the theme
       alt="lomi.africa" // Provide an alt text for accessibility
       className="lucide lucide-panels-top-left mr-2" // Apply other classes for styling
-      style={{ width: '30px', height: '30px' }} // Set the desired width and height
+      style={{ width: '38px', height: '37px' }} // Set the desired width and height
     />
   );
 };
