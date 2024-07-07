@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import icon from "/icon.png"; // Import the light mode image
+import paymentg from "/payment-gateway.png"; // Import the light mode image
+import shield from "/shield.png"; // Import the light mode image
+import shieldwhite from "/shieldwhite.png"; // Import the light mode image
 import iconDark from "/icon_dark.png"; // Import the dark mode image
 import { useTheme } from '../../lib/useTheme'; // Import the custom useTheme hook
 
@@ -18,6 +21,36 @@ export const LogoIcon = () => {
       alt="lomi.africa" // Provide an alt text for accessibility
       className="lucide lucide-panels-top-left mr-2" // Apply other classes for styling
       style={{ width: '38px', height: '37px' }} // Set the desired width and height
+    />
+  );
+};
+
+export const PaymentIcon = () => {
+  return (
+    <img
+      src={paymentg} // Use the current icon based on the theme
+      alt="orchestrate" // Provide an alt text for accessibility
+      className="lucide lucide-panels-top-left mr-2" // Apply other classes for styling
+      style={{ width: '45px', height: '45px' }} // Set the desired width and height
+    />
+  );
+};
+
+export const ShieldIcon = () => {
+  const { theme } = useTheme(); // Get the current theme from the custom hook
+  const [currentShield, setCurrentShield] = useState(shield);
+
+  useEffect(() => {
+    // Update the shield icon based on the theme
+    setCurrentShield(theme === 'dark' ? shieldwhite : shield);
+  }, [theme]);
+
+  return (
+    <img
+      src={currentShield} // Use the current shield icon based on the theme
+      alt="orchestrate" // Provide an alt text for accessibility
+      className="lucide lucide-panels-top-left mr-2" // Apply other classes for styling
+      style={{ width: '45px', height: '45px' }} // Set the desired width and height
     />
   );
 };

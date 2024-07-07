@@ -54,10 +54,10 @@ export const Navbar = () => {
               <a
                 rel="lomi.africa"
                 href="/"
-                className=" flex items-center gap-1 ml-2 font-bold text-xl"
+                className="ml-2 font-bold text-xl flex items-center"
               >
                 <LogoIcon />
-                lomi.africa
+                <span className="ml-1">lomi.africa</span> {/* Added margin-left to create space */}
               </a>
             </NavigationMenuItem>
           </div>

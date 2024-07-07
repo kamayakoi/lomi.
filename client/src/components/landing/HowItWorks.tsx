@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { MedalIcon, MapIcon, PlaneIcon, LightBulbIcon } from "./Icons";
+import { MedalIcon, MapIcon, PlaneIcon, ShieldIcon } from "./Icons";
 
 interface ProductProps {
   icon: JSX.Element;
@@ -24,7 +24,7 @@ const products: ProductProps[] = [
     description: "Our platform is built to scale with your business, ensuring reliable and fast transactions regardless of volume.",
   },
   {
-    icon: <LightBulbIcon />, // Assuming LockIcon is another icon linked to security
+    icon: <ShieldIcon />, // Assuming LockIcon is another icon linked to security
     title: "Security",
     description: "Advanced security features to protect your transactions and customer data at all times.",
   },
@@ -35,7 +35,7 @@ export const HowItWorks = () => {
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
       <h2 className="text-3xl md:text-4xl font-bold">
         How it{" "}
-        <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
+        <span className="inline bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
           works{" "}
         </span>
       </h2>

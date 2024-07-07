@@ -20,7 +20,7 @@ export const HeroCards = () => {
   return (
     <div className="hidden lg:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
       {/* Testimonial */}
-      <Card className="absolute w-[340px] -top-[24px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute w-[340px] -top-[31px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="flex flex-row items-center gap-4 pb-2">
           <Avatar>
             <AvatarImage
@@ -42,7 +42,7 @@ export const HeroCards = () => {
       </Card>
 
       {/* Team */}
-      <div className="absolute right-[-75px] top-[20px] w-[500px] flex flex-col justify-center items-center drop-shadow-xl shadow-black/10 dark:shadow-white/10 z-50 transform transition-transform duration-500 hover:scale-105">
+      <div className="absolute right-[-75px] top-[15px] w-[500px] flex flex-col justify-center items-center drop-shadow-xl shadow-black/10 dark:shadow-white/10 z-50 transform transition-transform duration-500 hover:scale-105">
         <img
           src={theme === 'dark' ? canvasdark : canvas} // Use canvasdark in dark mode
           alt="Our mission"
@@ -52,7 +52,7 @@ export const HeroCards = () => {
       );
 
       {/* Pricing */}
-      <Card className="absolute top-[133px] left-[47px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute top-[133px] left-[25px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader>
           <CardTitle className="flex item-center justify-between">
             <Badge
@@ -96,15 +96,15 @@ export const HeroCards = () => {
       </Card>
 
       {/*  Payment Orchestration */}
-      <Card className="absolute w-[350px] -right-[10px] bottom-[-120px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute w-[350px] -right-[4px] bottom-[-100px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="space-y-1 flex md:flex-row justify-start items-start gap-4">
-          <div className="mt-1"> {/* Removed bg-primary/20 and p-1 */}
+          <div className="mt-1 bg-primary/10 p-1 rounded-2xl">
             <LightBulbIcon />
           </div>
           <div>
             <CardTitle>Payment Orchestration</CardTitle>
             <CardDescription className="text-md mt-2 text-gray-800 dark:text-gray-200">
-              Manage all your payment methods and providers in one single place.
+              Manage all your payment methods in one single place.
             </CardDescription>
           </div>
         </CardHeader>

@@ -35,15 +35,15 @@ export const Services = () => {
       <div className="grid lg:grid-cols-[1fr,1fr] gap-8 place-items-center">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold">
-            <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
+            <span className="inline bg-gradient-to-r from-[#F596D3] to-[#4781d2] text-transparent bg-clip-text">
               Our products{" "}
             </span>
             at launch
           </h2>
-
           <p className="text-muted-foreground text-xl mt-4 mb-8 ">
             A Payment Interface uniquely built for West Africa.
           </p>
+
 
           <div className="flex flex-col gap-8">
             {serviceList.map(({ icon, title, description }: ServiceProps) => (

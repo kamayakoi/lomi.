@@ -8,7 +8,7 @@ export const Hero = () => {
   return (
     <section className="container grid lg:grid-cols-2 place-items-center py-20 md:py-32 gap-10">
       <div className="text-center lg:text-start space-y-6">
-        <main className="text-5xl md:text-6xl font-bold">
+        <main className="text-5xl md:text-6xl font-bold text-left lg:text-start"> {/* Added text-left for mobile */}
           <h1 className="inline">
             <span className="inline bg-gradient-to-r from-[#F596D3]  to-[#D247BF] text-transparent bg-clip-text">
               One integration
@@ -17,7 +17,7 @@ export const Hero = () => {
           </h1>
         </main>
 
-        <p className="text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0">
+        <p className="text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0 text-left lg:text-start"> {/* Added text-left for mobile */}
           An API and payment gateway integrated with multiple banks and networks across West Africa — so your business can handle transactions seamlessly and scale faster.
         </p>
         <div className="space-y-4 md:space-y-0 md:space-x-4">
