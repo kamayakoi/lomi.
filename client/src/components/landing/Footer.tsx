@@ -85,6 +85,9 @@ export const Footer = () => {
         <div className="flex items-center gap-4 ml-[-2px]">
           <p>&copy; 2024 lomi.africa, Inc. </p> {/*All rights reserved.*/}
           <a className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            English
+          </a>
+          <a className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
             Abidjan, Côte d'Ivoire
           </a>
           <a href="/privacy-policy" className="hover:underline text-gray-600 dark:text-gray-300">

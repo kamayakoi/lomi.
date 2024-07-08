@@ -73,7 +73,7 @@ export const FAQ = () => {
           href="https://developers.lomi.africa/" // Updated link
           className="text-primary transition-all border-primary hover:border-b-2"
         >
-          Visit our Support Center
+          Visit our support center
         </a>
       </h3>
     </section>
