@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { VisitIcon } from "./Icons.tsx";
 import { Badge } from "../ui/badge";
 import { Button } from "@/components/ui/button";
 import canvas from "/canvas.png";
@@ -22,15 +22,9 @@ export const HeroCards = () => {
       {/* Testimonial */}
       <Card className="absolute w-[340px] -top-[31px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="flex flex-row items-center gap-4 pb-2">
-          <Avatar>
-            <AvatarImage
-              alt="John Doe"
-              src="https://github.com/shadcn.png"
-            />
-            <AvatarFallback>JD</AvatarFallback>
-          </Avatar>
-
-          <div className="flex flex-col">
+          {/* Replaced Avatar component with VisitIcon */}
+          <VisitIcon />
+          <div className="flex flex-col ml-[-10px]"> {/* Added negative left margin */}
             <CardTitle className="text-lg">Kwame Adjei</CardTitle>
             <CardDescription>@kadjei_</CardDescription>
           </div>
