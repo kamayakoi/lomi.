@@ -1,5 +1,9 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://www.lomi.africa/$1",
+      "permanent": true
+    }
   ]
 }
