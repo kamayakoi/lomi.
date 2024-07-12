@@ -1,6 +1,13 @@
+import { useState } from "react"; // Import useState
 import { LogoIcon } from "./Icons";
 
 export const Footer = () => {
+  const [showLanguages, setShowLanguages] = useState(false); // State to toggle language options
+
+  const toggleLanguages = () => {
+    setShowLanguages(!showLanguages); // Toggle the state
+  };
+
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full"> {/* Add dark mode background color */}
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
@@ -84,10 +91,7 @@ export const Footer = () => {
       <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
         <div className="flex items-center gap-4 ml-[-2px]">
           <p>&copy; 2024 lomi.africa, Inc. </p> {/*All rights reserved.*/}
-          <a className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
-            English
-          </a>
-          <a className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+          <a className="hover:underline text-gray-600 dark:text-gray-300">
             Abidjan, Côte d'Ivoire
           </a>
           <a href="/privacy-policy" className="hover:underline text-gray-600 dark:text-gray-300">
@@ -96,6 +100,21 @@ export const Footer = () => {
           <a href="/terms-of-service" className="hover:underline text-gray-600 dark:text-gray-300">
             Terms of Service
           </a>
+          <div className="relative">
+            <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
+              English
+            </button>
+            {showLanguages && (
+              <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg"> {/* Position above the button */}
+                <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  English
+                </a>
+                <a href="/home/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  French
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </footer>

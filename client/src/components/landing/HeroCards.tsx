@@ -1,8 +1,8 @@
+//Components
 import { VisitIcon } from "./Icons.tsx";
 import { Badge } from "../ui/badge";
 import { Button } from "@/components/ui/button";
-import canvas from "/canvas.png";
-import canvasdark from "/canvas_dark.png";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -14,6 +14,10 @@ import {
 import { Check } from "lucide-react";
 import { LightBulbIcon } from "./Icons";
 import { useTheme } from '../../lib/useTheme';
+
+//Images
+import canvas from "/canvas.png";
+import canvasdark from "/canvas_dark.png";
 
 export const HeroCards = () => {
   const { theme } = useTheme();
@@ -67,8 +71,11 @@ export const HeroCards = () => {
         </CardHeader>
 
         <CardContent>
-          <Button className="w-full">Start</Button>
+          <Link to="/login">
+            <Button className="w-full">Start</Button>
+          </Link>
         </CardContent>
+
 
         <hr className="w-4/5 m-auto mb-4" />
 

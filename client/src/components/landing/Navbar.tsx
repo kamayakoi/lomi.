@@ -24,20 +24,16 @@ interface RouteProps {
 
 const routeList: RouteProps[] = [
   {
-    href: "#products",
+    href: "/products",
     label: "Products",
-  },
-  {
-    href: "/about",
-    label: "About",
   },
   {
     href: "https://developers.lomi.africa/",
     label: "Resources",
   },
   {
-    href: "#faq",
-    label: "FAQ",
+    href: "/about",
+    label: "About",
   },
 ];
 
@@ -122,7 +118,6 @@ export const Navbar = () => {
             >
               Contact sales
             </button>
-
             <ModeToggle />
           </div>
         </NavigationMenuList>

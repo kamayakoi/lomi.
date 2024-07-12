@@ -1,12 +1,12 @@
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
 
-const About = () => {
+const Support = () => {
     return (
         <>
             <Navbar />
             <div className="container py-24 sm:py-32">
-                <h1>About Us</h1>
+                <h1>Support</h1>
                 <p>Welcome to the About page!</p>
             </div>
             <Footer />
@@ -14,4 +14,4 @@ const About = () => {
     );
 };
 
-export default About;
+export default Support;

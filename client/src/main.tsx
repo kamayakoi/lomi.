@@ -1,21 +1,18 @@
+// Components 
+
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Analytics } from "@vercel/analytics/react"
-import Homepage from "./Homepage.tsx";
-import About from './pages/About.tsx'; // Ensure this matches the file name exactly
+import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/landing/theme-provider.tsx";
+import AppRouter from "./router"; // Import the router component
+
+// Styles
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/about" element={<About />} /> {/* Add the new route */}
-        </Routes>
-      </Router>
+      <AppRouter /> {/* Use the router component */}
       <Analytics />
     </ThemeProvider>
   </React.StrictMode>
