@@ -1,12 +1,27 @@
-import { useState } from "react"; // Import useState
+import { useState, useEffect, useRef } from "react"; // Import MutableRefObject
 import { LogoIcon } from "./Icons";
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false); // State to toggle language options
+  const dropdownRef = useRef<HTMLDivElement>(null); // Type the ref as HTMLDivElement
 
   const toggleLanguages = () => {
     setShowLanguages(!showLanguages); // Toggle the state
   };
+
+  // Function to handle clicks outside the dropdown
+  const handleClickOutside = (event: MouseEvent) => { // Type the event as MouseEvent
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) { // Type cast event.target as Node
+      setShowLanguages(false); // Collapse the dropdown
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside); // Add event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside); // Clean up event listener
+    };
+  }, []);
 
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full"> {/* Add dark mode background color */}
@@ -94,13 +109,13 @@ export const Footer = () => {
           <a className="hover:underline text-gray-600 dark:text-gray-300">
             Abidjan, Côte d'Ivoire
           </a>
-          <a href="/privacy-policy" className="hover:underline text-gray-600 dark:text-gray-300">
+          <a href="/privacy" className="hover:underline text-gray-600 dark:text-gray-300">
             Privacy Policy
           </a>
-          <a href="/terms-of-service" className="hover:underline text-gray-600 dark:text-gray-300">
+          <a href="/terms" className="hover:underline text-gray-600 dark:text-gray-300">
             Terms of Service
           </a>
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}> {/* Attach ref to the container */}
             <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
               English
             </button>
@@ -109,7 +124,7 @@ export const Footer = () => {
                 <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                   English
                 </a>
-                <a href="/home/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <a href="/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                   French
                 </a>
               </div>

@@ -7,7 +7,7 @@ const Support = () => {
             <Navbar />
             <div className="container py-24 sm:py-32">
                 <h1>Support</h1>
-                <p>Welcome to the About page!</p>
+                <p>Welcome to the Support page!</p>
             </div>
             <Footer />
         </>

@@ -1,6 +1,5 @@
 import { Card } from '@/components/ui/card'
 import { SignUpForm } from './components/sign-up-form'
-import { Link } from 'react-router-dom'
 
 export default function SignUp() {
   return (
@@ -9,19 +8,9 @@ export default function SignUp() {
         <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
           <Card className='p-6'>
             <div className='mb-2 flex flex-col space-y-2 text-left'>
-              <h1 className='text-lg font-semibold tracking-tight'>
+              <h1 className='text-2xl font-semibold tracking-tight'>
                 Create an account
               </h1>
-              <p className='text-sm text-muted-foreground'>
-                Enter your email and password to create your account. <br />
-                If you already have an account?{' '}
-                <Link
-                  to='/sign-in'
-                  className='underline underline-offset-4 hover:text-primary'
-                >
-                  Sign In
-                </Link>
-              </p>
             </div>
             <SignUpForm />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>

@@ -66,7 +66,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 <FormItem className='space-y-1'>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@example.com' {...field} />
+                    <Input placeholder='name@yourcompany.com' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,7 +94,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               )}
             />
             <Button className='mt-2' loading={isLoading}>
-              Login
+              Continue
             </Button>
             <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
               Don't have an account?{' '}
@@ -132,7 +132,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 className='w-full'
                 type='button'
                 loading={isLoading}
-                leftSection={<IconBrandGoogle className='h-4 w-4' />} // Updated button
+                leftSection={<IconBrandGoogle className='h-4 w-4' />}
               >
                 Google
               </Button>

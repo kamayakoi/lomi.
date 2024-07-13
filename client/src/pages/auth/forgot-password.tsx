@@ -22,7 +22,6 @@ export default function ForgotPassword() {
               >
                 Sign up
               </Link>
-              .
             </p>
           </Card>
         </div>

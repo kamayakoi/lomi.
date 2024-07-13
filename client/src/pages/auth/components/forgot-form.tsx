@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> {}
+interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> { }
 
 const formSchema = z.object({
   email: z
@@ -52,7 +52,7 @@ export function ForgotForm({ className, ...props }: ForgotFormProps) {
                 <FormItem className='space-y-1'>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@example.com' {...field} />
+                    <Input placeholder='name@yourcompany.com' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

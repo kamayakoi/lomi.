@@ -1,7 +1,8 @@
 import { HTMLAttributes, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import { Link } from 'react-router-dom'
+import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react'
 import { z } from 'zod'
 import {
   Form,
@@ -16,7 +17,7 @@ import { Button } from '@/components/custom/button'
 import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 
-interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> {}
+interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> { }
 
 const formSchema = z
   .object({
@@ -72,7 +73,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                 <FormItem className='space-y-1'>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@example.com' {...field} />
+                    <Input placeholder='name@yourcompany.com' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,8 +106,14 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               )}
             />
             <Button className='mt-2' loading={isLoading}>
-              Create Account
+              Continue
             </Button>
+            <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
+              Already have an account?{' '}
+              <Link to='/log-in' className='underline underline-offset-4 hover:text-primary'>
+                Sign in
+              </Link>
+            </p>
 
             <div className='relative my-2'>
               <div className='absolute inset-0 flex items-center'>
@@ -134,9 +141,9 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                 className='w-full'
                 type='button'
                 loading={isLoading}
-                leftSection={<IconBrandFacebook className='h-4 w-4' />}
+                leftSection={<IconBrandGoogle className='h-4 w-4' />}
               >
-                Facebook
+                Google
               </Button>
             </div>
           </div>

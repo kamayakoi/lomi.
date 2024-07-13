@@ -17,6 +17,11 @@ module.exports = {
     },
     extend: {
       colors: {
+       sage: {
+          100: '#E6EFE9', // Light sage
+          200: '#C5D1C8', // Slightly darker sage for secondary text
+          800: '#2C4A3E', // Dark sage for background
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

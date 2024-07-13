@@ -1,4 +1,5 @@
-//Components
+//components
+
 import { VisitIcon } from "./Icons.tsx";
 import { Badge } from "../ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,9 @@ export const HeroCards = () => {
   const { theme } = useTheme();
   return (
     <div className="hidden lg:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
+      {/* Shadow */}
+      <div className="shadow hero-card-shadow"></div>
+
       {/* Testimonial */}
       <Card className="absolute w-[340px] -top-[31px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="flex flex-row items-center gap-4 pb-2">
@@ -47,7 +51,6 @@ export const HeroCards = () => {
           className="w-full h-auto rounded-lg border-1 border-gray-50 dark:border-gray-700"
         />
       </div>
-      );
 
       {/* Pricing */}
       <Card className="absolute top-[133px] left-[25px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
@@ -71,11 +74,10 @@ export const HeroCards = () => {
         </CardHeader>
 
         <CardContent>
-          <Link to="/login">
+          <Link to="/sign-in">
             <Button className="w-full">Start</Button>
           </Link>
         </CardContent>
-
 
         <hr className="w-4/5 m-auto mb-4" />
 

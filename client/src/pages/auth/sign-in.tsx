@@ -6,27 +6,32 @@ export default function SignIn() {
     <>
       <div className='container relative grid h-svh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0'>
         <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
-          <div className='absolute inset-0 bg-zinc-900' />
-          <div className='relative z-20 flex items-center text-lg font-medium'>
-            lomi.
+          {/* Updated background color to a darker sage */}
+          <div className='absolute inset-0 bg-sage-800' />
+
+          {/* Reintroduced and updated the text */}
+          <div className='relative z-20 flex items-center text-2xl font-medium text-sage-100'>
+            Portal
           </div>
 
-          {/* Update the image source to the new logo */}
-          <img
-            src={Icon}
-            className='relative m-auto'
-            width={301}
-            height={60}
-            alt='Icon'
-          />
+          {/* Centered the logo */}
+          <div className='relative z-20 flex items-center justify-center flex-grow'>
+            <img
+              src={Icon}
+              className='relative'
+              width={301}
+              height={60}
+              alt='Lomi Logo'
+            />
+          </div>
 
+          {/* Kept the quote at the bottom */}
           <div className='relative z-20 mt-auto'>
             <blockquote className='space-y-2'>
-              {/* Update the text to "we're just getting started" */}
-              <p className='text-lg'>
+              <p className='text-lg text-sage-100'>
                 &ldquo;We're just getting started.&rdquo;
               </p>
-              <footer className='text-sm'>The Founder</footer>
+              <footer className='text-sm text-sage-200'>lomi.'s Team</footer>
             </blockquote>
           </div>
         </div>
