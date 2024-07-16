@@ -13,7 +13,10 @@ export const Hero = () => {
             <span className="inline bg-gradient-to-r from-[#F596D3]  to-[#D247BF] text-transparent bg-clip-text">
               One integration
             </span>{" "}
-            for all your payment needs.
+            for all your{" "}
+            <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#1B95E0] text-transparent bg-clip-text"> {/* Applied the blue gradient */}
+              payment needs.
+            </span>
           </h1>
         </main>
 

@@ -27,14 +27,36 @@ export const Footer = () => {
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
-        {/* Logo and Location */}
-        <div className="flex flex-col gap-4 col-span-1 md:col-span-1">
+        {/* Logo and Subscription Form */}
+        <div className="flex flex-col gap-2 col-span-1 md:col-span-1">
           <a href="/" className="flex items-center gap-1">
             <LogoIcon />
             <span className="text-xl font-bold text-black dark:text-white">
               lomi.africa
             </span>
           </a>
+          <div className="mt-2">
+            <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">
+              Get the latest happenings and tips.
+            </h4>
+            <form className="flex items-center">
+              <div className="relative flex-grow">
+                <input
+                  type="email"
+                  placeholder="Email address*"
+                  className="w-full px-2 py-2 text-gray-900 dark:text-gray-100 bg-transparent"
+                  style={{ textAlign: 'left' }} // Align text to the left
+                />
+                <div className="absolute bottom-0 left-0 w-[calc(100%-1px)] h-1 border-b-2 border-gray-500 pointer-events-none"></div> {/* Adjust underline width and height */}
+              </div>
+              <button
+                type="submit"
+                className="ml-[-1px] px-4 py-2 bg-gray-800 text-white hover:bg-gray-700"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="hidden md:block md:col-span-1"></div>

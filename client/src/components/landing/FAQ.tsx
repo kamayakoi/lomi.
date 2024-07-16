@@ -42,7 +42,7 @@ export const FAQ = () => {
     >
       <h2 className="text-3xl md:text-4xl font-bold mb-4">
         Frequently Asked{" "}
-        <span className="inline bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
+        <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#1B95E0] text-transparent bg-clip-text">
           Questions
         </span>
       </h2>

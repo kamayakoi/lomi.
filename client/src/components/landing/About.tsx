@@ -16,7 +16,15 @@ export const About = () => {
           <div className="flex-1 flex flex-col justify-between">
             <div className="pb-6 text-left"> {/* Added text-left class */}
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                <span className="inline bg-gradient-to-r from-[#F596D3] to-[#4781d2] text-transparent bg-clip-text">One link to grow your revenue and </span>manage all your payment needs.
+                <span className="inline bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
+                  One link to grow your revenue
+                </span>{" "}
+                <span className="text-current"> {/* Adapts to the current text color */}
+                  and manage all your
+                </span>{" "}
+                <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#1B95E0] text-transparent bg-clip-text"> {/* Applied the blue gradient */}
+                  payment needs.
+                </span>
               </h2>
               <p className="text-xl text-muted-foreground mt-4">
                 Our mission is to make online payments seamless and accessible for businesses and entrepreneurs alike.

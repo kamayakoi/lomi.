@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // Home Pages
-import Homepage from "./Homepage.tsx";
+import Homepage from "./pages/Homepage/Homepage.tsx";
 import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
 import Solutions from './pages/Solutions.tsx';
@@ -11,7 +11,7 @@ import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
 // FR Pages
-import HomepageFR from "./Homepage.tsx";
+import HomepageFR from "./pages/Homepage/Homepage.tsx";
 
 // Connect Pages
 import Signin from './pages/auth/sign-in.tsx';
