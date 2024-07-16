@@ -1,112 +1,111 @@
-import { useState, useEffect, useRef } from "react"; // Import MutableRefObject
+import { useState, useEffect, useRef } from "react";
 import { LogoIcon } from "./Icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-brands-svg-icons'; // Import the icons
 
 export const Footer = () => {
-  const [showLanguages, setShowLanguages] = useState(false); // State to toggle language options
-  const dropdownRef = useRef<HTMLDivElement>(null); // Type the ref as HTMLDivElement
+  const [showLanguages, setShowLanguages] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleLanguages = () => {
-    setShowLanguages(!showLanguages); // Toggle the state
+    setShowLanguages(!showLanguages);
   };
 
-  // Function to handle clicks outside the dropdown
-  const handleClickOutside = (event: MouseEvent) => { // Type the event as MouseEvent
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) { // Type cast event.target as Node
-      setShowLanguages(false); // Collapse the dropdown
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setShowLanguages(false);
     }
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside); // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside); // Clean up event listener
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
-    <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full"> {/* Add dark mode background color */}
+    <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         {/* Logo and Location */}
-        <div className="flex flex-col gap-4 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
+        <div className="flex flex-col gap-4 col-span-1 md:col-span-1">
           <a href="/" className="flex items-center gap-1">
             <LogoIcon />
-            <span className="text-xl font-bold text-black dark:text-white"> {/* Add dark mode text color */}
+            <span className="text-xl font-bold text-black dark:text-white">
               lomi.africa
             </span>
           </a>
         </div>
 
-        {/* Spacer to create space between sections */}
-        <div className="hidden md:block md:col-span-1"></div> {/* Hidden on small screens, spans one column on medium and larger screens, with a custom height */}
+        <div className="hidden md:block md:col-span-1"></div>
 
         {/* Company Section */}
-        <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
+        <div className="grid gap-2 col-span-1 md:col-span-1">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-1">
             Company
           </h4>
           <nav className="grid gap-1">
-            <a href="/about" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="/about" className="hover:underline text-gray-600 dark:text-gray-300">
               About
             </a>
-            <a href="/products" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="/products" className="hover:underline text-gray-600 dark:text-gray-300">
               Products
             </a>
-            <a href="/solutions" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="/solutions" className="hover:underline text-gray-600 dark:text-gray-300">
               Solutions
             </a>
-            <a href="/careers" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="/careers" className="hover:underline text-gray-600 dark:text-gray-300">
               Careers
             </a>
           </nav>
         </div>
 
         {/* Resources Section */}
-        <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
+        <div className="grid gap-2 col-span-1 md:col-span-1">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
             Resources
           </h4>
           <nav className="grid gap-1">
-            <a href="/documentation" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://developers.lomi.africa/" className="hover:underline text-gray-600 dark:text-gray-300">
               Developers
             </a>
-            <a href="/recipes" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://developers.lomi.africa/api-documentation" className="hover:underline text-gray-600 dark:text-gray-300">
               Recipes
             </a>
-            <a href="/support" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://developers.lomi.africa/guides/support" className="hover:underline text-gray-600 dark:text-gray-300">
               Support
             </a>
-            <a href="/contact" className="hover:underline text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+            <a href="https://developers.lomi.africa/guides/support/contact" className="hover:underline text-gray-600 dark:text-gray-300">
               Contact
             </a>
           </nav>
         </div>
 
         {/* Community Section */}
-        <div className="grid gap-2 col-span-1 md:col-span-1"> {/* Ensure this section spans one column */}
+        <div className="grid gap-2 col-span-1 md:col-span-1">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
             Community
           </h4>
           <nav className="grid gap-1">
-            <a href="https://github.com/princemuichkine" className="hover:underline text-gray-600 dark:text-gray-300">
-              Github
+            <a href="https://github.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
+              <FontAwesomeIcon icon={faGithub} /> Github
             </a>
-            <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-600 dark:text-gray-300">
-              LinkedIn
+            <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
+              <FontAwesomeIcon icon={faLinkedin} /> LinkedIn
             </a>
-            <a href="https://wa.me/687533993" className="hover:underline text-gray-600 dark:text-gray-300">
-              WhatsApp
+            <a href="https://wa.me/31687533993" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
+              <FontAwesomeIcon icon={faWhatsapp} /> WhatsApp
             </a>
-            <a href="https://x.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300">
-              X | Twitter
+            <a href="https://x.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
+              <FontAwesomeIcon icon={faTwitter} /> X | Twitter
             </a>
           </nav>
         </div>
       </div>
-
-      <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300"> {/* Add dark mode text color */}
+      <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
         <div className="flex items-center gap-4 ml-[-2px]">
-          <p>&copy; 2024 lomi.africa, Inc. </p> {/*All rights reserved.*/}
-          <a className="hover:underline text-gray-600 dark:text-gray-300">
+          <p>&copy; 2024 lomi.africa, Inc. </p>
+          <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300">
             Abidjan, Côte d'Ivoire
           </a>
           <a href="/privacy" className="hover:underline text-gray-600 dark:text-gray-300">
@@ -115,12 +114,12 @@ export const Footer = () => {
           <a href="/terms" className="hover:underline text-gray-600 dark:text-gray-300">
             Terms of Service
           </a>
-          <div className="relative" ref={dropdownRef}> {/* Attach ref to the container */}
+          <div className="relative" ref={dropdownRef}>
             <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
               English
             </button>
             {showLanguages && (
-              <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg"> {/* Position above the button */}
+              <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg">
                 <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                   English
                 </a>

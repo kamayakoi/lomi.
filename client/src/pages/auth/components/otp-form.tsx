@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { Separator } from '@/components/ui/separator'
 
-interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {}
+interface OtpFormProps extends HTMLAttributes<HTMLDivElement> { }
 
 const formSchema = z.object({
   otp: z.string().min(1, { message: 'Please enter your otp code.' }),
@@ -44,7 +44,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-2'>
+          <div className='grid gap-4'> {/* Increased gap to add space between elements */}
             <FormField
               control={form.control}
               name='otp'

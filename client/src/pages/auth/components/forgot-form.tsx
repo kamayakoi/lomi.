@@ -9,7 +9,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -44,23 +43,28 @@ export function ForgotForm({ className, ...props }: ForgotFormProps) {
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-2'>
+          <div className='grid gap-2'> {/* Reduced space between elements */}
             <FormField
               control={form.control}
               name='email'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@yourcompany.com' {...field} />
+                    <Input
+                      placeholder='Email address*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className='mt-2' loading={isLoading}>
-              Continue
-            </Button>
+            <div className='mt-2'> {/* Added margin-top to create space */}
+              <Button className='w-full' loading={isLoading}> {/* Set width to full */}
+                Continue
+              </Button>
+            </div>
           </div>
         </form>
       </Form>

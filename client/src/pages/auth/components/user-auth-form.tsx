@@ -9,7 +9,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -58,44 +57,52 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-2'>
+          <div className='grid gap-2'> {/* Reduced space between elements */}
             <FormField
               control={form.control}
               name='email'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@yourcompany.com' {...field} />
+                    <Input
+                      placeholder='Email address*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <div className='flex justify-end mb-1'> {/* Positioned "Forgot password?" link */}
+              <Link
+                to='/forgot-password'
+                className='text-sm font-medium text-muted-foreground hover:opacity-75 whitespace-nowrap' // Ensured "Forgot password?" is on one line
+              >
+                Forgot password?
+              </Link>
+            </div>
             <FormField
               control={form.control}
               name='password'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <div className='flex items-center justify-between'>
-                    <FormLabel>Password</FormLabel>
-                    <Link
-                      to='/forgot-password'
-                      className='text-sm font-medium text-muted-foreground hover:opacity-75'
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
                   <FormControl>
-                    <PasswordInput placeholder='********' {...field} />
+                    <PasswordInput
+                      placeholder='Password*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className='mt-2' loading={isLoading}>
-              Continue
-            </Button>
+            <div className='mt-2'> {/* Added margin-top to create space */}
+              <Button className='w-full' loading={isLoading}> {/* Set width to full */}
+                Continue
+              </Button>
+            </div>
             <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
               Don't have an account?{' '}
               <Link

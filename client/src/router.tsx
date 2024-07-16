@@ -6,13 +6,12 @@ import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
 import Solutions from './pages/Solutions.tsx';
 import Careers from './pages/Careers.tsx';
-import Support from './pages/Support.tsx';
+import Template from './pages/Template.tsx';
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
 // FR Pages
 import HomepageFR from "./Homepage.tsx";
-
 
 // Connect Pages
 import Signin from './pages/auth/sign-in.tsx';
@@ -21,9 +20,29 @@ import Signup from './pages/auth/sign-up.tsx';
 import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
 
-// Dashboard Pages
-import Dashboard from './pages/auth/otp.tsx';
+// Error Pages
+import GeneralError from './pages/errors/general-error.tsx';
+import NotFoundError from './pages/errors/not-found-error.tsx';
+import MaintenanceError from './pages/errors/maintenance-error.tsx';
 
+// Dashboard
+import AppShell from './components/dashboard/app-shell';
+import Dashboard from './pages/dashboard/Dashboard.tsx';
+import Tasks from './pages/tasks/tasks.tsx';
+import Integrations from './pages/integrations/integrations.tsx';
+import ExtraComponents from './pages/extra-components/extra-component.tsx';
+import Settings from './pages/settings/settings.tsx';
+import Profile from './pages/settings/profile/index.tsx';
+import Account from './pages/settings/account/index.tsx';
+import Appearance from './pages/settings/appearance/index.tsx';
+import Notifications from './pages/settings/notifications/index.tsx';
+import Display from './pages/settings/display/index.tsx';
+import ErrorExample from './pages/settings/error-example/index.tsx';
+
+// Dashboard Coming soon
+import Chats from "./components/dashboard/coming-soon";
+import Users from "./components/dashboard/coming-soon";
+import Analysis from "./components/dashboard/coming-soon";
 
 const AppRouter = () => (
     <Router>
@@ -35,18 +54,42 @@ const AppRouter = () => (
             <Route path="/products" element={<Products />} />
             <Route path="/solutions" element={<Solutions />} />
             <Route path="/careers" element={<Careers />} />
-            <Route path="/support" element={<Support />} />
+            <Route path="/template" element={<Template />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/fr" element={< HomepageFR />} />
+            <Route path="/fr" element={<HomepageFR />} />
+
+            {/* Dashboard routes */}
+            <Route path="/portal" element={<AppShell />}>
+                <Route index element={<Dashboard />} />
+                <Route path="tasks" element={<Tasks />} />
+                <Route path="chats" element={<Chats />} />
+                <Route path="integrations" element={<Integrations />} />
+                <Route path="users" element={<Users />} />
+                <Route path="analysis" element={<Analysis />} />
+                <Route path="extra-components" element={<ExtraComponents />} />
+                <Route path="settings" element={<Settings />}>
+                    <Route index element={<Profile />} />
+                    <Route path="account" element={<Account />} />
+                    <Route path="appearance" element={<Appearance />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="display" element={<Display />} />
+                    <Route path="error-example" element={<ErrorExample />} />
+                </Route>
+            </Route>
+
             {/* Login/Signup routes */}
             <Route path="/sign-in" element={<Signin />} />
             <Route path="/log-in" element={<Login />} />
             <Route path="/sign-up" element={<Signup />} />
             <Route path="/forgot-password" element={<Forgot />} />
             <Route path="/otp" element={<OTP />} />
-            {/* Portal routes */}
-            <Route path="/portal/dashboard" element={<Dashboard />} />
+
+            {/* Error routes */}
+            <Route path="/500" element={<GeneralError />} />
+            <Route path="/404" element={<NotFoundError />} />
+            <Route path="/503" element={<MaintenanceError />} />
+            <Route path="*" element={<NotFoundError />} />
         </Routes>
     </Router>
 );

@@ -12,6 +12,7 @@ export default function SignUp() {
                 Create an account
               </h1>
             </div>
+            <div className='mb-4'></div>
             <SignUpForm />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               By creating an account, you agree to our{' '}

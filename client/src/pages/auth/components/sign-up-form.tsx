@@ -9,7 +9,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -65,15 +64,18 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-2'>
+          <div className='grid gap-4'> {/* Increased gap to add space between elements */}
             <FormField
               control={form.control}
               name='email'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='name@yourcompany.com' {...field} />
+                    <Input
+                      placeholder='name@company.com*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,9 +86,12 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               name='password'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder='********' {...field} />
+                    <PasswordInput
+                      placeholder='Password*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,20 +102,28 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <PasswordInput placeholder='********' {...field} />
+                    <PasswordInput
+                      placeholder='Confirm password*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className='mt-2' loading={isLoading}>
-              Continue
-            </Button>
+            <div className='mt-2'> {/* Added margin-top to create space */}
+              <Button className='w-full' loading={isLoading}> {/* Set width to full */}
+                Continue
+              </Button>
+            </div>
             <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
               Already have an account?{' '}
-              <Link to='/log-in' className='underline underline-offset-4 hover:text-primary'>
+              <Link
+                to='/log-in'
+                className='underline underline-offset-4 hover:text-primary'
+              >
                 Sign in
               </Link>
             </p>

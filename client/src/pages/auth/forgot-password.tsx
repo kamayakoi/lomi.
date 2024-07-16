@@ -9,10 +9,11 @@ export default function ForgotPassword() {
         <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
           <Card className='p-6'>
             <div className='mb-2 flex flex-col space-y-2 text-left'>
-              <h1 className='text-md font-semibold tracking-tight'>
+              <h1 className='text-2xl font-semibold tracking-tight'>
                 Reset your password
               </h1>
             </div>
+            <div className='mb-4'></div>
             <ForgotForm />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               Don't have an account?{' '}
