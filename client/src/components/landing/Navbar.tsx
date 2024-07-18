@@ -44,22 +44,23 @@ export const Navbar = () => {
   return (
     <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
       <NavigationMenu className="mx-auto">
-        <NavigationMenuList className="container h-14 px-4 w-screen flex items-center">
+        <NavigationMenuList className="container h-16 px-4 w-screen flex items-center"> {/* Increased height */}
           <div className="flex items-center flex-grow">
             <NavigationMenuItem className="font-bold flex items-center">
               <a
                 rel="lomi.africa"
                 href="/"
                 className="ml-2 font-bold text-xl flex items-center"
+                style={{ fontSize: '1.5rem' }}
               >
                 <LogoIcon />
-                <span className="ml-1">lomi.africa</span> {/* Added margin-left to create space */}
+                <span className="ml-1">lomi.africa</span>
               </a>
             </NavigationMenuItem>
           </div>
 
           {/* mobile */}
-          <span className="flex md:hidden ml-auto pr-4"> {/* Added pr-4 for padding */}
+          <span className="flex md:hidden ml-auto pr-4">
             <ModeToggle />
 
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -74,7 +75,7 @@ export const Navbar = () => {
 
               <SheetContent side={"left"}>
                 <SheetHeader>
-                  <SheetTitle className="font-bold text-xl">
+                  <SheetTitle className="font-bold text-xl" style={{ fontSize: '1.2rem' }}>
                     lomi.africa
                   </SheetTitle>
                 </SheetHeader>
@@ -86,6 +87,7 @@ export const Navbar = () => {
                       href={href}
                       onClick={() => setIsOpen(false)}
                       className={buttonVariants({ variant: "ghost" })}
+                      style={{ fontSize: '1.06rem' }} // Increased font size
                     >
                       {label}
                     </a>
@@ -105,6 +107,7 @@ export const Navbar = () => {
                 className={`text-[17px] ${buttonVariants({
                   variant: "ghost",
                 })}`}
+                style={{ fontSize: '1.06rem' }} // Increased font size
               >
                 {route.label}
               </a>
@@ -115,6 +118,7 @@ export const Navbar = () => {
             <button
               onClick={() => setIsFormOpen(true)}
               className={`border ${buttonVariants({ variant: "secondary" })}`}
+              style={{ fontSize: '1.06rem', padding: '0.75rem 1.25rem' }} // Increased font size and added padding
             >
               Contact sales
             </button>

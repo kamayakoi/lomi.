@@ -12,19 +12,19 @@ const serviceList: ServiceProps[] = [
   {
     title: "Collect Money",
     description:
-      "Accept payments via Card, Mobile Money, e-wallets, and Pay by bank.",
+      "Accept payments via Card, Mobile Money, e-wallets, and Pay by bank using an interface uniquely built for West Africa.",
     icon: <WalletIcon />,
   },
   {
     title: "Manage Money",
     description:
-      "Orchestrate and reconcile payments seamlessly across different methods and providers.",
+      "Orchestrate and reconcile money seamlessly across different methods and providers.",
     icon: <ChartIcon />,
   },
   {
     title: "Send Money",
     description:
-      "Send payouts quickly and efficiently to anywhere your money needs to go.",
+      "Send payouts quickly and efficiently to anywhere your earnings need to go.",
     icon: <MagnifierIcon />,
   },
 ];
@@ -36,12 +36,13 @@ export const Services = () => {
         <div>
           <h2 className="text-3xl md:text-4xl font-bold">
             Our products{" "}
-            <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#1B95E0] text-transparent bg-clip-text">
+            <span className="inline bg-gradient-to-r from-[#F596D3]  to-[#D247BF] text-transparent bg-clip-text">
               at launch
             </span>
           </h2>
-          <p className="text-muted-foreground text-xl mt-4 mb-8 ">
-            A Payment Interface uniquely built for West Africa.
+          <p className="text-muted-foreground text-2xl mt-4 mb-8 ">
+            Our products provide a frictionless customer experience for receiving funds.
+
           </p>
 
 
@@ -54,7 +55,7 @@ export const Services = () => {
                   </div>
                   <div>
                     <CardTitle>{title}</CardTitle>
-                    <CardDescription className="text-md mt-2">
+                    <CardDescription className="text-md mt-2" style={{ fontSize: '1.01rem' }}>
                       {description}
                     </CardDescription>
                   </div>

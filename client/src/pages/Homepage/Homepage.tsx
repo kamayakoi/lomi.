@@ -1,7 +1,6 @@
 // Imported
-import { About } from "../../components/landing/About";
 import { FAQ } from "../../components/landing/FAQ";
-import { Footer } from "../../components/landing/Footer";
+import { Footer } from "../../components/landing/Footer-Homepage";
 import { Hero } from "../../components/landing/Hero";
 import { HowItWorks } from "../../components/landing/HowItWorks";
 import { Navbar } from "../../components/landing/Navbar";
@@ -12,6 +11,7 @@ import "./Homepage.css";
 
 // Not Imported
 
+{/* import { About } from "../../components/landing/About";* /}
 {/* import { Newsletter } from "./components/landing/Newsletter";* /}
 {/* import { Pricing } from "./components/landing/Pricing"; */ }
 {/* import { Sponsors } from "./components/landing/Sponsors"; */ }
@@ -26,7 +26,6 @@ function Homepage() {
       <Navbar />
       <Hero />
       <HowItWorks />
-      <About />
       <Services />
       <FAQ />
       <Footer />

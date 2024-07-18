@@ -57,11 +57,11 @@ export const FAQ = () => {
             key={value}
             value={value}
           >
-            <AccordionTrigger className="text-left">
+            <AccordionTrigger className="text-left" style={{ fontSize: '1.2rem' }}>
               {question}
             </AccordionTrigger>
 
-            <AccordionContent>{answer}</AccordionContent>
+            <AccordionContent style={{ fontSize: '1.06rem' }}>{answer}</AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>

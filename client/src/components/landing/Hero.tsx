@@ -2,6 +2,12 @@ import { Button } from "../ui/button";
 import { HeroCards } from "./HeroCards";
 import { useState } from "react"; // Import useState
 
+// Image import
+import africanledger from '/public/africanledger_round.png';
+import testimony2 from '/public/testimony2.png';
+import testimony3 from '/public/testimony3.png';
+import heart from '/public/heart.png';
+
 export const Hero = () => {
   const [isFormOpen, setIsFormOpen] = useState(false); // State to manage modal visibility
 
@@ -20,23 +26,46 @@ export const Hero = () => {
           </h1>
         </main>
 
-        <p className="text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0 text-left lg:text-start"> {/* Added text-left for mobile */}
-          An API and payment gateway integrated with multiple banks and networks across West Africa — so your business can handle transactions seamlessly and scale faster.
+        <p className="text-2xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0 text-left lg:text-start"> {/* Added text-left for mobile */}
+          We offer an easy-to-use API & financial gateway that connects with banks and networks across West Africa — making it simple for your business to handle transactions and scale faster.
         </p>
         <div className="space-y-4 md:space-y-0 md:space-x-4">
-          <Button className="w-full md:w-1/3" onClick={() => setIsFormOpen(true)}>
-            Contact sales
+          <Button
+            className="w-full md:w-1/2 lg:w-1/5 text-2xl  px-20 py-7" // Increased font size and padding for height
+            onClick={() => setIsFormOpen(true)}
+          >
+            Learn more
           </Button>
 
           <Button
-            className="w-full md:w-1/3"
+            className="w-full md:w-1/2 lg:w-1/5 text-2xl  px-20 py-7"
             variant="outline"
             onClick={() => window.location.href = "https://developers.lomi.africa/"} // Redirect to the resources URL
           >
             Resources
           </Button>
         </div>
+
+
+        {/* New section for "Loved by over 3 million academics" */}
+        <div className="relative flex items-center mt-6 group">
+          <div className="relative -ml-2"> {/* Reduced negative margin to -ml-2 */}
+            <img src={africanledger} alt="Person 1" className="w-8 h-8 rounded-full border-2 border-white" /> {/* Added border */}
+            <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-10px] left-[80px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
+          </div>
+          <div className="relative -ml-2"> {/* Reduced negative margin to -ml-2 */}
+            <img src={testimony2} alt="Person 2" className="w-8 h-8 rounded-full border-2 border-white" /> {/* Added border */}
+            <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-20px] left-[65px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
+          </div>
+          <div className="relative -ml-2"> {/* Reduced negative margin to -ml-2 */}
+            <img src={testimony3} alt="Person 3" className="w-8 h-8 rounded-full border-2 border-white" /> {/* Added border */}
+            <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-18px] left-[60px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
+          </div>
+          <span className="text-lg text-gray-600 ml-2">Loved by dozens of businesses and entrepreneurs.</span> {/* Added margin-left */}
+        </div>
       </div>
+
+
 
       {/* Hero cards sections */}
       <div className="z-10">

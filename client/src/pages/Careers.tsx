@@ -16,11 +16,11 @@ const Careers = () => {
     return (
         <>
             <Navbar />
-            <section className="bg-muted py-12 md:py-24 lg:py-32">
+            <section className=" py-12 md:py-24 lg:py-32">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">Join our growing team</h1>
+                            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">Join our team</h1>
                             <p className="mt-4 max-w-md text-muted-foreground md:text-xl">
                                 At Acme Inc., we're passionate about building innovative products that make a difference. Come be a
                                 part of our mission.
@@ -36,7 +36,7 @@ const Careers = () => {
                     </div>
                 </div>
             </section>
-            <section className="py-12 md:py-24 lg:py-32">
+            <section className="py-12 md:py-24 lg:py-32 bg-muted">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid gap-8">
                         <div>
@@ -84,7 +84,7 @@ const Careers = () => {
                     </div>
                 </div>
             </section>
-            <section className="bg-muted py-12 md:py-24 lg:py-32">
+            <section className="py-12 md:py-24 lg:py-32">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
@@ -96,20 +96,22 @@ const Careers = () => {
                                 Don't see anything interesting for you here and still interested in joining our team? Reach out to
                             </p>
                             <div
-                                className="mt-2 w-48 h-11 p-2 border rounded-lg bg-blue-100 shadow-md cursor-pointer hover:bg-blue-200 transition"
+                                className="mt-2 w-64 h-12 p-2 border rounded-lg bg-white shadow-md cursor-pointer hover:border-green-700 transition"
                                 onClick={handleEmailClick}
                             >
-                                <p className="text-lg text-blue-800 text-center">
-                                    {emailClicked ? "📧 Email copied!" : "work@lomi.africa"}
+                                <p className="text-lg text-black text-center flex items-center justify-between px-4">
+                                    {emailClicked ? "Copied! Say 👋🏼" : "work@lomi.africa"}
+                                    <span className="text-xl">→</span>
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-            <Footer /> {/* Add the Footer component here */}
+            <Footer />
         </>
     );
 };
 
 export default Careers;
+

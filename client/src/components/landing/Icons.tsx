@@ -42,7 +42,7 @@ export const VisitIcon = () => {
   return (
     <img
       src={kwameadjei} // Use the current icon based on the theme
-      alt="Kwame Adjei" // Provide an alt text for accessibility
+      alt="Testimonial icon" // Provide an alt text for accessibility
       className="lucide lucide-panels-top-left mr-2" // Apply other classes for styling
       style={{ width: '45px', height: '45px' }} // Set the desired width and height
     />
