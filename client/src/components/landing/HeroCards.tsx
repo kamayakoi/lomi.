@@ -28,7 +28,7 @@ export const HeroCards = () => {
       <div className="shadow hero-card-shadow"></div>
 
       {/* Testimonial */}
-      <Card className="absolute w-[350px] -top-[51px] left-[-85px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute w-[350px] -top-[53px] left-[-95px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="flex flex-row items-center gap-4 pb-2">
           {/* Replaced Avatar component with VisitIcon */}
           <VisitIcon />
@@ -83,7 +83,7 @@ export const HeroCards = () => {
         <CardContent>
           <div className="flex justify-center"> {/* Center the button container */}
             <Link to="/sign-in">
-              <Button className="w-full lg:w-auto px-10 py-8 bg-gray-800 text-white hover:bg-gray-700 rounded-lg"> {/* Changed to rounded-full */}
+              <Button className="px-6 py-7 rounded-lg"> {/* Adjusted padding */}
                 <span className="text-2xl font-bold">Start</span> {/* Larger text for "Start" */}
                 <span className="text-lg ml-2">— in minutes</span> {/* Smaller text for "in minutes" */}
               </Button>

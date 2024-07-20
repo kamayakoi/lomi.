@@ -17,9 +17,9 @@ import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 
 interface SignUpFormProps extends HTMLAttributes<HTMLDivElement> { }
-
 const formSchema = z
   .object({
+    name: z.string().min(1, { message: 'Please enter your name' }), // Added name field
     email: z
       .string()
       .min(1, { message: 'Please enter your email' })
@@ -32,11 +32,6 @@ const formSchema = z
       .min(7, {
         message: 'Password must be at least 7 characters long',
       }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ['confirmPassword'],
   })
 
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
@@ -45,9 +40,9 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '', // Added default value for name
       email: '',
       password: '',
-      confirmPassword: '',
     },
   })
 
@@ -56,7 +51,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
     console.log(data)
 
     setTimeout(() => {
-      setIsLoading(false)
+      setIsLoading(false) // Corrected the typo here
     }, 3000)
   }
 
@@ -64,7 +59,23 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-4'> {/* Increased gap to add space between elements */}
+          <div className='grid gap-4'>
+            <FormField
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem className='space-y-1'>
+                  <FormControl>
+                    <Input
+                      placeholder='Full name*'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name='email'
@@ -72,9 +83,9 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                 <FormItem className='space-y-1'>
                   <FormControl>
                     <Input
-                      placeholder='name@company.com*'
+                      placeholder='Email address*'
                       {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
                   </FormControl>
                   <FormMessage />
@@ -90,31 +101,15 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
                     <PasswordInput
                       placeholder='Password*'
                       {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='confirmPassword'
-              render={({ field }) => (
-                <FormItem className='space-y-1'>
-                  <FormControl>
-                    <PasswordInput
-                      placeholder='Confirm password*'
-                      {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className='mt-2'> {/* Added margin-top to create space */}
-              <Button className='w-full' loading={isLoading}> {/* Set width to full */}
+            <div className='mt-2'>
+              <Button className='w-full' loading={isLoading}>
                 Continue
               </Button>
             </div>

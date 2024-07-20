@@ -65,7 +65,7 @@ const Solutions = () => {
                     </div>
                 </div>
             </section>
-            <Footer /> {/* Ensure Footer component is working */}
+            <Footer />
         </div>
     );
 };

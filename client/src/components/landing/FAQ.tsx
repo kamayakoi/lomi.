@@ -13,7 +13,7 @@ interface FAQProps {
 
 const FAQList: FAQProps[] = [
   {
-    question: "How quickly can I get started with Lomi?",
+    question: "How quickly can I get started with lomi.?",
     answer: "Our onboarding process is simple and quick. You can start accepting payments the same day you set up your account.",
     value: "item-1",
   },

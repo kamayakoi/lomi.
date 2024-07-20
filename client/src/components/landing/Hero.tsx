@@ -3,10 +3,10 @@ import { HeroCards } from "./HeroCards";
 import { useState } from "react"; // Import useState
 
 // Image import
-import africanledger from '/public/africanledger_round.png';
-import testimony2 from '/public/testimony2.png';
-import testimony3 from '/public/testimony3.png';
-import heart from '/public/heart.png';
+import africanledger from "/africanledger_round.png";
+import testimony2 from "/testimony2.png";
+import testimony3 from "/testimony3.png";
+import heart from "/heart.png";
 
 export const Hero = () => {
   const [isFormOpen, setIsFormOpen] = useState(false); // State to manage modal visibility
@@ -38,18 +38,17 @@ export const Hero = () => {
           </Button>
 
           <Button
-            className="w-full md:w-1/2 lg:w-1/5 text-2xl  px-20 py-7"
-            variant="outline"
-            onClick={() => window.location.href = "https://developers.lomi.africa/"} // Redirect to the resources URL
+            className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7 bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-lg"
+            onClick={() => window.location.href = "https://developers.lomi.africa/"}
           >
             Resources
           </Button>
         </div>
 
 
-        {/* New section for "Loved by over 3 million academics" */}
+        {/* New section */}
         <div className="relative flex items-center mt-6 group">
-          <div className="relative -ml-2"> {/* Reduced negative margin to -ml-2 */}
+          <div className="relative -ml"> {/* Reduced negative margin to -ml-2 */}
             <img src={africanledger} alt="Person 1" className="w-8 h-8 rounded-full border-2 border-white" /> {/* Added border */}
             <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-10px] left-[80px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
           </div>
@@ -59,9 +58,11 @@ export const Hero = () => {
           </div>
           <div className="relative -ml-2"> {/* Reduced negative margin to -ml-2 */}
             <img src={testimony3} alt="Person 3" className="w-8 h-8 rounded-full border-2 border-white" /> {/* Added border */}
-            <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-18px] left-[60px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
+            <img src={heart} alt="Heart" className="absolute w-6 h-6 top-[-13px] left-[52px] opacity-0 group-hover:opacity-100" /> {/* Adjusted position */}
           </div>
-          <span className="text-lg text-gray-600 ml-2">Loved by dozens of businesses and entrepreneurs.</span> {/* Added margin-left */}
+          <span className="text-lg text-gray-600 dark:text-gray-300 ml-2"> {/* Added dark mode text color */}
+            Loved by dozens of businesses and entrepreneurs.
+          </span>
         </div>
       </div>
 

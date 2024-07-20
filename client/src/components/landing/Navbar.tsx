@@ -114,7 +114,7 @@ export const Navbar = () => {
             ))}
           </nav>
 
-          <div className="hidden md:flex gap-2 ml-auto pr-4"> {/* Added pr-4 for padding */}
+          <div className="hidden md:flex gap-2 ml-auto pr-4">
             <button
               onClick={() => setIsFormOpen(true)}
               className={`border ${buttonVariants({ variant: "secondary" })}`}

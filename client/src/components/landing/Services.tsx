@@ -12,7 +12,7 @@ const serviceList: ServiceProps[] = [
   {
     title: "Collect Money",
     description:
-      "Accept payments via Card, Mobile Money, e-wallets, and Pay by bank using an interface uniquely built for West Africa.",
+      "Accept payments via Card, Mobile Money, e-wallets, and pay-by-bank using an interface uniquely built for West Africa.",
     icon: <WalletIcon />,
   },
   {
