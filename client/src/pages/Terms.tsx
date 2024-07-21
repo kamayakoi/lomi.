@@ -1,4 +1,4 @@
-import { Navbar } from '../components/landing/Navbar';
+import { Navbar } from '../components/landing/Navbar-not-sticky';
 import { Footer } from '../components/landing/Footer';
 import SideNav from '../components/landing/Sidenav';
 
@@ -577,7 +577,7 @@ const Terms = () => {
                     <div id="restricted-activities"> {/* Add id for navigation */}
                         <h2 className="text-3xl font-bold mt-12">Restricted Activities</h2> {/* Section title */}
                         <p className="mt-6 text-lg text-muted-foreground"> {/* Section content */}
-                            The Second Party acknowledges that the First Party is prohibited from engaging in or providing services in activities restricted under Philippine laws, including Unlawful Activities as defined under the Anti-Money Laundering Act of 2001, as amended, and its Revised Implementing Rules and Regulations (“Restricted Activities”). The list of Restricted Activities may change from time to time due to changes in regulations. Thus, the Second Party acknowledges that the First Party may unilaterally change, revise, or modify the list of Restricted Activities below without prior notification to the Second Party. The list below is representative but not exhaustive. If the Second Party is uncertain as to whether its business is classified as a Restricted Activity or has questions about how these requirements apply, please contact us.
+                            The Second Party acknowledges that the First Party is prohibited from engaging in or providing services in activities restricted under Ivoirian laws, including Unlawful Activities as defined under the Anti-Money Laundering laws, as amended, and its Implementing Rules and Regulations (“Restricted Activities”). The list of Restricted Activities may change from time to time due to changes in regulations. Thus, the Second Party acknowledges that the First Party may unilaterally change, revise, or modify the list of Restricted Activities below without prior notification to the Second Party. The list below is representative but not exhaustive. If the Second Party is uncertain as to whether its business is classified as a Restricted Activity or has questions about how these requirements apply, please contact us.
                         </p>
                         <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
                             The Second Party legally acknowledges and confirms its consent and agrees that it will not use the Service to accept or disburse payments in connection with any of the Restricted Activities including but not limited to:
