@@ -23,7 +23,9 @@ import "./Homepage.css";
 function Homepage() {
   return (
     <>
-      <Navbar />
+      <div className="navbar-wrapper">
+        <Navbar />
+      </div>
       <Hero />
       <HowItWorks />
       <Services />

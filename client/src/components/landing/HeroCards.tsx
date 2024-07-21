@@ -28,7 +28,7 @@ export const HeroCards = () => {
       <div className="shadow hero-card-shadow"></div>
 
       {/* Testimonial */}
-      <Card className="absolute w-[350px] -top-[53px] left-[-95px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute w-[350px] -top-[82px] left-[-84px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader className="flex flex-row items-center gap-4 pb-2">
           {/* Replaced Avatar component with VisitIcon */}
           <VisitIcon />
@@ -53,7 +53,7 @@ export const HeroCards = () => {
       </div>
 
       {/* Pricing */}
-      <Card className="absolute top-[133px] left-[-70px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
+      <Card className="absolute top-[123px] left-[-70px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
         <CardHeader>
           <CardTitle className="flex item-center justify-between">
             <Badge

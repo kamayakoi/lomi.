@@ -86,7 +86,7 @@
 .collapsibleDropdown[data-state='open'] {
   animation: slideDown 200ms ease-out;
 }
-.collapsibleDropdown[data-state='closed'] {
+collapsibleDropdown[data-state='closed'] {
   animation: slideUp 200ms ease-out;
 }
 
@@ -167,4 +167,75 @@
       right: 100px;
     }
   }
+}
+
+/* Side Navigation Hover Effect */
+.side-nav {
+    width: 250px; /* Initial width */
+    overflow: hidden; /* Hide overflow */
+    transition: width 0.3s ease-in-out; /* Smooth transition */
+    background-color: hsl(211, 100%, 89%); /* Light mode friendly */
+    color: var(--background); /* Light mode friendly */
+    position: fixed;
+    right: 20px; /* Add some space from the right border */
+    top: 25%;
+    z-index: 1000; /* Ensure it stays on top */
+    border-radius: 1rem; /* More rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0.7; /* Reduced opacity */
+        max-height: 50vh; /* Limit height to 50% of viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.side-nav:hover {
+    width: 160px; /* Expanded width on hover */
+    opacity: 1; /* Full opacity on hover */
+}
+
+.side-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.side-nav ul li {
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    padding: 0.5rem 1rem;
+}
+
+.side-nav ul li a {
+    color: black; /* Ensure text is always visible */
+    text-decoration: none;
+}
+
+.side-nav:hover ul li {
+    opacity: 1; /* Fully visible on hover */
+}
+
+.toggle-button {
+    margin: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+.navbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40; /* Ensure it stays above other content */
+  width: 100%; /* Ensure it spans the full width */
+  background-color: white; /* Adjust as needed */
+  border-bottom: 1px solid #e2e8f0; /* Adjust as needed */
+}
+
+.navbar-placeholder {
+  height: 4rem; /* Adjust this value based on the height of your navbar */
 }

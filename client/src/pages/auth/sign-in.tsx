@@ -21,7 +21,7 @@ export default function SignIn() {
               className='relative'
               width={301}
               height={60}
-              alt='Lomi Logo'
+              alt='lomi. Logo'
             />
           </div>
 

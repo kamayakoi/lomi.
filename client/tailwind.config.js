@@ -17,7 +17,7 @@ module.exports = {
     },
     extend: {
       colors: {
-       sage: {
+        sage: {
           100: '#E6EFE9', // Light sage
           200: '#C5D1C8', // Slightly darker sage for secondary text
           800: '#2C4A3E', // Dark sage for background
@@ -55,6 +55,8 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'dark-text': '#1a1a1a', // Very dark color for light mode
+        'light-text': '#e0e0e0', // Lighter color for dark mode
       },
       borderRadius: {
         lg: "var(--radius)",
