@@ -29,9 +29,9 @@ export const Footer = () => {
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         {/* Logo Section */}
         <div className="flex flex-col gap-2 col-span-1 md:col-span-1">
-          <a href="/" className="flex items-center gap-1">
+          <a href="/" className="flex items-center gap-1" style={{ fontSize: '1.5rem' }}>
             <LogoIcon />
-            <span className="text-xl font-bold text-black dark:text-white">
+            <span className="text-2xl font-bold text-black dark:text-white">
               lomi.africa
             </span>
           </a>
