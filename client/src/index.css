@@ -239,3 +239,29 @@ collapsibleDropdown[data-state='closed'] {
 .navbar-placeholder {
   height: 4rem; /* Adjust this value based on the height of your navbar */
 }
+
+/* New section styles for mobile */
+@media (max-width: 640px) { /* Tailwind's sm breakpoint */
+  .relative.flex.items-center.mt-6.group {
+    flex-direction: column; /* Stack items vertically on mobile */
+    align-items: center; /* Center items horizontally */
+  }
+  .relative.-ml,
+  .relative.-ml-2 {
+    margin-left: 0; /* Remove negative margin on mobile */
+    margin-bottom: 1rem; /* Add space between items */
+  }
+  .relative.-ml img,
+  .relative.-ml-2 img {
+    margin-left: 0; /* Ensure images are aligned properly */
+  }
+  .relative.-ml img + img,
+  .relative.-ml-2 img + img {
+    left: 0 !important; /* Adjust heart icon position */
+    top: 0 !important; /* Adjust heart icon position */
+  }
+  .text-lg.text-gray-600.dark:text-gray-300.ml-2 {
+    margin-left: 0; /* Remove left margin on mobile */
+    text-align: center; /* Center text on mobile */
+  }
+}
