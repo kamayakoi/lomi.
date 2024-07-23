@@ -6,15 +6,17 @@ const About = () => {
         <>
             <Navbar />
             {/* Hero Section */}
-            <section
-                className="relative w-full h-[500px] bg-muted"
-                style={{ backgroundImage: 'url("/placeholder.svg?height=500&width=1920")' }}
-            >
-                <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center text-center px-4 md:px-6">
-                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">About us</h1>
-                    <p className="max-w-[600px] mt-4 text-muted-foreground md:text-xl">
-                        Our mission is to transform the payments landscape in West Africa.<br />
-                        We strive to provide seamless, secure, and scalable payment solutions.
+            <section className="relative w-full h-[500px] bg-background overflow-hidden">
+                <div
+                    className="absolute inset-0 bg-cover bg-center z-0"
+                    style={{
+                        backgroundImage: 'url("/transition-star.png")',
+                        backgroundPosition: '14% 14%'  // Adjust these values
+                    }}
+                ></div>
+                <div className="container relative h-full flex flex-col justify-center items-center px-4 md:px-6 z-10">
+                    <p className="text-5xl tracking-tighter sm:text-6xl md:text-5xl lg:text-5xl text-justified text-white">
+                        Our mission is to transform the payments landscape in West Africa by providing seamless, secure, and scalable payment solutions.
                     </p>
                 </div>
             </section>
@@ -23,7 +25,7 @@ const About = () => {
             <section className="w-full py-12 md:py-24 lg:py-32">
                 <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
                     <div className="space-y-4">
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Our story</h2>
+                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">Our story</h2>
                         <p className="text-muted-foreground md:text-xl">
                             Founded in 2024, lomi. emerged to address the need for better payment solutions in West Africa. Our founder recognized the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.
                         </p>

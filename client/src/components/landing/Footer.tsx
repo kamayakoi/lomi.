@@ -5,7 +5,6 @@ import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-b
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // State to track form submission
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleLanguages = () => {
@@ -25,16 +24,10 @@ export const Footer = () => {
     };
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent form from redirecting
-    setIsSubmitted(true); // Set the form as submitted
-    // Add your Supabase logic here to save the email to a specific table
-  };
-
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
-        {/* Logo and Subscription Form */}
+        {/* Logo Section */}
         <div className="flex flex-col gap-2 col-span-1 md:col-span-1">
           <a href="/" className="flex items-center gap-1" style={{ fontSize: '1.5rem' }}>
             <LogoIcon />
@@ -42,33 +35,6 @@ export const Footer = () => {
               lomi.africa
             </span>
           </a>
-          <div className="mt-2">
-            <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">
-              Get the latest happenings and tips.
-            </h4>
-            {isSubmitted ? ( // Check if the form is submitted
-              <p className="text-center text-black dark:text-white bg-gray-200 dark:bg-gray-800 py-2 px-4">
-                We'll keep in touch !
-              </p>
-            ) : (
-              <form className="flex items-center" onSubmit={handleSubmit}>
-                <div className="relative flex-grow">
-                  <input
-                    type="email"
-                    placeholder="Email address*"
-                    className="w-full px-2 py-2 text-gray-900 dark:text-gray-100 bg-transparent"
-                  />
-                  <div className="absolute bottom-0 left-0 w-[calc(100%-1px)] h-1 border-b-2 border-gray-500 pointer-events-none"></div>
-                </div>
-                <button
-                  type="submit"
-                  className="ml-[-1px] px-4 py-2 bg-gray-800 text-white hover:bg-gray-700"
-                >
-                  Subscribe
-                </button>
-              </form>
-            )}
-          </div>
         </div>
 
         <div className="hidden md:block md:col-span-1"></div>

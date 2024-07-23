@@ -37,11 +37,11 @@ const Integrations = () => {
     return (
         <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-500 font-poppins">
             <Navbar />
-            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-gray-50 dark:bg-slate-400">
+            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-gray-50 dark:bg-gray-900">
                 <div className="container mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-gray-800 dark:text-black">Integration made easy</h2>
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-800">Choose the integration option that best suits your needs</p>
+                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-gray-800 dark:text-white">Integration made easy</h2>
+                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-50">Choose the integration option that best suits your needs.</p>
                     </div>
                     <div className="space-y-8 w-full max-w-4xl mx-auto">
                         {integrationOptions.map((option, index) => (

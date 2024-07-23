@@ -1,5 +1,5 @@
 import { Navbar } from '../components/landing/Navbar-not-sticky';
-import { Footer } from '../components/landing/Footer';
+import { Footer } from '../components/landing/Footer-Newsletter';
 import SideNav from '../components/landing/Sidenav';
 
 const Terms = () => {

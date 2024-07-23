@@ -1,6 +1,6 @@
 // Imported
 import { FAQ } from "../../components/landing/FAQ";
-import { Footer } from "../../components/landing/Footer-Homepage";
+import { Footer } from "../../components/landing/Footer";
 import { Hero } from "../../components/landing/Hero";
 import { HowItWorks } from "../../components/landing/HowItWorks";
 import { Navbar } from "../../components/landing/Navbar";
