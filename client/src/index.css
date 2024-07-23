@@ -225,21 +225,6 @@ collapsibleDropdown[data-state='closed'] {
     background-color: #0056b3;
 }
 
-.navbar-fixed {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40; /* Ensure it stays above other content */
-  width: 100%; /* Ensure it spans the full width */
-  background-color: white; /* Adjust as needed */
-  border-bottom: 1px solid #e2e8f0; /* Adjust as needed */
-}
-
-.navbar-placeholder {
-  height: 4rem; /* Adjust this value based on the height of your navbar */
-}
-
 /* New section styles for mobile */
 @media (max-width: 640px) { /* Tailwind's sm breakpoint */
   .relative.flex.items-center.mt-6.group {

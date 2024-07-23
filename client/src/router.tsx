@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-// Home Pages
+// Home and landing Pages
 import Homepage from "./pages/Homepage/Homepage.tsx";
 import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
+import Integrations from './pages/Integrations.tsx';
 import Solutions from './pages/Solutions.tsx';
 import Careers from './pages/Careers.tsx';
 import Template from './pages/Template.tsx';
@@ -29,7 +30,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/dashboard/Dashboard.tsx';
 import Tasks from './pages/tasks/tasks.tsx';
-import Integrations from './pages/integrations/integrations.tsx';
+import DashboardIntegrations from './pages/integrations/integrations.tsx';
 import ExtraComponents from './pages/extra-components/extra-component.tsx';
 import Settings from './pages/settings/settings.tsx';
 import Profile from './pages/settings/profile/index.tsx';
@@ -52,6 +53,7 @@ const AppRouter = () => (
             <Route path="/home" element={<Homepage />} />
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/integrations" element={<Integrations />} />
             <Route path="/solutions" element={<Solutions />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/template" element={<Template />} />
@@ -64,7 +66,7 @@ const AppRouter = () => (
                 <Route index element={<Dashboard />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="chats" element={<Chats />} />
-                <Route path="integrations" element={<Integrations />} />
+                <Route path="integrations" element={<DashboardIntegrations />} />
                 <Route path="users" element={<Users />} />
                 <Route path="analysis" element={<Analysis />} />
                 <Route path="extra-components" element={<ExtraComponents />} />

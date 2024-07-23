@@ -33,6 +33,10 @@ const routeList: RouteProps[] = [
     label: "Resources",
   },
   {
+    href: "/integrations",
+    label: "Integration",
+  },
+  {
     href: "/about",
     label: "About",
   },
@@ -133,11 +137,11 @@ export const Navbar = () => {
         {/* Airtable form modal */}
         {isFormOpen && (
           <div
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+            className="fixed inset-0 flex items-center justify-center z-[100] bg-black bg-opacity-50"
             onClick={() => setIsFormOpen(false)} // Close modal on background click
           >
             <div
-              className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2" // Added mx-4 for smaller margins
+              className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2 max-h-[90vh] overflow-y-auto" // Added max-height and overflow
               onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
             >
               <iframe
