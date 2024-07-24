@@ -3,7 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from '../../lib/useTheme';
 import { Moon, Sun } from "lucide-react";
 
-export function ModeToggle() {
+// Define the props interface to include className
+interface ModeToggleProps {
+  className?: string;
+}
+
+export function ModeToggle({ className }: ModeToggleProps) {
   const { theme, setTheme } = useTheme();
   const [currentTheme, setCurrentTheme] = useState<"dark" | "light">(
     theme === "system"
@@ -36,7 +41,7 @@ export function ModeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="ghost"
+      className={`ghost ${className}`} // Apply the passed className
       onClick={toggleTheme} // Toggle theme on button click
     >
       <Sun className={`h-[1.1rem] w-[1.2rem] transition-all ${currentTheme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`} />

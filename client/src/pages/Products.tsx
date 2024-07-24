@@ -80,7 +80,7 @@ const Products = () => {
                                 Collect Money
                             </h2>
                             <p className="mt-2 text-gray-700 dark:text-gray-300 md:text-lg text-justify">
-                                Accept payments via Card, mobile money, e-wallets, and Pay by bank. Our platform ensures seamless integration and quick processing, making it easy for your customers to pay.
+                                Our platform ensures seamless integration with the payment method you want, making it easy for your customers to pay.
                             </p>
                         </div>
                         <div className="p-6 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md">
@@ -96,7 +96,7 @@ const Products = () => {
                                 Send Money
                             </h2>
                             <p className="mt-2 text-gray-700 dark:text-gray-300 md:text-lg text-justify">
-                                Send payouts quickly and efficiently to anywhere your money needs to go. Our secure and reliable system ensures that your funds reach their destination safely.
+                                Send payouts quickly and efficiently to anywhere your money needs to go. Our secure system ensures that your funds reach their destination safely.
                             </p>
                         </div>
                     </div>

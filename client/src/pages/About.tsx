@@ -1,4 +1,4 @@
-import { Navbar } from '../components/landing/Navbar';
+import { Navbar } from '../components/landing/Navbar-About';
 import { Footer } from '../components/landing/Footer';
 
 const About = () => {
@@ -6,17 +6,18 @@ const About = () => {
         <>
             <Navbar />
             {/* Hero Section */}
-            <section className="relative w-full h-[700px] bg-background overflow-hidden"> {/* Increased height */}
+            <section className="relative w-full h-[1100px] bg-background overflow-hidden"> {/* Increased height */}
                 <div
                     className="absolute inset-0 bg-cover bg-center z-0"
                     style={{
                         backgroundImage: 'url("/transition-star.png")',
                         backgroundPosition: '55% 12%',
-                        backgroundSize: '105%'  // Dezoom the image
+                        backgroundSize: '105%',  // Dezoom the image
+                        backgroundRepeat: 'no-repeat'  // Prevent the image from repeating
                     }}
                 ></div>
                 <div className="container relative h-full flex flex-col justify-center items-center px-4 md:px-6 z-10">
-                    <p className="text-5xl tracking-tighter sm:text-6xl md:text-5xl lg:text-5xl text-center text-white">
+                    <p className="text-5xl tracking-tighter sm:text-6xl md:text-5xl lg:text-5xl text-center text-white mt-[-295px]"> {/* Added negative margin-top */}
                         Our mission is to make online payments simple, secure, and accessible for businesses across West Africa.
                     </p>
                 </div>
@@ -34,37 +35,30 @@ const About = () => {
                             Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. We provide you with the tools you need to sell your products and services, maximize your reach, and connect with your customers wherever they are.
                         </p>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
+                    <div className="space-y-4 mt-12 lg:mt-0"> {/* Added margin-top for spacing on smaller screens */}
+                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">Our values</h2> {/* New heading */}
+                        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 className="text-lg font-semibold mt-0 text-gray-900 dark:text-gray-100">
                                 Innovation
                             </h3>
                             <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                Constantly evolving to meet our clients needs.
+                                Constantly evolving to exceed our clients' and  partners' expectations.
                             </p>
                         </div>
-                        <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
-                                Customer Focus
+                        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 className="text-lg font-semibold mt-0 text-gray-900 dark:text-gray-100">
+                                Customer and Product obsession
                             </h3>
                             <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                Providing exceptional service and exceptional support.
+                                Delivering unparalleled service, unparalleled support.
                             </p>
                         </div>
-                        <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                            <h3 className="text-lg font-semibold mt-0 text-gray-900 dark:text-gray-100">
                                 Integrity
                             </h3>
                             <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                Ensuring trust and transparency in all our operations.
-                            </p>
-                        </div>
-                        <div className="bg-gray-200 dark:bg-gray-700 p-4 rounded-lg">
-                            <h3 className="text-lg font-semibold mt-2 text-gray-900 dark:text-gray-100">
-                                Collaboration
-                            </h3>
-                            <p className="text-gray-700 dark:text-gray-300 mt-1">
-                                Building strong partnerships to create value.
+                                Upholding trust and transparency in every interaction.
                             </p>
                         </div>
                     </div>
