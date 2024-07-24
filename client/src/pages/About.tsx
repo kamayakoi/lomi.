@@ -6,12 +6,13 @@ const About = () => {
         <>
             <Navbar />
             {/* Hero Section */}
-            <section className="relative w-full h-[500px] bg-background overflow-hidden">
+            <section className="relative w-full h-[700px] bg-background overflow-hidden"> {/* Increased height */}
                 <div
                     className="absolute inset-0 bg-cover bg-center z-0"
                     style={{
                         backgroundImage: 'url("/transition-star.png")',
-                        backgroundPosition: '14% 14%'  // Adjust these values
+                        backgroundPosition: '55% 12%',
+                        backgroundSize: '105%'  // Dezoom the image
                     }}
                 ></div>
                 <div className="container relative h-full flex flex-col justify-center items-center px-4 md:px-6 z-10">
