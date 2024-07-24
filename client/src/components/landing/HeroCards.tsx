@@ -83,8 +83,8 @@ export const HeroCards = () => {
         <CardContent>
           <div className="flex justify-center"> {/* Center the button container */}
             <Link to="/sign-in">
-              <Button className="px-6 py-7 rounded-lg"> {/* Adjusted padding */}
-                <span className="text-2xl font-bold">Start</span> {/* Larger text for "Start" */}
+              <Button className="px-6 py-7 rounded-md shadow-lg bg-blue-600 text-white font-semibold text-2xl hover:bg-blue-700"> {/* Adjusted padding and border-radius */}
+                <span className="font-bold">Start</span> {/* Larger text for "Start" */}
                 <span className="text-lg ml-2">— in minutes</span> {/* Smaller text for "in minutes" */}
               </Button>
             </Link>

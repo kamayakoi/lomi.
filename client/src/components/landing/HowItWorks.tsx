@@ -51,7 +51,7 @@ export const HowItWorks = () => {
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
       <h2 className="text-3xl md:text-4xl font-bold">
         How it{" "}
-        <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#1B95E0] text-transparent bg-clip-text">
+        <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text">
           works{" "}
         </span>
       </h2>
