@@ -15,8 +15,8 @@ const About = () => {
                     }}
                 ></div>
                 <div className="container relative h-full flex flex-col justify-center items-center px-4 md:px-6 z-10">
-                    <p className="text-5xl tracking-tighter sm:text-6xl md:text-5xl lg:text-5xl text-justified text-white">
-                        Our mission is to transform the payments landscape in West Africa by providing seamless, secure, and scalable payment solutions.
+                    <p className="text-5xl tracking-tighter sm:text-6xl md:text-5xl lg:text-5xl text-center text-white">
+                        Our mission is to make online payments simple, secure, and accessible for businesses across West Africa.
                     </p>
                 </div>
             </section>
@@ -27,10 +27,10 @@ const About = () => {
                     <div className="space-y-4">
                         <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6">Our story</h2>
                         <p className="text-muted-foreground md:text-xl">
-                            Founded in 2024, lomi. emerged to address the need for better payment solutions in West Africa. Our founder recognized the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.
+                            Founded in 2024, lomi. emerged to address the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.
                         </p>
                         <p className="text-muted-foreground md:text-xl">
-                            With many payment methods and a growing demand for innovative solutions, lomi. focuses on simplicity, security, and scalability, giving businesses and entrepreneurs the tools they need to succeed.
+                            Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. We provide you with the tools you need to sell your products and services, maximize your reach, and connect with your customers wherever they are.
                         </p>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">

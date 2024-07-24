@@ -46,7 +46,7 @@ const Products = () => {
                 <div className="container px-4 md:px-6 flex flex-col lg:flex-row items-center">
                     <div className="lg:w-1/2">
                         <h1 className="text-4xl font-bold tracking-tighter sm:text-6xl xl:text-7xl text-gray-900 dark:text-gray-100">
-                            Frictionless payments for businesses and entrepreneurs
+                            Frictionless payments for businesses
                         </h1>
                         <p className="mt-4 max-w-[600px] text-lg md:text-2xl text-gray-700 dark:text-gray-300 text-left">
                             Integrate online payments and invoicing in minutes.
