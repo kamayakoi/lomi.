@@ -24,7 +24,8 @@ const integrationOptions = [
 ];
 
 const Integrations = () => {
-    const [expandedIndices, setExpandedIndices] = useState<number[]>([]);
+    // Initialize expandedIndices with the index of the "No Code" option (index 2)
+    const [expandedIndices, setExpandedIndices] = useState<number[]>([2]);
 
     const toggleExpand = (index: number) => {
         setExpandedIndices((prevIndices) =>
@@ -70,6 +71,8 @@ const Integrations = () => {
                     </div>
                 </div>
             </div>
+            {/* Add border-b to create a line after the last section */}
+            <div className="border-b border-gray-300 dark:border-gray-700"></div>
             <Footer />
         </div>
     );

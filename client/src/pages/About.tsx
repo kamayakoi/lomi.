@@ -36,7 +36,7 @@ const About = () => {
                                     Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. We provide you with the tools you need to sell your products and services, maximize your reach, and connect with your customers wherever they are.
                                 </p>
                                 {/* Get Started Button */}
-                                <Link to="/integration">
+                                <Link to="/integrations">
                                     <button className="text-xl mt-4 px-6 py-3 bg-red-700 text-white font-semibold rounded-lg shadow-lg  hover:bg-red-800 transition-colors duration-300">
                                         Get Started
                                     </button>
