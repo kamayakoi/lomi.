@@ -6,7 +6,7 @@ const Privacy = () => {
         <>
             <Navbar />
             <div className="bg-background text-dark-text dark:text-light-text"> {/* Adjust text color for light and dark modes */}
-                <main className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+                <main className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
                     <div className="space-y-12"> {/* Increased space between sections */}
                         <div>
                             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Privacy Policy</h1> {/* Increased font size */}

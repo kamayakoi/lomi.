@@ -40,9 +40,12 @@ export const FAQ = () => {
       id="faq"
       className="container py-24 sm:py-32"
     >
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
+        SUPPORT
+      </h3>
       <h2 className="text-3xl md:text-4xl font-bold mb-4">
         Frequently asked{" "}
-        <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text">
+        <span className="inline text-gray-900 dark:text-gray-100">
           questions
         </span>
       </h2>

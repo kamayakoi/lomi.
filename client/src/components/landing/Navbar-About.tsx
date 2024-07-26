@@ -37,8 +37,8 @@ const routeList: RouteProps[] = [
     label: "Resources",
   },
   {
-    href: "/about",
-    label: "About",
+    href: "/home",
+    label: "Home",
   },
 ];
 
@@ -120,13 +120,6 @@ export const Navbar = () => {
           </nav>
 
           <div className="hidden md:flex gap-2 ml-auto pr-4">
-            <button
-              onClick={() => setIsFormOpen(true)}
-              className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })} text-white`} // Ensured text is white
-              style={{ fontSize: '1.06rem', padding: '1rem 1rem' }}
-            >
-              Contact sales
-            </button>
             <ModeToggle className="text-white dark:text-white" />
           </div>
         </NavigationMenuList>

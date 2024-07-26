@@ -1,6 +1,7 @@
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer-Newsletter';
 import SideNav from '../components/landing/Sidenav';
+import { ScrollToTop } from "../components/landing/ScrollToTop";
 
 const Terms = () => {
     const navItems = [
@@ -24,7 +25,7 @@ const Terms = () => {
             <Navbar />
             <SideNav items={navItems} /> {/* Pass the navigation items as props */}
             <div className="bg-background text-dark-text dark:text-light-text"> {/* Adjust text color for light and dark modes */}
-                <main className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+                <main className="container mx-auto max-w-6xl px-8 py-12 sm:px-10 lg:px-12">
                     <div className="space-y-12"> {/* Increased space between sections */}
                         <div>
                             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Terms and Conditions</h1> {/* Increased font size */}
@@ -715,6 +716,7 @@ const Terms = () => {
                     </div>
                 </main>
             </div>
+            <ScrollToTop />
             <Footer />
         </>
     );

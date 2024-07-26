@@ -49,14 +49,19 @@ const products: ProductProps[] = [
 export const HowItWorks = () => {
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
+      {/* New section name */}
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
+        Key Benefits
+      </h3>
+
       <h2 className="text-3xl md:text-4xl font-bold">
-        How it{" "}
-        <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text">
-          works{" "}
+        Why choose {" "}
+        <span className="inline text-gray-900 dark:text-gray-100">
+          us ?{" "}
         </span>
       </h2>
       <p className="md:w-3/4 mx-auto mt-4 mb-8 text-2xl text-muted-foreground">
-        Accept online payments and offer your clients flexibility through our seamless checkout experience and payment methods integrations.
+        Accept online payments and offer your clients flexibility through our seamless checkout experience and payment methods integrations
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

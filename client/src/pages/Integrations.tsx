@@ -37,20 +37,23 @@ const Integrations = () => {
     return (
         <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-500 font-poppins">
             <Navbar />
-            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-gray-50 dark:bg-gray-900">
+            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-gray-50 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
                 <div className="container mx-auto">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-gray-800 dark:text-white">Integration made easy</h2>
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-50">Choose the integration option that best suits your needs.</p>
+                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-50">Choose the integration option that best suits your needs</p>
                     </div>
-                    <div className="space-y-8 w-full max-w-4xl mx-auto">
+                    <div className="space-y-12 w-full max-w-3xl mx-auto">
                         {integrationOptions.map((option, index) => (
-                            <div key={index} className="p-8 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105">
+                            <div
+                                key={index}
+                                className="p-12 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                            >
                                 <div
                                     className="flex justify-between items-center cursor-pointer"
                                     onClick={() => toggleExpand(index)}
                                 >
-                                    <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">{option.title}</h2>
+                                    <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200">{option.title}</h2>
                                     <button className="text-3xl text-gray-600 dark:text-gray-400">{expandedIndices.includes(index) ? '×' : '+'}</button>
                                 </div>
                                 {expandedIndices.includes(index) && (

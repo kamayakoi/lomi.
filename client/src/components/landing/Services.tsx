@@ -34,9 +34,14 @@ export const Services = () => {
     <section id="products" className="container py-24 sm:py-32">
       <div className="grid lg:grid-cols-[1fr,1fr] gap-8 place-items-center">
         <div>
+          {/* New section name */}
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
+            CUSTOMER LOVE
+          </h3>
+
           <h2 className="text-3xl md:text-4xl font-bold">
             Our products{" "}
-            <span className="inline bg-gradient-to-r from-[#F596D3]  to-[#D247BF] text-transparent bg-clip-text">
+            <span className="inline text-gray-900 dark:text-gray-100">
               at launch
             </span>
           </h2>
