@@ -28,6 +28,7 @@ function Homepage() {
       <HowItWorks />
       <Services />
       <FAQ />
+      <div className="border-b border-gray-300 dark:border-gray-700"></div>
       <Footer />
       <ScrollToTop />
     </>

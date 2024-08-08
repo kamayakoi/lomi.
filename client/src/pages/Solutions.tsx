@@ -1,5 +1,5 @@
 import { Navbar } from '../components/landing/Navbar'; // Ensure this path is correct
-import { Footer } from '../components/landing/Footer-Newsletter'; // Ensure this path is correct
+import { Footer } from '../components/landing/Footer'; // Ensure this path is correct
 import { Link } from 'react-router-dom'; // Updated to use 'react-router-dom'
 
 const Solutions = () => {
@@ -65,6 +65,7 @@ const Solutions = () => {
                     </div>
                 </div>
             </section>
+            <div className="border-b border-gray-300 dark:border-gray-700"></div>
             <Footer />
         </div>
     );

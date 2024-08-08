@@ -14,9 +14,7 @@ import {
 
 import { buttonVariants } from '../../lib/button-utils';
 import { Menu } from "lucide-react";
-import { ModeToggle } from "./mode-toggle";
 import { LogoIcon } from "./Icons";
-
 
 interface RouteProps {
   href: string;
@@ -55,7 +53,7 @@ export const Navbar = () => {
               <a
                 rel="lomi.africa"
                 href="/"
-                className="ml-2 font-bold text-xl flex items-center text-white" // Ensured text is white
+                className="ml-2 font-bold text-xl flex items-center text-white"
                 style={{ fontSize: '1.5rem' }}
               >
                 <LogoIcon />
@@ -66,12 +64,10 @@ export const Navbar = () => {
 
           {/* mobile */}
           <span className="flex md:hidden ml-auto pr-4">
-            <ModeToggle />
-
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger className="px-2">
                 <Menu
-                  className="flex md:hidden h-5 w-5 text-white" // Ensured text is white
+                  className="flex md:hidden h-5 w-5 text-white"
                   onClick={() => setIsOpen(true)}
                 >
                   <span className="sr-only">Menu Icon</span>
@@ -80,7 +76,7 @@ export const Navbar = () => {
 
               <SheetContent side={"left"}>
                 <SheetHeader>
-                  <SheetTitle className="font-bold text-xl text-white" style={{ fontSize: '1.2rem' }}> {/* Ensured text is white */}
+                  <SheetTitle className="font-bold text-xl text-white" style={{ fontSize: '1.2rem' }}>
                     lomi.africa
                   </SheetTitle>
                 </SheetHeader>
@@ -91,7 +87,7 @@ export const Navbar = () => {
                       key={label}
                       href={href}
                       onClick={() => setIsOpen(false)}
-                      className={`${buttonVariants({ variant: "ghost" })} text-white`} // Ensured text is white
+                      className={`${buttonVariants({ variant: "ghost" })} text-white`}
                       style={{ fontSize: '1.06rem' }}
                     >
                       {label}
@@ -111,17 +107,13 @@ export const Navbar = () => {
                 key={i}
                 className={`text-[17px] ${buttonVariants({
                   variant: "ghost",
-                })} text-white`} // Ensured text is white
+                })} text-white`}
                 style={{ fontSize: '1.06rem' }}
               >
                 {route.label}
               </a>
             ))}
           </nav>
-
-          <div className="hidden md:flex gap-2 ml-auto pr-4">
-            <ModeToggle className="text-white dark:text-white" />
-          </div>
         </NavigationMenuList>
       </NavigationMenu>
 
@@ -129,11 +121,11 @@ export const Navbar = () => {
       {isFormOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          onClick={() => setIsFormOpen(false)} // Close modal on background click
+          onClick={() => setIsFormOpen(false)}
         >
           <div
-            className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2" // Added mx-4 for smaller margins
-            onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
+            className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2"
+            onClick={(e) => e.stopPropagation()}
           >
             <iframe
               className="airtable-embed"
