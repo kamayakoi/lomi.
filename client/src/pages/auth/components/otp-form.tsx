@@ -11,40 +11,63 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
+import { supabase } from '@/utils/supabase/client'
+import { toast } from '@/components/ui/use-toast'
+import { useNavigate } from 'react-router-dom'
 
-interface OtpFormProps extends HTMLAttributes<HTMLDivElement> { }
+interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {
+  email: string; // Add this line
+}
 
 const formSchema = z.object({
   otp: z.string().min(1, { message: 'Please enter your otp code.' }),
 })
 
-export function OtpForm({ className, ...props }: OtpFormProps) {
+export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add email here
   const [isLoading, setIsLoading] = useState(false)
   const [disabledBtn, setDisabledBtn] = useState(true)
+  const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { otp: '' },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    console.log({ data })
-
-    setTimeout(() => {
-      form.reset()
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: email, // Add this line
+        token: data.otp,
+        type: 'email',
+      })
+      if (error) throw error
+      toast({
+        title: "Success",
+        description: "OTP verified successfully.",
+      })
+      navigate('/portal') // Redirect to portal after successful verification
+    } catch (error) {
+      console.error('Error during OTP verification:', error)
+      toast({
+        title: "Error",
+        description: "Invalid OTP. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-    }, 2000)
+      form.reset()
+    }
   }
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-4'> {/* Increased gap to add space between elements */}
+          <div className='grid gap-4'>
             <FormField
               control={form.control}
               name='otp'
@@ -63,7 +86,7 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
                         return (
                           <PinInputField
                             key={i}
-                            component={Input}
+                            component={Input} // This should now work with the import
                             className={`${form.getFieldState('otp').invalid ? 'border-red-500' : ''}`}
                           />
                         )

@@ -1,7 +1,53 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
 import { SignUpForm } from './components/sign-up-form'
+import { supabase } from '@/utils/supabase/client'
+import { toast } from '@/components/ui/use-toast'
 
 export default function SignUp() {
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSignUp = async (data: { email: string; password: string; name: string }) => {
+    setIsLoading(true)
+    try {
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+          },
+        },
+      })
+      if (error) throw error
+      if (authData.user) {
+        toast({
+          title: "Account created successfully",
+          description: "Please complete the onboarding process.",
+        })
+        navigate('/onboarding')
+      } else {
+        // Handle the case where user is not created
+        toast({
+          title: "Error",
+          description: "There was a problem creating your account.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error('Error signing up:', error)
+      toast({
+        title: "Error",
+        description: "There was a problem creating your account.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <>
       <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
@@ -13,7 +59,7 @@ export default function SignUp() {
               </h1>
             </div>
             <div className='mb-4'></div>
-            <SignUpForm />
+            <SignUpForm onSubmit={handleSignUp} isLoading={isLoading} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               By creating an account, you agree to our{' '}
               <a

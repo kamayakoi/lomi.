@@ -1,4 +1,7 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { User } from '@supabase/supabase-js';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/utils/supabase/client';
 
 // Home and landing Pages
 import Homepage from "./pages/Homepage/Homepage.tsx";
@@ -20,6 +23,9 @@ import Login from './pages/auth/log-in.tsx';
 import Signup from './pages/auth/sign-up.tsx';
 import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
+import Onboarding from './pages/auth/onboarding.tsx';
+import AuthCallback from './pages/auth/auth-callback.tsx';
+
 
 // Error Pages
 import GeneralError from './pages/errors/general-error.tsx';
@@ -45,6 +51,24 @@ import Chats from "./components/dashboard/coming-soon";
 import Users from "./components/dashboard/coming-soon";
 import Analysis from "./components/dashboard/coming-soon";
 
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            setLoading(false);
+        };
+        checkUser();
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <Navigate to="/sign-in" />;
+    return <>{children}</>;
+};
+
 const AppRouter = () => (
     <Router>
         <Routes>
@@ -62,7 +86,11 @@ const AppRouter = () => (
             <Route path="/fr" element={<HomepageFR />} />
 
             {/* Dashboard routes */}
-            <Route path="/portal" element={<AppShell />}>
+            <Route path="/portal" element={
+                <ProtectedRoute>
+                    <AppShell />
+                </ProtectedRoute>
+            }>
                 <Route index element={<Dashboard />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="chats" element={<Chats />} />
@@ -86,6 +114,8 @@ const AppRouter = () => (
             <Route path="/sign-up" element={<Signup />} />
             <Route path="/forgot-password" element={<Forgot />} />
             <Route path="/otp" element={<OTP />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Error routes */}
             <Route path="/500" element={<GeneralError />} />

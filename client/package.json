@@ -23,7 +23,12 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:init": "npx supabase init",
+  "supabase:start": "npx supabase start",
+  "supabase:stop": "npx supabase stop",
+  "supabase:status": "npx supabase status",
+  "supabase:db:reset": "npx supabase db reset"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
@@ -47,6 +52,8 @@
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.45.1",
     "@tabler/icons-react": "^3.10.0",
     "@tanstack/react-table": "^8.19.2",
     "@vercel/analytics": "^1.3.1",

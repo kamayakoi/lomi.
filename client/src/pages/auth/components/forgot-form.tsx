@@ -12,8 +12,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { supabase } from '@/utils/supabase/client'
+import { toast } from '@/components/ui/use-toast'
 
-interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> { }
+interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> {
+  onSuccess?: () => void; // Added onSuccess prop
+}
 
 const formSchema = z.object({
   email: z
@@ -22,7 +26,7 @@ const formSchema = z.object({
     .email({ message: 'Invalid email address' }),
 })
 
-export function ForgotForm({ className, ...props }: ForgotFormProps) {
+export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -30,13 +34,28 @@ export function ForgotForm({ className, ...props }: ForgotFormProps) {
     defaultValues: { email: '' },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    console.log(data)
-
-    setTimeout(() => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      })
+      if (error) throw error
+      toast({
+        title: "Success",
+        description: "Password reset email sent. Please check your inbox.",
+      })
+      if (onSuccess) onSuccess(); // Call onSuccess if provided
+    } catch (error) {
+      console.error('Error during password reset:', error)
+      toast({
+        title: "Error",
+        description: "There was a problem sending the password reset email. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
       setIsLoading(false)
-    }, 3000)
+    }
   }
 
   return (
