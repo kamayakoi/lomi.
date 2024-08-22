@@ -16,6 +16,10 @@ const AuthCallback = () => {
                 if (user?.user_metadata?.onboarded) {
                     navigate('/portal');
                 } else {
+                    // Set onboarded to false for new OAuth users
+                    await supabase.auth.updateUser({
+                        data: { onboarded: false }
+                    });
                     navigate('/onboarding');
                 }
             } else {
