@@ -13,12 +13,16 @@ const Onboarding: React.FC = () => {
     useEffect(() => {
         const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                navigate('/sign-in');
-            } else {
+            if (user) {
                 setUser(user);
-                setLoading(false);
+                if (user.user_metadata.onboarded) {
+                    navigate('/portal');
+                }
+            } else {
+                // If no user, wait for a short time and check again
+                setTimeout(checkUser, 1000);
             }
+            setLoading(false);
         };
         checkUser();
     }, [navigate]);
@@ -48,6 +52,18 @@ const Onboarding: React.FC = () => {
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    if (!user) {
+        return (
+            <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
+                <Card className='p-6'>
+                    <h1 className='text-2xl font-semibold tracking-tight'>Authentication Required</h1>
+                    <p>Please sign in to complete your onboarding.</p>
+                    <Button onClick={() => navigate('/sign-in')} className="mt-4">Sign In</Button>
+                </Card>
+            </div>
+        );
     }
 
     return (

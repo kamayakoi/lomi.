@@ -12,7 +12,7 @@ export default function SignUp() {
   const handleSignUp = async (data: { email: string; password: string; name: string }) => {
     setIsLoading(true)
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -23,11 +23,18 @@ export default function SignUp() {
         },
       })
       if (error) throw error
-      toast({
-        title: "Account created successfully",
-        description: "Please check your email for the verification link.",
-      })
-      navigate('/onboarding')
+      if (authData.user) {
+        toast({
+          title: "Account created successfully",
+          description: "You will now be redirected to complete your profile.",
+        })
+        navigate('/onboarding')
+      } else {
+        toast({
+          title: "Account created",
+          description: "Please check your email for the verification link.",
+        })
+      }
       return true
     } catch (error) {
       console.error('Error signing up:', error)

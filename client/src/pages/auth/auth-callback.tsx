@@ -13,17 +13,13 @@ const AuthCallback = () => {
                 navigate('/sign-in');
             } else if (data?.session) {
                 const { data: { user } } = await supabase.auth.getUser();
-                if (user?.user_metadata?.onboarded) {
-                    navigate('/portal');
-                } else {
-                    // Set onboarded to false for new OAuth users
-                    await supabase.auth.updateUser({
-                        data: { onboarded: false }
-                    });
+                if (user?.email_confirmed_at) {
                     navigate('/onboarding');
+                } else {
+                    navigate('/sign-in');
                 }
             } else {
-                navigate('/sign-up');
+                navigate('/sign-in');
             }
         };
 
