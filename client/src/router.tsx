@@ -57,7 +57,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
         const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                setUser(user);
+                if (!user.user_metadata?.onboarded) {
+                    navigate('/onboarding');
+                } else {
+                    setUser(user);
+                }
             } else {
                 navigate('/sign-in');
             }

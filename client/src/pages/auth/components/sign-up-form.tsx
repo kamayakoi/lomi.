@@ -68,10 +68,14 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `https://www.lomi.africa/auth/callback`,
         }
       });
       if (error) throw error;
+      toast({
+        title: "Success",
+        description: `Signed up with ${provider} successfully. You will be redirected to complete your profile.`,
+      });
     } catch (error) {
       console.error(`Error signing up with ${provider}:`, error);
       toast({

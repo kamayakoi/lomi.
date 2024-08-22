@@ -12,9 +12,14 @@ const AuthCallback = () => {
                 console.error('Error during auth callback:', error);
                 navigate('/sign-in');
             } else if (data?.session) {
-                navigate('/portal');
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user?.user_metadata?.onboarded) {
+                    navigate('/portal');
+                } else {
+                    navigate('/onboarding');
+                }
             } else {
-                navigate('/sign-in');
+                navigate('/sign-up');
             }
         };
 

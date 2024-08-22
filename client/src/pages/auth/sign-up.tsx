@@ -18,6 +18,7 @@ export default function SignUp() {
         options: {
           data: {
             name: data.name,
+            onboarded: false,
           },
         },
       })
