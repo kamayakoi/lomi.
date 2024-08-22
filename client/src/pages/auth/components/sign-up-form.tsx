@@ -65,17 +65,13 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
 
   const handleOAuthSignUp = async (provider: 'github' | 'google') => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `https://www.lomi.africa/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback`
         }
       });
-      if (error) {
-        console.error(`Error signing up with ${provider}:`, error);
-        throw error;
-      }
-      console.log('OAuth sign-up successful:', data);
+      if (error) throw error;
     } catch (error) {
       console.error(`Error signing up with ${provider}:`, error);
       toast({

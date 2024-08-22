@@ -1,5 +1,5 @@
 import { User } from '@supabase/supabase-js';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/utils/supabase/client';
 
@@ -51,22 +51,23 @@ import Analysis from "./components/dashboard/coming-soon";
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            if (user && user.email_confirmed_at) {
+            if (user) {
                 setUser(user);
             } else {
-                setUser(null);
+                navigate('/sign-in');
             }
             setLoading(false);
         };
         checkUser();
-    }, []);
+    }, [navigate]);
 
     if (loading) return <div>Loading...</div>;
-    if (!user) return <Navigate to="/sign-in" />;
+    if (!user) return null;
     return <>{children}</>;
 };
 
