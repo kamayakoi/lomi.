@@ -55,7 +55,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     useEffect(() => {
         const checkUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
+            if (user && user.email_confirmed_at) {
+                setUser(user);
+            } else {
+                setUser(null);
+            }
             setLoading(false);
         };
         checkUser();

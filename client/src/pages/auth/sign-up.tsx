@@ -12,7 +12,7 @@ export default function SignUp() {
   const handleSignUp = async (data: { email: string; password: string; name: string }) => {
     setIsLoading(true)
     try {
-      const { data: authData, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -22,20 +22,12 @@ export default function SignUp() {
         },
       })
       if (error) throw error
-      if (authData.user) {
-        toast({
-          title: "Account created successfully",
-          description: "Please complete the onboarding process.",
-        })
-        navigate('/onboarding')
-      } else {
-        // Handle the case where user is not created
-        toast({
-          title: "Error",
-          description: "There was a problem creating your account.",
-          variant: "destructive",
-        })
-      }
+      toast({
+        title: "Account created successfully",
+        description: "Please check your email for the verification link.",
+      })
+      navigate('/onboarding')
+      return true
     } catch (error) {
       console.error('Error signing up:', error)
       toast({
@@ -43,6 +35,7 @@ export default function SignUp() {
         description: "There was a problem creating your account.",
         variant: "destructive",
       })
+      return false
     } finally {
       setIsLoading(false)
     }

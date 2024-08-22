@@ -18,7 +18,7 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 
 interface SignUpFormCustomProps {
-  onSubmit: (data: { email: string; password: string; name: string }) => Promise<void>
+  onSubmit: (data: { email: string; password: string; name: string }) => Promise<boolean>
   isLoading: boolean
 }
 
@@ -49,8 +49,10 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
 
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
-      await onSubmit(data)
-      setIsConfirmationSent(true)
+      const success = await onSubmit(data)
+      if (success) {
+        setIsConfirmationSent(true)
+      }
     } catch (error) {
       console.error('Error during sign up:', error)
       toast({
