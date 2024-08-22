@@ -14,9 +14,6 @@ import Template from './pages/Template.tsx';
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
-// FR Pages
-import HomepageFR from "./pages/Homepage/Homepage.tsx";
-
 // Connect Pages
 import Signin from './pages/auth/sign-in.tsx';
 import Login from './pages/auth/log-in.tsx';
@@ -83,7 +80,6 @@ const AppRouter = () => (
             <Route path="/template" element={<Template />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/fr" element={<HomepageFR />} />
 
             {/* Dashboard routes */}
             <Route path="/portal" element={
