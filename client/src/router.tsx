@@ -1,7 +1,7 @@
-import { User } from '@supabase/supabase-js';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/utils/supabase/client';
+// import { User } from '@supabase/supabase-js';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+// import { useState, useEffect } from 'react';
+// import { supabase } from '@/utils/supabase/client';
 
 // Home and landing Pages
 import Homepage from "./pages/Homepage/Homepage.tsx";
@@ -48,32 +48,32 @@ import Chats from "./components/dashboard/coming-soon";
 import Users from "./components/dashboard/coming-soon";
 import Analysis from "./components/dashboard/coming-soon";
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+// const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+//     const [user, setUser] = useState<User | null>(null);
+//     const [loading, setLoading] = useState(true);
+//     const navigate = useNavigate();
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                if (!user.user_metadata?.onboarded) {
-                    navigate('/onboarding');
-                } else {
-                    setUser(user);
-                }
-            } else {
-                navigate('/sign-in');
-            }
-            setLoading(false);
-        };
-        checkUser();
-    }, [navigate]);
+//     useEffect(() => {
+//         const checkUser = async () => {
+//             const { data: { user } } = await supabase.auth.getUser();
+//             if (user) {
+//                 if (!user.user_metadata?.onboarded) {
+//                     navigate('/onboarding');
+//                 } else {
+//                     setUser(user);
+//                 }
+//             } else {
+//                 navigate('/sign-in');
+//             }
+//             setLoading(false);
+//         };
+//         checkUser();
+//     }, [navigate]);
 
-    if (loading) return <div>Loading...</div>;
-    if (!user) return null;
-    return <>{children}</>;
-};
+//     if (loading) return <div>Loading...</div>;
+//     if (!user) return null;
+//     return <>{children}</>;
+// };
 
 const AppRouter = () => (
     <Router>
@@ -91,11 +91,14 @@ const AppRouter = () => (
             <Route path="/privacy" element={<Privacy />} />
 
             {/* Dashboard routes */}
-            <Route path="/portal" element={
+            {/* Commented out ProtectedRoute for /portal temporarily */}
+            {/* <Route path="/portal" element={
                 <ProtectedRoute>
                     <AppShell />
                 </ProtectedRoute>
-            }>
+            }> */}
+            <Route path="/portal" element={<AppShell />}>
+                {/* End of comment */}
                 <Route index element={<Dashboard />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="chats" element={<Chats />} />
