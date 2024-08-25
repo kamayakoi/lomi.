@@ -53,8 +53,8 @@ export interface OrganizationPaymentMethod {
   id: number;
   organization_id: number;
   payment_method_id: number;
-  phone_number: string;
-  card_number: string;
+  phone_number?: string;
+  card_number?: string;
   created_at: string;
 }
 
@@ -68,7 +68,6 @@ export interface Account {
   account_id: number;
   user_id: number;
   payment_method_id: number;
-  balance: number;
   currency_id: number;
   created_at: string;
 }
@@ -76,7 +75,6 @@ export interface Account {
 export interface MainAccount {
   main_account_id: number;
   user_id: number;
-  balance: number;
   currency_id: number;
   created_at: string;
 }
@@ -85,9 +83,8 @@ export interface EndCustomer {
   end_customer_id: number;
   user_id: number;
   name: string;
-  email: string;
-  phone_number: string;
-  card_number: string;
+  email?: string;
+  phone_number?: string;
   country_code: string;
   created_at: string;
   updated_at: string;
@@ -100,7 +97,8 @@ export interface Transaction {
   organization_id: number;
   user_id: number;
   amount: number;
-  fee: number;
+  fee_amount: number;
+  fee_id: number;
   currency_id: number;
   status: string;
   transaction_type: string;
@@ -108,6 +106,14 @@ export interface Transaction {
   metadata: any;
   created_at: string;
   updated_at: string;
+}
+
+export interface EndCustomerPaymentMethod {
+  id: number;
+  end_customer_id: number;
+  payment_method_id: number;
+  card_number?: string;
+  created_at: string;
 }
 
 export interface Fee {

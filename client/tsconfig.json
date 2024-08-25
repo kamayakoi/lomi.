@@ -29,7 +29,8 @@
         }
     },
     "include": [
-        "src"
+        "src",
+        "api/routes/server.js"
     ],
     "references": [
         {

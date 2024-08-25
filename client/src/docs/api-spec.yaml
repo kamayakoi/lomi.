@@ -1,0 +1,30 @@
+// API Endpoints and Request/Response Formats
+
+// Client Management
+POST /clients
+  Request: { name, email, apiKey }
+  Response: { clientId, name, email, apiKey, createdAt }
+
+GET /clients/:clientId
+  Response: { clientId, name, email, apiKey, createdAt }
+
+PUT /clients/:clientId
+  Request: { name, email }
+  Response: { clientId, name, email, apiKey, createdAt, updatedAt }
+
+// Payment Processing
+POST /payments
+  Request: { clientId, amount, currency, paymentMethod, endCustomerDetails }
+  Response: { transactionId, status, amount, currency, paymentMethod, createdAt }
+
+GET /payments/:transactionId
+  Response: { transactionId, status, amount, currency, paymentMethod, createdAt }
+
+// Transaction Management
+GET /transactions
+  Request: { clientId, startDate, endDate }
+  Response: [{ transactionId, status, amount, currency, paymentMethod, createdAt }, ...]
+
+POST /refunds
+  Request: { transactionId, amount }
+  Response: { refundId, transactionId, status, amount, createdAt }

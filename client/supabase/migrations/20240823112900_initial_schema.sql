@@ -72,8 +72,8 @@ CREATE TABLE organization_payment_methods (
   id BIGSERIAL PRIMARY KEY,
   organization_id BIGINT NOT NULL REFERENCES organizations(organization_id),
   payment_method_id BIGINT NOT NULL REFERENCES payment_methods(payment_method_id),
-  phone_number VARCHAR NOT NULL,
-  card_number VARCHAR NOT NULL,
+  phone_number VARCHAR,
+  card_number VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -92,7 +92,6 @@ CREATE TABLE accounts (
   account_id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(user_id),
   payment_method_id BIGINT NOT NULL REFERENCES payment_methods(payment_method_id),
-  balance BIGINT NOT NULL DEFAULT 0,
   currency_id INTEGER NOT NULL REFERENCES currencies(currency_id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -105,7 +104,6 @@ CREATE INDEX idx_accounts_currency_id ON accounts(currency_id);
 CREATE TABLE main_accounts (
   main_account_id BIGSERIAL PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(user_id),
-  balance BIGINT NOT NULL DEFAULT 0,
   currency_id INTEGER NOT NULL REFERENCES currencies(currency_id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -119,7 +117,7 @@ CREATE TABLE end_customers (
   user_id BIGINT NOT NULL REFERENCES users(user_id),
   name VARCHAR NOT NULL,
   email VARCHAR,
-  phone_number VARCHAR NOT NULL,
+  phone_number VARCHAR,
   card_number VARCHAR,
   country_code VARCHAR NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -127,6 +125,30 @@ CREATE TABLE end_customers (
 );
 
 CREATE INDEX idx_end_customers_user_id ON end_customers(user_id);
+
+-- End customer payment methods table
+CREATE TABLE end_customer_payment_methods (
+  id BIGSERIAL PRIMARY KEY,
+  end_customer_id BIGINT NOT NULL REFERENCES end_customers(end_customer_id),
+  payment_method_id BIGINT NOT NULL REFERENCES payment_methods(payment_method_id),
+  card_number VARCHAR,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_end_customer_payment_methods_end_customer_id ON end_customer_payment_methods(end_customer_id);
+CREATE INDEX idx_end_customer_payment_methods_payment_method_id ON end_customer_payment_methods(payment_method_id);
+
+-- Fees table
+CREATE TABLE fees (
+  fee_id BIGSERIAL PRIMARY KEY,
+  transaction_type VARCHAR NOT NULL,
+  fee_percentage DECIMAL(5, 2) NOT NULL,
+  fee_fixed BIGINT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_fees_transaction_type ON fees(transaction_type);
 
 -- Transactions table
 CREATE TABLE transactions (
@@ -136,7 +158,8 @@ CREATE TABLE transactions (
   organization_id BIGINT NOT NULL REFERENCES organizations(organization_id),
   user_id BIGINT NOT NULL REFERENCES users(user_id),
   amount BIGINT NOT NULL,
-  fee BIGINT NOT NULL DEFAULT 0,
+  fee_amount BIGINT NOT NULL,
+  fee_id BIGINT REFERENCES fees(fee_id),
   currency_id INTEGER NOT NULL REFERENCES currencies(currency_id),
   status VARCHAR NOT NULL CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
   transaction_type VARCHAR NOT NULL,
@@ -151,20 +174,10 @@ CREATE INDEX idx_transactions_payment_method_id ON transactions(payment_method_i
 CREATE INDEX idx_transactions_organization_id ON transactions(organization_id);
 CREATE INDEX idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX idx_transactions_currency_id ON transactions(currency_id);
+CREATE INDEX idx_transactions_fee_id ON transactions(fee_id);
 
 COMMENT ON COLUMN transactions.payment_info IS 'Details like phone number, card number, etc.';
-
--- Fees table
-CREATE TABLE fees (
-  fee_id BIGSERIAL PRIMARY KEY,
-  transaction_type VARCHAR NOT NULL,
-  fee_percentage DECIMAL(5, 2) NOT NULL,
-  fee_fixed BIGINT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_fees_transaction_type ON fees(transaction_type);
+COMMENT ON COLUMN transactions.fee_amount IS 'Actual fee amount charged for this transaction';
 
 -- Refunds table
 CREATE TABLE refunds (
