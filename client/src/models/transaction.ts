@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { Transaction } from '../types';
+import { createPaymentIntent } from '@/partners/stripe/payments';
 
 const pool = new Pool({
   // Database connection configuration
@@ -9,7 +10,23 @@ export async function createTransaction(end_customer_id: number, payment_method_
   const query = 'SELECT * FROM create_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
   const values = [end_customer_id, payment_method_id, organization_id, user_id, amount, fee_amount, fee_id, currency_id, status, transaction_type, payment_info];
   const result = await pool.query(query, values);
-  return result.rows[0];
+  const transaction = result.rows[0];
+
+  const stripeAccountId = await getMerchantStripeAccountId(organization_id);
+
+  const paymentIntent = await createPaymentIntent(transaction, stripeAccountId);
+
+  await updateTransactionWithStripeId(transaction.transaction_id, paymentIntent.id);
+
+  return transaction;
+}
+
+async function getMerchantStripeAccountId(organizationId: number): Promise<string> {
+  // Retrieve the Stripe account ID for the given organization
+}
+
+async function updateTransactionWithStripeId(transactionId: number, stripePaymentIntentId: string): Promise<void> {
+  // Update the transaction record with the Stripe PaymentIntent ID
 }
 
 export async function getTransactionById(transactionId: number): Promise<Transaction | null> {

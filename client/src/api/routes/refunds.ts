@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { transaction_id, user_id, amount, currency_id, reason } = req.body;
-    const newRefund = await createRefund(transaction_id, user_id, amount, currency_id, reason);
+    const { transaction_id, amount, currency_id, reason } = req.body;
+    const newRefund = await createRefund(transaction_id, amount, currency_id, reason);
     res.status(201).json(newRefund);
   } catch (error) {
     res.status(500).json({ error: 'Error creating refund' });

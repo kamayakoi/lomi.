@@ -7,6 +7,7 @@ export interface User {
   is_admin: boolean;
   verified: boolean;
   user_type: string;
+  country: string;
   metadata: any;
   created_at: string;
   updated_at: string;

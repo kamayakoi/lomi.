@@ -1,30 +1,263 @@
-// API Endpoints and Request/Response Formats
+openapi: 3.0.0
+info:
+  title: lomi. Payment Gateway API
+  description: API for managing clients, processing payments, and handling transactions
+  version: 1.0.0
 
-// Client Management
-POST /clients
-  Request: { name, email, apiKey }
-  Response: { clientId, name, email, apiKey, createdAt }
+servers:
+  - url: https://api.example.com/v1
 
-GET /clients/:clientId
-  Response: { clientId, name, email, apiKey, createdAt }
-
-PUT /clients/:clientId
-  Request: { name, email }
-  Response: { clientId, name, email, apiKey, createdAt, updatedAt }
-
-// Payment Processing
-POST /payments
-  Request: { clientId, amount, currency, paymentMethod, endCustomerDetails }
-  Response: { transactionId, status, amount, currency, paymentMethod, createdAt }
-
-GET /payments/:transactionId
-  Response: { transactionId, status, amount, currency, paymentMethod, createdAt }
-
-// Transaction Management
-GET /transactions
-  Request: { clientId, startDate, endDate }
-  Response: [{ transactionId, status, amount, currency, paymentMethod, createdAt }, ...]
-
-POST /refunds
-  Request: { transactionId, amount }
-  Response: { refundId, transactionId, status, amount, createdAt }
+paths:
+  /clients:
+    post:
+      summary: Create a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClientRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+                
+  /clients/{clientId}:
+    get:
+      summary: Get a client by ID
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: Client not found
+          
+    put:
+      summary: Update a client
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '404':
+          description: Client not found
+          
+  /payments:
+    post:
+      summary: Process a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+                
+  /payments/{transactionId}:
+    get:
+      summary: Get a payment by transaction ID
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          description: Payment not found
+          
+  /transactions:
+    get:
+      summary: Get transactions for a client
+      parameters:
+        - name: clientId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:    
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+                  
+  /refunds:
+    post:
+      summary: Process a refund
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRefundRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:    
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+                
+components:
+  schemas:
+    CreateClientRequest:
+      type: object
+      required:
+        - name
+        - email
+        - apiKey
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        apiKey:
+          type: string
+          
+    UpdateClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+          
+    ClientResponse:
+      type: object
+      properties:
+        clientId:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        apiKey:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          
+    CreatePaymentRequest:
+      type: object
+      required:
+        - clientId
+        - amount
+        - currency
+        - paymentMethod
+        - endCustomerDetails
+      properties:
+        clientId:
+          type: integer
+        amount:
+          type: number
+        currency:
+          type: string
+        paymentMethod:
+          type: string
+        endCustomerDetails:
+          type: object
+          
+    PaymentResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        paymentMethod:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          
+    TransactionResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+        paymentMethod:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          
+    CreateRefundRequest:
+      type: object
+      required:
+        - transactionId
+        - amount
+      properties:
+        transactionId:
+          type: string
+        amount:
+          type: number
+          
+    RefundResponse:

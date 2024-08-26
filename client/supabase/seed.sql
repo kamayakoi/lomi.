@@ -13,4 +13,4 @@ INSERT INTO providers (name, description) VALUES
 INSERT INTO payment_methods (name, description, provider_id) VALUES
   ('Card', 'Credit/Debit Card', (SELECT provider_id FROM providers WHERE name = 'Mastercard')),
   ('Mobile Money', 'MTN Mobile Money', (SELECT provider_id FROM providers WHERE name = 'MTN')),
-  ('Cash', 'Cash Payment', NULL);
+  ('Cash', 'Cash Payment', (SELECT provider_id FROM providers WHERE name = 'Generic'));

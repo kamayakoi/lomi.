@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { account_id, amount, currency_id, destination, status } = req.body;
-    const newPayout = await createPayout(account_id, amount, currency_id, destination, status);
+    const { account_id, amount, currency_id, status } = req.body;
+    const newPayout = await createPayout(account_id, amount, currency_id, status);
     res.status(201).json(newPayout);
   } catch (error) {
     res.status(500).json({ error: 'Error creating payout' });
