@@ -43,6 +43,8 @@ CREATE TABLE users (
 
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_active_users ON users(user_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_created_by ON users(created_by);
+CREATE INDEX idx_users_updated_by ON users(updated_by);
 
 COMMENT ON TABLE users IS 'Stores information about all users of the system, including users and admins';
 
@@ -55,6 +57,12 @@ CREATE TABLE organizations (
   country VARCHAR NOT NULL,
   status organization_status NOT NULL DEFAULT 'active',
   metadata JSONB,
+  max_transactions_per_day INT,
+  max_providers INT,
+  max_transaction_amount NUMERIC(15,2),
+  max_monthly_volume NUMERIC(15,2),
+  max_api_calls_per_minute INT,
+  max_webhooks INT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_by UUID REFERENCES users(user_id),
@@ -63,6 +71,8 @@ CREATE TABLE organizations (
 );
 
 CREATE INDEX idx_organizations_email ON organizations(email);
+CREATE INDEX idx_organizations_created_by ON organizations(created_by);
+CREATE INDEX idx_organizations_updated_by ON organizations(updated_by);
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
 
@@ -103,6 +113,8 @@ CREATE TABLE payment_methods (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_payment_methods_provider_code ON payment_methods(provider_code);
 
 COMMENT ON TABLE payment_methods IS 'Examples: CARD, MOBILE_MONEY, CASH, BANK_TRANSFER';
 
@@ -168,6 +180,7 @@ CREATE TABLE end_customers (
   phone_number VARCHAR,
   card_number VARCHAR,
   country_code VARCHAR(4) NOT NULL,
+  data JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -256,6 +269,7 @@ CREATE TABLE entries (
   account_id UUID NOT NULL REFERENCES accounts(account_id),
   transaction_id UUID REFERENCES transactions(transaction_id),
   amount NUMERIC(10,2) NOT NULL,
+  entry_type VARCHAR(20),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -350,21 +364,6 @@ CREATE INDEX idx_logs_created_at ON logs(created_at);
 
 COMMENT ON TABLE logs IS 'Audit log for tracking important actions and events in the system';
 
--- Organization quotas table
-CREATE TABLE organization_quotas (
-  organization_id UUID PRIMARY KEY REFERENCES organizations(organization_id),
-  max_transactions_per_day INT,
-  max_providers INT,
-  max_transaction_amount NUMERIC(15,2),
-  max_monthly_volume NUMERIC(15,2),
-  max_api_calls_per_minute INT,
-  max_webhooks INT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-COMMENT ON TABLE organization_quotas IS 'Defines quotas and limits for each organization';
-
 -- Recurring Payments table
 CREATE TABLE recurring_payments (
   recurring_payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -434,12 +433,10 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'organizations_phone_number_unique') THEN
     ALTER TABLE organizations ADD CONSTRAINT organizations_phone_number_unique UNIQUE (phone_number);
   END IF;
-
-  -- Removed constraints for end_customers
 END $$;
 
 -- Create UNIQUE indexes for combinations that should be unique
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_org_links_unique ON user_organization_links(user_id, organization_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_org_links_unique ON user_organization_links(user_id, organization_id, role);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_org_providers_unique ON organization_providers(organization_id, provider_code);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_unique ON accounts(user_id, payment_method_code, currency_code);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_main_accounts_unique ON main_accounts(user_id, currency_code);
@@ -448,3 +445,16 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_end_customer_payment_methods_unique ON end
 -- Partial Indexes
 CREATE INDEX idx_transactions_pending ON transactions(transaction_id) WHERE status = 'pending';
 CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE status = 'completed';
+
+-- Add CHECK constraints for positive numeric fields
+ALTER TABLE accounts ADD CONSTRAINT check_accounts_balance_positive CHECK (balance >= 0);
+ALTER TABLE main_accounts ADD CONSTRAINT check_main_accounts_balance_positive CHECK (balance >= 0);
+ALTER TABLE fees ADD CONSTRAINT check_fees_amount_positive CHECK (amount > 0);
+ALTER TABLE transactions ADD CONSTRAINT check_transactions_amount_positive CHECK (amount > 0);
+ALTER TABLE refunds ADD CONSTRAINT check_refunds_amount_positive CHECK (amount > 0);
+ALTER TABLE entries ADD CONSTRAINT check_entries_amount_not_zero CHECK (amount != 0);
+ALTER TABLE transfers ADD CONSTRAINT check_transfers_amount_positive CHECK (amount > 0);
+ALTER TABLE payouts ADD CONSTRAINT check_payouts_amount_positive CHECK (amount > 0);
+
+-- Add unique constraint on api_keys
+ALTER TABLE api_keys ADD CONSTRAINT api_keys_api_key_unique UNIQUE (api_key);
