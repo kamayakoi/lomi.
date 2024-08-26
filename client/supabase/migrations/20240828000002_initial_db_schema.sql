@@ -1,26 +1,3 @@
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Enum Types
-CREATE TYPE user_type AS ENUM ('user', 'admin', 'super_admin');
-CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
-CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'payout');
-CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('MTN', 'WAVE', 'ORANGE', 'STRIPE', 'PAYPAL', 'LOMI');
-CREATE TYPE recurring_payment_type AS ENUM ('subscription', 'installment', 'debt', 'utility', 'other');
-CREATE TYPE transfer_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
-CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
-CREATE TYPE invoice_status AS ENUM ('draft', 'sent', 'paid', 'overdue', 'cancelled');
-CREATE TYPE payment_method_code AS ENUM (
-    'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'SEPA', 'PAYPAL',
-    'APPLE_PAY', 'GOOGLE_PAY', 'CASH', 'CRYPTOCURRENCY', 'IDEAL', 'COUNTER', 'WAVE',
-    'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD'
-);
-CREATE TYPE currency_code AS ENUM (
-    'XOF', 'XAF', 'NGN', 'GHS', 'KES', 'ZAR', 'EGP', 'MAD', 'RWF', 'ETB', 'ZMW', 'NAD', 'USD', 'EUR', 'MRO'
-);
-CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
-
 -- Users table
 CREATE TABLE users (
   user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -330,8 +307,8 @@ CREATE TABLE api_keys (
     is_active BOOLEAN NOT NULL DEFAULT true,
     expiration_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    last_used_at
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_used_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_api_keys_user_id ON api_keys(user_id);
