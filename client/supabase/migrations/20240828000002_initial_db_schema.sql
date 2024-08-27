@@ -17,9 +17,10 @@ CREATE TYPE payment_method_code AS ENUM (
     'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD'
 );
 CREATE TYPE currency_code AS ENUM (
-    'XOF' | 'XAF' | 'NGN' | 'GHS' | 'KES' | 'ZAR' | 'EGP' | 'MAD' | 'RWF' | 'ETB' | 'ZMW' | 'NAD' | 'USD' | 'EUR' | 'MRO';
+    'XOF', 'XAF', 'NGN', 'GHS', 'KES', 'ZAR', 'EGP', 'MAD', 'RWF', 'ETB', 'ZMW', 'NAD', 'USD', 'EUR', 'MRO'
 );
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+
 
 --------------- TABLES ---------------
 
