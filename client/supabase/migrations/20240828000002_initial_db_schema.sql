@@ -1,3 +1,28 @@
+--------------- ENUM TYPES ---------------
+
+CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
+CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'payout');
+CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
+CREATE TYPE provider_code AS ENUM ('MTN', 'WAVE', 'ORANGE', 'STRIPE', 'PAYPAL', 'LOMI');
+CREATE TYPE recurring_payment_type AS ENUM ('subscription', 'installment', 'debt', 'utility', 'other');
+CREATE TYPE transfer_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
+CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
+CREATE TYPE invoice_status AS ENUM ('draft', 'sent', 'paid', 'overdue', 'cancelled');
+CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'yearly', 'one-time');
+CREATE TYPE entry_type AS ENUM ('debit', 'credit');
+CREATE TYPE country_code AS ENUM ('+233', '+234', '+225', '+254', '+27', '+20', '+212', '+251', '+256', '+221', '+237', '+255', '+222', '+216', '+250', '+260', '+263', '+213', '+33', '+44', '+49', '+39', '+34', '+31', '+46', '+48', '+351', '+30', '+32', '+43', '+1');
+CREATE TYPE payment_method_code AS ENUM (
+    'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'SEPA', 'PAYPAL',
+    'APPLE_PAY', 'GOOGLE_PAY', 'CASH', 'CRYPTOCURRENCY', 'IDEAL', 'COUNTER', 'WAVE',
+    'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD'
+);
+CREATE TYPE currency_code AS ENUM (
+    'XOF' | 'XAF' | 'NGN' | 'GHS' | 'KES' | 'ZAR' | 'EGP' | 'MAD' | 'RWF' | 'ETB' | 'ZMW' | 'NAD' | 'USD' | 'EUR' | 'MRO';
+);
+CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+
+--------------- TABLES ---------------
+
 -- Users table
 CREATE TABLE users (
   user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -6,7 +31,6 @@ CREATE TABLE users (
   phone_number VARCHAR NOT NULL,
   is_admin BOOLEAN NOT NULL DEFAULT false,
   verified BOOLEAN NOT NULL DEFAULT false,
-  user_type user_type NOT NULL DEFAULT 'user',
   country VARCHAR,
   metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -53,7 +77,7 @@ COMMENT ON TABLE organizations IS 'Represents businesses or entities using our a
 
 -- User-Organization links table
 CREATE TABLE user_organization_links (
-  user_orgid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(user_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
@@ -84,7 +108,7 @@ CREATE TABLE payment_methods (
   provider_code provider_code REFERENCES providers(provider_code),
   phone_number VARCHAR,
   card_number VARCHAR,
-  country_code VARCHAR(4) NOT NULL,
+  country_code country_code NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -140,7 +164,6 @@ CREATE TABLE main_accounts (
     user_id UUID NOT NULL REFERENCES users(user_id),
     balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    account_id UUID NOT NULL REFERENCES accounts(account_id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (user_id, currency_code)
 );
@@ -157,8 +180,7 @@ CREATE TABLE end_customers (
     name VARCHAR NOT NULL,
     email VARCHAR,
     phone_number VARCHAR,
-    card_number VARCHAR,
-    country_code VARCHAR(4) NOT NULL,
+    country_code country_code NOT NULL,
     data JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -229,6 +251,29 @@ CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE st
 
 COMMENT ON TABLE transactions IS 'Records all financial transactions in the system';
 
+-- Recurring Payments table
+CREATE TABLE recurring_payments (
+    recurring_payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(user_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
+    payment_type recurring_payment_type NOT NULL,
+    frequency VARCHAR NOT NULL CHECK (frequency IN ('daily', 'weekly', 'bi-weekly', 'monthly', 'yearly', 'one-time')),
+    next_payment_date DATE NOT NULL,
+    end_date DATE,
+    description TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_recurring_payments_user_id ON recurring_payments(user_id);
+CREATE INDEX idx_recurring_payments_organization_id ON recurring_payments(organization_id);
+
+COMMENT ON TABLE recurring_payments IS 'Stores information for recurring payment schedules';
+
 -- Refunds table
 CREATE TABLE refunds (
     refund_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -242,7 +287,7 @@ CREATE TABLE refunds (
 
 CREATE INDEX idx_refunds_transaction_id ON refunds(transaction_id);
 
-COMMENT ON TABLE refunds IS 'Tracks refund transactions linked to original transactions';
+COMMENT ON TABLE refunds IS 'Tracks refunds linked to transactions';
 
 -- Entries table
 CREATE TABLE entries (
@@ -250,7 +295,7 @@ CREATE TABLE entries (
     account_id UUID NOT NULL REFERENCES accounts(account_id),
     transaction_id UUID REFERENCES transactions(transaction_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount != 0),
-    entry_type VARCHAR(20),
+    entry_type entry_type NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -276,7 +321,24 @@ CREATE INDEX idx_transfers_to_account_id ON transfers(to_account_id);
 CREATE INDEX idx_transfers_transaction_id ON transfers(transaction_id);
 CREATE INDEX idx_transfers_created_at ON transfers(created_at);
 
-COMMENT ON TABLE transfers IS 'Records transfers between accounts within the system';
+COMMENT ON TABLE transfers IS 'Records transfers between users accounts within the system';
+
+-- Internal Transfers table
+CREATE TABLE internal_transfers (
+    internal_transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    from_account_id UUID NOT NULL REFERENCES accounts(account_id),
+    to_main_account_id UUID NOT NULL REFERENCES main_accounts(main_account_id),
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    status transfer_status NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_internal_transfers_from_account_id ON internal_transfers(from_account_id);
+CREATE INDEX idx_internal_transfers_to_main_account_id ON internal_transfers(to_main_account_id);
+
+COMMENT ON TABLE internal_transfers IS 'Records transfers from individual accounts to main accounts';
 
 -- Payouts table
 CREATE TABLE payouts (
@@ -347,29 +409,6 @@ CREATE INDEX idx_logs_created_at ON logs(created_at);
 
 COMMENT ON TABLE logs IS 'Audit log for tracking important actions and events in the system';
 
--- Recurring Payments table
-CREATE TABLE recurring_payments (
-    recurring_payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
-    currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
-    payment_type recurring_payment_type NOT NULL,
-    frequency INTERVAL NOT NULL,
-    next_payment_date DATE NOT NULL,
-    end_date DATE,
-    description TEXT,
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_recurring_payments_user_id ON recurring_payments(user_id);
-CREATE INDEX idx_recurring_payments_organization_id ON recurring_payments(organization_id);
-
-COMMENT ON TABLE recurring_payments IS 'Stores information for recurring payment schedules';
-
 -- Invoices table
 CREATE TABLE invoices (
     invoice_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -388,19 +427,3 @@ CREATE INDEX idx_invoices_user_id ON invoices(user_id);
 CREATE INDEX idx_invoices_organization_id ON invoices(organization_id);
 
 COMMENT ON TABLE invoices IS 'Stores invoice information for users and organizations';
-
--- Exchange Rates table
-CREATE TABLE exchange_rates (
-    xr_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    from_currency currency_code NOT NULL,
-    to_currency currency_code NOT NULL,
-    rate NUMERIC(10,6) NOT NULL CHECK (rate > 0),
-    effective_date DATE NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_exchange_rates_currencies ON exchange_rates(from_currency, to_currency);
-CREATE INDEX idx_exchange_rates_effective_date ON exchange_rates(effective_date);
-
-COMMENT ON TABLE exchange_rates IS 'Tracks exchange rates between different currencies';
