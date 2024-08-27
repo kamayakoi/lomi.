@@ -3,21 +3,24 @@ CREATE OR REPLACE FUNCTION create_user(
   p_name VARCHAR,
   p_email VARCHAR,
   p_phone_number VARCHAR,
-  p_password_hash VARCHAR,
-  p_user_type VARCHAR DEFAULT 'merchant',
-  p_metadata JSONB DEFAULT NULL
+  p_is_admin BOOLEAN DEFAULT false,
+  p_verified BOOLEAN DEFAULT false,
+  p_country VARCHAR,
+  p_metadata JSONB DEFAULT NULL,
+  p_avatar_url TEXT DEFAULT NULL,
+  p_logo_url TEXT DEFAULT NULL
 ) RETURNS users AS $$
 DECLARE
   new_user users;
 BEGIN
   -- Validate input
-  IF p_name IS NULL OR p_email IS NULL OR p_phone_number IS NULL OR p_password_hash IS NULL THEN
-    RAISE EXCEPTION 'Name, email, phone number, and password hash are required';
+  IF p_name IS NULL OR p_email IS NULL OR p_phone_number IS NULL THEN
+    RAISE EXCEPTION 'Name, email, and phone number are required';
   END IF;
 
   -- Insert the new user
-  INSERT INTO users (name, email, phone_number, password_hash, user_type, metadata)
-  VALUES (p_name, p_email, p_phone_number, p_password_hash, p_user_type, p_metadata)
+  INSERT INTO users (name, email, phone_number, is_admin, verified, country, metadata, avatar_url, logo_url)
+  VALUES (p_name, p_email, p_phone_number, p_is_admin, p_verified, p_country, p_metadata, p_avatar_url, p_logo_url)
   RETURNING * INTO new_user;
   
   RETURN new_user;
@@ -25,19 +28,24 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Read a user by ID
-CREATE OR REPLACE FUNCTION get_user_by_id(p_user_id BIGINT)
+CREATE OR REPLACE FUNCTION get_user_by_id(p_user_id UUID)
 RETURNS users AS $$
   SELECT * FROM users WHERE user_id = p_user_id;
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a user
 CREATE OR REPLACE FUNCTION update_user(
-  p_user_id BIGINT,
+  p_user_id UUID,
   p_name VARCHAR,
   p_email VARCHAR,
   p_phone_number VARCHAR,
-  p_user_type VARCHAR,
-  p_metadata JSONB
+  p_is_admin BOOLEAN,
+  p_verified BOOLEAN,
+  p_country VARCHAR,
+  p_metadata JSONB,
+  p_avatar_url TEXT,
+  p_logo_url TEXT,
+  p_updated_by UUID
 ) RETURNS users AS $$
 DECLARE
   updated_user users;
@@ -53,9 +61,14 @@ BEGIN
     name = p_name,
     email = p_email,
     phone_number = p_phone_number,
-    user_type = p_user_type,
+    is_admin = p_is_admin,
+    verified = p_verified,
+    country = p_country,
     metadata = p_metadata,
-    updated_at = NOW()
+    avatar_url = p_avatar_url,
+    logo_url = p_logo_url,
+    updated_at = NOW(),
+    updated_by = p_updated_by
   WHERE user_id = p_user_id
   RETURNING * INTO updated_user;
   
@@ -64,7 +77,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a user
-CREATE OR REPLACE FUNCTION delete_user(p_user_id BIGINT)
+CREATE OR REPLACE FUNCTION delete_user(p_user_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;

@@ -1,20 +1,16 @@
 -- Create a new payment method
 CREATE OR REPLACE FUNCTION create_payment_method(
   p_name VARCHAR,
+  p_code payment_method_code,
   p_description TEXT,
   p_metadata JSONB DEFAULT NULL
 ) RETURNS payment_methods AS $$
 DECLARE
   new_payment_method payment_methods;
 BEGIN
-  -- Validate input
-  IF p_name IS NULL THEN
-    RAISE EXCEPTION 'Name is required';
-  END IF;
-
   -- Insert the new payment method
-  INSERT INTO payment_methods (name, description, metadata)
-  VALUES (p_name, p_description, p_metadata)
+  INSERT INTO payment_methods (name, code, description, metadata)
+  VALUES (p_name, p_code, p_description, p_metadata)
   RETURNING * INTO new_payment_method;
   
   RETURN new_payment_method;
@@ -22,15 +18,16 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Read a payment method by ID
-CREATE OR REPLACE FUNCTION get_payment_method_by_id(p_payment_method_id BIGINT)
+CREATE OR REPLACE FUNCTION get_payment_method_by_id(p_payment_method_id UUID)
 RETURNS payment_methods AS $$
   SELECT * FROM payment_methods WHERE payment_method_id = p_payment_method_id;
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a payment method
 CREATE OR REPLACE FUNCTION update_payment_method(
-  p_payment_method_id BIGINT,
+  p_payment_method_id UUID,
   p_name VARCHAR,
+  p_code payment_method_code,
   p_description TEXT,
   p_metadata JSONB
 ) RETURNS payment_methods AS $$
@@ -41,6 +38,7 @@ BEGIN
   UPDATE payment_methods
   SET 
     name = p_name,
+    code = p_code,
     description = p_description,
     metadata = p_metadata,
     updated_at = NOW()
@@ -52,7 +50,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a payment method
-CREATE OR REPLACE FUNCTION delete_payment_method(p_payment_method_id BIGINT)
+CREATE OR REPLACE FUNCTION delete_payment_method(p_payment_method_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;

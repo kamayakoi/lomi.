@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { Account } from '../types';
+import { Account } from '../types/account';
 
 const pool = new Pool({
   // Database connection configuration

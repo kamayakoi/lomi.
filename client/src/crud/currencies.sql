@@ -29,8 +29,7 @@ $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a currency
 CREATE OR REPLACE FUNCTION update_currency(
-  p_currency_id INTEGER,
-  p_code VARCHAR,
+  p_code currency_code,
   p_name VARCHAR,
   p_symbol VARCHAR
 ) RETURNS currencies AS $$
@@ -40,11 +39,10 @@ BEGIN
   -- Update the currency
   UPDATE currencies
   SET 
-    code = p_code,
     name = p_name,
     symbol = p_symbol,
     updated_at = NOW()
-  WHERE currency_id = p_currency_id
+  WHERE code = p_code
   RETURNING * INTO updated_currency;
   
   RETURN updated_currency;
@@ -52,14 +50,14 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a currency
-CREATE OR REPLACE FUNCTION delete_currency(p_currency_id INTEGER)
+CREATE OR REPLACE FUNCTION delete_currency(p_code currency_code)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;
 BEGIN
   UPDATE currencies
   SET deleted_at = NOW()
-  WHERE currency_id = p_currency_id
+  WHERE code = p_code
     AND deleted_at IS NULL;
   
   GET DIAGNOSTICS rows_affected = ROW_COUNT;

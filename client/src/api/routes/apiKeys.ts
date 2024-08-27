@@ -1,12 +1,13 @@
 import express from 'express';
 import { createApiKey, getApiKeyById, updateApiKey, deleteApiKey } from '../../models/apiKey';
+import { Database } from '../../../database.types';
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { user_id, name, key, permissions, expires_at } = req.body;
-    const newApiKey = await createApiKey(user_id, name, key, permissions, expires_at);
+    const apiKeyData = req.body as Database['public']['Tables']['api_keys']['Insert'];
+    const newApiKey = await createApiKey(apiKeyData);
     res.status(201).json(newApiKey);
   } catch (error) {
     console.error('Error creating API key:', error);
@@ -14,10 +15,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:apiKeyId', async (req, res) => {
+router.get('/:keyId', async (req, res) => {
   try {
-    const apiKeyId = parseInt(req.params.apiKeyId);
-    const apiKey = await getApiKeyById(apiKeyId);
+    const keyId = req.params.keyId;
+    const apiKey = await getApiKeyById(keyId);
     if (apiKey) {
       res.json(apiKey);
     } else {
@@ -29,11 +30,11 @@ router.get('/:apiKeyId', async (req, res) => {
   }
 });
 
-router.put('/:apiKeyId', async (req, res) => {
+router.put('/:keyId', async (req, res) => {
   try {
-    const apiKeyId = parseInt(req.params.apiKeyId);
-    const { name, permissions, expires_at } = req.body;
-    const updatedApiKey = await updateApiKey(apiKeyId, name, permissions, expires_at);
+    const keyId = req.params.keyId;
+    const { api_key, is_active, expiration_date } = req.body as Database['public']['Tables']['api_keys']['Update'];
+    const updatedApiKey = await updateApiKey(keyId, { api_key, is_active, expiration_date });
     if (updatedApiKey) {
       res.json(updatedApiKey);
     } else {
@@ -45,10 +46,10 @@ router.put('/:apiKeyId', async (req, res) => {
   }
 });
 
-router.delete('/:apiKeyId', async (req, res) => {
+router.delete('/:keyId', async (req, res) => {
   try {
-    const apiKeyId = parseInt(req.params.apiKeyId);
-    await deleteApiKey(apiKeyId);
+    const keyId = req.params.keyId;
+    await deleteApiKey(keyId);
     res.sendStatus(204);
   } catch (error) {
     console.error('Error deleting API key:', error);

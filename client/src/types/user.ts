@@ -7,6 +7,7 @@ export interface User {
   verified: boolean;
   country?: string;
   metadata?: any;
+  avatar_url?: string;
   created_at: string;
   updated_at: string;
   created_by?: string;  

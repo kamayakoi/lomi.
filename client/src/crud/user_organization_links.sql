@@ -1,7 +1,7 @@
 -- Create a new user organization link
 CREATE OR REPLACE FUNCTION create_user_organization_link(
-  p_user_id BIGINT,
-  p_organization_id BIGINT,
+  p_user_id UUID,
+  p_organization_id UUID,
   p_role VARCHAR
 ) RETURNS user_organization_links AS $$
 DECLARE
@@ -12,7 +12,7 @@ BEGIN
     RAISE EXCEPTION 'User ID, organization ID, and role are required';
   END IF;
 
-  -- Insert the new link
+  -- Insert the new user organization link
   INSERT INTO user_organization_links (user_id, organization_id, role)
   VALUES (p_user_id, p_organization_id, p_role)
   RETURNING * INTO new_link;
@@ -22,20 +22,20 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Read a user organization link by ID
-CREATE OR REPLACE FUNCTION get_user_organization_link_by_id(p_link_id BIGINT)
+CREATE OR REPLACE FUNCTION get_user_organization_link_by_id(p_link_id UUID)
 RETURNS user_organization_links AS $$
   SELECT * FROM user_organization_links WHERE link_id = p_link_id;
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a user organization link
 CREATE OR REPLACE FUNCTION update_user_organization_link(
-  p_link_id BIGINT,
+  p_link_id UUID,
   p_role VARCHAR
 ) RETURNS user_organization_links AS $$
 DECLARE
   updated_link user_organization_links;
 BEGIN
-  -- Update the link
+  -- Update the user organization link
   UPDATE user_organization_links
   SET 
     role = p_role,
@@ -48,7 +48,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a user organization link
-CREATE OR REPLACE FUNCTION delete_user_organization_link(p_link_id BIGINT)
+CREATE OR REPLACE FUNCTION delete_user_organization_link(p_link_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;

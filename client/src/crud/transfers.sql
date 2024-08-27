@@ -1,23 +1,23 @@
 -- Create a new transfer
 CREATE OR REPLACE FUNCTION create_transfer(
-  p_from_account_id BIGINT,
-  p_to_account_id BIGINT,
-  p_amount BIGINT,
-  p_currency_id INTEGER,
-  p_status VARCHAR,
+  p_from_account_id UUID,
+  p_to_account_id UUID,
+  p_amount NUMERIC(10,2),
+  p_currency_code currency_code,
+  p_status transfer_status,
   p_metadata JSONB DEFAULT NULL
 ) RETURNS transfers AS $$
 DECLARE
   new_transfer transfers;
 BEGIN
   -- Validate input
-  IF p_from_account_id IS NULL OR p_to_account_id IS NULL OR p_amount IS NULL OR p_currency_id IS NULL OR p_status IS NULL THEN
-    RAISE EXCEPTION 'From account ID, to account ID, amount, currency ID, and status are required';
+  IF p_from_account_id IS NULL OR p_to_account_id IS NULL OR p_amount IS NULL OR p_currency_code IS NULL OR p_status IS NULL THEN
+    RAISE EXCEPTION 'From account ID, to account ID, amount, currency code, and status are required';
   END IF;
 
   -- Insert the new transfer
-  INSERT INTO transfers (from_account_id, to_account_id, amount, currency_id, status, metadata)
-  VALUES (p_from_account_id, p_to_account_id, p_amount, p_currency_id, p_status, p_metadata)
+  INSERT INTO transfers (from_account_id, to_account_id, amount, currency_code, status, metadata)
+  VALUES (p_from_account_id, p_to_account_id, p_amount, p_currency_code, p_status, p_metadata)
   RETURNING * INTO new_transfer;
   
   RETURN new_transfer;
@@ -32,8 +32,8 @@ $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a transfer
 CREATE OR REPLACE FUNCTION update_transfer(
-  p_transfer_id BIGINT,
-  p_status VARCHAR,
+  p_transfer_id UUID,
+  p_status transfer_status,
   p_metadata JSONB
 ) RETURNS transfers AS $$
 DECLARE
@@ -53,7 +53,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a transfer
-CREATE OR REPLACE FUNCTION delete_transfer(p_transfer_id BIGINT)
+CREATE OR REPLACE FUNCTION delete_transfer(p_transfer_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;

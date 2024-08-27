@@ -1,21 +1,17 @@
 -- Create a new refund
 CREATE OR REPLACE FUNCTION create_refund(
-  p_transaction_id BIGINT,
-  p_amount BIGINT,
+  p_transaction_id UUID,
+  p_amount NUMERIC(10,2),
+  p_currency_code currency_code,
   p_reason TEXT,
   p_metadata JSONB DEFAULT NULL
 ) RETURNS refunds AS $$
 DECLARE
   new_refund refunds;
 BEGIN
-  -- Validate input
-  IF p_transaction_id IS NULL OR p_amount IS NULL OR p_reason IS NULL THEN
-    RAISE EXCEPTION 'Transaction ID, amount, and reason are required';
-  END IF;
-
   -- Insert the new refund
-  INSERT INTO refunds (transaction_id, amount, reason, metadata)
-  VALUES (p_transaction_id, p_amount, p_reason, p_metadata)
+  INSERT INTO refunds (transaction_id, amount, currency_code, reason, metadata)
+  VALUES (p_transaction_id, p_amount, p_currency_code, p_reason, p_metadata)
   RETURNING * INTO new_refund;
   
   RETURN new_refund;
@@ -23,15 +19,15 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Read a refund by ID
-CREATE OR REPLACE FUNCTION get_refund_by_id(p_refund_id BIGINT)
+CREATE OR REPLACE FUNCTION get_refund_by_id(p_refund_id UUID)
 RETURNS refunds AS $$
   SELECT * FROM refunds WHERE refund_id = p_refund_id;
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- Update a refund
 CREATE OR REPLACE FUNCTION update_refund(
-  p_refund_id BIGINT,
-  p_reason TEXT,
+  p_refund_id UUID,
+  p_status refund_status,
   p_metadata JSONB
 ) RETURNS refunds AS $$
 DECLARE
@@ -40,7 +36,7 @@ BEGIN
   -- Update the refund
   UPDATE refunds
   SET 
-    reason = p_reason,
+    status = p_status,
     metadata = p_metadata,
     updated_at = NOW()
   WHERE refund_id = p_refund_id
@@ -51,7 +47,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Soft delete a refund
-CREATE OR REPLACE FUNCTION delete_refund(p_refund_id BIGINT)
+CREATE OR REPLACE FUNCTION delete_refund(p_refund_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
   rows_affected INT;

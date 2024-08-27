@@ -12,6 +12,7 @@ export interface Organization {
   max_monthly_volume?: number;
   max_api_calls_per_minute?: number;
   max_webhooks?: number;
+  logo_url?: string;
   created_at: string;
   updated_at: string;
   created_by?: string; 
