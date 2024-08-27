@@ -11,8 +11,8 @@ jobs:
     permissions:
       contents: write
     env:
-        SUPABASE_URL: ${{secrets.SUPABASE_URL}}
-        SUPABASE_ANON_KEY: ${{secrets.SUPABASE_ANON_KEY}}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      PROJECT_REF: ${{ secrets.VITE_SUPABASE_URL}}
     steps:
       - uses: actions/checkout@v2
         with:
