@@ -1,4 +1,4 @@
-// import { buttonVariants } from '../../lib/button-utils';
+// import { buttonVariants } from '@/lib/button-utils';
 // import {
 //   Card,
 //   CardContent,

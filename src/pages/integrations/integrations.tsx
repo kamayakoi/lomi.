@@ -14,9 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Search } from '../../components/dashboard/search'
-import ThemeSwitch from '../../components/dashboard/theme-switch'
-import { UserNav } from '../../components/dashboard/user-nav'
+import { Search } from '@/components/dashboard/search'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
+import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
 import { integrations } from './data'
 

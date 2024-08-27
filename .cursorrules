@@ -108,5 +108,3 @@ Code Quality
 - Use ESLint for linting.
 - Implement Prettier for code formatting.
 - Leverage TypeScript's static type checking.
-
-Follow these guidelines to ensure a consistent, high-quality development process for your payment orchestration platform using Vite and React.

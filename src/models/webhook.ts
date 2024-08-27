@@ -1,27 +1,54 @@
-import { Pool } from 'pg';
-import { Webhook } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Webhook = Database['public']['Tables']['webhooks']['Row'];
+type WebhookInsert = Database['public']['Tables']['webhooks']['Insert'];
+type WebhookUpdate = Database['public']['Tables']['webhooks']['Update'];
 
-export async function createWebhook(url: string, event_type: string, organization_id: number): Promise<Webhook> {
-  const query = 'SELECT * FROM create_webhook($1, $2, $3)';
-  const values = [url, event_type, organization_id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createWebhook(webhookData: WebhookInsert): Promise<Webhook | null> {
+  const { data, error } = await supabase
+    .rpc('create_webhook', webhookData);
+
+  if (error) {
+    console.error('Error creating webhook:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getWebhookById(webhookId: number): Promise<Webhook | null> {
-  const query = 'SELECT * FROM get_webhook_by_id($1)';
-  const values = [webhookId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getWebhookById(webhookId: string): Promise<Webhook | null> {
+  const { data, error } = await supabase
+    .rpc('get_webhook_by_id', { p_webhook_id: webhookId });
+
+  if (error) {
+    console.error('Error retrieving webhook:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function updateWebhook(webhookId: number, url: string, event_type: string, organization_id: number): Promise<Webhook | null> {
-  const query = 'SELECT * FROM update_webhook($1, $2, $3, $4)';
-  const values = [webhookId, url, event_type, organization_id];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function updateWebhook(webhookId: string, updates: WebhookUpdate): Promise<Webhook | null> {
+  const { data, error } = await supabase
+    .rpc('update_webhook', { p_webhook_id: webhookId, ...updates });
+
+  if (error) {
+    console.error('Error updating webhook:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deleteWebhook(webhookId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_webhook', { p_webhook_id: webhookId });
+
+  if (error) {
+    console.error('Error deleting webhook:', error);
+    return false;
+  }
+
+  return data;
 }

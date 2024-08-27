@@ -4,7 +4,7 @@ import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/utils'
-import { sidelinks } from '../../lib/data/sidelinks'
+import { sidelinks } from '@/lib/data/sidelinks'
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean

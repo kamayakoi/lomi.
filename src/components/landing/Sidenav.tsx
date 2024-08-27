@@ -1,5 +1,5 @@
 import React from 'react';
-import "../../index.css"; // Import the CSS file
+import "@/index.css"; // Import the CSS file
 
 interface NavItem {
     id: string;

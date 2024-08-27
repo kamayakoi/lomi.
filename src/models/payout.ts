@@ -1,27 +1,54 @@
-import { Pool } from 'pg';
-import { Payout } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Payout = Database['public']['Tables']['payouts']['Row'];
+type PayoutInsert = Database['public']['Tables']['payouts']['Insert'];
+type PayoutUpdate = Database['public']['Tables']['payouts']['Update'];
 
-export async function createPayout(account_id: number, amount: number, currency_id: number, status: string): Promise<Payout> {
-  const query = 'SELECT * FROM create_payout($1, $2, $3, $4)';
-  const values = [account_id, amount, currency_id, status];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createPayout(payoutData: PayoutInsert): Promise<Payout | null> {
+  const { data, error } = await supabase
+    .rpc('create_payout', payoutData);
+
+  if (error) {
+    console.error('Error creating payout:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getPayoutById(payoutId: number): Promise<Payout | null> {
-  const query = 'SELECT * FROM get_payout_by_id($1)';
-  const values = [payoutId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getPayoutById(payoutId: string): Promise<Payout | null> {
+  const { data, error } = await supabase
+    .rpc('get_payout_by_id', { p_payout_id: payoutId });
+
+  if (error) {
+    console.error('Error retrieving payout:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getPayoutsByAccountId(accountId: number): Promise<Payout[]> {
-  const query = 'SELECT * FROM get_payouts_by_account_id($1)';
-  const values = [accountId];
-  const result = await pool.query(query, values);
-  return result.rows;
+export async function updatePayout(payoutId: string, updates: PayoutUpdate): Promise<Payout | null> {
+  const { data, error } = await supabase
+    .rpc('update_payout', { p_payout_id: payoutId, ...updates });
+
+  if (error) {
+    console.error('Error updating payout:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deletePayout(payoutId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_payout', { p_payout_id: payoutId });
+
+  if (error) {
+    console.error('Error deleting payout:', error);
+    return false;
+  }
+
+  return data;
 }

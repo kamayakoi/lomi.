@@ -1,30 +1,42 @@
-import express from 'express';
-import { createRefund, getRefundById } from '../../models/refund';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const router = express.Router();
+type Refund = Database['public']['Tables']['refunds']['Row'];
+type RefundInsert = Database['public']['Tables']['refunds']['Insert'];
+type RefundUpdate = Database['public']['Tables']['refunds']['Update'];
 
-router.post('/', async (req, res) => {
-  try {
-    const { transaction_id, amount, currency_id, reason } = req.body;
-    const newRefund = await createRefund(transaction_id, amount, currency_id, reason);
-    res.status(201).json(newRefund);
-  } catch (error) {
-    res.status(500).json({ error: 'Error creating refund' });
+export async function createRefund(refundData: RefundInsert): Promise<Refund | null> {
+  const { data, error } = await supabase
+    .rpc('create_refund', refundData);
+
+  if (error) {
+    console.error('Error creating refund:', error);
+    return null;
   }
-});
 
-router.get('/:refundId', async (req, res) => {
-  try {
-    const refundId = parseInt(req.params.refundId);
-    const refund = await getRefundById(refundId);
-    if (refund) {
-      res.json(refund);
-    } else {
-      res.status(404).json({ error: 'Refund not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Error retrieving refund' });
+  return data;
+}
+
+export async function getRefundById(refundId: string): Promise<Refund | null> {
+  const { data, error } = await supabase
+    .rpc('get_refund_by_id', { p_refund_id: refundId });
+
+  if (error) {
+    console.error('Error retrieving refund:', error);
+    return null;
   }
-});
 
-export default router;
+  return data;
+}
+
+export async function updateRefund(refundId: string, updates: RefundUpdate): Promise<Refund | null> {
+  const { data, error } = await supabase
+    .rpc('update_refund', { p_refund_id: refundId, ...updates });
+
+  if (error) {
+    console.error('Error updating refund:', error);
+    return null;
+  }
+
+  return data;
+}

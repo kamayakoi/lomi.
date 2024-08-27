@@ -1,14 +1,17 @@
 import express from 'express';
-import { createApiKey, getApiKeyById, updateApiKey, deleteApiKey } from '../../models/apiKey';
-import { Database } from '../../../database.types';
+import { createApiKey, getApiKeyById, updateApiKey, deleteApiKey } from '@/models/apiKey';
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const apiKeyData = req.body as Database['public']['Tables']['api_keys']['Insert'];
+    const apiKeyData = req.body;
     const newApiKey = await createApiKey(apiKeyData);
-    res.status(201).json(newApiKey);
+    if (newApiKey) {
+      res.status(201).json(newApiKey);
+    } else {
+      res.status(400).json({ error: 'Failed to create API key' });
+    }
   } catch (error) {
     console.error('Error creating API key:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -33,8 +36,8 @@ router.get('/:keyId', async (req, res) => {
 router.put('/:keyId', async (req, res) => {
   try {
     const keyId = req.params.keyId;
-    const { api_key, is_active, expiration_date } = req.body as Database['public']['Tables']['api_keys']['Update'];
-    const updatedApiKey = await updateApiKey(keyId, { api_key, is_active, expiration_date });
+    const updates = req.body;
+    const updatedApiKey = await updateApiKey(keyId, updates);
     if (updatedApiKey) {
       res.json(updatedApiKey);
     } else {
@@ -49,8 +52,12 @@ router.put('/:keyId', async (req, res) => {
 router.delete('/:keyId', async (req, res) => {
   try {
     const keyId = req.params.keyId;
-    await deleteApiKey(keyId);
-    res.sendStatus(204);
+    const deleted = await deleteApiKey(keyId);
+    if (deleted) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'API key not found' });
+    }
   } catch (error) {
     console.error('Error deleting API key:', error);
     res.status(500).json({ error: 'Internal server error' });

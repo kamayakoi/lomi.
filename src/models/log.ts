@@ -1,20 +1,29 @@
-import { Pool } from 'pg';
-import { Log } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Log = Database['public']['Tables']['logs']['Row'];
+type LogInsert = Database['public']['Tables']['logs']['Insert'];
 
-export async function createLog(user_id: number, action: string, details: any): Promise<Log> {
-  const query = 'INSERT INTO logs (user_id, action, details) VALUES ($1, $2, $3) RETURNING *';
-  const values = [user_id, action, details];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createLog(logData: LogInsert): Promise<Log | null> {
+  const { data, error } = await supabase
+    .rpc('create_log', logData);
+
+  if (error) {
+    console.error('Error creating log:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getLogById(logId: number): Promise<Log | null> {
-  const query = 'SELECT * FROM logs WHERE log_id = $1';
-  const values = [logId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getLogById(logId: string): Promise<Log | null> {
+  const { data, error } = await supabase
+    .rpc('get_log_by_id', { p_log_id: logId });
+
+  if (error) {
+    console.error('Error retrieving log:', error);
+    return null;
+  }
+
+  return data;
 }

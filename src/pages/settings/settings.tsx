@@ -8,10 +8,10 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
-import { Search } from '../../components/dashboard/search'
+import { Search } from '@/components/dashboard/search'
 import { Separator } from '@/components/ui/separator'
-import ThemeSwitch from '../../components/dashboard/theme-switch'
-import { UserNav } from '../../components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
+import { UserNav } from '@/components/dashboard/user-nav'
 import SidebarNav from './components/sidebar-nav'
 
 export default function Settings() {

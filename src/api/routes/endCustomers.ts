@@ -1,13 +1,17 @@
 import express from 'express';
-import { createEndCustomer, getEndCustomerById, updateEndCustomer } from '../../models/endCustomer';
+import { createEndCustomer, getEndCustomerById, updateEndCustomer, deleteEndCustomer } from '@/models/endCustomer';
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone_number } = req.body;
-    const newEndCustomer = await createEndCustomer(name, email, phone_number);
-    res.status(201).json(newEndCustomer);
+    const endCustomerData = req.body;
+    const newEndCustomer = await createEndCustomer(endCustomerData);
+    if (newEndCustomer) {
+      res.status(201).json(newEndCustomer);
+    } else {
+      res.status(400).json({ error: 'Failed to create end customer' });
+    }
   } catch (error) {
     console.error('Error creating end customer:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -16,7 +20,7 @@ router.post('/', async (req, res) => {
 
 router.get('/:endCustomerId', async (req, res) => {
   try {
-    const endCustomerId = parseInt(req.params.endCustomerId);
+    const endCustomerId = req.params.endCustomerId;
     const endCustomer = await getEndCustomerById(endCustomerId);
     if (endCustomer) {
       res.json(endCustomer);
@@ -31,9 +35,9 @@ router.get('/:endCustomerId', async (req, res) => {
 
 router.put('/:endCustomerId', async (req, res) => {
   try {
-    const endCustomerId = parseInt(req.params.endCustomerId);
-    const { name, email, phone_number } = req.body;
-    const updatedEndCustomer = await updateEndCustomer(endCustomerId, name, email, phone_number);
+    const endCustomerId = req.params.endCustomerId;
+    const updates = req.body;
+    const updatedEndCustomer = await updateEndCustomer(endCustomerId, updates);
     if (updatedEndCustomer) {
       res.json(updatedEndCustomer);
     } else {
@@ -41,6 +45,21 @@ router.put('/:endCustomerId', async (req, res) => {
     }
   } catch (error) {
     console.error('Error updating end customer:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.delete('/:endCustomerId', async (req, res) => {
+  try {
+    const endCustomerId = req.params.endCustomerId;
+    const deleted = await deleteEndCustomer(endCustomerId);
+    if (deleted) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'End customer not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting end customer:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

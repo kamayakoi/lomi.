@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { LightBulbIcon } from "./Icons";
-import { useTheme } from '../../lib/useTheme';
+import { useTheme } from '@/lib/useTheme';
 
 //Images
 import canvas from "/canvas.png";

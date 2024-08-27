@@ -1,20 +1,54 @@
-import { Pool } from 'pg';
-import { Transfer } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Transfer = Database['public']['Tables']['transfers']['Row'];
+type TransferInsert = Database['public']['Tables']['transfers']['Insert'];
+type TransferUpdate = Database['public']['Tables']['transfers']['Update'];
 
-export async function createTransfer(source_account_id: number, destination_account_id: number, amount: number, currency_id: number): Promise<Transfer> {
-  const query = 'SELECT * FROM create_transfer($1, $2, $3, $4)';
-  const values = [source_account_id, destination_account_id, amount, currency_id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createTransfer(transferData: TransferInsert): Promise<Transfer | null> {
+  const { data, error } = await supabase
+    .rpc('create_transfer', transferData);
+
+  if (error) {
+    console.error('Error creating transfer:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getTransferById(transferId: number): Promise<Transfer | null> {
-  const query = 'SELECT * FROM get_transfer_by_id($1)';
-  const values = [transferId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getTransferById(transferId: string): Promise<Transfer | null> {
+  const { data, error } = await supabase
+    .rpc('get_transfer_by_id', { p_transfer_id: transferId });
+
+  if (error) {
+    console.error('Error retrieving transfer:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function updateTransfer(transferId: string, updates: TransferUpdate): Promise<Transfer | null> {
+  const { data, error } = await supabase
+    .rpc('update_transfer', { p_transfer_id: transferId, ...updates });
+
+  if (error) {
+    console.error('Error updating transfer:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deleteTransfer(transferId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_transfer', { p_transfer_id: transferId });
+
+  if (error) {
+    console.error('Error deleting transfer:', error);
+    return false;
+  }
+
+  return data;
 }

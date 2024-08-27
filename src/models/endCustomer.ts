@@ -1,27 +1,54 @@
-import { Pool } from 'pg';
-import { EndCustomer } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type EndCustomer = Database['public']['Tables']['end_customers']['Row'];
+type EndCustomerInsert = Database['public']['Tables']['end_customers']['Insert'];
+type EndCustomerUpdate = Database['public']['Tables']['end_customers']['Update'];
 
-export async function createEndCustomer(name: string, email: string, phone_number: string): Promise<EndCustomer> {
-  const query = 'SELECT * FROM create_end_customer($1, $2, $3)';
-  const values = [name, email, phone_number];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createEndCustomer(endCustomerData: EndCustomerInsert): Promise<EndCustomer | null> {
+  const { data, error } = await supabase
+    .rpc('create_end_customer', endCustomerData);
+
+  if (error) {
+    console.error('Error creating end customer:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getEndCustomerById(endCustomerId: number): Promise<EndCustomer | null> {
-  const query = 'SELECT * FROM get_end_customer_by_id($1)';
-  const values = [endCustomerId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getEndCustomerById(endCustomerId: string): Promise<EndCustomer | null> {
+  const { data, error } = await supabase
+    .rpc('get_end_customer_by_id', { p_end_customer_id: endCustomerId });
+
+  if (error) {
+    console.error('Error retrieving end customer:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function updateEndCustomer(endCustomerId: number, name: string, email: string, phone_number: string): Promise<EndCustomer | null> {
-  const query = 'SELECT * FROM update_end_customer($1, $2, $3, $4)';
-  const values = [endCustomerId, name, email, phone_number];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function updateEndCustomer(endCustomerId: string, updates: EndCustomerUpdate): Promise<EndCustomer | null> {
+  const { data, error } = await supabase
+    .rpc('update_end_customer', { p_end_customer_id: endCustomerId, ...updates });
+
+  if (error) {
+    console.error('Error updating end customer:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deleteEndCustomer(endCustomerId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_end_customer', { p_end_customer_id: endCustomerId });
+
+  if (error) {
+    console.error('Error deleting end customer:', error);
+    return false;
+  }
+
+  return data;
 }

@@ -1,44 +1,66 @@
-import { Pool } from 'pg';
-import { Transaction } from '../types';
-import { createPaymentIntent } from '@/partners/stripe/payments';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Transaction = Database['public']['Tables']['transactions']['Row'];
+type TransactionInsert = Database['public']['Tables']['transactions']['Insert'];
+type TransactionUpdate = Database['public']['Tables']['transactions']['Update'];
 
-export async function createTransaction(end_customer_id: number, payment_method_id: number, organization_id: number, user_id: number, amount: number, fee_amount: number, fee_id: number, currency_id: number, status: string, transaction_type: string, payment_info: any): Promise<Transaction> {
-  const query = 'SELECT * FROM create_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
-  const values = [end_customer_id, payment_method_id, organization_id, user_id, amount, fee_amount, fee_id, currency_id, status, transaction_type, payment_info];
-  const result = await pool.query(query, values);
-  const transaction = result.rows[0];
+export async function createTransaction(transactionData: TransactionInsert): Promise<Transaction | null> {
+  const { data, error } = await supabase
+    .rpc('create_transaction', transactionData);
 
-  const stripeAccountId = await getMerchantStripeAccountId(organization_id);
+  if (error) {
+    console.error('Error creating transaction:', error);
+    return null;
+  }
 
-  const paymentIntent = await createPaymentIntent(transaction, stripeAccountId);
-
-  await updateTransactionWithStripeId(transaction.transaction_id, paymentIntent.id);
-
-  return transaction;
+  return data;
 }
 
-async function getMerchantStripeAccountId(organizationId: number): Promise<string> {
-  // Retrieve the Stripe account ID for the given organization
+export async function getTransactionById(transactionId: string): Promise<Transaction | null> {
+  const { data, error } = await supabase
+    .rpc('get_transaction_by_id', { p_transaction_id: transactionId });
+
+  if (error) {
+    console.error('Error retrieving transaction:', error);
+    return null;
+  }
+
+  return data;
 }
 
-async function updateTransactionWithStripeId(transactionId: number, stripePaymentIntentId: string): Promise<void> {
-  // Update the transaction record with the Stripe PaymentIntent ID
+export async function updateTransaction(transactionId: string, updates: TransactionUpdate): Promise<Transaction | null> {
+  const { data, error } = await supabase
+    .rpc('update_transaction', { p_transaction_id: transactionId, ...updates });
+
+  if (error) {
+    console.error('Error updating transaction:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getTransactionById(transactionId: number): Promise<Transaction | null> {
-  const query = 'SELECT * FROM get_transaction_by_id($1)';
-  const values = [transactionId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getTransactionsByUserId(userId: string): Promise<Transaction[]> {
+  const { data, error } = await supabase
+    .rpc('get_transactions_by_user_id', { p_user_id: userId });
+
+  if (error) {
+    console.error('Error retrieving transactions:', error);
+    return [];
+  }
+
+  return data || [];
 }
 
-export async function getTransactionsByOrganizationId(organizationId: number): Promise<Transaction[]> {
-  const query = 'SELECT * FROM get_transactions_by_organization_id($1)';
-  const values = [organizationId];
-  const result = await pool.query(query, values);
-  return result.rows;
+export async function getTransactionsByOrganizationId(organizationId: string): Promise<Transaction[]> {
+  const { data, error } = await supabase
+    .rpc('get_transactions_by_organization_id', { p_organization_id: organizationId });
+
+  if (error) {
+    console.error('Error retrieving transactions:', error);
+    return [];
+  }
+
+  return data || [];
 }

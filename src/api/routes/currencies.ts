@@ -1,23 +1,30 @@
 import express from 'express';
-import { createCurrency, getCurrencyById, updateCurrency } from '../../models/currency';
+import { createCurrency, getCurrencyByCode, updateCurrency } from '@/models/currency';
+import { Database } from '@/../database.types';
 
 const router = express.Router();
 
+type CurrencyCode = Database['public']['Enums']['currency_code'];
+
 router.post('/', async (req, res) => {
   try {
-    const { code, name, symbol } = req.body;
-    const newCurrency = await createCurrency(code, name, symbol);
-    res.status(201).json(newCurrency);
+    const currencyData = req.body;
+    const newCurrency = await createCurrency(currencyData);
+    if (newCurrency) {
+      res.status(201).json(newCurrency);
+    } else {
+      res.status(400).json({ error: 'Failed to create currency' });
+    }
   } catch (error) {
     console.error('Error creating currency:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-router.get('/:currencyId', async (req, res) => {
+router.get('/:currencyCode', async (req, res) => {
   try {
-    const currencyId = parseInt(req.params.currencyId);
-    const currency = await getCurrencyById(currencyId);
+    const currencyCode = req.params.currencyCode as CurrencyCode;
+    const currency = await getCurrencyByCode(currencyCode);
     if (currency) {
       res.json(currency);
     } else {
@@ -29,11 +36,11 @@ router.get('/:currencyId', async (req, res) => {
   }
 });
 
-router.put('/:currencyId', async (req, res) => {
+router.put('/:currencyCode', async (req, res) => {
   try {
-    const currencyId = parseInt(req.params.currencyId);
-    const { code, name, symbol } = req.body;
-    const updatedCurrency = await updateCurrency(currencyId, code, name, symbol);
+    const currencyCode = req.params.currencyCode as CurrencyCode;
+    const updates = req.body;
+    const updatedCurrency = await updateCurrency(currencyCode, updates);
     if (updatedCurrency) {
       res.json(updatedCurrency);
     } else {

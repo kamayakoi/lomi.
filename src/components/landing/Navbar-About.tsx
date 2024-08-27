@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { buttonVariants } from '../../lib/button-utils';
+import { buttonVariants } from '@/lib/button-utils';
 import { Menu } from "lucide-react";
 import { LogoIcon } from "./Icons";
 

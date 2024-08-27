@@ -5,7 +5,7 @@ import shield from "/shield.png"; // Import the light mode image
 import shieldwhite from "/shieldwhite.png"; // Import the light mode image
 import kwameadjei from "/kwameadjei.png"; // Import the light mode image
 import iconDark from "/icon_dark.svg"; // Import the dark mode image
-import { useTheme } from '../../lib/useTheme'; // Import the custom useTheme hook
+import { useTheme } from '@/lib/useTheme'; // Import the custom useTheme hook
 
 export const LogoIcon = () => {
   const { theme } = useTheme(); // Get the current theme from the custom hook

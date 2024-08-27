@@ -1,13 +1,17 @@
 import express from 'express';
-import { createWebhook, getWebhookById, updateWebhook } from '../../models/webhook';
+import { createWebhook, getWebhookById, updateWebhook, deleteWebhook } from '@/models/webhook';
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { url, event_type, organization_id } = req.body;
-    const newWebhook = await createWebhook(url, event_type, organization_id);
-    res.status(201).json(newWebhook);
+    const webhookData = req.body;
+    const newWebhook = await createWebhook(webhookData);
+    if (newWebhook) {
+      res.status(201).json(newWebhook);
+    } else {
+      res.status(400).json({ error: 'Failed to create webhook' });
+    }
   } catch (error) {
     console.error('Error creating webhook:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -16,7 +20,7 @@ router.post('/', async (req, res) => {
 
 router.get('/:webhookId', async (req, res) => {
   try {
-    const webhookId = parseInt(req.params.webhookId);
+    const webhookId = req.params.webhookId;
     const webhook = await getWebhookById(webhookId);
     if (webhook) {
       res.json(webhook);
@@ -31,9 +35,9 @@ router.get('/:webhookId', async (req, res) => {
 
 router.put('/:webhookId', async (req, res) => {
   try {
-    const webhookId = parseInt(req.params.webhookId);
-    const { url, event_type, organization_id } = req.body;
-    const updatedWebhook = await updateWebhook(webhookId, url, event_type, organization_id);
+    const webhookId = req.params.webhookId;
+    const updates = req.body;
+    const updatedWebhook = await updateWebhook(webhookId, updates);
     if (updatedWebhook) {
       res.json(updatedWebhook);
     } else {
@@ -41,6 +45,21 @@ router.put('/:webhookId', async (req, res) => {
     }
   } catch (error) {
     console.error('Error updating webhook:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.delete('/:webhookId', async (req, res) => {
+  try {
+    const webhookId = req.params.webhookId;
+    const deleted = await deleteWebhook(webhookId);
+    if (deleted) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: 'Webhook not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting webhook:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

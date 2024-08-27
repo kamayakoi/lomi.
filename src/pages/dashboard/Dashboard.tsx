@@ -7,11 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Search } from '../../components/dashboard/search'
+import { Search } from '@/components/dashboard/search'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import ThemeSwitch from '../../components/dashboard/theme-switch'
-import { TopNav } from '../../components/dashboard/top-nav'
-import { UserNav } from '../../components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
 import { RecentSales } from './components/recent-sales'
 import { Overview } from './components/overview'
 

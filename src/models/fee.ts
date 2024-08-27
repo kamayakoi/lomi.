@@ -1,27 +1,54 @@
-import { Pool } from 'pg';
-import { Fee } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Fee = Database['public']['Tables']['fees']['Row'];
+type FeeInsert = Database['public']['Tables']['fees']['Insert'];
+type FeeUpdate = Database['public']['Tables']['fees']['Update'];
 
-export async function createFee(name: string, description: string, amount: number, currency_id: number): Promise<Fee> {
-  const query = 'SELECT * FROM create_fee($1, $2, $3, $4)';
-  const values = [name, description, amount, currency_id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createFee(feeData: FeeInsert): Promise<Fee | null> {
+  const { data, error } = await supabase
+    .rpc('create_fee', feeData);
+
+  if (error) {
+    console.error('Error creating fee:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getFeeById(feeId: number): Promise<Fee | null> {
-  const query = 'SELECT * FROM get_fee_by_id($1)';
-  const values = [feeId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getFeeById(feeId: string): Promise<Fee | null> {
+  const { data, error } = await supabase
+    .rpc('get_fee_by_id', { p_fee_id: feeId });
+
+  if (error) {
+    console.error('Error retrieving fee:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function updateFee(feeId: number, name: string, description: string, amount: number, currency_id: number): Promise<Fee | null> {
-  const query = 'SELECT * FROM update_fee($1, $2, $3, $4, $5)';
-  const values = [feeId, name, description, amount, currency_id];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function updateFee(feeId: string, updates: FeeUpdate): Promise<Fee | null> {
+  const { data, error } = await supabase
+    .rpc('update_fee', { p_fee_id: feeId, ...updates });
+
+  if (error) {
+    console.error('Error updating fee:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deleteFee(feeId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_fee', { p_fee_id: feeId });
+
+  if (error) {
+    console.error('Error deleting fee:', error);
+    return false;
+  }
+
+  return data;
 }

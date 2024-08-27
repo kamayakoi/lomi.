@@ -1,27 +1,54 @@
-import { Pool } from 'pg';
-import { Account } from '../types/account';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Account = Database['public']['Tables']['accounts']['Row'];
+type AccountInsert = Database['public']['Tables']['accounts']['Insert'];
+type AccountUpdate = Database['public']['Tables']['accounts']['Update'];
 
-export async function createAccount(user_id: number, payment_method_id: number, currency_id: number): Promise<Account> {
-  const query = 'SELECT * FROM create_account($1, $2, $3)';
-  const values = [user_id, payment_method_id, currency_id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createAccount(accountData: AccountInsert): Promise<Account | null> {
+  const { data, error } = await supabase
+    .rpc('create_account', accountData);
+
+  if (error) {
+    console.error('Error creating account:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getAccountById(accountId: number): Promise<Account | null> {
-  const query = 'SELECT * FROM get_account_by_id($1)';
-  const values = [accountId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getAccountById(accountId: string): Promise<Account | null> {
+  const { data, error } = await supabase
+    .rpc('get_account_by_id', { p_account_id: accountId });
+
+  if (error) {
+    console.error('Error retrieving account:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getAccountsByUserId(userId: number): Promise<Account[]> {
-  const query = 'SELECT * FROM get_accounts_by_user_id($1)';
-  const values = [userId];
-  const result = await pool.query(query, values);
-  return result.rows;
+export async function updateAccount(accountId: string, updates: AccountUpdate): Promise<Account | null> {
+  const { data, error } = await supabase
+    .rpc('update_account', { p_account_id: accountId, ...updates });
+
+  if (error) {
+    console.error('Error updating account:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deleteAccount(accountId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_account', { p_account_id: accountId });
+
+  if (error) {
+    console.error('Error deleting account:', error);
+    return false;
+  }
+
+  return data;
 }

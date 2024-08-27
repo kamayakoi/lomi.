@@ -1,33 +1,54 @@
-import { Pool } from 'pg';
-import { Provider } from '../types';
+import { supabase } from '@/utils/supabase/client';
+import { Database } from '@/../database.types';
 
-const pool = new Pool({
-  // Database connection configuration
-});
+type Provider = Database['public']['Tables']['providers']['Row'];
+type ProviderInsert = Database['public']['Tables']['providers']['Insert'];
+type ProviderUpdate = Database['public']['Tables']['providers']['Update'];
 
-export async function createProvider(name: string, description: string, base_url: string): Promise<Provider> {
-  const query = 'INSERT INTO providers (name, description, base_url) VALUES ($1, $2, $3) RETURNING *';
-  const values = [name, description, base_url];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+export async function createProvider(providerData: ProviderInsert): Promise<Provider | null> {
+  const { data, error } = await supabase
+    .rpc('create_provider', providerData);
+
+  if (error) {
+    console.error('Error creating provider:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function getProviderById(providerId: number): Promise<Provider | null> {
-  const query = 'SELECT * FROM providers WHERE provider_id = $1';
-  const values = [providerId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function getProviderById(providerId: string): Promise<Provider | null> {
+  const { data, error } = await supabase
+    .rpc('get_provider_by_id', { p_provider_id: providerId });
+
+  if (error) {
+    console.error('Error retrieving provider:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function updateProvider(providerId: number, name: string, description: string, base_url: string): Promise<Provider | null> {
-  const query = 'UPDATE providers SET name = $1, description = $2, base_url = $3 WHERE provider_id = $4 RETURNING *';
-  const values = [name, description, base_url, providerId];
-  const result = await pool.query(query, values);
-  return result.rows[0] || null;
+export async function updateProvider(providerId: string, updates: ProviderUpdate): Promise<Provider | null> {
+  const { data, error } = await supabase
+    .rpc('update_provider', { p_provider_id: providerId, ...updates });
+
+  if (error) {
+    console.error('Error updating provider:', error);
+    return null;
+  }
+
+  return data;
 }
 
-export async function deleteProvider(providerId: number): Promise<void> {
-  const query = 'DELETE FROM providers WHERE provider_id = $1';
-  const values = [providerId];
-  await pool.query(query, values);
+export async function deleteProvider(providerId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .rpc('delete_provider', { p_provider_id: providerId });
+
+  if (error) {
+    console.error('Error deleting provider:', error);
+    return false;
+  }
+
+  return data;
 }
