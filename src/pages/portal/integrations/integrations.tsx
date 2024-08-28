@@ -215,7 +215,7 @@ export default function Integrations() {
                     variant='default'
                     size='sm'
                     onClick={handleStripeConnect}
-                    className='flex items-center px-4 py-2 text-sm font-medium bg-blue-800 text-white hover:bg-gray-700'
+                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-800 text-white hover:bg-[#635BFF]'
                   >
                     <IconExternalLink size={14} className="mr-2" />
                     Setup
