@@ -5,6 +5,7 @@ import userOrganizationLinksRouter from './routes/userOrganizationLinks';
 import transactionsRouter from './routes/transactions';
 import endCustomersRouter from './routes/endCustomers';
 import providersRouter from './routes/providers';
+import stripeRouter from '../providers/stripe/route';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/user-organization-links', userOrganizationLinksRouter);
 app.use('/transactions', transactionsRouter);
 app.use('/end-customers', endCustomersRouter);
 app.use('/providers', providersRouter);
+app.use('/stripe', stripeRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

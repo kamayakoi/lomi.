@@ -29,7 +29,7 @@
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
     "supabase:db:reset": "npx supabase db reset",
-    "update-types": "npx supabase gen types --lang=typescript --project-id \"injlwsgidvxehdmwdoo\" > database.types.ts"
+    "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "6.5.1",

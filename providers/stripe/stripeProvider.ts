@@ -1,5 +1,5 @@
 import stripeClient from '../../src/utils/stripe/client';
-import { Database } from '@/../../database.types';
+import { Database } from '../../database.types';
 
 type User = Database['public']['Tables']['users']['Row'];
 type Transaction = Database['public']['Tables']['transactions']['Row'];
@@ -66,7 +66,7 @@ async createAccountSession(account: string) {
     return await stripeClient.accountSessions.create({
       account,
       components: {
-        account_onboarding: { enabled: true },
+        account_onboarding: { enabled: true }
       },
     });
   } catch (error) {

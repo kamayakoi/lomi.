@@ -1,7 +1,6 @@
 import Stripe from 'stripe';
-import { stripeConfig } from './config';
 
-const stripeClient = new Stripe(stripeConfig.secretKey, {
+const stripeClient = new Stripe(process.env.VITE_STRIPE_SECRET_KEY!, {
   apiVersion: '2023-08-16',
 });
 
