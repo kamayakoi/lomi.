@@ -3,7 +3,7 @@
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'payout');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('MTN', 'WAVE', 'ORANGE', 'STRIPE', 'PAYPAL', 'LOMI');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'PAYPAL', 'LOMI');
 CREATE TYPE recurring_payment_type AS ENUM ('subscription', 'installment', 'debt', 'utility', 'other');
 CREATE TYPE transfer_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
 CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
@@ -97,11 +97,13 @@ CREATE TABLE providers (
   provider_code provider_code PRIMARY KEY,
   name VARCHAR NOT NULL,
   description TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, STRIPE, PAYPAL';
+COMMENT ON COLUMN providers.is_active IS 'Indicates if the provider is currently active and available for use in the system';
 
 -- Payment methods table
 CREATE TABLE payment_methods (
@@ -125,6 +127,7 @@ CREATE TABLE organization_providers (
     org_provider_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+    is_connected BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (organization_id, provider_code)
@@ -134,6 +137,7 @@ CREATE INDEX idx_org_providers_org_id ON organization_providers(organization_id)
 CREATE INDEX idx_org_providers_provider_code ON organization_providers(provider_code);
 
 COMMENT ON TABLE organization_providers IS 'Links organizations to their chosen payment providers';
+COMMENT ON COLUMN organization_providers.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';
 
 -- Currencies table
 CREATE TABLE currencies (

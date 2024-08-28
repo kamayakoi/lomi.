@@ -474,6 +474,7 @@ export type Database = {
       organization_providers: {
         Row: {
           created_at: string
+          is_connected: boolean
           org_provider_id: string
           organization_id: string
           provider_code: Database["public"]["Enums"]["provider_code"]
@@ -481,6 +482,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          is_connected?: boolean
           org_provider_id?: string
           organization_id: string
           provider_code: Database["public"]["Enums"]["provider_code"]
@@ -488,6 +490,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          is_connected?: boolean
           org_provider_id?: string
           organization_id?: string
           provider_code?: Database["public"]["Enums"]["provider_code"]
@@ -700,6 +703,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          is_active: boolean
           name: string
           provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at: string
@@ -707,6 +711,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          is_active?: boolean
           name: string
           provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
@@ -714,6 +719,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          is_active?: boolean
           name?: string
           provider_code?: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
@@ -1225,7 +1231,14 @@ export type Database = {
         | "QR_CODE"
         | "USSD"
       payout_status: "pending" | "processing" | "completed" | "failed"
-      provider_code: "MTN" | "WAVE" | "ORANGE" | "STRIPE" | "PAYPAL" | "LOMI"
+      provider_code:
+        | "ORANGE"
+        | "WAVE"
+        | "ECOBANK"
+        | "MTN"
+        | "STRIPE"
+        | "PAYPAL"
+        | "LOMI"
       recurring_payment_type:
         | "subscription"
         | "installment"

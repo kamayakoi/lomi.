@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
   IconSortDescendingLetters,
+  IconExternalLink,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Input } from '@/components/ui/input'
@@ -18,7 +19,9 @@ import { Search } from '@/components/dashboard/search'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
-import { integrations } from './data'
+import { providers, Provider } from './data'
+import { supabase } from '@/utils/supabase/client'
+import { Database } from '@/../database.types'
 
 const integrationText = new Map<string, string>([
   ['all', 'All Integrations'],
@@ -30,25 +33,81 @@ export default function Integrations() {
   const [sort, setSort] = useState('ascending')
   const [integrationType, setIntegrationType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [organizationProviders, setOrganizationProviders] = useState<Database['public']['Tables']['organization_providers']['Row'][]>([])
 
-  const filteredIntegrations = integrations
+  useEffect(() => {
+    fetchOrganizationProviders()
+  }, [])
+
+  const fetchOrganizationProviders = async () => {
+    const { data, error } = await supabase
+      .from('organization_providers')
+      .select('*')
+
+    if (error) {
+      console.error('Error fetching organization providers:', error)
+    } else {
+      setOrganizationProviders(data || [])
+    }
+  }
+
+  const updateProviderConnection = async (providerCode: string, isConnected: boolean) => {
+    const { error } = await supabase
+      .from('organization_providers')
+      .upsert({
+        provider_code: providerCode,
+        is_connected: isConnected
+      })
+
+    if (error) {
+      console.error('Error updating provider connection:', error)
+    } else {
+      fetchOrganizationProviders()
+    }
+  }
+
+  const handleStripeConnect = async () => {
+    try {
+      const response = await fetch("/api/stripe/account_link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to create Stripe account link")
+      }
+
+      const { url } = await response.json()
+      window.location.href = url
+    } catch (error) {
+      console.error("Error creating Stripe account link:", error)
+    }
+  }
+
+  const filteredProviders = providers
     .sort((a, b) =>
       sort === 'ascending'
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name)
     )
-    .filter((integration) =>
-      integrationType === 'connected'
-        ? integration.connected
-        : integrationType === 'notConnected'
-          ? !integration.connected
-          : true
-    )
-    .filter((integration) => integration.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter((provider) => {
+      const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
+      if (integrationType === 'connected' && !isConnected) return false
+      if (integrationType === 'notConnected' && isConnected) return false
+      return provider.name.toLowerCase().includes(searchTerm.toLowerCase())
+    })
+
+  const directProviders = filteredProviders.filter(provider => provider.provider_code !== 'STRIPE')
+  const stripeProvider = filteredProviders.find(provider => provider.provider_code === 'STRIPE')
+
+  const isStripeProvider = (provider: Provider): provider is Provider & { includedPayments: Array<{ name: string; icon: JSX.Element }> } => {
+    return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
+  };
 
   return (
     <Layout fixed>
-      {/* ===== Top Heading ===== */}
       <Layout.Header>
         <div className='flex w-full items-center justify-between'>
           <Search />
@@ -63,7 +122,7 @@ export default function Integrations() {
       <Layout.Body className='flex flex-col'>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            Payment methods
+            Providers
           </h1>
           <p className='text-muted-foreground'>
             Below is a list of payment methods you can activate for your customers.
@@ -111,34 +170,82 @@ export default function Integrations() {
             </SelectContent>
           </Select>
         </div>
-        <Separator className='shadow' />
-        <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
-          {filteredIntegrations.map((integration) => (
-            <li
-              key={integration.name}
-              className='rounded-lg border p-4 hover:shadow-md'
-            >
-              <div className='mb-8 flex items-center justify-between'>
-                <div
-                  className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2`}
-                >
-                  {integration.logo}
+
+        <div className='flex-grow overflow-auto'>
+          <h2 className='text-xl font-semibold mb-4 mt-8'>Direct Integrations</h2>
+          <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
+            {directProviders.map((provider) => (
+              <li
+                key={provider.provider_code}
+                className='rounded-lg border p-6 hover:shadow-md'
+              >
+                <div className='mb-8 flex items-center justify-between'>
+                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
+                    {provider.logo}
+                  </div>
+                  <Button
+                    variant='default'
+                    size='sm'
+                    onClick={() => updateProviderConnection(provider.provider_code, !organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected))}
+                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-700'
+                  >
+                    {organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected) ? 'Disconnect' : 'Connect'}
+                  </Button>
                 </div>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className={`${integration.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
-                >
-                  {integration.connected ? 'Connected' : 'Connect'}
-                </Button>
-              </div>
-              <div>
-                <h2 className='mb-1 font-semibold'>{integration.name}</h2>
-                <p className='line-clamp-2 text-gray-500'>{integration.desc}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+                <div>
+                  <h2 className='mb-2 text-lg font-semibold'>{provider.name}</h2>
+                  <p className='line-clamp-3 text-gray-500'>{provider.description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <Separator className='my-8' />
+          <h2 className='text-xl font-semibold mb-4'>Other</h2>
+          <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
+            {stripeProvider && (
+              <li
+                key={stripeProvider.provider_code}
+                className='rounded-lg border p-6 hover:shadow-md'
+              >
+                <div className='mb-8 flex items-center justify-between'>
+                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
+                    {stripeProvider.logo}
+                  </div>
+                  <Button
+                    variant='default'
+                    size='sm'
+                    onClick={handleStripeConnect}
+                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-700'
+                  >
+                    <IconExternalLink size={14} className="mr-2" />
+                    Setup
+                  </Button>
+                </div>
+                <div>
+                  <h2 className='mb-2 text-lg font-semibold'>{stripeProvider.name}</h2>
+                  <p className='text-gray-500'>{stripeProvider.description}</p>
+                  <p className='text-xs text-blue-600 mt-2 flex items-center'>
+                    <IconExternalLink size={12} className="mr-1" />
+                    External sign-up required
+                  </p>
+                  {isStripeProvider(stripeProvider) && (
+                    <div className='mt-4'>
+                      <p className='text-sm font-medium mb-2'>Includes:</p>
+                      <div className='flex flex-wrap gap-2'>
+                        {stripeProvider.includedPayments.map((payment) => (
+                          <div key={payment.name} className='flex items-center bg-gray-100 rounded-full px-2 py-1'>
+                            <span className='mr-1'>{payment.icon}</span>
+                            <span className='text-xs'>{payment.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </li>
+            )}
+          </ul>
+        </div>
       </Layout.Body>
     </Layout>
   )

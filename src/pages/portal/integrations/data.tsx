@@ -1,57 +1,59 @@
 import {
+  IconBrandStripe,
   IconBrandVisa,
+  IconBrandMastercard,
   IconBrandPaypal,
+  IconBrandApple,
+  IconBrandGoogle,
 } from '@tabler/icons-react'
+import { Database } from '@/../database.types'
 
-// Remove placeholder icon components since we will use images from the public directory
+export type Provider = Omit<Database['public']['Tables']['providers']['Row'], 'created_at' | 'updated_at'> & {
+  logo: JSX.Element;
+  includedPayments?: Array<{ name: string; icon: JSX.Element }>;
+}
 
-export const integrations = [
+export const providers: Provider[] = [
   {
-    name: 'Visa',
-    logo: <IconBrandVisa />,
-    connected: true,
-    desc: 'Easily manage Visa transactions and payments.',
+    provider_code: 'ORANGE',
+    name: 'Orange',
+    logo: <img src="/orange.png" alt="Orange Money" className="w-12 h-12 object-contain" />,
+    description: 'Easily manage Orange Money transactions and payments.',
+    is_active: true,
   },
   {
-    name: 'Paypal',
-    logo: <IconBrandPaypal />,
-    connected: true,
-    desc: 'Easily manage Paypal transactions and payments.',
+    provider_code: 'WAVE',
+    name: 'Wave Mobile Money',
+    logo: <img src="/wave.png" alt="Wave" className="w-full h-full object-contain" />,
+    description: 'Easily manage Wave transactions and payments.',
+    is_active: true,
   },
   {
-    name: 'Wave',
-    logo: <img src="/images/wave.png" alt="Wave" style={{ width: 24, height: 24 }} />,
-    connected: false,
-    desc: 'Easily manage Wave transactions and payments.',
-  },
-  {
+    provider_code: 'ECOBANK',
     name: 'Ecobank',
-    logo: <img src="/images/ecobank.png" alt="Ecobank" style={{ width: 24, height: 24 }} />,
-    connected: false,
-    desc: 'Easily manage Ecobank transactions and payments.',
+    logo: <img src="/ecobank.png" alt="Ecobank" className="w-full h-full object-cover" />,
+    description: 'Easily manage Ecobank transactions and payments.',
+    is_active: true,
   },
   {
-    name: 'UBA Bank',
-    logo: <img src="/images/uba.png" alt="UBA Bank" style={{ width: 24, height: 24 }} />,
-    connected: false,
-    desc: 'Easily manage UBA Bank transactions and payments.',
+    provider_code: 'MTN',
+    name: 'MTN',
+    logo: <img src="/mtn.png" alt="MTN" className="w-full h-full object-contain" />,
+    description: 'Easily manage MTN transactions and payments.',
+    is_active: true,
   },
   {
-    name: 'Mastercard',
-    logo: <img src="/images/mastercard.png" alt="Mastercard" style={{ width: 24, height: 24 }} />,
-    connected: true,
-    desc: 'Easily manage Mastercard transactions and payments.',
-  },
-  {
-    name: 'Airtel',
-    logo: <img src="/images/airtel.png" alt="Airtel" style={{ width: 24, height: 24 }} />,
-    connected: false,
-    desc: 'Easily integrate Airtel for direct messaging.',
-  },
-  {
-    name: 'Vodafone',
-    logo: <img src="/images/vodafone.png" alt="Vodafone" style={{ width: 24, height: 24 }} />,
-    connected: false,
-    desc: 'Easily integrate Vodafone for direct messaging.',
+    provider_code: 'STRIPE',
+    name: 'Stripe',
+    logo: <IconBrandStripe className="w-10 h-10 text-[#635BFF]" />,
+    description: 'Create or connect a Stripe account to enable credit card payments and access advanced features via our API.',
+    is_active: true,
+    includedPayments: [
+      { name: 'Visa', icon: <IconBrandVisa /> },
+      { name: 'Mastercard', icon: <IconBrandMastercard /> },
+      { name: 'PayPal', icon: <IconBrandPaypal /> },
+      { name: 'Apple Pay', icon: <IconBrandApple /> },
+      { name: 'Google Pay', icon: <IconBrandGoogle /> },
+    ],
   },
 ]
