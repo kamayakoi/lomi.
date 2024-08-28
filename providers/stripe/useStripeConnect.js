@@ -27,18 +27,18 @@ export const useStripeConnect = (connectedAccountId) => {
         }
       };
 
-      setStripeConnectInstance(
-        loadConnectAndInitialize({
-          publishableKey: process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY,
-          fetchClientSecret,
-          appearance: {
-            overlays: "dialog",
-            variables: {
-              colorPrimary: "#635BFF",
-            },
-          },
-        })
-      );
+setStripeConnectInstance(
+  loadConnectAndInitialize({
+    publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY,
+    fetchClientSecret,
+    appearance: {
+      overlays: "dialog",
+      variables: {
+        colorPrimary: "#635BFF",
+      },
+    },
+  })
+);
     }
   }, [connectedAccountId]);
 
