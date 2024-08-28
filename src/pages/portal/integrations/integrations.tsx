@@ -120,8 +120,8 @@ export default function Integrations() {
 
       {/* ===== Content ===== */}
       <Layout.Body className='flex flex-col'>
-        <div>
-          <h1 className='text-2xl font-bold tracking-tight'>
+        <div style={{ marginBottom: '0.5rem' }}>
+          <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>
             Providers
           </h1>
           <p className='text-muted-foreground'>
@@ -171,7 +171,7 @@ export default function Integrations() {
           </Select>
         </div>
 
-        <div className='flex-grow overflow-auto'>
+        <div className='flex-grow overflow-auto' style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
           <h2 className='text-xl font-semibold mb-4 mt-8'>Direct Integrations</h2>
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
             {directProviders.map((provider) => (
@@ -184,10 +184,10 @@ export default function Integrations() {
                     {provider.logo}
                   </div>
                   <Button
-                    variant='default'
+                    variant='outline'
                     size='sm'
                     onClick={() => updateProviderConnection(provider.provider_code, !organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected))}
-                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-700'
+                    className='flex items-center px-4 py-2 text-sm font-medium'
                   >
                     {organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected) ? 'Disconnect' : 'Connect'}
                   </Button>
@@ -215,7 +215,7 @@ export default function Integrations() {
                     variant='default'
                     size='sm'
                     onClick={handleStripeConnect}
-                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white hover:bg-gray-700'
+                    className='flex items-center px-4 py-2 text-sm font-medium bg-blue-800 text-white hover:bg-gray-700'
                   >
                     <IconExternalLink size={14} className="mr-2" />
                     Setup
