@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 // import { supabase } from '@/utils/supabase/client';
 
 // Home and landing Pages
-import Homepage from "./pages/Homepage/Homepage.tsx";
+import Home from "./pages/home/Home.tsx";
 import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
 import Integrations from './pages/Integrations.tsx';
@@ -25,23 +25,23 @@ import AuthCallback from './pages/auth/auth-callback.tsx';
 
 
 // Error Pages
-import GeneralError from './pages/errors/general-error.tsx';
-import NotFoundError from './pages/errors/not-found-error.tsx';
-import MaintenanceError from './pages/errors/maintenance-error.tsx';
+import GeneralError from './pages/portal/errors/general-error.tsx';
+import NotFoundError from './pages/portal/errors/not-found-error.tsx';
+import MaintenanceError from './pages/portal/errors/maintenance-error.tsx';
 
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
-import Dashboard from './pages/dashboard/Dashboard.tsx';
-import Tasks from './pages/tasks/tasks.tsx';
-import DashboardIntegrations from './pages/integrations/integrations.tsx';
-import ExtraComponents from './pages/extra-components/extra-component.tsx';
-import Settings from './pages/settings/settings.tsx';
-import Profile from './pages/settings/profile/index.tsx';
-import Account from './pages/settings/account/index.tsx';
-import Appearance from './pages/settings/appearance/index.tsx';
-import Notifications from './pages/settings/notifications/index.tsx';
-import Display from './pages/settings/display/index.tsx';
-import ErrorExample from './pages/settings/error-example/index.tsx';
+import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
+import Tasks from './pages/portal/tasks/tasks.tsx';
+import DashboardIntegrations from './pages/portal/integrations/integrations.tsx';
+import ExtraComponents from './pages/portal/extra-components/extra-component.tsx';
+import Settings from './pages/portal/settings/settings.tsx';
+import Profile from './pages/portal/settings/profile/index.tsx';
+import Account from './pages/portal/settings/account/index.tsx';
+import Appearance from './pages/portal/settings/appearance/index.tsx';
+import Notifications from './pages/portal/settings/notifications/index.tsx';
+import Display from './pages/portal/settings/display/index.tsx';
+import ErrorExample from './pages/portal/settings/error-example/index.tsx';
 
 // Dashboard Coming soon
 import Chats from "./components/dashboard/coming-soon";
@@ -79,8 +79,8 @@ const AppRouter = () => (
     <Router>
         <Routes>
             {/* Website routes */}
-            <Route path="/" element={<Homepage />} />
-            <Route path="/home" element={<Homepage />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/products" element={<Products />} />
             <Route path="/integrations" element={<Integrations />} />
