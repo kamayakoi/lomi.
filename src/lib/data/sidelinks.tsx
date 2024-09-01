@@ -1,168 +1,161 @@
 import {
   IconApps,
-  IconBarrierBlock,
-  IconBoxSeam,
+  IconActivity,
   IconChartHistogram,
-  IconChecklist,
-  IconComponents,
-  IconError404,
-  IconExclamationCircle,
-  IconHexagonNumber1,
-  IconHexagonNumber2,
-  IconHexagonNumber3,
-  IconHexagonNumber4,
-  IconHexagonNumber5,
-  IconLayoutDashboard,
-  IconMessages,
   IconRouteAltLeft,
-  IconServerOff,
+  IconLayoutDashboard,
   IconSettings,
-  IconTruck,
-  IconUserShield,
   IconUsers,
+  IconRepeat,
+  IconWebhook,
+  IconCreditCardPay,
+  IconCreditCard,
+  IconLink,
+  IconListNumbers,
+  IconCurrencyDollar,
+  IconExchange,
+  IconLinkPlus,
+  IconBuildingBank,
+  IconCashBanknote,
+  IconWallet,
+  IconSend,
 } from '@tabler/icons-react'
 
 export interface NavLink {
   title: string
-  label?: string
   href: string
   icon: JSX.Element
+  label?: string
+}
+
+export interface SubNavLink extends NavLink {
+  subSub?: NavLink[]
 }
 
 export interface SideLink extends NavLink {
-  sub?: NavLink[]
+  sub?: SubNavLink[]
 }
 
-export const sidelinks: SideLink[] = [
+export interface SectionTitle {
+  type: 'section'
+  title: string
+}
+
+export type SidebarItem = SideLink | SectionTitle
+
+export const sidelinks: SidebarItem[] = [
+  { type: 'section', title: 'MAIN MENU' },
   {
-    title: 'Dashboard',
-    label: '',
+    title: 'Home',
     href: '/portal',
     icon: <IconLayoutDashboard size={18} />,
   },
   {
-    title: 'Tasks',
-    label: '3',
+    title: 'Balance',
     href: '/portal/tasks',
-    icon: <IconChecklist size={18} />,
+    icon: <IconCurrencyDollar size={18} />,
   },
   {
-    title: 'Chats',
-    label: '9',
+    title: 'Transactions',
     href: '/portal/chats',
-    icon: <IconMessages size={18} />,
+    icon: <IconExchange size={18} />,
   },
+  {
+    title: 'Reporting',
+    href: '',
+    icon: <IconChartHistogram size={18} />,
+  },
+  { type: 'section', title: 'PAYMENTS' },
+  {
+    title: 'Accept Payments',
+    href: '/portal/users',
+    icon: <IconCreditCardPay size={18} />,
+    sub: [
+      {
+        title: 'Credit | Debit Cards',
+        href: '/sign-in-2',
+        icon: <IconCreditCard size={18} />,
+      },
+      {
+        title: 'Fixed Virtual Accounts',
+        href: '/sign-in-2',
+        icon: <IconBuildingBank size={18} />,
+      },
+      {
+        title: 'eWallets',
+        href: '/sign-up',
+        icon: <IconWallet size={18} />,
+      },
+    ],
+  },
+  {
+    title: 'Payment Links',
+    href: '/portal/requests',
+    icon: <IconLinkPlus size={18} />,
+    sub: [
+      {
+        title: 'Payment Links',
+        href: '/sign-in',
+        icon: <IconLink size={18} />,
+      },
+      {
+        title: 'Batch Payment Links',
+        href: '/sign-in-2',
+        icon: <IconListNumbers size={18} />,
+      },
+    ],
+  },
+  {
+    title: 'Subscriptions',
+    href: '/portal/analysis',
+    icon: <IconRepeat size={18} />,
+  },
+  {
+    title: 'Send Payments',
+    href: '/portal/extra-components',
+    icon: <IconSend size={18} />,
+    sub: [
+      {
+        title: 'Payout Links',
+        href: '/sign-in-2',
+        icon: <IconCashBanknote size={18} />,
+      },
+      {
+        title: 'Batch Disbursements',
+        href: '/sign-in',
+        icon: <IconListNumbers size={18} />,
+      },
+    ],
+  },
+  {
+    title: 'Customers',
+    href: '',
+    icon: <IconUsers size={18} />,
+  },
+  { type: 'section', title: 'DEVELOPERS' },
+  {
+    title: 'Webhooks',
+    href: '/portal/settings',
+    icon: <IconWebhook size={18} />,
+  },
+  { type: 'section', title: 'CONFIGURATION' },
   {
     title: 'Integrations',
-    label: '',
     href: '/portal/integrations',
     icon: <IconApps size={18} />,
   },
   {
-    title: 'Authentication',
-    label: '',
-    href: '',
-    icon: <IconUserShield size={18} />,
-    sub: [
-      {
-        title: 'Sign In (email + password)',
-        label: '',
-        href: '/sign-in',
-        icon: <IconHexagonNumber1 size={18} />,
-      },
-      {
-        title: 'Sign In (Box)',
-        label: '',
-        href: '/sign-in-2',
-        icon: <IconHexagonNumber2 size={18} />,
-      },
-      {
-        title: 'Sign Up',
-        label: '',
-        href: '/sign-up',
-        icon: <IconHexagonNumber3 size={18} />,
-      },
-      {
-        title: 'Forgot Password',
-        label: '',
-        href: '/forgot-password',
-        icon: <IconHexagonNumber4 size={18} />,
-      },
-      {
-        title: 'OTP',
-        label: '',
-        href: '/otp',
-        icon: <IconHexagonNumber5 size={18} />,
-      },
-    ],
-  },
-  {
-    title: 'Users',
-    label: '',
-    href: '/portal/users',
-    icon: <IconUsers size={18} />,
-  },
-  {
-    title: 'Requests',
-    label: '10',
-    href: '/portal/requests',
+    title: 'Payment Channels',
+    href: '/portal/payment-channels',
     icon: <IconRouteAltLeft size={18} />,
-    sub: [
-      {
-        title: 'Trucks',
-        label: '9',
-        href: '/portal/trucks',
-        icon: <IconTruck size={18} />,
-      },
-      {
-        title: 'Cargos',
-        label: '',
-        href: '/portal/cargos',
-        icon: <IconBoxSeam size={18} />,
-      },
-    ],
   },
   {
-    title: 'Analysis',
-    label: '',
-    href: '/portal/analysis',
-    icon: <IconChartHistogram size={18} />,
-  },
-  {
-    title: 'Extra Components',
-    label: '',
-    href: '/portal/extra-components',
-    icon: <IconComponents size={18} />,
-  },
-  {
-    title: 'Error Pages',
-    label: '',
-    href: '',
-    icon: <IconExclamationCircle size={18} />,
-    sub: [
-      {
-        title: 'Not Found',
-        label: '',
-        href: '/404',
-        icon: <IconError404 size={18} />,
-      },
-      {
-        title: 'Internal Server Error',
-        label: '',
-        href: '/500',
-        icon: <IconServerOff size={18} />,
-      },
-      {
-        title: 'Maintenance Error',
-        label: '',
-        href: '/503',
-        icon: <IconBarrierBlock size={18} />,
-      },
-    ],
+    title: 'Activity Logs',
+    href: '/portal/activity-logs',
+    icon: <IconActivity size={18} />,
   },
   {
     title: 'Settings',
-    label: '',
     href: '/portal/settings',
     icon: <IconSettings size={18} />,
   },
