@@ -22,7 +22,7 @@ app.use('/providers', providersRouter);
 app.use('/stripe', stripeRouter);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, res) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal server error' });
 });

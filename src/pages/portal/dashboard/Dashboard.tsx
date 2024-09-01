@@ -311,13 +311,8 @@ const topNav = [
     isActive: true,
   },
   {
-    title: 'Transactions',
-    href: 'transactions',
-    isActive: false,
-  },
-  {
-    title: 'Customers',
-    href: 'customers',
+    title: 'Integrations',
+    href: 'integrations',
     isActive: false,
   },
   {

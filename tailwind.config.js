@@ -18,9 +18,9 @@ module.exports = {
     extend: {
       colors: {
         sage: {
-          100: '#E6EFE9', // Light sage
-          200: '#C5D1C8', // Slightly darker sage for secondary text
-          800: '#2C4A3E', // Dark sage for background
+          100: '#E6EFE9', 
+          200: '#C5D1C8', 
+          800: '#2C4A3E', 
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -55,8 +55,8 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'dark-text': '#1a1a1a', // Very dark color for light mode
-        'light-text': '#e0e0e0', // Lighter color for dark mode
+        'dark-text': '#1a1a1a',
+        'light-text': '#e0e0e0',
       },
       borderRadius: {
         lg: "var(--radius)",

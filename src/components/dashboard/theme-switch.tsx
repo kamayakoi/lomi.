@@ -1,5 +1,5 @@
 import { IconMoon, IconSun } from '@tabler/icons-react'
-import { useTheme } from './theme-provider'
+import { useTheme } from '@/lib/useTheme'
 import { Button } from '@/components/custom/button'
 import { useEffect } from 'react'
 

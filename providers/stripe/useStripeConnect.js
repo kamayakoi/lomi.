@@ -18,7 +18,6 @@ export const useStripeConnect = (connectedAccountId) => {
         });
 
         if (!response.ok) {
-          // Handle errors on the client side here
           const { error } = await response.json();
           throw ("An error occurred: ", error);
         } else {

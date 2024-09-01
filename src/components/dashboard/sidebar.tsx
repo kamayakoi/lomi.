@@ -5,6 +5,9 @@ import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/utils'
 import { sidelinks } from '@/lib/data/sidelinks'
+import { useTheme } from '@/lib/useTheme'
+import icon from "/icon.png"
+import iconDark from "/icon_dark.svg"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean
@@ -17,6 +20,7 @@ export default function Sidebar({
   setIsCollapsed,
 }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
+  const { theme } = useTheme()
 
   /* Make body not scrollable when navBar is opened */
   useEffect(() => {
@@ -49,7 +53,7 @@ export default function Sidebar({
           <div className={`flex items-center ${!isCollapsed ? 'gap-2' : ''}`}>
             <div className="flex items-center justify-center">
               <img
-                src="/icon.png"
+                src={theme === 'dark' ? iconDark : icon}
                 alt="lomi. Logo"
                 className={`transition-all mt-0.5 ${isCollapsed ? 'h-6 w-6' : 'h-8 w-8'}`}
               />

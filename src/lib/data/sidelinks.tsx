@@ -89,6 +89,23 @@ export const sidelinks: SidebarItem[] = [
     ],
   },
   {
+    title: 'Send Payments',
+    href: '/portal/extra-components',
+    icon: <IconSend size={18} />,
+    sub: [
+      {
+        title: 'Payout Links',
+        href: '/sign-in-2',
+        icon: <IconCashBanknote size={18} />,
+      },
+      {
+        title: 'Batch Disbursements',
+        href: '/sign-in',
+        icon: <IconListNumbers size={18} />,
+      },
+    ],
+  },
+  {
     title: 'Payment Links',
     href: '/portal/requests',
     icon: <IconLinkPlus size={18} />,
@@ -109,23 +126,6 @@ export const sidelinks: SidebarItem[] = [
     title: 'Subscriptions',
     href: '/portal/analysis',
     icon: <IconRepeat size={18} />,
-  },
-  {
-    title: 'Send Payments',
-    href: '/portal/extra-components',
-    icon: <IconSend size={18} />,
-    sub: [
-      {
-        title: 'Payout Links',
-        href: '/sign-in-2',
-        icon: <IconCashBanknote size={18} />,
-      },
-      {
-        title: 'Batch Disbursements',
-        href: '/sign-in',
-        icon: <IconListNumbers size={18} />,
-      },
-    ],
   },
   {
     title: 'Customers',
