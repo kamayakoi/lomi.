@@ -127,6 +127,7 @@ CREATE TABLE organization_providers (
     org_provider_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+    provider_account_id VARCHAR,
     is_connected BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

@@ -19,7 +19,11 @@ router.post("/account_session", async (req, res) => {
 
 router.post("/account", async (req, res) => {
   try {
-    const account = await stripeProvider.createConnectedAccount(req.body);
+    const { user, organizationId } = req.body;
+    if (!user || !organizationId) {
+      throw new Error('User and organizationId are required');
+    }
+    const account = await stripeProvider.createConnectedAccount(user, organizationId);
     res.json({
       account: account.id,
     });

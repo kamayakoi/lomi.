@@ -51,8 +51,7 @@ const About = () => {
                                         Innovation
                                     </h3>
                                     <p className="text-white mt-1">
-                                        Constantly evolving to exceed our clients' and partners' expectations.
-                                    </p>
+                                        Constantly evolving to exceed our clients and partners expectations.                                    </p>
                                 </div>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">

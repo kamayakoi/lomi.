@@ -6,11 +6,16 @@ import AppRouter from "./router";
 
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <AppRouter />
-      <Analytics />
-    </ThemeProvider>
-  </React.StrictMode>
-);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <ThemeProvider>
+        <AppRouter />
+        <Analytics />
+      </ThemeProvider>
+    </React.StrictMode>
+  );
+} else {
+  console.error("Root element not found");
+}

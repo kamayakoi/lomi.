@@ -86,9 +86,9 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
     return (
       <div className="text-center">
         <h2 className="text-2xl font-semibold mb-4">Check your email</h2>
-        <p className="mb-4">We've sent you a confirmation email. Please check your inbox and follow the instructions to complete your registration.</p>
+        <p className="mb-4">We&apos;ve sent you a confirmation email. Please check your inbox and follow the instructions to complete your registration.</p>
         <p className="text-sm text-muted-foreground">
-          Didn't receive the email? Check your spam folder or{' '}
+          Didn&apos;t receive the email? Check your spam folder or{' '}
           <button
             className="text-primary hover:underline"
             onClick={() => setIsConfirmationSent(false)}

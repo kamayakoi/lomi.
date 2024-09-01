@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 
-interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> { }
+type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
 const formSchema = z.object({
   email: z
@@ -140,7 +140,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </Button>
             </div>
             <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link
                 to='/sign-up'
                 className='underline underline-offset-4 hover:text-primary'

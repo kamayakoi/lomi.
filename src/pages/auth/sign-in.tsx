@@ -29,9 +29,9 @@ export default function SignIn() {
           <div className='relative z-20 mt-auto'>
             <blockquote className='space-y-2'>
               <p className='text-lg text-sage-100'>
-                &ldquo;We're just getting started.&rdquo;
+                &ldquo;We&apos;re just getting started.&rdquo;
               </p>
-              <footer className='text-sm text-sage-200'>lomi.'s Team</footer>
+              <footer className='text-sm text-sage-200'>lomi&apos;s Team</footer>
             </blockquote>
           </div>
         </div>

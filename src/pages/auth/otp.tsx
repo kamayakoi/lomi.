@@ -62,7 +62,7 @@ export default function Otp() {
             <div className='mb-4'></div>
             <OtpForm email={email} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-              Haven't received it?{' '}
+              Haven&apos;t received it?{' '}
               <button
                 onClick={handleResendOtp}
                 disabled={isResending}

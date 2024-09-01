@@ -21,7 +21,7 @@ const Careers = () => {
                         <div>
                             <h2 className="text-4xl font-bold tracking-tight">Join our team</h2>
                             <p className="mt-4 max-w-md text-muted-foreground md:text-xl">
-                                Don't see anything interesting for you here and still interested in joining our team? Reach out to:
+                                Don&apos;t see anything interesting for you here and still interested in joining our team? Reach out to:
                             </p>
                             <div
                                 className="mt-4 w-64 h-12 p-2 border-radius rounded-lg bg-white shadow-md cursor-pointer hover:border-green-700 transition"

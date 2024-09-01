@@ -106,7 +106,7 @@ export const Footer = () => {
         <div className="flex items-center gap-4 ml-[-2px]">
           <p>&copy; 2024 lomi.africa, Inc. </p>
           <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300">
-            Abidjan, Côte d'Ivoire
+            Abidjan, Côte d&apos;Ivoire
           </a>
           <a href="/privacy" className="hover:underline text-gray-600 dark:text-gray-300">
             Privacy Policy

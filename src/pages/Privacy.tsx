@@ -20,7 +20,7 @@ const Privacy = () => {
                                     Privacy is important to us.
                                 </p>
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
-                                    <strong>lomi.africa Inc.</strong>  ("lomi.", "lomi", "We", "Our" or "Us") is an operator of payment systems. We offer payment and disbursement services (<strong>Services</strong>) to our clients. In providing our Services, we process personal information (<strong>Personal Data</strong>) about our clients, their authorized representatives, and their customers (collectively, the <strong>Data Subjects</strong>). This processing is governed by applicable data protection laws and regulations in Côte d'Ivoire.
+                                    <strong>lomi.africa Inc.</strong>  (&quot;lomi.&quot;, &quot;lomi&quot;, &quot;We&quot;, &quot;Our&quot; or &quot;Us&quot;) is an operator of payment systems. We offer payment and disbursement services (<strong>Services</strong>) to our clients. In providing our Services, we process personal information (<strong>Personal Data</strong>) about our clients, their authorized representatives, and their customers (collectively, the <strong>Data Subjects</strong>). This processing is governed by applicable data protection laws and regulations in Côte d&apos;Ivoire.
                                 </p>
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
                                     In certain instances, we partner with our affiliates and third-party vendors for the provision of our Services (e.g., banks, card acquiring partners, payment centers, and e-money issuers, collectively, <strong>Payment Channel Partners</strong>). Whenever there is such a partnership, we execute appropriate agreements with said affiliates and Payment Channel Partners, setting out the extent of their processing in relation to the provision of Services and their obligations over the Personal Data they process on behalf of lomi.
@@ -38,7 +38,7 @@ const Privacy = () => {
                             <div>
                                 <h2 className="text-3xl font-bold">Personal Data We Collect</h2> {/* New section */}
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
-                                    We call "Personal Data" any data that identifies, or that could reasonably be used to identify, a Data Subject as an individual. We collect Personal Data in different ways. For example, we collect Personal Data when a business registers for a lomi. account, or a customer makes payments or conducts transactions through our Services. We may also collect Personal Data from the identification documents our clients submit to us when we perform our <strong>Know-Your-Customer (KYC)</strong> and <strong>Customer Due Diligence (CDD)</strong> vetting of our clients prior to establishing a business relationship with them.
+                                    We call &quot;Personal Data&quot; any data that identifies, or that could reasonably be used to identify, a Data Subject as an individual. We collect Personal Data in different ways. For example, we collect Personal Data when a business registers for a lomi. account, or a customer makes payments or conducts transactions through our Services. We may also collect Personal Data from the identification documents our clients submit to us when we perform our <strong>Know-Your-Customer (KYC)</strong> and <strong>Customer Due Diligence (CDD)</strong> vetting of our clients prior to establishing a business relationship with them.
                                     <br />
                                     <br />
                                     We also receive Personal Data from other sources, such as our partners, financial service providers, identity verification services, and publicly available sources. For clarity, Personal Data does not include data that has been aggregated or made anonymous such that it can no longer be reasonably associated with a specific person. The Personal Data that we may collect includes:
@@ -127,7 +127,7 @@ const Privacy = () => {
                             <div>
                                 <h2 className="text-3xl font-bold">Jurisdiction and Cross-Border Transfer</h2> {/* New section */}
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
-                                    Our Services are global, and Personal Data may be stored and processed in any country where we have operations or where we engage service providers. We may transfer Personal Data to countries outside of Côte d'Ivoire, including the United States and European Union countries, which may have data protection rules that are different from those of the Data Subject’s country.
+                                    Our Services are global, and Personal Data may be stored and processed in any country where we have operations or where we engage service providers. We may transfer Personal Data to countries outside of Côte d&apos;Ivoire, including the United States and European Union countries, which may have data protection rules that are different from those of the Data Subject&apos;s country.
                                     <br />
                                     However, we will take appropriate measures to ensure that any such transfers comply with applicable data protection laws and that your Data remains protected to the standards described in our Privacy Policy. In certain circumstances, courts, law enforcement agencies, regulatory agencies, or security authorities in those other countries may be entitled to access your Personal Data.
                                 </p>
@@ -175,7 +175,7 @@ const Privacy = () => {
                                     Cocody, II Plateau
                                 </p>
                                 <p className="mt-1 text-base text-muted-foreground"> {/* Reduced margin and smaller text */}
-                                    Abidjan, Côte d'Ivoire
+                                    Abidjan, Côte d&apos;Ivoire
                                 </p>
                             </div>
                         </div>

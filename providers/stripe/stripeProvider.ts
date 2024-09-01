@@ -1,11 +1,14 @@
 import stripeClient from '../../src/utils/stripe/client';
 import { Database } from '../../database.types';
+import { createServerSupabaseClient } from '../../src/utils/supabase/server';
+import { Provider } from '../index';
+import Stripe from 'stripe';
 
 type User = Database['public']['Tables']['users']['Row'];
 type Transaction = Database['public']['Tables']['transactions']['Row'];
 
-export class StripeProvider {
-  async createConnectedAccount(user: User) {
+export class StripeProvider implements Provider {
+  async createConnectedAccount(user: User, organizationId: string): Promise<Stripe.Response<Stripe.Account>> {
     try {
       if (!user.country) {
         throw new Error('User country is required for creating a Stripe account');
@@ -21,7 +24,7 @@ export class StripeProvider {
         business_type: 'individual',
       });
 
-      await this.saveUserStripeId(user.user_id, account.id);
+      await this.saveStripeAccountId(organizationId, account.id);
 
       return account;
     } catch (error) {
@@ -30,7 +33,7 @@ export class StripeProvider {
     }
   }
 
-  async createAccountLink(accountId: string) {
+  async createAccountLink(accountId: string): Promise<Stripe.Response<Stripe.AccountLink>> {
     try {
       return await stripeClient.accountLinks.create({
         account: accountId,
@@ -44,7 +47,7 @@ export class StripeProvider {
     }
   }
 
-  async createPaymentIntent(transaction: Transaction, stripeAccountId: string) {
+  async createPaymentIntent(transaction: Transaction, stripeAccountId: string): Promise<Stripe.Response<Stripe.PaymentIntent>> {
     try {
       return await stripeClient.paymentIntents.create({
         amount: transaction.amount,
@@ -61,26 +64,36 @@ export class StripeProvider {
     }
   }
 
-async createAccountSession(account: string) {
-  try {
-    return await stripeClient.accountSessions.create({
-      account,
-      components: {
-        account_onboarding: { enabled: true }
-      },
-    });
-  } catch (error) {
-    console.error('Error creating account session:', error);
-    throw error;
+  async createAccountSession(account: string): Promise<Stripe.Response<Stripe.AccountSession>> {
+    try {
+      return await stripeClient.accountSessions.create({
+        account,
+        components: {
+          account_onboarding: { enabled: true }
+        },
+      });
+    } catch (error) {
+      console.error('Error creating account session:', error);
+      throw error;
+    }
   }
-}
 
   private calculateApplicationFee(amount: number): number {
     return Math.round(amount * 0.1);
   }
 
-  private async saveUserStripeId(userId: string, stripeAccountId: string) {
-    // Implement the logic to save the Stripe account ID to your database
-    // You might want to use your Supabase client here to update the user record
+  private async saveStripeAccountId(organizationId: string, stripeAccountId: string) {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from('organization_providers')
+      .upsert({
+        organization_id: organizationId,
+        provider_code: 'STRIPE',
+        provider_account_id: stripeAccountId,
+        is_connected: true
+      });
+
+    if (error) throw error;
+    return data;
   }
 }

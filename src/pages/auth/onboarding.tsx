@@ -4,10 +4,11 @@ import { supabase } from '@/utils/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/custom/button';
 import { toast } from '@/components/ui/use-toast';
+import { User } from '@supabase/supabase-js';
 
 const Onboarding: React.FC = () => {
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -15,25 +16,41 @@ const Onboarding: React.FC = () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 setUser(user);
-                if (user.user_metadata.onboarded) {
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('onboarded')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (profile && profile.onboarded) {
                     navigate('/portal');
+                } else {
+                    setLoading(false);
                 }
             } else {
-                // If no user, wait for a short time and check again
-                setTimeout(checkUser, 1000);
+                // If no user, redirect to sign-in page
+                navigate('/sign-in');
             }
-            setLoading(false);
         };
         checkUser();
     }, [navigate]);
 
     const handleOnboardingComplete = async () => {
         try {
-            const { error } = await supabase.auth.updateUser({
+            if (!user) throw new Error('No user found');
+
+            const { error: updateError } = await supabase.auth.updateUser({
                 data: { onboarded: true }
             });
 
-            if (error) throw error;
+            if (updateError) throw updateError;
+
+            const { error: profileError } = await supabase
+                .from('users')
+                .update({ onboarded: true })
+                .eq('user_id', user.id);
+
+            if (profileError) throw profileError;
 
             toast({
                 title: "Onboarding Complete",
@@ -71,7 +88,7 @@ const Onboarding: React.FC = () => {
             <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
                 <Card className='p-6'>
                     <h1 className='text-2xl font-semibold tracking-tight'>Complete Your Profile</h1>
-                    <p>Welcome, {user.user_metadata.name || user.email}! Let's set up your account.</p>
+                    <p>Welcome, {user.user_metadata.name || user.email}! Let&apos;s set up your account.</p>
                     {/* Add onboarding form or steps here */}
                     <Button onClick={handleOnboardingComplete} className="mt-4">Complete Onboarding</Button>
                 </Card>

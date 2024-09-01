@@ -14,9 +14,9 @@ export default function ForgotPassword() {
             {isEmailSent ? (
               <div className='text-center'>
                 <h2 className='text-2xl font-semibold mb-4'>Check your email</h2>
-                <p className='mb-4'>We've sent you a password reset email. Please check your inbox and follow the instructions to reset your password.</p>
+                <p className='mb-4'>We&apos;ve sent you a password reset email. Please check your inbox and follow the instructions to reset your password.</p>
                 <p className='text-sm text-muted-foreground'>
-                  Didn't receive the email? Check your spam folder or{' '}
+                  Didn&apos;t receive the email? Check your spam folder or{' '}
                   <button
                     className='text-primary hover:underline'
                     onClick={() => setIsEmailSent(false)}
@@ -35,7 +35,7 @@ export default function ForgotPassword() {
                 <div className='mb-4'></div>
                 <ForgotForm onSuccess={() => setIsEmailSent(true)} />
                 <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link
                     to='/sign-up'
                     className='underline underline-offset-4 hover:text-primary'

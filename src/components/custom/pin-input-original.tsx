@@ -192,6 +192,8 @@ const PinInputField = React.forwardRef<HTMLInputElement, InputProps>(
   }
 )
 
+PinInputField.displayName = 'PinInputField'
+
 /* ========== usePinInput custom hook ========== */
 
 interface UsePinInputProps {
@@ -328,11 +330,11 @@ const usePinInput = ({
     if (type === 'numeric') {
       const canTypeSign =
         key === 'Backspace' ||
-        key === 'Tab' ||
-        key === 'Control' ||
-        key === 'Delete' ||
-        (ctrlKey && key === 'v') ||
-        (metaKey && key === 'v')
+          key === 'Tab' ||
+          key === 'Control' ||
+          key === 'Delete' ||
+          (ctrlKey && key === 'v') ||
+          (metaKey && key === 'v')
           ? true
           : !Number.isNaN(Number(key))
 

@@ -1,6 +1,12 @@
 import Stripe from 'stripe';
 
-const stripeClient = new Stripe(process.env.VITE_STRIPE_SECRET_KEY!, {
+const stripeSecretKey = process.env.VITE_STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  throw new Error('VITE_STRIPE_SECRET_KEY is not defined in the environment variables');
+}
+
+const stripeClient = new Stripe(stripeSecretKey, {
   apiVersion: '2023-08-16',
 });
 
