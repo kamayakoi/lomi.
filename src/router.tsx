@@ -21,7 +21,6 @@ import Signup from './pages/auth/sign-up.tsx';
 import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
 import Onboarding from './pages/auth/onboarding.tsx';
-import AuthCallback from './pages/auth/auth-callback.tsx';
 
 
 // Error Pages
@@ -123,7 +122,6 @@ const AppRouter = () => (
             <Route path="/forgot-password" element={<Forgot />} />
             <Route path="/otp" element={<OTP />} />
             <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
 
             {/* Error routes */}
             <Route path="/500" element={<GeneralError />} />

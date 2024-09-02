@@ -20,6 +20,7 @@ import { toast } from '@/components/ui/use-toast'
 interface SignUpFormCustomProps {
   onSubmit: (data: { email: string; password: string; name: string }) => Promise<boolean>
   isLoading: boolean
+  isConfirmationSent: boolean
 }
 
 interface SignUpFormProps extends SignUpFormCustomProps, Omit<HTMLAttributes<HTMLDivElement>, 'onSubmit'> { }
@@ -36,8 +37,8 @@ const formSchema = z.object({
     .min(7, { message: 'Password must be at least 7 characters long' }),
 })
 
-export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpFormProps) {
-  const [isConfirmationSent, setIsConfirmationSent] = useState(false)
+export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, ...props }: SignUpFormProps) {
+  const [email, setEmail] = useState('')
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,7 +52,7 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
     try {
       const success = await onSubmit(data)
       if (success) {
-        setIsConfirmationSent(true)
+        setEmail(data.email)
       }
     } catch (error) {
       console.error('Error during sign up:', error)
@@ -82,6 +83,27 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
     }
   }
 
+  const handleResendEmail = async () => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      })
+      if (error) throw error
+      toast({
+        title: "Email Resent",
+        description: "A new verification email has been sent to your inbox.",
+      })
+    } catch (error) {
+      console.error('Error resending email:', error)
+      toast({
+        title: "Error",
+        description: "There was a problem resending the verification email. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   if (isConfirmationSent) {
     return (
       <div className="text-center">
@@ -91,9 +113,9 @@ export function SignUpForm({ className, onSubmit, isLoading, ...props }: SignUpF
           Didn&apos;t receive the email? Check your spam folder or{' '}
           <button
             className="text-primary hover:underline"
-            onClick={() => setIsConfirmationSent(false)}
+            onClick={handleResendEmail}
           >
-            try again
+            resend the email
           </button>
         </p>
       </div>

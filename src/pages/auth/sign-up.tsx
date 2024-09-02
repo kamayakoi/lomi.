@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
 import { SignUpForm } from './components/sign-up-form'
 import { supabase } from '@/utils/supabase/client'
@@ -7,9 +6,9 @@ import { toast } from '@/components/ui/use-toast'
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
+  const [isConfirmationSent, setIsConfirmationSent] = useState(false)
 
-  const handleSignUp = async (data: { email: string; password: string; name: string }) => {
+  const handleSignUp = async (data: { email: string; password: string; name: string }): Promise<boolean> => {
     setIsLoading(true)
     try {
       const { data: authData, error } = await supabase.auth.signUp({
@@ -18,24 +17,37 @@ export default function SignUp() {
         options: {
           data: {
             name: data.name,
-            onboarded: false,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (error) throw error
+
       if (authData.user) {
-        toast({
-          title: "Account created successfully",
-          description: "You will now be redirected to complete your profile.",
-        })
-        navigate('/onboarding')
-      } else {
+        // Create a minimal user profile in the users table
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([
+            {
+              user_id: authData.user.id,
+              name: data.name,
+              email: data.email,
+              phone_number: '', // This will be collected during onboarding
+              is_admin: false,
+              verified: false,
+              onboarded: false,
+            }
+          ])
+        if (profileError) throw profileError
+
+        setIsConfirmationSent(true)
         toast({
           title: "Account created",
           description: "Please check your email for the verification link.",
         })
+        return true
       }
-      return true
+      return false // If no user was created
     } catch (error) {
       console.error('Error signing up:', error)
       toast({
@@ -60,7 +72,11 @@ export default function SignUp() {
               </h1>
             </div>
             <div className='mb-4'></div>
-            <SignUpForm onSubmit={handleSignUp} isLoading={isLoading} />
+            <SignUpForm
+              onSubmit={handleSignUp}
+              isLoading={isLoading}
+              isConfirmationSent={isConfirmationSent}
+            />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               By creating an account, you agree to our{' '}
               <a
