@@ -134,7 +134,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder='Full name*'
+                      placeholder='Full name**'
                       {...field}
                       className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
@@ -150,7 +150,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder='Email address*'
+                      placeholder='Email address**'
                       type='email'
                       {...field}
                       className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
@@ -167,7 +167,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
                 <FormItem>
                   <FormControl>
                     <PasswordInput
-                      placeholder='Password*'
+                      placeholder='Password**'
                       {...field}
                       className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />

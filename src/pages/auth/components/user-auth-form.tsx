@@ -46,23 +46,39 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       })
 
-      if (error) throw error
-
-      toast({
-        title: "Success",
-        description: "You have successfully signed in.",
-      })
-      navigate('/portal')
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Error",
+            description: "Invalid email or password. Please try again or sign up if you don't have an account.",
+            variant: "destructive",
+          })
+        } else if (error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Error",
+            description: "Please confirm your email address before signing in.",
+            variant: "destructive",
+          })
+        } else {
+          throw error
+        }
+      } else if (signInData.user) {
+        toast({
+          title: "Success",
+          description: "You have successfully signed in.",
+        })
+        navigate('/portal')
+      }
     } catch (error) {
       console.error('Error during sign in:', error)
       toast({
         title: "Error",
-        description: "There was a problem signing in. Please check your credentials and try again.",
+        description: "An unexpected error occurred. Please try again later.",
         variant: "destructive",
       })
     } finally {
@@ -83,7 +99,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       console.error(`Error signing in with ${provider}:`, error)
       toast({
         title: "Error",
-        description: `There was a problem signing in with ${provider}.`,
+        description: `There was a problem signing in with ${provider}. Please try again.`,
         variant: "destructive",
       })
     }
@@ -98,7 +114,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               control={form.control}
               name='email'
               render={({ field }) => (
-                <FormItem className='space-y-1'>
+                <FormItem>
                   <FormControl>
                     <Input
                       placeholder='Email address*'
@@ -122,7 +138,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               control={form.control}
               name='password'
               render={({ field }) => (
-                <FormItem className='space-y-1'>
+                <FormItem>
                   <FormControl>
                     <PasswordInput
                       placeholder='Password*'
@@ -134,57 +150,53 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 </FormItem>
               )}
             />
-            <div className='mt-2'>
-              <Button className='w-full' loading={isLoading}>
-                Sign In
-              </Button>
-            </div>
-            <p className='mt-1 px-8 text-center text-sm text-muted-foreground'>
-              Don&apos;t have an account?{' '}
-              <Link
-                to='/sign-up'
-                className='underline underline-offset-4 hover:text-primary'
-              >
-                Sign up
-              </Link>
-            </p>
-
-            <div className='relative my-2'>
-              <div className='absolute inset-0 flex items-center'>
-                <span className='w-full border-t' />
-              </div>
-              <div className='relative flex justify-center text-xs uppercase'>
-                <span className='bg-background px-2 text-muted-foreground'>
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                loading={isLoading}
-                onClick={() => handleOAuthSignIn('github')}
-              >
-                <IconBrandGithub className='h-4 w-4 mr-2' />
-                GitHub
-              </Button>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                loading={isLoading}
-                onClick={() => handleOAuthSignIn('google')}
-              >
-                <IconBrandGoogle className='h-4 w-4 mr-2' />
-                Google
-              </Button>
-            </div>
+            <Button className='w-full' type='submit' disabled={isLoading}>
+              {isLoading ? 'Processing...' : 'Connect'}
+            </Button>
           </div>
         </form>
       </Form>
+      <div className='relative'>
+        <div className='absolute inset-0 flex items-center'>
+          <span className='w-full border-t' />
+        </div>
+        <div className='relative flex justify-center text-xs uppercase'>
+          <span className='bg-background px-2 text-muted-foreground'>
+            Or continue with
+          </span>
+        </div>
+      </div>
+      <div className='flex items-center gap-2'>
+        <Button
+          variant='outline'
+          className='w-full'
+          type='button'
+          disabled={isLoading}
+          onClick={() => handleOAuthSignIn('github')}
+        >
+          <IconBrandGithub className='h-4 w-4 mr-2' />
+          GitHub
+        </Button>
+        <Button
+          variant='outline'
+          className='w-full'
+          type='button'
+          disabled={isLoading}
+          onClick={() => handleOAuthSignIn('google')}
+        >
+          <IconBrandGoogle className='h-4 w-4 mr-2' />
+          Google
+        </Button>
+      </div>
+      <p className='px-8 text-center text-sm text-muted-foreground'>
+        Don&apos;t have an account?{' '}
+        <Link
+          to='/sign-up'
+          className='underline underline-offset-4 hover:text-primary'
+        >
+          Sign up
+        </Link>
+      </p>
     </div>
   )
 }

@@ -477,6 +477,7 @@ export type Database = {
           is_connected: boolean
           org_provider_id: string
           organization_id: string
+          provider_account_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at: string
         }
@@ -485,6 +486,7 @@ export type Database = {
           is_connected?: boolean
           org_provider_id?: string
           organization_id: string
+          provider_account_id?: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
         }
@@ -493,6 +495,7 @@ export type Database = {
           is_connected?: boolean
           org_provider_id?: string
           organization_id?: string
+          provider_account_id?: string | null
           provider_code?: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
         }
@@ -515,11 +518,14 @@ export type Database = {
       }
       organizations: {
         Row: {
+          address: string
+          city: string
           country: string
           created_at: string
           created_by: string | null
           deleted_at: string | null
           email: string
+          industry: string | null
           logo_url: string | null
           max_api_calls_per_minute: number | null
           max_monthly_volume: number | null
@@ -531,16 +537,21 @@ export type Database = {
           name: string
           organization_id: string
           phone_number: string
+          postal_code: string
           status: Database["public"]["Enums"]["organization_status"]
           updated_at: string
           updated_by: string | null
+          website_url: string | null
         }
         Insert: {
+          address: string
+          city: string
           country: string
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           email: string
+          industry?: string | null
           logo_url?: string | null
           max_api_calls_per_minute?: number | null
           max_monthly_volume?: number | null
@@ -552,16 +563,21 @@ export type Database = {
           name: string
           organization_id?: string
           phone_number: string
+          postal_code: string
           status?: Database["public"]["Enums"]["organization_status"]
           updated_at?: string
           updated_by?: string | null
+          website_url?: string | null
         }
         Update: {
+          address?: string
+          city?: string
           country?: string
           created_at?: string
           created_by?: string | null
           deleted_at?: string | null
           email?: string
+          industry?: string | null
           logo_url?: string | null
           max_api_calls_per_minute?: number | null
           max_monthly_volume?: number | null
@@ -573,9 +589,11 @@ export type Database = {
           name?: string
           organization_id?: string
           phone_number?: string
+          postal_code?: string
           status?: Database["public"]["Enums"]["organization_status"]
           updated_at?: string
           updated_by?: string | null
+          website_url?: string | null
         }
         Relationships: [
           {
