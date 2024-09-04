@@ -1,4 +1,4 @@
-import { HTMLAttributes, useState } from 'react'
+import { HTMLAttributes } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react'
@@ -18,15 +18,15 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 
 interface SignUpFormCustomProps {
-  onSubmit: (data: { email: string; password: string; name: string }) => Promise<boolean>
+  onSubmit: (data: { email: string; password: string }) => Promise<boolean>
   isLoading: boolean
   isConfirmationSent: boolean
+  onResendEmail: () => Promise<void>
 }
 
 interface SignUpFormProps extends SignUpFormCustomProps, Omit<HTMLAttributes<HTMLDivElement>, 'onSubmit'> { }
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'Please enter your name' }),
   email: z
     .string()
     .min(1, { message: 'Please enter your email' })
@@ -37,23 +37,20 @@ const formSchema = z.object({
     .min(7, { message: 'Password must be at least 7 characters long' }),
 })
 
-export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, ...props }: SignUpFormProps) {
-  const [email, setEmail] = useState('')
+export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, ...props }: SignUpFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
     },
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {
+    console.log('Form submitted with data:', data); // Add this line
     try {
-      const success = await onSubmit(data)
-      if (success) {
-        setEmail(data.email)
-      }
+      const result = await onSubmit(data);
+      console.log('onSubmit result:', result); // Add this line
     } catch (error) {
       console.error('Error during sign up:', error)
       toast({
@@ -66,13 +63,15 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
 
   const handleOAuthSignUp = async (provider: 'github' | 'google') => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/onboarding`,
         }
       })
       if (error) throw error
+      if (!data.url) throw new Error('No URL returned from Supabase')
+      window.location.href = data.url
     } catch (error) {
       console.error(`Error signing up with ${provider}:`, error)
       toast({
@@ -83,37 +82,16 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
     }
   }
 
-  const handleResendEmail = async () => {
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-      })
-      if (error) throw error
-      toast({
-        title: "Email Resent",
-        description: "A new verification email has been sent to your inbox.",
-      })
-    } catch (error) {
-      console.error('Error resending email:', error)
-      toast({
-        title: "Error",
-        description: "There was a problem resending the verification email. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
   if (isConfirmationSent) {
     return (
-      <div className="text-center">
+      <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105">
         <h2 className="text-2xl font-semibold mb-4">Check your email</h2>
         <p className="mb-4">We&apos;ve sent you a confirmation email. Please check your inbox and follow the instructions to complete your registration.</p>
         <p className="text-sm text-muted-foreground">
           Didn&apos;t receive the email? Check your spam folder or{' '}
           <button
             className="text-primary hover:underline"
-            onClick={handleResendEmail}
+            onClick={onResendEmail}
           >
             resend the email
           </button>
@@ -127,22 +105,6 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
       <Form {...form}>
         <form onSubmit={handleSubmit}>
           <div className='grid gap-4'>
-            <FormField
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder='Full name**'
-                      {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name='email'
@@ -176,7 +138,12 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
                 </FormItem>
               )}
             />
-            <Button className='w-full' type='submit' disabled={isLoading}>
+            <Button
+              className='w-full'
+              type='submit'
+              disabled={isLoading}
+              onClick={() => console.log('Submit button clicked')} // Add this line
+            >
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
           </div>
