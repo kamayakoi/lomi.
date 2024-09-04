@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { ForgotForm } from './components/forgot-form'
-import { CheckEmailMessage } from './components/check-email-message'
+import { CheckEmailMessage } from './components/password-email-message'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'

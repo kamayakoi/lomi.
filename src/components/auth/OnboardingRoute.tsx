@@ -38,7 +38,7 @@ export function OnboardingRoute({ children }: OnboardingRouteProps) {
     }, []);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return null;
     }
 
     if (!shouldOnboard) {

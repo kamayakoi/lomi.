@@ -15,9 +15,7 @@ export function SessionCheck({ children }: SessionCheckProps) {
         const checkUserSession = async () => {
             const session = await checkSession()
             if (session) {
-                // User is authenticated
                 if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
-                    // Redirect to portal if trying to access login/signup pages
                     navigate('/portal')
                 }
             }
@@ -28,7 +26,7 @@ export function SessionCheck({ children }: SessionCheckProps) {
     }, [navigate, location])
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return null
     }
 
     return <>{children}</>

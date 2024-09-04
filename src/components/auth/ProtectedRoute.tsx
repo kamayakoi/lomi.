@@ -26,7 +26,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     }, [navigate])
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return null
     }
 
     return isAuthenticated ? <>{children}</> : null
