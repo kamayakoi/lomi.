@@ -15,7 +15,6 @@ const AuthCallback: React.FC = () => {
             }
 
             if (data?.session) {
-                // Session exists, user is authenticated
                 const { data: profile } = await supabase
                     .from('users')
                     .select('onboarded')
@@ -28,7 +27,6 @@ const AuthCallback: React.FC = () => {
                     navigate('/onboarding');
                 }
             } else {
-                // No session, redirect to sign-in
                 navigate('/sign-in');
             }
         };
@@ -40,7 +38,7 @@ const AuthCallback: React.FC = () => {
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <div className="text-center">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-                <p className="mt-4 text-lg font-semibold text-gray-700">Completing sign up process...</p>
+                <p className="mt-4 text-lg font-semibold text-gray-700">Completing authentication process...</p>
             </div>
         </div>
     );

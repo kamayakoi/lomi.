@@ -54,6 +54,7 @@ CREATE TABLE organizations (
   organization_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR NOT NULL,
   email VARCHAR UNIQUE NOT NULL,
+  onboarded BOOLEAN DEFAULT FALSE,
   phone_number VARCHAR NOT NULL,
   country VARCHAR NOT NULL,
   city VARCHAR NOT NULL,
