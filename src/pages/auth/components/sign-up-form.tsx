@@ -1,4 +1,3 @@
-import { HTMLAttributes } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react'
@@ -16,30 +15,21 @@ import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import { useNavigate } from 'react-router-dom'
 
-interface SignUpFormCustomProps {
-  onSubmit: (data: { email: string; password: string }) => Promise<boolean>
+interface SignUpFormProps {
+  className?: string
+  onSubmit: (data: { email: string; password: string }) => Promise<void>
   isLoading: boolean
   isConfirmationSent: boolean
   onResendEmail: () => Promise<void>
 }
 
-interface SignUpFormProps extends SignUpFormCustomProps, Omit<HTMLAttributes<HTMLDivElement>, 'onSubmit'> { }
-
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Please enter your email' })
-    .email({ message: 'Invalid email address' }),
-  password: z
-    .string()
-    .min(1, { message: 'Please enter your password' })
-    .min(7, { message: 'Password must be at least 7 characters long' }),
+  email: z.string().email(),
+  password: z.string().min(8),
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, ...props }: SignUpFormProps) {
-  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,22 +39,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    console.log('Form submitted with data:', data);
-    try {
-      const result = await onSubmit(data);
-      console.log('onSubmit result:', result);
-      if (result) {
-        // Redirect to onboarding page after successful sign-up
-        navigate('/onboarding');
-      }
-    } catch (error) {
-      console.error('Error during sign up:', error)
-      toast({
-        title: "Error",
-        description: "There was a problem creating your account. Please try again.",
-        variant: "destructive",
-      })
-    }
+    await onSubmit(data)
   })
 
   const handleOAuthSignUp = async (provider: 'github' | 'google') => {
@@ -148,7 +123,6 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
               className='w-full'
               type='submit'
               disabled={isLoading}
-              onClick={() => console.log('Submit button clicked')} // Add this line
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>

@@ -22,6 +22,13 @@ export const signInWithGoogle = async () => {
   return { data, error }
 }
 
+export const signInWithGithub = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+  })
+  return { data, error }
+}
+
 export const checkSession = async () => {
   const { data, error } = await supabase.auth.getSession()
   if (error) {

@@ -9,45 +9,32 @@ export default function SignUp() {
   const [isConfirmationSent, setIsConfirmationSent] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleSignUp = async (data: { email: string; password: string }): Promise<boolean> => {
-    console.log('handleSignUp called with data:', data); // Add this line
+  const handleSignUp = async (data: { email: string; password: string }) => {
     setIsLoading(true)
     setEmail(data.email)
-    try {
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-      console.log('Supabase auth.signUp response:', { authData, error }); // Add this line
+    const { error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/onboarding`,
+      },
+    })
 
-      if (error) throw error
-
-      if (authData.user) {
-        setTimeout(() => {
-          setIsConfirmationSent(true)
-          setIsLoading(false)
-          toast({
-            title: "Account created",
-            description: "Please check your email for the verification link.",
-          })
-        }, 5000)
-        return true
-      } else {
-        throw new Error('User data not returned from Supabase')
-      }
-    } catch (error) {
-      console.error('Error signing up:', error)
+    if (error) {
       toast({
-        title: "Error",
-        description: "There was a problem creating your account. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
       })
-      setIsLoading(false)
-      return false
+    } else {
+      setIsConfirmationSent(true)
+      toast({
+        title: 'Success',
+        description: 'Please check your email for the confirmation link.',
+      })
     }
+
+    setIsLoading(false)
   }
 
   const handleResendEmail = async () => {
