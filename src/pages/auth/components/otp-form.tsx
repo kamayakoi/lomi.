@@ -12,7 +12,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
-import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
@@ -23,12 +22,11 @@ interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const formSchema = z.object({
-  otp: z.string().min(1, { message: 'Please enter your otp code.' }),
+  otp: z.string().length(6, { message: 'OTP must be 6 digits' }),
 })
 
 export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add email here
   const [isLoading, setIsLoading] = useState(false)
-  const [disabledBtn, setDisabledBtn] = useState(true)
   const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,16 +38,16 @@ export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add e
     setIsLoading(true)
     try {
       const { error } = await supabase.auth.verifyOtp({
-        email: email, // Add this line
+        email,
         token: data.otp,
-        type: 'email',
+        type: 'recovery', // Changed from 'signup' to 'recovery'
       })
       if (error) throw error
       toast({
         title: "Success",
         description: "OTP verified successfully.",
       })
-      navigate('/portal') // Redirect to portal after successful verification
+      navigate('/portal') // Changed from '/onboarding' to '/portal'
     } catch (error) {
       console.error('Error during OTP verification:', error)
       toast({
@@ -59,7 +57,6 @@ export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add e
       })
     } finally {
       setIsLoading(false)
-      form.reset()
     }
   }
 
@@ -72,33 +69,28 @@ export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add e
               control={form.control}
               name='otp'
               render={({ field }) => (
-                <FormItem className='space-y-1'>
+                <FormItem>
                   <FormControl>
                     <PinInput
                       {...field}
-                      className='flex h-10 justify-between'
-                      onComplete={() => setDisabledBtn(false)}
-                      onIncomplete={() => setDisabledBtn(true)}
+                      onComplete={(value) => form.setValue('otp', value)}
+                      className='flex justify-between'
                     >
-                      {Array.from({ length: 7 }, (_, i) => {
-                        if (i === 3)
-                          return <Separator key={i} orientation='vertical' />
-                        return (
-                          <PinInputField
-                            key={i}
-                            component={Input} // This should now work with the import
-                            className={`${form.getFieldState('otp').invalid ? 'border-red-500' : ''}`}
-                          />
-                        )
-                      })}
+                      {Array.from({ length: 6 }, (_, i) => (
+                        <PinInputField
+                          key={i}
+                          component={Input}
+                          className='w-12 h-12 text-center'
+                        />
+                      ))}
                     </PinInput>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button className='mt-2' disabled={disabledBtn} loading={isLoading}>
-              Verify
+            <Button type="submit" className='w-full' disabled={isLoading}>
+              {isLoading ? 'Verifying...' : 'Verify Email'}
             </Button>
           </div>
         </form>

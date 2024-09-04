@@ -62,6 +62,8 @@ const employeeRanges = [
 const phoneRegex = /^\d{1,14}$/;
 
 const formSchema = z.object({
+    firstName: z.string().min(1, 'First name is required'),
+    lastName: z.string().min(1, 'Last name is required'),
     countryCode: z.string().min(1, 'Country code is required'),
     phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
     country: z.string().min(1, 'Country is required'),
@@ -208,6 +210,7 @@ const Onboarding: React.FC = () => {
         const { error } = await supabase
             .from('users')
             .update({
+                name: `${formData.firstName} ${formData.lastName}`,
                 phone_number: `${formData.countryCode}${formData.phoneNumber}`,
                 country: formData.country,
                 onboarded: true,
@@ -548,6 +551,34 @@ const Onboarding: React.FC = () => {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                        <div className="flex space-x-2 mb-4">
+                            <div className="flex-1">
+                                <Label htmlFor="firstName">First Name*</Label>
+                                <Input
+                                    id="firstName"
+                                    placeholder="e.g., John"
+                                    {...register("firstName")}
+                                    className={cn(
+                                        "w-full",
+                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                    )}
+                                />
+                                {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
+                            </div>
+                            <div className="flex-1">
+                                <Label htmlFor="lastName">Last Name*</Label>
+                                <Input
+                                    id="lastName"
+                                    placeholder="e.g., Doe"
+                                    {...register("lastName")}
+                                    className={cn(
+                                        "w-full",
+                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                    )}
+                                />
+                                {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
+                            </div>
                         </div>
                         <div className="flex justify-between mt-6">
                             <Button

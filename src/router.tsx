@@ -1,7 +1,8 @@
-// import { User } from '@supabase/supabase-js';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import { useState, useEffect } from 'react';
-// import { supabase } from '@/utils/supabase/client';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
+import { SessionCheck } from '@/components/auth/SessionCheck';
+import ResetPassword from './pages/auth/reset-password.tsx';
 
 // Home and landing Pages
 import Home from "./pages/home/Home.tsx";
@@ -22,7 +23,6 @@ import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
 import Onboarding from './pages/auth/onboarding.tsx';
 import AuthCallback from './pages/auth/callback';
-
 
 // Error Pages
 import GeneralError from './pages/portal/errors/general-error.tsx';
@@ -48,89 +48,66 @@ import Chats from "./components/dashboard/coming-soon";
 import Users from "./components/dashboard/coming-soon";
 import Analysis from "./components/dashboard/coming-soon";
 
-// const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//     const [user, setUser] = useState<User | null>(null);
-//     const [loading, setLoading] = useState(true);
-//     const navigate = useNavigate();
-
-//     useEffect(() => {
-//         const checkUser = async () => {
-//             const { data: { user } } = await supabase.auth.getUser();
-//             if (user) {
-//                 if (!user.user_metadata?.onboarded) {
-//                     navigate('/onboarding');
-//                 } else {
-//                     setUser(user);
-//                 }
-//             } else {
-//                 navigate('/sign-in');
-//             }
-//             setLoading(false);
-//         };
-//         checkUser();
-//     }, [navigate]);
-
-//     if (loading) return <div>Loading...</div>;
-//     if (!user) return null;
-//     return <>{children}</>;
-// };
-
 const AppRouter = () => (
     <Router>
-        <Routes>
-            {/* Website routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/integrations" element={<Integrations />} />
-            <Route path="/solutions" element={<Solutions />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/template" element={<Template />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
+        <SessionCheck>
+            <Routes>
+                {/* Website routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/integrations" element={<Integrations />} />
+                <Route path="/solutions" element={<Solutions />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/template" element={<Template />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
 
-            {/* Dashboard routes */}
-            {/* Commented out ProtectedRoute for /portal temporarily */}
-            {/* <Route path="/portal" element={
-                <ProtectedRoute>
-                    <AppShell />
-                </ProtectedRoute>
-            }> */}
-            <Route path="/portal" element={<AppShell />}>
-                {/* End of comment */}
-                <Route index element={<Dashboard />} />
-                <Route path="tasks" element={<Tasks />} />
-                <Route path="chats" element={<Chats />} />
-                <Route path="integrations" element={<DashboardIntegrations />} />
-                <Route path="users" element={<Users />} />
-                <Route path="analysis" element={<Analysis />} />
-                <Route path="extra-components" element={<ExtraComponents />} />
-                <Route path="settings" element={<Settings />}>
-                    <Route index element={<Profile />} />
-                    <Route path="account" element={<Account />} />
-                    <Route path="appearance" element={<Appearance />} />
-                    <Route path="notifications" element={<Notifications />} />
-                    <Route path="display" element={<Display />} />
-                    <Route path="error-example" element={<ErrorExample />} />
+                {/* Dashboard routes */}
+                <Route path="/portal" element={
+                    <ProtectedRoute>
+                        <AppShell />
+                    </ProtectedRoute>
+                }>
+                    <Route index element={<Dashboard />} />
+                    <Route path="tasks" element={<Tasks />} />
+                    <Route path="chats" element={<Chats />} />
+                    <Route path="integrations" element={<DashboardIntegrations />} />
+                    <Route path="users" element={<Users />} />
+                    <Route path="analysis" element={<Analysis />} />
+                    <Route path="extra-components" element={<ExtraComponents />} />
+                    <Route path="settings" element={<Settings />}>
+                        <Route index element={<Profile />} />
+                        <Route path="account" element={<Account />} />
+                        <Route path="appearance" element={<Appearance />} />
+                        <Route path="notifications" element={<Notifications />} />
+                        <Route path="display" element={<Display />} />
+                        <Route path="error-example" element={<ErrorExample />} />
+                    </Route>
                 </Route>
-            </Route>
 
-            {/* Login/Signup routes */}
-            <Route path="/sign-in" element={<Signin />} />
-            <Route path="/log-in" element={<Login />} />
-            <Route path="/sign-up" element={<Signup />} />
-            <Route path="/forgot-password" element={<Forgot />} />
-            <Route path="/otp" element={<OTP />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
+                {/* Login/Signup routes */}
+                <Route path="/sign-in" element={<Signin />} />
+                <Route path="/log-in" element={<Login />} />
+                <Route path="/sign-up" element={<Signup />} />
+                <Route path="/forgot-password" element={<Forgot />} />
+                <Route path="/otp" element={<OTP />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/onboarding" element={
+                    <OnboardingRoute>
+                        <Onboarding />
+                    </OnboardingRoute>
+                } />
+                <Route path="/auth/callback" element={<AuthCallback />} />
 
-            {/* Error routes */}
-            <Route path="/500" element={<GeneralError />} />
-            <Route path="/404" element={<NotFoundError />} />
-            <Route path="/503" element={<MaintenanceError />} />
-            <Route path="*" element={<NotFoundError />} />
-        </Routes>
+                {/* Error routes */}
+                <Route path="/500" element={<GeneralError />} />
+                <Route path="/404" element={<NotFoundError />} />
+                <Route path="/503" element={<MaintenanceError />} />
+                <Route path="*" element={<NotFoundError />} />
+            </Routes>
+        </SessionCheck>
     </Router>
 );
 

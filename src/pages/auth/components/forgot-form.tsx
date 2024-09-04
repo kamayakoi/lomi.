@@ -16,7 +16,7 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 
 interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> {
-  onSuccess?: () => void; // Added onSuccess prop
+  onSuccess: (email: string) => void;
 }
 
 const formSchema = z.object({
@@ -45,7 +45,7 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
         title: "Success",
         description: "Password reset email sent. Please check your inbox.",
       })
-      if (onSuccess) onSuccess(); // Call onSuccess if provided
+      onSuccess(data.email)
     } catch (error) {
       console.error('Error during password reset:', error)
       toast({
@@ -62,28 +62,26 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
     <div className={cn('grid gap-6', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className='grid gap-2'> {/* Reduced space between elements */}
+          <div className='grid gap-2'>
             <FormField
               control={form.control}
               name='email'
               render={({ field }) => (
-                <FormItem className='space-y-1'>
+                <FormItem>
                   <FormControl>
                     <Input
                       placeholder='Email address*'
                       {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600' // Increased height and added effects
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className='mt-2'> {/* Added margin-top to create space */}
-              <Button className='w-full' loading={isLoading}> {/* Set width to full */}
-                Continue
-              </Button>
-            </div>
+            <Button type="submit" className='w-full mt-2' disabled={isLoading}>
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
+            </Button>
           </div>
         </form>
       </Form>

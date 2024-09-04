@@ -16,6 +16,7 @@ import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
+import { useNavigate } from 'react-router-dom'
 
 interface SignUpFormCustomProps {
   onSubmit: (data: { email: string; password: string }) => Promise<boolean>
@@ -38,6 +39,7 @@ const formSchema = z.object({
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, ...props }: SignUpFormProps) {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,10 +49,14 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
   })
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    console.log('Form submitted with data:', data); // Add this line
+    console.log('Form submitted with data:', data);
     try {
       const result = await onSubmit(data);
-      console.log('onSubmit result:', result); // Add this line
+      console.log('onSubmit result:', result);
+      if (result) {
+        // Redirect to onboarding page after successful sign-up
+        navigate('/onboarding');
+      }
     } catch (error) {
       console.error('Error during sign up:', error)
       toast({

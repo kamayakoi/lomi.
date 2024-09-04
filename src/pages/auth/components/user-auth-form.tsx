@@ -88,13 +88,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   const handleOAuthSignIn = async (provider: 'github' | 'google') => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (error) throw error
+      if (!data.url) throw new Error('No URL returned from Supabase')
+      window.location.href = data.url
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       toast({
