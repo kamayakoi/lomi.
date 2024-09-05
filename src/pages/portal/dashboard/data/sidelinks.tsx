@@ -82,7 +82,7 @@ export const sidelinks: SidebarItem[] = [
       },
       {
         title: 'eWallets',
-        href: '/portal/ewallets',
+        href: '/portal/e-wallets',
         icon: <IconWallet size={18} />,
       },
     ],
