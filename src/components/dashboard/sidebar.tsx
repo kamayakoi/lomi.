@@ -4,7 +4,7 @@ import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/utils'
-import { sidelinks } from '@/lib/data/sidelinks'
+import { sidelinks } from '../../pages/portal/dashboard/data/sidelinks'
 import { useTheme } from '@/lib/useTheme'
 import icon from "/icon.png"
 import iconDark from "/icon_dark.svg"
@@ -50,7 +50,7 @@ export default function Sidebar({
           sticky
           className='z-50 flex justify-between px-4 py-3 shadow-sm md:px-4'
         >
-          <div className={`flex items-center ${!isCollapsed ? 'gap-2' : ''}`}>
+          <a href="/portal" className={`flex items-center ${!isCollapsed ? 'gap-2' : ''}`}>
             <div className="flex items-center justify-center">
               <img
                 src={theme === 'dark' ? iconDark : icon}
@@ -64,7 +64,8 @@ export default function Sidebar({
               <span className='font-medium leading-tight'>lomi.</span>
               <span className='text-xs leading-tight'>Portal</span>
             </div>
-          </div>
+          </a>
+
 
           {/* Toggle Button in mobile */}
           <Button

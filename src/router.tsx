@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
 import { SessionCheck } from '@/components/auth/SessionCheck';
 import ResetPassword from './pages/auth/reset-password.tsx';
@@ -11,7 +10,6 @@ import Products from './pages/Products.tsx';
 import Integrations from './pages/Integrations.tsx';
 import Solutions from './pages/Solutions.tsx';
 import Careers from './pages/Careers.tsx';
-import Template from './pages/Template.tsx';
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
@@ -25,28 +23,24 @@ import Onboarding from './pages/auth/onboarding.tsx';
 import AuthCallback from './pages/auth/callback';
 
 // Error Pages
-import GeneralError from './pages/portal/errors/general-error.tsx';
-import NotFoundError from './pages/portal/errors/not-found-error.tsx';
-import MaintenanceError from './pages/portal/errors/maintenance-error.tsx';
+import GeneralError from './pages/errors/general-error.tsx';
+import NotFoundError from './pages/errors/not-found-error.tsx';
+import MaintenanceError from './pages/errors/maintenance-error.tsx';
 
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Tasks from './pages/portal/tasks/tasks.tsx';
-import DashboardIntegrations from './pages/portal/integrations/integrations.tsx';
-import ExtraComponents from './pages/portal/extra-components/extra-component.tsx';
+import Providers from './pages/portal/integrations/providers.tsx';
 import Settings from './pages/portal/settings/settings.tsx';
 import Profile from './pages/portal/settings/profile/index.tsx';
 import Account from './pages/portal/settings/account/index.tsx';
 import Appearance from './pages/portal/settings/appearance/index.tsx';
 import Notifications from './pages/portal/settings/notifications/index.tsx';
 import Display from './pages/portal/settings/display/index.tsx';
-import ErrorExample from './pages/portal/settings/error-example/index.tsx';
+import PaymentChannels from './pages/portal/payment-channels/paymentChannels.tsx'
 
 // Dashboard Coming soon
-import Chats from "./components/dashboard/coming-soon";
-import Users from "./components/dashboard/coming-soon";
-import Analysis from "./components/dashboard/coming-soon";
+import Subscription from "./pages/portal/subscription/subscription.tsx";
 
 const AppRouter = () => (
     <Router>
@@ -60,30 +54,24 @@ const AppRouter = () => (
                 <Route path="/integrations" element={<Integrations />} />
                 <Route path="/solutions" element={<Solutions />} />
                 <Route path="/careers" element={<Careers />} />
-                <Route path="/template" element={<Template />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
 
                 {/* Dashboard routes */}
                 <Route path="/portal" element={
-                    <ProtectedRoute>
-                        <AppShell />
-                    </ProtectedRoute>
+                    <AppShell />
                 }>
                     <Route index element={<Dashboard />} />
-                    <Route path="tasks" element={<Tasks />} />
-                    <Route path="chats" element={<Chats />} />
-                    <Route path="integrations" element={<DashboardIntegrations />} />
-                    <Route path="users" element={<Users />} />
-                    <Route path="analysis" element={<Analysis />} />
-                    <Route path="extra-components" element={<ExtraComponents />} />
+                    <Route path="integrations" element={<Providers />} />
+                    <Route path="subscription" element={<Subscription />} />
+                    <Route path="payment-channels" element={<PaymentChannels />} />
+
                     <Route path="settings" element={<Settings />}>
                         <Route index element={<Profile />} />
                         <Route path="account" element={<Account />} />
                         <Route path="appearance" element={<Appearance />} />
                         <Route path="notifications" element={<Notifications />} />
                         <Route path="display" element={<Display />} />
-                        <Route path="error-example" element={<ErrorExample />} />
                     </Route>
                 </Route>
 
