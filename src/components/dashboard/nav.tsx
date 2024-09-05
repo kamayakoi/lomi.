@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils'
 import useCheckActiveNav from '@/lib/hooks/use-check-active-nav'
 import { SideLink, SidebarItem } from '../../pages/portal/dashboard/data/sidelinks'
+import { useLocation } from 'react-router-dom'
 
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
   isCollapsed: boolean
@@ -105,20 +106,22 @@ function NavLink({
   closeNav,
   subLink = false,
 }: NavLinkProps) {
-  const { checkActiveNav } = useCheckActiveNav()
+  const location = useLocation();
+  const isActive = location.pathname === href;
+
   return (
     <Link
       to={href}
       onClick={closeNav}
       className={cn(
         buttonVariants({
-          variant: checkActiveNav(href) ? 'secondary' : 'ghost',
+          variant: isActive ? 'secondary' : 'ghost',
           size: 'sm',
         }),
         'h-12 justify-start text-wrap rounded-none px-6',
         subLink && 'h-10 w-full border-l border-l-slate-500 px-2'
       )}
-      aria-current={checkActiveNav(href) ? 'page' : undefined}
+      aria-current={isActive ? 'page' : undefined}
     >
       <div className='mr-2'>{icon}</div>
       {title}
