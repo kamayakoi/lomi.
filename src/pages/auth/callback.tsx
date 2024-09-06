@@ -15,17 +15,7 @@ const AuthCallback: React.FC = () => {
             }
 
             if (data?.session) {
-                const { data: profile } = await supabase
-                    .from('users')
-                    .select('onboarded')
-                    .eq('user_id', data.session.user.id)
-                    .single();
-
-                if (profile && profile.onboarded) {
-                    navigate('/portal');
-                } else {
-                    navigate('/onboarding');
-                }
+                navigate('/onboarding'); // Redirect to the onboarding route
             } else {
                 navigate('/sign-in');
             }

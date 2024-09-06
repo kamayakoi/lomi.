@@ -750,49 +750,67 @@ export type Database = {
       recurring_payments: {
         Row: {
           amount: number
+          charge_immediately: boolean
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           description: string | null
+          email_notifications: Json | null
           end_date: string | null
+          failed_payment_action: string | null
           frequency: string
           is_active: boolean
-          next_payment_date: string
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           payment_type: Database["public"]["Enums"]["recurring_payment_type"]
           recurring_payment_id: string
+          retry_payment_every: number | null
+          start_date: string
+          total_cycles: number | null
+          total_retries: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
+          charge_immediately?: boolean
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          email_notifications?: Json | null
           end_date?: string | null
+          failed_payment_action?: string | null
           frequency: string
           is_active?: boolean
-          next_payment_date: string
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           payment_type: Database["public"]["Enums"]["recurring_payment_type"]
           recurring_payment_id?: string
+          retry_payment_every?: number | null
+          start_date: string
+          total_cycles?: number | null
+          total_retries?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          charge_immediately?: boolean
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          email_notifications?: Json | null
           end_date?: string | null
+          failed_payment_action?: string | null
           frequency?: string
           is_active?: boolean
-          next_payment_date?: string
           organization_id?: string
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
           payment_type?: Database["public"]["Enums"]["recurring_payment_type"]
           recurring_payment_id?: string
+          retry_payment_every?: number | null
+          start_date?: string
+          total_cycles?: number | null
+          total_retries?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -1050,7 +1068,7 @@ export type Database = {
           email: string
           is_admin: boolean
           metadata: Json | null
-          name: string
+          name: string | null
           phone_number: string
           updated_at: string
           updated_by: string | null
@@ -1066,7 +1084,7 @@ export type Database = {
           email: string
           is_admin?: boolean
           metadata?: Json | null
-          name: string
+          name?: string | null
           phone_number: string
           updated_at?: string
           updated_by?: string | null
@@ -1082,7 +1100,7 @@ export type Database = {
           email?: string
           is_admin?: boolean
           metadata?: Json | null
-          name?: string
+          name?: string | null
           phone_number?: string
           updated_at?: string
           updated_by?: string | null

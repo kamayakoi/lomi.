@@ -8,7 +8,7 @@ interface OnboardingRouteProps {
 
 export function OnboardingRoute({ children }: OnboardingRouteProps) {
     const [isLoading, setIsLoading] = useState(true);
-    const [shouldOnboard, setShouldOnboard] = useState(false);
+    const [isOnboarded, setIsOnboarded] = useState(false);
 
     useEffect(() => {
         const checkOnboardingStatus = async () => {
@@ -30,7 +30,7 @@ export function OnboardingRoute({ children }: OnboardingRouteProps) {
                 return;
             }
 
-            setShouldOnboard(!profile?.onboarded);
+            setIsOnboarded(profile?.onboarded || false);
             setIsLoading(false);
         };
 
@@ -41,7 +41,7 @@ export function OnboardingRoute({ children }: OnboardingRouteProps) {
         return null;
     }
 
-    if (!shouldOnboard) {
+    if (isOnboarded) {
         return <Navigate to="/portal" replace />;
     }
 

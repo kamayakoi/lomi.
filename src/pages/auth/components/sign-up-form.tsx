@@ -18,7 +18,7 @@ import { toast } from '@/components/ui/use-toast'
 
 interface SignUpFormProps {
   className?: string
-  onSubmit: (data: { email: string; password: string }) => Promise<void>
+  onSubmit: (data: { email: string; password: string; fullName: string }) => Promise<void>
   isLoading: boolean
   isConfirmationSent: boolean
   onResendEmail: () => Promise<void>
@@ -27,6 +27,7 @@ interface SignUpFormProps {
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
+  fullName: z.string().min(1, 'Full name is required'),
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, ...props }: SignUpFormProps) {
@@ -35,6 +36,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
     defaultValues: {
       email: '',
       password: '',
+      fullName: '',
     },
   })
 
@@ -47,7 +49,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/onboarding`,
+          redirectTo: `${window.location.origin}/onboarding`, // Update the redirect URL
         }
       })
       if (error) throw error
@@ -111,6 +113,22 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
                   <FormControl>
                     <PasswordInput
                       placeholder='Password**'
+                      {...field}
+                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='fullName'
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      placeholder='Full Name**'
                       {...field}
                       className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />

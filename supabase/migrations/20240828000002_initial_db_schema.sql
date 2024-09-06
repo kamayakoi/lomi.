@@ -27,7 +27,7 @@ CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed
 -- Users table
 CREATE TABLE users (
   user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR NOT NULL,
+  name VARCHAR, -- Allow null values for name
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR NOT NULL,
   is_admin BOOLEAN NOT NULL DEFAULT false,

@@ -9,13 +9,16 @@ export default function SignUp() {
   const [isConfirmationSent, setIsConfirmationSent] = useState(false)
   const [email, setEmail] = useState('')
 
-  const handleSignUp = async (data: { email: string; password: string }) => {
+  const handleSignUp = async (data: { email: string; password: string; fullName: string }) => {
     setIsLoading(true)
     setEmail(data.email)
     const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
+        data: {
+          full_name: data.fullName,
+        },
         emailRedirectTo: `${window.location.origin}/onboarding`,
       },
     })
@@ -26,15 +29,16 @@ export default function SignUp() {
         description: error.message,
         variant: 'destructive',
       })
+      setIsLoading(false)
     } else {
       setIsConfirmationSent(true)
       toast({
         title: 'Success',
         description: 'Please check your email for the confirmation link.',
       })
+      await new Promise((resolve) => setTimeout(resolve, 4000)) // Delay for 4 seconds
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   const handleResendEmail = async () => {
