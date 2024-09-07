@@ -8,38 +8,69 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false)
   const [isConfirmationSent, setIsConfirmationSent] = useState(false)
   const [email, setEmail] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const handleSignUp = async (data: { email: string; password: string; fullName: string }) => {
-    setIsLoading(true)
-    setEmail(data.email)
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.fullName,
-        },
-        emailRedirectTo: `${window.location.origin}/onboarding`,
-      },
-    })
+    setIsLoading(true);
+    setEmail(data.email);
+    setErrorMessage('');
 
-    if (error) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      })
-      setIsLoading(false)
-    } else {
-      setIsConfirmationSent(true)
-      toast({
-        title: 'Success',
-        description: 'Please check your email for the confirmation link.',
-      })
-      await new Promise((resolve) => setTimeout(resolve, 4000)) // Delay for 4 seconds
-      setIsLoading(false)
+    try {
+      // Check if the user already exists
+      const { data: existingUser, error: getUserError } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', data.email)
+        .single();
+
+      if (getUserError) {
+        console.error('Error checking user existence:', getUserError);
+        setErrorMessage('An error occurred while checking user existence. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (existingUser) {
+        setErrorMessage('A user with this email already exists. Please sign in instead.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Create a new user if the email doesn't exist
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.fullName,
+          },
+          emailRedirectTo: `${window.location.origin}/onboarding`,
+        },
+      });
+
+      if (error) {
+        console.error('Error creating user:', error);
+        let message = 'An error occurred while creating your account. Please try again.';
+        if (error.message.includes('Password should be at least 6 characters')) {
+          message = 'Password should be at least 6 characters long.';
+        }
+        setErrorMessage(message);
+        setIsLoading(false);
+      } else {
+        setIsConfirmationSent(true);
+        toast({
+          title: 'Success',
+          description: 'Please check your email for the confirmation link.',
+        });
+        await new Promise((resolve) => setTimeout(resolve, 4000)); // Delay for 4 seconds
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Unexpected error during sign-up:', error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleResendEmail = async () => {
     try {
@@ -77,6 +108,7 @@ export default function SignUp() {
             isLoading={isLoading}
             isConfirmationSent={isConfirmationSent}
             onResendEmail={handleResendEmail}
+            errorMessage={errorMessage}
           />
           <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
             By creating an account, you agree to our{' '}

@@ -14,7 +14,6 @@ import { Button } from '@/components/custom/button'
 import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from '@/components/ui/use-toast'
 
 interface SignUpFormProps {
   className?: string
@@ -22,6 +21,7 @@ interface SignUpFormProps {
   isLoading: boolean
   isConfirmationSent: boolean
   onResendEmail: () => Promise<void>
+  errorMessage: string
 }
 
 const formSchema = z.object({
@@ -30,7 +30,7 @@ const formSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
 })
 
-export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, ...props }: SignUpFormProps) {
+export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, errorMessage, ...props }: SignUpFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,19 +49,14 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/onboarding`, // Update the redirect URL
-        }
-      })
-      if (error) throw error
-      if (!data.url) throw new Error('No URL returned from Supabase')
-      window.location.href = data.url
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      if (!data.url) throw new Error('No URL returned from Supabase');
+      window.location.href = data.url;
     } catch (error) {
-      console.error(`Error signing up with ${provider}:`, error)
-      toast({
-        title: "Error",
-        description: `There was a problem signing up with ${provider}.`,
-        variant: "destructive",
-      })
+      console.error(`Error signing up with ${provider}:`, error);
     }
   }
 
@@ -144,6 +139,9 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
+            {errorMessage && (
+              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+            )}
           </div>
         </form>
       </Form>

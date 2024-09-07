@@ -8,6 +8,7 @@ import { toast } from '@/components/ui/use-toast'
 export default function Otp() {
   const [isResending, setIsResending] = useState(false)
   const [email, setEmail] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const location = useLocation()
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function Otp() {
 
   const handleResendOtp = async () => {
     setIsResending(true)
+    setErrorMessage('')
     try {
       const { error } = await supabase.auth.resend({
         type: 'signup',
@@ -36,11 +38,7 @@ export default function Otp() {
       })
     } catch (error) {
       console.error('Error resending OTP:', error)
-      toast({
-        title: "Error",
-        description: "There was a problem resending the OTP. Please try again.",
-        variant: "destructive",
-      })
+      setErrorMessage('There was a problem resending the OTP. Please try again.')
     } finally {
       setIsResending(false)
     }
@@ -60,7 +58,7 @@ export default function Otp() {
               </p>
             </div>
             <div className='mb-4'></div>
-            <OtpForm email={email} />
+            <OtpForm email={email} errorMessage={errorMessage} setErrorMessage={setErrorMessage} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               Haven&apos;t received it?{' '}
               <button
@@ -71,6 +69,9 @@ export default function Otp() {
                 {isResending ? 'Resending...' : 'Resend a new code'}
               </button>
             </p>
+            {errorMessage && (
+              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+            )}
           </Card>
         </div>
       </div>

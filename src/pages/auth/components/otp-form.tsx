@@ -18,14 +18,16 @@ import { toast } from '@/components/ui/use-toast'
 import { useNavigate } from 'react-router-dom'
 
 interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {
-  email: string; // Add this line
+  email: string;
+  errorMessage: string;
+  setErrorMessage: (message: string) => void;
 }
 
 const formSchema = z.object({
   otp: z.string().length(6, { message: 'OTP must be 6 digits' }),
 })
 
-export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add email here
+export function OtpForm({ className, email, errorMessage, setErrorMessage, ...props }: OtpFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
@@ -36,25 +38,22 @@ export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add e
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    setErrorMessage('')
     try {
       const { error } = await supabase.auth.verifyOtp({
         email,
         token: data.otp,
-        type: 'recovery', // Changed from 'signup' to 'recovery'
+        type: 'recovery',
       })
       if (error) throw error
       toast({
         title: "Success",
         description: "OTP verified successfully.",
       })
-      navigate('/portal') // Changed from '/onboarding' to '/portal'
+      navigate('/portal')
     } catch (error) {
       console.error('Error during OTP verification:', error)
-      toast({
-        title: "Error",
-        description: "Invalid OTP. Please try again.",
-        variant: "destructive",
-      })
+      setErrorMessage('Invalid OTP. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -92,6 +91,9 @@ export function OtpForm({ className, email, ...props }: OtpFormProps) { // Add e
             <Button type="submit" className='w-full' disabled={isLoading}>
               {isLoading ? 'Verifying...' : 'Verify Email'}
             </Button>
+            {errorMessage && (
+              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+            )}
           </div>
         </form>
       </Form>

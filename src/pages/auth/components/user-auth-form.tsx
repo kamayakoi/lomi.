@@ -33,6 +33,7 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,6 +46,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    setErrorMessage('')
     try {
       const { data: signInData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
@@ -52,21 +54,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       })
 
       if (error) {
+        let message = 'An error occurred while signing in. Please try again.'
         if (error.message.includes('Invalid login credentials')) {
-          toast({
-            title: "Error",
-            description: "Invalid email or password. Please try again or sign up if you don't have an account.",
-            variant: "destructive",
-          })
+          message = "Invalid email or password. Please try again or sign up if you don't have an account."
         } else if (error.message.includes('Email not confirmed')) {
-          toast({
-            title: "Error",
-            description: "Please confirm your email address before signing in.",
-            variant: "destructive",
-          })
-        } else {
-          throw error
+          message = "Please confirm your email address before signing in."
         }
+        setErrorMessage(message)
       } else if (signInData.user) {
         toast({
           title: "Success",
@@ -76,11 +70,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       }
     } catch (error) {
       console.error('Error during sign in:', error)
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again later.",
-        variant: "destructive",
-      })
+      setErrorMessage('An unexpected error occurred. Please try again later.')
     } finally {
       setIsLoading(false)
     }
@@ -99,11 +89,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       window.location.href = data.url
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
-      toast({
-        title: "Error",
-        description: `There was a problem signing in with ${provider}. Please try again.`,
-        variant: "destructive",
-      })
+      setErrorMessage(`There was a problem signing in with ${provider}. Please try again.`)
     }
   }
 
@@ -155,6 +141,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             <Button className='w-full' type='submit' disabled={isLoading}>
               {isLoading ? 'Processing...' : 'Connect'}
             </Button>
+            {errorMessage && (
+              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+            )}
           </div>
         </form>
       </Form>
