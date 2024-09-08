@@ -1067,7 +1067,7 @@ export type Database = {
           metadata: Json | null
           name: string | null
           onboarded: boolean
-          phone_number: string
+          phone_number: string | null
           updated_at: string
           updated_by: string | null
           user_id: string
@@ -1084,7 +1084,7 @@ export type Database = {
           metadata?: Json | null
           name?: string | null
           onboarded?: boolean
-          phone_number: string
+          phone_number?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string
@@ -1101,7 +1101,7 @@ export type Database = {
           metadata?: Json | null
           name?: string | null
           onboarded?: boolean
-          phone_number?: string
+          phone_number?: string | null
           updated_at?: string
           updated_by?: string | null
           user_id?: string
@@ -1173,6 +1173,60 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_organization: {
+        Args: {
+          p_name: string
+          p_email: string
+          p_phone_number: string
+          p_country: string
+          p_city: string
+          p_address: string
+          p_postal_code: string
+          p_industry: string
+          p_website_url: string
+          p_created_by: string
+        }
+        Returns: {
+          address: string
+          city: string
+          country: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          email: string
+          industry: string | null
+          logo_url: string | null
+          max_api_calls_per_minute: number | null
+          max_monthly_volume: number | null
+          max_providers: number | null
+          max_transaction_amount: number | null
+          max_transactions_per_day: number | null
+          max_webhooks: number | null
+          metadata: Json | null
+          name: string
+          organization_id: string
+          phone_number: string
+          postal_code: string
+          status: Database["public"]["Enums"]["organization_status"]
+          updated_at: string
+          updated_by: string | null
+          website_url: string | null
+        }
+      }
+      create_user_organization_link: {
+        Args: {
+          p_user_id: string
+          p_organization_id: string
+          p_role: string
+        }
+        Returns: {
+          created_at: string
+          organization_id: string
+          role: string
+          user_id: string
+          user_org_id: string
+        }
+      }
       delete_storage_object: {
         Args: {
           bucket: string
@@ -1186,6 +1240,16 @@ export type Database = {
           object_path: string
         }
         Returns: Record<string, unknown>
+      }
+      update_user_profile: {
+        Args: {
+          p_user_id: string
+          p_name: string
+          p_phone_number: string
+          p_country: string
+          p_onboarded: boolean
+        }
+        Returns: undefined
       }
     }
     Enums: {
