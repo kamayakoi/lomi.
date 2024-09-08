@@ -416,3 +416,42 @@ export const countryCodes = [
   '+260', // Zambia
   '+263', // Zimbabwe
 ];
+
+export const industries = [
+    'Technology',
+    'Finance',
+    'Healthcare',
+    'Education',
+    'Retail',
+    'Manufacturing',
+    'Agriculture',
+    'Entertainment',
+    'Transportation',
+    'Hospitality',
+    'Real Estate',
+    'Construction',
+    'Energy',
+    'Telecommunications',
+    'Media and Television',
+    'Advertising',
+    'Consulting',
+    'Legal Services',
+    'Accounting',
+    'Insurance',
+    'Pharmaceuticals',
+    'Biotechnology',
+    'Aerospace',
+    'Defense',
+    'Nonprofit',
+    'Government',
+    'Other'
+];
+
+export const employeeRanges = [
+    '1-10',
+    '11-50',
+    '51-200',
+    '201-500',
+    '501-1000',
+    '1000+'
+];
