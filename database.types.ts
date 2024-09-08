@@ -535,7 +535,6 @@ export type Database = {
           max_webhooks: number | null
           metadata: Json | null
           name: string
-          onboarded: boolean | null
           organization_id: string
           phone_number: string
           postal_code: string
@@ -562,7 +561,6 @@ export type Database = {
           max_webhooks?: number | null
           metadata?: Json | null
           name: string
-          onboarded?: boolean | null
           organization_id?: string
           phone_number: string
           postal_code: string
@@ -589,7 +587,6 @@ export type Database = {
           max_webhooks?: number | null
           metadata?: Json | null
           name?: string
-          onboarded?: boolean | null
           organization_id?: string
           phone_number?: string
           postal_code?: string
@@ -1069,6 +1066,7 @@ export type Database = {
           is_admin: boolean
           metadata: Json | null
           name: string | null
+          onboarded: boolean
           phone_number: string
           updated_at: string
           updated_by: string | null
@@ -1085,6 +1083,7 @@ export type Database = {
           is_admin?: boolean
           metadata?: Json | null
           name?: string | null
+          onboarded?: boolean
           phone_number: string
           updated_at?: string
           updated_by?: string | null
@@ -1101,6 +1100,7 @@ export type Database = {
           is_admin?: boolean
           metadata?: Json | null
           name?: string | null
+          onboarded?: boolean
           phone_number?: string
           updated_at?: string
           updated_by?: string | null

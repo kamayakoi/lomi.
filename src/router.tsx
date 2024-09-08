@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
+import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
 import { SessionCheck } from '@/components/auth/SessionCheck';
 import ResetPassword from './pages/auth/reset-password.tsx';
@@ -77,7 +77,9 @@ const AppRouter = () => (
 
                 {/* Dashboard routes */}
                 <Route path="/portal" element={
-                    <AppShell />
+                    <ProtectedRoute>
+                        <AppShell />
+                    </ProtectedRoute>
                 }>
                     <Route index element={<Dashboard />} />
                     <Route path="integrations" element={<Providers />} />
