@@ -12,30 +12,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
-
-const countryCodes = [
-    { code: '+225', name: 'Côte d\'Ivoire' },
-    { code: '+1', name: 'United States' },
-    { code: '+44', name: 'United Kingdom' },
-    { code: '+233', name: 'Ghana' },
-    { code: '+234', name: 'Nigeria' },
-];
-
-const countries = [
-    'United States', 'United Kingdom', 'Ghana', 'Nigeria',
-];
-
-const roles = [
-    'Founder',
-    'Entrepreneur',
-    'Chief Executive Officer',
-    'Chief Technology Officer',
-    'Chief Operations Officer',
-    'Product Manager',
-    'Software Engineer',
-    'Marketing/Sales Officer',
-    'Other'
-];
+import { countryCodes, countries, roles } from '@/data/onboarding';
 
 const industries = [
     'Technology',
@@ -266,8 +243,8 @@ const Onboarding: React.FC = () => {
 
     if (loading) {
         return (
-            <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
-                <Card className='p-6'>
+            <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
+                <Card className={cn('p-6', 'dark:bg-gray-800')}>
                     <h1 className='text-2xl font-semibold tracking-tight'>Loading...</h1>
                     <p>Please wait while we set up your account.</p>
                 </Card>
@@ -277,11 +254,11 @@ const Onboarding: React.FC = () => {
 
     if (!isEmailVerified) {
         return (
-            <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
-                <Card className='p-6'>
+            <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
+                <Card className={cn('p-6', 'dark:bg-gray-800')}>
                     <h1 className='text-2xl font-semibold tracking-tight'>Email Verification Required</h1>
                     <p>Please verify your email to continue with onboarding.</p>
-                    <Button onClick={handleResendVerification} className="mt-4">Resend Verification Email</Button>
+                    <Button onClick={handleResendVerification} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">Resend Verification Email</Button>
                 </Card>
             </div>
         );
@@ -289,20 +266,20 @@ const Onboarding: React.FC = () => {
 
     if (!user) {
         return (
-            <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
-                <Card className='p-6'>
+            <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
+                <Card className={cn('p-6', 'dark:bg-gray-800')}>
                     <h1 className='text-2xl font-semibold tracking-tight'>Authentication Required</h1>
                     <p>Please sign in to complete your onboarding.</p>
-                    <Button onClick={() => navigate('/sign-in')} className="mt-4">Sign In</Button>
+                    <Button onClick={() => navigate('/sign-in')} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">Sign In</Button>
                 </Card>
             </div>
         );
     }
 
     return (
-        <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
+        <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
             <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[800px] lg:p-8'>
-                <Card className='p-6'>
+                <Card className={cn('p-6', 'dark:bg-gray-800')}>
                     <h1 className='text-2xl font-semibold tracking-tight'>Complete Your Profile</h1>
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold mb-2">Onboarding</h2>
@@ -347,13 +324,14 @@ const Onboarding: React.FC = () => {
                                                         id="countryCode"
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                         {...register("countryCode")}
                                                     >
                                                         {countryCodes.map((code) => (
-                                                            <option key={code.code} value={code.code}>
-                                                                {code.code}
+                                                            <option key={code} value={code}>
+                                                                {code}
                                                             </option>
                                                         ))}
                                                     </select>
@@ -366,7 +344,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("phoneNumber")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
@@ -382,7 +361,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("country")}
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     >
                                                         {countries.map((country) => (
@@ -400,7 +380,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("role")}
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     >
                                                         {roles.map((role) => (
@@ -423,7 +404,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgName")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.orgName && <p className="text-red-500 text-sm">{errors.orgName.message}</p>}
@@ -435,7 +417,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgCountry")}
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     >
                                                         {countries.map((country) => (
@@ -458,7 +441,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgCity")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.orgCity && <p className="text-red-500 text-sm">{errors.orgCity.message}</p>}
@@ -471,7 +455,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgAddress")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.orgAddress && <p className="text-red-500 text-sm">{errors.orgAddress.message}</p>}
@@ -488,7 +473,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgPostalCode")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.orgPostalCode && <p className="text-red-500 text-sm">{errors.orgPostalCode.message}</p>}
@@ -500,7 +486,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgIndustry")}
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     >
                                                         {industries.map((industry) => (
@@ -523,7 +510,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgWebsite")}
                                                         className={cn(
                                                             "w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     />
                                                     {errors.orgWebsite && <p className="text-red-500 text-sm">{errors.orgWebsite.message}</p>}
@@ -535,7 +523,8 @@ const Onboarding: React.FC = () => {
                                                         {...register("orgEmployees")}
                                                         className={cn(
                                                             "p-2 border rounded-md w-full",
-                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
+                                                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                         )}
                                                     >
                                                         {employeeRanges.map((range) => (
@@ -552,48 +541,21 @@ const Onboarding: React.FC = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="flex space-x-2 mb-4">
-                            <div className="flex-1">
-                                <Label htmlFor="firstName">First Name*</Label>
-                                <Input
-                                    id="firstName"
-                                    placeholder="e.g., John"
-                                    {...register("firstName")}
-                                    className={cn(
-                                        "w-full",
-                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
-                                    )}
-                                />
-                                {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
-                            </div>
-                            <div className="flex-1">
-                                <Label htmlFor="lastName">Last Name*</Label>
-                                <Input
-                                    id="lastName"
-                                    placeholder="e.g., Doe"
-                                    {...register("lastName")}
-                                    className={cn(
-                                        "w-full",
-                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none"
-                                    )}
-                                />
-                                {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
-                            </div>
-                        </div>
                         <div className="flex justify-between mt-6">
                             <Button
                                 onClick={handlePrevious}
                                 disabled={currentStep === 0}
                                 variant="outline"
+                                className="dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
                             >
                                 <ChevronLeft className="mr-2 h-4 w-4" /> Previous
                             </Button>
                             {currentStep === steps.length - 1 ? (
-                                <Button type="submit">
+                                <Button type="submit" className="dark:bg-primary-600 dark:hover:bg-primary-700">
                                     Finish <ChevronRight className="ml-2 h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button onClick={handleNext}>
+                                <Button onClick={handleNext} className="dark:bg-primary-600 dark:hover:bg-primary-700">
                                     Next <ChevronRight className="ml-2 h-4 w-4" />
                                 </Button>
                             )}
