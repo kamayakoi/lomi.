@@ -89,23 +89,25 @@ BEGIN
         updated_at = NOW()
     WHERE merchant_id = p_merchant_id;
 
-    -- Get the organization ID linked to the merchant
-    SELECT organization_id INTO org_id
-    FROM merchant_organization_links
-    WHERE merchant_id = p_merchant_id
-    LIMIT 1;
+    -- Create organization
+    INSERT INTO organizations (
+        name, email, phone_number, country, city, address, postal_code, industry
+    ) VALUES (
+        p_org_name, 
+        (SELECT email FROM merchants WHERE merchant_id = p_merchant_id),
+        p_phone_number,
+        p_org_country,
+        p_org_city,
+        p_org_address,
+        p_org_postal_code,
+        p_org_industry
+    ) RETURNING organization_id INTO org_id;
 
-    -- Update organization information
-    UPDATE organizations
-    SET 
-        name = p_org_name,
-        phone_number = p_phone_number,
-        country = p_org_country,
-        city = p_org_city,
-        address = p_org_address,
-        postal_code = p_org_postal_code,
-        industry = p_org_industry,
-        updated_at = NOW()
-    WHERE organization_id = org_id;
+    -- Link merchant to organization
+    INSERT INTO merchant_organization_links (
+        merchant_id, organization_id, role
+    ) VALUES (
+        p_merchant_id, org_id, 'admin'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

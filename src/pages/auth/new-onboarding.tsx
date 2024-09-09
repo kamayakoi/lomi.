@@ -7,32 +7,38 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { User } from '@supabase/supabase-js';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
-interface FormData {
-    phoneNumber: string;
-    country: string;
-    orgName: string;
-    orgCountry: string;
-    orgCity: string;
-    orgAddress: string;
-    orgPostalCode: string;
-    orgIndustry: string;
-}
+const formSchema = z.object({
+    phoneNumber: z.string().min(1, "Phone number is required"),
+    country: z.string().min(1, "Country is required"),
+    orgName: z.string().min(1, "Organization name is required"),
+    orgCountry: z.string().min(1, "Organization country is required"),
+    orgCity: z.string().min(1, "Organization city is required"),
+    orgAddress: z.string().min(1, "Organization address is required"),
+    orgPostalCode: z.string().min(1, "Postal code is required"),
+    orgIndustry: z.string().min(1, "Industry is required"),
+});
 
 const NewOnboarding: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState<FormData>({
-        phoneNumber: '',
-        country: '',
-        orgName: '',
-        orgCountry: '',
-        orgCity: '',
-        orgAddress: '',
-        orgPostalCode: '',
-        orgIndustry: '',
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            phoneNumber: '',
+            country: '',
+            orgName: '',
+            orgCountry: '',
+            orgCity: '',
+            orgAddress: '',
+            orgPostalCode: '',
+            orgIndustry: '',
+        },
     });
 
     useEffect(() => {
@@ -48,31 +54,33 @@ const NewOnboarding: React.FC = () => {
         checkUser();
     }, [navigate]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            if (!user) throw new Error("User not found");
+            setLoading(true);
 
+            if (!user) {
+                throw new Error("User not found");
+            }
+
+            // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
                 p_merchant_id: user.id,
-                p_phone_number: formData.phoneNumber,
-                p_country: formData.country,
-                p_org_name: formData.orgName,
-                p_org_country: formData.orgCountry,
-                p_org_city: formData.orgCity,
-                p_org_address: formData.orgAddress,
-                p_org_postal_code: formData.orgPostalCode,
-                p_org_industry: formData.orgIndustry
+                p_phone_number: data.phoneNumber,
+                p_country: data.country,
+                p_org_name: data.orgName,
+                p_org_country: data.orgCountry,
+                p_org_city: data.orgCity,
+                p_org_address: data.orgAddress,
+                p_org_postal_code: data.orgPostalCode,
+                p_org_industry: data.orgIndustry
             });
 
-            if (error) throw error;
+            if (error) {
+                throw error;
+            }
+
+            // Update the local session to reflect the onboarded status
+            await supabase.auth.refreshSession();
 
             toast({
                 title: "Onboarding Complete",
@@ -80,7 +88,7 @@ const NewOnboarding: React.FC = () => {
             });
             navigate('/portal');
         } catch (error) {
-            console.error('Error during onboarding:', error);
+            console.error('Error completing onboarding:', error);
             toast({
                 title: "Error",
                 description: "There was a problem completing your onboarding. Please try again.",
@@ -103,93 +111,22 @@ const NewOnboarding: React.FC = () => {
         <div className="container mx-auto px-4 py-8">
             <Card className="p-6 max-w-lg mx-auto">
                 <h1 className="text-2xl font-bold mb-6 text-center">Complete Your Profile</h1>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="phoneNumber">Phone Number</Label>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    {Object.keys(form.getValues()).map((fieldName) => (
+                        <div key={fieldName}>
+                            <Label htmlFor={fieldName}>{fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/([A-Z])/g, ' $1')}</Label>
                             <Input
-                                id="phoneNumber"
-                                name="phoneNumber"
-                                value={formData.phoneNumber}
-                                onChange={handleInputChange}
-                                required
+                                id={fieldName}
+                                {...form.register(fieldName as keyof z.infer<typeof formSchema>)}
+                                className="mt-1"
                             />
+                            {form.formState.errors[fieldName as keyof z.infer<typeof formSchema>] && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {form.formState.errors[fieldName as keyof z.infer<typeof formSchema>]?.message}
+                                </p>
+                            )}
                         </div>
-                        <div>
-                            <Label htmlFor="country">Country</Label>
-                            <Input
-                                id="country"
-                                name="country"
-                                value={formData.country}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <Label htmlFor="orgName">Organization Name</Label>
-                        <Input
-                            id="orgName"
-                            name="orgName"
-                            value={formData.orgName}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="orgCountry">Organization Country</Label>
-                            <Input
-                                id="orgCountry"
-                                name="orgCountry"
-                                value={formData.orgCountry}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="orgCity">Organization City</Label>
-                            <Input
-                                id="orgCity"
-                                name="orgCity"
-                                value={formData.orgCity}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <Label htmlFor="orgAddress">Organization Address</Label>
-                        <Input
-                            id="orgAddress"
-                            name="orgAddress"
-                            value={formData.orgAddress}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="orgPostalCode">Postal Code</Label>
-                            <Input
-                                id="orgPostalCode"
-                                name="orgPostalCode"
-                                value={formData.orgPostalCode}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="orgIndustry">Industry</Label>
-                            <Input
-                                id="orgIndustry"
-                                name="orgIndustry"
-                                value={formData.orgIndustry}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                    </div>
+                    ))}
                     <Button type="submit" className="w-full" disabled={loading}>
                         {loading ? 'Submitting...' : 'Complete Onboarding'}
                     </Button>
