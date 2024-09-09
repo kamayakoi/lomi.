@@ -16,27 +16,6 @@ export default function SignUp() {
     setErrorMessage('');
 
     try {
-      // Check if the user already exists
-      const { data: existingUser, error: getUserError } = await supabase
-        .from('users')
-        .select('email')
-        .eq('email', data.email)
-        .single();
-
-      if (getUserError) {
-        console.error('Error checking user existence:', getUserError);
-        setErrorMessage('An error occurred while checking user existence. Please try again.');
-        setIsLoading(false);
-        return;
-      }
-
-      if (existingUser) {
-        setErrorMessage('A user with this email already exists. Please sign in instead.');
-        setIsLoading(false);
-        return;
-      }
-
-      // Create a new user if the email doesn't exist
       const { error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
