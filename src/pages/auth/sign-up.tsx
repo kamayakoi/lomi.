@@ -21,8 +21,7 @@ export default function SignUp() {
         password: data.password,
         options: {
           data: {
-            full_name: data.fullName,
-            is_merchant: true,
+            full_name: data.fullName
           },
           emailRedirectTo: `${window.location.origin}/onboarding`,
         },

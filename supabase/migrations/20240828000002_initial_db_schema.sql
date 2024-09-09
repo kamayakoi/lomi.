@@ -69,14 +69,10 @@ CREATE TABLE organizations (
   website_url VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES merchants(merchant_id),
-  updated_by UUID REFERENCES merchants(merchant_id),
   deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_organizations_email ON organizations(email);
-CREATE INDEX idx_organizations_created_by ON organizations(created_by);
-CREATE INDEX idx_organizations_updated_by ON organizations(updated_by);
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
 
@@ -177,7 +173,6 @@ CREATE TABLE lomi_payouts (
   payout_method VARCHAR NOT NULL,
   payout_details JSONB,
   status payout_status NOT NULL DEFAULT 'pending',
-  created_by UUID REFERENCES merchants(merchant_id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -185,7 +180,6 @@ CREATE TABLE lomi_payouts (
 CREATE INDEX idx_lomi_payouts_organization_id ON lomi_payouts(organization_id);
 CREATE INDEX idx_lomi_payouts_currency_code ON lomi_payouts(currency_code);
 CREATE INDEX idx_lomi_payouts_status ON lomi_payouts(status);
-CREATE INDEX idx_lomi_payouts_created_by ON lomi_payouts(created_by);
 CREATE INDEX idx_lomi_payouts_created_at ON lomi_payouts(created_at);
 
 COMMENT ON TABLE lomi_payouts IS 'Stores information about the payouts made by Lomi to organizations';
