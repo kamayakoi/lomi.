@@ -13,12 +13,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
 import { countryCodes, countries, roles, employeeRanges, industries } from '@/data/onboarding';
 
-const phoneRegex = /^(\+\d{1, 3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
 const onboardingFormSchema = z.object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
-    countryCode: z.string().min(1, 'Country code is required'),
+    countryCode: z.string().regex(/^\+\d+$/, 'Invalid country code format'),
     phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
     country: z.string().min(1, 'Country is required'),
     role: z.string().min(1, 'Role is required'),
@@ -126,6 +126,9 @@ const NewOnboarding: React.FC = () => {
                 throw new Error("User not found");
             }
 
+            // Prepend "https://" to the website URL if not present
+            const websiteUrl = formData.orgWebsite ? (formData.orgWebsite.startsWith('http') ? formData.orgWebsite : `https://${formData.orgWebsite}`) : '';
+
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
                 p_merchant_id: user.id,
@@ -136,7 +139,8 @@ const NewOnboarding: React.FC = () => {
                 p_org_city: formData.orgCity,
                 p_org_address: formData.orgAddress,
                 p_org_postal_code: formData.orgPostalCode,
-                p_org_industry: formData.orgIndustry
+                p_org_industry: formData.orgIndustry,
+                p_org_website_url: websiteUrl
             });
 
             if (error) {
@@ -259,6 +263,7 @@ const NewOnboarding: React.FC = () => {
                                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                 )}
                                             />
+                                            {onboardingForm.formState.errors.countryCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>}
                                             {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
                                                 <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
                                                     {filteredCountryCodes.map((code: string) => (

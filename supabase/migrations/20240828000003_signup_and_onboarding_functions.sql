@@ -75,7 +75,8 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_org_city VARCHAR,
     p_org_address VARCHAR,
     p_org_postal_code VARCHAR,
-    p_org_industry VARCHAR
+    p_org_industry VARCHAR,
+    p_org_website_url VARCHAR
 ) RETURNS void AS $$
 DECLARE
     org_id UUID;
@@ -91,7 +92,7 @@ BEGIN
 
     -- Create organization
     INSERT INTO organizations (
-        name, email, phone_number, country, city, address, postal_code, industry
+        name, email, phone_number, country, city, address, postal_code, industry, website_url
     ) VALUES (
         p_org_name, 
         (SELECT email FROM merchants WHERE merchant_id = p_merchant_id),
@@ -100,7 +101,8 @@ BEGIN
         p_org_city,
         p_org_address,
         p_org_postal_code,
-        p_org_industry
+        p_org_industry,
+        p_org_website_url
     ) RETURNING organization_id INTO org_id;
 
     -- Link merchant to organization
