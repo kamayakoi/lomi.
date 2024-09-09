@@ -22,13 +22,13 @@ export default function SignUp() {
         options: {
           data: {
             full_name: data.fullName,
+            is_merchant: true,
           },
           emailRedirectTo: `${window.location.origin}/onboarding`,
         },
       });
 
       if (error) {
-        console.error('Error creating user:', error);
         let message = 'An error occurred while creating your account. Please try again.';
         if (error.message.includes('Password should be at least 6 characters')) {
           message = 'Password should be at least 6 characters long.';
@@ -41,7 +41,7 @@ export default function SignUp() {
           title: 'Success',
           description: 'Please check your email for the confirmation link.',
         });
-        await new Promise((resolve) => setTimeout(resolve, 4000)); // Delay for 4 seconds
+        await new Promise((resolve) => setTimeout(resolve, 4000));
         setIsLoading(false);
       }
     } catch (error) {

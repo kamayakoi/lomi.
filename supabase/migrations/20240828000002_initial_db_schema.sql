@@ -21,12 +21,11 @@ CREATE TYPE currency_code AS ENUM (
 );
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 
-
 --------------- TABLES ---------------
 
--- Users table
-CREATE TABLE users (
-  user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+-- Merchants table
+CREATE TABLE merchants (
+  merchant_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR,
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR,
@@ -36,19 +35,16 @@ CREATE TABLE users (
   country VARCHAR,
   metadata JSONB,
   avatar_url TEXT,
+  preferred_language VARCHAR(5),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES users(user_id),
-  updated_by UUID REFERENCES users(user_id),
   deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_active_users ON users(user_id) WHERE deleted_at IS NULL;
-CREATE INDEX idx_users_created_by ON users(created_by);
-CREATE INDEX idx_users_updated_by ON users(updated_by);
+CREATE INDEX idx_merchants_email ON merchants(email);
+CREATE INDEX idx_active_merchants ON merchants(merchant_id) WHERE deleted_at IS NULL;
 
-COMMENT ON TABLE users IS 'Stores information about all users of the system, including users and admins';
+COMMENT ON TABLE merchants IS 'Stores information about all merchants using the system';
 
 -- Organizations table
 CREATE TABLE organizations (
@@ -66,15 +62,15 @@ CREATE TABLE organizations (
   max_providers INT,
   max_transaction_amount NUMERIC(15,2),
   max_monthly_volume NUMERIC(15,2),
-  max_api_calls_per_minute INT,
+  max_api_calls_per_hour INT,
   max_webhooks INT,
   logo_url TEXT,
   industry VARCHAR, 
   website_url VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  created_by UUID REFERENCES users(user_id),
-  updated_by UUID REFERENCES users(user_id),
+  created_by UUID REFERENCES merchants(merchant_id),
+  updated_by UUID REFERENCES merchants(merchant_id),
   deleted_at TIMESTAMPTZ
 );
 
@@ -84,25 +80,23 @@ CREATE INDEX idx_organizations_updated_by ON organizations(updated_by);
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
 
--- User-Organization links table
-CREATE TABLE user_organization_links (
-  user_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(user_id),
+-- Merchant-Organization links table
+CREATE TABLE merchant_organization_links (
+  merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_user_org_links_user_id ON user_organization_links(user_id);
-CREATE INDEX idx_user_org_links_org_id ON user_organization_links(organization_id);
+CREATE INDEX idx_merchant_org_links_merchant_id ON merchant_organization_links(merchant_id);
+CREATE INDEX idx_merchant_org_links_org_id ON merchant_organization_links(organization_id);
 
-COMMENT ON TABLE user_organization_links IS 'Links users to organizations, defining their roles within each organization';
+COMMENT ON TABLE merchant_organization_links IS 'Links merchants to organizations, defining their roles within each organization';
 
 -- Providers table
 CREATE TABLE providers (
   provider_code provider_code PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  description TEXT,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -114,12 +108,7 @@ COMMENT ON COLUMN providers.is_active IS 'Indicates if the provider is currently
 -- Payment methods table
 CREATE TABLE payment_methods (
   payment_method_code payment_method_code PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  description TEXT,
   provider_code provider_code REFERENCES providers(provider_code),
-  phone_number VARCHAR,
-  card_number VARCHAR,
-  country_code country_code NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -133,8 +122,14 @@ CREATE TABLE organization_providers (
     org_provider_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(provider_code),
-    provider_account_id VARCHAR,
     is_connected BOOLEAN NOT NULL DEFAULT false,
+    country_code country_code NOT NULL,
+    phone_number VARCHAR,
+    card_number VARCHAR,
+    bank_account_number VARCHAR,
+    bank_account_name VARCHAR,
+    bank_name VARCHAR,
+    bank_code VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (organization_id, provider_code)
@@ -154,70 +149,118 @@ CREATE TABLE currencies (
 
 COMMENT ON TABLE currencies IS 'Examples: USD, EUR, XOF, GHS, NGN, etc.';
 
+-- lomi/Admin Balances table
+CREATE TABLE lomi_balances (
+  balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  currency_code currency_code NOT NULL REFERENCES currencies(code),
+  balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
+  total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
+  total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
+  total_amount NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
+  last_transaction_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (currency_code)
+);
+
+CREATE INDEX idx_lomi_balances_currency_code ON lomi_balances(currency_code);
+CREATE INDEX idx_lomi_balances_last_transaction_at ON lomi_balances(last_transaction_at);
+
+COMMENT ON TABLE lomi_balances IS 'Stores Lomi''s balance, total transactions, total fees, and total amount for each currency after deducting fees from users'' end customers transactions';
+
+-- lomi/Admin Payouts table
+CREATE TABLE lomi_payouts (
+  payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+  amount NUMERIC(15,2) NOT NULL CHECK (amount > 0),
+  currency_code currency_code NOT NULL REFERENCES currencies(code),
+  payout_method VARCHAR NOT NULL,
+  payout_details JSONB,
+  status payout_status NOT NULL DEFAULT 'pending',
+  created_by UUID REFERENCES merchants(merchant_id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_lomi_payouts_organization_id ON lomi_payouts(organization_id);
+CREATE INDEX idx_lomi_payouts_currency_code ON lomi_payouts(currency_code);
+CREATE INDEX idx_lomi_payouts_status ON lomi_payouts(status);
+CREATE INDEX idx_lomi_payouts_created_by ON lomi_payouts(created_by);
+CREATE INDEX idx_lomi_payouts_created_at ON lomi_payouts(created_at);
+
+COMMENT ON TABLE lomi_payouts IS 'Stores information about the payouts made by Lomi to organizations';
+
+
+-- lomi/Admin Balances table
+CREATE TABLE provider_balances (
+  balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+  currency_code currency_code NOT NULL REFERENCES currencies(code),
+  balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
+  total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
+  total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
+  total_amount NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
+  last_transaction_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (provider_code, currency_code)
+);
+
+CREATE INDEX idx_provider_balances_provider_code ON provider_balances(provider_code);
+CREATE INDEX idx_provider_balances_currency_code ON provider_balances(currency_code);
+CREATE INDEX idx_provider_balances_last_transaction_at ON provider_balances(last_transaction_at);
+
+COMMENT ON TABLE provider_balances IS 'Stores the balance, total transactions, total fees, and total amount for each provider and currency';
+
 -- Accounts table
 CREATE TABLE accounts (
     account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     balance NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     is_active BOOLEAN NOT NULL DEFAULT true,
-    UNIQUE (user_id, payment_method_code, currency_code)
+    UNIQUE (merchant_id, payment_method_code, currency_code)
 );
 
-CREATE INDEX idx_accounts_user_id ON accounts(user_id);
+CREATE INDEX idx_accounts_merchant_id ON accounts(merchant_id);
 CREATE INDEX idx_accounts_payment_method_code ON accounts(payment_method_code);
 CREATE INDEX idx_accounts_currency_code ON accounts(currency_code);
 
-COMMENT ON TABLE accounts IS 'Represents financial accounts for users, linked to specific payment methods and currencies';
+COMMENT ON TABLE accounts IS 'Represents financial accounts for merchants, linked to specific payment methods and currencies';
 
 -- Main accounts table
 CREATE TABLE main_accounts (
     main_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (user_id, currency_code)
+    UNIQUE (merchant_id, currency_code)
 );
 
-CREATE INDEX idx_main_accounts_user_id ON main_accounts(user_id);
+CREATE INDEX idx_main_accounts_merchant_id ON main_accounts(merchant_id);
 
-COMMENT ON TABLE main_accounts IS 'Identifies the primary account for each user in each currency';
+COMMENT ON TABLE main_accounts IS 'Identifies the primary account for each merchant in each currency';
 
--- End customers table
-CREATE TABLE end_customers (
-    end_customer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+-- Customers table
+CREATE TABLE customers (
+    customer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     name VARCHAR NOT NULL,
     email VARCHAR,
     phone_number VARCHAR,
-    country_code country_code NOT NULL,
-    data JSONB,
+    metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_end_customers_user_id ON end_customers(user_id);
-CREATE INDEX idx_end_customers_organization_id ON end_customers(organization_id);
+CREATE INDEX idx_customers_merchant_id ON customers(merchant_id);
+CREATE INDEX idx_customers_organization_id ON customers(organization_id);
 
-COMMENT ON TABLE end_customers IS 'Stores information about the customers of our users';
-
--- End customer payment methods table
-CREATE TABLE end_customer_payment_methods (
-    ecpm_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    end_customer_id UUID NOT NULL REFERENCES end_customers(end_customer_id),
-    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (end_customer_id, payment_method_code)
-);
-
-CREATE INDEX idx_end_customer_payment_methods_end_customer_id ON end_customer_payment_methods(end_customer_id);
-CREATE INDEX idx_end_customer_payment_methods_payment_method_code ON end_customer_payment_methods(payment_method_code);
-
-COMMENT ON TABLE end_customer_payment_methods IS 'Links end customers to their preferred payment methods';
+COMMENT ON TABLE customers IS 'Stores information about the customers of our merchants';
 
 -- Fees table
 CREATE TABLE fees (
@@ -237,9 +280,9 @@ COMMENT ON TABLE fees IS 'Defines fee structures for different transaction types
 -- Transactions table
 CREATE TABLE transactions (
     transaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    end_customer_id UUID REFERENCES end_customers(end_customer_id),
+    customer_id UUID REFERENCES customers(customer_id),
     transaction_type transaction_type NOT NULL,
     status transaction_status NOT NULL DEFAULT 'pending',
     description TEXT,
@@ -251,9 +294,9 @@ CREATE TABLE transactions (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_transactions_user_id ON transactions(user_id);
+CREATE INDEX idx_transactions_merchant_id ON transactions(merchant_id);
 CREATE INDEX idx_transactions_organization_id ON transactions(organization_id);
-CREATE INDEX idx_transactions_end_customer_id ON transactions(end_customer_id);
+CREATE INDEX idx_transactions_customer_id ON transactions(customer_id);
 CREATE INDEX idx_transactions_transaction_type ON transactions(transaction_type);
 CREATE INDEX idx_transactions_status ON transactions(status);
 CREATE INDEX idx_transactions_currency_code ON transactions(currency_code);
@@ -268,7 +311,7 @@ COMMENT ON TABLE transactions IS 'Records all financial transactions in the syst
 -- Recurring Payments table
 CREATE TABLE recurring_payments (
     recurring_payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
@@ -289,7 +332,7 @@ CREATE TABLE recurring_payments (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_recurring_payments_user_id ON recurring_payments(user_id);
+CREATE INDEX idx_recurring_payments_merchant_id ON recurring_payments(merchant_id);
 CREATE INDEX idx_recurring_payments_organization_id ON recurring_payments(organization_id);
 
 COMMENT ON TABLE recurring_payments IS 'Stores information for recurring payment schedules';
@@ -325,7 +368,7 @@ CREATE INDEX idx_entries_created_at ON entries(created_at);
 
 COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes';
 
--- Transfers table
+-- [EXPERIMENTAL] Transfers table
 CREATE TABLE transfers (
     transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     from_account_id UUID NOT NULL REFERENCES accounts(account_id),
@@ -341,7 +384,7 @@ CREATE INDEX idx_transfers_to_account_id ON transfers(to_account_id);
 CREATE INDEX idx_transfers_transaction_id ON transfers(transaction_id);
 CREATE INDEX idx_transfers_created_at ON transfers(created_at);
 
-COMMENT ON TABLE transfers IS 'Records transfers between users accounts within the system';
+COMMENT ON TABLE transfers IS 'Records transfers between merchants accounts within the system';
 
 -- Internal Transfers table
 CREATE TABLE internal_transfers (
@@ -384,7 +427,8 @@ COMMENT ON TABLE payouts IS 'Tracks payouts from the system to external accounts
 -- API Keys table
 CREATE TABLE api_keys (
     key_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     api_key VARCHAR NOT NULL UNIQUE,
     is_active BOOLEAN NOT NULL DEFAULT true,
     expiration_date TIMESTAMPTZ,
@@ -393,7 +437,7 @@ CREATE TABLE api_keys (
     last_used_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_api_keys_user_id ON api_keys(user_id);
+CREATE INDEX idx_api_keys_merchant_id ON api_keys(merchant_id);
 CREATE INDEX idx_api_keys_api_key ON api_keys(api_key);
 
 COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the system';
@@ -401,7 +445,7 @@ COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the sy
 -- Webhooks table
 CREATE TABLE webhooks (
   webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES users(user_id),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   url VARCHAR NOT NULL,
   events VARCHAR[] NOT NULL,
   secret VARCHAR NOT NULL,
@@ -411,20 +455,21 @@ CREATE TABLE webhooks (
   last_triggered_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_webhooks_user_id ON webhooks(user_id);
+CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';
 
 -- Logs table
 CREATE TABLE logs (
     log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(user_id),
+    merchant_id UUID REFERENCES merchants(merchant_id),
     action VARCHAR NOT NULL,
     details JSONB,
+    severity VARCHAR NOT NULL CHECK (severity IN ('INFO', 'WARNING', 'ERROR', 'CRITICAL')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_logs_user_id ON logs(user_id);
+CREATE INDEX idx_logs_merchant_id ON logs(merchant_id);
 CREATE INDEX idx_logs_created_at ON logs(created_at);
 
 COMMENT ON TABLE logs IS 'Audit log for tracking important actions and events in the system';
@@ -432,7 +477,7 @@ COMMENT ON TABLE logs IS 'Audit log for tracking important actions and events in
 -- Invoices table
 CREATE TABLE invoices (
     invoice_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(user_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT,
@@ -443,7 +488,23 @@ CREATE TABLE invoices (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_invoices_user_id ON invoices(user_id);
+CREATE INDEX idx_invoices_merchant_id ON invoices(merchant_id);
 CREATE INDEX idx_invoices_organization_id ON invoices(organization_id);
 
-COMMENT ON TABLE invoices IS 'Stores invoice information for users and organizations';
+COMMENT ON TABLE invoices IS 'Stores invoice information for merchants and organizations';
+
+-- Metrics table
+CREATE TABLE metrics (
+    metric_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR NOT NULL,
+    value NUMERIC NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    labels JSONB,
+    organization_id UUID REFERENCES organizations(organization_id)
+);
+
+CREATE INDEX idx_metrics_name ON metrics(name);
+CREATE INDEX idx_metrics_timestamp ON metrics(timestamp);
+CREATE INDEX idx_metrics_organization_id ON metrics(organization_id);
+
+COMMENT ON TABLE metrics IS 'Stores metrics for monitoring and observability';

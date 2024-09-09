@@ -108,3 +108,27 @@ Code Quality
 - Use ESLint for linting.
 - Implement Prettier for code formatting.
 - Leverage TypeScript's static type checking.
+
+Microservices Architecture
+- Decompose the system into loosely coupled, independently deployable services
+- Minimize dependencies between services to reduce complexity
+- Use asynchronous communication (e.g. message queues) to decouple services
+- Aim for stateless services that can scale horizontally
+
+API Design
+- Follow RESTful principles for a clean, intuitive API surface
+- Use appropriate HTTP methods and status codes
+- Minimize over-fetching and under-fetching of data with well-defined resources
+- Implement caching and rate limiting to optimize performance
+
+Code Modularity
+- Break code into small, reusable functions and components
+Minimize coupling between modules
+- Use pure functions without side effects where possible
+- Leverage TypeScript interfaces to define clear contracts
+
+Performance Optimization
+- Lazy load non-critical resources to minimize initial bundle size
+- Implement caching at various layers (database, API, client)
+- Optimize expensive operations like large data transfers or complex computations
+- Monitor and profile the system to identify performance bottlenecks

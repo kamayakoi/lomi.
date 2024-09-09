@@ -63,9 +63,9 @@ const Onboarding: React.FC = () => {
                 setUser(session.user);
                 setIsEmailVerified(session.user.email_confirmed_at !== null);
                 const { data: profile, error: profileError } = await supabase
-                    .from('users')
+                    .from('merchants')
                     .select('onboarded')
-                    .eq('user_id', session.user.id)
+                    .eq('merchant_id', session.user.id)
                     .single();
 
                 if (profileError) {
@@ -140,26 +140,26 @@ const Onboarding: React.FC = () => {
         return data;
     };
 
-    const updateUserProfile = async (formData: OnboardingFormData, organizationId: string) => {
+    const updateMerchantProfile = async (formData: OnboardingFormData, organizationId: string) => {
         if (!user) return;
 
-        const { error: userError } = await supabase
-            .from('users')
+        const { error: merchantError } = await supabase
+            .from('merchants')
             .update({
                 name: `${formData.firstName} ${formData.lastName}`,
                 phone_number: `${formData.countryCode}${formData.phoneNumber}`,
                 country: formData.country,
                 onboarded: true,
             })
-            .eq('user_id', user.id);
+            .eq('merchant_id', user.id);
 
-        if (userError) throw userError;
+        if (merchantError) throw merchantError;
 
         const { error: linkError } = await supabase
-            .from('user_organization_links')
+            .from('merchant_organization_links')
             .insert([
                 {
-                    user_id: user.id,
+                    merchant_id: user.id,
                     organization_id: organizationId,
                     role: 'admin',
                 }
@@ -178,7 +178,7 @@ const Onboarding: React.FC = () => {
 
             const organization = await createOrganization(formData);
             if (organization) {
-                await updateUserProfile(formData, organization.organization_id);
+                await updateMerchantProfile(formData, organization.organization_id);
             }
             toast({
                 title: "Onboarding Complete",

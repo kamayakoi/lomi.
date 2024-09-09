@@ -19,13 +19,13 @@ export function OnboardingRoute({ children }: OnboardingRouteProps) {
             }
 
             const { data: profile, error: profileError } = await supabase
-                .from('users')
+                .from('merchants')
                 .select('onboarded')
-                .eq('user_id', session.user.id)
+                .eq('merchant_id', session.user.id)
                 .single();
 
             if (profileError) {
-                console.error('Error fetching user profile:', profileError);
+                console.error('Error fetching merchant profile:', profileError);
                 setIsLoading(false);
                 return;
             }
