@@ -20,7 +20,7 @@ import Login from './pages/auth/log-in.tsx';
 import Signup from './pages/auth/sign-up.tsx';
 import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
-import NewOnboarding from './pages/auth/new-onboarding';
+import Onboarding from './pages/auth/onboarding.tsx';
 import AuthCallback from './pages/auth/callback';
 
 // Error Pages
@@ -117,7 +117,7 @@ const AppRouter = () => (
                 <Route path="/auth/reset-password" element={<ResetPassword />} />
                 <Route path="/onboarding" element={
                     <OnboardingRoute>
-                        <NewOnboarding />
+                        <Onboarding />
                     </OnboardingRoute>
                 } />
                 <Route path="/auth/callback" element={<AuthCallback />} />

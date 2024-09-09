@@ -18,7 +18,7 @@ const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-
 const onboardingFormSchema = z.object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
-    countryCode: z.string().min(1, 'Country code is required'),
+    countryCode: z.string().regex(/^\+\d+$/, 'Invalid country code format'),
     phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
     country: z.string().min(1, 'Country is required'),
     role: z.string().min(1, 'Role is required'),
@@ -34,7 +34,7 @@ const onboardingFormSchema = z.object({
 
 type OnboardingFormData = z.infer<typeof onboardingFormSchema>;
 
-const Onboarding: React.FC = () => {
+const NewOnboarding: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -114,60 +114,6 @@ const Onboarding: React.FC = () => {
         }
     };
 
-    const createOrganization = async (formData: OnboardingFormData) => {
-        if (!user) return null;
-
-        const { data, error } = await supabase
-            .from('organizations')
-            .insert([
-                {
-                    name: formData.orgName,
-                    email: user.email,
-                    phone_number: `${formData.countryCode}${formData.phoneNumber}`,
-                    country: formData.orgCountry,
-                    city: formData.orgCity,
-                    address: formData.orgAddress,
-                    postal_code: formData.orgPostalCode,
-                    industry: formData.orgIndustry,
-                    website_url: formData.orgWebsite,
-                    created_by: user.id,
-                }
-            ])
-            .select()
-            .single();
-
-        if (error) throw error;
-        return data;
-    };
-
-    const updateMerchantProfile = async (formData: OnboardingFormData, organizationId: string) => {
-        if (!user) return;
-
-        const { error: merchantError } = await supabase
-            .from('merchants')
-            .update({
-                name: `${formData.firstName} ${formData.lastName}`,
-                phone_number: `${formData.countryCode}${formData.phoneNumber}`,
-                country: formData.country,
-                onboarded: true,
-            })
-            .eq('merchant_id', user.id);
-
-        if (merchantError) throw merchantError;
-
-        const { error: linkError } = await supabase
-            .from('merchant_organization_links')
-            .insert([
-                {
-                    merchant_id: user.id,
-                    organization_id: organizationId,
-                    role: 'admin',
-                }
-            ]);
-
-        if (linkError) throw linkError;
-    };
-
     const onSubmit = async () => {
         try {
             const isValid = await onboardingForm.trigger();
@@ -176,10 +122,34 @@ const Onboarding: React.FC = () => {
             setLoading(true);
             const formData = onboardingForm.getValues();
 
-            const organization = await createOrganization(formData);
-            if (organization) {
-                await updateMerchantProfile(formData, organization.organization_id);
+            if (!user) {
+                throw new Error("User not found");
             }
+
+            // Prepend "https://" to the website URL if not present
+            const websiteUrl = formData.orgWebsite ? (formData.orgWebsite.startsWith('http') ? formData.orgWebsite : `https://${formData.orgWebsite}`) : '';
+
+            // Call the complete_onboarding function
+            const { error } = await supabase.rpc('complete_onboarding', {
+                p_merchant_id: user.id,
+                p_phone_number: `${formData.countryCode}${formData.phoneNumber}`,
+                p_country: formData.country,
+                p_org_name: formData.orgName,
+                p_org_country: formData.orgCountry,
+                p_org_city: formData.orgCity,
+                p_org_address: formData.orgAddress,
+                p_org_postal_code: formData.orgPostalCode,
+                p_org_industry: formData.orgIndustry,
+                p_org_website_url: websiteUrl
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            // Update the local session to reflect the onboarded status
+            await supabase.auth.refreshSession();
+
             toast({
                 title: "Onboarding Complete",
                 description: "Your account has been set up successfully.",
@@ -241,6 +211,38 @@ const Onboarding: React.FC = () => {
                         <form onSubmit={(e) => e.preventDefault()}>
                             <div className="mb-6">
                                 <div className="flex space-x-2">
+                                    <div className="w-1/2">
+                                        <Label htmlFor="firstName" className="mb-1">First Name<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="firstName"
+                                            placeholder="e.g., John"
+                                            {...onboardingForm.register("firstName")}
+                                            className={cn(
+                                                "w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        />
+                                        {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
+                                    </div>
+                                    <div className="w-1/2">
+                                        <Label htmlFor="lastName" className="mb-1">Last Name<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="lastName"
+                                            placeholder="e.g., Doe"
+                                            {...onboardingForm.register("lastName")}
+                                            className={cn(
+                                                "w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        />
+                                        {onboardingForm.formState.errors.lastName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.lastName.message}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-6">
+                                <div className="flex space-x-2">
                                     <div className="w-1/3">
                                         <Label htmlFor="countryCode" className="mb-1">Country Code<span className="text-red-500">*</span></Label>
                                         <div className="relative">
@@ -261,6 +263,7 @@ const Onboarding: React.FC = () => {
                                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                 )}
                                             />
+                                            {onboardingForm.formState.errors.countryCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>}
                                             {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
                                                 <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
                                                     {filteredCountryCodes.map((code: string) => (
@@ -355,7 +358,7 @@ const Onboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgName.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgCountry" className="mb-1">Country<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgCountry" className="mb-1">Company Country<span className="text-red-500">*</span></Label>
                                         <select
                                             id="orgCountry"
                                             {...onboardingForm.register("orgCountry")}
@@ -450,18 +453,8 @@ const Onboarding: React.FC = () => {
                                         <Label htmlFor="orgWebsite" className="mb-1">Website</Label>
                                         <Input
                                             id="orgWebsite"
-                                            placeholder="e.g., example.com"
-                                            {...onboardingForm.register("orgWebsite", {
-                                                setValueAs: (value) => {
-                                                    if (!value) return '';
-                                                    const url = value.toLowerCase();
-                                                    if (url.startsWith('http://') || url.startsWith('https://')) {
-                                                        return url;
-                                                    } else {
-                                                        return `https://${url.startsWith('www.') ? url : `www.${url}`}`;
-                                                    }
-                                                },
-                                            })}
+                                            placeholder="e.g., www.example.com"
+                                            {...onboardingForm.register("orgWebsite")}
                                             className={cn(
                                                 "w-full",
                                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -491,11 +484,8 @@ const Onboarding: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Button
-                                onClick={onSubmit}
-                                className="mt-6 dark:bg-primary-600 dark:hover:bg-primary-700"
-                            >
-                                Finish
+                            <Button type="submit" className="w-full" disabled={loading} onClick={onSubmit}>
+                                {loading ? 'Submitting...' : 'Complete Onboarding'}
                             </Button>
                         </form>
                     </FormProvider>
@@ -505,4 +495,4 @@ const Onboarding: React.FC = () => {
     );
 };
 
-export default Onboarding;
+export default NewOnboarding;
