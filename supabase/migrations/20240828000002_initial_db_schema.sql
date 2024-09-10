@@ -10,7 +10,6 @@ CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed
 CREATE TYPE invoice_status AS ENUM ('draft', 'sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'yearly', 'one-time');
 CREATE TYPE entry_type AS ENUM ('debit', 'credit');
-CREATE TYPE country_code AS ENUM ('+233', '+234', '+225', '+254', '+27', '+20', '+212', '+251', '+256', '+221', '+237', '+255', '+222', '+216', '+250', '+260', '+263', '+213', '+33', '+44', '+49', '+39', '+34', '+31', '+46', '+48', '+351', '+30', '+32', '+43', '+1');
 CREATE TYPE payment_method_code AS ENUM (
     'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'SEPA', 'PAYPAL',
     'APPLE_PAY', 'GOOGLE_PAY', 'CASH', 'CRYPTOCURRENCY', 'IDEAL', 'COUNTER', 'WAVE',
@@ -20,6 +19,7 @@ CREATE TYPE currency_code AS ENUM (
     'XOF', 'XAF', 'NGN', 'GHS', 'KES', 'ZAR', 'EGP', 'MAD', 'RWF', 'ETB', 'ZMW', 'NAD', 'USD', 'EUR', 'MRO'
 );
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+CREATE TYPE dispute_status AS ENUM ('open', 'under_review', 'resolved', 'closed');
 
 --------------- TABLES ---------------
 
@@ -38,13 +38,15 @@ CREATE TABLE merchants (
   preferred_language VARCHAR(5),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  is_deleted BOOLEAN NOT NULL DEFAULT false,
   deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_merchants_email ON merchants(email);
-CREATE INDEX idx_active_merchants ON merchants(merchant_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_active_merchants ON merchants(merchant_id) WHERE is_deleted = false;
 
 COMMENT ON TABLE merchants IS 'Stores information about all merchants using the system';
+COMMENT ON COLUMN merchants.status IS 'Current status of the merchant account';
 
 -- Organizations table
 CREATE TABLE organizations (
@@ -73,12 +75,15 @@ CREATE TABLE organizations (
   website_url VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  is_deleted BOOLEAN NOT NULL DEFAULT false,
   deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_organizations_email ON organizations(email);
+CREATE INDEX idx_organizations_is_deleted ON organizations(is_deleted) WHERE is_deleted = false;
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
+COMMENT ON COLUMN organizations.status IS 'Current status of the organization account';
 
 -- Organization KYC table
 CREATE TABLE organization_kyc (
@@ -272,6 +277,8 @@ CREATE TABLE customers (
 
 CREATE INDEX idx_customers_merchant_id ON customers(merchant_id);
 CREATE INDEX idx_customers_organization_id ON customers(organization_id);
+CREATE INDEX idx_customers_email ON customers(email);
+CREATE INDEX idx_customers_phone_number ON customers(phone_number);
 
 COMMENT ON TABLE customers IS 'Stores information about the customers of our merchants';
 
@@ -326,8 +333,10 @@ CREATE INDEX idx_transactions_created_at ON transactions(created_at);
 CREATE INDEX idx_transactions_amount ON transactions(amount);
 CREATE INDEX idx_transactions_pending ON transactions(transaction_id) WHERE status = 'pending';
 CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE status = 'completed';
+CREATE INDEX idx_transactions_provider_code ON transactions(provider_code);
 
 COMMENT ON TABLE transactions IS 'Records all financial transactions in the system';
+COMMENT ON COLUMN transactions.metadata IS 'Additional transaction-specific data in JSON format';
 
 -- Recurring Payments table
 CREATE TABLE recurring_payments (
@@ -453,9 +462,9 @@ COMMENT ON TABLE payouts IS 'Tracks payouts from the system to external accounts
 -- API Keys table
 CREATE TABLE api_keys (
     key_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     api_key VARCHAR NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT true,
     expiration_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -467,6 +476,20 @@ CREATE INDEX idx_api_keys_merchant_id ON api_keys(merchant_id);
 CREATE INDEX idx_api_keys_api_key ON api_keys(api_key);
 
 COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the system';
+
+-- API usage tracking for rate limiting
+CREATE TABLE api_usage (
+    usage_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    api_key_id UUID NOT NULL REFERENCES api_keys(key_id),
+    endpoint VARCHAR(255) NOT NULL,
+    request_count INT NOT NULL DEFAULT 0,
+    last_request_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_api_usage_api_key_id ON api_usage(api_key_id);
+CREATE INDEX idx_api_usage_last_request_at ON api_usage(last_request_at);
 
 -- Webhooks table
 CREATE TABLE webhooks (
@@ -509,7 +532,7 @@ CREATE TABLE invoices (
     description TEXT,
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
-    status invoice_status NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'paid', 'cancelled')),
+    status invoice_status NOT NULL DEFAULT 'draft',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
