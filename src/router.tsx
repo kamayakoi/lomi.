@@ -3,6 +3,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
 import { SessionCheck } from '@/components/auth/SessionCheck';
 import ResetPassword from './pages/auth/reset-password.tsx';
+// import { config } from '@/utils/config';
 
 // Home and landing Pages
 import Home from "./pages/home/Home.tsx";
@@ -52,12 +53,6 @@ import BatchDisbursements from './pages/portal/send-payments/batch-disbursements
 import BatchPaymentLinks from './pages/portal/receive-payments/batch-payment-links/BatchPaymentLinks.tsx'
 import PaymentLinks from './pages/portal/receive-payments/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx'
-
-
-
-
-
-// Dashboard Coming soon
 import Subscription from "./pages/portal/subscription/subscription.tsx";
 
 const AppRouter = () => (
@@ -76,6 +71,7 @@ const AppRouter = () => (
                 <Route path="/privacy" element={<Privacy />} />
 
                 {/* Dashboard routes */}
+                {/* {config.isPortal ? ( */}
                 <Route path="/portal" element={
                     <ProtectedRoute>
                         <AppShell />

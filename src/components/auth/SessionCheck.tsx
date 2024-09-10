@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { checkSession } from '@/utils/supabase/client'
+// import { config } from '@/utils/config'
 
 interface SessionCheckProps {
     children: React.ReactNode
@@ -17,6 +18,7 @@ export function SessionCheck({ children }: SessionCheckProps) {
             if (session) {
                 if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
                     navigate('/portal')
+                    // navigate(config.isPortal ? '/' : '/portal')
                 }
             }
             setIsLoading(false)

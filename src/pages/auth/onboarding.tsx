@@ -12,6 +12,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
 import { countryCodes, countries, roles, employeeRanges, industries } from '@/data/onboarding';
+// import { config } from '@/utils/config';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
@@ -76,6 +77,7 @@ const NewOnboarding: React.FC = () => {
 
                 if (profile && profile.onboarded) {
                     navigate('/portal');
+                    // navigate(config.isPortal ? '/' : '/portal');
                 } else {
                     setLoading(false);
                 }
@@ -155,6 +157,7 @@ const NewOnboarding: React.FC = () => {
                 description: "Your account has been set up successfully.",
             });
             navigate('/portal');
+            // navigate(config.isPortal ? '/' : '/portal');
         } catch (error) {
             console.error('Error completing onboarding:', error);
             toast({
