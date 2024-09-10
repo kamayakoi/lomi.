@@ -28,7 +28,7 @@ CREATE TABLE merchants (
   merchant_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR,
   email VARCHAR UNIQUE NOT NULL,
-  phone_number VARCHAR,
+  phone_number VARCHAR UNIQUE,
   is_admin BOOLEAN NOT NULL DEFAULT false,
   onboarded BOOLEAN NOT NULL DEFAULT false,
   verified BOOLEAN NOT NULL DEFAULT false,
@@ -52,11 +52,15 @@ CREATE TABLE organizations (
   name VARCHAR NOT NULL,
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR NOT NULL,
+  tax_number VARCHAR UNIQUE,
   country VARCHAR NOT NULL,
   city VARCHAR NOT NULL,
   address VARCHAR NOT NULL, 
   postal_code VARCHAR NOT NULL, 
   status organization_status NOT NULL DEFAULT 'active',
+  kyc_status VARCHAR NOT NULL DEFAULT 'pending' CHECK (kyc_status IN ('pending', 'approved', 'rejected')),
+  kyc_submitted_at TIMESTAMPTZ,
+  kyc_approved_at TIMESTAMPTZ,
   metadata JSONB,
   max_transactions_per_day INT,
   max_providers INT,
@@ -76,6 +80,22 @@ CREATE INDEX idx_organizations_email ON organizations(email);
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
 
+-- Organization KYC table
+CREATE TABLE organization_kyc (
+  kyc_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+  document_type VARCHAR NOT NULL,
+  document_url VARCHAR NOT NULL,
+  status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  reviewed_at TIMESTAMPTZ,
+  UNIQUE (organization_id, document_type)
+);
+
+CREATE INDEX idx_organization_kyc_organization_id ON organization_kyc(organization_id);
+
+COMMENT ON TABLE organization_kyc IS 'Stores KYC information for organizations';
+
 -- Merchant-Organization links table
 CREATE TABLE merchant_organization_links (
   merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -83,6 +103,8 @@ CREATE TABLE merchant_organization_links (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+
+  UNIQUE (merchant_id, organization_id)
 );
 
 CREATE INDEX idx_merchant_org_links_merchant_id ON merchant_organization_links(merchant_id);
@@ -119,7 +141,6 @@ CREATE TABLE organization_providers (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(provider_code),
     is_connected BOOLEAN NOT NULL DEFAULT false,
-    country_code country_code NOT NULL,
     phone_number VARCHAR,
     card_number VARCHAR,
     bank_account_number VARCHAR,
@@ -145,11 +166,10 @@ CREATE TABLE currencies (
 
 COMMENT ON TABLE currencies IS 'Examples: USD, EUR, XOF, GHS, NGN, etc.';
 
--- lomi/Admin Balances table
-CREATE TABLE lomi_balances (
-  balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+-- Admin Balance table
+CREATE TABLE lomi_balance (
+  balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (balance >= 0),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
-  balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
   total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
   total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
   total_amount NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
@@ -159,12 +179,12 @@ CREATE TABLE lomi_balances (
   UNIQUE (currency_code)
 );
 
-CREATE INDEX idx_lomi_balances_currency_code ON lomi_balances(currency_code);
-CREATE INDEX idx_lomi_balances_last_transaction_at ON lomi_balances(last_transaction_at);
+CREATE INDEX idx_lomi_balance_currency_code ON lomi_balance(currency_code);
+CREATE INDEX idx_lomi_balance_last_transaction_at ON lomi_balance(last_transaction_at);
 
-COMMENT ON TABLE lomi_balances IS 'Stores Lomi''s balance, total transactions, total fees, and total amount for each currency after deducting fees from users'' end customers transactions';
+COMMENT ON TABLE lomi_balance IS 'Stores Lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
 
--- lomi/Admin Payouts table
+-- Admin Payouts table
 CREATE TABLE lomi_payouts (
   payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
@@ -172,7 +192,6 @@ CREATE TABLE lomi_payouts (
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   payout_method VARCHAR NOT NULL,
   payout_details JSONB,
-  status payout_status NOT NULL DEFAULT 'pending',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -182,10 +201,10 @@ CREATE INDEX idx_lomi_payouts_currency_code ON lomi_payouts(currency_code);
 CREATE INDEX idx_lomi_payouts_status ON lomi_payouts(status);
 CREATE INDEX idx_lomi_payouts_created_at ON lomi_payouts(created_at);
 
-COMMENT ON TABLE lomi_payouts IS 'Stores information about the payouts made by Lomi to organizations';
+COMMENT ON TABLE lomi_payouts IS 'Stores information about the payouts made by organizations to lomi.';
 
 
--- lomi/Admin Balances table
+-- Provider Balances table
 CREATE TABLE provider_balances (
   balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   provider_code provider_code NOT NULL REFERENCES providers(provider_code),
@@ -211,22 +230,22 @@ CREATE TABLE accounts (
     account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     balance NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
-    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
+    provider_code provider_code NOT NULL REFERENCES providers(provider_code),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     is_active BOOLEAN NOT NULL DEFAULT true,
-    UNIQUE (merchant_id, payment_method_code, currency_code)
+    UNIQUE (merchant_id, provider_code, currency_code)
 );
 
 CREATE INDEX idx_accounts_merchant_id ON accounts(merchant_id);
-CREATE INDEX idx_accounts_payment_method_code ON accounts(payment_method_code);
+CREATE INDEX idx_accounts_provider_code ON accounts(provider_code);
 CREATE INDEX idx_accounts_currency_code ON accounts(currency_code);
 
 COMMENT ON TABLE accounts IS 'Represents financial accounts for merchants, linked to specific payment methods and currencies';
 
 -- Main accounts table
 CREATE TABLE main_accounts (
-    main_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    main_account_id UUID PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
@@ -258,31 +277,39 @@ COMMENT ON TABLE customers IS 'Stores information about the customers of our mer
 
 -- Fees table
 CREATE TABLE fees (
-    fee_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR PRIMARY KEY NOT NULL,
     transaction_type transaction_type NOT NULL,
-    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    fee_type VARCHAR NOT NULL,
+    percentage NUMERIC(5,2) NOT NULL CHECK (percentage >= 0 AND percentage <= 100),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
+    payment_method_code payment_method_code REFERENCES payment_methods(payment_method_code),
+    provider_code provider_code REFERENCES providers(provider_code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (transaction_type, fee_type, currency_code, payment_method_code, provider_code)
 );
 
 CREATE INDEX idx_fees_transaction_type ON fees(transaction_type);
+CREATE INDEX idx_fees_fee_type ON fees(fee_type);
 CREATE INDEX idx_fees_currency_code ON fees(currency_code);
+CREATE INDEX idx_fees_payment_method_code ON fees(payment_method_code);
+CREATE INDEX idx_fees_provider_code ON fees(provider_code);
 
-COMMENT ON TABLE fees IS 'Defines fee structures for different transaction types';
+COMMENT ON TABLE fees IS 'Defines fee structures for different transaction types and payment methods';
 
 -- Transactions table
 CREATE TABLE transactions (
-    transaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transaction_id UUID PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    customer_id UUID REFERENCES customers(customer_id),
+    customer_id UUID NOT NULL REFERENCES customers(customer_id),
     transaction_type transaction_type NOT NULL,
     status transaction_status NOT NULL DEFAULT 'pending',
     description TEXT,
     metadata JSONB,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
+    provider_code provider_code NOT NULL REFERENCES providers(provider_code),
     payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -336,6 +363,8 @@ CREATE TABLE refunds (
     refund_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     transaction_id UUID NOT NULL REFERENCES transactions(transaction_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    refunded_amount NUMERIC(10,2) NOT NULL CHECK (refunded_amount > 0),
+    fee_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
     reason TEXT,
     status refund_status NOT NULL DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -345,6 +374,9 @@ CREATE TABLE refunds (
 CREATE INDEX idx_refunds_transaction_id ON refunds(transaction_id);
 
 COMMENT ON TABLE refunds IS 'Tracks refunds linked to transactions';
+COMMENT ON COLUMN refunds.amount IS 'Original transaction amount';
+COMMENT ON COLUMN refunds.refunded_amount IS 'Amount refunded to the customer';
+COMMENT ON COLUMN refunds.fee_amount IS 'Fee charged for processing the refund';
 
 -- Entries table
 CREATE TABLE entries (
@@ -477,7 +509,7 @@ CREATE TABLE invoices (
     description TEXT,
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
-    status invoice_status NOT NULL DEFAULT 'draft',
+    status invoice_status NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'paid', 'cancelled')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -486,6 +518,46 @@ CREATE INDEX idx_invoices_merchant_id ON invoices(merchant_id);
 CREATE INDEX idx_invoices_organization_id ON invoices(organization_id);
 
 COMMENT ON TABLE invoices IS 'Stores invoice information for merchants and organizations';
+
+-- Notifications table
+CREATE TABLE notifications (
+    notification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    type VARCHAR NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_notifications_merchant_id ON notifications(merchant_id);
+CREATE INDEX idx_notifications_organization_id ON notifications(organization_id);
+CREATE INDEX idx_notifications_type ON notifications(type);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+
+COMMENT ON TABLE notifications IS 'Stores notifications for merchants and organizations';
+
+-- Disputes table
+CREATE TABLE disputes (
+    dispute_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    transaction_id UUID NOT NULL REFERENCES transactions(transaction_id),
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    fee_amount NUMERIC(10,2) NOT NULL DEFAULT 15.00,
+    reason TEXT NOT NULL,
+    status dispute_status NOT NULL DEFAULT 'open',
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_disputes_transaction_id ON disputes(transaction_id);
+CREATE INDEX idx_disputes_status ON disputes(status);
+CREATE INDEX idx_disputes_currency_code ON disputes(currency_code);
+
+COMMENT ON TABLE disputes IS 'Stores dispute information for transactions';
+COMMENT ON COLUMN disputes.amount IS 'Disputed transaction amount';
+COMMENT ON COLUMN disputes.fee_amount IS 'Fee charged for processing the dispute';
 
 -- Metrics table
 CREATE TABLE metrics (
