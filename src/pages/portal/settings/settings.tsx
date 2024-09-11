@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 import {
   IconBuildingStore,
   IconCreditCard,
@@ -27,7 +27,7 @@ export default function Settings() {
         </div>
       </Layout.Header>
 
-      <Layout.Body className='flex flex-col h-full'> {/* Ensure full height */}
+      <Layout.Body className='flex flex-col h-full'>
         <div className='space-y-0.5'>
           <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
             Settings
@@ -38,7 +38,7 @@ export default function Settings() {
         </div>
         <Separator className='my-4 lg:my-6' />
         <div className='flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <aside className='top-0 lg:sticky lg:w-1/5 h-full overflow-y-auto'> {/* Ensure full height */}
+          <aside className='top-0 lg:sticky lg:w-1/5 h-full overflow-y-auto'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
           <div className='flex w-full p-1 pr-4 md:overflow-y-auto'>
@@ -54,20 +54,20 @@ const sidebarNavItems = [
   {
     title: 'Business and Profile',
     icon: <IconBuildingStore size={18} />,
-    href: '/settings',
+    href: '/portal/settings',
     subItems: [
-      { title: 'Your Profile', href: '/portal/settings/profile' },
-      { title: 'Your Business', href: '/portal/settings/business' }
+      { title: 'Profile', href: '/portal/settings/profile' },
+      { title: 'Business', href: '/portal/settings/business' }
     ],
     defaultOpen: true,
   },
   {
-    title: 'Accepting Money',
+    title: 'Receiving Money',
     icon: <IconCreditCard size={18} />,
-    href: '/settings/accepting-money',
+    href: '/settings/receiving-money',
     subItems: [
-      { title: 'Payment Methods', href: 'portal/settings/accepting-money/payment-methods' },
-      { title: 'Checkout', href: 'portal/settings/accepting-money/checkout' },
+      { title: 'Payment Methods', href: '/portal/settings/receiving-money/payment-methods' },
+      { title: 'Checkout', href: '/portal/settings/receiving-money/checkout' },
     ],
   },
   {
@@ -75,8 +75,8 @@ const sidebarNavItems = [
     icon: <IconSend size={18} />,
     href: '/settings/sending-money',
     subItems: [
-      { title: 'Disbursements', href: '/settings/sending-money/disbursements' },
-      { title: 'Notifications', href: '/settings/sending-money/notifications' },
+      { title: 'Disbursements', href: '/portal/settings/sending-money/disbursements' },
+      { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
     ],
   },
   {
@@ -84,8 +84,8 @@ const sidebarNavItems = [
     icon: <IconUsers size={18} />,
     href: '/settings/team',
     subItems: [
-      { title: 'Your Team', href: '/settings/team/members' },
-      { title: 'Email Recipients', href: '/settings/team/email-recipients' },
+      { title: 'Your Team', href: '/portal/settings/team/members' },
+      { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
     ],
   },
   {
@@ -93,8 +93,8 @@ const sidebarNavItems = [
     icon: <IconReceipt size={18} />,
     href: '/settings/billing',
     subItems: [
-      { title: 'Billing', href: '/settings/billing/statements' },
-      { title: 'Fee Structure', href: '/settings/billing/fee-structure' },
+      { title: 'Billing', href: '/portal/settings/billing/statements' },
+      { title: 'Fee Structure', href: '/portal/settings/billing/fee-structure' },
     ],
   },
   {
@@ -102,9 +102,9 @@ const sidebarNavItems = [
     icon: <IconCode size={18} />,
     href: '/settings/developers',
     subItems: [
-      { title: 'API Keys', href: '/settings/developers/api-keys' },
-      { title: 'Webhooks', href: '/settings/developers/webhooks' },
-      { title: 'IP Allowlist', href: '/settings/developers/ip-allowlist' },
+      { title: 'API Keys', href: '/portal/settings/developers/api-keys' },
+      { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
+      { title: 'IP Allowlist', href: '/portal/settings/developers/ip-allowlist' },
     ],
   },
   {
@@ -112,10 +112,15 @@ const sidebarNavItems = [
     icon: <IconWallet size={18} />,
     href: '/settings/withdrawals',
     subItems: [
-      { title: 'Bank Accounts', href: '/settings/withdrawals/bank-accounts' },
-      { title: 'Phone numbers', href: '/settings/withdrawals/phone-numbers' },
-      { title: 'Notifications', href: '/settings/withdrawals/email-notifications' },
-      { title: 'Auto Withdrawal', href: '/settings/withdrawals/auto-withdrawal' },
+      { title: 'Bank Accounts', href: '/portal/settings/withdrawals/bank-accounts' },
+      { title: 'Phone numbers', href: '/portal/settings/withdrawals/phone-numbers' },
+      { title: 'Notifications', href: '/portal/settings/withdrawals/email-notifications' },
+      { title: 'Auto Withdrawal', href: '/portal/settings/withdrawals/auto-withdrawal' },
     ],
   },
 ]
+
+// Add this at the end of the file
+export function SettingsIndex() {
+  return <Navigate to="/portal/settings/profile" replace />;
+}

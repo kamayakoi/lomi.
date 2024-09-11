@@ -155,7 +155,7 @@ export const sidelinks: SidebarItem[] = [
   },
   {
     title: 'Settings',
-    href: '/portal/settings',
+    href: '/portal/settings/profile',
     icon: <IconSettings size={18} />,
   },
 ]

@@ -33,7 +33,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
 import Providers from './pages/portal/Providers/providers.tsx';
-import Settings from './pages/portal/settings/Settings.tsx';
+import Settings from './pages/portal/settings/settings.tsx';
 import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
 import Logs from './pages/portal/logs/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
@@ -51,24 +51,24 @@ import Customers from './pages/portal/customers/Customers.tsx'
 import Subscription from "./pages/portal/subscription/subscription.tsx";
 
 // Settings pages
-import PaymentMethods from './pages/portal/settings/accepting-money/payment-methods';
-import Checkout from './pages/portal/settings/accepting-money/checkout';
-import Disbursements from './pages/portal/settings/sending-money/disbursements';
-import CategoryApproval from './pages/portal/settings/sending-money/category-approval';
-import DisbursementNotifications from './pages/portal/settings/sending-money/notifications';
+import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
+import Checkout from './pages/portal/settings/receiving-money/checkout.tsx';
+import Disbursements from './pages/portal/settings/sending-money/disbursements.tsx';
+import CategoryApproval from './pages/portal/settings/sending-money/category-approval.tsx';
+import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
 import Business from './pages/portal/settings/business-profile/business';
 import Profile from './pages/portal/settings/business-profile/profile';
-import Timezone from './pages/portal/settings/business-profile/timezone';
-import TeamMembers from './pages/portal/settings/team/members';
-import EmailRecipients from './pages/portal/settings/team/email-recipients';
-import BillingStatements from './pages/portal/settings/billing/statements';
-import FeeStructure from './pages/portal/settings/billing/fee-structure';
-import ApiKeys from './pages/portal/settings/developers/api-keys';
-import IpAllowlist from './pages/portal/settings/developers/ip-allowlist';
-import SettingsWebhooks from './pages/portal/settings/developers/webhooks';
-import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts';
-import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications';
-import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal';
+import TeamMembers from './pages/portal/settings/team/members.tsx';
+import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
+import BillingStatements from './pages/portal/settings/billing/statements.tsx';
+import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
+import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
+import IpAllowlist from './pages/portal/settings/developers/ip-allowlist.tsx';
+import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
+import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
+import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
+import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
+import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 
 const AppRouter = () => (
     <Router>
@@ -111,16 +111,15 @@ const AppRouter = () => (
                     <Route path="customers" element={<Customers />} />
 
                     <Route path="settings" element={<Settings />}>
-                        <Route path="accepting-money/payment-methods" element={<PaymentMethods />} />
-                        <Route path="accepting-money/checkout" element={<Checkout />} />
+                        <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
+                        <Route path="receiving-money/checkout" element={<Checkout />} />
                         <Route path="sending-money/disbursements" element={<Disbursements />} />
                         <Route path="sending-money/category-approval" element={<CategoryApproval />} />
                         <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
                         <Route path="business" element={<Business />} />
                         <Route path="profile" element={<Profile />} />
-                        {/* <Route path="timezone" element={<Timezone />} /> */}
-                        <Route path="members" element={<TeamMembers />} />
-                        <Route path="email-recipients" element={<EmailRecipients />} />
+                        <Route path="team/members" element={<TeamMembers />} />
+                        <Route path="team/email-recipients" element={<EmailRecipients />} />
                         <Route path="billing/statements" element={<BillingStatements />} />
                         <Route path="billing/fee-structure" element={<FeeStructure />} />
                         <Route path="developers/api-keys" element={<ApiKeys />} />
@@ -129,6 +128,7 @@ const AppRouter = () => (
                         <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
                         <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
                         <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
+                        <Route path="withdrawals/phone-numbers" element={<PhoneNumbers />} />
                     </Route>
                 </Route>
 

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
@@ -30,10 +30,17 @@ export default function SidebarNav({
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [val, setVal] = useState(pathname ?? '/settings')
+  const [openSections, setOpenSections] = useState(
+    items.reduce((acc, item) => ({ ...acc, [item.href]: item.defaultOpen }), {})
+  )
 
   const handleSelect = (e: string) => {
     setVal(e)
     navigate(e)
+  }
+
+  const toggleSection = (href: string) => {
+    setOpenSections(prev => ({ ...prev, [href]: !prev[href] }))
   }
 
   return (
@@ -65,25 +72,23 @@ export default function SidebarNav({
           {...props}
         >
           {items.map((item) => (
-            <Collapsible key={item.href} open={item.defaultOpen}>
-              <CollapsibleTrigger className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                'justify-between w-full'
-              )}>
+            <Collapsible key={item.href} open={openSections[item.href]}>
+              <CollapsibleTrigger
+                className={cn(
+                  buttonVariants({ variant: 'ghost' }),
+                  'justify-between w-full'
+                )}
+                onClick={() => toggleSection(item.href)}
+              >
                 <div className="flex items-center">
                   <span className='mr-2'>{item.icon}</span>
                   {item.title}
                 </div>
                 {item.subItems && (
-                  <ChevronDown className="h-4 w-4" />
+                  openSections[item.href] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                 )}
               </CollapsibleTrigger>
               <CollapsibleContent
-                style={{
-                  overflowY: 'auto',
-                  overflowX: 'hidden',
-                  whiteSpace: 'normal', // Allow text to wrap
-                }}
                 className="space-y-1 pl-4 pr-2"
               >
                 {item.subItems?.map((subItem) => (
@@ -104,6 +109,7 @@ export default function SidebarNav({
               </CollapsibleContent>
             </Collapsible>
           ))}
+          <div className="h-24" />
         </nav>
       </div>
     </>

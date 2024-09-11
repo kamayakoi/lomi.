@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LogoIcon } from "./Icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-brands-svg-icons'; // Import the icons
+import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-brands-svg-icons';
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
@@ -25,7 +25,7 @@ export const Footer = () => {
   }, []);
 
   return (
-    <footer id="footer" className="bg-gray-100 dark:bg-gray-900 py-10 w-full">
+    <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
         {/* Logo Section */}
         <div className="flex flex-col gap-2 col-span-1 md:col-span-1">
@@ -119,11 +119,11 @@ export const Footer = () => {
               English
             </button>
             {showLanguages && (
-              <div className="absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg">
-                <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <div className="absolute bottom-full mb-2 bg-white dark:bg-[#06060A] border border-gray-300 dark:border-gray-700 rounded shadow-lg">
+                <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                   English
                 </a>
-                <a href="/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <a href="/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                   French
                 </a>
               </div>

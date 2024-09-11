@@ -7,7 +7,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Services } from "@/components/landing/Services";
 
-import "./Home.css";
+// import "./Home.css";
 
 // Not Imported
 
