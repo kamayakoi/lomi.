@@ -55,12 +55,17 @@ CREATE TABLE organizations (
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR NOT NULL,
   country VARCHAR NOT NULL,
-  city VARCHAR NOT NULL,
-  address VARCHAR NOT NULL, 
+  region VARCHAR NOT NULL,
+  district VARCHAR NOT NULL,
+  commune VARCHAR NOT NULL,
+  address VARCHAR NOT NULL,
+  mailing_address VARCHAR,
   postal_code VARCHAR NOT NULL,
   logo_url TEXT,
+  business_description TEXT,
   industry VARCHAR, 
   website_url VARCHAR,
+  other_platform_url VARCHAR,
   status organization_status NOT NULL DEFAULT 'active',
   tax_number VARCHAR UNIQUE,
   kyc_status VARCHAR NOT NULL DEFAULT 'pending' CHECK (kyc_status IN ('pending', 'approved', 'rejected')),
@@ -84,6 +89,13 @@ CREATE INDEX idx_organizations_is_deleted ON organizations(is_deleted) WHERE is_
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
 COMMENT ON COLUMN organizations.status IS 'Current status of the organization account';
+COMMENT ON COLUMN organizations.business_description IS 'Brief description of what the business sells and where they sell';
+COMMENT ON COLUMN organizations.province IS 'Province of the legal business address';
+COMMENT ON COLUMN organizations.district IS 'District of the legal business address'; 
+COMMENT ON COLUMN organizations.commune IS 'Commune of the legal business address';
+COMMENT ON COLUMN organizations.address_details IS 'Street name, building/house number of the legal business address';
+COMMENT ON COLUMN organizations.mailing_address IS 'Mailing address if different from the legal address';
+COMMENT ON COLUMN organizations.proof_of_business IS 'Proof of business (website, social media, e-commerce)';
 
 -- Organization KYC table
 CREATE TABLE organization_kyc (
@@ -91,6 +103,7 @@ CREATE TABLE organization_kyc (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   document_type VARCHAR NOT NULL,
   document_url VARCHAR NOT NULL,
+  authorized_signatory JSONB,
   status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   reviewed_at TIMESTAMPTZ,
@@ -100,6 +113,7 @@ CREATE TABLE organization_kyc (
 CREATE INDEX idx_organization_kyc_organization_id ON organization_kyc(organization_id);
 
 COMMENT ON TABLE organization_kyc IS 'Stores KYC information for organizations';
+COMMENT ON COLUMN organization_kyc.authorized_signatory IS 'Information about the authorized signatory for the organization';
 
 -- Merchant-Organization links table
 CREATE TABLE merchant_organization_links (
@@ -284,14 +298,13 @@ COMMENT ON TABLE customers IS 'Stores information about the customers of our mer
 CREATE TABLE merchant_products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     price NUMERIC(10,2) NOT NULL CHECK (price >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    is_subscription BOOLEAN NOT NULL DEFAULT false,
-    billing_frequency VARCHAR(20),
-    metadata JSONB,
+    frequency frequency NOT NULL,
+    image_url TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -310,7 +323,7 @@ CREATE TABLE customer_subscriptions (
     start_date DATE NOT NULL,
     end_date DATE,
     next_billing_date DATE,
-    billing_frequency VARCHAR(20) NOT NULL,
+    billing_frequency frequency NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     metadata JSONB,

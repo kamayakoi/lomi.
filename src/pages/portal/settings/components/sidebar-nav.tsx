@@ -9,12 +9,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { ChevronDown } from 'lucide-react'
 
 interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   items: {
     href: string
     title: string
     icon: JSX.Element
+    subItems?: { href: string; title: string }[]
+    defaultOpen?: boolean
   }[]
 }
 
@@ -55,26 +59,50 @@ export default function SidebarNav({
       <div className='hidden w-full overflow-x-auto bg-background px-1 py-2 md:block'>
         <nav
           className={cn(
-            'flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1',
+            'flex flex-col space-y-1',
             className
           )}
           {...props}
         >
           {items.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
+            <Collapsible key={item.href} open={item.defaultOpen}>
+              <CollapsibleTrigger className={cn(
                 buttonVariants({ variant: 'ghost' }),
-                pathname === item.href
-                  ? 'bg-muted hover:bg-muted'
-                  : 'hover:bg-transparent hover:underline',
-                'justify-start'
-              )}
-            >
-              <span className='mr-2'>{item.icon}</span>
-              {item.title}
-            </Link>
+                'justify-between w-full'
+              )}>
+                <div className="flex items-center">
+                  <span className='mr-2'>{item.icon}</span>
+                  {item.title}
+                </div>
+                {item.subItems && (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </CollapsibleTrigger>
+              <CollapsibleContent
+                style={{
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  whiteSpace: 'normal', // Allow text to wrap
+                }}
+                className="space-y-1 pl-4 pr-2"
+              >
+                {item.subItems?.map((subItem) => (
+                  <Link
+                    key={subItem.href}
+                    to={subItem.href}
+                    className={cn(
+                      buttonVariants({ variant: 'ghost' }),
+                      pathname === subItem.href
+                        ? 'bg-muted hover:bg-muted'
+                        : 'hover:bg-transparent hover:underline',
+                      'justify-start block'
+                    )}
+                  >
+                    {subItem.title}
+                  </Link>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </nav>
       </div>
