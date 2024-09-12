@@ -61,13 +61,16 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => navigate('/portal/settings/profile')}>
-            Account
+            Settings
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/portal/settings/billing')}>
+          <DropdownMenuItem onClick={() => navigate('/portal/settings/billing/statements')}>
             Billing
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/portal/settings')}>
-            Settings
+          <DropdownMenuItem onClick={() => navigate('')}>
+            Support
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('')}>
+            Developers
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

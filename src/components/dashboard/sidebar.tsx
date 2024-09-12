@@ -9,9 +9,6 @@ import { useTheme } from '@/lib/useTheme'
 import icon from "/icon.png"
 import iconDark from "/icon_dark.svg"
 import { supabase } from '@/utils/supabase/client'
-import { Database } from '../../../database.types'
-
-type Organization = Database['public']['Tables']['organizations']['Row']
 
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean
@@ -25,57 +22,26 @@ export default function Sidebar({
 }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
   const { theme } = useTheme()
-  const [organization, setOrganization] = useState<Organization | null>(null)
+  const [organizationName, setOrganizationName] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchOrganization = async () => {
+    const fetchOrganizationName = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-
       if (user) {
         const { data, error } = await supabase
-          .from('organizations')
-          .select(`
-            name,
-            address,
-            city,
-            country,
-            created_at,
-            created_by,
-            deleted_at,
-            email,
-            industry,
-            logo_url,
-            max_api_calls_per_minute,
-            max_monthly_volume,
-            max_providers,
-            max_transaction_amount,
-            max_transactions_per_day,
-            max_webhooks,
-            metadata,
-            onboarded,
-            organization_id,
-            phone_number,
-            postal_code,
-            status,
-            updated_at,
-            updated_by,
-            website_url
-          `)
-          .eq('created_by', user.id)
-          .single()
+          .rpc('fetch_organization_name', { user_id: user.id })
 
         if (error) {
-          console.error('Error fetching organization:', error)
+          console.error('Error fetching organization name:', error)
         } else {
-          setOrganization(data as Organization)
+          setOrganizationName(data)
         }
       }
     }
 
-    fetchOrganization()
+    fetchOrganizationName()
   }, [])
 
-  /* Make body not scrollable when navBar is opened */
   useEffect(() => {
     if (navOpened) {
       document.body.classList.add('overflow-hidden')
@@ -108,7 +74,7 @@ export default function Sidebar({
               <img
                 src={theme === 'dark' ? iconDark : icon}
                 alt="lomi. Logo"
-                className={`transition-all mt-0.5 ${isCollapsed ? 'h-6 w-6' : 'h-8 w-8'}`}
+                className={`transition-all mt-0.5 ${isCollapsed ? 'h-8 w-8' : 'h-10 w-10'}`}
               />
             </div>
             <div
@@ -118,7 +84,6 @@ export default function Sidebar({
               <span className='text-xs leading-tight'>Portal</span>
             </div>
           </a>
-
 
           {/* Toggle Button in mobile */}
           <Button
@@ -144,9 +109,9 @@ export default function Sidebar({
         />
 
         {/* Organization name */}
-        {organization && (
-          <div className={`px-4 py-2 text-sm ${isCollapsed ? 'sr-only' : ''}`}>
-            <span className='font-semibold'>{organization.name}</span>
+        {organizationName && !isCollapsed && (
+          <div className="px-4 py-2 text-sm font-semibold text-muted-foreground">
+            {organizationName}
           </div>
         )}
 

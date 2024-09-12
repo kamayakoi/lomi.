@@ -9,7 +9,6 @@ import {
   IconWallet,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
-import { Search } from '@/components/dashboard/search'
 import { Separator } from '@/components/ui/separator'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
 import { UserNav } from '@/components/dashboard/user-nav'
@@ -20,7 +19,6 @@ export default function Settings() {
     <Layout fixed>
       {/* ===== Top Heading ===== */}
       <Layout.Header>
-        <Search />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <UserNav />
@@ -28,12 +26,12 @@ export default function Settings() {
       </Layout.Header>
 
       <Layout.Body className='flex flex-col h-full'>
-        <div className='space-y-0.5'>
-          <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
+        <div style={{ marginBottom: '1rem' }}>
+          <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>
             Settings
           </h1>
           <p className='text-muted-foreground'>
-            Manage your account settings and set e-mail preferences.
+            Configure your account, set up payments and payouts, and customize your experience.
           </p>
         </div>
         <Separator className='my-4 lg:my-6' />
@@ -84,7 +82,7 @@ const sidebarNavItems = [
     icon: <IconUsers size={18} />,
     href: '/settings/team',
     subItems: [
-      { title: 'Your Team', href: '/portal/settings/team/members' },
+      { title: 'Members', href: '/portal/settings/team/members' },
       { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
     ],
   },
@@ -115,7 +113,7 @@ const sidebarNavItems = [
       { title: 'Bank Accounts', href: '/portal/settings/withdrawals/bank-accounts' },
       { title: 'Phone numbers', href: '/portal/settings/withdrawals/phone-numbers' },
       { title: 'Notifications', href: '/portal/settings/withdrawals/email-notifications' },
-      { title: 'Auto Withdrawal', href: '/portal/settings/withdrawals/auto-withdrawal' },
+      { title: 'Automated Payouts', href: '/portal/settings/withdrawals/auto-withdrawal' },
     ],
   },
 ]

@@ -22,6 +22,10 @@ interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
   }[]
 }
 
+interface OpenSections {
+  [key: string]: boolean;
+}
+
 export default function SidebarNav({
   className,
   items,
@@ -30,8 +34,8 @@ export default function SidebarNav({
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [val, setVal] = useState(pathname ?? '/settings')
-  const [openSections, setOpenSections] = useState(
-    items.reduce((acc, item) => ({ ...acc, [item.href]: item.defaultOpen }), {})
+  const [openSections, setOpenSections] = useState<OpenSections>(
+    items.reduce((acc, item) => ({ ...acc, [item.href]: item.defaultOpen || false }), {})
   )
 
   const handleSelect = (e: string) => {
@@ -89,7 +93,7 @@ export default function SidebarNav({
                 )}
               </CollapsibleTrigger>
               <CollapsibleContent
-                className="space-y-1 pl-4 pr-2"
+                className="space-y-1 pl-8 pr-2" // Increased left padding for subsections
               >
                 {item.subItems?.map((subItem) => (
                   <Link
