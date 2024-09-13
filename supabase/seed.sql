@@ -44,6 +44,7 @@ INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
     ('CASH', 'LOMI'),
     ('SEPA', 'LOMI'),
     ('COUNTER', 'LOMI'),
+    ('BANK_TRANSFER', 'PARTNER'),
     ('CRYPTOCURRENCY', 'PARTNER'),
     ('USSD', 'PARTNER'),
     ('E_WALLET', 'PARTNER'),
@@ -51,215 +52,254 @@ INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
     ('BANK_TRANSFER', 'PARTNER'),
 
 -- Insert fees
-INSERT INTO fees (name, transaction_type, fee_type, percentage, currency_code, payment_method_code) VALUES
-    ('USD Credit Card Payment Fee', 'payment', 'processing', 2.9, 'USD', 'CREDIT_CARD'),
-    ('USD Debit Card Payment Fee', 'payment', 'processing', 2.9, 'USD', 'DEBIT_CARD'),
-    ('USD Mobile Money Payment Fee', 'payment', 'processing', 2.9, 'USD', 'MOBILE_MONEY'),
-    ('USD Bank Transfer Payment Fee', 'payment', 'processing', 2.9, 'USD', 'BANK_TRANSFER'),
-    ('EUR SEPA Payment Fee', 'payment', 'processing', 2.9, 'EUR', 'SEPA'),
-    ('XOF Mobile Money Payment Fee', 'payment', 'processing', 1.2, 'XOF', 'MOBILE_MONEY'),
-    ('GHS Mobile Money Payment Fee', 'payment', 'processing', 1.5, 'GHS', 'MOBILE_MONEY'),
-    ('USD PayPal Payment Fee', 'payment', 'processing', 3.5, 'USD', 'PAYPAL'),
-    ('USD Refund Processing Fee', 'refund', 'processing', 1.5, 'USD', NULL),
-    ('EUR Refund Processing Fee', 'refund', 'processing', 1.2, 'EUR', NULL),
-    ('USD Payout Processing Fee', 'payout', 'processing', 2.0, 'USD', NULL),
-    ('EUR Payout Processing Fee', 'payout', 'processing', 1.8, 'EUR', NULL),
-    ('Currency Conversion Fee', 'payment', 'conversion', 1.5, 'USD', NULL),
-    ('Chargeback Fee', 'payment', 'chargeback', 15.00, 'USD', NULL),
-    ('Recurring Payment Setup Fee', 'payment', 'recurring_setup', 2.0, 'USD', NULL),
-    ('Express Payout Fee', 'payout', 'express', 1.0, 'USD', NULL),
-    ('Pro Tier Subscription Fee', 'subscription', 'monthly', 29.99, 'USD', NULL),
-    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 'USD', NULL);
+INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, currency_code, payment_method_code, provider_code) VALUES
+    -- USD COMPANY FEES
+    ('Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 29.99, 'USD', NULL, NULL),
+    ('Enterprise Tier Yearly Subscription Fee', 'subscription', 'yearly', 0.0, 299.99, 'USD', NULL, NULL),
+    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 0.00, 'USD', NULL, NULL),
+    ('Referral Discount', 'payment', 'referral_discount', -0.5, 0.00, 'USD', NULL, NULL),
+    -- EUR COMPANY FEES
+    ('Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 26.99, 'EUR', NULL, NULL),
+    ('Enterprise Tier Yearly Subscription Fee', 'subscription', 'yearly', 0.0, 269.99, 'EUR', NULL, NULL),
+    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 0.00, 'EUR', NULL, NULL),
+    ('Referral Discount', 'payment', 'referral_discount', -0.5, 0.00, 'EUR', NULL, NULL),
+    -- XOF COMPANY FEES
+    ('Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 15000.00, 'XOF', NULL, NULL),
+    ('Enterprise Tier Yearly Subscription Fee', 'subscription', 'yearly', 0.0, 150000.00, 'XOF', NULL, NULL),
+    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 0.00, 'XOF', NULL, NULL),
+    ('Referral Discount', 'payment', 'referral_discount', -0.5, 0.00, 'XOF', NULL, NULL),
+    -- GHS COMPANY FEES
+    ('Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 300.99, 'GHS', NULL, NULL),
+    ('Enterprise Tier Yearly Subscription Fee', 'subscription', 'yearly', 0.0, 3000.00, 'GHS', NULL, NULL),
+    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 0.00, 'GHS', NULL, NULL),
+    ('Referral Discount', 'payment', 'referral_discount', -0.5, 0.00, 'GHS', NULL, NULL),
 
-    ('USD Payment Processing Fee', 'payment', 'processing', 2.9, 'USD'),
-    ('USD Payment Service Fee', 'payment', 'service', 0.30, 'USD'),
-    ('EUR Payment Processing Fee', 'payment', 'processing', 2.4, 'EUR'),
-    ('EUR Payment Service Fee', 'payment', 'service', 0.25, 'EUR'),
-    ('XOF Payment Processing Fee', 'payment', 'processing', 3.5, 'XOF'),
-    ('XOF Payment Service Fee', 'payment', 'service', 0.40, 'XOF'),
-    ('GHS Payment Processing Fee', 'payment', 'processing', 3.2, 'GHS'),
-    ('GHS Payment Service Fee', 'payment', 'service', 0.35, 'GHS'),
-    ('KES Payment Processing Fee', 'payment', 'processing', 3.0, 'KES'),
-    ('KES Payment Service Fee', 'payment', 'service', 0.30, 'KES'),
-    ('MRO Payment Processing Fee', 'payment', 'processing', 2.8, 'MRO'),
-    ('MRO Payment Service Fee', 'payment', 'service', 0.25, 'MRO'),
-    ('USD Refund Processing Fee', 'refund', 'processing', 1.5, 'USD'),
-    ('EUR Refund Processing Fee', 'refund', 'processing', 1.2, 'EUR'),
-    ('XOF Refund Processing Fee', 'refund', 'processing', 1.8, 'XOF'),
-    ('GHS Refund Processing Fee', 'refund', 'processing', 1.6, 'GHS'),
-    ('KES Refund Processing Fee', 'refund', 'processing', 1.5, 'KES'),
-    ('MRO Refund Processing Fee', 'refund', 'processing', 1.4, 'MRO'),
-    ('USD Transfer Fee', 'transfer', 'service', 1.0, 'USD'),
-    ('EUR Transfer Fee', 'transfer', 'service', 0.8, 'EUR'),
-    ('XOF Transfer Fee', 'transfer', 'service', 1.2, 'XOF'),
-    ('GHS Transfer Fee', 'transfer', 'service', 1.1, 'GHS'),
-    ('KES Transfer Fee', 'transfer', 'service', 1.0, 'KES'),
-    ('MRO Transfer Fee', 'transfer', 'service', 0.9, 'MRO'),
-    ('USD Payout Processing Fee', 'payout', 'processing', 2.0, 'USD'),
-    ('USD Payout Service Fee', 'payout', 'service', 0.50, 'USD'),
-    ('EUR Payout Processing Fee', 'payout', 'processing', 1.8, 'EUR'),
-    ('EUR Payout Service Fee', 'payout', 'service', 0.40, 'EUR'),
-    ('XOF Payout Processing Fee', 'payout', 'processing', 2.2, 'XOF'),
-    ('XOF Payout Service Fee', 'payout', 'service', 0.60, 'XOF'),
-    ('GHS Payout Processing Fee', 'payout', 'processing', 2.1, 'GHS'),
-    ('GHS Payout Service Fee', 'payout', 'service', 0.55, 'GHS'),
-    ('KES Payout Processing Fee', 'payout', 'processing', 2.0, 'KES'),
-    ('KES Payout Service Fee', 'payout', 'service', 0.50, 'KES'),
-    ('MRO Payout Processing Fee', 'payout', 'processing', 1.9, 'MRO'),
-    ('MRO Payout Service Fee', 'payout', 'service', 0.45, 'MRO');
-    ('Currency Conversion Fee', 'payment', 'conversion', 1.5, 'USD'),
-    ('Chargeback Fee', 'payment', 'chargeback', 15.00, 'USD'),
-    ('Recurring Payment Setup Fee', 'payment', 'recurring_setup', 2.0, 'USD'),
-    ('Express Payout Fee', 'payout', 'express', 1.0, 'USD'),
-    ('Pro Tier Subscription Fee', 'subscription', 'monthly', 29.99, 'USD'),
-    ('High Volume Discount', 'payment', 'volume_discount', -0.5, 'USD');
+    -- STRIPE FEES
+    ('USD/STRIPE Credit Card Fee', 'payment', 'processing', 2.9, 0.00, 'USD', 'CREDIT_CARD', 'STRIPE'),
+    ('USD/STRIPE Debit Card Fee', 'payment', 'processing', 2.9, 0.00, 'USD', 'DEBIT_CARD', 'STRIPE'),
+    ('USD/STRIPE SEPA Fee', 'payment', 'processing', 1.4, 1.00, 'USD', 'SEPA', 'STRIPE'),
+    ('EUR/STRIPE Credit Card Fee', 'payment', 'processing', 2.9, 0.00, 'EUR', 'CREDIT_CARD', 'STRIPE'),
+    ('EUR/STRIPE Debit Card Fee', 'payment', 'processing', 2.9, 0.00, 'EUR', 'DEBIT_CARD', 'STRIPE'),
+    ('EUR/STRIPE SEPA Fee', 'payment', 'processing', 1.4, 1.00, 'EUR', 'SEPA', 'STRIPE'),
 
-    -- Insert merchants
+    -- PAYPAL FEES
+    ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'PAYPAL'),
+    ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'PAYPAL'),
+
+    -- ORANGE FEES
+    ('XOF/ORANGE Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'XOF', 'MOBILE_MONEY', 'ORANGE'),
+
+    -- MTN FEES
+    ('XOF/MTN Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'XOF', 'MOBILE_MONEY', 'MTN'),
+    ('GHS/MTN Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'GHS', 'MOBILE_MONEY', 'MTN'),
+
+    -- WAVE FEES
+    ('XOF/WAVE Mobile Money Fee', 'payment', 'processing', 2.9, 66.00, 'XOF', 'MOBILE_MONEY', 'WAVE'),
+
+    -- ECOBANK FEES
+    ('USD/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 1.00, 'USD', 'BANK_TRANSFER', 'ECOBANK'),
+    ('XOF/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 256.00, 'XOF', 'BANK_TRANSFER', 'ECOBANK'),
+    ('GHS/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 20.00, 'GHS', 'BANK_TRANSFER', 'ECOBANK'),
+    
+    -- LOMI FEES
+    ('LOMI STANDARD FEE', 'payment', 'processing', 3.3, 56.00, 'XOF', 'CASH', 'LOMI'),
+    ('LOMI COMMERCE FEE', 'payment', 'processing', 2.9, 0.00, 'XOF', 'E_WALLET', 'LOMI'),
+
+    -- PARTNER FEES
+    ('USD/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'USD', 'PARTNER', 'PARTNER'),
+    ('EUR/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'EUR', 'PARTNER', 'PARTNER'),
+    ('XOF/PARTNER Payout Fee', 'payout', 'processing', 2.9, 66.00, 'XOF', 'PARTNER', 'PARTNER'),
+    ('GHS/PARTNER Payout Fee', 'payout', 'processing', 2.9, 22.00, 'GHS', 'PARTNER', 'PARTNER'),
+
+    -- CURRENCY CONVERSION FEE
+    ('USD/Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'USD', NULL, NULL),
+    ('EUR/Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'EUR', NULL, NULL),
+    ('XOF/Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'XOF', NULL, NULL),
+    ('GHS/Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'GHS', NULL, NULL),
+
+    -- CHARGEBACK FEE
+    ('USD/Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'USD', NULL, NULL),
+    ('EUR/Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'EUR', NULL, NULL),
+    ('XOF/Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'XOF', NULL, NULL),
+    ('GHS/Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'GHS', NULL, NULL),
+
+    -- RECURRING PAYMENT SETUP FEE
+    ('USD/Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'USD', NULL, NULL),
+    ('EUR/Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'EUR', NULL, NULL),
+    ('XOF/Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'XOF', NULL, NULL),
+    ('GHS/Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'GHS', NULL, NULL),
+
+    -- EXPRESS PAYOUT FEE
+    ('USD/Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'USD', NULL, NULL),
+    ('EUR/Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'EUR', NULL, NULL),
+    ('XOF/Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'XOF', NULL, NULL),
+    ('GHS/Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'GHS', NULL, NULL),
+
+    -- REFUND FEES
+    ('USD Refund Processing Fee', 'refund', 'processing', 1.5, 0.00, 'USD', NULL, NULL),
+    ('EUR Refund Processing Fee', 'refund', 'processing', 1.5, 0.00, 'EUR', NULL, NULL),
+    ('XOF Payout Processing Fee', 'payout', 'processing', 2.2, 0.00, 'XOF', NULL, NULL),
+    ('GHS Payout Processing Fee', 'payout', 'processing', 2.2, 0.00, 'GHS', NULL, NULL),
+
+    ('USD Payout Processing Fee', 'payout', 'processing', 2.0, 0.50, 'USD', NULL, NULL),
+    ('EUR Payout Processing Fee', 'payout', 'processing', 1.8, 0.40, 'EUR', NULL, NULL),
+    ('XOF Payout Processing Fee', 'payout', 'processing', 2.2, 0.00, 'XOF', NULL, NULL),
+    ('GHS Payout Processing Fee', 'payout', 'processing', 2.1, 0.00, 'GHS', NULL, NULL),
+
+  -- Insert merchants
 INSERT INTO merchants (name, email, phone_number, is_admin, onboarded, verified, country, metadata, avatar_url, preferred_language)
 VALUES
-    ('John Doe', 'john@example.com', '+1234567890', false, true, true, 'USA', '{"company_size": "small"}', 'https://example.com/avatar1.jpg', 'en'),
-    ('Jane Smith', 'jane@example.com', '+2345678901', true, true, true, 'UK', '{"company_size": "medium"}', 'https://example.com/avatar2.jpg', 'en'),
-    ('Kofi Annan', 'kofi@example.com', '+2337654321', false, true, true, 'Ghana', '{"company_size": "large"}', 'https://example.com/avatar3.jpg', 'en');
+    ('Acme Inc.', 'info@acme.com', '+1234567890', false, true, true, 'USA', '{"industry": "E-commerce"}', 'https://example.com/acme_avatar.jpg', 'en'),
+    ('Global Traders', 'contact@globaltraders.com', '+44987654321', true, true, true, 'UK', '{"industry": "Import/Export"}', 'https://example.com/gt_avatar.jpg', 'en'),
+    ('Tech Innovators', 'hello@techinnovators.com', '+233123456789', false, true, true, 'Ghana', '{"industry": "Technology"}', 'https://example.com/ti_avatar.jpg', 'en'),
+    ('Niche Boutique', 'info@nicheboutique.com', '+33123456789', false, true, true, 'France', '{"industry": "Fashion"}', 'https://example.com/nb_avatar.jpg', 'fr'),
+    ('Artisanal Creations', 'contact@artisanalcreations.com', '+221987654321', false, true, true, 'Senegal', '{"industry": "Handcrafted Goods"}', 'https://example.com/ac_avatar.jpg', 'fr');
 
 -- Insert organizations
 INSERT INTO organizations (name, email, phone_number, tax_id, country, city, address, postal_code, status, kyc_status, industry, website_url)
 VALUES
-    ('Tech Innovators', 'info@techinnovators.com', '+1987654321', 'TI123456', 'USA', 'San Francisco', '123 Tech St', '94105', 'active', 'approved', 'Technology', 'https://techinnovators.com'),
-    ('Global Traders', 'contact@globaltraders.com', '+44123456789', 'GT789012', 'UK', 'London', '456 Trade Ave', 'EC1A 1BB', 'active', 'pending', 'Finance', 'https://globaltraders.com'),
-    ('AfriTech Solutions', 'hello@afritech.com', '+233123456789', 'AT345678', 'Ghana', 'Accra', '789 Innovation Rd', '00233', 'active', 'approved', 'Technology', 'https://afritech.com');
-
--- Insert organization KYC documents
-INSERT INTO organization_kyc_documents (organization_id, document_type, document_url, status)
-VALUES
-    ((SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'business_registration', 'https://example.com/docs/ti_registration.pdf', 'approved'),
-    ((SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'tax_certificate', 'https://example.com/docs/ti_tax.pdf', 'approved'),
-    ((SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'business_registration', 'https://example.com/docs/gt_registration.pdf', 'pending'),
-    ((SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'business_registration', 'https://example.com/docs/at_registration.pdf', 'approved'),
-    ((SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'tax_certificate', 'https://example.com/docs/at_tax.pdf', 'approved');
+    ('Acme Corp', 'corp@acme.com', '+1234567890', 'AC123456', 'USA', 'New York', '123 Main St', '10001', 'active', 'approved', 'Technology', 'https://acmecorp.com'),
+    ('Global Enterprises', 'info@globalenterprises.com', '+44987654321', 'GE789012', 'UK', 'London', '456 Oxford St', 'W1A 1AB', 'active', 'pending', 'Finance', 'https://globalenterprises.com'),
+    ('Innovate Ltd', 'contact@innovate.com', '+233123456789', 'IL345678', 'Ghana', 'Accra', '789 Tech Rd', '00233', 'active', 'approved', 'Technology', 'https://innovate.com'),
+    ('Boutique SAS', 'info@boutique.fr', '+33123456789', 'BS901234', 'France', 'Paris', '321 Rue de la Mode', '75001', 'active', 'approved', 'Fashion', 'https://boutique.fr'),
+    ('Artisans SARL', 'contact@artisans.sn', '+221987654321', 'AS567890', 'Senegal', 'Dakar', '654 Avenue des Artisans', '12345', 'active', 'approved', 'Handcrafted Goods', 'https://artisans.sn');
 
 -- Insert merchant-organization links
 INSERT INTO merchant_organization_links (merchant_id, organization_id, role)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'admin'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'admin'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'admin');
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'), (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'), 'admin'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'), (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'), 'admin'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'), (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'), 'admin'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'), (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'), 'admin'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'), (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'), 'admin');
 
--- Insert organization providers
-INSERT INTO organization_providers (organization_id, provider_code, is_connected, country_code, phone_number)
+-- Insert customers
+INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, address, city, country, postal_code, metadata)
 VALUES
-    ((SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'STRIPE', true, '+1987654321'),
-    ((SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'PAYPAL', true, '+44123456789'),
-    ((SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'WAVE', false, '+233123456789');
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'), (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'), 'John Doe', 'john@example.com', '+1234567890', '123 Main St', 'New York', 'USA', '10001', '{"loyalty_points": 100}'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'), (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'), 'Jane Smith', 'jane@example.com', '+44987654321', '456 Oxford St', 'London', 'UK', 'W1A 1AB', '{"loyalty_points": 200}'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'), (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'), 'Kofi Mensah', 'kofi@example.com', '+233123456789', '789 Tech Rd', 'Accra', 'Ghana', '00233', '{"loyalty_points": 150}'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'), (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'), 'Marie Dubois', 'marie@example.com', '+33123456789', '321 Rue de la Mode', 'Paris', 'France', '75001', '{"loyalty_points": 300}'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'), (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'), 'Fatou Diop', 'fatou@example.com', '+221987654321', '654 Avenue des Artisans', 'Dakar', 'Senegal', '12345', '{"loyalty_points": 250}');
 
 -- Insert accounts
-INSERT INTO accounts (merchant_id, balance, provider_code, currency_code)
+INSERT INTO accounts (merchant_id, organization_id, customer_id, balance, currency_code, payment_method_code, account_type, status)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 1000.00, 'STRIPE', 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 555.00, 'WAVE', 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 10000.00, 'ORANGE', 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), 15000.00, 'WAVE', 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), 5000.00, 'MTN', 'GHS');
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), 10000.00, 'ECOBANK', 'GHS');
-
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'),
+     (SELECT customer_id FROM customers WHERE email = 'john@example.com'),
+     1000, 'USD', 'CREDIT_CARD', 'standard', 'active'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'),
+     (SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+     2000, 'GBP', 'BANK_TRANSFER', 'standard', 'active'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'),
+     (SELECT customer_id FROM customers WHERE email = 'kofi@example.com'),
+     1500, 'GHS', 'MOBILE_MONEY', 'standard', 'active'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'),
+     (SELECT customer_id FROM customers WHERE email = 'marie@example.com'),
+     3000, 'EUR', 'SEPA', 'standard', 'active'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'),
+     (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+     2500, 'XOF', 'MOBILE_MONEY', 'standard', 'active');
 
 -- Insert main accounts
 INSERT INTO main_accounts (merchant_id, balance, currency_code)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 1555.00, 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), 0, 'XOF'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), 15000.00, 'GHS');
-
--- Insert customers
-INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, metadata)
-VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'Alice Johnson', 'alice@example.com', '+1122334455', '{"loyalty_points": 100}'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'Bob Williams', 'bob@example.com', '+2233445566', '{"loyalty_points": 50}'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'Kwame Nkrumah', 'kwame@example.com', '+233987654321', '{"loyalty_points": 75}');
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'), 10000, 'USD'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'), 20000, 'GBP'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'), 15000, 'GHS'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'), 30000, 'EUR'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'), 25000, 'XOF');
 
 -- Insert transactions
-INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, amount, currency_code, payment_method_code)
+INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, metadata, amount, currency_code, provider_code, payment_method_code)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), (SELECT customer_id FROM customers WHERE email = 'alice@example.com'), 'payment', 'completed', 'Product purchase', 100.00, 'USD', 'CREDIT_CARD'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), (SELECT customer_id FROM customers WHERE email = 'bob@example.com'), 'payment', 'completed', 'Service fee', 50.00, 'GBP', 'BANK_TRANSFER'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), (SELECT customer_id FROM customers WHERE email = 'kwame@example.com'), 'payment', 'completed', 'Subscription', 20.00, 'GHS', 'MOBILE_MONEY');
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'),
+     (SELECT customer_id FROM customers WHERE email = 'john@example.com'),
+     'payment', 'completed', 'Payment for order #1234', '{"order_id": "1234"}', 100, 'USD', 'STRIPE', 'CREDIT_CARD'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'),
+     (SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+     'payment', 'completed', 'Payment for order #5678', '{"order_id": "5678"}', 200, 'GBP', 'STRIPE', 'BANK_TRANSFER'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'),
+     (SELECT customer_id FROM customers WHERE email = 'kofi@example.com'),
+     'payment', 'completed', 'Payment for order #9012', '{"order_id": "9012"}', 150, 'GHS', 'MTN', 'MOBILE_MONEY'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'),
+     (SELECT customer_id FROM customers WHERE email = 'marie@example.com'),
+     'payment', 'completed', 'Payment for order #3456', '{"order_id": "3456"}', 300, 'EUR', 'STRIPE', 'SEPA'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'),
+     (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+     'payment', 'completed', 'Payment for order #7890', '{"order_id": "7890"}', 250, 'XOF', 'ORANGE', 'MOBILE_MONEY');
 
--- Insert recurring payments
-INSERT INTO recurring_payments (merchant_id, organization_id, amount, currency_code, payment_method_code, payment_type, frequency, start_date, description)
+-- Insert recurring transactions
+INSERT INTO recurring_transactions (merchant_id, organization_id, amount, currency_code, payment_method_code, payment_type, frequency, start_date)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 19.99, 'USD', 'CREDIT_CARD', 'subscription', 'monthly', '2023-01-01', 'Premium Plan'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 99.99, 'GBP', 'BANK_TRANSFER', 'subscription', 'yearly', '2023-02-01', 'Enterprise Plan'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 5.99, 'GHS', 'MOBILE_MONEY', 'subscription', 'monthly', '2023-03-01', 'Basic Plan');
-
--- Insert refunds
-INSERT INTO refunds (transaction_id, amount, reason, status)
-VALUES
-    ((SELECT transaction_id FROM transactions WHERE amount = 50.00), 50.00, 'Customer dissatisfaction', 'completed');
-
--- Insert entries
-INSERT INTO entries (account_id, transaction_id, amount, entry_type)
-VALUES
-    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'john@example.com')), (SELECT transaction_id FROM transactions WHERE amount = 100.00), 100.00, 'credit'),
-    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'jane@example.com')), (SELECT transaction_id FROM transactions WHERE amount = 50.00), 50.00, 'credit'),
-    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com')), (SELECT transaction_id FROM transactions WHERE amount = 20.00), 20.00, 'credit');
-
--- Insert internal transfers
-INSERT INTO internal_transfers (from_account_id, to_main_account_id, amount, currency_code, status)
-VALUES
-    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'john@example.com')),
-     (SELECT main_account_id FROM main_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'john@example.com')),
-     555.00, 'XOF', 'completed');
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'),
+     50, 'USD', 'CREDIT_CARD', 'subscription', 'monthly', '2023-06-01'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'),
+     100, 'GBP', 'BANK_TRANSFER', 'subscription', 'monthly', '2023-06-01'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'),
+     75, 'GHS', 'MOBILE_MONEY', 'subscription', 'monthly', '2023-06-01'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'),
+     150, 'EUR', 'SEPA', 'subscription', 'monthly', '2023-06-01'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'),
+     125, 'XOF', 'MOBILE_MONEY', 'subscription', 'monthly', '2023-06-01');
 
 -- Insert payouts
-INSERT INTO payouts (transaction_id, account_id, amount, currency_code, destination, status)
+INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status)
 VALUES
-    ((SELECT transaction_id FROM transactions WHERE amount = 100.00),
-     (SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'john@example.com')),
-     1000.00, 'XOF', '+1987654321', 'completed');
+    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'info@acme.com') LIMIT 1),
+     (SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'),
+     1000, 'USD', 'BANK_TRANSFER', 'completed'),
+    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com') LIMIT 1),
+     (SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'),
+     2000, 'GBP', 'BANK_TRANSFER', 'completed'),
+    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com') LIMIT 1),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'),
+     1500, 'GHS', 'MOBILE_MONEY', 'completed'),
+    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com') LIMIT 1),
+     (SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'),
+     3000, 'EUR', 'BANK_TRANSFER', 'completed'),
+    ((SELECT account_id FROM accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com') LIMIT 1),
+     (SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'),
+     2500, 'XOF', 'MOBILE_MONEY', 'completed');
 
 -- Insert API keys
-INSERT INTO api_keys (merchant_id, organization_id, api_key)
+INSERT INTO api_keys (organization_id, api_key, name)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'sk_test_abcdefghijklmnopqrstuvwxyz123456'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'sk_test_bcdefghijklmnopqrstuvwxyz234567'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'sk_test_cdefghijklmnopqrstuvwxyz345678');
+    ((SELECT organization_id FROM organizations WHERE email = 'corp@acme.com'), 'acme_api_key_1', 'Acme API Key 1'),
+    ((SELECT organization_id FROM organizations WHERE email = 'info@globalenterprises.com'), 'global_api_key_1', 'Global Enterprises API Key 1'),
+    ((SELECT organization_id FROM organizations WHERE email = 'contact@innovate.com'), 'innovate_api_key_1', 'Innovate API Key 1'),
+    ((SELECT organization_id FROM organizations WHERE email = 'info@boutique.fr'), 'boutique_api_key_1', 'Boutique API Key 1'),
+    ((SELECT organization_id FROM organizations WHERE email = 'contact@artisans.sn'), 'artisans_api_key_1', 'Artisans API Key 1');
 
 -- Insert webhooks
 INSERT INTO webhooks (merchant_id, url, events, secret)
 VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 'https://techinnovators.com/webhook', ARRAY['payment.success', 'payment.failed'], 'whsec_abcdefghijklmnopqrstuvwxyz123456'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), 'https://globaltraders.com/webhook', ARRAY['payout.success', 'payout.failed'], 'whsec_bcdefghijklmnopqrstuvwxyz234567'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), 'https://afritech.com/webhook', ARRAY['refund.success', 'refund.failed'], 'whsec_cdefghijklmnopqrstuvwxyz345678');
-
--- Insert logs
-INSERT INTO logs (merchant_id, action, details, severity)
-VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), 'API_REQUEST', '{"endpoint": "/v1/payments", "method": "POST"}', 'INFO'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), 'WEBHOOK_DELIVERY', '{"event": "payment.success", "attempt": 1}', 'INFO'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), 'AUTHENTICATION_FAILED', '{"ip_address": "192.168.1.1", "reason": "Invalid API key"}', 'ERROR');
-
--- Insert invoices
-INSERT INTO invoices (merchant_id, organization_id, amount, description, currency_code, due_date, status)
-VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 1000.00, 'Monthly service fee', 'XOF', '2023-05-01', 'paid'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 5000.00, 'Monthly service fee', 'XOF', '2023-06-01', 'paid'),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 500.00, 'Monthly service fee', 'GHS', '2023-07-01', 'paid');
-
--- Insert metrics
-INSERT INTO metrics (name, value, labels, organization_id)
-VALUES
-    ('total_transactions', 1000, '{"currency": "USD"}', (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators')),
-    ('average_transaction_value', 75.50, '{"currency": "GBP"}', (SELECT organization_id FROM organizations WHERE name = 'Global Traders')),
-    ('active_customers', 500, '{"country": "Ghana"}', (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'));
-
--- Insert notifications
-INSERT INTO notifications (merchant_id, organization_id, type, message, is_read)
-VALUES
-    ((SELECT merchant_id FROM merchants WHERE email = 'john@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Tech Innovators'), 'PAYMENT_RECEIVED', 'You have received a payment of $100.00', false),
-    ((SELECT merchant_id FROM merchants WHERE email = 'jane@example.com'), (SELECT organization_id FROM organizations WHERE name = 'Global Traders'), 'PAYOUT_COMPLETED', 'Your payout of £500.00 has been completed', false),
-    ((SELECT merchant_id FROM merchants WHERE email = 'kofi@example.com'), (SELECT organization_id FROM organizations WHERE name = 'AfriTech Solutions'), 'KYC_APPROVED', 'Your KYC documents have been approved', true);
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@acme.com'), 'https://acme.com/webhooks', ARRAY['payment.success', 'payout.success'], 'acme_webhook_secret'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com'), 'https://globaltraders.com/webhooks', ARRAY['payment.success', 'payout.success'], 'global_webhook_secret'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com'), 'https://techinnovators.com/webhooks', ARRAY['payment.success', 'payout.success'], 'innovate_webhook_secret'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com'), 'https://nicheboutique.com/webhooks', ARRAY['payment.success', 'payout.success'], 'boutique_webhook_secret'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com'), 'https://artisanalcreations.com/webhooks', ARRAY['payment.success', 'payout.success'], 'artisans_webhook_secret');
 
 -- Insert disputes
-INSERT INTO disputes (transaction_id, reason, status, amount, currency_code)
+INSERT INTO disputes (transaction_id, reason, description, status, amount, fee_amount, currency_code)
 VALUES
-    ((SELECT transaction_id FROM transactions WHERE amount = 100.00), 'Product not received', 'open', 100.00, 'USD'),
-    ((SELECT transaction_id FROM transactions WHERE amount = 50.00), 'Unauthorized transaction', 'resolved', 50.00, 'GBP');
+    ((SELECT transaction_id FROM transactions WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'info@acme.com') LIMIT 1), 'Unauthorized transaction', 'Customer claims they did not authorize this transaction', 'open', 100, 15, 'USD'),
+    ((SELECT transaction_id FROM transactions WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'contact@globaltraders.com') LIMIT 1), 'Item not received', 'Customer claims they did not receive the item', 'under_review', 200, 30, 'GBP'),
+    ((SELECT transaction_id FROM transactions WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'hello@techinnovators.com') LIMIT 1), 'Defective product', 'Customer claims the product is defective', 'resolved', 150, 22.5, 'GHS'),
+    ((SELECT transaction_id FROM transactions WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'info@nicheboutique.com') LIMIT 1), 'Wrong item received', 'Customer claims they received the wrong item', 'closed', 300, 45, 'EUR'),
+    ((SELECT transaction_id FROM transactions WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'contact@artisanalcreations.com') LIMIT 1), 'Item not as described', 'Customer claims the item is not as described', 'open', 250, 37.5, 'XOF');

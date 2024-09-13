@@ -17,7 +17,7 @@ export type Database = {
           currency_code: Database["public"]["Enums"]["currency_code"]
           is_active: boolean
           merchant_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
         }
         Insert: {
           account_id?: string
@@ -26,7 +26,7 @@ export type Database = {
           currency_code: Database["public"]["Enums"]["currency_code"]
           is_active?: boolean
           merchant_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
         }
         Update: {
           account_id?: string
@@ -35,7 +35,7 @@ export type Database = {
           currency_code?: Database["public"]["Enums"]["currency_code"]
           is_active?: boolean
           merchant_id?: string
-          payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
+          provider_code?: Database["public"]["Enums"]["provider_code"]
         }
         Relationships: [
           {
@@ -53,11 +53,11 @@ export type Database = {
             referencedColumns: ["merchant_id"]
           },
           {
-            foreignKeyName: "accounts_payment_method_code_fkey"
-            columns: ["payment_method_code"]
+            foreignKeyName: "accounts_provider_code_fkey"
+            columns: ["provider_code"]
             isOneToOne: false
-            referencedRelation: "payment_methods"
-            referencedColumns: ["payment_method_code"]
+            referencedRelation: "providers"
+            referencedColumns: ["provider_code"]
           },
         ]
       }
@@ -69,7 +69,7 @@ export type Database = {
           is_active: boolean
           key_id: string
           last_used_at: string | null
-          merchant_id: string
+          name: string
           organization_id: string
           updated_at: string
         }
@@ -80,7 +80,7 @@ export type Database = {
           is_active?: boolean
           key_id?: string
           last_used_at?: string | null
-          merchant_id: string
+          name: string
           organization_id: string
           updated_at?: string
         }
@@ -91,24 +91,55 @@ export type Database = {
           is_active?: boolean
           key_id?: string
           last_used_at?: string | null
-          merchant_id?: string
+          name?: string
           organization_id?: string
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "api_keys_merchant_id_fkey"
-            columns: ["merchant_id"]
-            isOneToOne: false
-            referencedRelation: "merchants"
-            referencedColumns: ["merchant_id"]
-          },
           {
             foreignKeyName: "api_keys_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      api_usage: {
+        Row: {
+          api_key_id: string
+          created_at: string
+          endpoint: string
+          last_request_at: string
+          request_count: number
+          updated_at: string
+          usage_id: string
+        }
+        Insert: {
+          api_key_id: string
+          created_at?: string
+          endpoint: string
+          last_request_at?: string
+          request_count?: number
+          updated_at?: string
+          usage_id?: string
+        }
+        Update: {
+          api_key_id?: string
+          created_at?: string
+          endpoint?: string
+          last_request_at?: string
+          request_count?: number
+          updated_at?: string
+          usage_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_api_key_id_fkey"
+            columns: ["api_key_id"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["key_id"]
           },
         ]
       }
@@ -126,6 +157,76 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      customer_subscriptions: {
+        Row: {
+          amount: number
+          billing_frequency: Database["public"]["Enums"]["frequency"]
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          customer_id: string
+          end_date: string | null
+          metadata: Json | null
+          next_billing_date: string | null
+          product_id: string
+          start_date: string
+          status: string
+          subscription_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          billing_frequency: Database["public"]["Enums"]["frequency"]
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          customer_id: string
+          end_date?: string | null
+          metadata?: Json | null
+          next_billing_date?: string | null
+          product_id: string
+          start_date: string
+          status?: string
+          subscription_id?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          billing_frequency?: Database["public"]["Enums"]["frequency"]
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          customer_id?: string
+          end_date?: string | null
+          metadata?: Json | null
+          next_billing_date?: string | null
+          product_id?: string
+          start_date?: string
+          status?: string
+          subscription_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_subscriptions_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "customer_subscriptions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_subscriptions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_products"
+            referencedColumns: ["product_id"]
+          },
+        ]
       }
       customers: {
         Row: {
@@ -178,6 +279,57 @@ export type Database = {
           },
         ]
       }
+      disputes: {
+        Row: {
+          amount: number
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          dispute_id: string
+          fee_amount: number
+          reason: string
+          status: Database["public"]["Enums"]["dispute_status"]
+          transaction_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          dispute_id?: string
+          fee_amount?: number
+          reason: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          transaction_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          dispute_id?: string
+          fee_amount?: number
+          reason?: string
+          status?: Database["public"]["Enums"]["dispute_status"]
+          transaction_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "disputes_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["transaction_id"]
+          },
+        ]
+      }
       entries: {
         Row: {
           account_id: string
@@ -185,7 +337,10 @@ export type Database = {
           created_at: string
           entry_id: string
           entry_type: Database["public"]["Enums"]["entry_type"]
+          internal_transfer_id: string | null
+          payout_id: string | null
           transaction_id: string | null
+          transfer_id: string | null
         }
         Insert: {
           account_id: string
@@ -193,7 +348,10 @@ export type Database = {
           created_at?: string
           entry_id?: string
           entry_type: Database["public"]["Enums"]["entry_type"]
+          internal_transfer_id?: string | null
+          payout_id?: string | null
           transaction_id?: string | null
+          transfer_id?: string | null
         }
         Update: {
           account_id?: string
@@ -201,7 +359,10 @@ export type Database = {
           created_at?: string
           entry_id?: string
           entry_type?: Database["public"]["Enums"]["entry_type"]
+          internal_transfer_id?: string | null
+          payout_id?: string | null
           transaction_id?: string | null
+          transfer_id?: string | null
         }
         Relationships: [
           {
@@ -212,36 +373,72 @@ export type Database = {
             referencedColumns: ["account_id"]
           },
           {
+            foreignKeyName: "entries_internal_transfer_id_fkey"
+            columns: ["internal_transfer_id"]
+            isOneToOne: false
+            referencedRelation: "internal_transfers"
+            referencedColumns: ["internal_transfer_id"]
+          },
+          {
+            foreignKeyName: "entries_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "payouts"
+            referencedColumns: ["payout_id"]
+          },
+          {
             foreignKeyName: "entries_transaction_id_fkey"
             columns: ["transaction_id"]
             isOneToOne: false
             referencedRelation: "transactions"
             referencedColumns: ["transaction_id"]
           },
+          {
+            foreignKeyName: "entries_transfer_id_fkey"
+            columns: ["transfer_id"]
+            isOneToOne: false
+            referencedRelation: "transfers"
+            referencedColumns: ["transfer_id"]
+          },
         ]
       }
       fees: {
         Row: {
-          amount: number
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          fee_id: string
+          fee_type: string
+          name: string
+          payment_method_code:
+            | Database["public"]["Enums"]["payment_method_code"]
+            | null
+          percentage: number
+          provider_code: Database["public"]["Enums"]["provider_code"] | null
           transaction_type: Database["public"]["Enums"]["transaction_type"]
           updated_at: string
         }
         Insert: {
-          amount: number
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          fee_id?: string
+          fee_type: string
+          name: string
+          payment_method_code?:
+            | Database["public"]["Enums"]["payment_method_code"]
+            | null
+          percentage: number
+          provider_code?: Database["public"]["Enums"]["provider_code"] | null
           transaction_type: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
         }
         Update: {
-          amount?: number
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          fee_id?: string
+          fee_type?: string
+          name?: string
+          payment_method_code?:
+            | Database["public"]["Enums"]["payment_method_code"]
+            | null
+          percentage?: number
+          provider_code?: Database["public"]["Enums"]["provider_code"] | null
           transaction_type?: Database["public"]["Enums"]["transaction_type"]
           updated_at?: string
         }
@@ -252,6 +449,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "currencies"
             referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "fees_payment_method_code_fkey"
+            columns: ["payment_method_code"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["payment_method_code"]
+          },
+          {
+            foreignKeyName: "fees_provider_code_fkey"
+            columns: ["provider_code"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["provider_code"]
           },
         ]
       }
@@ -406,43 +617,37 @@ export type Database = {
           },
         ]
       }
-      lomi_balances: {
+      lomi_balance: {
         Row: {
           balance: number
-          balance_id: string
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at: string | null
-          total_amount: number
           total_fees: number
+          total_revenue: number
           total_transactions: number
           updated_at: string
         }
         Insert: {
           balance?: number
-          balance_id?: string
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
-          total_amount?: number
           total_fees?: number
+          total_revenue?: number
           total_transactions?: number
           updated_at?: string
         }
         Update: {
           balance?: number
-          balance_id?: string
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
-          total_amount?: number
           total_fees?: number
+          total_revenue?: number
           total_transactions?: number
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "lomi_balances_currency_code_fkey"
+            foreignKeyName: "lomi_balance_currency_code_fkey"
             columns: ["currency_code"]
             isOneToOne: true
             referencedRelation: "currencies"
@@ -459,7 +664,6 @@ export type Database = {
           payout_details: Json | null
           payout_id: string
           payout_method: string
-          status: Database["public"]["Enums"]["payout_status"]
           updated_at: string
         }
         Insert: {
@@ -470,7 +674,6 @@ export type Database = {
           payout_details?: Json | null
           payout_id?: string
           payout_method: string
-          status?: Database["public"]["Enums"]["payout_status"]
           updated_at?: string
         }
         Update: {
@@ -481,7 +684,6 @@ export type Database = {
           payout_details?: Json | null
           payout_id?: string
           payout_method?: string
-          status?: Database["public"]["Enums"]["payout_status"]
           updated_at?: string
         }
         Relationships: [
@@ -498,6 +700,60 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      lomi_provider_balances: {
+        Row: {
+          balance: number
+          balance_id: string
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          last_transaction_at: string | null
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          total_fees: number
+          total_revenue: number
+          total_transactions: number
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          balance_id?: string
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          last_transaction_at?: string | null
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          total_fees?: number
+          total_revenue?: number
+          total_transactions?: number
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          balance_id?: string
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          last_transaction_at?: string | null
+          provider_code?: Database["public"]["Enums"]["provider_code"]
+          total_fees?: number
+          total_revenue?: number
+          total_transactions?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lomi_provider_balances_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "lomi_provider_balances_provider_code_fkey"
+            columns: ["provider_code"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["provider_code"]
           },
         ]
       }
@@ -579,6 +835,63 @@ export type Database = {
           },
         ]
       }
+      merchant_products: {
+        Row: {
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          description: string | null
+          frequency: Database["public"]["Enums"]["frequency"]
+          image_url: string | null
+          is_active: boolean
+          merchant_id: string
+          name: string
+          price: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          description?: string | null
+          frequency: Database["public"]["Enums"]["frequency"]
+          image_url?: string | null
+          is_active?: boolean
+          merchant_id: string
+          name: string
+          price: number
+          product_id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          description?: string | null
+          frequency?: Database["public"]["Enums"]["frequency"]
+          image_url?: string | null
+          is_active?: boolean
+          merchant_id?: string
+          name?: string
+          price?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchant_products_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "merchant_products_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+        ]
+      }
       merchants: {
         Row: {
           avatar_url: string | null
@@ -587,12 +900,14 @@ export type Database = {
           deleted_at: string | null
           email: string
           is_admin: boolean
+          is_deleted: boolean
           merchant_id: string
           metadata: Json | null
           name: string | null
           onboarded: boolean
           phone_number: string | null
           preferred_language: string | null
+          referral_code: string | null
           updated_at: string
           verified: boolean
         }
@@ -603,12 +918,14 @@ export type Database = {
           deleted_at?: string | null
           email: string
           is_admin?: boolean
+          is_deleted?: boolean
           merchant_id?: string
           metadata?: Json | null
           name?: string | null
           onboarded?: boolean
           phone_number?: string | null
           preferred_language?: string | null
+          referral_code?: string | null
           updated_at?: string
           verified?: boolean
         }
@@ -619,12 +936,14 @@ export type Database = {
           deleted_at?: string | null
           email?: string
           is_admin?: boolean
+          is_deleted?: boolean
           merchant_id?: string
           metadata?: Json | null
           name?: string | null
           onboarded?: boolean
           phone_number?: string | null
           preferred_language?: string | null
+          referral_code?: string | null
           updated_at?: string
           verified?: boolean
         }
@@ -665,6 +984,95 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          is_read: boolean
+          merchant_id: string
+          message: string
+          notification_id: string
+          organization_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          is_read?: boolean
+          merchant_id: string
+          message: string
+          notification_id?: string
+          organization_id: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          is_read?: boolean
+          merchant_id?: string
+          message?: string
+          notification_id?: string
+          organization_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      organization_kyc: {
+        Row: {
+          authorized_signatory: Json | null
+          document_type: string
+          document_url: string
+          kyc_id: string
+          organization_id: string
+          reviewed_at: string | null
+          status: string
+          uploaded_at: string
+        }
+        Insert: {
+          authorized_signatory?: Json | null
+          document_type: string
+          document_url: string
+          kyc_id?: string
+          organization_id: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Update: {
+          authorized_signatory?: Json | null
+          document_type?: string
+          document_url?: string
+          kyc_id?: string
+          organization_id?: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_kyc_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
       organization_providers: {
         Row: {
           bank_account_name: string | null
@@ -672,7 +1080,7 @@ export type Database = {
           bank_code: string | null
           bank_name: string | null
           card_number: string | null
-          country_code: Database["public"]["Enums"]["country_code"]
+          complementary_information: Json | null
           created_at: string
           is_connected: boolean
           org_provider_id: string
@@ -687,7 +1095,7 @@ export type Database = {
           bank_code?: string | null
           bank_name?: string | null
           card_number?: string | null
-          country_code: Database["public"]["Enums"]["country_code"]
+          complementary_information?: Json | null
           created_at?: string
           is_connected?: boolean
           org_provider_id?: string
@@ -702,7 +1110,7 @@ export type Database = {
           bank_code?: string | null
           bank_name?: string | null
           card_number?: string | null
-          country_code?: Database["public"]["Enums"]["country_code"]
+          complementary_information?: Json | null
           created_at?: string
           is_connected?: boolean
           org_provider_id?: string
@@ -731,13 +1139,19 @@ export type Database = {
       organizations: {
         Row: {
           address: string
-          city: string
+          business_description: string | null
+          commune: string
           country: string
           created_at: string
           deleted_at: string | null
           email: string
           industry: string | null
+          is_deleted: boolean
+          kyc_approved_at: string | null
+          kyc_status: string
+          kyc_submitted_at: string | null
           logo_url: string | null
+          mailing_address: string | null
           max_api_calls_per_hour: number | null
           max_monthly_volume: number | null
           max_providers: number | null
@@ -747,21 +1161,30 @@ export type Database = {
           metadata: Json | null
           name: string
           organization_id: string
+          other_platform_url: string | null
           phone_number: string
           postal_code: string
+          region: string
           status: Database["public"]["Enums"]["organization_status"]
+          tax_number: string | null
           updated_at: string
           website_url: string | null
         }
         Insert: {
           address: string
-          city: string
+          business_description?: string | null
+          commune: string
           country: string
           created_at?: string
           deleted_at?: string | null
           email: string
           industry?: string | null
+          is_deleted?: boolean
+          kyc_approved_at?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
           logo_url?: string | null
+          mailing_address?: string | null
           max_api_calls_per_hour?: number | null
           max_monthly_volume?: number | null
           max_providers?: number | null
@@ -771,21 +1194,30 @@ export type Database = {
           metadata?: Json | null
           name: string
           organization_id?: string
+          other_platform_url?: string | null
           phone_number: string
           postal_code: string
+          region: string
           status?: Database["public"]["Enums"]["organization_status"]
+          tax_number?: string | null
           updated_at?: string
           website_url?: string | null
         }
         Update: {
           address?: string
-          city?: string
+          business_description?: string | null
+          commune?: string
           country?: string
           created_at?: string
           deleted_at?: string | null
           email?: string
           industry?: string | null
+          is_deleted?: boolean
+          kyc_approved_at?: string | null
+          kyc_status?: string
+          kyc_submitted_at?: string | null
           logo_url?: string | null
+          mailing_address?: string | null
           max_api_calls_per_hour?: number | null
           max_monthly_volume?: number | null
           max_providers?: number | null
@@ -795,9 +1227,12 @@ export type Database = {
           metadata?: Json | null
           name?: string
           organization_id?: string
+          other_platform_url?: string | null
           phone_number?: string
           postal_code?: string
+          region?: string
           status?: Database["public"]["Enums"]["organization_status"]
+          tax_number?: string | null
           updated_at?: string
           website_url?: string | null
         }
@@ -836,37 +1271,49 @@ export type Database = {
         Row: {
           account_id: string
           amount: number
+          bank_account_number: string | null
+          bank_code: string | null
+          bank_name: string | null
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          destination: string
           metadata: Json | null
+          organization_id: string | null
           payout_id: string
+          payout_method: string
+          phone_number: string | null
           status: Database["public"]["Enums"]["payout_status"]
-          transaction_id: string
           updated_at: string
         }
         Insert: {
           account_id: string
           amount: number
+          bank_account_number?: string | null
+          bank_code?: string | null
+          bank_name?: string | null
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          destination: string
           metadata?: Json | null
+          organization_id?: string | null
           payout_id?: string
+          payout_method: string
+          phone_number?: string | null
           status?: Database["public"]["Enums"]["payout_status"]
-          transaction_id: string
           updated_at?: string
         }
         Update: {
           account_id?: string
           amount?: number
+          bank_account_number?: string | null
+          bank_code?: string | null
+          bank_name?: string | null
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          destination?: string
           metadata?: Json | null
+          organization_id?: string | null
           payout_id?: string
+          payout_method?: string
+          phone_number?: string | null
           status?: Database["public"]["Enums"]["payout_status"]
-          transaction_id?: string
           updated_at?: string
         }
         Relationships: [
@@ -885,65 +1332,11 @@ export type Database = {
             referencedColumns: ["code"]
           },
           {
-            foreignKeyName: "payouts_transaction_id_fkey"
-            columns: ["transaction_id"]
+            foreignKeyName: "payouts_organization_id_fkey"
+            columns: ["organization_id"]
             isOneToOne: false
-            referencedRelation: "transactions"
-            referencedColumns: ["transaction_id"]
-          },
-        ]
-      }
-      provider_balances: {
-        Row: {
-          balance: number
-          balance_id: string
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          total_amount: number
-          total_fees: number
-          total_transactions: number
-          updated_at: string
-        }
-        Insert: {
-          balance?: number
-          balance_id?: string
-          created_at?: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          total_amount?: number
-          total_fees?: number
-          total_transactions?: number
-          updated_at?: string
-        }
-        Update: {
-          balance?: number
-          balance_id?: string
-          created_at?: string
-          currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
-          provider_code?: Database["public"]["Enums"]["provider_code"]
-          total_amount?: number
-          total_fees?: number
-          total_transactions?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "provider_balances_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "provider_balances_provider_code_fkey"
-            columns: ["provider_code"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["provider_code"]
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
           },
         ]
       }
@@ -968,7 +1361,7 @@ export type Database = {
         }
         Relationships: []
       }
-      recurring_payments: {
+      recurring_transactions: {
         Row: {
           amount: number
           charge_immediately: boolean
@@ -978,13 +1371,14 @@ export type Database = {
           email_notifications: Json | null
           end_date: string | null
           failed_payment_action: string | null
+          follow_up_subscriber: boolean
           frequency: string
           is_active: boolean
           merchant_id: string
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          payment_type: Database["public"]["Enums"]["recurring_payment_type"]
-          recurring_payment_id: string
+          payment_type: Database["public"]["Enums"]["recurring_transaction_type"]
+          recurring_transaction_id: string
           retry_payment_every: number | null
           start_date: string
           total_cycles: number | null
@@ -1000,13 +1394,14 @@ export type Database = {
           email_notifications?: Json | null
           end_date?: string | null
           failed_payment_action?: string | null
+          follow_up_subscriber?: boolean
           frequency: string
           is_active?: boolean
           merchant_id: string
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          payment_type: Database["public"]["Enums"]["recurring_payment_type"]
-          recurring_payment_id?: string
+          payment_type: Database["public"]["Enums"]["recurring_transaction_type"]
+          recurring_transaction_id?: string
           retry_payment_every?: number | null
           start_date: string
           total_cycles?: number | null
@@ -1022,13 +1417,14 @@ export type Database = {
           email_notifications?: Json | null
           end_date?: string | null
           failed_payment_action?: string | null
+          follow_up_subscriber?: boolean
           frequency?: string
           is_active?: boolean
           merchant_id?: string
           organization_id?: string
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
-          payment_type?: Database["public"]["Enums"]["recurring_payment_type"]
-          recurring_payment_id?: string
+          payment_type?: Database["public"]["Enums"]["recurring_transaction_type"]
+          recurring_transaction_id?: string
           retry_payment_every?: number | null
           start_date?: string
           total_cycles?: number | null
@@ -1037,28 +1433,28 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "recurring_payments_currency_code_fkey"
+            foreignKeyName: "recurring_transactions_currency_code_fkey"
             columns: ["currency_code"]
             isOneToOne: false
             referencedRelation: "currencies"
             referencedColumns: ["code"]
           },
           {
-            foreignKeyName: "recurring_payments_merchant_id_fkey"
+            foreignKeyName: "recurring_transactions_merchant_id_fkey"
             columns: ["merchant_id"]
             isOneToOne: false
             referencedRelation: "merchants"
             referencedColumns: ["merchant_id"]
           },
           {
-            foreignKeyName: "recurring_payments_organization_id_fkey"
+            foreignKeyName: "recurring_transactions_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["organization_id"]
           },
           {
-            foreignKeyName: "recurring_payments_payment_method_code_fkey"
+            foreignKeyName: "recurring_transactions_payment_method_code_fkey"
             columns: ["payment_method_code"]
             isOneToOne: false
             referencedRelation: "payment_methods"
@@ -1070,8 +1466,10 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
+          fee_amount: number
           reason: string | null
           refund_id: string
+          refunded_amount: number
           status: Database["public"]["Enums"]["refund_status"]
           transaction_id: string
           updated_at: string
@@ -1079,8 +1477,10 @@ export type Database = {
         Insert: {
           amount: number
           created_at?: string
+          fee_amount?: number
           reason?: string | null
           refund_id?: string
+          refunded_amount: number
           status?: Database["public"]["Enums"]["refund_status"]
           transaction_id: string
           updated_at?: string
@@ -1088,8 +1488,10 @@ export type Database = {
         Update: {
           amount?: number
           created_at?: string
+          fee_amount?: number
           reason?: string | null
           refund_id?: string
+          refunded_amount?: number
           status?: Database["public"]["Enums"]["refund_status"]
           transaction_id?: string
           updated_at?: string
@@ -1109,12 +1511,13 @@ export type Database = {
           amount: number
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id: string | null
+          customer_id: string
           description: string | null
           merchant_id: string
           metadata: Json | null
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
           status: Database["public"]["Enums"]["transaction_status"]
           transaction_id: string
           transaction_type: Database["public"]["Enums"]["transaction_type"]
@@ -1124,12 +1527,13 @@ export type Database = {
           amount: number
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id?: string | null
+          customer_id: string
           description?: string | null
           merchant_id: string
           metadata?: Json | null
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_id?: string
           transaction_type: Database["public"]["Enums"]["transaction_type"]
@@ -1139,12 +1543,13 @@ export type Database = {
           amount?: number
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          customer_id?: string | null
+          customer_id?: string
           description?: string | null
           merchant_id?: string
           metadata?: Json | null
           organization_id?: string
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
+          provider_code?: Database["public"]["Enums"]["provider_code"]
           status?: Database["public"]["Enums"]["transaction_status"]
           transaction_id?: string
           transaction_type?: Database["public"]["Enums"]["transaction_type"]
@@ -1185,6 +1590,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "payment_methods"
             referencedColumns: ["payment_method_code"]
+          },
+          {
+            foreignKeyName: "transactions_provider_code_fkey"
+            columns: ["provider_code"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["provider_code"]
           },
         ]
       }
@@ -1324,40 +1736,14 @@ export type Database = {
         }
         Returns: Record<string, unknown>
       }
+      fetch_organization_name: {
+        Args: {
+          user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
-      country_code:
-        | "+233"
-        | "+234"
-        | "+225"
-        | "+254"
-        | "+27"
-        | "+20"
-        | "+212"
-        | "+251"
-        | "+256"
-        | "+221"
-        | "+237"
-        | "+255"
-        | "+222"
-        | "+216"
-        | "+250"
-        | "+260"
-        | "+263"
-        | "+213"
-        | "+33"
-        | "+44"
-        | "+49"
-        | "+39"
-        | "+34"
-        | "+31"
-        | "+46"
-        | "+48"
-        | "+351"
-        | "+30"
-        | "+32"
-        | "+43"
-        | "+1"
       currency_code:
         | "XOF"
         | "XAF"
@@ -1374,6 +1760,7 @@ export type Database = {
         | "USD"
         | "EUR"
         | "MRO"
+      dispute_status: "open" | "under_review" | "resolved" | "closed"
       entry_type: "debit" | "credit"
       frequency:
         | "daily"
@@ -1415,7 +1802,7 @@ export type Database = {
         | "STRIPE"
         | "PAYPAL"
         | "LOMI"
-      recurring_payment_type:
+      recurring_transaction_type:
         | "subscription"
         | "installment"
         | "debt"

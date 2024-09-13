@@ -1,0 +1,78 @@
+--------------- ENUM TYPES ---------------
+
+CREATE TYPE feedback_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+CREATE TYPE ticket_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+
+--------------- TABLES ---------------
+
+-- Merchant Preferences table
+CREATE TABLE merchant_preferences (
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  theme VARCHAR(50),
+  language VARCHAR(10),
+  notification_settings JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_merchant_preferences_merchant_id ON merchant_preferences(merchant_id);
+
+COMMENT ON TABLE merchant_preferences IS 'Stores merchant-specific settings and preferences';
+
+-- Merchant Sessions table
+CREATE TABLE merchant_sessions (
+  session_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  session_data JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_merchant_sessions_merchant_id ON merchant_sessions(merchant_id);
+CREATE INDEX idx_merchant_sessions_expires_at ON merchant_sessions(expires_at);
+
+COMMENT ON TABLE merchant_sessions IS 'Stores merchant session information for authentication and session management';
+
+-- UI Configuration table
+CREATE TABLE ui_configuration (
+  config_name VARCHAR(100) NOT NULL,
+  config_value JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_ui_configuration_config_name ON ui_configuration(config_name);
+
+COMMENT ON TABLE ui_configuration IS 'Stores configuration options for the UI';
+
+-- Merchant Feedback table
+CREATE TABLE merchant_feedback (
+  feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  feedback_type VARCHAR(50) NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  status feedback_status NOT NULL DEFAULT 'open'
+);
+
+CREATE INDEX idx_merchant_feedback_merchant_id ON merchant_feedback(merchant_id);
+CREATE INDEX idx_merchant_feedback_status ON merchant_feedback(status);
+
+COMMENT ON TABLE merchant_feedback IS 'Stores merchant feedback, bug reports, or feature requests';
+
+-- Support tickets table
+CREATE TABLE support_tickets (
+  ticket_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  customer_id UUID REFERENCES customers(customer_id),
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  resolution_date TIMESTAMPTZ,
+  resolution_details TEXT,
+  status ticket_status NOT NULL DEFAULT 'open'
+);
+
+CREATE INDEX idx_support_tickets_merchant_id ON support_tickets(merchant_id);
+CREATE INDEX idx_support_tickets_status ON support_tickets(status);
+
+COMMENT ON TABLE support_tickets IS 'Stores merchant support tickets';
