@@ -103,6 +103,8 @@ CREATE TABLE organization_addresses (
 
 CREATE INDEX idx_organization_addresses_organization_id ON organization_addresses(organization_id);
 
+COMMENT ON TABLE organization_addresses IS 'Stores address information for organizations';
+
 -- Organization KYC table
 CREATE TABLE organization_kyc (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
@@ -612,6 +614,8 @@ CREATE TABLE api_usage (
 CREATE INDEX idx_api_usage_api_key_id ON api_usage(api_key_id);
 CREATE INDEX idx_api_usage_last_request_at ON api_usage(last_request_at);
 
+COMMENT ON TABLE api_usage IS 'Tracks API usage metrics for each API key';
+
 
 -- Webhooks table
 CREATE TABLE webhooks (
@@ -686,6 +690,8 @@ CREATE TABLE customer_invoices (
 CREATE INDEX idx_customer_invoices_merchant_id ON customer_invoices(merchant_id);
 CREATE INDEX idx_customer_invoices_organization_id ON customer_invoices(organization_id);
 CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id);
+
+COMMENT ON TABLE customer_invoices IS 'Stores invoice information for customers of merchants';
 
 
 -- Notifications table
