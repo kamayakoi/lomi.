@@ -98,7 +98,7 @@ CREATE TABLE organization_addresses (
   default_language VARCHAR(5) NOT NULL,
   timezone VARCHAR NOT NULL DEFAULT 'UTC',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_organization_addresses_organization_id ON organization_addresses(organization_id);
@@ -143,7 +143,7 @@ COMMENT ON TABLE merchant_organization_links IS 'Links merchants to organization
 CREATE TABLE providers (
   provider_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR NOT NULL,
-  code provider_code NOT NULL,
+  code provider_code NOT NULL UNIQUE,
   description TEXT,
   logo_url VARCHAR,
   website_url VARCHAR,
@@ -158,13 +158,12 @@ CREATE TABLE providers (
 CREATE INDEX idx_providers_code ON providers(code);
 
 COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, STRIPE, PAYPAL';
-COMMENT ON COLUMN providers.is_active IS 'Indicates if the provider is currently active and available for use in the system';
 
 
 -- Payment methods table
 CREATE TABLE payment_methods (
   payment_method_code payment_method_code PRIMARY KEY,
-  provider_code provider_code REFERENCES providers(provider_code),
+  provider_code provider_code REFERENCES providers(code),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -174,10 +173,10 @@ CREATE INDEX idx_payment_methods_provider_code ON payment_methods(provider_code)
 COMMENT ON TABLE payment_methods IS 'Examples: CARD, MOBILE_MONEY, CASH, BANK_TRANSFER';
 
 
--- Organization-Providers table
+-- Organization-Providers Settings table
 CREATE TABLE organization_providers_settings (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
     is_connected BOOLEAN NOT NULL DEFAULT false,
     phone_number VARCHAR,
     card_number VARCHAR,
@@ -188,15 +187,14 @@ CREATE TABLE organization_providers_settings (
     bank_code VARCHAR,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (organization_id, provider_id),
+    PRIMARY KEY (organization_id, provider_code),
     UNIQUE (organization_id, provider_code)
 );
 
-CREATE INDEX idx_org_providers_org_id ON organization_providers(organization_id);
-CREATE INDEX idx_org_providers_provider_code ON organization_providers(provider_code);
+CREATE INDEX idx_org_providers_provider_code ON organization_providers_settings(provider_code);
 
-COMMENT ON TABLE organization_providers IS 'Links organizations to their chosen payment providers';
-COMMENT ON COLUMN organization_providers.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';
+COMMENT ON TABLE organization_providers_settings IS 'Links organizations to their chosen payment providers';
+COMMENT ON COLUMN organization_providers_settings.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';
 
 
 -- Currencies table
@@ -234,7 +232,7 @@ CREATE TABLE accounts (
     account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     balance NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
-    provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     is_active BOOLEAN NOT NULL DEFAULT true,
@@ -304,7 +302,7 @@ COMMENT ON TABLE platform_payouts IS 'Stores information about the payouts made 
 -- Platform Provider Balances table
 CREATE TABLE platform_provider_balances (
   balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+  provider_code provider_code NOT NULL REFERENCES providers(code),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
   total_transactions NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
@@ -369,14 +367,14 @@ COMMENT ON TABLE customer_subscriptions IS 'Tracks customer subscriptions to mer
 -- Fees table
 CREATE TABLE fees (
     fee_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR NOT NULL,
+    name VARCHAR NOT NULL UNIQUE,
     transaction_type transaction_type NOT NULL,
     fee_type VARCHAR NOT NULL,
     percentage NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (percentage >= 0 AND percentage <= 100),
     fixed_amount NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (fixed_amount >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     payment_method_code payment_method_code REFERENCES payment_methods(payment_method_code),
-    provider_code provider_code REFERENCES providers(provider_code),
+    provider_code provider_code REFERENCES providers(code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (transaction_type, fee_type, currency_code, payment_method_code, provider_code)
@@ -405,8 +403,9 @@ CREATE TABLE transactions (
     gross_amount NUMERIC(10,2) NOT NULL CHECK (gross_amount > 0),
     fee_amount NUMERIC(15,2) NOT NULL,
     net_amount NUMERIC(10,2) NOT NULL CHECK (net_amount > 0),
+    fee_reference TEXT NOT NULL REFERENCES fees(name),
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
-    provider_code provider_code NOT NULL REFERENCES providers(provider_code),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
     payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -420,11 +419,13 @@ CREATE INDEX idx_transactions_status ON transactions(status);
 CREATE INDEX idx_transactions_currency_code ON transactions(currency_code);
 CREATE INDEX idx_transactions_payment_method_code ON transactions(payment_method_code);
 CREATE INDEX idx_transactions_created_at ON transactions(created_at);
-CREATE INDEX idx_transactions_amount ON transactions(amount);
+CREATE INDEX idx_transactions_net_amount ON transactions(net_amount);
+CREATE INDEX idx_transactions_gross_amount ON transactions(gross_amount);
+CREATE INDEX idx_transactions_fee_amount ON transactions(fee_amount);
 CREATE INDEX idx_transactions_pending ON transactions(transaction_id) WHERE status = 'pending';
 CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE status = 'completed';
 CREATE INDEX idx_transactions_provider_code ON transactions(provider_code);
-CREATE INDEX idx_transactions_fee_id ON transactions(fee_id);
+CREATE INDEX idx_transactions_fee_reference ON transactions(fee_reference);
 
 COMMENT ON TABLE transactions IS 'Records all financial transactions in the system';
 COMMENT ON COLUMN transactions.metadata IS 'Additional transaction-specific data in JSON format';
@@ -691,10 +692,11 @@ CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id)
 CREATE TABLE notifications (
     notification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID REFERENCES organizations(organization_id),
     type VARCHAR NOT NULL,
     message TEXT NOT NULL,
     is_read BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_notifications_merchant_id ON notifications(merchant_id);
