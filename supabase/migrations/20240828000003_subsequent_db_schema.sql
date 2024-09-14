@@ -110,3 +110,65 @@ CREATE INDEX idx_notifications_type ON notifications(type);
 CREATE INDEX idx_notifications_is_read ON notifications(is_read);
 
 COMMENT ON TABLE notifications IS 'Stores notifications for merchants and organizations';
+
+-- Customer API Interactions table
+CREATE TABLE customer_api_interactions (
+    interaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    endpoint VARCHAR(255) NOT NULL,
+    request_method VARCHAR(10) NOT NULL,
+    request_payload JSONB,
+    response_status INT,
+    response_payload JSONB,
+    response_time FLOAT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_customer_api_interactions_organization_id ON customer_api_interactions(organization_id);
+
+-- Webhook Delivery Logs table
+CREATE TABLE webhook_delivery_logs (
+    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    webhook_id UUID NOT NULL REFERENCES webhooks(webhook_id),
+    payload JSONB,
+    response_status INT,
+    response_body TEXT,
+    delivery_time FLOAT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_webhook_delivery_logs_webhook_id ON webhook_delivery_logs(webhook_id);
+
+-- API Rate Limits table
+CREATE TABLE api_rate_limits (
+    rate_limit_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    api_key_id UUID NOT NULL REFERENCES api_keys(key_id),
+    endpoint VARCHAR(255) NOT NULL,
+    requests_count INT NOT NULL DEFAULT 0,
+    last_reset_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (api_key_id, endpoint)
+);
+
+CREATE INDEX idx_api_rate_limits_api_key_id ON api_rate_limits(api_key_id);
+
+-- Cache Entries table
+CREATE TABLE cache_entries (
+    cache_key VARCHAR(255) PRIMARY KEY,
+    cache_value JSONB NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_cache_entries_expires_at ON cache_entries(expires_at);
+
+-- Error Logs table
+CREATE TABLE error_logs (
+    error_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    error_type VARCHAR(50) NOT NULL,
+    error_message TEXT NOT NULL,
+    stack_trace TEXT,
+    context JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_error_logs_error_type ON error_logs(error_type);
+CREATE INDEX idx_error_logs_created_at ON error_logs(created_at);

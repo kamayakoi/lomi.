@@ -612,13 +612,16 @@ COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the sy
 
 -- API usage tracking table
 CREATE TABLE api_usage (
-    usage_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    api_key_id UUID NOT NULL REFERENCES api_keys(key_id),
+    api_key_id UUID NOT NULL PRIMARY KEY REFERENCES api_keys(key_id),
     endpoint VARCHAR(255) NOT NULL,
     request_count INT NOT NULL DEFAULT 0,
     last_request_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    request_method VARCHAR(10),
+    response_status INT,
+    response_time FLOAT,
+    ip_address VARCHAR(45)
 );
 
 CREATE INDEX idx_api_usage_api_key_id ON api_usage(api_key_id);
@@ -638,7 +641,13 @@ CREATE TABLE webhooks (
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  last_triggered_at TIMESTAMPTZ
+  last_triggered_at TIMESTAMPTZ,
+  last_response_status INT,
+  last_response_time FLOAT,
+  retry_count INT DEFAULT 0,
+  next_retry_at TIMESTAMPTZ,
+  cache_key VARCHAR(255),
+  cache_expiry TIMESTAMPTZ
 );
 
 CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);

@@ -257,16 +257,16 @@ VALUES
   ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW(), NOW());
 
 -- api usage tracking table
-INSERT INTO api_usage (api_key_id, endpoint, request_count, last_request_at, created_at)
+INSERT INTO api_usage (api_key_id, endpoint, request_count, last_request_at, request_method, response_status, response_time, ip_address)
 VALUES
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '/v1/transactions', 100, NOW(), NOW()),
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '/v1/transactions', 500, NOW(), NOW());
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '/v1/transactions', 100, NOW(), 'GET', 200, 0.15, '192.168.1.1'),
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '/v1/transactions', 500, NOW(), 'POST', 201, 0.25, '10.0.0.1');
 
 -- webhooks table
-INSERT INTO webhooks (merchant_id, url, events, secret, is_active, created_at, updated_at, last_triggered_at)
+INSERT INTO webhooks (merchant_id, url, events, secret, is_active, created_at, updated_at, last_triggered_at, last_response_status, last_response_time, retry_count, next_retry_at, cache_key, cache_expiry)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://africanledger.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_africanledger_123456789', true, NOW(), NOW(), NOW()),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://telnyx.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_telnyx_987654321', true, NOW(), NOW(), NOW());
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://africanledger.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_africanledger_123456789', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:' || (SELECT webhook_id FROM webhooks WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), NOW() + INTERVAL '1 day'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://telnyx.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_telnyx_987654321', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:' || (SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), NOW() + INTERVAL '1 day');
 
 -- logs table
 INSERT INTO logs (merchant_id, action, details, severity, created_at)
@@ -308,44 +308,73 @@ VALUES
   (uuid_generate_v4(), 'platform', 'total_merchants', 600, CURRENT_DATE, NOW(), NOW()),
   (uuid_generate_v4(), 'platform', 'total_transactions', 25000, CURRENT_DATE, NOW(), NOW());
 
--- merchant preferences
+-- Merchant Preferences table
 INSERT INTO merchant_preferences (merchant_id, theme, language, notification_settings)
 VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dark', 'fr', '{"email": true, "sms": false}'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'light', 'en', '{"email": true, "sms": true}');
 
--- merchant sessions
+-- Merchant Sessions table
 INSERT INTO merchant_sessions (merchant_id, session_data, expires_at)
 VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"user_agent": "Mozilla/5.0"}', NOW() + INTERVAL '1 day'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"user_agent": "Chrome/93.0.4577.82"}', NOW() + INTERVAL '1 day');
 
--- ui configuration
+-- UI Configuration table
 INSERT INTO ui_configuration (config_name, config_value)
 VALUES
   ('dashboard_layout', '{"widgets": ["revenue", "transactions", "customers"]}'),
   ('report_settings', '{"default_currency": "USD", "date_range": "last_30_days"}');
 
--- merchant feedback
+-- Merchant Feedback table
 INSERT INTO merchant_feedback (merchant_id, feedback_type, message)
 VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bug', 'The dashboard is not loading properly'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'feature_request', 'Please add support for more payment methods');
 
--- customer feedback
+-- Customer Feedback table
 INSERT INTO customer_feedback (customer_id, feedback_type, message)
 VALUES
   ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'complaint', 'The payment failed but I was still charged'),
   ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'suggestion', 'The checkout process could be more user-friendly');
 
--- support tickets
+-- Support Tickets table
 INSERT INTO support_tickets (merchant_id, customer_id, message)
 VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'I need help with a refund request'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'I have a question about my subscription');
 
+-- Customer API Interactions table
+INSERT INTO customer_api_interactions (organization_id, endpoint, request_method, request_payload, response_status, response_payload, response_time)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', '/webhook', 'POST', '{"event": "payment.success"}', 200, '{"status": "received"}', 0.1),
+  ('22222222-2222-2222-2222-222222222222', '/webhook', 'POST', '{"event": "refund.initiated"}', 200, '{"status": "processed"}', 0.15);
 
-  -- Customer Subscriptions table
+-- Webhook Delivery Logs table
+INSERT INTO webhook_delivery_logs (webhook_id, payload, response_status, response_body, delivery_time)
+VALUES
+  ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), '{"event": "payment.success", "amount": 9999.00}', 200, '{"received": true}', 0.5),
+  ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), '{"event": "payment.success", "amount": 199.99}', 200, '{"received": true}', 0.3);
+
+-- API Rate Limits table
+INSERT INTO api_rate_limits (api_key_id, endpoint, requests_count, last_reset_at)
+VALUES
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '/v1/transactions', 50, NOW() - INTERVAL '1 hour'),
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '/v1/transactions', 100, NOW() - INTERVAL '1 hour');
+
+-- Cache Entries table
+INSERT INTO cache_entries (cache_key, cache_value, expires_at)
+VALUES
+  ('user:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"name": "Babacar Diop", "email": "babacar@africanledger.com"}', NOW() + INTERVAL '1 hour'),
+  ('user:bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"name": "John Doe", "email": "john@telnyx.com"}', NOW() + INTERVAL '1 hour');
+
+-- Error Logs table
+INSERT INTO error_logs (error_type, error_message, stack_trace, context)
+VALUES
+  ('API_ERROR', 'Invalid API key', 'Error: Invalid API key\n    at validateApiKey (/app/src/middleware/auth.ts:25:7)\n    at processRequest (/app/src/server.ts:45:3)', '{"ip": "192.168.1.100", "endpoint": "/v1/transactions"}'),
+  ('WEBHOOK_DELIVERY_FAILURE', 'Connection timeout', 'Error: Connection timeout\n    at sendWebhook (/app/src/services/webhook.ts:67:9)\n    at processEvent (/app/src/workers/eventProcessor.ts:32:5)', '{"webhookId": "12345678-1234-1234-1234-123456789abc", "attempt": 3}');
+
+-- Customer Subscriptions table
 INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, next_billing_date, billing_frequency, amount, currency_code, metadata)
 VALUES
   ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
