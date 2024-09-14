@@ -68,7 +68,6 @@ CREATE TABLE organizations (
   business_platform_url VARCHAR,
   status organization_status NOT NULL DEFAULT 'active',
   default_currency currency_code NOT NULL DEFAULT 'XOF',
-  notification_preferences JSONB,
   total_revenue NUMERIC(15,2) DEFAULT 0.00,
   total_transactions INT DEFAULT 0,
   total_merchants INT DEFAULT 0,
@@ -263,9 +262,9 @@ CREATE INDEX idx_main_accounts_merchant_id ON main_accounts(merchant_id);
 COMMENT ON TABLE main_accounts IS 'Identifies the primary account for each merchant in each currency';
 
 
--- Platform Main Account Balance table
-CREATE TABLE platform_balance (
-  balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (balance >= 0),
+-- Platform Main Balance table
+CREATE TABLE platform_main_balance (
+  platform_main_balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (balance >= 0),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
   total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
@@ -275,9 +274,9 @@ CREATE TABLE platform_balance (
   UNIQUE (currency_code)
 );
 
-CREATE INDEX idx_platform_balance_currency_code ON platform_balance(currency_code);
+CREATE INDEX idx_platform_main_balance_currency_code ON platform_main_balance(currency_code);
 
-COMMENT ON TABLE platform_balance IS 'Stores lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
+COMMENT ON TABLE platform_main_ balance IS 'Stores lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
 
 
 -- Platform Payouts table
@@ -303,17 +302,15 @@ COMMENT ON TABLE platform_payouts IS 'Stores information about the payouts made 
 
 -- Platform Provider Balances table
 CREATE TABLE platform_provider_balances (
-  balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  platform_provider_balance NUMERIC(15,2) PRIMARY KEY NOT NULL DEFAULT 0 CHECK (balance >= 0),
   provider_code provider_code NOT NULL REFERENCES providers(code),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
-  balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
   total_transactions NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
   total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
   total_revenue NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_revenue >= 0),
   last_transaction_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (provider_code, currency_code)
 );
 
 CREATE INDEX idx_platform_provider_balances_provider_code ON platform_provider_balances(provider_code);
@@ -509,7 +506,8 @@ CREATE INDEX idx_internal_transfers_to_main_account_id ON internal_transfers(to_
 
 COMMENT ON TABLE internal_transfers IS 'Records transfers from individual accounts to main accounts';
 
--- [EXPERIMENTAL] Transfers table
+
+-- [EXPERIMENTAL & NOT USED] Transfers table
 CREATE TABLE transfers (
     transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     from_account_id UUID NOT NULL REFERENCES accounts(account_id),
@@ -666,8 +664,8 @@ CREATE TABLE invoices (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_invoices_merchant_id ON invoices(merchant_id);
-CREATE INDEX idx_invoices_organization_id ON invoices(organization_id);
+CREATE INDEX idx_platform_invoices_merchant_id ON invoices(merchant_id);
+CREATE INDEX idx_platform_invoices_organization_id ON invoices(organization_id);
 
 COMMENT ON TABLE invoices IS 'Stores invoice information for merchants and organizations';
 
@@ -692,25 +690,6 @@ CREATE INDEX idx_customer_invoices_organization_id ON customer_invoices(organiza
 CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id);
 
 COMMENT ON TABLE customer_invoices IS 'Stores invoice information for customers of merchants';
-
-
--- Notifications table
-CREATE TABLE notifications (
-    notification_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID REFERENCES organizations(organization_id),
-    type VARCHAR NOT NULL,
-    message TEXT NOT NULL,
-    is_read BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_notifications_merchant_id ON notifications(merchant_id);
-CREATE INDEX idx_notifications_organization_id ON notifications(organization_id);
-CREATE INDEX idx_notifications_type ON notifications(type);
-CREATE INDEX idx_notifications_is_read ON notifications(is_read);
-
-COMMENT ON TABLE notifications IS 'Stores notifications for merchants and organizations';
 
 
 -- Disputes table
