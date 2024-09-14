@@ -1,9 +1,9 @@
 --------------- ENUM TYPES ---------------
 
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
-CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'payout');
+CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'subscription', 'payout');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'PAYPAL', 'LOMI');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'PAYPAL', 'LOMI', 'PARTNER');
 CREATE TYPE recurring_transaction_type AS ENUM ('subscription', 'installment', 'debt', 'utility', 'other');
 CREATE TYPE transfer_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
 CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
@@ -14,7 +14,7 @@ CREATE TYPE entry_type AS ENUM ('debit', 'credit');
 CREATE TYPE payment_method_code AS ENUM (
     'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'SEPA', 'PAYPAL',
     'APPLE_PAY', 'GOOGLE_PAY', 'CASH', 'CRYPTOCURRENCY', 'IDEAL', 'COUNTER', 'WAVE',
-    'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD'
+    'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD', 'PARTNER'
 );
 CREATE TYPE currency_code AS ENUM (
     'XOF', 'XAF', 'NGN', 'GHS', 'KES', 'ZAR', 'EGP', 'MAD', 'RWF', 'ETB', 'ZMW', 'NAD', 'USD', 'EUR', 'MRO'
@@ -163,10 +163,11 @@ COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, STRIPE, PAYPAL';
 
 -- Payment methods table
 CREATE TABLE payment_methods (
-  payment_method_code payment_method_code PRIMARY KEY,
+  payment_method_code payment_method_code,
   provider_code provider_code REFERENCES providers(code),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (payment_method_code, provider_code)
 );
 
 CREATE INDEX idx_payment_methods_provider_code ON payment_methods(provider_code);
@@ -215,6 +216,10 @@ CREATE TABLE customers (
     name VARCHAR NOT NULL,
     email VARCHAR,
     phone_number VARCHAR,
+    address VARCHAR,
+    city VARCHAR,
+    country VARCHAR,
+    postal_code VARCHAR,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -289,12 +294,15 @@ CREATE TABLE platform_payouts (
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   payout_method VARCHAR NOT NULL,
   payout_details JSONB,
+  status payout_status NOT NULL DEFAULT 'pending',
+  reference_id VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_platform_payouts_organization_id ON platform_payouts(organization_id);
 CREATE INDEX idx_platform_payouts_currency_code ON platform_payouts(currency_code);
+CREATE INDEX idx_platform_payouts_status ON platform_payouts(status);
 CREATE INDEX idx_platform_payouts_created_at ON platform_payouts(created_at);
 
 COMMENT ON TABLE platform_payouts IS 'Stores information about the payouts made by organizations to lomi.';
@@ -369,14 +377,14 @@ CREATE TABLE fees (
     name VARCHAR NOT NULL UNIQUE,
     transaction_type transaction_type NOT NULL,
     fee_type VARCHAR NOT NULL,
-    percentage NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (percentage >= 0 AND percentage <= 100),
+    percentage NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (percentage >= -100 AND percentage <= 100),
     fixed_amount NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (fixed_amount >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payment_method_code payment_method_code REFERENCES payment_methods(payment_method_code),
-    provider_code provider_code REFERENCES providers(code),
+    payment_method_code payment_method_code,
+    provider_code provider_code,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (transaction_type, fee_type, currency_code, payment_method_code, provider_code)
+    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
 );
 
 CREATE INDEX idx_fees_transaction_type ON fees(transaction_type);
@@ -405,9 +413,10 @@ CREATE TABLE transactions (
     fee_reference TEXT NOT NULL REFERENCES fees(name),
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
     provider_code provider_code NOT NULL REFERENCES providers(code),
-    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
+    payment_method_code payment_method_code NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
 );
 
 CREATE INDEX idx_transactions_merchant_id ON transactions(merchant_id);
@@ -440,7 +449,8 @@ CREATE TABLE recurring_transactions (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payment_method_code payment_method_code NOT NULL REFERENCES payment_methods(payment_method_code),
+    payment_method_code payment_method_code NOT NULL,
+    provider_code provider_code NOT NULL,
     payment_type recurring_transaction_type NOT NULL,
     frequency frequency NOT NULL,
     start_date DATE NOT NULL,
@@ -457,11 +467,13 @@ CREATE TABLE recurring_transactions (
     description TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
 );
 
 CREATE INDEX idx_recurring_transactions_merchant_id ON recurring_transactions(merchant_id);
 CREATE INDEX idx_recurring_transactions_organization_id ON recurring_transactions(organization_id);
+CREATE INDEX idx_recurring_transactions_payment_method ON recurring_transactions(payment_method_code, provider_code);
 
 COMMENT ON TABLE recurring_transactions IS 'Stores information for recurring payment schedules';
 COMMENT ON COLUMN recurring_transactions.next_payment_date IS 'The next payment date of the recurring transaction';
