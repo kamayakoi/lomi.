@@ -264,7 +264,7 @@ COMMENT ON TABLE main_accounts IS 'Identifies the primary account for each merch
 
 -- Platform Main Balance table
 CREATE TABLE platform_main_balance (
-  platform_main_balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (balance >= 0),
+  platform_main_balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (platform_main_balance >= 0),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
   total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
@@ -276,7 +276,7 @@ CREATE TABLE platform_main_balance (
 
 CREATE INDEX idx_platform_main_balance_currency_code ON platform_main_balance(currency_code);
 
-COMMENT ON TABLE platform_main_ balance IS 'Stores lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
+COMMENT ON TABLE platform_main_balance IS 'Stores lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
 
 
 -- Platform Payouts table
@@ -302,7 +302,7 @@ COMMENT ON TABLE platform_payouts IS 'Stores information about the payouts made 
 
 -- Platform Provider Balances table
 CREATE TABLE platform_provider_balances (
-  platform_provider_balance NUMERIC(15,2) PRIMARY KEY NOT NULL DEFAULT 0 CHECK (balance >= 0),
+  platform_provider_balance NUMERIC(15,2) PRIMARY KEY NOT NULL DEFAULT 0 CHECK (platform_provider_balance >= 0),
   provider_code provider_code NOT NULL REFERENCES providers(code),
   currency_code currency_code NOT NULL REFERENCES currencies(code),
   total_transactions NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
@@ -310,7 +310,7 @@ CREATE TABLE platform_provider_balances (
   total_revenue NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_revenue >= 0),
   last_transaction_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_platform_provider_balances_provider_code ON platform_provider_balances(provider_code);

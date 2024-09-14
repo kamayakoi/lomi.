@@ -271,6 +271,10 @@ VALUES
 INSERT INTO merchant_feedback (merchant_id, feedback_type, message, created_at, status)
 VALUES
 
+-- Customer Feedback table
+INSERT INTO customer_feedback (customer_id, feedback_type, message, created_at, status)
+VALUES
+
 -- Support tickets table
 INSERT INTO support_tickets (merchant_id, customer_id, message, created_at, resolution_date, resolution_details, status)
 VALUES
