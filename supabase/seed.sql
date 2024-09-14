@@ -343,3 +343,74 @@ INSERT INTO support_tickets (merchant_id, customer_id, message)
 VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'I need help with a refund request'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'I have a question about my subscription');
+
+
+  -- Customer Subscriptions table
+INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, next_billing_date, billing_frequency, amount, currency_code, metadata)
+VALUES
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 month',
+   'monthly',
+   9999.00,
+   'XOF',
+   '{"auto_renew": true}'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Enterprise Comms'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 month',
+   'monthly',
+   199.99,
+   'USD',
+   '{"auto_renew": true}');
+
+-- Internal Transfers table
+INSERT INTO internal_transfers (from_account_id, to_main_account_id, amount, currency_code, status)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   5000.00,
+   'XOF',
+   'completed'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   10000.00,
+   'USD',
+   'completed');
+
+-- Refunds table
+INSERT INTO refunds (transaction_id, amount, refunded_amount, fee_amount, reason, metadata, status)
+VALUES
+  ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'),
+   9999.00,
+   9699.03,
+   299.97,
+   'Customer request',
+   '{"refund_method": "original_payment_method"}',
+   'completed'),
+  ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'),
+   199.99,
+   194.19,
+   5.80,
+   'Product not as described',
+   '{"refund_method": "original_payment_method"}',
+   'pending');
+
+-- [EXPERIMENTAL & NOT USED] Transfers table
+INSERT INTO transfers (from_account_id, to_account_id, transaction_id, amount, status)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'),
+   5000.00,
+   'completed'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'),
+   100.00,
+   'pending');
