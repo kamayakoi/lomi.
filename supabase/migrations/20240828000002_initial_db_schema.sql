@@ -94,8 +94,9 @@ CREATE TABLE organization_addresses (
   country VARCHAR NOT NULL,
   region VARCHAR NOT NULL,
   city VARCHAR NOT NULL,
-  address VARCHAR NOT NULL,
+  district VARCHAR NOT NULL,
   postal_code VARCHAR NOT NULL,
+  address VARCHAR NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

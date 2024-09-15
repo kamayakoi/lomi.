@@ -12,18 +12,19 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_merchant_id UUID,
     p_phone_number VARCHAR,
     p_country VARCHAR,
+    p_preferred_language VARCHAR,
     p_org_name VARCHAR,
     p_org_email VARCHAR,
     p_org_phone_number VARCHAR,
     p_org_country VARCHAR,
     p_org_region VARCHAR,
     p_org_city VARCHAR,
+    p_org_district VARCHAR,
     p_org_address VARCHAR,
     p_org_postal_code VARCHAR,
     p_org_industry VARCHAR,
     p_org_website_url VARCHAR,
-    p_org_employee_number VARCHAR,
-    p_org_default_language VARCHAR
+    p_org_employee_number VARCHAR
 )
 RETURNS VOID AS $$
 DECLARE
@@ -35,7 +36,7 @@ BEGIN
         phone_number = p_phone_number,
         country = p_country,
         onboarded = true,
-        preferred_language = p_org_default_language,
+        preferred_language = p_preferred_language,
         updated_at = NOW()
     WHERE merchant_id = p_merchant_id;
 
@@ -65,6 +66,7 @@ BEGIN
         country,
         region,
         city,
+        district,
         address,
         postal_code
     ) VALUES (
@@ -72,6 +74,7 @@ BEGIN
         p_org_country,
         p_org_region,
         p_org_city,
+        p_org_district,
         p_org_address,
         p_org_postal_code
     );

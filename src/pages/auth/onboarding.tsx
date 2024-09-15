@@ -28,6 +28,7 @@ const onboardingFormSchema = z.object({
     orgCountry: z.string().min(1, 'Organization country is required'),
     orgRegion: z.string().min(1, 'Region is required'),
     orgCity: z.string().min(1, 'City is required'),
+    orgDistrict: z.string().min(1, 'District is required'),
     orgAddress: z.string().min(1, 'Address is required'),
     orgPostalCode: z.string().min(1, 'Postal code is required'),
     orgIndustry: z.string().min(1, 'Industry is required'),
@@ -147,6 +148,7 @@ const NewOnboarding: React.FC = () => {
                 p_org_region: formData.orgRegion,
                 p_org_city: formData.orgCity,
                 p_org_address: formData.orgAddress,
+                p_org_district: formData.orgDistrict,
                 p_org_postal_code: formData.orgPostalCode,
                 p_org_industry: formData.orgIndustry,
                 p_org_website_url: websiteUrl,
@@ -254,8 +256,22 @@ const NewOnboarding: React.FC = () => {
                             </div>
                             <div className="mb-6">
                                 <div className="flex space-x-2">
+                                    <div className="flex-1">
+                                        <Label htmlFor="phoneNumber" className="mb-1">Phone number<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="phoneNumber"
+                                            placeholder="0160223401"
+                                            {...onboardingForm.register("phoneNumber")}
+                                            className={cn(
+                                                "w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        />
+                                        {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
+                                    </div>
                                     <div className="w-1/3">
-                                        <Label htmlFor="countryCode" className="mb-1">Country ode<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="countryCode" className="mb-1">Country code<span className="text-red-500">*</span></Label>
                                         <div className="relative">
                                             <Input
                                                 id="countryCode"
@@ -293,20 +309,6 @@ const NewOnboarding: React.FC = () => {
                                                 </ul>
                                             )}
                                         </div>
-                                    </div>
-                                    <div className="flex-1">
-                                        <Label htmlFor="phoneNumber" className="mb-1">Phone number<span className="text-red-500">*</span></Label>
-                                        <Input
-                                            id="phoneNumber"
-                                            placeholder="0160223401"
-                                            {...onboardingForm.register("phoneNumber")}
-                                            className={cn(
-                                                "w-full",
-                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                            )}
-                                        />
-                                        {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
                                     </div>
                                 </div>
                             </div>
@@ -350,8 +352,35 @@ const NewOnboarding: React.FC = () => {
                                         </select>
                                         {onboardingForm.formState.errors.role && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.role.message}</p>}
                                     </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language<span className="text-red-500">*</span></Label>
+                                        <select
+                                            id="orgDefaultLanguage"
+                                            {...onboardingForm.register("orgDefaultLanguage")}
+                                            className={cn(
+                                                "p-2 border rounded-md w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        >
+                                            {languages.map((language) => (
+                                                <option key={language} value={language}>
+                                                    {language}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {onboardingForm.formState.errors.orgDefaultLanguage && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDefaultLanguage.message}</p>}
+                                    </div>
                                 </div>
                             </div>
+
+                            {/* Stylish separator */}
+                            <div className="my-8 flex items-center">
+                                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                                <span className="flex-shrink mx-4 text-gray-400 dark:text-gray-500">Company</span>
+                                <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+                            </div>
+
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
@@ -381,6 +410,25 @@ const NewOnboarding: React.FC = () => {
                                             )}
                                         />
                                         {onboardingForm.formState.errors.orgEmail && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmail.message}</p>}
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="orgEmployees" className="mb-1">Nb. of collaborators<span className="text-red-500">*</span></Label>
+                                        <select
+                                            id="orgEmployees"
+                                            {...onboardingForm.register("orgEmployees")}
+                                            className={cn(
+                                                "p-2 border rounded-md w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        >
+                                            {employeeRanges.map((range) => (
+                                                <option key={range} value={range}>
+                                                    {range}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {onboardingForm.formState.errors.orgEmployees && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmployees.message}</p>}
                                     </div>
                                 </div>
                             </div>
@@ -438,19 +486,20 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgAddress" className="mb-1">Address<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgDistrict" className="mb-1">District<span className="text-red-500">*</span></Label>
                                         <Input
-                                            id="orgAddress"
-                                            placeholder="123 Rue des Jardins"
-                                            {...onboardingForm.register("orgAddress")}
+                                            id="orgDistrict"
+                                            placeholder="Cocody"
+                                            {...onboardingForm.register("orgDistrict")}
                                             className={cn(
                                                 "w-full",
                                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                             )}
                                         />
-                                        {onboardingForm.formState.errors.orgAddress && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgAddress.message}</p>}
+                                        {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
                                     </div>
+
                                 </div>
                             </div>
                             <div className="mb-6">
@@ -470,23 +519,18 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgIndustry" className="mb-1">Industry<span className="text-red-500">*</span></Label>
-                                        <select
-                                            id="orgIndustry"
-                                            {...onboardingForm.register("orgIndustry")}
+                                        <Label htmlFor="orgAddress" className="mb-1">Address<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="orgAddress"
+                                            placeholder="123 Rue des Jardins"
+                                            {...onboardingForm.register("orgAddress")}
                                             className={cn(
-                                                "p-2 border rounded-md w-full",
+                                                "w-full",
                                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                             )}
-                                        >
-                                            {industries.map((industry) => (
-                                                <option key={industry} value={industry}>
-                                                    {industry}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
+                                        />
+                                        {onboardingForm.formState.errors.orgAddress && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgAddress.message}</p>}
                                     </div>
                                 </div>
                             </div>
@@ -507,42 +551,23 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgWebsite && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgWebsite.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgEmployees" className="mb-1">Number of employees<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgIndustry" className="mb-1">Industry<span className="text-red-500">*</span></Label>
                                         <select
-                                            id="orgEmployees"
-                                            {...onboardingForm.register("orgEmployees")}
+                                            id="orgIndustry"
+                                            {...onboardingForm.register("orgIndustry")}
                                             className={cn(
                                                 "p-2 border rounded-md w-full",
                                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                             )}
                                         >
-                                            {employeeRanges.map((range) => (
-                                                <option key={range} value={range}>
-                                                    {range}
+                                            {industries.map((industry) => (
+                                                <option key={industry} value={industry}>
+                                                    {industry}
                                                 </option>
                                             ))}
                                         </select>
-                                        {onboardingForm.formState.errors.orgEmployees && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmployees.message}</p>}
-                                    </div>
-                                    <div className="flex-1">
-                                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language<span className="text-red-500">*</span></Label>
-                                        <select
-                                            id="orgDefaultLanguage"
-                                            {...onboardingForm.register("orgDefaultLanguage")}
-                                            className={cn(
-                                                "p-2 border rounded-md w-full",
-                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                            )}
-                                        >
-                                            {languages.map((language) => (
-                                                <option key={language} value={language}>
-                                                    {language}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {onboardingForm.formState.errors.orgDefaultLanguage && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDefaultLanguage.message}</p>}
+                                        {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
                                     </div>
                                 </div>
                             </div>
