@@ -1,4 +1,4 @@
-export const roles = [
+export const organizationPositions = [
   'Founder',
   'Entrepreneur',
   'Co-Founder',
@@ -454,4 +454,13 @@ export const employeeRanges = [
     '201-500',
     '501-1000',
     '1000+'
+];
+
+export const languages = [
+  'en',
+  'fr',
+  'ar',
+  'zh',
+  'wo',
+  'ha'
 ];

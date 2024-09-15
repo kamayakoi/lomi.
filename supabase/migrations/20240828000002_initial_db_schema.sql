@@ -32,7 +32,6 @@ CREATE TABLE merchants (
   name VARCHAR,
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR UNIQUE,
-  is_admin BOOLEAN NOT NULL DEFAULT false,
   onboarded BOOLEAN NOT NULL DEFAULT false,
   verified BOOLEAN NOT NULL DEFAULT false,
   country VARCHAR,
@@ -73,6 +72,8 @@ CREATE TABLE organizations (
   total_merchants INT DEFAULT 0,
   total_customers INT DEFAULT 0,
   metadata JSONB,
+  employee_number VARCHAR,
+  industry VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   is_deleted BOOLEAN NOT NULL DEFAULT false,
@@ -130,6 +131,7 @@ CREATE TABLE merchant_organization_links (
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
+  organization_position VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (merchant_id, organization_id)
 );
