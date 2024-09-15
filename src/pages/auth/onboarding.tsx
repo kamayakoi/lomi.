@@ -215,18 +215,18 @@ const NewOnboarding: React.FC = () => {
 
     return (
         <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
-            <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[800px] lg:p-8'>
+            <div className='mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[800px] lg:p-12'>
                 <Card className={cn('p-6', 'dark:bg-gray-800')}>
-                    <h1 className='text-2xl font-semibold tracking-tight mb-6'>Complete Your Profile</h1>
+                    <h1 className='text-2xl font-semibold tracking-tight mb-6'>Complete your profile</h1>
                     <FormProvider {...onboardingForm}>
                         <form onSubmit={(e) => e.preventDefault()}>
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="w-1/2">
-                                        <Label htmlFor="firstName" className="mb-1">First Name<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="firstName" className="mb-1">First name<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="firstName"
-                                            placeholder="e.g., John"
+                                            placeholder="Jessy"
                                             {...onboardingForm.register("firstName")}
                                             className={cn(
                                                 "w-full",
@@ -237,10 +237,10 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
                                     </div>
                                     <div className="w-1/2">
-                                        <Label htmlFor="lastName" className="mb-1">Last Name<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="lastName" className="mb-1">Last name<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="lastName"
-                                            placeholder="e.g., Doe"
+                                            placeholder="Luckey"
                                             {...onboardingForm.register("lastName")}
                                             className={cn(
                                                 "w-full",
@@ -255,12 +255,12 @@ const NewOnboarding: React.FC = () => {
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="w-1/3">
-                                        <Label htmlFor="countryCode" className="mb-1">Country Code<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="countryCode" className="mb-1">Country ode<span className="text-red-500">*</span></Label>
                                         <div className="relative">
                                             <Input
                                                 id="countryCode"
                                                 type="text"
-                                                placeholder="Search country code"
+                                                placeholder="+225"
                                                 value={countryCodeSearch}
                                                 onChange={(e) => {
                                                     setCountryCodeSearch(e.target.value);
@@ -295,10 +295,10 @@ const NewOnboarding: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="phoneNumber" className="mb-1">Phone Number<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="phoneNumber" className="mb-1">Phone number<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="phoneNumber"
-                                            placeholder="01 60 223 401"
+                                            placeholder="0160223401"
                                             {...onboardingForm.register("phoneNumber")}
                                             className={cn(
                                                 "w-full",
@@ -332,7 +332,7 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.country.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="role" className="mb-1">Your Role<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="role" className="mb-1">Your role<span className="text-red-500">*</span></Label>
                                         <select
                                             id="role"
                                             {...onboardingForm.register("role")}
@@ -355,10 +355,10 @@ const NewOnboarding: React.FC = () => {
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
-                                        <Label htmlFor="orgName" className="mb-1">Company Name<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgName" className="mb-1">Company name<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgName"
-                                            placeholder="e.g., Ashanti Shoes Inc."
+                                            placeholder="Ashanti Shoes Inc."
                                             {...onboardingForm.register("orgName")}
                                             className={cn(
                                                 "w-full",
@@ -369,10 +369,10 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgName.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgEmail" className="mb-1">Company Email<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgEmail" className="mb-1">Company email<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgEmail"
-                                            placeholder="e.g., info@example.com"
+                                            placeholder="jessy@example.com"
                                             {...onboardingForm.register("orgEmail")}
                                             className={cn(
                                                 "w-full",
@@ -387,7 +387,7 @@ const NewOnboarding: React.FC = () => {
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
-                                        <Label htmlFor="orgCountry" className="mb-1">Company Country<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgCountry" className="mb-1">Company HQ<span className="text-red-500">*</span></Label>
                                         <select
                                             id="orgCountry"
                                             {...onboardingForm.register("orgCountry")}
@@ -409,7 +409,7 @@ const NewOnboarding: React.FC = () => {
                                         <Label htmlFor="orgRegion" className="mb-1">Region<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgRegion"
-                                            placeholder="e.g., Kumasi"
+                                            placeholder="Lagunes"
                                             {...onboardingForm.register("orgRegion")}
                                             className={cn(
                                                 "w-full",
@@ -427,7 +427,7 @@ const NewOnboarding: React.FC = () => {
                                         <Label htmlFor="orgCity" className="mb-1">City<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgCity"
-                                            placeholder="e.g., Kumasi"
+                                            placeholder="Abidjan"
                                             {...onboardingForm.register("orgCity")}
                                             className={cn(
                                                 "w-full",
@@ -441,7 +441,7 @@ const NewOnboarding: React.FC = () => {
                                         <Label htmlFor="orgAddress" className="mb-1">Address<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgAddress"
-                                            placeholder="e.g., 123 Main St"
+                                            placeholder="123 Rue des Jardins"
                                             {...onboardingForm.register("orgAddress")}
                                             className={cn(
                                                 "w-full",
@@ -456,10 +456,10 @@ const NewOnboarding: React.FC = () => {
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
-                                        <Label htmlFor="orgPostalCode" className="mb-1">Postal Code<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgPostalCode" className="mb-1">Postal code<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgPostalCode"
-                                            placeholder="e.g., 12345"
+                                            placeholder="01015"
                                             {...onboardingForm.register("orgPostalCode")}
                                             className={cn(
                                                 "w-full",
@@ -496,7 +496,7 @@ const NewOnboarding: React.FC = () => {
                                         <Label htmlFor="orgWebsite" className="mb-1">Website</Label>
                                         <Input
                                             id="orgWebsite"
-                                            placeholder="e.g., www.example.com"
+                                            placeholder="https://www.ashantishoes.com"
                                             {...onboardingForm.register("orgWebsite")}
                                             className={cn(
                                                 "w-full",
@@ -507,7 +507,7 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgWebsite && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgWebsite.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgEmployees" className="mb-1">Number of Employees<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgEmployees" className="mb-1">Number of employees<span className="text-red-500">*</span></Label>
                                         <select
                                             id="orgEmployees"
                                             {...onboardingForm.register("orgEmployees")}
@@ -526,7 +526,7 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgEmployees && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmployees.message}</p>}
                                     </div>
                                     <div className="flex-1">
-                                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Default Language<span className="text-red-500">*</span></Label>
+                                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language<span className="text-red-500">*</span></Label>
                                         <select
                                             id="orgDefaultLanguage"
                                             {...onboardingForm.register("orgDefaultLanguage")}

@@ -1,11 +1,9 @@
 export const organizationPositions = [
-  'Founder',
-  'Entrepreneur',
-  'Co-Founder',
   'CEO',
-  'CTO',
+  'Co-Founder',
+  'Founder',
   'CFO',
-  'COO',
+  'CTO',
   'CMO',
   'VP of Engineering',
   'VP of Product',
@@ -13,13 +11,26 @@ export const organizationPositions = [
   'VP of Marketing',
   'Director',
   'Manager',
+  'Product Manager',
+  'Business Analyst',
+  'Sales Representative',
+  'Marketing Specialist',
   'Engineer',
+  'Software Developer',
+  'Project Manager',
+  'UX/UI Designer',
   'Data Analyst',
+  'Scientist',
+  'HR Manager',
+  'Operator',
+  'Lawyer',
+  'Entrepreneur',
   'Other',
 ];
 
 export const countries = [
-  "Côte d'Ivoire",
+  'Ghana',
+  'Côte d\'Ivoire',
   'Afghanistan',
   'Albania',
   'Algeria',
@@ -85,7 +96,6 @@ export const countries = [
   'Gambia',
   'Georgia',
   'Germany',
-  'Ghana',
   'Greece',
   'Grenada',
   'Guatemala',
@@ -219,6 +229,7 @@ export const countries = [
 ];
 
 export const countryCodes = [
+  '+233', // Ghana
   '+225', // Côte d'Ivoire
   '+93',  // Afghanistan
   '+355', // Albania
@@ -285,7 +296,6 @@ export const countryCodes = [
   '+220', // Gambia
   '+995', // Georgia
   '+49',  // Germany
-  '+233', // Ghana
   '+30',  // Greece
   '+1473',// Grenada
   '+502', // Guatemala
@@ -448,12 +458,15 @@ export const industries = [
 ];
 
 export const employeeRanges = [
-    '1-10',
-    '11-50',
-    '51-200',
-    '201-500',
-    '501-1000',
-    '1000+'
+  '1-5',
+  '6-10',
+  '11-25',
+  '26-50',
+  '51-100',
+  '101-200',
+  '201-500',
+  '501-1000',
+  '1000+'
 ];
 
 export const languages = [
@@ -463,4 +476,26 @@ export const languages = [
   'Chinese',
   'Wolof',
   'Hausa',
+  'Baoule',
+  'Twi',
+  'Swahili',
+  'Igbo',
+  'Yoruba',
+  'Fula',
+  'Mandinka',
+  'Portuguese',
+  'Spanish',
+  'German',
+  'Other',
+];
+
+export const timezones = [
+  'UTC-01:00', // Azores
+  'UTC±00:00', // Greenwich Mean Time (GMT)
+  'UTC+01:00', // Central European Time (CET)
+  'UTC+02:00', // West Africa Time (WAT)
+  'UTC+03:00', // Moscow Time
+  'UTC+04:00', // Gulf Standard Time
+  'UTC+05:00', // Pakistan Standard Time
+  'UTC+08:00', // China Standard Time
 ];
