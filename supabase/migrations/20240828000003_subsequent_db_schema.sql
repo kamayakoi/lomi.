@@ -24,6 +24,7 @@ CREATE TABLE merchant_sessions (
   session_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   session_data JSONB,
+  ip_address VARCHAR(45),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   expires_at TIMESTAMPTZ NOT NULL
 );
@@ -129,18 +130,17 @@ CREATE INDEX idx_webhook_delivery_logs_webhook_id ON webhook_delivery_logs(webho
 
 -- API Rate Limits table
 CREATE TABLE api_rate_limits (
-    rate_limit_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    api_key_id UUID NOT NULL REFERENCES api_keys(key_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    api_key VARCHAR NOT NULL,
     endpoint VARCHAR(255) NOT NULL,
     requests_limit INT NOT NULL,
     time_window INTERVAL NOT NULL,
     current_usage INT NOT NULL DEFAULT 0,
     last_reset_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (api_key_id, endpoint)
+    PRIMARY KEY (organization_id, api_key, endpoint)
 );
 
-CREATE INDEX idx_api_rate_limits_api_key_id ON api_rate_limits(api_key_id);
+CREATE INDEX idx_api_rate_limits_organization_id ON api_rate_limits(organization_id);
 
 -- Cache Entries table
 CREATE TABLE cache_entries (

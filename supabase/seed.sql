@@ -102,23 +102,29 @@ VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 15000.00, 'XOF'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 75000.00, 'USD');
 
--- platform main balance table
-INSERT INTO platform_main_balance (platform_main_balance, currency_code, total_transactions, total_fees, total_revenue)
+-- Platform Balance table
+INSERT INTO platform_balance (total_balance, available_balance, pending_balance, currency_code)
 VALUES
-  (100000.00, 'XOF', 1000, 5000.00, 10000.00),
-  (500000.00, 'USD', 5000, 25000.00, 50000.00);
+  (1000000.00, 900000.00, 100000.00, 'XOF'),
+  (500000.00, 450000.00, 50000.00, 'USD');
 
--- platform payouts table
-INSERT INTO platform_payouts (organization_id, amount, from_account_id, from_main_account_id, currency_code, payout_method, payout_details, status, reference_id)
+  
+-- Platform Payouts table
+INSERT INTO platform_payouts (organization_id, amount, currency_code, provider_code, status, created_at, completed_at)
 VALUES
-  ('11111111-1111-1111-1111-111111111111', 5000.00, (SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), 'XOF', 'bank_transfer', '{"bank_name": "Bank of Africa", "account_number": "1234567890"}', 'completed', 'PO-001'),
-  ('22222222-2222-2222-2222-222222222222', 10000.00, (SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), 'USD', 'bank_transfer', '{"bank_name": "Chase", "account_number": "0987654321"}', 'completed', 'PO-002');
+  ('11111111-1111-1111-1111-111111111111', 50000.00, 'XOF', 'ORANGE', 'completed', NOW() - INTERVAL '7 days', NOW() - INTERVAL '6 days'),
+  ('11111111-1111-1111-1111-111111111111', 25000.00, 'XOF', 'MTN', 'pending', NOW() - INTERVAL '2 days', NULL),
+  ('22222222-2222-2222-2222-222222222222', 100000.00, 'USD', 'STRIPE', 'completed', NOW() - INTERVAL '14 days', NOW() - INTERVAL '13 days'),
+  ('22222222-2222-2222-2222-222222222222', 50000.00, 'USD', 'PAYPAL', 'pending', NOW() - INTERVAL '1 day', NULL);
 
--- platform provider balances table
-INSERT INTO platform_provider_balances (platform_provider_balance, provider_code, currency_code, total_transactions, total_fees, total_revenue)
+-- Platform Provider Balance table
+INSERT INTO platform_provider_balance (provider_code, balance, currency_code)
 VALUES
-  (10000.00, 'ORANGE', 'XOF', 100, 500.00, 9500.00),
-  (20000.00, 'STRIPE', 'USD', 200, 1000.00, 19000.00);
+  ('ORANGE', 100000.00, 'XOF'),
+  ('MTN', 50000.00, 'XOF'),
+  ('WAVE', 75000.00, 'XOF'),
+  ('STRIPE', 200000.00, 'USD'),
+  ('PAYPAL', 100000.00, 'USD');
 
 -- merchant products table
 INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, frequency, image_url, is_active)
@@ -127,8 +133,24 @@ VALUES
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Enterprise Comms', 'Enterprise communication package', 199.99, 'USD', 'monthly', 'https://example.com/enterprise_comms.jpg', true);
 
 -- customer subscriptions table
--- INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, billing_frequency, amount, currency_code) VALUES
-
+INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, billing_frequency, amount, currency_code)
+VALUES
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   9999.00,
+   'XOF'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Enterprise Comms'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   199.99,
+   'USD');
 
 -- fees table
 INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, currency_code, payment_method_code, provider_code) VALUES
@@ -251,22 +273,23 @@ VALUES
   ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'), NULL, NULL, NULL, 194.19, 'credit');
 
 -- api keys table
-INSERT INTO api_keys (organization_id, api_key, name, is_active, expiration_date, last_used_at, created_at)
+INSERT INTO api_keys (organization_id, api_key, name, is_active, expiration_date, last_used_at)
 VALUES
-  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW(), NOW()),
-  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW(), NOW());
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW()),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW());
 
 -- api usage tracking table
-INSERT INTO api_usage (api_key_id, endpoint, request_count, last_request_at, request_method, response_status, response_time, ip_address)
+INSERT INTO api_usage (organization_id, api_key, endpoint, request_count, last_request_at, request_method, response_status, response_time, ip_address)
 VALUES
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '/v1/transactions', 100, NOW(), 'GET', 200, 0.15, '192.168.1.1'),
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '/v1/transactions', 500, NOW(), 'POST', 201, 0.25, '10.0.0.1');
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', '/v1/transactions', 100, NOW(), 'GET', 200, 0.15, '192.168.1.1'),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', '/v1/transactions', 500, NOW(), 'POST', 201, 0.25, '10.0.0.1');
 
 -- webhooks table
-INSERT INTO webhooks (merchant_id, url, events, secret, is_active, created_at, updated_at, last_triggered_at, last_response_status, last_response_time, retry_count, next_retry_at, cache_key, cache_expiry)
+INSERT INTO webhooks (webhook_id, merchant_id, organization_id, url, events, secret, is_active, created_at, updated_at, last_triggered_at, last_response_status, last_response_time, retry_count, next_retry_at, cache_key, cache_expiry)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'https://africanledger.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_africanledger_123456789', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:' || (SELECT webhook_id FROM webhooks WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), NOW() + INTERVAL '1 day'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'https://telnyx.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_telnyx_987654321', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:' || (SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), NOW() + INTERVAL '1 day');
+  (uuid_generate_v4(), 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'https://africanledger.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_africanledger_123456789', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:africanledger', NOW() + INTERVAL '1 day'),
+  (uuid_generate_v4(), 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'https://telnyx.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_telnyx_987654321', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:telnyx', NOW() + INTERVAL '1 day');
+
 
 -- logs table
 INSERT INTO logs (merchant_id, action, details, severity, created_at)
@@ -351,10 +374,10 @@ VALUES
   ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), '{"event": "payment.success", "amount": 199.99}', 200, '{"received": true}', 0.3);
 
 -- API Rate Limits table
-INSERT INTO api_rate_limits (api_key_id, organization_id, endpoint, requests_limit, time_window, current_usage)
+INSERT INTO api_rate_limits (organization_id, api_key, endpoint, requests_limit, time_window, current_usage, last_reset_at)
 VALUES
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '11111111-1111-1111-1111-111111111111', '/v1/transactions', 1000, INTERVAL '1 hour', 50),
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '22222222-2222-2222-2222-222222222222', '/v1/transactions', 5000, INTERVAL '1 hour', 100);
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', '/v1/transactions', 1000, INTERVAL '1 hour', 50, NOW()),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', '/v1/transactions', 5000, INTERVAL '1 hour', 100, NOW());
 
 -- Cache Entries table
 INSERT INTO cache_entries (cache_key, cache_value, expires_at)

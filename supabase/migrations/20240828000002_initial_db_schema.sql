@@ -266,67 +266,50 @@ CREATE INDEX idx_main_accounts_merchant_id ON main_accounts(merchant_id);
 
 COMMENT ON TABLE main_accounts IS 'Identifies the primary account for each merchant in each currency';
 
-
--- Platform Main Balance table
-CREATE TABLE platform_main_balance (
-  platform_main_balance NUMERIC(15,2) NOT NULL PRIMARY KEY DEFAULT 0 CHECK (platform_main_balance >= 0),
-  currency_code currency_code NOT NULL REFERENCES currencies(code),
-  total_transactions INT NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
-  total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
-  total_revenue NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_revenue >= 0),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (currency_code)
+-- Platform Balance table
+CREATE TABLE platform_balance (
+    balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    total_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
+    available_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
+    pending_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
+    currency_code currency_code NOT NULL,
+    last_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_platform_main_balance_currency_code ON platform_main_balance(currency_code);
+CREATE INDEX idx_platform_balance_currency_code ON platform_balance(currency_code);
 
-COMMENT ON TABLE platform_main_balance IS 'Stores lomi.s balance, total transactions, total fees, and total amount for each currency after deducting fees from merchants'' customers transactions';
+COMMENT ON TABLE platform_balance IS 'Tracks the overall platform balance across all currencies';
 
+-- Platform Provider Balance table
+CREATE TABLE platform_provider_balance (
+    provider_code provider_code NOT NULL,
+    balance NUMERIC(15,2) NOT NULL DEFAULT 0,
+    currency_code currency_code NOT NULL,
+    last_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (provider_code, currency_code)
+);
+
+CREATE INDEX idx_platform_provider_balance_currency_code ON platform_provider_balance(currency_code);
+
+COMMENT ON TABLE platform_provider_balance IS 'Tracks the balance for each provider in each currency';
 
 -- Platform Payouts table
 CREATE TABLE platform_payouts (
-  payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-  amount NUMERIC(15,2) NOT NULL CHECK (amount > 0),
-  from_account_id UUID NOT NULL REFERENCES accounts(account_id),
-  from_main_account_id UUID NOT NULL REFERENCES main_accounts(main_account_id),
-  currency_code currency_code NOT NULL REFERENCES currencies(code),
-  payout_method VARCHAR NOT NULL,
-  payout_details JSONB,
-  status payout_status NOT NULL DEFAULT 'pending',
-  reference_id VARCHAR,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    amount NUMERIC(15,2) NOT NULL CHECK (amount > 0),
+    currency_code currency_code NOT NULL,
+    provider_code provider_code NOT NULL,
+    status payout_status NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_platform_payouts_organization_id ON platform_payouts(organization_id);
 CREATE INDEX idx_platform_payouts_currency_code ON platform_payouts(currency_code);
+CREATE INDEX idx_platform_payouts_provider_code ON platform_payouts(provider_code);
 CREATE INDEX idx_platform_payouts_status ON platform_payouts(status);
-CREATE INDEX idx_platform_payouts_created_at ON platform_payouts(created_at);
 
-COMMENT ON TABLE platform_payouts IS 'Stores information about the payouts made by organizations to lomi.';
-
-
--- Platform Provider Balances table
-CREATE TABLE platform_provider_balances (
-  platform_provider_balance NUMERIC(15,2) PRIMARY KEY NOT NULL DEFAULT 0 CHECK (platform_provider_balance >= 0),
-  provider_code provider_code NOT NULL REFERENCES providers(code),
-  currency_code currency_code NOT NULL REFERENCES currencies(code),
-  total_transactions NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_transactions >= 0),
-  total_fees NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_fees >= 0),
-  total_revenue NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (total_revenue >= 0),
-  last_transaction_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_platform_provider_balances_provider_code ON platform_provider_balances(provider_code);
-CREATE INDEX idx_platform_provider_balances_currency_code ON platform_provider_balances(currency_code);
-CREATE INDEX idx_platform_provider_balances_last_transaction_at ON platform_provider_balances(last_transaction_at);
-
-COMMENT ON TABLE platform_provider_balances IS 'Stores the balance, total transactions, total fees, and total amount for each provider and currency';
-
+COMMENT ON TABLE platform_payouts IS 'Records payouts made by the platform to various providers';
 
 -- Merchant Products table
 CREATE TABLE merchant_products (
@@ -592,7 +575,6 @@ COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes
 
 -- API Keys table
 CREATE TABLE api_keys (
-    key_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     api_key VARCHAR NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -600,7 +582,8 @@ CREATE TABLE api_keys (
     expiration_date TIMESTAMPTZ,
     last_used_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (organization_id, api_key)
 );
 
 CREATE INDEX idx_api_keys_organization_id ON api_keys(organization_id);
@@ -610,30 +593,31 @@ CREATE INDEX idx_api_keys_is_active ON api_keys(is_active);
 COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the system';
 
 
--- API usage tracking table
+-- API Usage table
 CREATE TABLE api_usage (
-    api_key_id UUID NOT NULL PRIMARY KEY REFERENCES api_keys(key_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    api_key VARCHAR PRIMARY KEY NOT NULL REFERENCES api_keys(api_key),
     endpoint VARCHAR(255) NOT NULL,
     request_count INT NOT NULL DEFAULT 0,
     last_request_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     request_method VARCHAR(10),
     response_status INT,
     response_time FLOAT,
-    ip_address VARCHAR(45)
+    ip_address VARCHAR(45),
+    FOREIGN KEY (organization_id, api_key) REFERENCES api_keys(organization_id, api_key),
+    UNIQUE (organization_id, api_key, endpoint)
 );
 
-CREATE INDEX idx_api_usage_api_key_id ON api_usage(api_key_id);
+CREATE INDEX idx_api_usage_organization_id ON api_usage(organization_id);
+CREATE INDEX idx_api_usage_api_key ON api_usage(api_key);
 CREATE INDEX idx_api_usage_last_request_at ON api_usage(last_request_at);
-
-COMMENT ON TABLE api_usage IS 'Tracks API usage metrics for each API key';
 
 
 -- Webhooks table
 CREATE TABLE webhooks (
   webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   url VARCHAR NOT NULL,
   events VARCHAR[] NOT NULL,
   secret VARCHAR,
@@ -647,10 +631,12 @@ CREATE TABLE webhooks (
   retry_count INT DEFAULT 0,
   next_retry_at TIMESTAMPTZ,
   cache_key VARCHAR(255),
-  cache_expiry TIMESTAMPTZ
+  cache_expiry TIMESTAMPTZ,
+  UNIQUE (merchant_id, url, organization_id)
 );
 
 CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);
+CREATE INDEX idx_webhooks_organization_id ON webhooks(organization_id);
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';
 
