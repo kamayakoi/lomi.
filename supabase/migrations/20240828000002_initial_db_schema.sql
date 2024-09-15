@@ -38,6 +38,7 @@ CREATE TABLE merchants (
   metadata JSONB,
   avatar_url TEXT,
   preferred_language VARCHAR(10),
+  timezone VARCHAR NOT NULL DEFAULT 'UTC',
   referral_code VARCHAR,
   mrr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   arr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
@@ -95,8 +96,6 @@ CREATE TABLE organization_addresses (
   city VARCHAR NOT NULL,
   address VARCHAR NOT NULL,
   postal_code VARCHAR NOT NULL,
-  default_language VARCHAR(5) NOT NULL,
-  timezone VARCHAR NOT NULL DEFAULT 'UTC',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
