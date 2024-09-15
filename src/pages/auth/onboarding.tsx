@@ -24,7 +24,9 @@ const onboardingFormSchema = z.object({
     country: z.string().min(1, 'Country is required'),
     role: z.string().min(1, 'Role is required'),
     orgName: z.string().min(1, 'Organization name is required'),
+    orgEmail: z.string().email('Invalid email format'),
     orgCountry: z.string().min(1, 'Organization country is required'),
+    orgRegion: z.string().min(1, 'Region is required'),
     orgCity: z.string().min(1, 'City is required'),
     orgAddress: z.string().min(1, 'Address is required'),
     orgPostalCode: z.string().min(1, 'Postal code is required'),
@@ -139,12 +141,16 @@ const NewOnboarding: React.FC = () => {
                 p_phone_number: `${formData.countryCode}${formData.phoneNumber}`,
                 p_country: formData.country,
                 p_org_name: formData.orgName,
+                p_org_email: formData.orgEmail,
+                p_org_phone_number: `${formData.countryCode}${formData.phoneNumber}`,
                 p_org_country: formData.orgCountry,
+                p_org_region: formData.orgRegion,
                 p_org_city: formData.orgCity,
                 p_org_address: formData.orgAddress,
                 p_org_postal_code: formData.orgPostalCode,
                 p_org_industry: formData.orgIndustry,
                 p_org_website_url: websiteUrl,
+                p_org_employee_number: formData.orgEmployees,
                 p_org_default_language: formData.orgDefaultLanguage
             });
 
@@ -160,7 +166,6 @@ const NewOnboarding: React.FC = () => {
                 description: "Your account has been set up successfully.",
             });
             navigate('/portal');
-            // navigate(config.isPortal ? '/' : '/portal');
         } catch (error) {
             console.error('Error completing onboarding:', error);
             toast({
@@ -364,6 +369,24 @@ const NewOnboarding: React.FC = () => {
                                         {onboardingForm.formState.errors.orgName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgName.message}</p>}
                                     </div>
                                     <div className="flex-1">
+                                        <Label htmlFor="orgEmail" className="mb-1">Company Email<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="orgEmail"
+                                            placeholder="e.g., info@example.com"
+                                            {...onboardingForm.register("orgEmail")}
+                                            className={cn(
+                                                "w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        />
+                                        {onboardingForm.formState.errors.orgEmail && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmail.message}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-6">
+                                <div className="flex space-x-2">
+                                    <div className="flex-1">
                                         <Label htmlFor="orgCountry" className="mb-1">Company Country<span className="text-red-500">*</span></Label>
                                         <select
                                             id="orgCountry"
@@ -381,6 +404,20 @@ const NewOnboarding: React.FC = () => {
                                             ))}
                                         </select>
                                         {onboardingForm.formState.errors.orgCountry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCountry.message}</p>}
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="orgRegion" className="mb-1">Region<span className="text-red-500">*</span></Label>
+                                        <Input
+                                            id="orgRegion"
+                                            placeholder="e.g., Kumasi"
+                                            {...onboardingForm.register("orgRegion")}
+                                            className={cn(
+                                                "w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        />
+                                        {onboardingForm.formState.errors.orgRegion && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgRegion.message}</p>}
                                     </div>
                                 </div>
                             </div>

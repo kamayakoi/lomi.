@@ -85,7 +85,7 @@ CREATE INDEX idx_organizations_email ON organizations(email);
 CREATE INDEX idx_organizations_is_deleted ON organizations(is_deleted) WHERE is_deleted = false;
 
 COMMENT ON TABLE organizations IS 'Represents businesses or entities using our application';
-COMMENT ON COLUMN organizations.status IS 'Current status of the organization account';;
+COMMENT ON COLUMN organizations.status IS 'Current status of the organization account';
 
 
 -- Organization Addresses table
