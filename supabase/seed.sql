@@ -320,12 +320,6 @@ VALUES
   ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"user_agent": "Mozilla/5.0"}', NOW() + INTERVAL '1 day'),
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"user_agent": "Chrome/93.0.4577.82"}', NOW() + INTERVAL '1 day');
 
--- UI Configuration table
-INSERT INTO ui_configuration (config_name, config_value)
-VALUES
-  ('dashboard_layout', '{"widgets": ["revenue", "transactions", "customers"]}'),
-  ('report_settings', '{"default_currency": "USD", "date_range": "last_30_days"}');
-
 -- Merchant Feedback table
 INSERT INTO merchant_feedback (merchant_id, feedback_type, message)
 VALUES
@@ -357,10 +351,10 @@ VALUES
   ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), '{"event": "payment.success", "amount": 199.99}', 200, '{"received": true}', 0.3);
 
 -- API Rate Limits table
-INSERT INTO api_rate_limits (api_key_id, endpoint, requests_count, last_reset_at)
+INSERT INTO api_rate_limits (api_key_id, organization_id, endpoint, requests_limit, time_window, current_usage)
 VALUES
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '/v1/transactions', 50, NOW() - INTERVAL '1 hour'),
-  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '/v1/transactions', 100, NOW() - INTERVAL '1 hour');
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_africanledger_123456789'), '11111111-1111-1111-1111-111111111111', '/v1/transactions', 1000, INTERVAL '1 hour', 50),
+  ((SELECT key_id FROM api_keys WHERE api_key = 'ak_live_telnyx_987654321'), '22222222-2222-2222-2222-222222222222', '/v1/transactions', 5000, INTERVAL '1 hour', 100);
 
 -- Cache Entries table
 INSERT INTO cache_entries (cache_key, cache_value, expires_at)

@@ -33,18 +33,6 @@ CREATE INDEX idx_merchant_sessions_expires_at ON merchant_sessions(expires_at);
 
 COMMENT ON TABLE merchant_sessions IS 'Stores merchant session information for authentication and session management';
 
--- UI Configuration table
-CREATE TABLE ui_configuration (
-  config_name VARCHAR(100) NOT NULL,
-  config_value JSONB,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_ui_configuration_config_name ON ui_configuration(config_name);
-
-COMMENT ON TABLE ui_configuration IS 'Stores configuration options for the UI';
-
 -- Merchant Feedback table
 CREATE TABLE merchant_feedback (
   merchant_feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -143,8 +131,11 @@ CREATE INDEX idx_webhook_delivery_logs_webhook_id ON webhook_delivery_logs(webho
 CREATE TABLE api_rate_limits (
     rate_limit_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     api_key_id UUID NOT NULL REFERENCES api_keys(key_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     endpoint VARCHAR(255) NOT NULL,
-    requests_count INT NOT NULL DEFAULT 0,
+    requests_limit INT NOT NULL,
+    time_window INTERVAL NOT NULL,
+    current_usage INT NOT NULL DEFAULT 0,
     last_reset_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (api_key_id, endpoint)
 );
