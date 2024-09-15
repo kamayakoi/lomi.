@@ -67,7 +67,6 @@ export type Database = {
           created_at: string
           expiration_date: string | null
           is_active: boolean
-          key_id: string
           last_used_at: string | null
           name: string
           organization_id: string
@@ -78,7 +77,6 @@ export type Database = {
           created_at?: string
           expiration_date?: string | null
           is_active?: boolean
-          key_id?: string
           last_used_at?: string | null
           name: string
           organization_id: string
@@ -89,7 +87,6 @@ export type Database = {
           created_at?: string
           expiration_date?: string | null
           is_active?: boolean
-          key_id?: string
           last_used_at?: string | null
           name?: string
           organization_id?: string
@@ -105,43 +102,119 @@ export type Database = {
           },
         ]
       }
-      api_usage: {
+      api_rate_limits: {
         Row: {
-          api_key_id: string
-          created_at: string
+          api_key: string
+          current_usage: number
           endpoint: string
-          last_request_at: string
-          request_count: number
-          updated_at: string
-          usage_id: string
+          last_reset_at: string
+          organization_id: string
+          requests_limit: number
+          time_window: unknown
         }
         Insert: {
-          api_key_id: string
-          created_at?: string
+          api_key: string
+          current_usage?: number
           endpoint: string
-          last_request_at?: string
-          request_count?: number
-          updated_at?: string
-          usage_id?: string
+          last_reset_at?: string
+          organization_id: string
+          requests_limit: number
+          time_window: unknown
         }
         Update: {
-          api_key_id?: string
-          created_at?: string
+          api_key?: string
+          current_usage?: number
           endpoint?: string
-          last_request_at?: string
-          request_count?: number
-          updated_at?: string
-          usage_id?: string
+          last_reset_at?: string
+          organization_id?: string
+          requests_limit?: number
+          time_window?: unknown
         }
         Relationships: [
           {
-            foreignKeyName: "api_usage_api_key_id_fkey"
-            columns: ["api_key_id"]
+            foreignKeyName: "api_rate_limits_organization_id_fkey"
+            columns: ["organization_id"]
             isOneToOne: false
-            referencedRelation: "api_keys"
-            referencedColumns: ["key_id"]
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
           },
         ]
+      }
+      api_usage: {
+        Row: {
+          api_key: string
+          endpoint: string
+          ip_address: string | null
+          last_request_at: string
+          organization_id: string
+          request_count: number
+          request_method: string | null
+          response_status: number | null
+          response_time: number | null
+        }
+        Insert: {
+          api_key: string
+          endpoint: string
+          ip_address?: string | null
+          last_request_at?: string
+          organization_id: string
+          request_count?: number
+          request_method?: string | null
+          response_status?: number | null
+          response_time?: number | null
+        }
+        Update: {
+          api_key?: string
+          endpoint?: string
+          ip_address?: string | null
+          last_request_at?: string
+          organization_id?: string
+          request_count?: number
+          request_method?: string | null
+          response_status?: number | null
+          response_time?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_usage_api_key_fkey"
+            columns: ["api_key"]
+            isOneToOne: true
+            referencedRelation: "api_keys"
+            referencedColumns: ["api_key"]
+          },
+          {
+            foreignKeyName: "api_usage_organization_id_api_key_fkey"
+            columns: ["organization_id", "api_key"]
+            isOneToOne: false
+            referencedRelation: "api_keys"
+            referencedColumns: ["organization_id", "api_key"]
+          },
+          {
+            foreignKeyName: "api_usage_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      cache_entries: {
+        Row: {
+          cache_key: string
+          cache_value: Json
+          expires_at: string
+        }
+        Insert: {
+          cache_key: string
+          cache_value: Json
+          expires_at: string
+        }
+        Update: {
+          cache_key?: string
+          cache_value?: Json
+          expires_at?: string
+        }
+        Relationships: []
       }
       currencies: {
         Row: {
@@ -157,6 +230,85 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      customer_api_interactions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          interaction_id: string
+          organization_id: string
+          request_method: string
+          request_payload: Json | null
+          response_payload: Json | null
+          response_status: number | null
+          response_time: number | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          interaction_id?: string
+          organization_id: string
+          request_method: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_status?: number | null
+          response_time?: number | null
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          interaction_id?: string
+          organization_id?: string
+          request_method?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          response_status?: number | null
+          response_time?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_api_interactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      customer_feedback: {
+        Row: {
+          created_at: string
+          customer_feedback_id: string
+          customer_id: string
+          feedback_type: string
+          message: string
+          status: Database["public"]["Enums"]["feedback_status"]
+        }
+        Insert: {
+          created_at?: string
+          customer_feedback_id?: string
+          customer_id: string
+          feedback_type: string
+          message: string
+          status?: Database["public"]["Enums"]["feedback_status"]
+        }
+        Update: {
+          created_at?: string
+          customer_feedback_id?: string
+          customer_id?: string
+          feedback_type?: string
+          message?: string
+          status?: Database["public"]["Enums"]["feedback_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_feedback_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["customer_id"]
+          },
+        ]
       }
       customer_invoices: {
         Row: {
@@ -301,6 +453,9 @@ export type Database = {
       }
       customers: {
         Row: {
+          address: string | null
+          city: string | null
+          country: string | null
           created_at: string
           customer_id: string
           email: string | null
@@ -309,9 +464,13 @@ export type Database = {
           name: string
           organization_id: string
           phone_number: string | null
+          postal_code: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           customer_id?: string
           email?: string | null
@@ -320,9 +479,13 @@ export type Database = {
           name: string
           organization_id: string
           phone_number?: string | null
+          postal_code?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           customer_id?: string
           email?: string | null
@@ -331,6 +494,7 @@ export type Database = {
           name?: string
           organization_id?: string
           phone_number?: string | null
+          postal_code?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -492,6 +656,33 @@ export type Database = {
           },
         ]
       }
+      error_logs: {
+        Row: {
+          context: Json | null
+          created_at: string
+          error_id: string
+          error_message: string
+          error_type: string
+          stack_trace: string | null
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          error_id?: string
+          error_message: string
+          error_type: string
+          stack_trace?: string | null
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          error_id?: string
+          error_message?: string
+          error_type?: string
+          stack_trace?: string | null
+        }
+        Relationships: []
+      }
       fees: {
         Row: {
           created_at: string
@@ -547,18 +738,11 @@ export type Database = {
             referencedColumns: ["code"]
           },
           {
-            foreignKeyName: "fees_payment_method_code_fkey"
-            columns: ["payment_method_code"]
+            foreignKeyName: "fees_payment_method_code_provider_code_fkey"
+            columns: ["payment_method_code", "provider_code"]
             isOneToOne: false
             referencedRelation: "payment_methods"
-            referencedColumns: ["payment_method_code"]
-          },
-          {
-            foreignKeyName: "fees_provider_code_fkey"
-            columns: ["provider_code"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["code"]
+            referencedColumns: ["payment_method_code", "provider_code"]
           },
         ]
       }
@@ -755,24 +939,24 @@ export type Database = {
       merchant_feedback: {
         Row: {
           created_at: string
-          feedback_id: string
           feedback_type: string
+          merchant_feedback_id: string
           merchant_id: string
           message: string
           status: Database["public"]["Enums"]["feedback_status"]
         }
         Insert: {
           created_at?: string
-          feedback_id?: string
           feedback_type: string
+          merchant_feedback_id?: string
           merchant_id: string
           message: string
           status?: Database["public"]["Enums"]["feedback_status"]
         }
         Update: {
           created_at?: string
-          feedback_id?: string
           feedback_type?: string
+          merchant_feedback_id?: string
           merchant_id?: string
           message?: string
           status?: Database["public"]["Enums"]["feedback_status"]
@@ -922,6 +1106,7 @@ export type Database = {
         Row: {
           created_at: string
           expires_at: string
+          ip_address: string | null
           merchant_id: string
           session_data: Json | null
           session_id: string
@@ -929,6 +1114,7 @@ export type Database = {
         Insert: {
           created_at?: string
           expires_at: string
+          ip_address?: string | null
           merchant_id: string
           session_data?: Json | null
           session_id?: string
@@ -936,6 +1122,7 @@ export type Database = {
         Update: {
           created_at?: string
           expires_at?: string
+          ip_address?: string | null
           merchant_id?: string
           session_data?: Json | null
           session_id?: string
@@ -1252,7 +1439,6 @@ export type Database = {
           is_deleted: boolean
           metadata: Json | null
           name: string
-          notification_preferences: Json | null
           organization_id: string
           phone_number: string
           status: Database["public"]["Enums"]["organization_status"]
@@ -1273,7 +1459,6 @@ export type Database = {
           is_deleted?: boolean
           metadata?: Json | null
           name: string
-          notification_preferences?: Json | null
           organization_id?: string
           phone_number: string
           status?: Database["public"]["Enums"]["organization_status"]
@@ -1294,7 +1479,6 @@ export type Database = {
           is_deleted?: boolean
           metadata?: Json | null
           name?: string
-          notification_preferences?: Json | null
           organization_id?: string
           phone_number?: string
           status?: Database["public"]["Enums"]["organization_status"]
@@ -1308,23 +1492,186 @@ export type Database = {
         }
         Relationships: []
       }
+      pages: {
+        Row: {
+          content: Json
+          created_at: string
+          description: string | null
+          is_active: boolean
+          merchant_id: string
+          organization_id: string
+          page_id: string
+          slug: string
+          theme: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          merchant_id: string
+          organization_id: string
+          page_id?: string
+          slug: string
+          theme?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          merchant_id?: string
+          organization_id?: string
+          page_id?: string
+          slug?: string
+          theme?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pages_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "pages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
+      payment_links: {
+        Row: {
+          billing_cycles: number | null
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          expires_at: string | null
+          frequency: Database["public"]["Enums"]["frequency"] | null
+          is_active: boolean
+          link_id: string
+          merchant_id: string
+          metadata: Json | null
+          organization_id: string
+          page_id: string | null
+          price: number | null
+          private_description: string | null
+          product_id: string | null
+          public_description: string | null
+          subscription_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          billing_cycles?: number | null
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          expires_at?: string | null
+          frequency?: Database["public"]["Enums"]["frequency"] | null
+          is_active?: boolean
+          link_id?: string
+          merchant_id: string
+          metadata?: Json | null
+          organization_id: string
+          page_id?: string | null
+          price?: number | null
+          private_description?: string | null
+          product_id?: string | null
+          public_description?: string | null
+          subscription_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          billing_cycles?: number | null
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          expires_at?: string | null
+          frequency?: Database["public"]["Enums"]["frequency"] | null
+          is_active?: boolean
+          link_id?: string
+          merchant_id?: string
+          metadata?: Json | null
+          organization_id?: string
+          page_id?: string | null
+          price?: number | null
+          private_description?: string | null
+          product_id?: string | null
+          public_description?: string | null
+          subscription_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_links_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: false
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "payment_links_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "payment_links_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "payment_links_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "pages"
+            referencedColumns: ["page_id"]
+          },
+          {
+            foreignKeyName: "payment_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "merchant_products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "payment_links_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "customer_subscriptions"
+            referencedColumns: ["subscription_id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           created_at: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          provider_code: Database["public"]["Enums"]["provider_code"] | null
+          provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at: string
         }
         Insert: {
           created_at?: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          provider_code?: Database["public"]["Enums"]["provider_code"] | null
+          provider_code: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
         }
         Update: {
           created_at?: string
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
-          provider_code?: Database["public"]["Enums"]["provider_code"] | null
+          provider_code?: Database["public"]["Enums"]["provider_code"]
           updated_at?: string
         }
         Relationships: [
@@ -1412,101 +1759,63 @@ export type Database = {
       }
       platform_balance: {
         Row: {
-          balance: number
-          created_at: string
+          available_balance: number
+          balance_id: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          total_fees: number
-          total_revenue: number
-          total_transactions: number
-          updated_at: string
+          last_updated_at: string
+          pending_balance: number
+          total_balance: number
         }
         Insert: {
-          balance?: number
-          created_at?: string
+          available_balance?: number
+          balance_id?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          total_fees?: number
-          total_revenue?: number
-          total_transactions?: number
-          updated_at?: string
+          last_updated_at?: string
+          pending_balance?: number
+          total_balance?: number
         }
         Update: {
-          balance?: number
-          created_at?: string
+          available_balance?: number
+          balance_id?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          total_fees?: number
-          total_revenue?: number
-          total_transactions?: number
-          updated_at?: string
+          last_updated_at?: string
+          pending_balance?: number
+          total_balance?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "platform_balance_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: true
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-        ]
+        Relationships: []
       }
       platform_payouts: {
         Row: {
           amount: number
+          completed_at: string | null
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          from_account_id: string
-          from_main_account_id: string
           organization_id: string
-          payout_details: Json | null
           payout_id: string
-          payout_method: string
-          updated_at: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          status: Database["public"]["Enums"]["payout_status"]
         }
         Insert: {
           amount: number
+          completed_at?: string | null
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          from_account_id: string
-          from_main_account_id: string
           organization_id: string
-          payout_details?: Json | null
           payout_id?: string
-          payout_method: string
-          updated_at?: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          status?: Database["public"]["Enums"]["payout_status"]
         }
         Update: {
           amount?: number
+          completed_at?: string | null
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          from_account_id?: string
-          from_main_account_id?: string
           organization_id?: string
-          payout_details?: Json | null
           payout_id?: string
-          payout_method?: string
-          updated_at?: string
+          provider_code?: Database["public"]["Enums"]["provider_code"]
+          status?: Database["public"]["Enums"]["payout_status"]
         }
         Relationships: [
-          {
-            foreignKeyName: "platform_payouts_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "platform_payouts_from_account_id_fkey"
-            columns: ["from_account_id"]
-            isOneToOne: false
-            referencedRelation: "accounts"
-            referencedColumns: ["account_id"]
-          },
-          {
-            foreignKeyName: "platform_payouts_from_main_account_id_fkey"
-            columns: ["from_main_account_id"]
-            isOneToOne: false
-            referencedRelation: "main_accounts"
-            referencedColumns: ["main_account_id"]
-          },
           {
             foreignKeyName: "platform_payouts_organization_id_fkey"
             columns: ["organization_id"]
@@ -1516,59 +1825,26 @@ export type Database = {
           },
         ]
       }
-      platform_provider_balances: {
+      platform_provider_balance: {
         Row: {
           balance: number
-          balance_id: string
-          created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at: string | null
+          last_updated_at: string
           provider_code: Database["public"]["Enums"]["provider_code"]
-          total_fees: number
-          total_revenue: number
-          total_transactions: number
-          updated_at: string
         }
         Insert: {
           balance?: number
-          balance_id?: string
-          created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
+          last_updated_at?: string
           provider_code: Database["public"]["Enums"]["provider_code"]
-          total_fees?: number
-          total_revenue?: number
-          total_transactions?: number
-          updated_at?: string
         }
         Update: {
           balance?: number
-          balance_id?: string
-          created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_transaction_at?: string | null
+          last_updated_at?: string
           provider_code?: Database["public"]["Enums"]["provider_code"]
-          total_fees?: number
-          total_revenue?: number
-          total_transactions?: number
-          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "platform_provider_balances_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "platform_provider_balances_provider_code_fkey"
-            columns: ["provider_code"]
-            isOneToOne: false
-            referencedRelation: "providers"
-            referencedColumns: ["code"]
-          },
-        ]
+        Relationships: []
       }
       providers: {
         Row: {
@@ -1633,6 +1909,7 @@ export type Database = {
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           payment_type: Database["public"]["Enums"]["recurring_transaction_type"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
           recurring_transaction_id: string
           retry_payment_every: number | null
           start_date: string
@@ -1658,6 +1935,7 @@ export type Database = {
           organization_id: string
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           payment_type: Database["public"]["Enums"]["recurring_transaction_type"]
+          provider_code: Database["public"]["Enums"]["provider_code"]
           recurring_transaction_id?: string
           retry_payment_every?: number | null
           start_date: string
@@ -1683,6 +1961,7 @@ export type Database = {
           organization_id?: string
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
           payment_type?: Database["public"]["Enums"]["recurring_transaction_type"]
+          provider_code?: Database["public"]["Enums"]["provider_code"]
           recurring_transaction_id?: string
           retry_payment_every?: number | null
           start_date?: string
@@ -1714,11 +1993,11 @@ export type Database = {
             referencedColumns: ["organization_id"]
           },
           {
-            foreignKeyName: "recurring_transactions_payment_method_code_fkey"
-            columns: ["payment_method_code"]
+            foreignKeyName: "recurring_transactions_payment_method_code_provider_code_fkey"
+            columns: ["payment_method_code", "provider_code"]
             isOneToOne: false
             referencedRelation: "payment_methods"
-            referencedColumns: ["payment_method_code"]
+            referencedColumns: ["payment_method_code", "provider_code"]
           },
         ]
       }
@@ -1775,6 +2054,7 @@ export type Database = {
           customer_id: string | null
           merchant_id: string
           message: string
+          organization_id: string | null
           resolution_date: string | null
           resolution_details: string | null
           status: Database["public"]["Enums"]["ticket_status"]
@@ -1785,6 +2065,7 @@ export type Database = {
           customer_id?: string | null
           merchant_id: string
           message: string
+          organization_id?: string | null
           resolution_date?: string | null
           resolution_details?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
@@ -1795,6 +2076,7 @@ export type Database = {
           customer_id?: string | null
           merchant_id?: string
           message?: string
+          organization_id?: string | null
           resolution_date?: string | null
           resolution_details?: string | null
           status?: Database["public"]["Enums"]["ticket_status"]
@@ -1814,6 +2096,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "merchants"
             referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "support_tickets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
           },
         ]
       }
@@ -1915,11 +2204,11 @@ export type Database = {
             referencedColumns: ["organization_id"]
           },
           {
-            foreignKeyName: "transactions_payment_method_code_fkey"
-            columns: ["payment_method_code"]
+            foreignKeyName: "transactions_payment_method_code_provider_code_fkey"
+            columns: ["payment_method_code", "provider_code"]
             isOneToOne: false
             referencedRelation: "payment_methods"
-            referencedColumns: ["payment_method_code"]
+            referencedColumns: ["payment_method_code", "provider_code"]
           },
           {
             foreignKeyName: "transactions_provider_code_fkey"
@@ -1982,59 +2271,97 @@ export type Database = {
           },
         ]
       }
-      ui_configuration: {
+      webhook_delivery_logs: {
         Row: {
-          config_name: string
-          config_value: Json | null
           created_at: string
-          updated_at: string
+          delivery_time: number | null
+          log_id: string
+          payload: Json | null
+          response_body: string | null
+          response_status: number | null
+          webhook_id: string
         }
         Insert: {
-          config_name: string
-          config_value?: Json | null
           created_at?: string
-          updated_at?: string
+          delivery_time?: number | null
+          log_id?: string
+          payload?: Json | null
+          response_body?: string | null
+          response_status?: number | null
+          webhook_id: string
         }
         Update: {
-          config_name?: string
-          config_value?: Json | null
           created_at?: string
-          updated_at?: string
+          delivery_time?: number | null
+          log_id?: string
+          payload?: Json | null
+          response_body?: string | null
+          response_status?: number | null
+          webhook_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "webhook_delivery_logs_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["webhook_id"]
+          },
+        ]
       }
       webhooks: {
         Row: {
+          cache_expiry: string | null
+          cache_key: string | null
           created_at: string
           events: string[]
           is_active: boolean
+          last_response_status: number | null
+          last_response_time: number | null
           last_triggered_at: string | null
           merchant_id: string
           metadata: Json | null
+          next_retry_at: string | null
+          organization_id: string
+          retry_count: number | null
           secret: string | null
           updated_at: string
           url: string
           webhook_id: string
         }
         Insert: {
+          cache_expiry?: string | null
+          cache_key?: string | null
           created_at?: string
           events: string[]
           is_active?: boolean
+          last_response_status?: number | null
+          last_response_time?: number | null
           last_triggered_at?: string | null
           merchant_id: string
           metadata?: Json | null
+          next_retry_at?: string | null
+          organization_id: string
+          retry_count?: number | null
           secret?: string | null
           updated_at?: string
           url: string
           webhook_id?: string
         }
         Update: {
+          cache_expiry?: string | null
+          cache_key?: string | null
           created_at?: string
           events?: string[]
           is_active?: boolean
+          last_response_status?: number | null
+          last_response_time?: number | null
           last_triggered_at?: string | null
           merchant_id?: string
           metadata?: Json | null
+          next_retry_at?: string | null
+          organization_id?: string
+          retry_count?: number | null
           secret?: string | null
           updated_at?: string
           url?: string
@@ -2047,6 +2374,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "merchants"
             referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "webhooks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
           },
         ]
       }
@@ -2117,7 +2451,7 @@ export type Database = {
       dispute_status: "open" | "under_review" | "resolved" | "closed"
       entity_type: "merchant" | "organization" | "platform"
       entry_type: "debit" | "credit"
-      feedback_status: "open" | "in_progress" | "resolved" | "closed"
+      feedback_status: "open" | "reviewed" | "implemented" | "closed"
       frequency:
         | "daily"
         | "weekly"
@@ -2150,6 +2484,7 @@ export type Database = {
         | "E_WALLET"
         | "QR_CODE"
         | "USSD"
+        | "PARTNER"
       payout_status: "pending" | "processing" | "completed" | "failed"
       provider_code:
         | "ORANGE"
@@ -2159,6 +2494,7 @@ export type Database = {
         | "STRIPE"
         | "PAYPAL"
         | "LOMI"
+        | "PARTNER"
       recurring_transaction_status:
         | "active"
         | "paused"
@@ -2178,7 +2514,12 @@ export type Database = {
         | "cancelled"
       ticket_status: "open" | "in_progress" | "resolved" | "closed"
       transaction_status: "pending" | "completed" | "failed" | "refunded"
-      transaction_type: "payment" | "refund" | "transfer" | "payout"
+      transaction_type:
+        | "payment"
+        | "refund"
+        | "transfer"
+        | "subscription"
+        | "payout"
       transfer_status:
         | "pending"
         | "processing"

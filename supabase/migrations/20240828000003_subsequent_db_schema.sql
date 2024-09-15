@@ -163,3 +163,56 @@ CREATE TABLE error_logs (
 
 CREATE INDEX idx_error_logs_error_type ON error_logs(error_type);
 CREATE INDEX idx_error_logs_created_at ON error_logs(created_at);
+
+
+-- Pages table
+CREATE TABLE pages (
+    page_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    slug VARCHAR(255) NOT NULL,
+    content JSONB NOT NULL,
+    theme VARCHAR(50),
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (merchant_id, slug)
+);
+
+CREATE INDEX idx_pages_merchant_id ON pages(merchant_id);
+CREATE INDEX idx_pages_organization_id ON pages(organization_id);
+CREATE INDEX idx_pages_slug ON pages(slug);
+
+COMMENT ON TABLE pages IS 'Stores custom checkout pages created by merchants';
+
+-- Payment Links table (updated version)
+CREATE TABLE payment_links (
+    link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    page_id UUID REFERENCES pages(page_id),
+    product_id UUID REFERENCES merchant_products(product_id),
+    subscription_id UUID REFERENCES customer_subscriptions(subscription_id),
+    title VARCHAR(255) NOT NULL,
+    public_description TEXT,
+    private_description TEXT,
+    price NUMERIC(10,2),
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    frequency frequency,
+    billing_cycles INT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    expires_at TIMESTAMPTZ,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_payment_links_merchant_id ON payment_links(merchant_id);
+CREATE INDEX idx_payment_links_organization_id ON payment_links(organization_id);
+CREATE INDEX idx_payment_links_page_id ON payment_links(page_id);
+CREATE INDEX idx_payment_links_product_id ON payment_links(product_id);
+CREATE INDEX idx_payment_links_subscription_id ON payment_links(subscription_id);
+
+COMMENT ON TABLE payment_links IS 'Stores payment links for one-time payments, subscriptions, and instant links';

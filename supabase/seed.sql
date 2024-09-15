@@ -338,28 +338,28 @@ VALUES
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'light', 'en', '{"email": true, "sms": true}');
 
 -- Merchant Sessions table
-INSERT INTO merchant_sessions (merchant_id, session_data, expires_at)
+INSERT INTO merchant_sessions (merchant_id, session_data, ip_address, expires_at)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"user_agent": "Mozilla/5.0"}', NOW() + INTERVAL '1 day'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"user_agent": "Chrome/93.0.4577.82"}', NOW() + INTERVAL '1 day');
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"user_agent": "Mozilla/5.0"}', '192.168.1.1', NOW() + INTERVAL '1 day'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"user_agent": "Chrome/93.0.4577.82"}', '10.0.0.1', NOW() + INTERVAL '1 day');
 
 -- Merchant Feedback table
-INSERT INTO merchant_feedback (merchant_id, feedback_type, message)
+INSERT INTO merchant_feedback (merchant_id, feedback_type, message, status)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bug', 'The dashboard is not loading properly'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'feature_request', 'Please add support for more payment methods');
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bug', 'The dashboard is not loading properly', 'open'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'feature_request', 'Please add support for more payment methods', 'open');
 
 -- Customer Feedback table
-INSERT INTO customer_feedback (customer_id, feedback_type, message)
+INSERT INTO customer_feedback (customer_id, feedback_type, message, status)
 VALUES
-  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'complaint', 'The payment failed but I was still charged'),
-  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'suggestion', 'The checkout process could be more user-friendly');
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'complaint', 'The payment failed but I was still charged', 'open'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'suggestion', 'The checkout process could be more user-friendly', 'open');
 
 -- Support Tickets table
-INSERT INTO support_tickets (merchant_id, customer_id, message)
+INSERT INTO support_tickets (merchant_id, customer_id, organization_id, message, status)
 VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'I need help with a refund request'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'I have a question about my subscription');
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), '11111111-1111-1111-1111-111111111111', 'I need help with a refund request', 'open'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), '22222222-2222-2222-2222-222222222222', 'I have a question about my subscription', 'open');
 
 -- Customer API Interactions table
 INSERT INTO customer_api_interactions (organization_id, endpoint, request_method, request_payload, response_status, response_payload, response_time)
@@ -391,29 +391,24 @@ VALUES
   ('API_ERROR', 'Invalid API key', 'Error: Invalid API key\n    at validateApiKey (/app/src/middleware/auth.ts:25:7)\n    at processRequest (/app/src/server.ts:45:3)', '{"ip": "192.168.1.100", "endpoint": "/v1/transactions"}'),
   ('WEBHOOK_DELIVERY_FAILURE', 'Connection timeout', 'Error: Connection timeout\n    at sendWebhook (/app/src/services/webhook.ts:67:9)\n    at processEvent (/app/src/workers/eventProcessor.ts:32:5)', '{"webhookId": "12345678-1234-1234-1234-123456789abc", "attempt": 3}');
 
--- Customer Subscriptions table
-INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, next_billing_date, billing_frequency, amount, currency_code, metadata)
+INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, billing_frequency, amount, currency_code)
 VALUES
   ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
    (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger'),
    'active',
    CURRENT_DATE,
    CURRENT_DATE + INTERVAL '1 year',
-   CURRENT_DATE + INTERVAL '1 month',
    'monthly',
    9999.00,
-   'XOF',
-   '{"auto_renew": true}'),
+   'XOF'),
   ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
    (SELECT product_id FROM merchant_products WHERE name = 'Enterprise Comms'),
    'active',
    CURRENT_DATE,
    CURRENT_DATE + INTERVAL '1 year',
-   CURRENT_DATE + INTERVAL '1 month',
    'monthly',
    199.99,
-   'USD',
-   '{"auto_renew": true}');
+   'USD');
 
 -- Internal Transfers table
 INSERT INTO internal_transfers (from_account_id, to_main_account_id, amount, currency_code, status)
@@ -460,3 +455,16 @@ VALUES
    (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'),
    100.00,
    'pending');
+
+   -- Pages table
+INSERT INTO pages (merchant_id, organization_id, title, description, slug, content, theme, is_active)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Premium Ledger Checkout', 'Checkout page for Premium Ledger subscription', 'premium-ledger-checkout', '{"header": "Premium Ledger Subscription", "description": "Get access to our advanced ledger service", "button_text": "Subscribe Now"}', 'default', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Enterprise Comms Checkout', 'Checkout page for Enterprise Comms package', 'enterprise-comms-checkout', '{"header": "Enterprise Communications Package", "description": "Streamline your business communications", "button_text": "Get Started"}', 'corporate', true);
+
+-- Payment Links table
+INSERT INTO payment_links (merchant_id, organization_id, page_id, product_id, subscription_id, title, public_description, private_description, price, currency_code, frequency, billing_cycles, is_active, expires_at, metadata)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', (SELECT page_id FROM pages WHERE slug = 'premium-ledger-checkout' LIMIT 1), (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger' LIMIT 1), NULL, 'Buy Premium Ledger', 'Get access to our advanced ledger service', 'Product-linked payment link for Premium Ledger', 9999.00, 'XOF', 'monthly', NULL, true, NULL, '{"product_type": "software"}'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', (SELECT page_id FROM pages WHERE slug = 'enterprise-comms-checkout' LIMIT 1), NULL, (SELECT subscription_id FROM customer_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE email = 'jane@example.com' LIMIT 1) LIMIT 1), 'Subscribe to Enterprise Comms', 'Get our enterprise communication package', 'Subscription-linked payment link for Enterprise Comms', 199.99, 'USD', 'monthly', 12, true, NULL, '{"subscription_type": "business"}'),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', NULL, NULL, NULL, 'Donate to Our Cause', 'Support our mission with a one-time donation', 'Instant payment link for donations', NULL, 'XOF', NULL, NULL, true, CURRENT_DATE + INTERVAL '30 days', '{"min_amount": 1000, "max_amount": 100000, "cause": "charity"}');
