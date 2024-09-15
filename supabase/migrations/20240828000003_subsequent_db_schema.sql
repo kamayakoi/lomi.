@@ -115,6 +115,8 @@ CREATE TABLE customer_api_interactions (
 
 CREATE INDEX idx_customer_api_interactions_organization_id ON customer_api_interactions(organization_id);
 
+COMMENT ON TABLE customer_api_interactions IS 'Logs customer interactions with the API for debugging and analysis';
+
 -- Webhook Delivery Logs table
 CREATE TABLE webhook_delivery_logs (
     log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -127,6 +129,8 @@ CREATE TABLE webhook_delivery_logs (
 );
 
 CREATE INDEX idx_webhook_delivery_logs_webhook_id ON webhook_delivery_logs(webhook_id);
+
+COMMENT ON TABLE webhook_delivery_logs IS 'Tracks the delivery status and details of webhook notifications';
 
 -- API Rate Limits table
 CREATE TABLE api_rate_limits (
@@ -142,6 +146,9 @@ CREATE TABLE api_rate_limits (
 
 CREATE INDEX idx_api_rate_limits_organization_id ON api_rate_limits(organization_id);
 
+COMMENT ON TABLE api_rate_limits IS 'Stores rate limiting information for API endpoints per organization and API key';
+
+
 -- Cache Entries table
 CREATE TABLE cache_entries (
     cache_key VARCHAR(255) PRIMARY KEY,
@@ -150,6 +157,8 @@ CREATE TABLE cache_entries (
 );
 
 CREATE INDEX idx_cache_entries_expires_at ON cache_entries(expires_at);
+
+COMMENT ON TABLE cache_entries IS 'Stores cached data with expiration times for improved performance';
 
 -- Error Logs table
 CREATE TABLE error_logs (
@@ -163,6 +172,8 @@ CREATE TABLE error_logs (
 
 CREATE INDEX idx_error_logs_error_type ON error_logs(error_type);
 CREATE INDEX idx_error_logs_created_at ON error_logs(created_at);
+
+COMMENT ON TABLE error_logs IS 'Records system errors for debugging and monitoring purposes';
 
 
 -- Pages table

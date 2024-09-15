@@ -612,6 +612,8 @@ CREATE INDEX idx_api_usage_organization_id ON api_usage(organization_id);
 CREATE INDEX idx_api_usage_api_key ON api_usage(api_key);
 CREATE INDEX idx_api_usage_last_request_at ON api_usage(last_request_at);
 
+COMMENT ON TABLE api_usage IS 'Tracks API usage statistics for each organization and API key';
+
 
 -- Webhooks table
 CREATE TABLE webhooks (
