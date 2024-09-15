@@ -37,7 +37,7 @@ CREATE TABLE merchants (
   country VARCHAR,
   metadata JSONB,
   avatar_url TEXT,
-  preferred_language VARCHAR(5),
+  preferred_language VARCHAR(10),
   referral_code VARCHAR,
   mrr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   arr NUMERIC(15,2) NOT NULL DEFAULT 0.00,

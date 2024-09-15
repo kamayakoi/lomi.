@@ -457,10 +457,10 @@ export const employeeRanges = [
 ];
 
 export const languages = [
-  'en',
-  'fr',
-  'ar',
-  'zh',
-  'wo',
-  'ha'
+  'English',
+  'French',
+  'Arabic',
+  'Chinese',
+  'Wolof',
+  'Hausa',
 ];

@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { cn } from '@/lib/utils';
-import { countryCodes, countries, roles, employeeRanges, industries } from '@/data/onboarding';
+import { countryCodes, countries, employeeRanges, industries, organizationPositions, languages } from '@/data/onboarding';
 // import { config } from '@/utils/config';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
@@ -31,6 +31,7 @@ const onboardingFormSchema = z.object({
     orgIndustry: z.string().min(1, 'Industry is required'),
     orgWebsite: z.string().url('Invalid website URL').optional().or(z.literal('')),
     orgEmployees: z.string().min(1, 'Number of employees is required'),
+    orgDefaultLanguage: z.string().min(1, 'Default language is required')
 });
 
 type OnboardingFormData = z.infer<typeof onboardingFormSchema>;
@@ -48,6 +49,7 @@ const NewOnboarding: React.FC = () => {
         mode: 'onChange',
         defaultValues: {
             countryCode: '+225',
+            orgDefaultLanguage: 'English'
         }
     });
 
@@ -142,7 +144,8 @@ const NewOnboarding: React.FC = () => {
                 p_org_address: formData.orgAddress,
                 p_org_postal_code: formData.orgPostalCode,
                 p_org_industry: formData.orgIndustry,
-                p_org_website_url: websiteUrl
+                p_org_website_url: websiteUrl,
+                p_org_default_language: formData.orgDefaultLanguage
             });
 
             if (error) {
@@ -334,9 +337,9 @@ const NewOnboarding: React.FC = () => {
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                             )}
                                         >
-                                            {roles.map((role) => (
-                                                <option key={role} value={role}>
-                                                    {role}
+                                            {organizationPositions.map((orgRole) => (
+                                                <option key={orgRole} value={orgRole}>
+                                                    {orgRole}
                                                 </option>
                                             ))}
                                         </select>
@@ -484,6 +487,25 @@ const NewOnboarding: React.FC = () => {
                                             ))}
                                         </select>
                                         {onboardingForm.formState.errors.orgEmployees && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmployees.message}</p>}
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Default Language<span className="text-red-500">*</span></Label>
+                                        <select
+                                            id="orgDefaultLanguage"
+                                            {...onboardingForm.register("orgDefaultLanguage")}
+                                            className={cn(
+                                                "p-2 border rounded-md w-full",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            )}
+                                        >
+                                            {languages.map((language) => (
+                                                <option key={language} value={language}>
+                                                    {language}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {onboardingForm.formState.errors.orgDefaultLanguage && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDefaultLanguage.message}</p>}
                                     </div>
                                 </div>
                             </div>
