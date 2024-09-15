@@ -977,6 +977,7 @@ export type Database = {
           merchant_id: string
           merchant_org_id: string
           organization_id: string
+          organization_position: string | null
           role: string
         }
         Insert: {
@@ -984,6 +985,7 @@ export type Database = {
           merchant_id: string
           merchant_org_id?: string
           organization_id: string
+          organization_position?: string | null
           role: string
         }
         Update: {
@@ -991,6 +993,7 @@ export type Database = {
           merchant_id?: string
           merchant_org_id?: string
           organization_id?: string
+          organization_position?: string | null
           role?: string
         }
         Relationships: [
@@ -1145,7 +1148,6 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           email: string
-          is_admin: boolean
           is_deleted: boolean
           merchant_id: string
           merchant_lifetime_value: number
@@ -1156,6 +1158,7 @@ export type Database = {
           phone_number: string | null
           preferred_language: string | null
           referral_code: string | null
+          timezone: string
           updated_at: string
           verified: boolean
         }
@@ -1166,7 +1169,6 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email: string
-          is_admin?: boolean
           is_deleted?: boolean
           merchant_id?: string
           merchant_lifetime_value?: number
@@ -1177,6 +1179,7 @@ export type Database = {
           phone_number?: string | null
           preferred_language?: string | null
           referral_code?: string | null
+          timezone?: string
           updated_at?: string
           verified?: boolean
         }
@@ -1187,7 +1190,6 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email?: string
-          is_admin?: boolean
           is_deleted?: boolean
           merchant_id?: string
           merchant_lifetime_value?: number
@@ -1198,6 +1200,7 @@ export type Database = {
           phone_number?: string | null
           preferred_language?: string | null
           referral_code?: string | null
+          timezone?: string
           updated_at?: string
           verified?: boolean
         }
@@ -1284,11 +1287,9 @@ export type Database = {
           city: string
           country: string
           created_at: string
-          default_language: string
           organization_id: string
           postal_code: string
           region: string
-          timezone: string
           updated_at: string
         }
         Insert: {
@@ -1296,11 +1297,9 @@ export type Database = {
           city: string
           country: string
           created_at?: string
-          default_language: string
           organization_id: string
           postal_code: string
           region: string
-          timezone?: string
           updated_at?: string
         }
         Update: {
@@ -1308,11 +1307,9 @@ export type Database = {
           city?: string
           country?: string
           created_at?: string
-          default_language?: string
           organization_id?: string
           postal_code?: string
           region?: string
-          timezone?: string
           updated_at?: string
         }
         Relationships: [
@@ -1436,6 +1433,8 @@ export type Database = {
           default_currency: Database["public"]["Enums"]["currency_code"]
           deleted_at: string | null
           email: string
+          employee_number: string | null
+          industry: string | null
           is_deleted: boolean
           metadata: Json | null
           name: string
@@ -1456,6 +1455,8 @@ export type Database = {
           default_currency?: Database["public"]["Enums"]["currency_code"]
           deleted_at?: string | null
           email: string
+          employee_number?: string | null
+          industry?: string | null
           is_deleted?: boolean
           metadata?: Json | null
           name: string
@@ -1476,6 +1477,8 @@ export type Database = {
           default_currency?: Database["public"]["Enums"]["currency_code"]
           deleted_at?: string | null
           email?: string
+          employee_number?: string | null
+          industry?: string | null
           is_deleted?: boolean
           metadata?: Json | null
           name?: string
@@ -2395,12 +2398,17 @@ export type Database = {
           p_phone_number: string
           p_country: string
           p_org_name: string
+          p_org_email: string
+          p_org_phone_number: string
           p_org_country: string
+          p_org_region: string
           p_org_city: string
           p_org_address: string
           p_org_postal_code: string
           p_org_industry: string
           p_org_website_url: string
+          p_org_employee_number: string
+          p_org_default_language: string
         }
         Returns: undefined
       }
@@ -2423,12 +2431,6 @@ export type Database = {
           object_path: string
         }
         Returns: Record<string, unknown>
-      }
-      fetch_organization_name: {
-        Args: {
-          user_id: string
-        }
-        Returns: string
       }
     }
     Enums: {
