@@ -1287,6 +1287,7 @@ export type Database = {
           city: string
           country: string
           created_at: string
+          district: string
           organization_id: string
           postal_code: string
           region: string
@@ -1297,6 +1298,7 @@ export type Database = {
           city: string
           country: string
           created_at?: string
+          district: string
           organization_id: string
           postal_code: string
           region: string
@@ -1307,6 +1309,7 @@ export type Database = {
           city?: string
           country?: string
           created_at?: string
+          district?: string
           organization_id?: string
           postal_code?: string
           region?: string
@@ -2397,18 +2400,19 @@ export type Database = {
           p_merchant_id: string
           p_phone_number: string
           p_country: string
+          p_preferred_language: string
           p_org_name: string
           p_org_email: string
           p_org_phone_number: string
           p_org_country: string
           p_org_region: string
           p_org_city: string
+          p_org_district: string
           p_org_address: string
           p_org_postal_code: string
           p_org_industry: string
           p_org_website_url: string
           p_org_employee_number: string
-          p_org_default_language: string
         }
         Returns: undefined
       }

@@ -19,7 +19,7 @@ const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-
 const onboardingFormSchema = z.object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
-    countryCode: z.string().regex(/^\+\d+$/, 'Invalid country code format'),
+    countryCode: z.string().regex(/^\+\d+$/, 'Country code must start with + followed by numbers'),
     phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
     country: z.string().min(1, 'Country is required'),
     role: z.string().min(1, 'Role is required'),
@@ -32,7 +32,15 @@ const onboardingFormSchema = z.object({
     orgAddress: z.string().min(1, 'Address is required'),
     orgPostalCode: z.string().min(1, 'Postal code is required'),
     orgIndustry: z.string().min(1, 'Industry is required'),
-    orgWebsite: z.string().url('Invalid website URL').optional().or(z.literal('')),
+    orgWebsite: z.string().min(1, 'Website is required').refine((value) => {
+        if (!value) return false; // Don't allow empty string
+        try {
+            new URL(value.startsWith('http') ? value : `https://${value}`);
+            return true;
+        } catch {
+            return false;
+        }
+    }, 'Invalid website URL'),
     orgEmployees: z.string().min(1, 'Number of employees is required'),
     orgDefaultLanguage: z.string().min(1, 'Default language is required')
 });
@@ -153,7 +161,7 @@ const NewOnboarding: React.FC = () => {
                 p_org_industry: formData.orgIndustry,
                 p_org_website_url: websiteUrl,
                 p_org_employee_number: formData.orgEmployees,
-                p_org_default_language: formData.orgDefaultLanguage
+                p_preferred_language: formData.orgDefaultLanguage
             });
 
             if (error) {
@@ -256,6 +264,50 @@ const NewOnboarding: React.FC = () => {
                             </div>
                             <div className="mb-6">
                                 <div className="flex space-x-2">
+                                    <div className="w-1/3">
+                                        <Label htmlFor="countryCode" className="mb-1">Country code<span className="text-red-500">*</span></Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="countryCode"
+                                                type="text"
+                                                placeholder="+225"
+                                                value={countryCodeSearch}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    setCountryCodeSearch(value);
+                                                    onboardingForm.setValue("countryCode", value, { shouldValidate: true });
+                                                    setIsCountryCodeDropdownOpen(true);
+                                                }}
+                                                onFocus={() => setIsCountryCodeDropdownOpen(true)}
+                                                onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
+                                                className={cn(
+                                                    "w-full",
+                                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                )}
+                                            />
+                                            {onboardingForm.formState.errors.countryCode && (
+                                                <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>
+                                            )}
+                                            {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
+                                                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
+                                                    {filteredCountryCodes.map((code: string) => (
+                                                        <li
+                                                            key={code}
+                                                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                            onClick={() => {
+                                                                setCountryCodeSearch(code);
+                                                                onboardingForm.setValue("countryCode", code, { shouldValidate: true });
+                                                                setIsCountryCodeDropdownOpen(false);
+                                                            }}
+                                                        >
+                                                            {code}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
                                     <div className="flex-1">
                                         <Label htmlFor="phoneNumber" className="mb-1">Phone number<span className="text-red-500">*</span></Label>
                                         <Input
@@ -269,46 +321,6 @@ const NewOnboarding: React.FC = () => {
                                             )}
                                         />
                                         {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
-                                    </div>
-                                    <div className="w-1/3">
-                                        <Label htmlFor="countryCode" className="mb-1">Country code<span className="text-red-500">*</span></Label>
-                                        <div className="relative">
-                                            <Input
-                                                id="countryCode"
-                                                type="text"
-                                                placeholder="+225"
-                                                value={countryCodeSearch}
-                                                onChange={(e) => {
-                                                    setCountryCodeSearch(e.target.value);
-                                                    setIsCountryCodeDropdownOpen(true);
-                                                }}
-                                                onFocus={() => setIsCountryCodeDropdownOpen(true)}
-                                                onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
-                                                className={cn(
-                                                    "w-full",
-                                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                )}
-                                            />
-                                            {onboardingForm.formState.errors.countryCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>}
-                                            {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
-                                                    {filteredCountryCodes.map((code: string) => (
-                                                        <li
-                                                            key={code}
-                                                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                            onClick={() => {
-                                                                setCountryCodeSearch(code);
-                                                                onboardingForm.setValue("countryCode", code);
-                                                                setIsCountryCodeDropdownOpen(false);
-                                                            }}
-                                                        >
-                                                            {code}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -537,10 +549,10 @@ const NewOnboarding: React.FC = () => {
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="flex-1">
-                                        <Label htmlFor="orgWebsite" className="mb-1">Website</Label>
+                                        <Label htmlFor="orgWebsite" className="mb-1">Website<span className="text-red-500">*</span></Label>
                                         <Input
                                             id="orgWebsite"
-                                            placeholder="https://www.ashantishoes.com"
+                                            placeholder="example.com"
                                             {...onboardingForm.register("orgWebsite")}
                                             className={cn(
                                                 "w-full",
@@ -548,7 +560,9 @@ const NewOnboarding: React.FC = () => {
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                             )}
                                         />
-                                        {onboardingForm.formState.errors.orgWebsite && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgWebsite.message}</p>}
+                                        {onboardingForm.formState.errors.orgWebsite && (
+                                            <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgWebsite.message}</p>
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <Label htmlFor="orgIndustry" className="mb-1">Industry<span className="text-red-500">*</span></Label>
