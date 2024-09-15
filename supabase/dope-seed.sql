@@ -1,3 +1,33 @@
+-- merchants table
+INSERT INTO merchants (merchant_id, name, email, phone_number, is_admin, onboarded, verified, country, metadata, avatar_url, preferred_language, referral_code, mrr, arr, merchant_lifetime_value)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Babacar Diop', 'babacar@africanledger.com', '+221987654321', true, true, true, 'Senegal', '{"position": "CEO"}', 'https://example.com/babacar.jpg', 'fr', 'AFLED001', 5000.00, 60000.00, 120000.00),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'John Doe', 'john@telnyx.com', '+1987654321', true, true, true, 'United States', '{"position": "CFO"}', 'https://example.com/john.jpg', 'en', 'TELNYX001', 20000.00, 240000.00, 500000.00);
+
+-- organizations table
+INSERT INTO organizations (organization_id, name, email, phone_number, tax_number, website_url, business_platform_url, status, default_currency, total_revenue, total_transactions, total_merchants, total_customers, metadata)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'African Ledger', 'contact@africanledger.com', '+221123456789', 'SN123456789', 'https://africanledger.com', NULL, 'active', 'XOF', 1000000.00, 5000, 100, 1000, '{"industry": "Fintech"}'),
+  ('22222222-2222-2222-2222-222222222222', 'Telnyx', 'contact@telnyx.com', '+1234567890', 'US987654321', 'https://telnyx.com', NULL, 'active', 'USD', 5000000.00, 20000, 500, 5000, '{"industry": "Telecommunications"}');
+
+-- organization addresses table
+INSERT INTO organization_addresses (organization_id, country, region, city, address, postal_code, default_language, timezone)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'Senegal', 'Dakar', 'Dakar', '123 Rue Félix Faure', '12345', 'fr', 'Africa/Dakar'),
+  ('22222222-2222-2222-2222-222222222222', 'United States', 'Illinois', 'Chicago', '311 W Superior Street, Suite 504', '60654', 'en', 'America/Chicago');
+
+-- organization KYC table
+INSERT INTO organization_kyc (organization_id, document_type, document_url, authorized_signatory, status, kyc_submitted_at, kyc_approved_at, uploaded_at, reviewed_at)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'business_registration', 'https://example.com/africanledger_reg.pdf', '{"name": "Babacar Diop", "position": "CEO"}', 'approved', NOW() - INTERVAL '30 days', NOW() - INTERVAL '25 days', NOW() - INTERVAL '30 days', NOW() - INTERVAL '25 days'),
+  ('22222222-2222-2222-2222-222222222222', 'business_registration', 'https://example.com/telnyx_reg.pdf', '{"name": "John Doe", "position": "CFO"}', 'approved', NOW() - INTERVAL '60 days', NOW() - INTERVAL '55 days', NOW() - INTERVAL '60 days', NOW() - INTERVAL '55 days');
+
+-- merchant-organization links table
+INSERT INTO merchant_organization_links (merchant_id, organization_id, role)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'admin'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'admin');
+
 -- Providers table
 INSERT INTO providers (name, code, description)
 VALUES
@@ -27,6 +57,14 @@ VALUES
     ('APPLE_PAY', 'STRIPE'),
     ('GOOGLE_PAY', 'STRIPE');
 
+-- organization-providers settings table
+INSERT INTO organization_providers_settings (organization_id, provider_code, is_connected, phone_number, card_number, complementary_information, bank_account_number, bank_account_name, bank_name, bank_code)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'ORANGE', true, '+221123456789', NULL, '{"api_key": "orange_api_key_123"}', NULL, NULL, NULL, NULL),
+  ('11111111-1111-1111-1111-111111111111', 'WAVE', true, '+221123456789', NULL, '{"api_key": "wave_api_key_123"}', NULL, NULL, NULL, NULL),
+  ('22222222-2222-2222-2222-222222222222', 'STRIPE', true, NULL, '4111111111111111', '{"api_key": "stripe_api_key_123"}', NULL, NULL, NULL, NULL),
+  ('22222222-2222-2222-2222-222222222222', 'PAYPAL', true, NULL, NULL, '{"api_key": "paypal_api_key_123"}', NULL, NULL, NULL, NULL);
+
 -- currencies table
 INSERT INTO currencies (code, name) VALUES
     ('XOF', 'West African CFA franc'),
@@ -44,6 +82,75 @@ INSERT INTO currencies (code, name) VALUES
     ('EUR', 'Euro'),
     ('MRO', 'Mauritanian ouguiya'),
     ('XAF', 'Central African CFA franc');
+
+
+-- customers table
+INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, address, city, country, postal_code, metadata)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Fatou Ndiaye', 'fatou@example.com', '+221555555555', '456 Avenue Léopold Sédar Senghor', 'Dakar', 'Senegal', '12345', '{"preferred_language": "fr"}'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Jane Smith', 'jane@example.com', '+1555555555', '789 Michigan Ave', 'Chicago', 'United States', '60601', '{"preferred_language": "en"}');
+
+-- accounts table
+INSERT INTO accounts (merchant_id, balance, provider_code, currency_code)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 10000.00, 'ORANGE', 'XOF'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 50000.00, 'STRIPE', 'USD');
+
+-- main accounts table
+INSERT INTO main_accounts (merchant_id, balance, currency_code)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 15000.00, 'XOF'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 75000.00, 'USD');
+
+-- Platform Balance table
+INSERT INTO platform_balance (total_balance, available_balance, pending_balance, currency_code)
+VALUES
+  (1000000.00, 900000.00, 100000.00, 'XOF'),
+  (500000.00, 450000.00, 50000.00, 'USD');
+
+  
+-- Platform Payouts table
+INSERT INTO platform_payouts (organization_id, amount, currency_code, provider_code, status, created_at, completed_at)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 50000.00, 'XOF', 'ORANGE', 'completed', NOW() - INTERVAL '7 days', NOW() - INTERVAL '6 days'),
+  ('11111111-1111-1111-1111-111111111111', 25000.00, 'XOF', 'MTN', 'pending', NOW() - INTERVAL '2 days', NULL),
+  ('22222222-2222-2222-2222-222222222222', 100000.00, 'USD', 'STRIPE', 'completed', NOW() - INTERVAL '14 days', NOW() - INTERVAL '13 days'),
+  ('22222222-2222-2222-2222-222222222222', 50000.00, 'USD', 'PAYPAL', 'pending', NOW() - INTERVAL '1 day', NULL);
+
+-- Platform Provider Balance table
+INSERT INTO platform_provider_balance (provider_code, balance, currency_code)
+VALUES
+  ('ORANGE', 100000.00, 'XOF'),
+  ('MTN', 50000.00, 'XOF'),
+  ('WAVE', 75000.00, 'XOF'),
+  ('STRIPE', 200000.00, 'USD'),
+  ('PAYPAL', 100000.00, 'USD');
+
+-- merchant products table
+INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, frequency, image_url, is_active)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Premium Ledger', 'Advanced ledger service', 9999.00, 'XOF', 'monthly', 'https://example.com/premium_ledger.jpg', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Enterprise Comms', 'Enterprise communication package', 199.99, 'USD', 'monthly', 'https://example.com/enterprise_comms.jpg', true);
+
+-- customer subscriptions table
+INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, billing_frequency, amount, currency_code)
+VALUES
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   9999.00,
+   'XOF'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Enterprise Comms'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   199.99,
+   'USD');
 
 -- fees table
 INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, currency_code, payment_method_code, provider_code) VALUES
@@ -139,3 +246,225 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
     ('EUR Payout Processing Fee', 'payout', 'processing', 1.8, 0.40, 'EUR', NULL, NULL),
     ('XOF Payout Processing Fee', 'payout', 'processing', 2.2, 0.00, 'XOF', NULL, NULL),
     ('GHS Payout Processing Fee', 'payout', 'processing', 2.1, 0.00, 'GHS', NULL, NULL);
+
+
+-- transactions table
+INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'payment', 'completed', 'Premium Ledger Subscription', 'REF001', '{"product": "Premium Ledger"}', 9999.00, 299.97, 9699.03, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'payment', 'completed', 'Enterprise Comms Subscription', 'REF002', '{"product": "Enterprise Comms"}', 199.99, 5.80, 194.19, 'USD/STRIPE Credit Card Fee', 'USD', 'STRIPE', 'CREDIT_CARD');
+
+-- recurring transactions table
+INSERT INTO recurring_transactions (merchant_id, organization_id, amount, currency_code, payment_method_code, provider_code, payment_type, frequency, start_date, end_date, next_payment_date, status, total_cycles, retry_payment_every, total_retries, failed_payment_action, email_notifications, charge_immediately, follow_up_subscriber, description, is_active)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 9999.00, 'XOF', 'MOBILE_MONEY', 'ORANGE', 'subscription', 'monthly', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 year', CURRENT_DATE + INTERVAL '1 month', 'active', 12, 3, 3, 'cancel', '{"payment_success": true, "payment_failed": true}', true, true, 'Premium Ledger Monthly Subscription', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 199.99, 'USD', 'CREDIT_CARD', 'STRIPE', 'subscription', 'monthly', CURRENT_DATE, CURRENT_DATE + INTERVAL '1 year', CURRENT_DATE + INTERVAL '1 month', 'active', 12, 3, 3, 'cancel', '{"payment_success": true, "payment_failed": true}', true, true, 'Enterprise Comms Monthly Subscription', true);
+
+-- payouts table
+INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), '11111111-1111-1111-1111-111111111111', 5000.00, 'XOF', 'bank_transfer', 'completed'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), '22222222-2222-2222-2222-222222222222', 10000.00, 'USD', 'bank_transfer', 'completed');
+
+-- entries table
+INSERT INTO entries (account_id, transaction_id, transfer_id, internal_transfer_id, payout_id, amount, entry_type)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), (SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'), NULL, NULL, NULL, 9699.03, 'credit'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'), NULL, NULL, NULL, 194.19, 'credit');
+
+-- api keys table
+INSERT INTO api_keys (organization_id, api_key, name, is_active, expiration_date, last_used_at)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW()),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', 'Production API Key', true, CURRENT_DATE + INTERVAL '1 year', NOW());
+
+-- api usage tracking table
+INSERT INTO api_usage (organization_id, api_key, endpoint, request_count, last_request_at, request_method, response_status, response_time, ip_address)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', '/v1/transactions', 100, NOW(), 'GET', 200, 0.15, '192.168.1.1'),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', '/v1/transactions', 500, NOW(), 'POST', 201, 0.25, '10.0.0.1');
+
+-- webhooks table
+INSERT INTO webhooks (webhook_id, merchant_id, organization_id, url, events, secret, is_active, created_at, updated_at, last_triggered_at, last_response_status, last_response_time, retry_count, next_retry_at, cache_key, cache_expiry)
+VALUES
+  (uuid_generate_v4(), 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'https://africanledger.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_africanledger_123456789', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:africanledger', NOW() + INTERVAL '1 day'),
+  (uuid_generate_v4(), 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'https://telnyx.com/webhooks', ARRAY['payment.success', 'payment.failed'], 'whsec_telnyx_987654321', true, NOW(), NOW(), NOW(), 200, 0.3, 0, NULL, 'webhook:telnyx', NOW() + INTERVAL '1 day');
+
+
+-- logs table
+INSERT INTO logs (merchant_id, action, details, severity, created_at)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'payment_received', '{"amount": 9999.00, "currency": "XOF"}', 'INFO', NOW()),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'payment_received', '{"amount": 199.99, "currency": "USD"}', 'INFO', NOW());
+
+-- platform invoices table
+INSERT INTO invoices (merchant_id, organization_id, amount, description, currency_code, due_date, status, created_at)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 299.97, 'Monthly platform fee', 'XOF', CURRENT_DATE + INTERVAL '30 days', 'sent', NOW()),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 5.80, 'Monthly platform fee', 'USD', CURRENT_DATE + INTERVAL '30 days', 'sent', NOW());
+
+-- customer invoices table
+INSERT INTO customer_invoices (merchant_id, organization_id, customer_id, amount, description, currency_code, due_date, status, created_at)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 9999.00, 'Premium Ledger Subscription', 'XOF', CURRENT_DATE + INTERVAL '30 days', 'sent', NOW()),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 199.99, 'Enterprise Comms Subscription', 'USD', CURRENT_DATE + INTERVAL '30 days', 'sent', NOW());
+
+-- notifications table
+INSERT INTO notifications (notification_id, merchant_id, organization_id, type, message, is_read, created_at)
+VALUES
+  (uuid_generate_v4(), 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'payment_success', 'Payment of 9999.00 XOF completed for REF001', false, NOW()),
+  (uuid_generate_v4(), 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'payment_success', 'Payment of 199.99 USD completed for REF002', false, NOW());
+
+-- disputes table
+INSERT INTO disputes (dispute_id, transaction_id, customer_id, amount, fee_amount, reason, metadata, status, currency_code, resolution_date, resolution_details, created_at)
+VALUES
+  (uuid_generate_v4(), (SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'), (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 9999.00, 50.00, 'Service not received', '{"dispute_category": "quality"}', 'open', 'XOF', NULL, NULL, NOW()),
+  (uuid_generate_v4(), (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'), (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 199.99, 10.00, 'Unauthorized transaction', '{"dispute_category": "fraud"}', 'under_review', 'USD', NULL, NULL, NOW());
+
+-- metrics table
+INSERT INTO metrics (metric_id, entity_type, metric_name, metric_value, metric_date, created_at, updated_at)
+VALUES
+  (uuid_generate_v4(), 'merchant', 'total_transactions', 100, CURRENT_DATE, NOW(), NOW()),
+  (uuid_generate_v4(), 'merchant', 'total_revenue', 999900.00, CURRENT_DATE, NOW(), NOW()),
+  (uuid_generate_v4(), 'organization', 'total_customers', 1000, CURRENT_DATE, NOW(), NOW()),
+  (uuid_generate_v4(), 'organization', 'total_revenue', 5000000.00, CURRENT_DATE, NOW(), NOW()),
+  (uuid_generate_v4(), 'platform', 'total_merchants', 600, CURRENT_DATE, NOW(), NOW()),
+  (uuid_generate_v4(), 'platform', 'total_transactions', 25000, CURRENT_DATE, NOW(), NOW());
+
+-- Merchant Preferences table
+INSERT INTO merchant_preferences (merchant_id, theme, language, notification_settings)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'dark', 'fr', '{"email": true, "sms": false}'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'light', 'en', '{"email": true, "sms": true}');
+
+-- Merchant Sessions table
+INSERT INTO merchant_sessions (merchant_id, session_data, ip_address, expires_at)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"user_agent": "Mozilla/5.0"}', '192.168.1.1', NOW() + INTERVAL '1 day'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"user_agent": "Chrome/93.0.4577.82"}', '10.0.0.1', NOW() + INTERVAL '1 day');
+
+-- Merchant Feedback table
+INSERT INTO merchant_feedback (merchant_id, feedback_type, message, status)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'bug', 'The dashboard is not loading properly', 'open'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'feature_request', 'Please add support for more payment methods', 'open');
+
+-- Customer Feedback table
+INSERT INTO customer_feedback (customer_id, feedback_type, message, status)
+VALUES
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), 'complaint', 'The payment failed but I was still charged', 'open'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'), 'suggestion', 'The checkout process could be more user-friendly', 'open');
+
+-- Support Tickets table
+INSERT INTO support_tickets (merchant_id, customer_id, organization_id, message, status)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', (SELECT customer_id FROM customers WHERE email = 'fatou@example.com'), '11111111-1111-1111-1111-111111111111', 'I need help with a refund request', 'open'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', (SELECT customer_id FROM customers WHERE email = 'jane@example.com'), '22222222-2222-2222-2222-222222222222', 'I have a question about my subscription', 'open');
+
+-- Customer API Interactions table
+INSERT INTO customer_api_interactions (organization_id, endpoint, request_method, request_payload, response_status, response_payload, response_time)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', '/webhook', 'POST', '{"event": "payment.success"}', 200, '{"status": "received"}', 0.1),
+  ('22222222-2222-2222-2222-222222222222', '/webhook', 'POST', '{"event": "refund.initiated"}', 200, '{"status": "processed"}', 0.15);
+
+-- Webhook Delivery Logs table
+INSERT INTO webhook_delivery_logs (webhook_id, payload, response_status, response_body, delivery_time)
+VALUES
+  ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1), '{"event": "payment.success", "amount": 9999.00}', 200, '{"received": true}', 0.5),
+  ((SELECT webhook_id FROM webhooks WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1), '{"event": "payment.success", "amount": 199.99}', 200, '{"received": true}', 0.3);
+
+-- API Rate Limits table
+INSERT INTO api_rate_limits (organization_id, api_key, endpoint, requests_limit, time_window, current_usage, last_reset_at)
+VALUES
+  ('11111111-1111-1111-1111-111111111111', 'ak_live_africanledger_123456789', '/v1/transactions', 1000, INTERVAL '1 hour', 50, NOW()),
+  ('22222222-2222-2222-2222-222222222222', 'ak_live_telnyx_987654321', '/v1/transactions', 5000, INTERVAL '1 hour', 100, NOW());
+
+-- Cache Entries table
+INSERT INTO cache_entries (cache_key, cache_value, expires_at)
+VALUES
+  ('user:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '{"name": "Babacar Diop", "email": "babacar@africanledger.com"}', NOW() + INTERVAL '1 hour'),
+  ('user:bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '{"name": "John Doe", "email": "john@telnyx.com"}', NOW() + INTERVAL '1 hour');
+
+-- Error Logs table
+INSERT INTO error_logs (error_type, error_message, stack_trace, context)
+VALUES
+  ('API_ERROR', 'Invalid API key', 'Error: Invalid API key\n    at validateApiKey (/app/src/middleware/auth.ts:25:7)\n    at processRequest (/app/src/server.ts:45:3)', '{"ip": "192.168.1.100", "endpoint": "/v1/transactions"}'),
+  ('WEBHOOK_DELIVERY_FAILURE', 'Connection timeout', 'Error: Connection timeout\n    at sendWebhook (/app/src/services/webhook.ts:67:9)\n    at processEvent (/app/src/workers/eventProcessor.ts:32:5)', '{"webhookId": "12345678-1234-1234-1234-123456789abc", "attempt": 3}');
+
+INSERT INTO customer_subscriptions (customer_id, product_id, status, start_date, end_date, billing_frequency, amount, currency_code)
+VALUES
+  ((SELECT customer_id FROM customers WHERE email = 'fatou@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   9999.00,
+   'XOF'),
+  ((SELECT customer_id FROM customers WHERE email = 'jane@example.com'),
+   (SELECT product_id FROM merchant_products WHERE name = 'Enterprise Comms'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   'monthly',
+   199.99,
+   'USD');
+
+-- Internal Transfers table
+INSERT INTO internal_transfers (from_account_id, to_main_account_id, amount, currency_code, status)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   5000.00,
+   'XOF',
+   'completed'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT main_account_id FROM main_accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   10000.00,
+   'USD',
+   'completed');
+
+-- Refunds table
+INSERT INTO refunds (transaction_id, amount, refunded_amount, fee_amount, reason, metadata, status)
+VALUES
+  ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'),
+   9999.00,
+   9699.03,
+   299.97,
+   'Customer request',
+   '{"refund_method": "original_payment_method"}',
+   'completed'),
+  ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'),
+   199.99,
+   194.19,
+   5.80,
+   'Product not as described',
+   '{"refund_method": "original_payment_method"}',
+   'pending');
+
+-- [EXPERIMENTAL & NOT USED] Transfers table
+INSERT INTO transfers (from_account_id, to_account_id, transaction_id, amount, status)
+VALUES
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT transaction_id FROM transactions WHERE reference_id = 'REF001'),
+   5000.00,
+   'completed'),
+  ((SELECT account_id FROM accounts WHERE merchant_id = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb' LIMIT 1),
+   (SELECT account_id FROM accounts WHERE merchant_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' LIMIT 1),
+   (SELECT transaction_id FROM transactions WHERE reference_id = 'REF002'),
+   100.00,
+   'pending');
+
+   -- Pages table
+INSERT INTO pages (merchant_id, organization_id, title, description, slug, content, theme, is_active)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Premium Ledger Checkout', 'Checkout page for Premium Ledger subscription', 'premium-ledger-checkout', '{"header": "Premium Ledger Subscription", "description": "Get access to our advanced ledger service", "button_text": "Subscribe Now"}', 'default', true),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'Enterprise Comms Checkout', 'Checkout page for Enterprise Comms package', 'enterprise-comms-checkout', '{"header": "Enterprise Communications Package", "description": "Streamline your business communications", "button_text": "Get Started"}', 'corporate', true);
+
+-- Payment Links table
+INSERT INTO payment_links (merchant_id, organization_id, page_id, product_id, subscription_id, title, public_description, private_description, price, currency_code, frequency, billing_cycles, is_active, expires_at, metadata)
+VALUES
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', (SELECT page_id FROM pages WHERE slug = 'premium-ledger-checkout' LIMIT 1), (SELECT product_id FROM merchant_products WHERE name = 'Premium Ledger' LIMIT 1), NULL, 'Buy Premium Ledger', 'Get access to our advanced ledger service', 'Product-linked payment link for Premium Ledger', 9999.00, 'XOF', 'monthly', NULL, true, NULL, '{"product_type": "software"}'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', (SELECT page_id FROM pages WHERE slug = 'enterprise-comms-checkout' LIMIT 1), NULL, (SELECT subscription_id FROM customer_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE email = 'jane@example.com' LIMIT 1) LIMIT 1), 'Subscribe to Enterprise Comms', 'Get our enterprise communication package', 'Subscription-linked payment link for Enterprise Comms', 199.99, 'USD', 'monthly', 12, true, NULL, '{"subscription_type": "business"}'),
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', NULL, NULL, NULL, 'Donate to Our Cause', 'Support our mission with a one-time donation', 'Instant payment link for donations', NULL, 'XOF', NULL, NULL, true, CURRENT_DATE + INTERVAL '30 days', '{"min_amount": 1000, "max_amount": 100000, "cause": "charity"}');
