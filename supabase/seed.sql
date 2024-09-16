@@ -5,10 +5,9 @@ VALUES
     ('Orange', 'ORANGE', 'Mobile money provider'),
     ('MTN', 'MTN', 'Mobile money provider'),
     ('Wave', 'WAVE', 'Mobile money and e-wallet provider'),
-    ('Partner', 'PARTNER', 'Generic partner integration'),
+    ('Partner', 'PARTNER', 'Generic partner provider'),
     ('Ecobank', 'ECOBANK', 'Bank transfer provider'),
-    ('Lomi', 'LOMI', 'Internal payment processor'),
-    ('PayPal', 'PAYPAL', 'Global online payment system');
+    ('Lomi', 'LOMI', 'Internal payment processor');
 
 -- payment methods table
 INSERT INTO payment_methods (payment_method_code, provider_code)
@@ -16,7 +15,7 @@ VALUES
     ('CREDIT_CARD', 'STRIPE'),
     ('DEBIT_CARD', 'STRIPE'),
     ('SEPA', 'STRIPE'),
-    ('PAYPAL', 'PAYPAL'),
+    ('PAYPAL', 'STRIPE'),
     ('MOBILE_MONEY', 'ORANGE'),
     ('MOBILE_MONEY', 'MTN'),
     ('MOBILE_MONEY', 'WAVE'),
@@ -77,8 +76,8 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
     ('EUR/STRIPE SEPA Fee', 'payment', 'processing', 1.4, 1.00, 'EUR', 'SEPA', 'STRIPE'),
 
     -- PAYPAL FEES
-    ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'PAYPAL'),
-    ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'PAYPAL'),
+    ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'STRIPE'),
+    ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'STRIPE'),
 
     -- ORANGE FEES
     ('XOF/ORANGE Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'XOF', 'MOBILE_MONEY', 'ORANGE'),

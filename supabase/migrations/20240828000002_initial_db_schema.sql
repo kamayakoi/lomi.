@@ -295,24 +295,6 @@ CREATE INDEX idx_platform_provider_balance_currency_code ON platform_provider_ba
 
 COMMENT ON TABLE platform_provider_balance IS 'Tracks the balance for each provider in each currency';
 
--- Platform Payouts table
-CREATE TABLE platform_payouts (
-    payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    amount NUMERIC(15,2) NOT NULL CHECK (amount > 0),
-    currency_code currency_code NOT NULL,
-    provider_code provider_code NOT NULL,
-    status payout_status NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMPTZ
-);
-
-CREATE INDEX idx_platform_payouts_currency_code ON platform_payouts(currency_code);
-CREATE INDEX idx_platform_payouts_provider_code ON platform_payouts(provider_code);
-CREATE INDEX idx_platform_payouts_status ON platform_payouts(status);
-
-COMMENT ON TABLE platform_payouts IS 'Records payouts made by the platform to various providers';
-
 -- Merchant Products table
 CREATE TABLE merchant_products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -333,27 +315,41 @@ CREATE INDEX idx_merchant_products_merchant_id ON merchant_products(merchant_id)
 COMMENT ON TABLE merchant_products IS 'Stores products and services offered by merchants';
 
 
--- Customer Subscriptions table
-CREATE TABLE customer_subscriptions (
+-- Subscriptions table
+CREATE TABLE subscriptions (
     subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
-    product_id UUID NOT NULL REFERENCES merchant_products(product_id),
+    product_id UUID REFERENCES merchant_products(product_id),
     status VARCHAR(20) NOT NULL DEFAULT 'active',
     start_date DATE NOT NULL,
     end_date DATE,
     next_billing_date DATE,
     billing_frequency frequency NOT NULL,
-    amount NUMERIC(10,2) NOT NULL CHECK (amount >= 0),
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
+    payment_method_code payment_method_code NOT NULL,
+    provider_code provider_code NOT NULL,
+    retry_payment_every INT DEFAULT 0,
+    total_retries INT DEFAULT 0,
+    failed_payment_action VARCHAR,
+    email_notifications JSONB,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
 );
 
-CREATE INDEX idx_customer_subscriptions_customer_id ON customer_subscriptions(customer_id);
-CREATE INDEX idx_customer_subscriptions_product_id ON customer_subscriptions(product_id);
+CREATE INDEX idx_subscriptions_merchant_id ON subscriptions(merchant_id);
+CREATE INDEX idx_subscriptions_organization_id ON subscriptions(organization_id);
+CREATE INDEX idx_subscriptions_customer_id ON subscriptions(customer_id);
+CREATE INDEX idx_subscriptions_product_id ON subscriptions(product_id);
+CREATE INDEX idx_subscriptions_payment_method ON subscriptions(payment_method_code, provider_code);
 
-COMMENT ON TABLE customer_subscriptions IS 'Tracks customer subscriptions to merchant products';
+COMMENT ON TABLE subscriptions IS 'Stores information for recurring payments and subscriptions';
+COMMENT ON COLUMN subscriptions.next_billing_date IS 'The next billing date of the subscription';
+COMMENT ON COLUMN subscriptions.status IS 'Current status of the subscription (active, paused, cancelled, expired)';
 
 
 -- Fees table
@@ -427,43 +423,6 @@ COMMENT ON COLUMN transactions.fee_amount IS 'Total fees charged for the transac
 COMMENT ON COLUMN transactions.net_amount IS 'Amount received by the merchant after deducting fees';
 
 
--- Recurring Transactions table
-CREATE TABLE recurring_transactions (
-    recurring_transaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
-    currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payment_method_code payment_method_code NOT NULL,
-    provider_code provider_code NOT NULL,
-    payment_type recurring_transaction_type NOT NULL,
-    frequency frequency NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE,
-    next_payment_date DATE NOT NULL,
-    status recurring_transaction_status NOT NULL DEFAULT 'active',
-    total_cycles INT DEFAULT 0,
-    retry_payment_every INT DEFAULT 0,
-    total_retries INT DEFAULT 0,
-    failed_payment_action VARCHAR,
-    email_notifications JSONB,
-    charge_immediately BOOLEAN NOT NULL DEFAULT true,
-    follow_up_subscriber BOOLEAN NOT NULL DEFAULT false,
-    description TEXT,
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
-);
-
-CREATE INDEX idx_recurring_transactions_merchant_id ON recurring_transactions(merchant_id);
-CREATE INDEX idx_recurring_transactions_organization_id ON recurring_transactions(organization_id);
-CREATE INDEX idx_recurring_transactions_payment_method ON recurring_transactions(payment_method_code, provider_code);
-
-COMMENT ON TABLE recurring_transactions IS 'Stores information for recurring payment schedules';
-COMMENT ON COLUMN recurring_transactions.next_payment_date IS 'The next payment date of the recurring transaction';
-COMMENT ON COLUMN recurring_transactions.status IS 'Current status of the recurring transaction (active, paused, cancelled, expired)';
-
 -- Refunds table
 CREATE TABLE refunds (
     refund_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -504,23 +463,23 @@ CREATE INDEX idx_internal_transfers_to_main_account_id ON internal_transfers(to_
 COMMENT ON TABLE internal_transfers IS 'Records transfers from individual accounts to main accounts';
 
 
--- [EXPERIMENTAL & NOT USED] Transfers table
-CREATE TABLE transfers (
-    transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    from_account_id UUID NOT NULL REFERENCES accounts(account_id),
-    to_account_id UUID NOT NULL REFERENCES accounts(account_id),
-    transaction_id UUID NOT NULL REFERENCES transactions(transaction_id),
-    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
-    status transfer_status NOT NULL DEFAULT 'pending',
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- -- [EXPERIMENTAL & NOT USED] Transfers table
+-- CREATE TABLE transfers (
+--     transfer_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     from_account_id UUID NOT NULL REFERENCES accounts(account_id),
+--     to_account_id UUID NOT NULL REFERENCES accounts(account_id),
+--     transaction_id UUID NOT NULL REFERENCES transactions(transaction_id),
+--     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+--     status transfer_status NOT NULL DEFAULT 'pending',
+--     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- );
 
-CREATE INDEX idx_transfers_from_account_id ON transfers(from_account_id);
-CREATE INDEX idx_transfers_to_account_id ON transfers(to_account_id);
-CREATE INDEX idx_transfers_transaction_id ON transfers(transaction_id);
-CREATE INDEX idx_transfers_created_at ON transfers(created_at);
+-- CREATE INDEX idx_transfers_from_account_id ON transfers(from_account_id);
+-- CREATE INDEX idx_transfers_to_account_id ON transfers(to_account_id);
+-- CREATE INDEX idx_transfers_transaction_id ON transfers(transaction_id);
+-- CREATE INDEX idx_transfers_created_at ON transfers(created_at);
 
-COMMENT ON TABLE transfers IS 'Records transfers between merchants accounts within the system';
+-- COMMENT ON TABLE transfers IS 'Records transfers between merchants accounts within the system';
 
 
 -- Payouts table
@@ -553,18 +512,16 @@ COMMENT ON TABLE payouts IS 'Tracks payouts from the system to external accounts
 CREATE TABLE entries (
     entry_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     account_id UUID NOT NULL REFERENCES accounts(account_id),
-    transaction_id UUID REFERENCES transactions(transaction_id),
-    transfer_id UUID REFERENCES transfers(transfer_id),
+    transaction_id UUID REFERENCES transactions(transaction_id),    
     internal_transfer_id UUID REFERENCES internal_transfers(internal_transfer_id),
     payout_id UUID REFERENCES payouts(payout_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount != 0),
     entry_type entry_type NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CHECK (
-        (transaction_id IS NOT NULL AND transfer_id IS NULL AND internal_transfer_id IS NULL AND payout_id IS NULL) OR
-        (transaction_id IS NULL AND transfer_id IS NOT NULL AND internal_transfer_id IS NULL AND payout_id IS NULL) OR
-        (transaction_id IS NULL AND transfer_id IS NULL AND internal_transfer_id IS NOT NULL AND payout_id IS NULL) OR
-        (transaction_id IS NULL AND transfer_id IS NULL AND internal_transfer_id IS NULL AND payout_id IS NOT NULL)
+        (transaction_id IS NOT NULL AND internal_transfer_id IS NULL AND payout_id IS NULL) OR
+        (transaction_id IS NULL AND internal_transfer_id IS NOT NULL AND payout_id IS NULL) OR
+        (transaction_id IS NULL AND internal_transfer_id IS NULL AND payout_id IS NOT NULL)
     )
 );
 

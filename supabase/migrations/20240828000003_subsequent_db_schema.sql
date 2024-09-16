@@ -205,7 +205,7 @@ CREATE TABLE payment_links (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     page_id UUID REFERENCES pages(page_id),
     product_id UUID REFERENCES merchant_products(product_id),
-    subscription_id UUID REFERENCES customer_subscriptions(subscription_id),
+    subscription_id UUID REFERENCES subscriptions(subscription_id),
     title VARCHAR(255) NOT NULL,
     public_description TEXT,
     private_description TEXT,
