@@ -40,6 +40,7 @@ CREATE TABLE merchants (
   preferred_language VARCHAR(10),
   timezone VARCHAR NOT NULL DEFAULT 'UTC',
   referral_code VARCHAR,
+  pin_code VARCHAR,
   mrr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   arr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   merchant_lifetime_value NUMERIC(15,2) NOT NULL DEFAULT 0.00,
@@ -66,6 +67,7 @@ CREATE TABLE organizations (
   tax_number VARCHAR,
   website_url VARCHAR,
   business_platform_url VARCHAR,
+  logo_url VARCHAR,
   status organization_status NOT NULL DEFAULT 'active',
   default_currency currency_code NOT NULL DEFAULT 'XOF',
   total_revenue NUMERIC(15,2) DEFAULT 0.00,
@@ -92,11 +94,11 @@ COMMENT ON COLUMN organizations.status IS 'Current status of the organization ac
 CREATE TABLE organization_addresses (
   organization_id UUID NOT NULL PRIMARY KEY REFERENCES organizations(organization_id),
   country VARCHAR NOT NULL,
-  region VARCHAR NOT NULL,
-  city VARCHAR NOT NULL,
-  district VARCHAR NOT NULL,
-  postal_code VARCHAR NOT NULL,
-  address VARCHAR NOT NULL,
+  region VARCHAR,
+  city VARCHAR,
+  district VARCHAR,
+  postal_code VARCHAR,
+  address VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

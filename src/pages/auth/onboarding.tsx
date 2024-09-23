@@ -224,12 +224,12 @@ const NewOnboarding: React.FC = () => {
     }
 
     return (
-        <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
-            <div className='mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[800px] lg:p-12'>
-                <Card className={cn('p-6', 'dark:bg-gray-800')}>
-                    <h1 className='text-2xl font-semibold tracking-tight mb-6'>Complete your profile</h1>
+        <div className="min-h-screen bg-background dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 overflow-y-auto">
+            <div className="max-w-4xl mx-auto">
+                <Card className="p-6 dark:bg-gray-800 shadow-lg">
+                    <h1 className="text-2xl font-semibold tracking-tight mb-6">Complete your profile</h1>
                     <FormProvider {...onboardingForm}>
-                        <form onSubmit={(e) => e.preventDefault()}>
+                        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                             <div className="mb-6">
                                 <div className="flex space-x-2">
                                     <div className="w-1/2">
@@ -387,9 +387,9 @@ const NewOnboarding: React.FC = () => {
                             </div>
 
                             {/* Stylish separator */}
-                            <div className="my-8 flex items-center">
+                            <div className="my-6 flex items-center">
                                 <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-                                <span className="flex-shrink mx-4 text-gray-400 dark:text-gray-500">Company</span>
+                                <span className="flex-shrink mx-4 text-sm text-gray-400 dark:text-gray-500">Company information</span>
                                 <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
                             </div>
 
@@ -585,7 +585,7 @@ const NewOnboarding: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <Button type="submit" className="w-full" disabled={loading} onClick={onSubmit}>
+                            <Button type="submit" className="w-full mt-6" disabled={loading} onClick={onSubmit}>
                                 {loading ? 'Submitting...' : 'Complete Onboarding'}
                             </Button>
                         </form>
