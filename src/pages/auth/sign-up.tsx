@@ -16,7 +16,8 @@ export default function SignUp() {
     setErrorMessage('');
 
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('Calling supabase.auth.signUp with data:', data);
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -27,7 +28,10 @@ export default function SignUp() {
         },
       });
 
+      console.log('Sign-up response:', signUpData);
+
       if (error) {
+        console.error('Error during sign-up:', error);
         let message = 'An error occurred while creating your account. Please try again.';
         if (error.message.includes('Password should be at least 6 characters')) {
           message = 'Password should be at least 6 characters long.';
