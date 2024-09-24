@@ -1,10 +1,10 @@
 -- Function to fetch merchant details
-CREATE OR REPLACE FUNCTION public.fetch_merchant_details(p_merchant_id UUID)
+CREATE OR REPLACE FUNCTION public.fetch_merchant_details(p_user_id UUID)
 RETURNS TABLE (
     merchant_id UUID,
     name VARCHAR,
     email VARCHAR,
-    avatar_url VARCHAR,
+    avatar_url TEXT,
     phone_number VARCHAR,
     referral_code VARCHAR,
     pin_code VARCHAR
@@ -21,8 +21,10 @@ BEGIN
         m.pin_code
     FROM 
         merchants m
+    JOIN
+        auth.users u ON m.email = u.email
     WHERE 
-        m.merchant_id = p_merchant_id;
+        u.id = p_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -53,7 +55,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Function to update merchant avatar
 CREATE OR REPLACE FUNCTION public.update_merchant_avatar(
     p_merchant_id UUID,
-    p_avatar_url VARCHAR
+    p_avatar_url TEXT
 )
 RETURNS VOID AS $$
 BEGIN

@@ -114,7 +114,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate }
     return (
         <div className="space-y-4">
             <div className="flex items-center space-x-4">
-                <div className="h-24 w-24 bg-gray-200 flex items-center justify-center overflow-hidden rounded-full">
+                <div className="h-20 w-20 bg-gray-200 flex items-center justify-center overflow-hidden rounded-full">
                     {currentAvatar ? (
                         <img src={currentAvatar} alt="Profile picture" className="object-cover w-full h-full" />
                     ) : (
