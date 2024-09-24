@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import LogoUploader from '../components/LogoUploader'
+import LogoUploader from '../components/logo-uploader'
 
 interface OrganizationDetails {
     organization_id: string;
@@ -41,6 +41,8 @@ export default function Business() {
             if (data && data.length > 0) {
                 setOrganization(data[0] as OrganizationDetails)
                 setLogoUrl(data[0].logo_url)
+            } else {
+                throw new Error('No organization found')
             }
         } catch (error) {
             console.error('Error fetching organization:', error)
