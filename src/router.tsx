@@ -52,14 +52,14 @@ import Subscription from "./pages/portal/subscription/subscription.tsx";
 
 // Settings pages
 import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
-import Checkout from './pages/portal/settings/receiving-money/checkout.tsx';
+import CheckoutSettings from './pages/portal/settings/receiving-money/checkout/checkout-settings.tsx';
 import Disbursements from './pages/portal/settings/sending-money/disbursements.tsx';
 import CategoryApproval from './pages/portal/settings/sending-money/category-approval.tsx';
 import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
 import Business from './pages/portal/settings/business-profile/business';
 import Profile from './pages/portal/settings/business-profile/profile';
-import TeamMembers from './pages/portal/settings/team/members.tsx';
-import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
+// import TeamMembers from './pages/portal/settings/team/members.tsx';
+// import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
 import BillingStatements from './pages/portal/settings/billing/statements.tsx';
 import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
 import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
@@ -112,14 +112,14 @@ const AppRouter = () => (
 
                     <Route path="settings" element={<Settings />}>
                         <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
-                        <Route path="receiving-money/checkout" element={<Checkout />} />
+                        <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
                         <Route path="sending-money/disbursements" element={<Disbursements />} />
                         <Route path="sending-money/category-approval" element={<CategoryApproval />} />
                         <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
                         <Route path="business" element={<Business />} />
                         <Route path="profile" element={<Profile />} />
-                        <Route path="team/members" element={<TeamMembers />} />
-                        <Route path="team/email-recipients" element={<EmailRecipients />} />
+                        {/* <Route path="team/members" element={<TeamMembers />} />
+                        <Route path="team/email-recipients" element={<EmailRecipients />} /> */}
                         <Route path="billing/statements" element={<BillingStatements />} />
                         <Route path="billing/fee-structure" element={<FeeStructure />} />
                         <Route path="developers/api-keys" element={<ApiKeys />} />

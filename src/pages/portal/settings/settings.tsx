@@ -3,7 +3,6 @@ import {
   IconBuildingStore,
   IconCreditCard,
   IconSend,
-  IconUsers,
   IconReceipt,
   IconCode,
   IconWallet,
@@ -77,15 +76,15 @@ const sidebarNavItems = [
       { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
     ],
   },
-  {
-    title: 'Your Team',
-    icon: <IconUsers size={18} />,
-    href: '/settings/team',
-    subItems: [
-      { title: 'Members', href: '/portal/settings/team/members' },
-      { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
-    ],
-  },
+  // {
+  //   title: 'Your Team',
+  //   icon: <IconUsers size={18} />,
+  //   href: '/settings/team',
+  //   subItems: [
+  //     { title: 'Members', href: '/portal/settings/team/members' },
+  //     { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
+  //   ],
+  // },
   {
     title: 'Billing and Fees',
     icon: <IconReceipt size={18} />,
