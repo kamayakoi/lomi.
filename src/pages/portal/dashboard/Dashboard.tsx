@@ -1,323 +1,155 @@
-import { Layout } from '@/components/custom/layout'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Search } from '@/components/dashboard/search'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import React from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from "@/components/ui/button"
+import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
-import { RecentSales } from './components/recent-sales'
-import { Overview } from './components/overview'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
+import { Search } from '@/components/dashboard/search'
+import { Link } from 'react-router-dom'
+import { Settings2 } from 'lucide-react'
+
+// Define Layout components
+const Layout = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-screen bg-background">{children}</div>
+)
+
+const LayoutHeader = ({ children }: { children: React.ReactNode }) => (
+  <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="container flex h-14 items-center">{children}</div>
+  </header>
+)
+LayoutHeader.displayName = 'LayoutHeader';
+
+const LayoutBody = ({ children }: { children: React.ReactNode }) => (
+  <main className="container py-6">{children}</main>
+)
+LayoutBody.displayName = 'LayoutBody';
 
 export default function Dashboard() {
   return (
     <Layout>
       {/* ===== Top Heading ===== */}
-      <Layout.Header>
-        <TopNav links={topNav} />
+      <LayoutHeader>
+        <TopNav links={[]} />
         <div className='ml-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
           <UserNav />
         </div>
-      </Layout.Header>
+      </LayoutHeader>
 
       {/* ===== Main ===== */}
-      <Layout.Body>
-        <div className='mb-2 flex items-center justify-between space-y-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
-          <div className='flex items-center space-x-2'>
+      <LayoutBody>
+        <div className='mb-8'>
+          <h1 className='text-2xl font-bold mb-6'>Getting Started</h1>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link to="/portal/settings/developers/api-keys" className="block">
+              <Card className="bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Manage API keys</CardTitle>
+                  <Settings2 className="h-6 w-6" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">View and manage your API keys</p>
+                  <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
+                    Technical
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/portal/settings/developers/webhooks" className="block">
+              <Card className="bg-sky-100 dark:bg-sky-800 hover:bg-sky-200 dark:hover:bg-sky-700 transition-colors duration-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Set callback URLs</CardTitle>
+                  <ArrowRight className="h-6 w-6" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Set up your Callback URLs for us to inform you of successful payments</p>
+                  <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
+                    Technical
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/portal/payment-links" className="block">
+              <Card className="bg-emerald-100 dark:bg-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Create payment links</CardTitle>
+                  <LinkIcon className="h-6 w-6" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Generate payment links to accept payments easily</p>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/portal/integrations" className="block">
+              <Card className="bg-violet-100 dark:bg-violet-800 hover:bg-violet-200 dark:hover:bg-violet-700 transition-colors duration-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-lg font-medium">Set integrations</CardTitle>
+                  <Settings2 className="h-6 w-6" />
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Connect with various payment providers and services</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
-        <Tabs
-          orientation='vertical'
-          defaultValue='overview'
-          className='space-y-4'
-        >
-          <div className='w-full overflow-x-auto pb-2'>
-            <TabsList>
-              <TabsTrigger value='overview'>Overview</TabsTrigger>
-              <TabsTrigger value='analytics'>Analytics</TabsTrigger>
-              <TabsTrigger value='notifications'>Notifications</TabsTrigger>
-            </TabsList>
+
+        <div className='mb-8'>
+          <h2 className="text-xl font-semibold mb-6">Developer Resources</h2>
+          <div className="overflow-x-auto pb-4">
+            <div className="flex space-x-6" style={{ minWidth: 'max-content' }}>
+              {developerResources.map((item, index) => (
+                <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block">
+                  <Card className="w-64 flex-shrink-0 hover:shadow-lg transition-shadow duration-200">
+                    <CardContent className="pt-6 h-full flex flex-col">
+                      {item.icon}
+                      <h3 className="font-semibold mb-2">{item.title}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                </a>
+              ))}
+            </div>
           </div>
-          <TabsContent value='overview' className='space-y-4'>
-            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total Revenue
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +20.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-              <Card className='col-span-1 lg:col-span-4'>
-                <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className='pl-2'>
-                  <Overview />
-                </CardContent>
-              </Card>
-              <Card className='col-span-1 lg:col-span-3'>
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
-                  <CardDescription>
-                    You made 265 sales this month.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RecentSales />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          <TabsContent value='analytics' className='space-y-4'>
-            <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Total Revenue
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +20.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                    <circle cx='9' cy='7' r='4' />
-                    <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <rect width='20' height='14' x='2' y='5' rx='2' />
-                    <path d='M2 10h20' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    className='h-4 w-4 text-muted-foreground'
-                  >
-                    <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-              <Card className='col-span-1 lg:col-span-4'>
-                <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className='pl-2'>
-                  <Overview />
-                </CardContent>
-              </Card>
-              <Card className='col-span-1 lg:col-span-3'>
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
-                  <CardDescription>
-                    You made 265 sales this month.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RecentSales />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </Layout.Body>
+        </div>
+
+      </LayoutBody>
     </Layout>
   )
 }
 
-const topNav = [
+const developerResources = [
   {
-    title: 'Home',
-    href: '',
-    isActive: true,
+    icon: <FileText className="h-10 w-10 text-purple-500 dark:text-purple-400 mb-4" />,
+    title: "Documentation",
+    description: "Familiarize yourself with lomi. products with our docs.",
+    link: "https://developers.lomi.africa/docs"
   },
   {
-    title: 'Integrations',
-    href: 'integrations',
-    isActive: false,
+    icon: <Code className="h-10 w-10 text-blue-500 dark:text-blue-400 mb-4" />,
+    title: "API reference",
+    description: "Find out how our APIs work and how you can deploy them.",
+    link: "https://developers.lomi.africa/api-reference"
   },
   {
-    title: 'Settings',
-    href: 'settings',
-    isActive: false,
+    icon: <BookOpen className="h-10 w-10 text-green-500 dark:text-green-400 mb-4" />,
+    title: "Integration guides",
+    description: "Step-by-step guides to integrate lomi. into your app.",
+    link: "https://developers.lomi.africa/guides"
   },
+  {
+    icon: <FileCode className="h-10 w-10 text-indigo-500 dark:text-indigo-400 mb-4" />,
+    title: "Sample projects",
+    description: "Explore sample projects & code to kickstart your integration.",
+    link: "https://github.com/lomi-africa"
+  },
+  {
+    icon: <HelpCircle className="h-10 w-10 text-teal-500 dark:text-teal-400 mb-4" />,
+    title: "Support",
+    description: "Get help and support from our team.",
+    link: "mailto:help@lomi.africa?subject=[Support] — Question about integration"
+  }
 ]

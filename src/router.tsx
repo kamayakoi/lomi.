@@ -54,7 +54,6 @@ import Subscription from "./pages/portal/subscription/subscription.tsx";
 import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
 import CheckoutSettings from './pages/portal/settings/receiving-money/checkout/checkout-settings.tsx';
 import Disbursements from './pages/portal/settings/sending-money/disbursements.tsx';
-import CategoryApproval from './pages/portal/settings/sending-money/category-approval.tsx';
 import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
 import Business from './pages/portal/settings/business-profile/business';
 import Profile from './pages/portal/settings/business-profile/profile';
@@ -69,6 +68,8 @@ import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx'
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
 import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
+
+import Activation from './pages/auth/activation.tsx';
 
 const AppRouter = () => (
     <Router>
@@ -114,7 +115,6 @@ const AppRouter = () => (
                         <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
                         <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
                         <Route path="sending-money/disbursements" element={<Disbursements />} />
-                        <Route path="sending-money/category-approval" element={<CategoryApproval />} />
                         <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
                         <Route path="business" element={<Business />} />
                         <Route path="profile" element={<Profile />} />
@@ -130,6 +130,7 @@ const AppRouter = () => (
                         <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
                         <Route path="withdrawals/phone-numbers" element={<PhoneNumbers />} />
                     </Route>
+                    <Route path="activation" element={<Activation />} />
                 </Route>
 
                 {/* Login/Signup routes */}

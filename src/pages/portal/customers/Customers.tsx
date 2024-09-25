@@ -1,317 +1,208 @@
-import { Layout } from '@/components/custom/layout'
+import React, { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import { Search } from '@/components/dashboard/search'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { PlusCircle, Search, User } from 'lucide-react'
 
-export default function Dashboard() {
+// Mocking the Layout component
+const Layout = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen bg-background">{children}</div>
+)
+
+Layout.Header = React.memo(function LayoutHeader({ children }: { children: React.ReactNode }) {
+    return (
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-14 items-center">{children}</div>
+        </header>
+    )
+})
+
+Layout.Body = React.memo(function LayoutBody({ children }: { children: React.ReactNode }) {
+    return <main className="container py-6">{children}</main>
+})
+
+const TopNav = ({ links }: { links: Array<{ title: string; href: string; isActive: boolean }> }) => (
+    <nav className="flex items-center space-x-4 lg:space-x-6">
+        {links.map((link, index) => (
+            <a
+                key={index}
+                href={link.href}
+                className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+            >
+                {link.title}
+            </a>
+        ))}
+    </nav>
+)
+
+const UserNav = () => (
+    <Button variant="ghost" size="icon">
+        <User className="h-5 w-5" />
+    </Button>
+)
+
+export default function CustomersPage() {
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [customers, setCustomers] = useState<Array<{ id: string; name: string; email: string; phone: string; type: string }>>([])
+
+    const topNav = [
+        { title: 'Home', href: '', isActive: false },
+        { title: 'Customers', href: 'customers', isActive: true },
+        { title: 'Settings', href: 'settings', isActive: false },
+    ]
+
+    const handleAddCustomer = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        const formData = new FormData(event.currentTarget)
+        const newCustomer = {
+            id: formData.get('referenceId') as string,
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
+            phone: formData.get('phone') as string,
+            type: formData.get('customerType') as string,
+        }
+        setCustomers([...customers, newCustomer])
+        setIsDialogOpen(false)
+    }
+
     return (
         <Layout>
-            {/* ===== Top Heading ===== */}
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
-                    <Search />
-                    <ThemeSwitch />
+                    <Button variant="ghost" size="icon">
+                        <Search className="h-5 w-5" />
+                    </Button>
                     <UserNav />
                 </div>
             </Layout.Header>
 
-            {/* ===== Main ===== */}
             <Layout.Body>
-                <div className='mb-2 flex items-center justify-between space-y-2'>
-                    <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
-                    <div className='flex items-center space-x-2'>
+                <div className='space-y-4'>
+                    <div className="flex justify-between items-center">
+                        <h1 className='text-2xl font-bold tracking-tight'>Customers</h1>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add a customer
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Add A Customer</DialogTitle>
+                                    <DialogDescription>
+                                        Fill in the details to add a new customer.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleAddCustomer} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="referenceId">Reference ID</Label>
+                                        <Input id="referenceId" name="referenceId" placeholder="A0012" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">Name</Label>
+                                        <Input id="name" name="name" placeholder="Individual or business name" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email address</Label>
+                                        <Input id="email" name="email" type="email" placeholder="johndoe@example.com" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone">Mobile number</Label>
+                                        <div className="flex space-x-2">
+                                            <Select name="countryCode">
+                                                <SelectTrigger className="w-[80px]">
+                                                    <SelectValue placeholder="+62" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="+62">+62</SelectItem>
+                                                    <SelectItem value="+1">+1</SelectItem>
+                                                    <SelectItem value="+44">+44</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <Input id="phone" name="phone" type="tel" className="flex-1" required />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="customerType">Customer type</Label>
+                                        <Select name="customerType">
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select customer type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="individual">Individual</SelectItem>
+                                                <SelectItem value="business">Business</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex justify-end space-x-2">
+                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit">Next</Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
+
+                    {customers.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
+                            <div className="rounded-full bg-primary/10 p-3">
+                                <User className="h-6 w-6 text-primary" />
+                            </div>
+                            <h2 className="text-lg font-semibold">No customer data records exists yet.</h2>
+                            <p className="text-muted-foreground">Add a customer to begin!</p>
+                            <Button onClick={() => setIsDialogOpen(true)}>
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Add a customer
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="rounded-md border">
+                            <table className="w-full">
+                                <thead>
+                                    <tr className="border-b bg-muted/50">
+                                        <th className="p-2 text-left font-medium">ID</th>
+                                        <th className="p-2 text-left font-medium">Name</th>
+                                        <th className="p-2 text-left font-medium">Email</th>
+                                        <th className="p-2 text-left font-medium">Phone</th>
+                                        <th className="p-2 text-left font-medium">Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {customers.map((customer, index) => (
+                                        <tr key={index} className="border-b">
+                                            <td className="p-2">{customer.id}</td>
+                                            <td className="p-2">{customer.name}</td>
+                                            <td className="p-2">{customer.email}</td>
+                                            <td className="p-2">{customer.phone}</td>
+                                            <td className="p-2">{customer.type}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
-                <Tabs
-                    orientation='vertical'
-                    defaultValue='overview'
-                    className='space-y-4'
-                >
-                    <div className='w-full overflow-x-auto pb-2'>
-                        <TabsList>
-                            <TabsTrigger value='overview'>Overview</TabsTrigger>
-                            <TabsTrigger value='analytics'>Analytics</TabsTrigger>
-                            <TabsTrigger value='notifications'>Notifications</TabsTrigger>
-                        </TabsList>
-                    </div>
-                    <TabsContent value='overview' className='space-y-4'>
-                        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Total Revenue
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>$45,231.89</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +20.1% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Subscriptions
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                                        <circle cx='9' cy='7' r='4' />
-                                        <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+2350</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +180.1% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <rect width='20' height='14' x='2' y='5' rx='2' />
-                                        <path d='M2 10h20' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+12,234</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +19% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Active Now
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+573</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +201 since last hour
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                        <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-                            <Card className='col-span-1 lg:col-span-4'>
-                                <CardHeader>
-                                    <CardTitle>Overview</CardTitle>
-                                </CardHeader>
-                                <CardContent className='pl-2'>
-                                </CardContent>
-                            </Card>
-                            <Card className='col-span-1 lg:col-span-3'>
-                                <CardHeader>
-                                    <CardTitle>Recent Sales</CardTitle>
-                                    <CardDescription>
-                                        You made 265 sales this month.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </TabsContent>
-                    <TabsContent value='analytics' className='space-y-4'>
-                        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Total Revenue
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>$45,231.89</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +20.1% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Subscriptions
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                                        <circle cx='9' cy='7' r='4' />
-                                        <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+2350</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +180.1% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>Sales</CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <rect width='20' height='14' x='2' y='5' rx='2' />
-                                        <path d='M2 10h20' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+12,234</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +19% from last month
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                                    <CardTitle className='text-sm font-medium'>
-                                        Active Now
-                                    </CardTitle>
-                                    <svg
-                                        xmlns='http://www.w3.org/2000/svg'
-                                        viewBox='0 0 24 24'
-                                        fill='none'
-                                        stroke='currentColor'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                        strokeWidth='2'
-                                        className='h-4 w-4 text-muted-foreground'
-                                    >
-                                        <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                                    </svg>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className='text-2xl font-bold'>+573</div>
-                                    <p className='text-xs text-muted-foreground'>
-                                        +201 since last hour
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-                        <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
-                            <Card className='col-span-1 lg:col-span-4'>
-                                <CardHeader>
-                                    <CardTitle>Overview</CardTitle>
-                                </CardHeader>
-                                <CardContent className='pl-2'>
-                                </CardContent>
-                            </Card>
-                            <Card className='col-span-1 lg:col-span-3'>
-                                <CardHeader>
-                                    <CardTitle>Recent Sales</CardTitle>
-                                    <CardDescription>
-                                        You made 265 sales this month.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </TabsContent>
-                </Tabs>
             </Layout.Body>
         </Layout>
     )
 }
-
-const topNav = [
-    {
-        title: 'Home',
-        href: '',
-        isActive: true,
-    },
-    {
-        title: 'Integrations',
-        href: 'integrations',
-        isActive: false,
-    },
-    {
-        title: 'Settings',
-        href: 'settings',
-        isActive: false,
-    },
-]

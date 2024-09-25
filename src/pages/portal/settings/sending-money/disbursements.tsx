@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
 import ContentSection from '../components/content-section'
 
 export default function Disbursements() {
@@ -25,12 +24,11 @@ export default function Disbursements() {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-2">
-                        <Label htmlFor="default-description">Payment</Label>
                         <Input
                             id="default-description"
                             value={defaultDescription}
                             onChange={(e) => setDefaultDescription(e.target.value)}
-                            placeholder="Enter default description"
+                            placeholder="Enter default description such as 'Payment' or 'Disbursement'"
                         />
                         <Button onClick={handleSaveDescription}>Save</Button>
                     </div>
