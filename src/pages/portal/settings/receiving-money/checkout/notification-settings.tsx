@@ -8,9 +8,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { PlusCircle } from "lucide-react"
 
 interface CustomerNotifications {
-    newPaymentLinks: { email: boolean; whatsapp: boolean; viber: boolean };
-    paymentReminders: { email: boolean; whatsapp: boolean; viber: boolean };
-    successfulPaymentAttempts: { email: boolean; whatsapp: boolean; viber: boolean };
+    newPaymentLinks: { email: boolean; whatsapp: boolean };
+    paymentReminders: { email: boolean; whatsapp: boolean };
+    successfulPaymentAttempts: { email: boolean; whatsapp: boolean };
 }
 
 interface MerchantRecipient {
@@ -21,9 +21,9 @@ interface MerchantRecipient {
 export function NotificationSettings() {
     const [notificationType, setNotificationType] = useState('physical-and-digital')
     const [customerNotifications, setCustomerNotifications] = useState<CustomerNotifications>({
-        newPaymentLinks: { email: false, whatsapp: false, viber: false },
-        paymentReminders: { email: false, whatsapp: false, viber: false },
-        successfulPaymentAttempts: { email: false, whatsapp: false, viber: false },
+        newPaymentLinks: { email: false, whatsapp: false },
+        paymentReminders: { email: false, whatsapp: false },
+        successfulPaymentAttempts: { email: false, whatsapp: false },
     })
     const [merchantRecipients, setMerchantRecipients] = useState<MerchantRecipient[]>([])
     const [supportEmail, setSupportEmail] = useState('no-reply@xendit.co')
@@ -86,7 +86,6 @@ export function NotificationSettings() {
                             <th></th>
                             <th className="text-left">Email</th>
                             <th className="text-left">WhatsApp</th>
-                            <th className="text-left">Viber</th>
                         </tr>
                     </thead>
                     <tbody>
