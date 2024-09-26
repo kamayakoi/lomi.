@@ -27,11 +27,15 @@ const LayoutBody = ({ children }: { children: React.ReactNode }) => (
 LayoutBody.displayName = 'LayoutBody';
 
 export default function Dashboard() {
+  const topNav = [
+    { title: 'Home', href: '/portal', isActive: true },
+    { title: 'Settings', href: '/portal/settings', isActive: false },
+  ]
+
   return (
     <Layout>
-      {/* ===== Top Heading ===== */}
       <LayoutHeader>
-        <TopNav links={[]} />
+        <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
