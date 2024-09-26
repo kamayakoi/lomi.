@@ -109,7 +109,7 @@ const Privacy = () => {
                                     <strong>Opting out of receiving electronic communications from us:</strong> Should the Data Subjects no longer want to receive marketing-related emails or communications from us on a going-forward basis, the Data Subjects may opt-out via the unsubscribe link included in such emails or communications, or by directly contacting us. We will try to comply with your request(s) as soon as reasonably practicable.
                                 </p>
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
-                                    <strong>How to access or modify Personal Data:</strong> Should Data Subjects wish to review, correct, or update their Personal Data previously disclosed to us, the Data Subjects may do so by contacting work@lomi.africa.
+                                    <strong>How to access or modify Personal Data:</strong> Should Data Subjects wish to review, correct, or update their Personal Data previously disclosed to us, the Data Subjects may do so by contacting hello@lomi.africa.
                                 </p>
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
                                     When emailing us the request, the Data Subjects are advised to make clear in their request what Personal Data they want modified. For the protection of the Data Subjects, we may only address and implement requests with respect to the Personal Data associated with the particular email address or contact information that the requesting Data Subject used to send us the request, and we may need to verify the Data Subjects’ identity before acting on the request. We will try to comply with your request as soon as reasonably practicable.
@@ -165,7 +165,7 @@ const Privacy = () => {
                                     lomi.africa Inc.
                                 </p>
                                 <p className="mt-1 text-lg text-muted-foreground"> {/* Slightly larger margin to separate email */}
-                                    work@lomi.africa
+                                    hello@lomi.africa
                                 </p>
                                 <hr className="my-4" /> {/* Horizontal line with margin */}
                                 <p className="mt-2 text-base text-muted-foreground"> {/* Reduced margin and smaller text */}

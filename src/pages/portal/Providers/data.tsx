@@ -1,59 +1,32 @@
-import {
-  IconBrandStripe,
-  IconBrandVisa,
-  IconBrandMastercard,
-  IconBrandPaypal,
-  IconBrandApple,
-  IconBrandGoogle,
-} from '@tabler/icons-react'
 import { Database } from '@/../database.types'
 
 export type Provider = Omit<Database['public']['Tables']['providers']['Row'], 'created_at' | 'updated_at'> & {
   logo: JSX.Element;
   includedPayments?: Array<{ name: string; icon: JSX.Element }>;
+  installLink: string;
 }
 
-export const providers: Provider[] = [
+
+export const integrationOptions = [
   {
-    provider_code: 'ORANGE',
-    name: 'Orange Money',
-    logo: <img src="/orange.png" alt="Orange Money" className="w-12 h-12 object-contain" />,
-    description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
-    is_active: true,
+    title: "Shopify",
+    description: "Integrate lomi.&apos;s checkout experience with your Shopify store for a smooth payment flow.",
+    link: "https://developers.lomi.africa/docs/shopify-integration",
+    logo: <img src="/shopify.png" alt="Shopify" className="w-12 h-12 object-contain" />,
+    installLink: "",
   },
   {
-    provider_code: 'WAVE',
-    name: 'Wave Mobile Money',
-    logo: <img src="/wave.png" alt="Wave" className="w-full h-full object-contain" />,
-    description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
-    is_active: true,
+    title: "Next.js",
+    description: "Jumpstart your development with our Next.js starter kit, complete with our pre-configured payment stack.",
+    link: "https://github.com/lomiafrica/nextjs-starter",
+    logo: <img src="/nextjs.png" alt="Next.js" className="w-12 h-12 object-contain" />,
+    installLink: "https://github.com/lomiafrica/nextjs-starter",
   },
   {
-    provider_code: 'ECOBANK',
-    name: 'Ecobank',
-    logo: <img src="/ecobank.png" alt="Ecobank" className="w-full h-full object-cover" />,
-    description: 'Connect with Ecobank to enable pay-by-bank payments for your customers. Ideal for businesses operating across multiple African countries.',
-    is_active: true,
+    title: "WordPress",
+    description: "Accept payments on your website with our easy-to-use plugin.",
+    link: "https://developers.lomi.africa/docs/wordpress-integration",
+    logo: <img src="/wordpress.png" alt="WordPress" className="w-12 h-12 object-contain" />,
+    installLink: "",
   },
-  {
-    provider_code: 'MTN',
-    name: 'MTN',
-    logo: <img src="/mtn.png" alt="MTN" className="w-full h-full object-contain" />,
-    description: 'Leverage MTN Mobile Money "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
-    is_active: true,
-  },
-  {
-    provider_code: 'STRIPE',
-    name: 'Stripe',
-    logo: <IconBrandStripe className="w-10 h-10 text-[#635BFF]" />,
-    description: 'Integrate Stripe to accept card payments globally. Benefit from advanced features like multicurrency support and access to additional integrations via their partner network.',
-    is_active: true,
-    includedPayments: [
-      { name: 'Visa', icon: <IconBrandVisa /> },
-      { name: 'Mastercard', icon: <IconBrandMastercard /> },
-      { name: 'PayPal', icon: <IconBrandPaypal /> },
-      { name: 'Apple Pay', icon: <IconBrandApple /> },
-      { name: 'Google Pay', icon: <IconBrandGoogle /> },
-    ],
-  },
-]
+];

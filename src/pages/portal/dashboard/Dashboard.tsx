@@ -155,6 +155,6 @@ const developerResources = [
     icon: <HelpCircle className="h-10 w-10 text-teal-500 dark:text-teal-400 mb-4" />,
     title: "Support",
     description: "Get help and support from our team.",
-    link: "mailto:help@lomi.africa?subject=[Support] — Question about integration"
+    link: "mailto:hello@lomi.africa?subject=[Support] — Question about integration"
   }
 ]

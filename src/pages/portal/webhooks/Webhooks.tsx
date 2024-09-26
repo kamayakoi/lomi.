@@ -9,7 +9,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CalendarIcon, AlertTriangle, Search, User } from 'lucide-react'
+import { CalendarIcon, AlertTriangle } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -17,6 +17,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 // Mocking the Layout component
 const Layout = ({ children }: { children: React.ReactNode }) => (
@@ -35,38 +38,13 @@ Layout.Body = React.memo(function LayoutBody({ children }: { children: React.Rea
     return <main className="container py-6">{children}</main>
 })
 
-// Mocking the TopNav component
-const TopNav = ({ links }: { links: Array<{ title: string; href: string; isActive: boolean }> }) => (
-    <nav className="flex items-center space-x-4 lg:space-x-6">
-        {links.map((link, index) => (
-            <a
-                key={index}
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
-                    }`}
-            >
-                {link.title}
-            </a>
-        ))}
-    </nav>
-)
-
-// Mocking the UserNav component
-const UserNav = () => (
-    <Button variant="ghost" size="icon">
-        <User className="h-5 w-5" />
-    </Button>
-)
-
 export default function WebhooksPage() {
     const [startDate, setStartDate] = useState<Date | undefined>(new Date())
     const [endDate, setEndDate] = useState<Date | undefined>(new Date())
 
     const topNav = [
-        { title: 'Home', href: '', isActive: false },
-        { title: 'Integrations', href: 'integrations', isActive: false },
-        { title: 'Webhooks', href: 'webhooks', isActive: true },
-        { title: 'Settings', href: 'settings', isActive: false },
+        { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
+        { title: 'Settings', href: '/portal/settings', isActive: false },
     ]
 
     return (
@@ -74,9 +52,7 @@ export default function WebhooksPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
-                    <Button variant="ghost" size="icon">
-                        <Search className="h-5 w-5" />
-                    </Button>
+                    <ThemeSwitch />
                     <UserNav />
                 </div>
             </Layout.Header>
@@ -89,7 +65,7 @@ export default function WebhooksPage() {
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>Failed events will be redelivered automatically.</AlertTitle>
                         <AlertDescription>
-                            Learn more about retry policy <a href="#" className="font-medium underline underline-offset-4">here</a>.
+                            Learn more about our retry policy <a href="https://devs.lomi.africa/docs/webhooks/retry-policy" className="font-medium underline underline-offset-4">here</a>.
                         </AlertDescription>
                     </Alert>
 

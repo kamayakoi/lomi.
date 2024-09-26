@@ -38,7 +38,7 @@ export default function PaymentMethods() {
                     <CardHeader>
                         <CardTitle>Payment Methods</CardTitle>
                         <CardDescription>
-                            Allow your customers to pay with more payment methods. Please reach out to help@lomi.africa if you would like to enable additional channels.
+                            Allow your customers to pay with more payment methods. Please reach out to hello@lomi.africa if you would like to enable additional channels.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

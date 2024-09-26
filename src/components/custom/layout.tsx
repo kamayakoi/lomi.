@@ -73,7 +73,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
     )
   }
 )
-Header.displayName = 'Header'
+Header.displayName = 'LayoutHeader'
 
 const Body = React.forwardRef<
   HTMLDivElement,
@@ -98,7 +98,7 @@ const Body = React.forwardRef<
     />
   )
 })
-Body.displayName = 'Body'
+Body.displayName = 'LayoutBody'
 
 Layout.Header = Header
 Layout.Body = Body

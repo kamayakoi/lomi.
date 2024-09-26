@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +11,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea"
 import { CalendarIcon, InfoIcon, Search, X } from 'lucide-react'
 import { format } from 'date-fns'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 // Mocking Layout and TopNav components
 const Layout = ({ children }: { children: React.ReactNode }) => (
@@ -28,21 +31,6 @@ Layout.Header = React.memo(function LayoutHeader({ children }: { children: React
 Layout.Body = React.memo(function LayoutBody({ children }: { children: React.ReactNode }) {
   return <main className="container py-6">{children}</main>
 })
-
-const TopNav = ({ links }: { links: Array<{ title: string; href: string; isActive: boolean }> }) => (
-  <nav className="flex items-center space-x-4 lg:space-x-6">
-    {links.map((link, index) => (
-      <a
-        key={index}
-        href={link.href}
-        className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
-          }`}
-      >
-        {link.title}
-      </a>
-    ))}
-  </nav>
-)
 
 const CreatePlanForm = ({ onClose }: { onClose: () => void }) => {
   const [startDate, setStartDate] = useState<Date>()
@@ -167,27 +155,103 @@ export default function SubscriptionsPage() {
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
   const [startDate, setStartDate] = useState<Date>()
   const [endDate, setEndDate] = useState<Date>()
+  const [isAlertVisible, setIsAlertVisible] = useState(true)
 
   const topNav = [
-    { title: 'Home', href: '', isActive: false },
-    { title: 'Subscriptions', href: 'subscriptions', isActive: true },
-    { title: 'Settings', href: 'settings', isActive: false },
+    { title: 'Subscriptions', href: '/portal/subscription', isActive: true },
+    { title: 'Settings', href: '/portal/settings', isActive: false },
   ]
+
+  const handleCloseAlert = () => {
+    setIsAlertVisible(false)
+    localStorage.setItem('paymentChannelAlertClosed', 'true')
+  }
+
+  useEffect(() => {
+    const alertClosed = localStorage.getItem('paymentChannelAlertClosed')
+    if (alertClosed) {
+      setIsAlertVisible(false)
+    }
+  }, [])
 
   return (
     <Layout>
       <Layout.Header>
         <TopNav links={topNav} />
+        <div className='ml-auto flex items-center space-x-4'>
+          <ThemeSwitch />
+          <UserNav />
+        </div>
       </Layout.Header>
 
       <Layout.Body>
-        <Alert className="mb-6">
-          <InfoIcon className="h-4 w-4" />
-          <AlertTitle>Activate Your Payment Channels Before Going Live!</AlertTitle>
-          <AlertDescription>
-            Payment channels are active by default in test mode as per our testing scenario. Follow <a href="#" className="font-medium underline underline-offset-4">this guide</a> to ensure they&apos;re activated before launch.
-          </AlertDescription>
-        </Alert>
+        {isAlertVisible && (
+          <Alert style={{
+            marginBottom: '1.5rem',
+            backgroundColor: '#EFF6FF',
+            color: '#1E40AF',
+            borderLeft: '0px solid #2563EB',
+            padding: '0.75rem',
+            width: '60%',
+            '@media (prefers-color-scheme: dark)': {
+              backgroundColor: '#1E3A8A',
+              color: '#93C5FD',
+              borderColor: '#1D4ED8',
+            },
+          } as React.CSSProperties}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <InfoIcon style={{ height: '1.25rem', width: '1.25rem', color: '#2563EB', '@media (prefers-color-scheme: dark)': { color: '#60A5FA' } } as React.CSSProperties} />
+                <AlertTitle style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                  Activate payment channels
+                </AlertTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCloseAlert}
+                style={{
+                  color: '#2563EB',
+                  ':hover': {
+                    color: '#1D4ED8',
+                    backgroundColor: '#DBEAFE',
+                  },
+                  '@media (prefers-color-scheme: dark)': {
+                    color: '#60A5FA',
+                    ':hover': {
+                      color: '#BFDBFE',
+                      backgroundColor: '#1D4ED8',
+                    },
+                  },
+                } as React.CSSProperties}
+              >
+                <X style={{ height: '1rem', width: '1rem' }} />
+              </Button>
+            </div>
+            <AlertDescription style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: '#1E40AF', marginLeft: '1.8rem', '@media (prefers-color-scheme: dark)': { color: '#93C5FD' } } as React.CSSProperties}>
+              Payment channels are not active by default. Follow{' '}
+              <a
+                href="https://devs.lomi.africa/guide/payment-channels"
+                style={{
+                  fontWeight: 500,
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '4px',
+                  ':hover': {
+                    color: '#1E3A8A',
+                  },
+                  '@media (prefers-color-scheme: dark)': {
+                    ':hover': {
+                      color: '#BFDBFE',
+                    },
+                  },
+                } as React.CSSProperties}
+              >
+                this guide
+              </a>{' '}
+              to ensure they&apos;re activated before you go live.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">

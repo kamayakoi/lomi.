@@ -365,7 +365,7 @@ export default function Profile() {
                     </Button>
 
                     <p className="text-sm text-muted-foreground mt-4">
-                        Contact help@lomi.africa if you want to update your business details.
+                        Contact hello@lomi.africa if you want to update your business details.
                     </p>
                 </div>
 

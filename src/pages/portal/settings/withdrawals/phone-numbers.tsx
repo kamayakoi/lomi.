@@ -106,7 +106,7 @@ export default function PhoneNumbers() {
                 )}
 
                 <p className="text-sm text-muted-foreground">
-                    Contact help@lomi.africa if you need assistance with managing your phone numbers.
+                    Contact hello@lomi.africa if you need assistance with managing your phone numbers.
                 </p>
             </div>
         </ContentSection>

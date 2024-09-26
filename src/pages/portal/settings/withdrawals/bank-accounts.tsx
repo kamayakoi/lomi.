@@ -118,7 +118,7 @@ export default function BankAccounts() {
                 )}
 
                 <p className="text-sm text-muted-foreground">
-                    Contact help@lomi.africa if you need assistance with managing your bank accounts.
+                    Contact hello@lomi.africa if you need assistance with managing your bank accounts.
                 </p>
             </div>
         </ContentSection>

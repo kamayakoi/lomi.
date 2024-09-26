@@ -17,7 +17,10 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { PlusCircle, Search, User } from 'lucide-react'
+import { PlusCircle } from 'lucide-react'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 // Mocking the Layout component
 const Layout = ({ children }: { children: React.ReactNode }) => (
@@ -36,35 +39,13 @@ Layout.Body = React.memo(function LayoutBody({ children }: { children: React.Rea
     return <main className="container py-6">{children}</main>
 })
 
-const TopNav = ({ links }: { links: Array<{ title: string; href: string; isActive: boolean }> }) => (
-    <nav className="flex items-center space-x-4 lg:space-x-6">
-        {links.map((link, index) => (
-            <a
-                key={index}
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
-                    }`}
-            >
-                {link.title}
-            </a>
-        ))}
-    </nav>
-)
-
-const UserNav = () => (
-    <Button variant="ghost" size="icon">
-        <User className="h-5 w-5" />
-    </Button>
-)
-
 export default function CustomersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [customers, setCustomers] = useState<Array<{ id: string; name: string; email: string; phone: string; type: string }>>([])
 
     const topNav = [
-        { title: 'Home', href: '', isActive: false },
-        { title: 'Customers', href: 'customers', isActive: true },
-        { title: 'Settings', href: 'settings', isActive: false },
+        { title: 'Customers', href: '/portal/customers', isActive: true },
+        { title: 'Settings', href: '/portal/settings', isActive: false },
     ]
 
     const handleAddCustomer = (event: React.FormEvent<HTMLFormElement>) => {
@@ -86,9 +67,7 @@ export default function CustomersPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
-                    <Button variant="ghost" size="icon">
-                        <Search className="h-5 w-5" />
-                    </Button>
+                    <ThemeSwitch />
                     <UserNav />
                 </div>
             </Layout.Header>
@@ -165,15 +144,8 @@ export default function CustomersPage() {
 
                     {customers.length === 0 ? (
                         <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
-                            <div className="rounded-full bg-primary/10 p-3">
-                                <User className="h-6 w-6 text-primary" />
-                            </div>
                             <h2 className="text-lg font-semibold">No customer data records exists yet.</h2>
                             <p className="text-muted-foreground">Add a customer to begin!</p>
-                            <Button onClick={() => setIsDialogOpen(true)}>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add a customer
-                            </Button>
                         </div>
                     ) : (
                         <div className="rounded-md border">

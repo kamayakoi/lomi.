@@ -13,13 +13,13 @@ const integrationOptions = [
         title: "Low Code",
         description: "<strong>Not ready for a full integration? Learn about our low-code option.</strong>",
         details: "No front-end java script code needed. Our low-code solution lets you get started quickly with minimal coding. Perfect for small businesses or those with limited tech resources. You can direct buyers to our hosted checkout page for payment.<br><br>Customize the interface to fit your brand and start accepting payments swiftly. This option is great for a quick start to all lomi. has to offer.",
-        link: "mailto:work@lomi.africa"
+        link: "mailto:hello@lomi.africa"
     },
     {
         title: "No Code",
         description: "<strong>No developers? No problem. Use our no-code option to get started today.</strong>",
         details: "Easily create a one-time payment link from your lomi.'s dashboard and send it to your buyer for payment. Buyers will select their payment terms and method using the generated order URL.<br><br>No integration necessary!",
-        link: "mailto:work@lomi.africa"
+        link: "mailto:hello@lomi.africa"
     }
 ];
 

@@ -153,7 +153,7 @@ export default function Business() {
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                        Contact help@lomi.africa if you want to update your business details.
+                        Contact hello@lomi.africa if you want to update your business details.
                     </p>
                 </div>
             </>

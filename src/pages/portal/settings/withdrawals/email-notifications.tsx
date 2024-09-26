@@ -85,7 +85,7 @@ export default function EmailNotifications() {
                 )}
 
                 <p className="text-sm text-muted-foreground">
-                    Contact help@lomi.africa if you need assistance with managing your email notifications.
+                    Contact hello@lomi.africa if you need assistance with managing your email notifications.
                 </p>
             </div>
         </ContentSection>

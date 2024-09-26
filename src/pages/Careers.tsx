@@ -7,7 +7,7 @@ const Careers = () => {
     const [emailClicked, setEmailClicked] = useState(false); // State to track if email is clicked
 
     const handleEmailClick = () => {
-        navigator.clipboard.writeText('work@lomi.africa'); // Copy email to clipboard
+        navigator.clipboard.writeText('hello@lomi.africa'); // Copy email to clipboard
         setEmailClicked(true); // Update state to show the message
         setTimeout(() => setEmailClicked(false), 2000); // Reset message after 2 seconds
     };
@@ -28,7 +28,7 @@ const Careers = () => {
                                 onClick={handleEmailClick}
                             >
                                 <p className="text-lg text-black text-center flex items-center justify-between px-4">
-                                    {emailClicked ? "Copied! Say 👋🏼" : "work@lomi.africa"}
+                                    {emailClicked ? "Copied! Say 👋🏼" : "hello@lomi.africa"}
                                     <span className="text-xl">→</span>
                                 </p>
                             </div>

@@ -21,6 +21,7 @@ import { Button } from '@/components/custom/button'
 import { providers, Provider } from './data'
 import { supabase } from '@/utils/supabase/client'
 import { Database } from '@/../database.types'
+import { TopNav } from '@/components/dashboard/top-nav'
 
 const integrationText = new Map<string, string>([
   ['all', 'All Integrations'],
@@ -32,7 +33,12 @@ export default function PaymentChannels() {
   const [sort, setSort] = useState('ascending')
   const [integrationType, setIntegrationType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [organizationProviders, setOrganizationProviders] = useState<Database['public']['Tables']['organization_providers']['Row'][]>([])
+  const [organizationProviders, setOrganizationProviders] = useState<Database['public']['Tables']['organization_providers_settings']['Row'][]>([])
+
+  const topNav = [
+    { title: 'Payment Channels', href: '/portal/payment-channels', isActive: true },
+    { title: 'Settings', href: '/portal/settings', isActive: false },
+  ]
 
   useEffect(() => {
     fetchOrganizationProviders()
@@ -40,7 +46,7 @@ export default function PaymentChannels() {
 
   const fetchOrganizationProviders = async () => {
     const { data, error } = await supabase
-      .from('organization_providers')
+      .from('organization_providers_settings')
       .select('*')
 
     if (error) {
@@ -52,7 +58,7 @@ export default function PaymentChannels() {
 
   const updateProviderConnection = async (providerCode: string, isConnected: boolean) => {
     const { error } = await supabase
-      .from('organization_providers')
+      .from('organization_providers_settings')
       .upsert({
         provider_code: providerCode,
         is_connected: isConnected
@@ -92,27 +98,26 @@ export default function PaymentChannels() {
         : b.name.localeCompare(a.name)
     )
     .filter((provider) => {
-      const isConnected = organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected)
+      const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
       if (integrationType === 'connected' && !isConnected) return false
       if (integrationType === 'notConnected' && isConnected) return false
       return provider.name.toLowerCase().includes(searchTerm.toLowerCase())
     })
 
-  const directProviders = filteredProviders.filter(provider => provider.provider_id !== 'STRIPE')
-  const stripeProvider = filteredProviders.find(provider => provider.provider_id === 'STRIPE')
+  const directProviders = filteredProviders.filter(provider => provider.provider_code !== 'STRIPE')
+  const stripeProvider = filteredProviders.find(provider => provider.provider_code === 'STRIPE')
 
   const isStripeProvider = (provider: Provider): provider is Provider & { includedPayments: Array<{ name: string; icon: JSX.Element }> } => {
-    return provider.provider_id === 'STRIPE' && 'includedPayments' in provider;
+    return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
   };
 
   return (
     <Layout fixed>
       <Layout.Header>
-        <div className='flex w-full items-center justify-between'>
-          <div className='flex items-center space-x-4'>
-            <ThemeSwitch />
-            <UserNav />
-          </div>
+        <TopNav links={topNav} />
+        <div className='ml-auto flex items-center space-x-4'>
+          <ThemeSwitch />
+          <UserNav />
         </div>
       </Layout.Header>
 
@@ -174,7 +179,7 @@ export default function PaymentChannels() {
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
             {directProviders.map((provider) => (
               <li
-                key={provider.provider_id}
+                key={provider.provider_code}
                 className='rounded-lg border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>
@@ -184,10 +189,10 @@ export default function PaymentChannels() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => updateProviderConnection(provider.provider_id, !organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected))}
+                    onClick={() => updateProviderConnection(provider.provider_code, !organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected))}
                     className='flex items-center px-4 py-2 text-sm font-medium'
                   >
-                    {organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected) ? 'Disconnect' : 'Connect'}
+                    {organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected) ? 'Disconnect' : 'Connect'}
                   </Button>
                 </div>
                 <div>
@@ -202,7 +207,7 @@ export default function PaymentChannels() {
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
             {stripeProvider && (
               <li
-                key={stripeProvider.provider_id}
+                key={stripeProvider.provider_code}
                 className='rounded-lg border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>
