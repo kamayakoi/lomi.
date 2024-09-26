@@ -70,11 +70,11 @@ export default function Sidebar({
           className='z-50 flex justify-between px-4 py-3 shadow-sm md:px-4'
         >
           <a href="/portal" className={`flex items-center ${!isCollapsed ? 'gap-2' : ''}`}>
-            <div className="flex items-center justify-center">
+            <div className={`flex items-center justify-center rounded ${isCollapsed ? 'h-8 w-8 -ml-1' : 'h-10 w-10'}`}>
               <img
                 src={theme === 'dark' ? iconDark : icon}
                 alt="lomi. Logo"
-                className={`transition-all mt-0.5 ${isCollapsed ? 'h-8 w-8' : 'h-10 w-10'}`}
+                className="object-contain h-full w-full"
               />
             </div>
             <div
