@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Search } from '@/components/dashboard/search'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
@@ -93,24 +92,23 @@ export default function PaymentChannels() {
         : b.name.localeCompare(a.name)
     )
     .filter((provider) => {
-      const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
+      const isConnected = organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected)
       if (integrationType === 'connected' && !isConnected) return false
       if (integrationType === 'notConnected' && isConnected) return false
       return provider.name.toLowerCase().includes(searchTerm.toLowerCase())
     })
 
-  const directProviders = filteredProviders.filter(provider => provider.provider_code !== 'STRIPE')
-  const stripeProvider = filteredProviders.find(provider => provider.provider_code === 'STRIPE')
+  const directProviders = filteredProviders.filter(provider => provider.provider_id !== 'STRIPE')
+  const stripeProvider = filteredProviders.find(provider => provider.provider_id === 'STRIPE')
 
   const isStripeProvider = (provider: Provider): provider is Provider & { includedPayments: Array<{ name: string; icon: JSX.Element }> } => {
-    return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
+    return provider.provider_id === 'STRIPE' && 'includedPayments' in provider;
   };
 
   return (
     <Layout fixed>
       <Layout.Header>
         <div className='flex w-full items-center justify-between'>
-          <Search />
           <div className='flex items-center space-x-4'>
             <ThemeSwitch />
             <UserNav />
@@ -176,7 +174,7 @@ export default function PaymentChannels() {
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
             {directProviders.map((provider) => (
               <li
-                key={provider.provider_code}
+                key={provider.provider_id}
                 className='rounded-lg border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>
@@ -186,10 +184,10 @@ export default function PaymentChannels() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => updateProviderConnection(provider.provider_code, !organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected))}
+                    onClick={() => updateProviderConnection(provider.provider_id, !organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected))}
                     className='flex items-center px-4 py-2 text-sm font-medium'
                   >
-                    {organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected) ? 'Disconnect' : 'Connect'}
+                    {organizationProviders.some(op => op.provider_id === provider.provider_id && op.is_connected) ? 'Disconnect' : 'Connect'}
                   </Button>
                 </div>
                 <div>
@@ -204,7 +202,7 @@ export default function PaymentChannels() {
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
             {stripeProvider && (
               <li
-                key={stripeProvider.provider_code}
+                key={stripeProvider.provider_id}
                 className='rounded-lg border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>

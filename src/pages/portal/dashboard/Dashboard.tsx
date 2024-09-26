@@ -5,7 +5,6 @@ import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as Lin
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
-import { Search } from '@/components/dashboard/search'
 import { Link } from 'react-router-dom'
 import { Settings2 } from 'lucide-react'
 
@@ -37,7 +36,6 @@ export default function Dashboard() {
       <LayoutHeader>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <Search />
           <ThemeSwitch />
           <UserNav />
         </div>

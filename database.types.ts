@@ -2276,7 +2276,7 @@ export type Database = {
       }
       fetch_merchant_details: {
         Args: {
-          p_merchant_id: string
+          p_user_id: string
         }
         Returns: {
           merchant_id: string
