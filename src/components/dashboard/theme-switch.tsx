@@ -1,27 +1,33 @@
-import { IconMoon, IconSun } from '@tabler/icons-react'
-import { useTheme } from '@/lib/useTheme'
-import { Button } from '@/components/custom/button'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { SunMedium, Moon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function ThemeSwitch() {
-  const { theme, setTheme } = useTheme()
+  const [theme, setTheme] = useState('light');
 
-  /* Update theme-color meta tag
-   * when theme is updated */
   useEffect(() => {
-    const themeColor = theme === 'dark' ? '#06060A' : '#fff'
-    const metaThemeColor = document.querySelector("meta[name='theme-color']")
-    metaThemeColor && metaThemeColor.setAttribute('content', themeColor)
-  }, [theme])
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
 
   return (
     <Button
-      size='icon'
-      variant='ghost'
-      className='rounded-full'
-      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+      variant="ghost"
+      size="sm"
+      onClick={toggleTheme}
     >
-      {theme === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
+      <SunMedium className="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
     </Button>
-  )
+  );
 }

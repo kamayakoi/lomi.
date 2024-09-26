@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/custom/button'
+import { useUser } from '@/lib/useUser';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/custom/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,42 +10,33 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { supabase } from '@/utils/supabase/client'
-import { User } from '@supabase/supabase-js'
+} from '@/components/ui/dropdown-menu';
+import { supabase } from '@/utils/supabase/client';
 
 export function UserNav() {
-  const [user, setUser] = useState<User | null>(null)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-    }
-    fetchUser()
-  }, [])
+  const { user } = useUser();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    navigate('/')
-  }
+    await supabase.auth.signOut();
+    navigate('/');
+  };
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase();
+  };
+
+  if (!user) {
+    return null; // Don't render anything if user data is not available yet
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-          <Avatar className='h-8 w-8'>
-            <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.email || ''} />
-            <AvatarFallback>{user?.email ? getInitials(user.email) : 'U'}</AvatarFallback>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.email || ''} />
+            <AvatarFallback>{user.email ? getInitials(user.email) : ''}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -79,5 +70,5 @@ export function UserNav() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
