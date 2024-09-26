@@ -99,15 +99,18 @@ export default function Dashboard() {
 
         <div className='mb-8'>
           <h2 className="text-xl font-semibold mb-6">Developer Resources</h2>
-          <div className="overflow-x-auto pb-4">
+          <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex space-x-6" style={{ minWidth: 'max-content' }}>
               {developerResources.map((item, index) => (
-                <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block">
-                  <Card className="w-64 flex-shrink-0 hover:shadow-lg transition-shadow duration-200 hover:scale-105 transform hover:z-10">
-                    <CardContent className="pt-6 h-full flex flex-col">
-                      {item.icon}
-                      <h3 className="font-semibold mb-2">{item.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">{item.description}</p>
+                <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block group">
+                  <Card className="w-64 flex-shrink-0 transition-all duration-200 group-hover:scale-105 transform group-hover:z-10 overflow-visible border border-gray-200 dark:border-gray-700">
+                    <CardContent className="pt-6 h-full flex flex-col relative">
+                      <div className="absolute inset-0 rounded-lg transition-colors duration-200 group-hover:bg-gray-100 dark:group-hover:bg-gray-800" />
+                      <div className="relative z-10">
+                        {item.icon}
+                        <h3 className="font-semibold mb-2">{item.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">{item.description}</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </a>

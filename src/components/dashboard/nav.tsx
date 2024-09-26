@@ -43,7 +43,7 @@ export default function Nav({
         <div
           key={item.title}
           className={cn(
-            'px-3 py-2 text-xs font-semibold text-muted-foreground',
+            'px-3 py-1 text-xs font-semibold text-muted-foreground',
             isCollapsed && 'sr-only'
           )}
         >
@@ -80,7 +80,7 @@ export default function Nav({
     <div
       data-collapsed={isCollapsed}
       className={cn(
-        'group border-b bg-background py-2 transition-[max-height,padding] duration-500 data-[collapsed=true]:py-2 md:border-none',
+        'group border-b bg-background py-1 transition-[max-height,padding] duration-500 data-[collapsed=true]:py-1 md:border-none',
         className
       )}
     >
@@ -118,8 +118,8 @@ function NavLink({
           variant: isActive ? 'secondary' : 'ghost',
           size: 'sm',
         }),
-        'h-12 justify-start text-wrap rounded-none px-6',
-        subLink && 'h-10 w-full border-l border-l-slate-500 px-2'
+        'h-8 justify-start text-wrap rounded-none px-6',
+        subLink && 'h-7 w-full border-l border-l-slate-500 px-2'
       )}
       aria-current={isActive ? 'page' : undefined}
     >
@@ -144,7 +144,7 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }:
       <CollapsibleTrigger
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'group h-12 w-full justify-start rounded-none',
+          'group h-8 w-full justify-start rounded-none',
           subLink ? 'pl-8' : 'px-6'
         )}
       >
@@ -166,7 +166,7 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }:
       <CollapsibleContent className='collapsibleDropdown max-h-[60vh] overflow-y-auto'>
         <ul className={cn(subLink ? 'pl-4' : 'pl-6')}>
           {sub?.map((sublink) => (
-            <li key={sublink.title} className='my-1'>
+            <li key={sublink.title} className='my-0.5'>
               {sublink.subSub ? (
                 <NavLinkDropdown {...sublink} closeNav={closeNav} subLink />
               ) : (
@@ -192,7 +192,7 @@ function NavLinkIcon({ title, icon, label, href }: NavLinkProps) {
               variant: checkActiveNav(href) ? 'secondary' : 'ghost',
               size: 'icon',
             }),
-            'h-12 w-12'
+            'h-8 w-8'
           )}
         >
           {icon}
@@ -222,7 +222,7 @@ function NavLinkIconDropdown({ title, icon, label, sub }: NavLinkProps) {
             <Button
               variant={isChildActive ? 'secondary' : 'ghost'}
               size='icon'
-              className='h-12 w-12'
+              className='h-8 w-8'
             >
               {icon}
             </Button>
