@@ -55,7 +55,7 @@ export default function Dashboard() {
                   <Settings2 className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">View and manage your API keys</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">View and manage your API keys.</p>
                   <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
                     Technical
                   </Button>
@@ -69,7 +69,7 @@ export default function Dashboard() {
                   <ArrowRight className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Set up your Callback URLs for us to inform you of successful payments</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Set up your Callback URLs for us to inform you of successful payments.</p>
                   <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
                     Technical
                   </Button>
@@ -83,7 +83,7 @@ export default function Dashboard() {
                   <LinkIcon className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Generate payment links to accept payments easily</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Generate payment links to collect money easily.</p>
                 </CardContent>
               </Card>
             </Link>
@@ -94,7 +94,7 @@ export default function Dashboard() {
                   <Plug className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Connect with various payment providers and services</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Connect with various payment providers and services.</p>
                 </CardContent>
               </Card>
             </Link>

@@ -9,6 +9,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Download, Search, ArrowDownIcon, ArrowUpIcon } from 'lucide-react'
 import { format } from 'date-fns'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
     <div className="min-h-screen bg-background">{children}</div>
@@ -16,7 +19,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
 
 Layout.Header = React.memo(function LayoutHeader({ children }: { children: React.ReactNode }) {
     return (
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background">
             <div className="container flex h-14 items-center">{children}</div>
         </header>
     )
@@ -26,35 +29,23 @@ Layout.Body = React.memo(function LayoutBody({ children }: { children: React.Rea
     return <main className="container py-6">{children}</main>
 })
 
-const TopNav = ({ links }: { links: Array<{ title: string; href: string; isActive: boolean }> }) => (
-    <nav className="flex items-center space-x-4 lg:space-x-6">
-        {links.map((link, index) => (
-            <a
-                key={index}
-                href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
-                    }`}
-            >
-                {link.title}
-            </a>
-        ))}
-    </nav>
-)
-
 export default function TransactionsPage() {
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
 
     const topNav = [
-        { title: 'Home', href: '', isActive: false },
-        { title: 'Transactions', href: 'transactions', isActive: true },
-        { title: 'Settings', href: 'settings', isActive: false },
+        { title: 'Transactions', href: '/portal/transactions', isActive: true },
+        { title: 'Settings', href: '/portal/settings', isActive: false },
     ]
 
     return (
         <Layout>
             <Layout.Header>
                 <TopNav links={topNav} />
+                <div className='ml-auto flex items-center space-x-4'>
+                    <ThemeSwitch />
+                    <UserNav />
+                </div>
             </Layout.Header>
 
             <Layout.Body>

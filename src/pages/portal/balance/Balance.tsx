@@ -10,7 +10,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { CalendarIcon, Download, Search, InfoIcon } from 'lucide-react'
 import { format } from 'date-fns'
-import { Link } from 'react-router-dom'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
     <div className="min-h-screen bg-background">{children}</div>
@@ -28,16 +30,6 @@ Layout.Body = React.memo(function LayoutBody({ children }: { children: React.Rea
     return <main className="container py-6">{children}</main>
 })
 
-const TopNav = ({ links }: { links: Array<{ title: string; path: string; element: React.ReactNode }> }) => (
-    <nav className="flex items-center space-x-4 lg:space-x-6">
-        {links.map((link, index) => (
-            <span key={index} className="text-sm font-medium transition-colors hover:text-primary">
-                {link.element}
-            </span>
-        ))}
-    </nav>
-)
-
 export default function BalancePage() {
     const [startDate, setStartDate] = useState<Date>()
     const [endDate, setEndDate] = useState<Date>()
@@ -48,9 +40,8 @@ export default function BalancePage() {
     const [balance, setBalance] = useState(0)
 
     const topNav = [
-        { title: 'Home', path: '/portal', element: <Link to="/portal">Home</Link> },
-        { title: 'Balance', path: '/portal/balance', element: <Link to="/portal/balance">Balance</Link> },
-        { title: 'Settings', path: '/portal/settings', element: <Link to="/portal/settings">Settings</Link> },
+        { title: 'Balance', href: '/portal/balance', isActive: true },
+        { title: 'Settings', href: '/portal/settings', isActive: false },
     ]
 
     const handleTopUp = () => {
@@ -75,6 +66,10 @@ export default function BalancePage() {
         <Layout>
             <Layout.Header>
                 <TopNav links={topNav} />
+                <div className='ml-auto flex items-center space-x-4'>
+                    <ThemeSwitch />
+                    <UserNav />
+                </div>
             </Layout.Header>
 
             <Layout.Body>
