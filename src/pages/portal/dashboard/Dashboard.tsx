@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon } from 'lucide-react'
+import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon, Plug } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
@@ -87,7 +87,7 @@ export default function Dashboard() {
               <Card className="bg-violet-100 dark:bg-violet-800 hover:bg-violet-200 dark:hover:bg-violet-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">Set integrations</CardTitle>
-                  <Settings2 className="h-6 w-6" />
+                  <Plug className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Connect with various payment providers and services</p>
@@ -103,7 +103,7 @@ export default function Dashboard() {
             <div className="flex space-x-6" style={{ minWidth: 'max-content' }}>
               {developerResources.map((item, index) => (
                 <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block">
-                  <Card className="w-64 flex-shrink-0 hover:shadow-lg transition-shadow duration-200">
+                  <Card className="w-64 flex-shrink-0 hover:shadow-lg transition-shadow duration-200 hover:scale-105 transform hover:z-10">
                     <CardContent className="pt-6 h-full flex flex-col">
                       {item.icon}
                       <h3 className="font-semibold mb-2">{item.title}</h3>
@@ -144,7 +144,7 @@ const developerResources = [
     icon: <FileCode className="h-10 w-10 text-indigo-500 dark:text-indigo-400 mb-4" />,
     title: "Sample projects",
     description: "Explore sample projects & code to kickstart your integration.",
-    link: "https://github.com/lomi-africa"
+    link: "https://github.com/lomiafrica"
   },
   {
     icon: <HelpCircle className="h-10 w-10 text-teal-500 dark:text-teal-400 mb-4" />,
