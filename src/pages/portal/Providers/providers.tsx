@@ -5,6 +5,7 @@ import { Button } from '@/components/custom/button'
 import { integrationOptions } from './data'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { IconPlus } from '@tabler/icons-react'
+import { Separator } from '@/components/ui/separator'
 
 export default function Providers() {
   const topNav = [
@@ -29,6 +30,8 @@ export default function Providers() {
           <UserNav />
         </div>
       </Layout.Header>
+
+      <Separator className='my-0' />
 
       {/* ===== Content ===== */}
       <Layout.Body className='flex flex-col'>

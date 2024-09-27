@@ -30,6 +30,8 @@ export default function Settings() {
         </div>
       </Layout.Header>
 
+      <Separator className='my-0' />
+
       <Layout.Body className='flex flex-col h-full'>
         <div style={{ marginBottom: '1rem' }}>
           <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>

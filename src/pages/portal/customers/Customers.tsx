@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -21,23 +21,8 @@ import { PlusCircle } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
-
-// Mocking the Layout component
-const Layout = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-background">{children}</div>
-)
-
-Layout.Header = React.memo(function LayoutHeader({ children }: { children: React.ReactNode }) {
-    return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-14 items-center">{children}</div>
-        </header>
-    )
-})
-
-Layout.Body = React.memo(function LayoutBody({ children }: { children: React.ReactNode }) {
-    return <main className="container py-6">{children}</main>
-})
+import { Layout } from '@/components/custom/layout'
+import { Separator } from '@/components/ui/separator'
 
 export default function CustomersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -63,7 +48,7 @@ export default function CustomersPage() {
     }
 
     return (
-        <Layout>
+        <Layout fixed>
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
@@ -71,6 +56,8 @@ export default function CustomersPage() {
                     <UserNav />
                 </div>
             </Layout.Header>
+
+            <Separator className='my-0' />
 
             <Layout.Body>
                 <div className='space-y-4'>
