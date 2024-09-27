@@ -39,14 +39,11 @@ import Logs from './pages/portal/logs/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
 import Cards from './pages/portal/accept-payments/cards/Cards.tsx'
 import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'
-import VirtualAccounts from './pages/portal/accept-payments/virtual-accounts/VirtualAccounts.tsx'
 import Transactions from './pages/portal/transactions/Transactions.tsx'
 import Reporting from './pages/portal/reporting/Reporting.tsx'
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx'
-import PayoutLinks from './pages/portal/send-payments/payout-links/PayoutLinks.tsx'
-import BatchDisbursements from './pages/portal/send-payments/batch-disbursements/BatchDisbursements.tsx'
-import BatchPaymentLinks from './pages/portal/receive-payments/batch-payment-links/BatchPaymentLinks.tsx'
-import PaymentLinks from './pages/portal/receive-payments/payment-links/PaymentLinks.tsx'
+import PayoutLinks from './pages/payout-links/PayoutLinks.tsx'
+import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/Subscription.tsx"
 
@@ -101,13 +98,10 @@ const AppRouter = () => (
                     <Route path="balance" element={<Balance />} />
                     <Route path="cards" element={<Cards />} />
                     <Route path="e-wallets" element={<EWallets />} />
-                    <Route path="virtual-accounts" element={<VirtualAccounts />} />
                     <Route path="transactions" element={<Transactions />} />
                     <Route path="reporting" element={<Reporting />} />
                     <Route path="webhooks" element={<Webhooks />} />
                     <Route path="payout-links" element={<PayoutLinks />} />
-                    <Route path="batch-disbursements" element={<BatchDisbursements />} />
-                    <Route path="batch-payment-links" element={<BatchPaymentLinks />} />
                     <Route path="payment-links" element={<PaymentLinks />} />
                     <Route path="customers" element={<Customers />} />
 

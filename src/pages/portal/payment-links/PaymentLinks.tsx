@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,23 +13,11 @@ import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon } from 'lu
 import { format } from 'date-fns'
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-
-// Layout component
-const Layout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-background">{children}</div>
-)
-
-Layout.Header = React.memo(function LayoutHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">{children}</div>
-    </header>
-  )
-})
-
-Layout.Body = React.memo(function LayoutBody({ children }: { children: React.ReactNode }) {
-  return <main className="container py-6">{children}</main>
-})
+import { Layout as DashboardLayout } from '@/components/custom/layout'
+import { Separator } from '@/components/ui/separator'
+import { TopNav } from '@/components/dashboard/top-nav'
+import { UserNav } from '@/components/dashboard/user-nav'
+import ThemeSwitch from '@/components/dashboard/theme-switch'
 
 export default function PaymentLinksPage() {
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
@@ -42,23 +30,18 @@ export default function PaymentLinksPage() {
   ]
 
   return (
-    <Layout>
-      <Layout.Header>
-        <nav className="flex items-center space-x-4 lg:space-x-6">
-          {topNav.map((link, index) => (
-            <a
-              key={index}
-              href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${link.isActive ? 'text-primary' : 'text-muted-foreground'
-                }`}
-            >
-              {link.title}
-            </a>
-          ))}
-        </nav>
-      </Layout.Header>
+    <DashboardLayout>
+      <DashboardLayout.Header>
+        <TopNav links={topNav} />
+        <div className='ml-auto flex items-center space-x-4'>
+          <ThemeSwitch />
+          <UserNav />
+        </div>
+      </DashboardLayout.Header>
 
-      <Layout.Body>
+      <Separator className='my-0' />
+
+      <DashboardLayout.Body>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold tracking-tight">Payment Links (Invoices)</h1>
@@ -193,7 +176,7 @@ export default function PaymentLinksPage() {
             </TabsContent>
           </Tabs>
         </div>
-      </Layout.Body>
+      </DashboardLayout.Body>
 
       <Dialog open={isCreateLinkOpen} onOpenChange={setIsCreateLinkOpen}>
         <DialogContent className="sm:max-w-[725px]">
@@ -235,6 +218,6 @@ export default function PaymentLinksPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </DashboardLayout>
   )
 }

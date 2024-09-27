@@ -67,7 +67,14 @@ export default function BalancePage() {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
-                            <InfoIcon className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                            <div className="relative group">
+                                <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 bg-secondary text-secondary-foreground rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-64 text-xs pointer-events-none">
+                                    Available Balance represents the funds that are currently accessible for transactions or withdrawal.
+                                    <br />
+                                    Upcoming withdrawal or disbursement might affect this amount.
+                                </div>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold mb-2">XOF {balance.toLocaleString()}</div>
@@ -89,7 +96,7 @@ export default function BalancePage() {
                     </Card>
                 </div>
 
-                <Tabs defaultValue="history" className="mb-6">
+                <Tabs defaultValue="history" className="mt-6">
                     <TabsList>
                         <TabsTrigger value="history">Balance History</TabsTrigger>
                         <TabsTrigger value="pending">Pending</TabsTrigger>

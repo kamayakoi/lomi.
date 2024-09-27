@@ -10,12 +10,9 @@ import {
   IconWebhook,
   IconCreditCardPay,
   IconCreditCard,
-  IconLink,
-  IconListNumbers,
   IconCurrencyDollar,
   IconExchange,
   IconLinkPlus,
-  IconBuildingBank,
   IconWallet,
   IconSend,
 } from '@tabler/icons-react'
@@ -76,11 +73,6 @@ export const sidelinks: SidebarItem[] = [
         icon: <IconCreditCard className="text-red-400" size={18} />,
       },
       {
-        title: 'Fixed Virtual Accounts',
-        href: '/portal/virtual-accounts',
-        icon: <IconBuildingBank className="text-blue-400" size={18} />,
-      },
-      {
         title: 'eWallets',
         href: '/portal/e-wallets',
         icon: <IconWallet className="text-green-400" size={18} />,
@@ -88,38 +80,14 @@ export const sidelinks: SidebarItem[] = [
     ],
   },
   {
-    title: 'Receive Payments',
-    href: '',
+    title: 'Payment Links',
+    href: '/portal/payment-links',
     icon: <IconLinkPlus className="text-indigo-500" size={18} />,
-    sub: [
-      {
-        title: 'Payment Links',
-        href: '/portal/payment-links',
-        icon: <IconLink className="text-indigo-400" size={18} />,
-      },
-      {
-        title: 'Batch Payment Links',
-        href: '/portal/batch-payment-links',
-        icon: <IconListNumbers className="text-purple-400" size={18} />,
-      },
-    ],
   },
   {
-    title: 'Send Payments',
-    href: '',
+    title: 'Payout Links',
+    href: '/portal/payout-links',
     icon: <IconSend className="text-orange-500" size={18} />,
-    sub: [
-      {
-        title: 'Payout Links',
-        href: '/portal/payout-links',
-        icon: <IconLink className="text-orange-400" size={18} />,
-      },
-      {
-        title: 'Batch Disbursements',
-        href: '/portal/batch-disbursements',
-        icon: <IconListNumbers className="text-red-400" size={18} />,
-      },
-    ],
   },
   {
     title: 'Subscriptions',
