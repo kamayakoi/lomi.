@@ -42,7 +42,7 @@ import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'
 import Transactions from './pages/portal/transactions/Transactions.tsx'
 import Reporting from './pages/portal/reporting/Reporting.tsx'
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx'
-import PayoutLinks from './pages/payout-links/PayoutLinks.tsx'
+import PayoutLinks from './pages/portal/payout-links/PayoutLinks.tsx'
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/Subscription.tsx"
