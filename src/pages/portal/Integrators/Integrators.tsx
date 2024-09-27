@@ -54,8 +54,11 @@ export default function Providers() {
                 className='rounded-lg border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>
-                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
-                    {integration.logo}
+                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-black'>
+                    {/* Adjusted icon container */}
+                    <div className="w-full h-full flex items-center justify-center">
+                      {integration.logo}
+                    </div>
                   </div>
                   <Button
                     variant='outline'
@@ -79,10 +82,10 @@ export default function Providers() {
             ))}
           </ul>
 
-          <div className="mt-12 mb-4 bg-white dark:bg-gray-800 rounded-lg p-8 shadow-lg relative overflow-hidden">
+          <div className="mt-12 mb-4 bg-white dark:bg-gray-800 rounded-lg p-8 shadow-lg relative overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:border-gray-300 dark:hover:border-gray-600">
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200 dark:bg-amber-700 rounded-full -mr-16 -mt-16 opacity-50"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-200 dark:bg-emerald-700 rounded-full -ml-12 -mb-12 opacity-50"></div>
-            <h2 className='text-2xl font-bold mb-4 relative z-10'>More integrations — coming soon ! </h2>
+            <h2 className='text-2xl font-bold mb-4 relative z-10'>More integrations — coming soon!</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6 relative z-10">We&apos;re constantly working on new ways to help you get started very quickly with our solutions. If there&apos;s an integration you need, let us know and we&apos;ll prioritize it for development.</p>
             <a
               href="mailto:hello@lomi.africa?subject=Integration Request"
