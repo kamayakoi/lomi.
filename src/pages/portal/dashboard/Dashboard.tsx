@@ -146,7 +146,7 @@ const developerResources = [
   {
     icon: <Video className="h-10 w-10 text-red-600 dark:text-red-400 mb-4" />,
     title: "Videos",
-    description: "Watch some videos to get you started faster.",
+    description: "Watch some videos to get you started very quickly.",
     link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
   }
 ]

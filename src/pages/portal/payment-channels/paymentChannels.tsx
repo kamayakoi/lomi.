@@ -126,10 +126,10 @@ export default function PaymentChannels() {
       <Layout.Body className='flex flex-col'>
         <div style={{ marginBottom: '0.5rem' }}>
           <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>
-            Providers
+            Partners
           </h1>
           <p className='text-muted-foreground'>
-            Below is a list of payment methods you can activate for your customers.
+            Below is a list of payment channels you can activate for your customers.
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
