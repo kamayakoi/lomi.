@@ -36,7 +36,7 @@ const channelData = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 
-export default function Component() {
+export default function ReportingPage() {
     const topNav = [
         { title: 'Reporting', href: '/portal/reporting', isActive: true },
         { title: 'Settings', href: '/portal/settings', isActive: false },
@@ -55,10 +55,10 @@ export default function Component() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-auto">
-                    <div className="container py-6 space-y-8">
+                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-4 pb-8">
                         <div className="flex justify-between items-center">
-                            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
                             <Select defaultValue="thisMonth">
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Select period" />

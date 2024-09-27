@@ -44,7 +44,7 @@ export default function PaymentLinksPage() {
       <DashboardLayout.Body>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold tracking-tight">Payment Links (Invoices)</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Payment Links | Invoices</h1>
             <div className="flex space-x-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
