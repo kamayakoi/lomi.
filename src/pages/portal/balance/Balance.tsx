@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,22 +13,8 @@ import { format } from 'date-fns'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
-
-const Layout = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-background">{children}</div>
-)
-
-Layout.Header = React.memo(function LayoutHeader({ children }: { children: React.ReactNode }) {
-    return (
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-14 items-center">{children}</div>
-        </header>
-    )
-})
-
-Layout.Body = React.memo(function LayoutBody({ children }: { children: React.ReactNode }) {
-    return <main className="container py-6">{children}</main>
-})
+import { Layout } from '@/components/custom/layout'
+import { Separator } from '@/components/ui/separator'
 
 export default function BalancePage() {
     const [startDate, setStartDate] = useState<Date>()
@@ -63,7 +49,7 @@ export default function BalancePage() {
     }
 
     return (
-        <Layout>
+        <Layout fixed>
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
@@ -71,6 +57,8 @@ export default function BalancePage() {
                     <UserNav />
                 </div>
             </Layout.Header>
+
+            <Separator className='my-0' />
 
             <Layout.Body>
                 <h1 className="text-2xl font-bold tracking-tight mb-4">Balance</h1>

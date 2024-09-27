@@ -37,7 +37,6 @@ export default function PaymentLinksPage() {
   const [endDate, setEndDate] = useState<Date>()
 
   const topNav = [
-    { title: 'Home', href: '', isActive: false },
     { title: 'Payment Links', href: 'payment-links', isActive: true },
     { title: 'Settings', href: 'settings', isActive: false },
   ]

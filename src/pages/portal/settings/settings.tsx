@@ -12,12 +12,18 @@ import { Separator } from '@/components/ui/separator'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
 import { UserNav } from '@/components/dashboard/user-nav'
 import SidebarNav from './components/sidebar-nav'
+import { TopNav } from '@/components/dashboard/top-nav'
 
 export default function Settings() {
+  const topNav = [
+    { title: 'Settings', href: '/portal/settings', isActive: true }
+  ]
+
   return (
     <Layout fixed>
       {/* ===== Top Heading ===== */}
       <Layout.Header>
+        <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <UserNav />

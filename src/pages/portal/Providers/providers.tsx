@@ -81,7 +81,10 @@ export default function Providers() {
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-200 dark:bg-emerald-700 rounded-full -ml-12 -mb-12 opacity-50"></div>
             <h2 className='text-2xl font-bold mb-4 relative z-10'>More integrations — coming soon ! </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6 relative z-10">We&apos;re constantly working on new ways to help you get started very quickly with our solutions. If there&apos;s an integration you need, let us know and we&apos;ll prioritize it for development.</p>
-            <a href="mailto:hello@lomi.africa?subject=Integration Request" className="relative z-10 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md inline-flex items-center">
+            <a
+              href="mailto:hello@lomi.africa?subject=Integration Request"
+              className="relative z-10 bg-amber-500 text-white px-4 py-2 rounded-md inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg"
+            >
               <IconPlus className="mr-2 h-4 w-4" />
               Request an integration
             </a>

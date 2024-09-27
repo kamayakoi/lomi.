@@ -10,7 +10,7 @@ export type Provider = Omit<Database['public']['Tables']['providers']['Row'], 'c
 export const integrationOptions = [
   {
     title: "Shopify",
-    description: "Integrate lomi.&apos;s checkout experience with your Shopify store for a smooth payment flow.",
+    description: "Integrate lomi.&apos;s checkout experience with your store for a smooth and localized payment flow.",
     link: "https://developers.lomi.africa/docs/shopify-integration",
     logo: <img src="/shopify.png" alt="Shopify" className="w-12 h-12 object-contain" />,
     installLink: "",

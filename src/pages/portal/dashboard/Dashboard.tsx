@@ -1,4 +1,3 @@
-import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon, Plug } from 'lucide-react'
@@ -7,23 +6,8 @@ import { UserNav } from '@/components/dashboard/user-nav'
 import ThemeSwitch from '@/components/dashboard/theme-switch'
 import { Link } from 'react-router-dom'
 import { Settings2 } from 'lucide-react'
-
-// Define Layout components
-const Layout = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-background">{children}</div>
-)
-
-const LayoutHeader = ({ children }: { children: React.ReactNode }) => (
-  <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-    <div className="container flex h-14 items-center">{children}</div>
-  </header>
-)
-LayoutHeader.displayName = 'LayoutHeader';
-
-const LayoutBody = ({ children }: { children: React.ReactNode }) => (
-  <main className="container py-6">{children}</main>
-)
-LayoutBody.displayName = 'LayoutBody';
+import { Layout } from '@/components/custom/layout'
+import { Separator } from '@/components/ui/separator'
 
 export default function Dashboard() {
   const topNav = [
@@ -32,17 +16,19 @@ export default function Dashboard() {
   ]
 
   return (
-    <Layout>
-      <LayoutHeader>
+    <Layout fixed>
+      <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <UserNav />
         </div>
-      </LayoutHeader>
+      </Layout.Header>
+
+      <Separator className='my-0' />
 
       {/* ===== Main ===== */}
-      <LayoutBody>
+      <Layout.Body>
         <div className='mb-8'>
           <h1 className='text-2xl font-bold mb-6'>Getting Started</h1>
           <div className="grid md:grid-cols-2 gap-6">
@@ -121,7 +107,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-      </LayoutBody>
+      </Layout.Body>
     </Layout>
   )
 }
