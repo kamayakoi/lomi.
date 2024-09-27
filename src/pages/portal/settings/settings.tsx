@@ -16,7 +16,8 @@ import { TopNav } from '@/components/dashboard/top-nav'
 
 export default function Settings() {
   const topNav = [
-    { title: 'Settings', href: '/portal/settings', isActive: true }
+    { title: 'Settings', href: '/portal/settings', isActive: true },
+    { title: 'Documentation', href: 'https://developers.lomi.africa', isActive: false },
   ]
 
   return (

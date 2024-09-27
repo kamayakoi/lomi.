@@ -32,8 +32,8 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Providers from './pages/portal/Providers/providers.tsx';
-import Settings from './pages/portal/settings/settings.tsx';
+import Integrators from './pages/portal/Integrators/Integrators.tsx';
+import Settings from './pages/portal/settings/Settings.tsx';
 import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
 import Logs from './pages/portal/logs/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
@@ -47,8 +47,8 @@ import PayoutLinks from './pages/portal/send-payments/payout-links/PayoutLinks.t
 import BatchDisbursements from './pages/portal/send-payments/batch-disbursements/BatchDisbursements.tsx'
 import BatchPaymentLinks from './pages/portal/receive-payments/batch-payment-links/BatchPaymentLinks.tsx'
 import PaymentLinks from './pages/portal/receive-payments/payment-links/PaymentLinks.tsx'
-import Customers from './pages/portal/customers/Customers.tsx'
-import Subscription from "./pages/portal/subscription/subscription.tsx";
+import Customers from './pages/portal/customers/Customers.tsx';
+import Subscription from "./pages/portal/subscription/Subscription.tsx"
 
 // Settings pages
 import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
@@ -94,7 +94,7 @@ const AppRouter = () => (
                     </ProtectedRoute>
                 }>
                     <Route index element={<Dashboard />} />
-                    <Route path="integrations" element={<Providers />} />
+                    <Route path="integrations" element={<Integrators />} />
                     <Route path="subscription" element={<Subscription />} />
                     <Route path="payment-channels" element={<PaymentChannels />} />
                     <Route path="logs" element={<Logs />} />
