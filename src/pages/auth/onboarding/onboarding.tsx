@@ -45,6 +45,10 @@ const NewOnboarding: React.FC = () => {
         orgWebsite: '',
         orgIndustry: '',
         orgDefaultLanguage: '',
+        workspaceHandle: '',
+        avatarUrl: '',
+        logoUrl: '',
+        howDidYouHearAboutUs: '',
     });
 
     useEffect(() => {
@@ -144,7 +148,11 @@ const NewOnboarding: React.FC = () => {
                 p_org_industry: formData.orgIndustry,
                 p_org_website_url: websiteUrl,
                 p_org_employee_number: formData.orgEmployees,
-                p_preferred_language: formData.orgDefaultLanguage
+                p_preferred_language: formData.orgDefaultLanguage,
+                p_workspace_handle: formData.workspaceHandle,
+                p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
+                p_avatar_url: formData.avatarUrl,
+                p_logo_url: formData.logoUrl,
             });
 
             if (error) {

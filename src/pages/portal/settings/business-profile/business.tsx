@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import LogoUploader from '../components/logo-uploader'
+import LogoUploader from '../../../auth/components/logo-uploader'
 
 interface OrganizationDetails {
     organization_id: string;

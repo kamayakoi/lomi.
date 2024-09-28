@@ -5,7 +5,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '../components/content-section'
-import ProfilePictureUploader from '../components/avatar-uploader'
+import ProfilePictureUploader from '../../../auth/components/avatar-uploader'
 import { supabase } from '@/utils/supabase/client'
 import { countryCodes } from '@/data/onboarding'
 

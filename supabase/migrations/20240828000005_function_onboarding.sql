@@ -24,7 +24,11 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_org_postal_code VARCHAR,
     p_org_industry VARCHAR,
     p_org_website_url VARCHAR,
-    p_org_employee_number VARCHAR
+    p_org_employee_number VARCHAR,
+    p_workspace_handle VARCHAR,
+    p_how_did_you_hear_about_us VARCHAR,
+    p_avatar_url VARCHAR,
+    p_logo_url VARCHAR
 )
 RETURNS VOID AS $$
 DECLARE
@@ -37,6 +41,7 @@ BEGIN
         country = p_country,
         onboarded = true,
         preferred_language = p_preferred_language,
+        avatar_url = p_avatar_url,
         updated_at = NOW()
     WHERE merchant_id = p_merchant_id;
 
@@ -48,7 +53,8 @@ BEGIN
         website_url,
         industry,
         employee_number,
-        default_currency
+        default_currency,
+        logo_url
     ) VALUES (
         p_org_name,
         p_org_email,
@@ -56,7 +62,8 @@ BEGIN
         p_org_website_url,
         p_org_industry,
         p_org_employee_number,
-        'XOF'
+        'XOF',
+        p_logo_url
     )
     RETURNING organization_id INTO v_organization_id;
 
@@ -84,12 +91,16 @@ BEGIN
         merchant_id,
         organization_id,
         role,
-        organization_position
+        organization_position,
+        workspace_handle,
+        how_did_you_hear_about_us
     ) VALUES (
         p_merchant_id,
         v_organization_id,
         'admin',
-        'Founder'
+        'Founder',
+        p_workspace_handle,
+        p_how_did_you_hear_about_us
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

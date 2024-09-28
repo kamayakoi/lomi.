@@ -18,7 +18,8 @@ const onboardingStep4Schema = z.object({
         }
     }, 'Invalid website URL'),
     orgIndustry: z.string().min(1, 'Industry is required'),
-    orgDefaultLanguage: z.string().min(1, 'Default language is required')
+    orgDefaultLanguage: z.string().min(1, 'Default language is required'),
+    howDidYouHearAboutUs: z.string().min(1, 'Please let us know how you heard about us')
 });
 
 type OnboardingStep4Data = z.infer<typeof onboardingStep4Schema>;
@@ -100,6 +101,22 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                         {onboardingForm.formState.errors.orgDefaultLanguage && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDefaultLanguage.message}</p>}
                     </div>
                 </div>
+            </div>
+            <div className="mb-6">
+                <Label htmlFor="howDidYouHearAboutUs" className="mb-1">How did you hear about us?<span className="text-red-500">*</span></Label>
+                <Input
+                    id="howDidYouHearAboutUs"
+                    placeholder="Search engine, social media, referral, etc."
+                    {...onboardingForm.register("howDidYouHearAboutUs")}
+                    className={cn(
+                        "w-full",
+                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    )}
+                />
+                {onboardingForm.formState.errors.howDidYouHearAboutUs && (
+                    <p className="text-red-500 text-sm">{onboardingForm.formState.errors.howDidYouHearAboutUs.message}</p>
+                )}
             </div>
             <div className="flex justify-between">
                 <Button
