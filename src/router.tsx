@@ -21,7 +21,7 @@ import Login from './pages/auth/log-in.tsx';
 import Signup from './pages/auth/sign-up.tsx';
 import Forgot from './pages/auth/forgot-password.tsx';
 import OTP from './pages/auth/otp.tsx';
-import Onboarding from './pages/auth/onboarding.tsx';
+import Onboarding from './pages/auth/onboarding/onboarding.tsx';
 import AuthCallback from './pages/auth/callback';
 
 // Error Pages
@@ -33,7 +33,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
 import Integrators from './pages/portal/Integrators/Integrators.tsx';
-import Settings from './pages/portal/settings/Settings.tsx';
+import Settings from './pages/portal/settings/settings.tsx';
 import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
 import Logs from './pages/portal/logs/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
@@ -66,7 +66,7 @@ import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-n
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
 import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 
-import Activation from './pages/auth/activation.tsx';
+import Activation from './pages/auth/kyc/activation.tsx';
 
 const AppRouter = () => (
     <Router>
