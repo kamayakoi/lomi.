@@ -29,6 +29,7 @@
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
     "supabase:db:reset": "npx supabase db reset",
+    "supabase:db:reset:linked": "supabase db reset --linked",
     "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts"
   },
   "dependencies": {
@@ -112,7 +113,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.5",
     "postcss": "8.4.35",
-    "supabase": "^1.192.5",
+    "supabase": "^1.200.3",
     "tailwindcss": "3.4.1",
     "typescript": "^5.5.4",
     "vite": "^5.4.2"
