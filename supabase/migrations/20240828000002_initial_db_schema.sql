@@ -132,6 +132,8 @@ CREATE TABLE merchant_organization_links (
   merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+  workspace_handle VARCHAR NOT NULL,
+  how_did_you_hear_about_us VARCHAR,
   role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
   organization_position VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
