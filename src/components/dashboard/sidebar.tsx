@@ -6,7 +6,7 @@ import Nav from './nav'
 import { cn } from '@/lib/utils'
 import { sidelinks } from '../../pages/portal/dashboard/data/sidelinks'
 import { useTheme } from '@/lib/useTheme'
-import icon from "/icon.png"
+import iconLight from "/icon.png"
 import iconDark from "/icon_dark.svg"
 import { supabase } from '@/utils/supabase/client'
 
@@ -65,7 +65,7 @@ export default function Sidebar({ className }: SidebarProps) {
           <a href="/portal" className="flex items-center gap-2">
             <div className="flex items-center justify-center rounded h-10 w-10">
               <img
-                src={theme === 'dark' ? iconDark : icon}
+                src={theme === 'dark' ? iconDark : iconLight}
                 alt="lomi. Logo"
                 className="object-contain h-full w-full"
               />
