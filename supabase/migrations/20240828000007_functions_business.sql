@@ -17,7 +17,7 @@ BEGIN
         o.organization_id,
         o.name,
         o.email,
-        o.logo_url,
+        COALESCE(o.logo_url, ''),
         o.website_url,
         oa.country,
         oa.address,

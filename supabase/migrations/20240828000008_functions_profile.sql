@@ -15,16 +15,14 @@ BEGIN
         m.merchant_id,
         m.name,
         m.email,
-        m.avatar_url,
+        COALESCE(m.avatar_url, ''),
         m.phone_number,
         m.referral_code,
         m.pin_code
     FROM 
         merchants m
-    JOIN
-        auth.users u ON m.email = u.email
     WHERE 
-        u.id = p_user_id;
+        m.merchant_id = p_user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -46,22 +44,6 @@ BEGIN
         phone_number = p_phone_number,
         pin_code = p_pin_code,
         referral_code = p_referral_code,
-        updated_at = NOW()
-    WHERE 
-        merchant_id = p_merchant_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Function to update merchant avatar
-CREATE OR REPLACE FUNCTION public.update_merchant_avatar(
-    p_merchant_id UUID,
-    p_avatar_url TEXT
-)
-RETURNS VOID AS $$
-BEGIN
-    UPDATE merchants
-    SET 
-        avatar_url = p_avatar_url,
         updated_at = NOW()
     WHERE 
         merchant_id = p_merchant_id;

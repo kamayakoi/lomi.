@@ -1,13 +1,7 @@
--- Disable RLS
-ALTER TABLE merchants DISABLE ROW LEVEL SECURITY;
-ALTER TABLE organizations DISABLE ROW LEVEL SECURITY;
-ALTER TABLE organization_addresses DISABLE ROW LEVEL SECURITY;
-ALTER TABLE merchant_organization_links DISABLE ROW LEVEL SECURITY;
-
 -- Drop the existing function if it exists
 DROP FUNCTION IF EXISTS public.complete_onboarding;
 
--- Create the new complete_onboarding function
+-- Create the complete_onboarding function
 CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_merchant_id UUID,
     p_phone_number VARCHAR,
@@ -104,9 +98,3 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Enable RLS
-ALTER TABLE merchants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE organization_addresses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE merchant_organization_links ENABLE ROW LEVEL SECURITY;

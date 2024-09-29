@@ -35,30 +35,31 @@ export default function Profile() {
 
     const fetchMerchant = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('No user found')
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
 
             const { data, error } = await supabase
-                .rpc('fetch_merchant_details', { p_user_id: user.id })
+                .rpc('fetch_merchant_details', { p_user_id: user.id });
 
-            if (error) throw error
+            if (error) throw error;
             if (data && data.length > 0) {
-                setMerchant(data[0] as MerchantDetails)
-                setAvatarUrl(data[0].avatar_url)
+                setMerchant(data[0] as MerchantDetails);
+                setAvatarUrl(data[0].avatar_url || null);
             } else {
-                throw new Error('No merchant found')
+                throw new Error('No merchant found');
             }
         } catch (error) {
-            console.error('Error fetching merchant:', error)
+            console.error('Error fetching merchant:', error);
             toast({
                 title: "Error",
                 description: "Failed to fetch merchant details",
                 variant: "destructive",
-            })
+            });
+            setAvatarUrl(null); // Set fallback avatar URL or placeholder
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     const handleAvatarUpdate = async (newAvatarUrl: string) => {
         setAvatarUrl(newAvatarUrl)
@@ -267,7 +268,11 @@ export default function Profile() {
             <div>
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4">
-                        <ProfilePictureUploader currentAvatar={avatarUrl} onAvatarUpdate={handleAvatarUpdate} />
+                        <ProfilePictureUploader
+                            currentAvatar={avatarUrl}
+                            onAvatarUpdate={handleAvatarUpdate}
+                            name={merchant?.name || ''}
+                        />
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">

@@ -31,28 +31,28 @@ export default function Business() {
 
     const fetchOrganization = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('No user found')
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
 
             const { data, error } = await supabase
-                .rpc('fetch_organization_details', { p_merchant_id: user.id })
+                .rpc('fetch_organization_details', { p_merchant_id: user.id });
 
-            if (error) throw error
+            if (error) throw error;
             if (data && data.length > 0) {
-                setOrganization(data[0] as OrganizationDetails)
-                setLogoUrl(data[0].logo_url)
+                setOrganization(data[0] as OrganizationDetails);
+                setLogoUrl(data[0].logo_url || null);
             } else {
-                throw new Error('No organization found')
+                throw new Error('No organization found');
             }
         } catch (error) {
-            console.error('Error fetching organization:', error)
+            console.error('Error fetching organization:', error);
             toast({
                 title: "Error",
                 description: "Failed to fetch organization details",
                 variant: "destructive",
-            })
+            });
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     }
 
@@ -111,7 +111,11 @@ export default function Business() {
                         </p>
                     </div>
 
-                    <LogoUploader currentLogo={logoUrl} onLogoUpdate={handleLogoUpdate} />
+                    <LogoUploader
+                        currentLogo={logoUrl}
+                        onLogoUpdate={handleLogoUpdate}
+                        companyName={organization?.name || ''}
+                    />
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="grid gap-2">
