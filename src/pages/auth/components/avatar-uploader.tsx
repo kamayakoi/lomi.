@@ -92,39 +92,56 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 const croppedImage = await getCroppedImg(
                     URL.createObjectURL(selectedFile),
                     croppedAreaPixels
-                )
+                );
 
                 if (croppedImage) {
                     // For preview purposes
-                    setPreviewUrl(URL.createObjectURL(croppedImage))
+                    setPreviewUrl(URL.createObjectURL(croppedImage));
 
                     // Upload to Supabase
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) throw new Error('No user found');
+
+                    const fileExt = selectedFile.name.split('.').pop();
+                    const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+                    const filePath = `${fileName}`;
+
                     const { data, error } = await supabase.storage
                         .from('avatars')
-                        .upload(`avatar-${Date.now()}.png`, croppedImage, { contentType: 'image/png' })
+                        .upload(filePath, croppedImage, { contentType: 'image/png' });
 
                     if (error) {
-                        throw error
+                        throw error;
                     }
 
                     if (data) {
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path)
-                        onAvatarUpdate(publicUrl)
+                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path);
+                        onAvatarUpdate(publicUrl);
+
+                        // Update the merchant's avatar URL in the database
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (user) {
+                            await supabase.rpc('update_merchant_avatar', {
+                                p_merchant_id: user.id,
+                                p_avatar_url: publicUrl,
+                            });
+                        }
+
                         toast({
                             title: "Success",
                             description: "Profile picture updated successfully",
-                        })
+                        });
                     }
                 }
             } catch (error) {
-                console.error('Error:', error)
+                console.error('Error:', error);
                 toast({
                     title: "Error",
                     description: "Failed to upload profile picture",
                     variant: "destructive",
-                })
+                });
             } finally {
-                setIsDialogOpen(false)
+                setIsDialogOpen(false);
             }
         }
     }

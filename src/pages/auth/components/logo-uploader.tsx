@@ -85,39 +85,62 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                 const croppedImage = await getCroppedImg(
                     URL.createObjectURL(selectedFile),
                     croppedAreaPixels
-                )
+                );
 
                 if (croppedImage) {
                     // For preview purposes
-                    setPreviewUrl(URL.createObjectURL(croppedImage))
+                    setPreviewUrl(URL.createObjectURL(croppedImage));
 
                     // Upload to Supabase
-                    const { data: { user } } = await supabase.auth.getUser()
-                    if (!user) throw new Error('No user found')
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) throw new Error('No user found');
 
-                    const fileExt = selectedFile.name.split('.').pop()
-                    const fileName = `${user.id}/logo-${Date.now()}.${fileExt}`
-                    const filePath = `${fileName}`
+                    const fileExt = selectedFile.name.split('.').pop();
+                    const fileName = `${user.id}/logo-${Date.now()}.${fileExt}`;
+                    const filePath = `${fileName}`;
 
                     const { data, error } = await supabase.storage
                         .from('logos')
-                        .upload(filePath, croppedImage, { contentType: 'image/png' })
+                        .upload(filePath, croppedImage, { contentType: 'image/png' });
 
                     if (error) {
-                        throw error
+                        throw error;
                     }
 
                     if (data) {
-                        const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(data.path)
-                        onLogoUpdate(publicUrl)
-                        toast({ title: "Success", description: "Logo updated successfully" })
+                        const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(data.path);
+                        onLogoUpdate(publicUrl);
+
+                        // Update the organization's logo URL in the database
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (user) {
+                            const { data: profile, error: profileError } = await supabase
+                                .from('merchant_organization_links')
+                                .select('organization_id')
+                                .eq('merchant_id', user.id)
+                                .single();
+
+                            if (profileError) {
+                                console.error('Error fetching organization ID:', profileError);
+                                throw new Error('Failed to fetch organization ID');
+                            }
+
+                            if (profile && profile.organization_id) {
+                                await supabase.rpc('update_organization_logo', {
+                                    p_organization_id: profile.organization_id,
+                                    p_logo_url: publicUrl,
+                                });
+                            }
+                        }
+
+                        toast({ title: "Success", description: "Logo updated successfully" });
                     }
                 }
             } catch (error) {
-                console.error('Error:', error)
-                toast({ title: "Error", description: "Failed to upload logo" })
+                console.error('Error:', error);
+                toast({ title: "Error", description: "Failed to upload logo" });
             } finally {
-                setIsDialogOpen(false)
+                setIsDialogOpen(false);
             }
         }
     }
