@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
@@ -11,9 +9,10 @@ import { toast } from "@/components/ui/use-toast"
 interface LogoUploaderProps {
     currentLogo: string | null
     onLogoUpdate: (newLogoUrl: string) => void
+    companyName: string
 }
 
-export default function LogoUploader({ currentLogo, onLogoUpdate }: LogoUploaderProps) {
+export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }: LogoUploaderProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -123,34 +122,53 @@ export default function LogoUploader({ currentLogo, onLogoUpdate }: LogoUploader
         }
     }
 
+    const getInitial = (companyName: string) => {
+        return companyName.charAt(0).toUpperCase()
+    }
+
+    const handleRemove = () => {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        onLogoUpdate('')
+    }
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
+            <p className="text-sm font-medium">Company logo</p>
             <div className="flex items-center space-x-4">
-                <div className="h-24 w-24 bg-gray-200 flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-16 bg-blue-500 text-white rounded-lg flex items-center justify-center">
                     {previewUrl ? (
-                        <img src={previewUrl} alt="Business logo" className="object-cover w-full h-full" />
+                        <img src={previewUrl} alt="Company logo" className="w-full h-full object-contain rounded-lg" />
                     ) : (
-                        <span className="text-gray-500">LOGO</span>
+                        <span className="text-2xl font-bold">{companyName ? getInitial(companyName) : ''}</span>
                     )}
                 </div>
-                <div className="space-y-2">
-                    <Input
-                        type="file"
-                        onChange={handleFileChange}
-                        accept="image/*"
+                <div className="space-x-2">
+                    <input
                         id="logo-upload"
+                        type="file"
+                        accept="image/*"
                         className="hidden"
+                        onChange={handleFileChange}
                     />
-                    <Label htmlFor="logo-upload" className="cursor-pointer">
-                        <Button variant="outline" asChild>
-                            <span>Choose file</span>
-                        </Button>
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                        Must be at least 200px by 200px and smaller than 1MB
-                    </p>
+                    <Button
+                        variant="outline"
+                        onClick={() => document.getElementById('logo-upload')?.click()}
+                    >
+                        Upload image
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={handleRemove}
+                        disabled={!previewUrl}
+                    >
+                        Remove
+                    </Button>
                 </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+                *png, *jpeg files up to 1MB at least 200px by 200px
+            </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">

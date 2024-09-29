@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import LogoUploader from '@/pages/auth/components/logo-uploader';
+import { useState, useEffect } from 'react';
 
 const onboardingStep2Schema = z.object({
     orgName: z.string().min(1, 'Organization name is required'),
@@ -13,12 +15,15 @@ const onboardingStep2Schema = z.object({
     orgEmployees: z.string().min(1, 'Number of employees is required'),
     orgCountry: z.string().min(1, 'Organization country is required'),
     orgRegion: z.string().min(1, 'Region is required'),
+    workspaceHandle: z.string().min(1, 'Workspace handle is required'),
 });
 
-type OnboardingStep2Data = z.infer<typeof onboardingStep2Schema>;
+type OnboardingStep2Data = z.infer<typeof onboardingStep2Schema> & {
+    logoUrl: string;
+};
 
 interface OnboardingStep2Props {
-    onNext: (data: OnboardingStep2Data) => void;
+    onNext: (data: OnboardingStep2Data & { logoUrl: string }) => void;
     onPrevious: () => void;
 }
 
@@ -28,9 +33,29 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
         mode: 'onChange',
     });
 
+    const [logoUrl, setLogoUrl] = useState('');
+
     const onSubmit = (data: OnboardingStep2Data) => {
-        onNext(data);
+        onNext({ ...data, logoUrl });
     };
+
+    const generateWorkspaceHandle = (orgName: string) => {
+        return orgName
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+    };
+
+    useEffect(() => {
+        const subscription = onboardingForm.watch((value, { name }) => {
+            if (name === 'orgName') {
+                const workspaceHandle = value.orgName ? generateWorkspaceHandle(value.orgName) : '';
+                onboardingForm.setValue('workspaceHandle', workspaceHandle);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [onboardingForm]);
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
@@ -116,6 +141,32 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgRegion && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgRegion.message}</p>}
                     </div>
                 </div>
+            </div>
+            <div className="mb-6">
+                <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle<span className="text-red-500">*</span></Label>
+                <div className="flex">
+                    <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-l-md">
+                        app.lomi.africa/
+                    </div>
+                    <Input
+                        id="workspaceHandle"
+                        placeholder="your-workspace"
+                        {...onboardingForm.register("workspaceHandle")}
+                        className={cn(
+                            "w-full rounded-l-none",
+                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        )}
+                    />
+                </div>
+                {onboardingForm.formState.errors.workspaceHandle && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.workspaceHandle.message}</p>}
+            </div>
+            <div className="mb-6">
+                <LogoUploader
+                    currentLogo={logoUrl}
+                    onLogoUpdate={setLogoUrl}
+                    companyName={onboardingForm.watch('orgName')}
+                />
             </div>
             <div className="flex justify-between">
                 <Button

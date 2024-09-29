@@ -1,32 +1,33 @@
 import React, { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { supabase } from '@/utils/supabase/client'
+import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
-import { supabase } from '@/utils/supabase/client'
-import { toast } from "@/components/ui/use-toast"
 
 interface ProfilePictureUploaderProps {
     currentAvatar: string | null
     onAvatarUpdate: (newAvatarUrl: string) => void
+    name: string
 }
 
-export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate }: ProfilePictureUploaderProps) {
+export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, name }: ProfilePictureUploaderProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatar)
 
     const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
         setCroppedAreaPixels(croppedAreaPixels)
     }, [])
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            const file = event.target.files[0]
+        const file = event.target.files?.[0]
+        if (file) {
             if (file.size > 1024 * 1024) {
                 toast({ title: "Error", description: "File size must be less than 1MB" })
                 return
@@ -88,6 +89,10 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate }
                 )
 
                 if (croppedImage) {
+                    // For preview purposes
+                    setPreviewUrl(URL.createObjectURL(croppedImage))
+
+                    // Upload to Supabase
                     const { data, error } = await supabase.storage
                         .from('avatars')
                         .upload(`avatar-${Date.now()}.png`, croppedImage, { contentType: 'image/png' })
@@ -99,46 +104,76 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate }
                     if (data) {
                         const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path)
                         onAvatarUpdate(publicUrl)
-                        toast({ title: "Success", description: "Profile picture updated successfully" })
+                        toast({
+                            title: "Success",
+                            description: "Profile picture updated successfully",
+                        })
                     }
                 }
             } catch (error) {
                 console.error('Error:', error)
-                toast({ title: "Error", description: "Failed to upload profile picture" })
+                toast({
+                    title: "Error",
+                    description: "Failed to upload profile picture",
+                    variant: "destructive",
+                })
             } finally {
                 setIsDialogOpen(false)
             }
         }
     }
 
+    const handleRemove = () => {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        onAvatarUpdate('')
+    }
+
+    const getInitials = (name: string) => {
+        const names = name.split(' ')
+        const initials = names.map(name => name.charAt(0)).join('')
+        return initials.toUpperCase().charAt(0)
+    }
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-2">
+            <p className="text-sm font-medium">Profile picture</p>
             <div className="flex items-center space-x-4">
-                <div className="h-20 w-20 bg-gray-200 flex items-center justify-center overflow-hidden rounded-full">
-                    {currentAvatar ? (
-                        <img src={currentAvatar} alt="Profile picture" className="object-cover w-full h-full" />
+                <Avatar className="w-16 h-16">
+                    {previewUrl ? (
+                        <AvatarImage src={previewUrl} alt="Profile picture" />
                     ) : (
-                        <span className="text-gray-500">Avatar</span>
+                        <AvatarFallback className="bg-blue-500 text-white">
+                            {name ? getInitials(name) : ''}
+                        </AvatarFallback>
                     )}
-                </div>
-                <div className="space-y-2">
-                    <Input
+                </Avatar>
+                <div className="space-x-2">
+                    <input
+                        id="profile-upload"
                         type="file"
-                        onChange={handleFileChange}
                         accept="image/*"
-                        id="avatar-upload"
                         className="hidden"
+                        onChange={handleFileChange}
                     />
-                    <Label htmlFor="avatar-upload" className="cursor-pointer">
-                        <Button variant="outline" asChild>
-                            <span>Choose file</span>
-                        </Button>
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                        Must be smaller than 1MB
-                    </p>
+                    <Button
+                        variant="outline"
+                        onClick={() => document.getElementById('profile-upload')?.click()}
+                    >
+                        Upload image
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={handleRemove}
+                        disabled={!previewUrl}
+                    >
+                        Remove
+                    </Button>
                 </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+                *png, *jpeg files up to 1MB at least 200px by 200px
+            </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">

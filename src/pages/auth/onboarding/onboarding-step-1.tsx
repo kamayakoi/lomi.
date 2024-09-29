@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { countryCodes, countries, organizationPositions } from '@/data/onboarding';
+import ProfilePictureUploader from '@/pages/auth/components/avatar-uploader';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
@@ -19,10 +20,12 @@ const onboardingStep1Schema = z.object({
     role: z.string().min(1, 'Role is required'),
 });
 
-type OnboardingStep1Data = z.infer<typeof onboardingStep1Schema>;
+type OnboardingStep1Data = z.infer<typeof onboardingStep1Schema> & {
+    avatarUrl: string;
+};
 
 interface OnboardingStep1Props {
-    onNext: (data: OnboardingStep1Data) => void;
+    onNext: (data: OnboardingStep1Data & { avatarUrl: string }) => void;
 }
 
 const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
@@ -36,6 +39,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
 
     const [countryCodeSearch, setCountryCodeSearch] = useState('');
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState('');
 
     const filteredCountryCodes = useMemo(() => {
         const lowercaseSearch = countryCodeSearch.toLowerCase();
@@ -45,7 +49,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
     }, [countryCodeSearch]);
 
     const onSubmit = (data: OnboardingStep1Data) => {
-        onNext(data);
+        onNext({ ...data, avatarUrl });
     };
 
     return (
@@ -143,6 +147,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                         {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
                     </div>
                 </div>
+            </div>
+            <div className="mb-6">
+                <ProfilePictureUploader
+                    currentAvatar={avatarUrl}
+                    onAvatarUpdate={setAvatarUrl}
+                    name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
+                />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">
