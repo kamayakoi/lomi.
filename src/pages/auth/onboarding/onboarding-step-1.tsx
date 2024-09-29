@@ -148,16 +148,19 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                     </div>
                 </div>
             </div>
-            <div className="mb-6">
-                <ProfilePictureUploader
-                    currentAvatar={avatarUrl}
-                    onAvatarUpdate={setAvatarUrl}
-                    name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
-                />
-            </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="flex-1">
+            <div className="mb-6 flex space-x-8">
+                <div className="w-1/2 space-y-6">
+                    <Label htmlFor="profilePicture" className="mb-1">Profile picture</Label>
+                    <div className="ml-8">
+                        <ProfilePictureUploader
+                            currentAvatar={avatarUrl}
+                            onAvatarUpdate={setAvatarUrl}
+                            name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
+                        />
+                    </div>
+                </div>
+                <div className="w-1/2 space-y-4">
+                    <div>
                         <Label htmlFor="country" className="mb-1">Country<span className="text-red-500">*</span></Label>
                         <select
                             id="country"
@@ -176,7 +179,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                         </select>
                         {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.country.message}</p>}
                     </div>
-                    <div className="flex-1">
+                    <div>
                         <Label htmlFor="role" className="mb-1">Your role<span className="text-red-500">*</span></Label>
                         <select
                             id="role"

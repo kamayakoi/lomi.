@@ -137,7 +137,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
 
     return (
         <div className="space-y-2">
-            <p className="text-sm font-medium">Profile picture</p>
             <div className="flex items-center space-x-4">
                 <Avatar className="w-16 h-16">
                     {previewUrl ? (
@@ -158,7 +157,10 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                     />
                     <Button
                         variant="outline"
-                        onClick={() => document.getElementById('profile-upload')?.click()}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById('profile-upload')?.click();
+                        }}
                     >
                         Upload image
                     </Button>
