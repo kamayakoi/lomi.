@@ -12,6 +12,13 @@ interface ProfilePictureUploaderProps {
     name: string
 }
 
+const colors = [
+    'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-pink-500', 'bg-purple-500',
+    'bg-red-500', 'bg-indigo-500', 'bg-orange-500', 'bg-teal-500', 'bg-cyan-500',
+    'bg-lime-500', 'bg-fuchsia-500', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500',
+    'bg-violet-500', 'bg-sky-500', 'bg-gray-500', 'bg-slate-500', 'bg-neutral-500'
+];
+
 export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, name }: ProfilePictureUploaderProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -134,15 +141,18 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
     }
 
     const getInitials = (name: string) => {
-        const names = name.split(' ')
-        const initials = names.map(name => name.charAt(0)).join('')
-        return initials.toUpperCase().charAt(0)
+        return name.charAt(0).toUpperCase()
+    }
+
+    const getBackgroundColor = (name: string) => {
+        const index = name.length - 1;
+        return colors[index] || colors[colors.length - 1];
     }
 
     return (
         <div className="space-y-2">
             <div className="flex items-center space-x-4">
-                <div className="w-20 h-20 bg-blue-500 text-white rounded-full flex items-center justify-center overflow-hidden">
+                <div className={`w-20 h-20 text-white rounded-full flex items-center justify-center overflow-hidden ${getBackgroundColor(name)}`}>
                     {previewUrl ? (
                         <img src={previewUrl} alt="Profile picture" className="w-full h-full object-cover" />
                     ) : (

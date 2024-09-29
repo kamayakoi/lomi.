@@ -131,6 +131,9 @@ const NewOnboarding: React.FC = () => {
             // Prepend "https://" to the website URL if not present
             const websiteUrl = formData.orgWebsite ? (formData.orgWebsite.startsWith('http') ? formData.orgWebsite : `https://${formData.orgWebsite}`) : '';
 
+            // Prepend "portal.lomi.africa/" to the workspace handle
+            const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
+
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
                 p_merchant_id: user.id,
@@ -149,7 +152,7 @@ const NewOnboarding: React.FC = () => {
                 p_org_website_url: websiteUrl,
                 p_org_employee_number: formData.orgEmployees,
                 p_preferred_language: formData.orgDefaultLanguage,
-                p_workspace_handle: formData.workspaceHandle,
+                p_workspace_handle: completeWorkspaceHandle,
                 p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
                 p_avatar_url: formData.avatarUrl,
                 p_logo_url: formData.logoUrl,

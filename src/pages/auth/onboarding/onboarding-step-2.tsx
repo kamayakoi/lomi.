@@ -36,8 +36,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
     const [logoUrl, setLogoUrl] = useState('');
 
     const onSubmit = (data: OnboardingStep2Data) => {
-        const completeWorkspaceHandle = `portal.lomi.africa/${data.workspaceHandle}`;
-        onNext({ ...data, logoUrl, workspaceHandle: completeWorkspaceHandle });
+        onNext({ ...data, logoUrl });
     };
 
     const generateWorkspaceHandle = (orgName: string) => {
@@ -154,10 +153,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         />
                     </div>
                 </div>
-                <div className="w-1/2 space-y-8">
+                <div className="w-1/2 space-y-10">
                     <Label htmlFor="workspaceHandle" className="block mb-2">Workspace Handle</Label>
                     <div className="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
-                        <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
+                        <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-base">
                             portal.lomi.africa/
                         </div>
                         <Input
@@ -165,7 +164,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                             placeholder="my-workspace"
                             {...onboardingForm.register("workspaceHandle")}
                             className={cn(
-                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px]",
+                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px] text-base",
                                 "dark:bg-gray-800 dark:text-white"
                             )}
                         />
