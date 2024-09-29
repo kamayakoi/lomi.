@@ -62,7 +62,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgName" className="mb-1">Company name<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgName" className="mb-1">Company name</Label>
                         <Input
                             id="orgName"
                             placeholder="Ashanti Shoes Inc."
@@ -76,10 +76,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgName.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgEmail" className="mb-1">Company email<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgEmail" className="mb-1">Company email</Label>
                         <Input
                             id="orgEmail"
-                            placeholder="jessy@example.com"
+                            placeholder="jessy@ashantishoes.com"
                             {...onboardingForm.register("orgEmail")}
                             className={cn(
                                 "w-full",
@@ -90,7 +90,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgEmail && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmail.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgEmployees" className="mb-1">Nb. of collaborators<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgEmployees" className="mb-1">Nb. of collaborators</Label>
                         <select
                             id="orgEmployees"
                             {...onboardingForm.register("orgEmployees")}
@@ -113,7 +113,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgCountry" className="mb-1">Company HQ<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgCountry" className="mb-1">Billing country</Label>
                         <Input
                             id="orgCountry"
                             placeholder="Côte d'Ivoire"
@@ -127,7 +127,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgCountry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCountry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgRegion" className="mb-1">Region<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgRegion" className="mb-1">Region</Label>
                         <Input
                             id="orgRegion"
                             placeholder="Lagunes"
@@ -154,14 +154,14 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                     </div>
                 </div>
                 <div className="w-1/2 space-y-8">
-                    <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle<span className="text-red-500">*</span></Label>
+                    <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle</Label>
                     <div className="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
                         <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
                             app.lomi.africa/
                         </div>
                         <Input
                             id="workspaceHandle"
-                            placeholder="your-workspace"
+                            placeholder="my-workspace"
                             {...onboardingForm.register("workspaceHandle")}
                             className={cn(
                                 "w-full border-0 focus:ring-0 pl-0 ml-[-10px]",

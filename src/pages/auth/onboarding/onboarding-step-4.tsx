@@ -47,7 +47,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgWebsite" className="mb-1">Website<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgWebsite" className="mb-1">Website</Label>
                         <Input
                             id="orgWebsite"
                             placeholder="example.com"
@@ -63,7 +63,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                         )}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgIndustry" className="mb-1">Industry<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgIndustry" className="mb-1">Industry</Label>
                         <select
                             id="orgIndustry"
                             {...onboardingForm.register("orgIndustry")}
@@ -82,7 +82,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                         {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language</Label>
                         <select
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}
@@ -103,13 +103,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                 </div>
             </div>
             <div className="mb-6">
-                <Label htmlFor="howDidYouHearAboutUs" className="mb-1">How did you hear about us?<span className="text-red-500">*</span></Label>
+                <Label htmlFor="howDidYouHearAboutUs" className="mb-1">How did you hear about us?</Label>
                 <Input
                     id="howDidYouHearAboutUs"
-                    placeholder="Search engine, social media, referral, etc."
+                    placeholder="Share how you heard about us..."
                     {...onboardingForm.register("howDidYouHearAboutUs")}
                     className={cn(
-                        "w-full",
+                        "w-full mb-2",
                         "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     )}

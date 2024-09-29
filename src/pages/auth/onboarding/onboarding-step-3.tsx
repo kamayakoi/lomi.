@@ -35,7 +35,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgCity" className="mb-1">City<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgCity" className="mb-1">City</Label>
                         <Input
                             id="orgCity"
                             placeholder="Abidjan"
@@ -49,7 +49,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDistrict" className="mb-1">District<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgDistrict" className="mb-1">District</Label>
                         <Input
                             id="orgDistrict"
                             placeholder="Cocody"
@@ -67,10 +67,10 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgPostalCode" className="mb-1">Postal code<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgPostalCode" className="mb-1">Postal code</Label>
                         <Input
                             id="orgPostalCode"
-                            placeholder="01015"
+                            placeholder="01012"
                             {...onboardingForm.register("orgPostalCode")}
                             className={cn(
                                 "w-full",
@@ -81,7 +81,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgAddress" className="mb-1">Address<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="orgAddress" className="mb-1">Address</Label>
                         <Input
                             id="orgAddress"
                             placeholder="123 Rue des Jardins"

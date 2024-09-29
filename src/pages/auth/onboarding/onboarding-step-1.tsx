@@ -57,7 +57,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="w-1/2">
-                        <Label htmlFor="firstName" className="mb-1">First name<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="firstName" className="mb-1">First name</Label>
                         <Input
                             id="firstName"
                             placeholder="Jessy"
@@ -71,7 +71,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                         {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
                     </div>
                     <div className="w-1/2">
-                        <Label htmlFor="lastName" className="mb-1">Last name<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="lastName" className="mb-1">Last name</Label>
                         <Input
                             id="lastName"
                             placeholder="Luckey"
@@ -89,7 +89,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="w-1/3">
-                        <Label htmlFor="countryCode" className="mb-1">Country code<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="countryCode" className="mb-1">Country code</Label>
                         <div className="relative">
                             <Input
                                 id="countryCode"
@@ -133,13 +133,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                         </div>
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="phoneNumber" className="mb-1">Phone number<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="phoneNumber" className="mb-1">Phone number</Label>
                         <Input
                             id="phoneNumber"
                             placeholder="0160223401"
                             {...onboardingForm.register("phoneNumber")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -161,7 +161,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                 </div>
                 <div className="w-1/2 space-y-4">
                     <div>
-                        <Label htmlFor="country" className="mb-1">Country<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="country" className="mb-1">Where are you based?</Label>
                         <select
                             id="country"
                             {...onboardingForm.register("country")}
@@ -180,7 +180,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                         {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.country.message}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="role" className="mb-1">Your role<span className="text-red-500">*</span></Label>
+                        <Label htmlFor="role" className="mb-1">Your role</Label>
                         <select
                             id="role"
                             {...onboardingForm.register("role")}

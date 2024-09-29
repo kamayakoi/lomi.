@@ -12,10 +12,10 @@ import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
 
 const steps = [
-    { title: 'Personal Information', component: OnboardingStep1 },
-    { title: 'Company Information', component: OnboardingStep2 },
-    { title: 'Company Details', component: OnboardingStep3 },
-    { title: 'Additional Information', component: OnboardingStep4 },
+    { title: 'Let\'s get to know you', component: OnboardingStep1 },
+    { title: 'Register your company', component: OnboardingStep2 },
+    { title: 'Help us customize your experience', component: OnboardingStep3 },
+    { title: 'A few more details and you\'re all set!', component: OnboardingStep4 },
 ];
 
 type OnboardingData = OnboardingStep1Data & OnboardingStep2Data & OnboardingStep3Data & OnboardingStep4Data;
