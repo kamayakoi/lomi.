@@ -47,13 +47,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgWebsite" className="mb-1">Website</Label>
+                        <Label htmlFor="orgWebsite" className="block mb-2">Website</Label>
                         <Input
                             id="orgWebsite"
                             placeholder="example.com"
                             {...onboardingForm.register("orgWebsite")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -63,12 +63,12 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                         )}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgIndustry" className="mb-1">Industry</Label>
+                        <Label htmlFor="orgIndustry" className="block mb-2">Industry</Label>
                         <select
                             id="orgIndustry"
                             {...onboardingForm.register("orgIndustry")}
                             className={cn(
-                                "p-2 border rounded-md w-full",
+                                "w-full mb-2 p-2 border rounded-md",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -82,12 +82,12 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                         {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="mb-1">Preferred language</Label>
+                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">Preferred language</Label>
                         <select
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}
                             className={cn(
-                                "p-2 border rounded-md w-full",
+                                "w-full mb-2 p-2 border rounded-md",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -103,7 +103,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious 
                 </div>
             </div>
             <div className="mb-6">
-                <Label htmlFor="howDidYouHearAboutUs" className="mb-1">How did you hear about us?</Label>
+                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">How did you hear about us?</Label>
                 <Input
                     id="howDidYouHearAboutUs"
                     placeholder="Share how you heard about us..."

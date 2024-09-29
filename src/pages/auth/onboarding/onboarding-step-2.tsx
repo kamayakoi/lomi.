@@ -36,7 +36,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
     const [logoUrl, setLogoUrl] = useState('');
 
     const onSubmit = (data: OnboardingStep2Data) => {
-        onNext({ ...data, logoUrl });
+        const completeWorkspaceHandle = `portal.lomi.africa/${data.workspaceHandle}`;
+        onNext({ ...data, logoUrl, workspaceHandle: completeWorkspaceHandle });
     };
 
     const generateWorkspaceHandle = (orgName: string) => {
@@ -62,13 +63,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgName" className="mb-1">Company name</Label>
+                        <Label htmlFor="orgName" className="block mb-2">Company name</Label>
                         <Input
                             id="orgName"
                             placeholder="Ashanti Shoes Inc."
                             {...onboardingForm.register("orgName")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -76,13 +77,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgName.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgEmail" className="mb-1">Company email</Label>
+                        <Label htmlFor="orgEmail" className="block mb-2">Company email</Label>
                         <Input
                             id="orgEmail"
                             placeholder="jessy@ashantishoes.com"
                             {...onboardingForm.register("orgEmail")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -90,12 +91,12 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgEmail && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmail.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgEmployees" className="mb-1">Nb. of collaborators</Label>
+                        <Label htmlFor="orgEmployees" className="block mb-2">Nb. of collaborators</Label>
                         <select
                             id="orgEmployees"
                             {...onboardingForm.register("orgEmployees")}
                             className={cn(
-                                "p-2 border rounded-md w-full",
+                                "w-full mb-2 p-2 border rounded-md",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -113,13 +114,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgCountry" className="mb-1">Billing country</Label>
+                        <Label htmlFor="orgCountry" className="block mb-2">Billing country</Label>
                         <Input
                             id="orgCountry"
                             placeholder="Côte d'Ivoire"
                             {...onboardingForm.register("orgCountry")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -127,13 +128,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgCountry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCountry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgRegion" className="mb-1">Region</Label>
+                        <Label htmlFor="orgRegion" className="block mb-2">Region</Label>
                         <Input
                             id="orgRegion"
                             placeholder="Lagunes"
                             {...onboardingForm.register("orgRegion")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -154,10 +155,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                     </div>
                 </div>
                 <div className="w-1/2 space-y-8">
-                    <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle</Label>
+                    <Label htmlFor="workspaceHandle" className="block mb-2">Workspace Handle</Label>
                     <div className="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
                         <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
-                            app.lomi.africa/
+                            portal.lomi.africa/
                         </div>
                         <Input
                             id="workspaceHandle"

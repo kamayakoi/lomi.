@@ -35,13 +35,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgCity" className="mb-1">City</Label>
+                        <Label htmlFor="orgCity" className="block mb-2">City</Label>
                         <Input
                             id="orgCity"
                             placeholder="Abidjan"
                             {...onboardingForm.register("orgCity")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -49,13 +49,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDistrict" className="mb-1">District</Label>
+                        <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
                         <Input
                             id="orgDistrict"
                             placeholder="Cocody"
                             {...onboardingForm.register("orgDistrict")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -67,13 +67,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgPostalCode" className="mb-1">Postal code</Label>
+                        <Label htmlFor="orgPostalCode" className="block mb-2">Postal code</Label>
                         <Input
                             id="orgPostalCode"
                             placeholder="01012"
                             {...onboardingForm.register("orgPostalCode")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -81,13 +81,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious })
                         {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgAddress" className="mb-1">Address</Label>
+                        <Label htmlFor="orgAddress" className="block mb-2">Address</Label>
                         <Input
                             id="orgAddress"
                             placeholder="123 Rue des Jardins"
                             {...onboardingForm.register("orgAddress")}
                             className={cn(
-                                "w-full",
+                                "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}

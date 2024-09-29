@@ -142,14 +142,14 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
     return (
         <div className="space-y-2">
             <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-blue-500 text-white rounded-lg flex items-center justify-center">
+                <div className="w-20 h-20 bg-blue-500 text-white rounded-full flex items-center justify-center overflow-hidden">
                     {previewUrl ? (
-                        <img src={previewUrl} alt="Profile picture" className="w-full h-full object-cover rounded-lg" />
+                        <img src={previewUrl} alt="Profile picture" className="w-full h-full object-cover" />
                     ) : (
-                        <span className="text-2xl font-bold">{name ? getInitials(name) : ''}</span>
+                        <span className="text-3xl font-bold">{name ? getInitials(name) : ''}</span>
                     )}
                 </div>
-                <div className="space-x-2">
+                <div className="space-x-2 mt-2">
                     <input
                         id="profile-upload"
                         type="file"
