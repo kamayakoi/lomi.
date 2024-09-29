@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { type OnboardingData } from './onboarding';
 
 const onboardingStep3Schema = z.object({
     orgCity: z.string().min(1, 'City is required'),
@@ -18,12 +19,19 @@ type OnboardingStep3Data = z.infer<typeof onboardingStep3Schema>;
 interface OnboardingStep3Props {
     onNext: (data: OnboardingStep3Data) => void;
     onPrevious: () => void;
+    data: OnboardingData;
 }
 
-const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious }) => {
+const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, data }) => {
     const onboardingForm = useForm<OnboardingStep3Data>({
         resolver: zodResolver(onboardingStep3Schema),
         mode: 'onChange',
+        defaultValues: {
+            orgCity: data.orgCity,
+            orgDistrict: data.orgDistrict,
+            orgPostalCode: data.orgPostalCode,
+            orgAddress: data.orgAddress,
+        },
     });
 
     const onSubmit = (data: OnboardingStep3Data) => {

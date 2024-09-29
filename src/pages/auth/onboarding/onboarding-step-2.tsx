@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import LogoUploader from '@/pages/auth/components/logo-uploader';
 import { useState, useEffect } from 'react';
+import { type OnboardingData } from './onboarding';
 
 const onboardingStep2Schema = z.object({
     orgName: z.string().min(1, 'Organization name is required'),
@@ -25,12 +26,21 @@ type OnboardingStep2Data = z.infer<typeof onboardingStep2Schema> & {
 interface OnboardingStep2Props {
     onNext: (data: OnboardingStep2Data & { logoUrl: string }) => void;
     onPrevious: () => void;
+    data: OnboardingData;
 }
 
-const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious }) => {
+const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, data }) => {
     const onboardingForm = useForm<OnboardingStep2Data>({
         resolver: zodResolver(onboardingStep2Schema),
         mode: 'onChange',
+        defaultValues: {
+            orgName: data.orgName,
+            orgEmail: data.orgEmail,
+            orgEmployees: data.orgEmployees,
+            orgCountry: data.orgCountry,
+            orgRegion: data.orgRegion,
+            workspaceHandle: data.workspaceHandle,
+        },
     });
 
     const [logoUrl, setLogoUrl] = useState('');

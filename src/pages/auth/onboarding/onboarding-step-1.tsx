@@ -26,14 +26,20 @@ type OnboardingStep1Data = z.infer<typeof onboardingStep1Schema> & {
 
 interface OnboardingStep1Props {
     onNext: (data: OnboardingStep1Data & { avatarUrl: string }) => void;
+    data: OnboardingStep1Data & { avatarUrl: string };
 }
 
-const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
+const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
     const onboardingForm = useForm<OnboardingStep1Data>({
         resolver: zodResolver(onboardingStep1Schema),
         mode: 'onChange',
         defaultValues: {
-            countryCode: '+225',
+            firstName: data.firstName,
+            lastName: data.lastName,
+            countryCode: data.countryCode || '+225',
+            phoneNumber: data.phoneNumber,
+            country: data.country,
+            role: data.role,
         },
     });
 

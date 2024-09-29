@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { type OnboardingData } from './onboarding';
 
 const onboardingStep4Schema = z.object({
     orgWebsite: z.string().min(1, 'Website is required').refine((value) => {
@@ -27,15 +28,19 @@ type OnboardingStep4Data = z.infer<typeof onboardingStep4Schema>;
 interface OnboardingStep4Props {
     onSubmit: (data: OnboardingStep4Data) => void;
     onPrevious: () => void;
+    data: OnboardingData;
 }
 
-const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious }) => {
+const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious, data }) => {
     const onboardingForm = useForm<OnboardingStep4Data>({
         resolver: zodResolver(onboardingStep4Schema),
         mode: 'onChange',
         defaultValues: {
-            orgDefaultLanguage: 'English'
-        }
+            orgWebsite: data.orgWebsite,
+            orgIndustry: data.orgIndustry,
+            orgDefaultLanguage: data.orgDefaultLanguage || 'English',
+            howDidYouHearAboutUs: data.howDidYouHearAboutUs,
+        },
     });
 
     const handleSubmit = (data: OnboardingStep4Data) => {

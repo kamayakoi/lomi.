@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { cn } from '@/lib/utils';
-import OnboardingStep1, { type OnboardingStep1Data } from './onboarding-step-1';
-import OnboardingStep2, { type OnboardingStep2Data } from './onboarding-step-2';
-import OnboardingStep3, { type OnboardingStep3Data } from './onboarding-step-3';
+import OnboardingStep1 from './onboarding-step-1';
+import OnboardingStep2 from './onboarding-step-2';
+import OnboardingStep3 from './onboarding-step-3';
 import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +18,32 @@ const steps = [
     { title: 'A few more details and you\'re all set!', component: OnboardingStep4 },
 ];
 
-type OnboardingData = OnboardingStep1Data & OnboardingStep2Data & OnboardingStep3Data & OnboardingStep4Data;
+const initialOnboardingData = {
+    firstName: '',
+    lastName: '',
+    countryCode: '',
+    phoneNumber: '',
+    country: '',
+    role: '',
+    orgName: '',
+    orgEmail: '',
+    orgEmployees: '',
+    orgCountry: '',
+    orgRegion: '',
+    orgCity: '',
+    orgDistrict: '',
+    orgPostalCode: '',
+    orgAddress: '',
+    orgWebsite: '',
+    orgIndustry: '',
+    orgDefaultLanguage: '',
+    workspaceHandle: '',
+    avatarUrl: '',
+    logoUrl: '',
+    howDidYouHearAboutUs: '',
+};
+
+export type OnboardingData = typeof initialOnboardingData;
 
 const NewOnboarding: React.FC = () => {
     const [loading, setLoading] = useState(true);
@@ -26,30 +51,7 @@ const NewOnboarding: React.FC = () => {
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-    const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-        firstName: '',
-        lastName: '',
-        countryCode: '',
-        phoneNumber: '',
-        country: '',
-        role: '',
-        orgName: '',
-        orgEmail: '',
-        orgEmployees: '',
-        orgCountry: '',
-        orgRegion: '',
-        orgCity: '',
-        orgDistrict: '',
-        orgPostalCode: '',
-        orgAddress: '',
-        orgWebsite: '',
-        orgIndustry: '',
-        orgDefaultLanguage: '',
-        workspaceHandle: '',
-        avatarUrl: '',
-        logoUrl: '',
-        howDidYouHearAboutUs: '',
-    });
+    const [onboardingData, setOnboardingData] = useState<OnboardingData>(initialOnboardingData);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -109,7 +111,7 @@ const NewOnboarding: React.FC = () => {
     };
 
     const onNext = (stepData: Partial<OnboardingData>) => {
-        setOnboardingData({ ...onboardingData, ...stepData });
+        setOnboardingData((prevData) => ({ ...prevData, ...stepData }));
         setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     };
 
@@ -119,7 +121,7 @@ const NewOnboarding: React.FC = () => {
 
     const onSubmit = async (stepData: OnboardingStep4Data) => {
         try {
-            setOnboardingData({ ...onboardingData, ...stepData });
+            setOnboardingData((prevData) => ({ ...prevData, ...stepData }));
             setLoading(true);
 
             if (!user) {
@@ -185,13 +187,13 @@ const NewOnboarding: React.FC = () => {
     const renderStep = () => {
         switch (currentStep) {
             case 0:
-                return <OnboardingStep1 onNext={(data) => onNext(data)} />;
+                return <OnboardingStep1 onNext={onNext} data={onboardingData} />;
             case 1:
-                return <OnboardingStep2 onNext={(data) => onNext(data)} onPrevious={onPrevious} />;
+                return <OnboardingStep2 onNext={onNext} onPrevious={onPrevious} data={onboardingData} />;
             case 2:
-                return <OnboardingStep3 onNext={(data) => onNext(data)} onPrevious={onPrevious} />;
+                return <OnboardingStep3 onNext={onNext} onPrevious={onPrevious} data={onboardingData} />;
             case 3:
-                return <OnboardingStep4 onSubmit={onSubmit} onPrevious={onPrevious} />;
+                return <OnboardingStep4 onSubmit={onSubmit} onPrevious={onPrevious} data={onboardingData} />;
             default:
                 return null;
         }
