@@ -149,7 +149,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext }) => {
                 </div>
             </div>
             <div className="mb-6 flex space-x-8">
-                <div className="w-1/2 space-y-6">
+                <div className="w-1/2 space-y-4">
                     <Label htmlFor="profilePicture" className="mb-1">Profile picture</Label>
                     <div className="ml-8">
                         <ProfilePictureUploader

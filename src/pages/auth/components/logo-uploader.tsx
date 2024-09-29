@@ -130,11 +130,15 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
         setSelectedFile(null)
         setPreviewUrl(null)
         onLogoUpdate('')
+        // Reset the file input value to allow selecting the same file again
+        const fileInput = document.getElementById('logo-upload') as HTMLInputElement
+        if (fileInput) {
+            fileInput.value = ''
+        }
     }
 
     return (
         <div className="space-y-2">
-            <p className="text-sm font-medium">Company logo</p>
             <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-blue-500 text-white rounded-lg flex items-center justify-center">
                     {previewUrl ? (
@@ -153,9 +157,12 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                     />
                     <Button
                         variant="outline"
-                        onClick={() => document.getElementById('logo-upload')?.click()}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById('logo-upload')?.click();
+                        }}
                     >
-                        Upload image
+                        {previewUrl ? 'Replace image' : 'Upload image'}
                     </Button>
                     <Button
                         variant="outline"

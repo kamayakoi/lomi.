@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { supabase } from '@/utils/supabase/client'
 import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -127,6 +126,11 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
         setSelectedFile(null)
         setPreviewUrl(null)
         onAvatarUpdate('')
+        // Reset the file input value to allow selecting the same file again
+        const fileInput = document.getElementById('profile-upload') as HTMLInputElement
+        if (fileInput) {
+            fileInput.value = ''
+        }
     }
 
     const getInitials = (name: string) => {
@@ -138,15 +142,13 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
     return (
         <div className="space-y-2">
             <div className="flex items-center space-x-4">
-                <Avatar className="w-16 h-16">
+                <div className="w-16 h-16 bg-blue-500 text-white rounded-lg flex items-center justify-center">
                     {previewUrl ? (
-                        <AvatarImage src={previewUrl} alt="Profile picture" />
+                        <img src={previewUrl} alt="Profile picture" className="w-full h-full object-cover rounded-lg" />
                     ) : (
-                        <AvatarFallback className="bg-blue-500 text-white">
-                            {name ? getInitials(name) : ''}
-                        </AvatarFallback>
+                        <span className="text-2xl font-bold">{name ? getInitials(name) : ''}</span>
                     )}
-                </Avatar>
+                </div>
                 <div className="space-x-2">
                     <input
                         id="profile-upload"
@@ -162,7 +164,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                             document.getElementById('profile-upload')?.click();
                         }}
                     >
-                        Upload image
+                        {previewUrl ? 'Replace image' : 'Upload image'}
                     </Button>
                     <Button
                         variant="outline"

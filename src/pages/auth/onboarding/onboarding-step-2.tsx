@@ -142,31 +142,35 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious })
                     </div>
                 </div>
             </div>
-            <div className="mb-6">
-                <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle<span className="text-red-500">*</span></Label>
-                <div className="flex">
-                    <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-l-md">
-                        app.lomi.africa/
+            <div className="mb-6 flex space-x-8">
+                <div className="w-1/2 space-y-6">
+                    <p className="text-sm font-medium">Company logo</p>
+                    <div className="ml-8">
+                        <LogoUploader
+                            currentLogo={logoUrl}
+                            onLogoUpdate={setLogoUrl}
+                            companyName={onboardingForm.watch('orgName')}
+                        />
                     </div>
-                    <Input
-                        id="workspaceHandle"
-                        placeholder="your-workspace"
-                        {...onboardingForm.register("workspaceHandle")}
-                        className={cn(
-                            "w-full rounded-l-none",
-                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        )}
-                    />
                 </div>
-                {onboardingForm.formState.errors.workspaceHandle && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.workspaceHandle.message}</p>}
-            </div>
-            <div className="mb-6">
-                <LogoUploader
-                    currentLogo={logoUrl}
-                    onLogoUpdate={setLogoUrl}
-                    companyName={onboardingForm.watch('orgName')}
-                />
+                <div className="w-1/2 space-y-8">
+                    <Label htmlFor="workspaceHandle" className="mb-1">Workspace Handle<span className="text-red-500">*</span></Label>
+                    <div className="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
+                        <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
+                            app.lomi.africa/
+                        </div>
+                        <Input
+                            id="workspaceHandle"
+                            placeholder="your-workspace"
+                            {...onboardingForm.register("workspaceHandle")}
+                            className={cn(
+                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px]",
+                                "dark:bg-gray-800 dark:text-white"
+                            )}
+                        />
+                    </div>
+                    {onboardingForm.formState.errors.workspaceHandle && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.workspaceHandle.message}</p>}
+                </div>
             </div>
             <div className="flex justify-between">
                 <Button
