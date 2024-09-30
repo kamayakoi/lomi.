@@ -1,9 +1,9 @@
 import { supabase } from '@/utils/supabase/client';
 import { Database } from '@/../database.types';
 
-type UserOrganizationLink = Database['public']['Tables']['user_organization_links']['Row'];
-type UserOrganizationLinkInsert = Database['public']['Tables']['user_organization_links']['Insert'];
-type UserOrganizationLinkUpdate = Database['public']['Tables']['user_organization_links']['Update'];
+type UserOrganizationLink = Database['public']['Tables']['merchant_organization_links']['Row'];
+type UserOrganizationLinkInsert = Database['public']['Tables']['merchant_organization_links']['Insert'];
+type UserOrganizationLinkUpdate = Database['public']['Tables']['merchant_organization_links']['Update'];
 
 export async function createUserOrganizationLink(linkData: UserOrganizationLinkInsert): Promise<UserOrganizationLink | null> {
   const { data, error } = await supabase

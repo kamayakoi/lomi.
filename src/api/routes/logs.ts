@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
-    const { user_id, action, details } = req.body;
-    const newLog = await createLog({ user_id, action, details });
+    const { merchant_id, action, details } = req.body;
+    const newLog = await createLog({ merchant_id, action, details, severity: 'info' });
     res.status(201).json(newLog);
   } catch (error) {
     console.error('Error creating log:', error);

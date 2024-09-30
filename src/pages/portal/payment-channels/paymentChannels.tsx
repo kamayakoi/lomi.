@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
@@ -71,24 +72,10 @@ export default function PaymentChannels() {
     }
   }
 
-  const handleStripeConnect = async () => {
-    try {
-      const response = await fetch("/api/stripe/account_link", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+  const navigate = useNavigate()
 
-      if (!response.ok) {
-        throw new Error("Failed to create Stripe account link")
-      }
-
-      const { url } = await response.json()
-      window.location.href = url
-    } catch (error) {
-      console.error("Error creating Stripe account link:", error)
-    }
+  const handleStripeConnect = () => {
+    navigate('/portal/stripe-connect-landing')
   }
 
   const filteredProviders = providers

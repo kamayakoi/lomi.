@@ -1,9 +1,9 @@
 import { supabase } from '@/utils/supabase/client';
 import { Database } from '@/../database.types';
 
-type EndCustomer = Database['public']['Tables']['end_customers']['Row'];
-type EndCustomerInsert = Database['public']['Tables']['end_customers']['Insert'];
-type EndCustomerUpdate = Database['public']['Tables']['end_customers']['Update'];
+type EndCustomer = Database['public']['Tables']['customers']['Row'];
+type EndCustomerInsert = Database['public']['Tables']['customers']['Insert'];
+type EndCustomerUpdate = Database['public']['Tables']['customers']['Update'];
 
 export async function createEndCustomer(endCustomerData: EndCustomerInsert): Promise<EndCustomer | null> {
   const { data, error } = await supabase

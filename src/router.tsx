@@ -70,6 +70,8 @@ import Activation from './pages/auth/kyc/activation.tsx';
 
 // API pages
 import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
+import StripeOnboarding from "../providers/stripe/StripeOnboarding";
+import StripeConnectLanding from "../providers/stripe/StripeConnectLanding";
 
 const AppRouter = () => (
     <Router>
@@ -107,6 +109,8 @@ const AppRouter = () => (
                     <Route path="payout-links" element={<PayoutLinks />} />
                     <Route path="payment-links" element={<PaymentLinks />} />
                     <Route path="customers" element={<Customers />} />
+                    <Route path="stripe-connect-landing" element={<StripeConnectLanding />} />
+                    <Route path="stripe-onboarding" element={<StripeOnboarding />} />
 
                     <Route path="settings" element={<Settings />}>
                         <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
