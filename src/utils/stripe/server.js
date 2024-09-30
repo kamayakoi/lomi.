@@ -16,7 +16,7 @@ const stripe = new Stripe(
     }
 );
 
-app.use(express.static(path.join(__dirname, '..', '..', '..', 'dist')));
+app.use(express.static(path.join(__dirname, "..", "..", "..", "dist")));
 app.use(express.json());
 
 app.post("/account_session", async (req, res) => {
@@ -74,7 +74,7 @@ app.post("/account", async (req, res) => {
 });
 
 app.get("*", (_req, res) => {
-    res.sendFile(path.join(__dirname, '..', '..', '..', 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, "..", "..", "..", "dist", "index.html"));
 });
 
 app.listen(4242, () => console.log("Node server listening on port 4242! Visit http://localhost:4242 in your browser."));
