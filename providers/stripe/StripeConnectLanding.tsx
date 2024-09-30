@@ -1,10 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useStripeConnect } from "../../src/lib/hooks/useStripeConnect";
+import {
+  ConnectAccountOnboarding,
+  ConnectComponentsProvider,
+} from "@stripe/react-connect-js";
 
 export default function StripeConnectLanding() {
   const [accountCreatePending, setAccountCreatePending] = useState(false);
+  const [onboardingExited, setOnboardingExited] = useState(false);
   const [error, setError] = useState(false);
-  const navigate = useNavigate();
+  const [connectedAccountId, setConnectedAccountId] = useState<string | null>(null);
+  const stripeConnectInstance = useStripeConnect(connectedAccountId);
 
   const handleSignUp = async () => {
     setAccountCreatePending(true);
@@ -19,8 +25,7 @@ export default function StripeConnectLanding() {
         const { account } = await response.json();
 
         if (account) {
-          // Redirect to the StripeOnboarding page
-          navigate("/stripe-onboarding");
+          setConnectedAccountId(account);
         } else {
           setError(true);
         }
@@ -36,21 +41,40 @@ export default function StripeConnectLanding() {
   };
 
   return (
-    <div className="container mx-auto">
-      <div className="banner">
-        <h2>lomi.</h2>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ width: "100vw", height: "64px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#09090b", color: "#ffffff" }}>
+        <h2 style={{ marginBottom: "18px", marginTop: "18px" }}>lomi.</h2>
       </div>
-      <div className="content">
-        <h2>Get ready for take off</h2>
-        <p>lomi. is the world&apos;s leading air travel platform: join our team of pilots to help people travel faster.</p>
-        {!accountCreatePending && (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", textAlign: "center", width: "420px", paddingTop: "40px", marginBottom: "110px" }}>
+        {!connectedAccountId && <h2 style={{ marginBottom: "0", fontSize: "20px" }}>Get ready for take off</h2>}
+        {connectedAccountId && !stripeConnectInstance && <h2 style={{ marginBottom: "0", fontSize: "20px" }}>Add information to start accepting money</h2>}
+        {!connectedAccountId && <p style={{ margin: "0", color: "#687385", padding: "8px 0" }}>lomi. is the world&apos;s leading air travel platform: join our team of pilots to help people travel faster.</p>}
+        {!accountCreatePending && !connectedAccountId && (
           <div>
-            <button onClick={handleSignUp}>Sign up</button>
+            <button
+              style={{ fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", fontSize: "16px", fontWeight: "600", border: "1px solid gray", borderRadius: "4px", marginTop: "32px", paddingTop: "10px", paddingBottom: "10px", backgroundColor: "#09090b", color: "#ffffff", width: "420px" }}
+              onClick={handleSignUp}
+            >
+              Sign up
+            </button>
           </div>
         )}
-        {error && <p className="error">Something went wrong!</p>}
-        {accountCreatePending && <p>Creating a connected account...</p>}
-        <div className="info-callout">
+        {stripeConnectInstance && (
+          <ConnectComponentsProvider connectInstance={stripeConnectInstance}>
+            <ConnectAccountOnboarding
+              onExit={() => setOnboardingExited(true)}
+            />
+          </ConnectComponentsProvider>
+        )}
+        {error && <p style={{ fontWeight: "400", color: "#E61947", fontSize: "14px" }}>Something went wrong!</p>}
+        {(connectedAccountId || accountCreatePending || onboardingExited) && (
+          <div style={{ position: "fixed", bottom: "110px", borderRadius: "4px", boxShadow: "0px 5px 15px 0px rgba(0, 0, 0, 0.12), 0px 15px 35px 0px rgba(48, 49, 61, 0.08)", padding: "9px 12px", backgroundColor: "#ffffff" }}>
+            {connectedAccountId && <p>Your connected account ID is: <code style={{ fontWeight: "700", fontSize: "14px" }}>{connectedAccountId}</code></p>}
+            {accountCreatePending && <p>Creating a connected account...</p>}
+            {onboardingExited && <p>The Account Onboarding component has exited</p>}
+          </div>
+        )}
+        <div style={{ position: "fixed", bottom: "40px", borderRadius: "4px", boxShadow: "0px 5px 15px 0px rgba(0, 0, 0, 0.12), 0px 15px 35px 0px rgba(48, 49, 61, 0.08)", padding: "9px 12px", backgroundColor: "#ffffff" }}>
           <p>
             This is a sample app for Connect onboarding using the Account Onboarding embedded component. <a href="https://docs.stripe.com/connect/onboarding/quickstart?connect-onboarding-surface=embedded" target="_blank" rel="noopener noreferrer">View docs</a>
           </p>

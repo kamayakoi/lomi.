@@ -1,0 +1,51 @@
+# Making API Calls for Connected Accounts in Stripe Connect
+
+1. **Server-side API calls**
+   - Use the `Stripe-Account` header with the connected account ID.
+   - Example of creating a PaymentIntent:
+   ```javascript
+   const stripe = require('stripe')('sk_test_...');
+   
+   const paymentIntent = await stripe.paymentIntents.create(
+     {
+       amount: 1000,
+       currency: 'usd',
+       automatic_payment_methods: { enabled: true },
+     },
+     {
+       stripeAccount: '{{CONNECTED_ACCOUNT_ID}}',
+     }
+   );
+   ```
+
+2. **API requests with account ID in URL**
+   - Example of retrieving an account:
+   ```javascript
+   const account = await stripe.accounts.retrieve('{{CONNECTED_ACCOUNT_ID}}');
+   ```
+
+3. **Per-request basis for server-side libraries**
+   - Example of creating a customer:
+   ```javascript
+   const customer = await stripe.customers.create(
+     { email: 'person@example.com' },
+     { stripeAccount: '{{CONNECTED_ACCOUNT_ID}}' }
+   );
+   ```
+
+4. **Client-side API calls**
+   - Pass the connected account ID as an argument to the client library.
+   - Example for JavaScript/React:
+   ```javascript
+   var stripe = Stripe('pk_test_...', {
+     stripeAccount: {{CONNECTED_ACCOUNT_ID}},
+   });
+   ```
+
+5. **Rate limits and allocations**
+   - Be aware that Stripe has established rate limits and allocations for API endpoints to help with performance and reliability.
+
+6. **Best practices**
+   - Always use the appropriate method (server-side or client-side) based on the context of your application.
+   - Ensure to replace placeholder values (e.g., `{{CONNECTED_ACCOUNT_ID}}`) with actual account IDs in your code.
+   - Keep your API keys secure and use the correct key (test/live) based on your environment.

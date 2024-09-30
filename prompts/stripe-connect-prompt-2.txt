@@ -1,0 +1,71 @@
+# Stripe Connect Integration - Continued
+
+1. **Embedded onboarding**
+   - Show a localized onboarding form that validates data.
+   - Use the Accounts API to read requirements and generate an onboarding form.
+
+2. **Create a connected account with default properties**
+   - Example code in `server.js`:
+   ```javascript
+   // Set your secret key. Remember to switch to your live secret key in production.
+   const stripe = require('stripe')('sk_test_51Ig94GGwgS0qnVOVRggeHRD8GnsDXDz4IuXzI8DHbezmT4CJSSItElsEN9SGXJr35eW4hJLA8ve7FWCatMO0ZRHR00lXyh0MQF');
+
+   const account = await stripe.accounts.create();
+   ```
+
+3. **Create an Account Session**
+   - Enable account onboarding by specifying `account_onboarding` in the components parameter.
+   - Example code in `server.js`:
+   ```javascript
+   const accountSession = await stripe.accountSessions.create({
+     account: '{{CONNECTED_ACCOUNT_ID}}',
+     components: {
+       account_onboarding: {
+         enabled: true,
+         features: {
+           external_account_collection: true,
+         },
+       },
+     },
+   });
+   ```
+
+4. **Render the Account onboarding component in the front end**
+   - Example code in your React component:
+   ```javascript
+   import * as React from "react";
+   import { ConnectAccountOnboarding, ConnectComponentsProvider } from "@stripe/react-connect-js";
+
+   const AccountOnboardingUI = () => {
+     return (
+       <ConnectComponentsProvider connectInstance={stripeConnectInstance}>
+         <ConnectAccountOnboarding
+           onExit={() => {
+             console.log("The account has exited onboarding");
+           }}
+           // Optional: follow policy instructions
+           // fullTermsOfServiceUrl="{{URL}}"
+           // recipientTermsOfServiceUrl="{{URL}}"
+           // privacyPolicyUrl="{{URL}}"
+           // skipTermsOfServiceCollection={false}
+           // collectionOptions={{
+           //   fields: 'eventually_due',
+           //   futureRequirements: 'include',
+           // }}
+           // onStepChange={(stepChange) => {
+           //   console.log(`User entered: ${stepChange.step}`);
+           // }}
+         />
+       </ConnectComponentsProvider>
+     );
+   }
+   ```
+
+5. **Handle new requirements becoming due**
+   - Set up your integration to listen for changes to account requirements.
+   - Use test mode trigger cards to simulate handling new requirements.
+   - Proactively collect information to fulfill future requirements by sending the connected account back into onboarding as necessary.
+
+6. **Handle verification errors**
+   - Listen to the `account.updated` event.
+   - If any currently_due fields are not fulfilled by the deadline, direct accounts to the Account onboarding component to remediate their verification requirements.
