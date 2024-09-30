@@ -47,15 +47,15 @@ export default function StripeConnectLanding() {
       </div>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", textAlign: "center", width: "420px", paddingTop: "40px", marginBottom: "110px" }}>
         {!connectedAccountId && <h2 style={{ marginBottom: "0", fontSize: "20px" }}>Get ready for take off</h2>}
-        {connectedAccountId && !stripeConnectInstance && <h2 style={{ marginBottom: "0", fontSize: "20px" }}>Add information to start accepting money</h2>}
-        {!connectedAccountId && <p style={{ margin: "0", color: "#687385", padding: "8px 0" }}>lomi. is the world&apos;s leading air travel platform: join our team of pilots to help people travel faster.</p>}
+        {connectedAccountId && !stripeConnectInstance && <h2 style={{ marginBottom: "0", fontSize: "20px" }}>Add information to start accepting card payments and more integrations such as Apple Pay. </h2>}
+        {!connectedAccountId && <p style={{ margin: "0", color: "#687385", padding: "8px 0" }}>lomi. is West Africa&apos;s Payment Orchestration Platform. We help businesses reach their customers on their preferred payment methods.</p>}
         {!accountCreatePending && !connectedAccountId && (
           <div>
             <button
               style={{ fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", fontSize: "16px", fontWeight: "600", border: "1px solid gray", borderRadius: "4px", marginTop: "32px", paddingTop: "10px", paddingBottom: "10px", backgroundColor: "#09090b", color: "#ffffff", width: "420px" }}
               onClick={handleSignUp}
             >
-              Sign up
+              Activate Stripe
             </button>
           </div>
         )}
