@@ -2,7 +2,7 @@ import { StripeProvider } from './stripe/stripeProvider';
 import { Database } from '../database.types';
 import Stripe from 'stripe';
 
-type User = Database['public']['Tables']['users']['Row'];
+type User = Database['public']['Tables']['merchants']['Row'];
 type Transaction = Database['public']['Tables']['transactions']['Row'];
 
 export interface Provider {
