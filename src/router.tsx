@@ -68,6 +68,9 @@ import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx'
 
 import Activation from './pages/auth/kyc/activation.tsx';
 
+// API pages
+import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
+
 const AppRouter = () => (
     <Router>
         <SessionCheck>
@@ -146,6 +149,10 @@ const AppRouter = () => (
                 <Route path="/404" element={<NotFoundError />} />
                 <Route path="/503" element={<MaintenanceError />} />
                 <Route path="*" element={<NotFoundError />} />
+
+                {/* API routes */}
+                <Route path="api/stripe/callback" element={<StripeCallback />} />
+
             </Routes>
         </SessionCheck>
     </Router>

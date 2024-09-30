@@ -1,11 +1,16 @@
 import React, { useState } from "react";
+import { useStripeConnect } from "../hooks/useStripeConnect";
+import {
+  ConnectAccountOnboarding,
+  ConnectComponentsProvider,
+} from "@stripe/react-connect-js";
 
 export default function Home() {
   const [accountCreatePending, setAccountCreatePending] = useState(false);
-  const [accountUpdatePending, setAccountUpdatePending] = useState(false);
-  const [connectedAccountUpdated, setConnectedAccountUpdated] = useState(false);
+  const [onboardingExited, setOnboardingExited] = useState(false);
   const [error, setError] = useState(false);
   const [connectedAccountId, setConnectedAccountId] = useState();
+  const stripeConnectInstance = useStripeConnect(connectedAccountId);
 
   return (
     <div className="container">
@@ -14,9 +19,8 @@ export default function Home() {
       </div>
       <div className="content">
         {!connectedAccountId && <h2>Get ready for take off</h2>}
+        {connectedAccountId && !stripeConnectInstance && <h2>Add information to start accepting money</h2>}
         {!connectedAccountId && <p>lomi. is the world&apos;s leading air travel platform: join our team of pilots to help people travel faster.</p>}
-        {connectedAccountId && <h2>Add information to start accepting money</h2>}
-        {connectedAccountId && <p>lomi. partners with Stripe to help you receive payments while keeping your personal and bank details secure.</p>}
         {!accountCreatePending && !connectedAccountId && (
           <div>
             <button
@@ -29,8 +33,15 @@ export default function Home() {
                   .then((response) => response.json())
                   .then((json) => {
                     setAccountCreatePending(false);
-                    const connectedAccountId = json.account;
-                    setConnectedAccountId(connectedAccountId);
+                    const { account, error } = json;
+
+                    if (account) {
+                      setConnectedAccountId(account);
+                    }
+
+                    if (error) {
+                      setError(true);
+                    }
                   });
               }}
             >
@@ -38,49 +49,24 @@ export default function Home() {
             </button>
           </div>
         )}
-        {connectedAccountId && !accountUpdatePending && !connectedAccountUpdated && (
-          <div>
-            <button
-              onClick={async () => {
-                setAccountUpdatePending(true);
-                setError(false);
-                fetch(`/account/${connectedAccountId}`, {
-                  method: "POST",
-                })
-                  .then((response) => response.json())
-                  .then((json) => {
-                    console.log(json);
-                    setAccountUpdatePending(false);
-                    setConnectedAccountUpdated(true);
-                  });
-              }}
-            >
-              Add information
-            </button>
-          </div>
-        )}
-        {connectedAccountUpdated && (
-          <div className="example-form">
-            <h2>Your onboarding flow goes here</h2>
-          </div>
+        {stripeConnectInstance && (
+          <ConnectComponentsProvider connectInstance={stripeConnectInstance}>
+            <ConnectAccountOnboarding
+              onExit={() => setOnboardingExited(true)}
+            />
+          </ConnectComponentsProvider>
         )}
         {error && <p className="error">Something went wrong!</p>}
-        {(connectedAccountId || accountCreatePending || accountUpdatePending) && (
+        {(connectedAccountId || accountCreatePending || onboardingExited) && (
           <div className="dev-callout">
             {connectedAccountId && <p>Your connected account ID is: <code className="bold">{connectedAccountId}</code></p>}
             {accountCreatePending && <p>Creating a connected account...</p>}
-            {accountUpdatePending && <p>Adding some onboarding information...</p>}
-            {connectedAccountUpdated && (
-              <div>
-                <p>Account onboarding has begun. Determine the <a href="https://docs.stripe.com/connect/required-verification-information" target="_blank" rel="noopener noreferrer">required information</a> you need to gather.</p>
-                <p>Build a flow for your connected accounts to input it and pass it to Stripe.</p>
-              </div>
-            )}
+            {onboardingExited && <p>The Account Onboarding component has exited</p>}
           </div>
         )}
         <div className="info-callout">
           <p>
-            This is a sample app for API-based Connect onboarding. <a href="https://docs.stripe.com/connect/onboarding/quickstart?connect-onboarding-surface=api" target="_blank" rel="noopener noreferrer">View docs</a>
+            This is a sample app for Connect onboarding using the Account Onboarding embedded component. <a href="https://docs.stripe.com/connect/onboarding/quickstart?connect-onboarding-surface=embedded" target="_blank" rel="noopener noreferrer">View docs</a>
           </p>
         </div>
       </div>
