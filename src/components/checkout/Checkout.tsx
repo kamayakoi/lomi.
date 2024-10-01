@@ -1,0 +1,233 @@
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { CreditCard, Smartphone, Apple, Building, CheckCircle, XCircle } from 'lucide-react'
+
+interface PaymentMethod {
+    id: string
+    name: string
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+    color: string
+}
+
+type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure'
+
+export default function Checkout() {
+    const [selectedMethod, setSelectedMethod] = useState('')
+    const [cardDetails, setCardDetails] = useState({ name: '', number: '', expiry: '', cvc: '' })
+    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
+    const paymentMethods: PaymentMethod[] = [
+        {
+            id: 'CREDIT_CARD',
+            name: 'Credit Card',
+            icon: CreditCard,
+            color: 'bg-indigo-100 text-indigo-600',
+        },
+        {
+            id: 'MOBILE_MONEY',
+            name: 'Mobile Money',
+            icon: Smartphone,
+            color: 'bg-yellow-100 text-yellow-600',
+        },
+        {
+            id: 'BANK_TRANSFER',
+            name: 'Bank Transfer',
+            icon: Building,
+            color: 'bg-green-100 text-green-600',
+        },
+        {
+            id: 'APPLE_PAY',
+            name: 'Apple Pay',
+            icon: Apple,
+            color: 'bg-gray-100 text-gray-600',
+        },
+    ]
+
+    const handleMethodSelect = (methodId: string) => {
+        setSelectedMethod(methodId)
+        setPaymentStatus('idle')
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
+        setCardDetails(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        setPaymentStatus('processing')
+
+        // Simulate API call
+        setTimeout(() => {
+            if (cardDetails.number === '4444 4444 4444 4444') {
+                setPaymentStatus('success')
+            } else if (cardDetails.number === '0000 0000 0000 0000') {
+                setPaymentStatus('failure')
+            } else {
+                setPaymentStatus('idle')
+            }
+        }, 2000)
+    }
+
+    const renderPaymentStatus = () => {
+        switch (paymentStatus) {
+            case 'processing':
+                return (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-center py-4"
+                    >
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                        <p className="text-indigo-600 font-semibold">Processing payment...</p>
+                    </motion.div>
+                )
+            case 'success':
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="text-center py-4"
+                    >
+                        <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                        <p className="text-green-600 font-semibold">Payment successful!</p>
+                    </motion.div>
+                )
+            case 'failure':
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="text-center py-4"
+                    >
+                        <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                        <p className="text-red-600 font-semibold">Payment failed. Please try again.</p>
+                    </motion.div>
+                )
+            default:
+                return null
+        }
+    }
+
+    return (
+        <Card className="w-full max-w-md mx-auto bg-white shadow-lg rounded-xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-6">
+                <CardTitle className="text-2xl font-bold text-center">Secure Payment</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+                <motion.div
+                    className="grid grid-cols-3 gap-4 mb-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {paymentMethods.map((method) => (
+                        <motion.div
+                            key={method.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleMethodSelect(method.id)}
+                            className={`flex flex-col items-center justify-center p-4 rounded-lg cursor-pointer transition-all duration-200 ${selectedMethod === method.id ? `${method.color} shadow-md` : 'bg-gray-50 hover:bg-gray-100'
+                                }`}
+                        >
+                            <method.icon className={`h-8 w-8 mb-2 ${selectedMethod === method.id ? '' : 'text-gray-500'}`} />
+                            <span className="text-xs font-medium text-center">{method.name}</span>
+                        </motion.div>
+                    ))}
+                </motion.div>
+                <AnimatePresence mode="wait">
+                    {selectedMethod === 'CREDIT_CARD' && paymentStatus === 'idle' && (
+                        <motion.form
+                            key="card-form"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            onSubmit={handleSubmit}
+                            className="space-y-4"
+                        >
+                            <div>
+                                <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name on Card</Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={cardDetails.name}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="number" className="text-sm font-medium text-gray-700">Card Number</Label>
+                                <Input
+                                    id="number"
+                                    name="number"
+                                    value={cardDetails.number}
+                                    onChange={handleInputChange}
+                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    required
+                                />
+                            </div>
+                            <div className="flex space-x-4">
+                                <div className="flex-1">
+                                    <Label htmlFor="expiry" className="text-sm font-medium text-gray-700">Expiry Date</Label>
+                                    <Input
+                                        id="expiry"
+                                        name="expiry"
+                                        value={cardDetails.expiry}
+                                        onChange={handleInputChange}
+                                        placeholder="MM/YY"
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <Label htmlFor="cvc" className="text-sm font-medium text-gray-700">CVC</Label>
+                                    <Input
+                                        id="cvc"
+                                        name="cvc"
+                                        value={cardDetails.cvc}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <Button type="submit" className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 shadow-md">
+                                Complete Payment
+                            </Button>
+                        </motion.form>
+                    )}
+                    {selectedMethod && selectedMethod !== 'CREDIT_CARD' && paymentStatus === 'idle' && (
+                        <motion.div
+                            key="other-method"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="text-center"
+                        >
+                            <p className="mb-4 text-gray-700">You&apos;ve selected {paymentMethods.find(m => m.id === selectedMethod)?.name}.</p>
+                            <Button
+                                onClick={() => console.log(`Proceeding with ${selectedMethod} payment`)}
+                                className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-300 shadow-md"
+                            >
+                                Continue with {paymentMethods.find(m => m.id === selectedMethod)?.name}
+                            </Button>
+                        </motion.div>
+                    )}
+                    {renderPaymentStatus()}
+                </AnimatePresence>
+            </CardContent>
+            <CardFooter className="bg-gray-50 py-3 flex justify-center items-center">
+                <span className="text-xs text-gray-500">Powered by lomi.</span>
+            </CardFooter>
+        </Card>
+    )
+}

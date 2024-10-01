@@ -72,6 +72,14 @@ import Activation from './pages/auth/kyc/activation.tsx';
 import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
 import StripeConnectLanding from "../providers/stripe/StripeConnectLanding";
 
+// // Test pages
+import Test from './pages/test/test.tsx'
+import CheckoutTest from './pages/test/CheckoutTest.tsx'
+import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx'
+import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx'
+import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx'
+import CheckoutProviderTest from './pages/test/CheckoutProviderTest.tsx'
+
 const AppRouter = () => (
     <Router>
         <SessionCheck>
@@ -146,14 +154,23 @@ const AppRouter = () => (
                 } />
                 <Route path="/auth/callback" element={<AuthCallback />} />
 
+                {/* API routes */}
+                <Route path="api/stripe/callback" element={<StripeCallback />} />
+
+                {/* Test routes */}
+                <Route path="test" element={<Test />}>
+                    <Route path="checkout" element={<CheckoutTest />} />
+                    <Route path="checkout-form" element={<CheckoutFormTest />} />
+                    <Route path="checkout-summary" element={<CheckoutSummaryTest />} />
+                    <Route path="payment-method-selector" element={<PaymentMethodSelectorTest />} />
+                    <Route path="checkout-provider" element={<CheckoutProviderTest />} />
+                </Route>
+
                 {/* Error routes */}
                 <Route path="/500" element={<GeneralError />} />
                 <Route path="/404" element={<NotFoundError />} />
                 <Route path="/503" element={<MaintenanceError />} />
                 <Route path="*" element={<NotFoundError />} />
-
-                {/* API routes */}
-                <Route path="api/stripe/callback" element={<StripeCallback />} />
 
             </Routes>
         </SessionCheck>
