@@ -21,6 +21,8 @@ function Homepage() {
   return (
     <>
       <Navbar />
+      {/* Spacer div */}
+      <div className="h-16"></div> {/* Adjust the height as needed */}
       <Hero />
       <HowItWorks />
       <Services />

@@ -27,7 +27,7 @@ export const Footer = () => {
 
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
-      <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
+      <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 mb-16">
         {/* Logo Section */}
         <div className="flex flex-col gap-2 col-span-1 md:col-span-1">
           <a href="/" className="flex items-center gap-1" style={{ fontSize: '1.5rem' }}>
@@ -108,6 +108,10 @@ export const Footer = () => {
           <ModeToggle />
         </div>
       </div>
+
+      {/* Added vertical space */}
+      <div className="h-10"></div>
+
       <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
         <div className="flex items-center gap-4 ml-[-2px]">
           <p>&copy; 2024 lomi.africa, Inc. </p>
