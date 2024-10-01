@@ -2,7 +2,6 @@
 
 import { VisitIcon } from "./Icons.tsx";
 import { Badge } from "../ui/badge";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -15,6 +14,7 @@ import {
 import { Check } from "lucide-react";
 import { LightBulbIcon } from "./Icons";
 import { useTheme } from '@/lib/useTheme';
+import PulsatingButton from "@/components/ui/pulsating-button";
 
 //Images
 import canvas from "/canvas.png";
@@ -83,10 +83,10 @@ export const HeroCards = () => {
         <CardContent>
           <div className="flex justify-center"> {/* Center the button container */}
             <Link to="/sign-in">
-              <Button className="px-6 py-7 rounded-md shadow-lg bg-blue-600 text-white font-semibold text-2xl hover:bg-blue-700"> {/* Adjusted padding and border-radius */}
+              <PulsatingButton className="px-6 py-4 rounded-md shadow-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700">
                 <span className="font-bold">Start</span> {/* Larger text for "Start" */}
                 <span className="text-lg ml-2">— in minutes</span> {/* Smaller text for "in minutes" */}
-              </Button>
+              </PulsatingButton>
             </Link>
           </div>
         </CardContent>
