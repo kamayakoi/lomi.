@@ -1,19 +1,11 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { IconBrandGoogle, IconBrandGithub } from '@tabler/icons-react'
 import { z } from 'zod'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/custom/button'
-import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/utils/supabase/client'
+import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/custom/password-input'
 
 interface SignUpFormProps {
   className?: string
@@ -31,18 +23,34 @@ const formSchema = z.object({
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, errorMessage, ...props }: SignUpFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-      fullName: '',
-    },
-  })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [isValidEmail, setIsValidEmail] = useState(false)
+  const [isValidPassword, setIsValidPassword] = useState(false)
+  const [isValidFullName, setIsValidFullName] = useState(false)
 
-  const handleSubmit = form.handleSubmit(async (data) => {
-    await onSubmit(data)
-  })
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value)
+    setIsValidEmail(formSchema.shape.email.safeParse(e.target.value).success)
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value)
+    setIsValidPassword(formSchema.shape.password.safeParse(e.target.value).success)
+  }
+
+  const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFullName(e.target.value)
+    setIsValidFullName(formSchema.shape.fullName.safeParse(e.target.value).success)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isValidEmail && isValidPassword && isValidFullName) {
+      await onSubmit({ email, password, fullName })
+    }
+  }
 
   const handleOAuthSignUp = async (provider: 'github' | 'google') => {
     try {
@@ -80,71 +88,64 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>
-      <Form {...form}>
-        <form onSubmit={handleSubmit}>
-          <div className='grid gap-4'>
-            <FormField
-              control={form.control}
-              name='fullName'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder='Full Name**'
-                      {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      placeholder='Email address**'
-                      type='email'
-                      {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <PasswordInput
-                      placeholder='Password**'
-                      {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              className='w-full'
-              type='submit'
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </Button>
-            {errorMessage && (
-              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+      <form onSubmit={handleSubmit}>
+        <div className='grid gap-4'>
+          <Input
+            id="fullName"
+            type="text"
+            placeholder='Full Name**'
+            value={fullName}
+            onChange={handleFullNameChange}
+            className={cn(
+              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              {
+                'border-gray-300 dark:border-gray-600': !isValidFullName && fullName === '',
+                'border-red-500 dark:border-red-500': !isValidFullName && fullName !== '',
+                'border-green-500 dark:border-green-500': isValidFullName,
+              }
             )}
-          </div>
-        </form>
-      </Form>
+          />
+          <Input
+            id="email"
+            type="email"
+            placeholder='Email address**'
+            value={email}
+            onChange={handleEmailChange}
+            className={cn(
+              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              {
+                'border-gray-300 dark:border-gray-600': !isValidEmail && email === '',
+                'border-red-500 dark:border-red-500': !isValidEmail && email !== '',
+                'border-green-500 dark:border-green-500': isValidEmail,
+              }
+            )}
+          />
+          <PasswordInput
+            id="password"
+            placeholder='Password**'
+            value={password}
+            onChange={handlePasswordChange}
+            className={cn(
+              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              {
+                'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
+                'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
+                'border-green-500 dark:border-green-500': isValidPassword,
+              }
+            )}
+          />
+          <Button
+            className="w-full"
+            type="submit"
+            disabled={isLoading || !isValidEmail || !isValidPassword || !isValidFullName}
+          >
+            {isLoading ? 'Creating account...' : 'Create account'}
+          </Button>
+          {errorMessage && (
+            <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
+          )}
+        </div>
+      </form>
       <div className='relative'>
         <div className='absolute inset-0 flex items-center'>
           <span className='w-full border-t' />
