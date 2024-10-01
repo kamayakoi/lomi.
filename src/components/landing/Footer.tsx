@@ -3,6 +3,7 @@ import { LogoIcon } from "./Icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { ModeToggle } from "./mode-toggle";
+import SystemOperational from "@/components/custom/System-operational";
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
@@ -37,8 +38,6 @@ export const Footer = () => {
             </span>
           </a>
         </div>
-
-        <div className="hidden md:block md:col-span-1"></div>
 
         {/* Company Section */}
         <div className="grid gap-2 col-span-1 md:col-span-1">
@@ -82,6 +81,9 @@ export const Footer = () => {
           </nav>
         </div>
 
+        {/* Vertical Separation Line */}
+        <div className="hidden md:block w-px bg-gray-300 dark:bg-gray-700 mx-auto"></div>
+
         {/* Community Section */}
         <div className="grid gap-2 col-span-1 md:col-span-1">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
@@ -102,18 +104,13 @@ export const Footer = () => {
             </a>
           </nav>
         </div>
-
-        {/* Add ModeToggle in a new section */}
-        <div className="grid gap-2 col-span-1 md:col-span-1">
-          <ModeToggle />
-        </div>
       </div>
 
       {/* Added vertical space */}
       <div className="h-10"></div>
 
-      <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-        <div className="flex items-center gap-4 ml-[-2px]">
+      <div className="container max-w-8xl mt-8 flex flex-wrap items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+        <div className="flex flex-wrap items-center gap-4 ml-[-2px]">
           <p>&copy; 2024 lomi.africa, Inc. </p>
           <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300">
             Abidjan, Côte d&apos;Ivoire
@@ -139,6 +136,10 @@ export const Footer = () => {
               </div>
             )}
           </div>
+        </div>
+        <div className="mt-4 md:mt-0 flex items-center gap-4">
+          <SystemOperational />
+          <ModeToggle />
         </div>
       </div>
     </footer>

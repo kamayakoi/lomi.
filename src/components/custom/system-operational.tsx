@@ -1,8 +1,16 @@
+import { Button } from "@/components/ui/button"
+
 export default function Component() {
     return (
-        <div className="inline-flex items-center px-3 py-2 bg-green-100 text-green-800 rounded-sm text-base font-medium">
-            <span className="mr-2 h-3 w-3 rounded-full bg-green-500" />
-            ALL SYSTEMS OPERATIONAL
-        </div>
+        <Button
+            asChild
+            variant="ghost"
+            className="bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
+        >
+            <a href="">
+                <span className="mr-2 h-3 w-3 rounded-full bg-green-500 inline-block" />
+                ALL SYSTEMS OPERATIONAL
+            </a>
+        </Button>
     )
 }
