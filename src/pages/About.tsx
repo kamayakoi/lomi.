@@ -1,4 +1,4 @@
-import { Navbar } from '../components/landing/Navbar-About';
+import { Navbar } from '../components/landing/Navbar';
 import { Link } from 'react-router-dom';
 
 const About = () => {

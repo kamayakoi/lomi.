@@ -1,0 +1,41 @@
+:root {
+  --navbar-logo-margin-right: 33rem;
+  --navbar-logo-padding-left: 1rem;
+  --navbar-menu-gap: 1rem;
+  --navbar-contact-sales-margin-left: 1rem;
+}
+
+.navbar-dock {
+  width: calc(100% - 40px);
+  max-width: 1350px;
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .navbar-dock {
+  background-color: #1214187d;
+}
+
+.navbar-logo-container {
+  margin-right: 33rem;
+  padding-left: 1rem;
+}
+
+.navbar-desktop-menu {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .navbar-desktop-menu {
+    display: flex;
+    gap: var(--navbar-menu-gap);
+    align-items: center;
+  }
+}
+
+.navbar-contact-sales {
+  margin-right: 1rem;
+}

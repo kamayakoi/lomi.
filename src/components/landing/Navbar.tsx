@@ -14,9 +14,10 @@ import {
 
 import { buttonVariants } from '@/lib/button-utils';
 import { Menu } from "lucide-react";
-import { ModeToggle } from "./mode-toggle";
 import { LogoIcon } from "./Icons";
+import { Dock } from "@/components/ui/dock";
 
+import "./Navbar.css";
 
 interface RouteProps {
   href: string;
@@ -47,100 +48,99 @@ export const Navbar = () => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
 
   return (
-    <header className="sticky border-b-[1px] top-0 z-40 w-full bg-white dark:border-b-slate-700 dark:bg-background">
-      <NavigationMenu className="mx-auto">
-        <NavigationMenuList className="container h-16 px-4 w-screen flex items-center"> {/* Increased height */}
-          <div className="flex items-center flex-grow">
-            <NavigationMenuItem className="font-bold flex items-center">
-              <a
-                rel="lomi.africa"
-                href="/"
-                className="ml-2 font-bold text-xl flex items-center"
-                style={{ fontSize: '1.5rem' }}
-              >
-                <LogoIcon />
-                <span className="ml-1">lomi.africa</span>
-              </a>
-            </NavigationMenuItem>
-          </div>
-
-          {/* mobile */}
-          <span className="flex md:hidden ml-auto pr-4">
-            <ModeToggle />
-
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger className="px-2">
-                <Menu
-                  className="flex md:hidden h-5 w-5"
-                  onClick={() => setIsOpen(true)}
+    <Dock>
+      <header className="navbar-dock">
+        <NavigationMenu className="mx-auto">
+          <NavigationMenuList className="container flex items-center justify-between">
+            <div className="navbar-logo-container">
+              <NavigationMenuItem className="font-bold flex items-center">
+                <a
+                  rel="lomi.africa"
+                  href="/"
+                  className="font-bold text-xl flex items-center"
+                  style={{ fontSize: '1.5rem' }}
                 >
-                  <span className="sr-only">Menu Icon</span>
-                </Menu>
-              </SheetTrigger>
+                  <LogoIcon />
+                  <span className="ml-2">lomi.africa</span>
+                </a>
+              </NavigationMenuItem>
+            </div>
 
-              <SheetContent side={"left"}>
-                <SheetHeader>
-                  <SheetTitle className="font-bold text-xl" style={{ fontSize: '1.2rem' }}>
-                    lomi.africa
-                  </SheetTitle>
-                </SheetHeader>
-                <nav className="flex flex-col justify-center items-center gap-2 mt-4">
-                  {routeList.map(({ href, label }: RouteProps) => (
-                    <a
-                      rel="noreferrer noopener"
-                      key={label}
-                      href={href}
-                      onClick={() => setIsOpen(false)}
-                      className={buttonVariants({ variant: "ghost" })}
-                      style={{ fontSize: '1.06rem' }} // Increased font size
-                    >
-                      {label}
-                    </a>
-                  ))}
-                </nav>
-              </SheetContent>
-            </Sheet>
-          </span>
+            {/* mobile */}
+            <span className="flex md:hidden">
+              <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetTrigger className="px-2">
+                  <Menu
+                    className="flex md:hidden h-5 w-5"
+                    onClick={() => setIsOpen(true)}
+                  >
+                    <span className="sr-only"></span>
+                  </Menu>
+                </SheetTrigger>
 
-          {/* desktop */}
-          <nav className="hidden md:flex gap-2 ml-auto pr-4"> {/* Added pr-4 for padding */}
-            {routeList.map((route: RouteProps, i) => (
-              <a
-                rel="noreferrer noopener"
-                href={route.href}
-                key={i}
-                className={`text-[17px] ${buttonVariants({
-                  variant: "ghost",
-                })}`}
-                style={{ fontSize: '1.06rem' }} // Increased font size
-              >
-                {route.label}
-              </a>
-            ))}
-          </nav>
+                <SheetContent side={"left"}>
+                  <SheetHeader>
+                    <SheetTitle className="font-bold text-xl" style={{ fontSize: '1.2rem' }}>
+                      lomi.africa
+                    </SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col justify-center items-center gap-2 mt-4">
+                    {routeList.map(({ href, label }: RouteProps) => (
+                      <a
+                        rel="noreferrer noopener"
+                        key={label}
+                        href={href}
+                        onClick={() => setIsOpen(false)}
+                        className={buttonVariants({ variant: "ghost" })}
+                        style={{ fontSize: '1.06rem' }}
+                      >
+                        {label}
+                      </a>
+                    ))}
+                  </nav>
+                </SheetContent>
+              </Sheet>
+            </span>
 
-          <div className="hidden md:flex gap-2 ml-auto pr-4">
-            <button
-              onClick={() => setIsFormOpen(true)}
-              className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })}`}
-              style={{ fontSize: '1.06rem', padding: '1rem 1rem' }} // Increased font size and added padding
-            >
-              Contact sales
-            </button>
-            <ModeToggle />
-          </div>
-        </NavigationMenuList>
-      </NavigationMenu>
+            {/* desktop */}
+            <nav className="navbar-desktop-menu">
+              {routeList.map((route: RouteProps, i) => (
+                <a
+                  rel="noreferrer noopener"
+                  href={route.href}
+                  key={i}
+                  className={`navbar-menu-item text-[17px] ${buttonVariants({
+                    variant: "ghost",
+                  })}`}
+                  style={{ fontSize: '1.06rem' }}
+                >
+                  {route.label}
+                </a>
+              ))}
+              <div className="navbar-contact-sales">
+                <button
+                  onClick={() => setIsFormOpen(true)}
+                  className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })}`}
+                  style={{ fontSize: '1.06rem', padding: '0.75rem 1rem' }}
+                >
+                  Contact sales
+                </button>
+              </div>
+            </nav>
+            {/* Remove the ModeToggle from here */}
+          </NavigationMenuList>
+        </NavigationMenu>
+      </header>
 
       {/* Airtable form modal */}
       {isFormOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          onClick={() => setIsFormOpen(false)} // Close modal on background click
+          onClick={() => setIsFormOpen(false)}
         >
           <div
-            className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2" // Added mx-4 for smaller margins
-            onClick={(e) => e.stopPropagation()} // Prevent modal close on content click
+            className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2"
+            onClick={(e) => e.stopPropagation()}
           >
             <iframe
               className="airtable-embed"
@@ -153,6 +153,6 @@ export const Navbar = () => {
           </div>
         </div>
       )}
-    </header>
+    </Dock>
   );
 };

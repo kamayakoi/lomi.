@@ -1,4 +1,3 @@
-// Imported
 import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
@@ -8,8 +7,6 @@ import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Services } from "@/components/landing/Services";
 
 // import "./Home.css";
-
-// Not Imported
 
 {/* import { About } from "@/components/landing/About";* /}
 {/* import { Newsletter } from "./components/landing/Newsletter";* /}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { LogoIcon } from "./Icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin, faWhatsapp, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { ModeToggle } from "./mode-toggle";
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
@@ -100,6 +101,11 @@ export const Footer = () => {
               <FontAwesomeIcon icon={faTwitter} /> X | Twitter
             </a>
           </nav>
+        </div>
+
+        {/* Add ModeToggle in a new section */}
+        <div className="grid gap-2 col-span-1 md:col-span-1">
+          <ModeToggle />
         </div>
       </div>
       <div className="container max-w-8xl mt-8 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
