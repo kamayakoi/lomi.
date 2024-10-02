@@ -70,7 +70,7 @@ export const Footer = () => {
               Checkout
             </a>
             <a href="" className="hover:underline text-gray-600 dark:text-gray-300">
-              Integrations
+              Payouts
             </a>
           </nav>
         </div>
@@ -90,8 +90,8 @@ export const Footer = () => {
             <a href="#" className="hover:underline text-gray-600 dark:text-gray-300">
               Support
             </a>
-            <a href="https://developers.lomi.africa/guides/support/contact" className="hover:underline text-gray-600 dark:text-gray-300">
-              Contact
+            <a href="" className="hover:underline text-gray-600 dark:text-gray-300">
+              Pricing
             </a>
           </nav>
         </div>
@@ -112,7 +112,7 @@ export const Footer = () => {
               Leave us a testimony
             </a>
             <a href="" className="hover:underline text-gray-600 dark:text-gray-300">
-              Join our Slack
+              Help center
             </a>
           </nav>
         </div>

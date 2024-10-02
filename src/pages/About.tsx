@@ -1,4 +1,4 @@
-import { Navbar } from '../components/landing/Navbar';
+import { NavbarAbout } from '../components/landing/Navbar-About';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTheme } from '@/lib/useTheme';
@@ -14,7 +14,7 @@ const About = () => {
     return (
         <div className="relative w-full min-h-screen bg-background overflow-hidden">
             <div className="bg-gray-900 min-h-screen pb-20"> {/* Added padding-bottom */}
-                <Navbar />
+                <NavbarAbout />
                 <div className="h-(-10)"></div>
 
                 <div
@@ -84,6 +84,14 @@ const About = () => {
                                     </h3>
                                     <p className="text-white mt-1">
                                         Upholding trust and transparency in every interaction.
+                                    </p>
+                                </div>
+                                <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
+                                    <h3 className="text-lg font-semibold mt-0 text-white">
+                                        Speed and Measurement
+                                    </h3>
+                                    <p className="text-white mt-1">
+                                        Delivering fast results with a focus on merchant-centered metrics.
                                     </p>
                                 </div>
                             </div>

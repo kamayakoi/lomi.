@@ -1,9 +1,0 @@
-.custom-pulsating-button {
-  --pulse-color: #ff4d4d;
-}
-
-.dark .custom-pulsating-button {
-  --pulse-color: #ff4d4d;
-  background-color: #ff4d4d;
-  color: white;
-}

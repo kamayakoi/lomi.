@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
 import PulsatingButton from '@/components/ui/pulsating-button';
-import './home/home.css'; // Import the home.css file
 
 // Import the logo images
 import orangeLogo from '/orange.png';
@@ -18,10 +17,12 @@ import applePayLogo from '/apple-pay.png';
 interface IntegrationAccordionProps {
     title: string;
     icon?: ReactNode;
-    children: ReactNode[];
+    logos: { src: string; alt: string }[];
 }
 
-const IntegrationAccordion = ({ title, icon, children }: IntegrationAccordionProps) => {
+const IntegrationAccordion = ({ title, icon, logos }: IntegrationAccordionProps) => {
+    const showComingSoonMessage = title === 'Mobile Money' || title === 'e-wallets' || title === 'Pay by bank';
+
     return (
         <div className="p-4 bg-card dark:bg-card rounded-lg shadow-md w-full">
             <div className="flex flex-col items-center mb-4">
@@ -32,20 +33,28 @@ const IntegrationAccordion = ({ title, icon, children }: IntegrationAccordionPro
             </div>
             <hr className="my-2 border-border dark:border-border" />
             <div className="mt-2 text-muted-foreground dark:text-muted-foreground">
-                {children.map((child, index) => (
+                {logos.map((logo, index) => (
                     <div key={index}>
                         <div className="flex items-center my-2">
-                            <div className="w-8 h-8 mr-2 bg-muted flex-shrink-0">
+                            <div className="w-8 h-8 mr-2 flex-shrink-0 border border-gray-300 dark:border-gray-600 rounded overflow-hidden">
                                 {/* Render the logo image */}
-                                <img src={child as string} alt={`Logo ${index + 1}`} className="w-full h-full object-contain" />
+                                <img src={logo.src} alt={logo.alt} className="w-full h-full object-contain" />
                             </div>
-                            <p>{`Logo ${index + 1}`}</p>
+                            <p>{logo.alt}</p>
                         </div>
-                        {index < children.length - 1 && (
+                        {index < logos.length - 1 && (
                             <hr className="my-2 border-border dark:border-border" />
                         )}
                     </div>
                 ))}
+                {showComingSoonMessage && (
+                    <>
+                        <hr className="my-2 border-border dark:border-border" />
+                        <div className="mt-4 text-center text-sm text-muted-foreground dark:text-muted-foreground">
+                            More integrations coming soon...
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
@@ -87,8 +96,52 @@ const Products = () => {
                 </div>
             </section>
 
+            {/* Section for Integrations */}
+            <section className="dark:bg-muted py-4 md:py-8 lg:py-12 p-4 bg-muted rounded-lg shadow-md w-full">
+                <div className="container px-4 md:px-6">
+                    <div className="flex flex-col items-center justify-center space-y-4 text-center">
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-foreground dark:text-foreground">Payment Channel Partners</h2>
+                            <p className="max-w-[900px] text-muted-foreground dark:text-muted-foreground md:text-xl">
+                                lomi. integrates with a variety of providers to support your customers where they are.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                            <IntegrationAccordion
+                                title="Mobile Money"
+                                logos={[
+                                    { src: orangeLogo, alt: "Orange" },
+                                    { src: mtnLogo, alt: "MTN" }
+                                ]}
+                            />
+                            <IntegrationAccordion
+                                title="e-wallets"
+                                logos={[
+                                    { src: waveLogo, alt: "Wave" }
+                                ]}
+                            />
+                            <IntegrationAccordion
+                                title="Pay by bank"
+                                logos={[
+                                    { src: ecobankLogo, alt: "Ecobank" },
+                                    { src: sepaLogo, alt: "SEPA" }
+                                ]}
+                            />
+                            <IntegrationAccordion
+                                title="Pay by card"
+                                logos={[
+                                    { src: visaLogo, alt: "Visa" },
+                                    { src: mastercardLogo, alt: "Mastercard" },
+                                    { src: applePayLogo, alt: "Apple Pay" }
+                                ]}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Sections for Collect Money, Manage Money, and Send Money */}
-            <section className="dark:bg-muted py-8 md:py-16 lg:py-24 p-4 bg-muted rounded-lg shadow-md w-full">
+            <section className="bg-background py-8 md:py-16 lg:py-24 dark:bg-muted">
                 <div className="container px-4 md:px-6">
                     <div className="grid gap-6 lg:grid-cols-3">
                         <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
@@ -119,41 +172,6 @@ const Products = () => {
                 </div>
             </section>
 
-            {/* Section for Integrations */}
-            <section className="bg-background py-8 md:py-16 lg:py-24 dark:bg-background">
-                <div className="container px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                        <div className="space-y-2">
-                            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-foreground dark:text-foreground">Payment Channel Partners</h2>
-                            <p className="max-w-[900px] text-muted-foreground dark:text-muted-foreground md:text-xl">
-                                lomi. integrates with a variety of providers to enable your customers where they are.
-                            </p>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-                            <IntegrationAccordion
-                                title="Mobile Money"
-                            >
-                                {[orangeLogo, mtnLogo]}
-                            </IntegrationAccordion>
-                            <IntegrationAccordion
-                                title="e-wallets"
-                            >
-                                {[waveLogo]}
-                            </IntegrationAccordion>
-                            <IntegrationAccordion
-                                title="Pay by bank"
-                            >
-                                {[ecobankLogo, sepaLogo]}
-                            </IntegrationAccordion>
-                            <IntegrationAccordion
-                                title="Pay by card"
-                            >
-                                {[visaLogo, mastercardLogo, applePayLogo]}
-                            </IntegrationAccordion>
-                        </div>
-                    </div>
-                </div>
-            </section>
             <Footer />
         </div>
     );
