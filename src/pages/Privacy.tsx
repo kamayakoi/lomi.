@@ -6,6 +6,7 @@ const Privacy = () => {
         <>
             <Navbar />
             <div className="bg-background text-dark-text dark:text-light-text"> {/* Adjust text color for light and dark modes */}
+                <div className="h-20"></div>
                 <main className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
                     <div className="space-y-12"> {/* Increased space between sections */}
                         <div>

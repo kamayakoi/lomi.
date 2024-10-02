@@ -2,6 +2,18 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
+import PulsatingButton from '@/components/ui/pulsating-button';
+import './home/home.css'; // Import the home.css file
+
+// Import the logo images
+import orangeLogo from '/orange.png';
+import mtnLogo from '/mtn.png';
+import waveLogo from '/wave.png';
+import ecobankLogo from '/ecobank.png';
+import sepaLogo from '/sepa.png';
+import visaLogo from '/visa.png';
+import mastercardLogo from '/mastercard.png';
+import applePayLogo from '/apple-pay.png';
 
 interface IntegrationAccordionProps {
     title: string;
@@ -11,23 +23,26 @@ interface IntegrationAccordionProps {
 
 const IntegrationAccordion = ({ title, icon, children }: IntegrationAccordionProps) => {
     return (
-        <div className="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md w-full">
+        <div className="p-4 bg-card dark:bg-card rounded-lg shadow-md w-full">
             <div className="flex flex-col items-center mb-4">
                 {icon && <div className="text-4xl mb-2">{icon}</div>}
-                <h3 className="text-2xl font-semibold text-center text-gray-900 dark:text-gray-100">
+                <h3 className="text-2xl font-semibold text-center text-card-foreground dark:text-card-foreground">
                     {title}
                 </h3>
             </div>
-            <hr className="my-2 border-gray-300 dark:border-gray-600" />
-            <div className="mt-2 text-gray-700 dark:text-gray-300">
+            <hr className="my-2 border-border dark:border-border" />
+            <div className="mt-2 text-muted-foreground dark:text-muted-foreground">
                 {children.map((child, index) => (
                     <div key={index}>
                         <div className="flex items-center my-2">
-                            <div className="w-8 h-8 mr-2 bg-gray-200 flex-shrink-0"></div>
-                            <p>{child}</p>
+                            <div className="w-8 h-8 mr-2 bg-muted flex-shrink-0">
+                                {/* Render the logo image */}
+                                <img src={child as string} alt={`Logo ${index + 1}`} className="w-full h-full object-contain" />
+                            </div>
+                            <p>{`Logo ${index + 1}`}</p>
                         </div>
                         {index < children.length - 1 && (
-                            <hr className="my-2 border-gray-300 dark:border-gray-600" />
+                            <hr className="my-2 border-border dark:border-border" />
                         )}
                     </div>
                 ))}
@@ -39,24 +54,25 @@ const IntegrationAccordion = ({ title, icon, children }: IntegrationAccordionPro
 
 const Products = () => {
     return (
-        <div className="flex flex-col min-h-[100dvh] bg-gray-100 dark:bg-gray-900">
+        <div className="flex flex-col min-h-[100dvh] bg-background dark:bg-background">
             <Navbar />
             {/* Hero Section */}
             <section className="py-12 md:py-24 lg:py-32 text-left">
                 <div className="container px-4 md:px-6 flex flex-col lg:flex-row items-center">
                     <div className="lg:w-1/2">
-                        <h1 className="text-4xl font-bold tracking-tighter sm:text-6xl xl:text-7xl text-gray-900 dark:text-gray-100">
+                        <h1 className="text-4xl font-bold tracking-tighter sm:text-6xl xl:text-7xl text-foreground dark:text-foreground">
                             Frictionless payments for businesses
                         </h1>
-                        <p className="mt-4 max-w-[600px] text-lg md:text-2xl text-gray-700 dark:text-gray-300 text-left">
-                            Integrate online payments and invoicing in minutes.
+                        <p className="mt-4 max-w-[600px] text-lg md:text-2xl text-muted-foreground dark:text-muted-foreground text-left">
+                            Enable online payments and invoicing in minutes.
                             <br />
-                            Accept mobile money, card, Wave and bank payments with API, low-code, or no-code integration options.
+                            Accept mobile money, cards, eWallets and bank payments with API, low-code, or no-code integration options.
                         </p>
-                        <Link to="/log-in">
-                            <button className="mt-8 bg-blue-600 text-white font-semibold text-2xl px-10 py-4 rounded-lg shadow-lg hover:bg-blue-700">
-                                Get Started
-                            </button>
+                        <Link to="/sign-in">
+                            <PulsatingButton className="mt-8 bg-blue-600 text-white font-semibold text-2xl px-10 py-4 rounded-lg shadow-lg hover:bg-blue-700">
+                                <span className="font-bold text-white">Start</span>
+                                <span className="text-lg ml-2 text-white">— in minutes</span>
+                            </PulsatingButton>
                         </Link>
                     </div>
                     <div className="lg:w-1/2 mt-8 lg:mt-0 flex justify-center items-center">
@@ -72,31 +88,31 @@ const Products = () => {
             </section>
 
             {/* Sections for Collect Money, Manage Money, and Send Money */}
-            <section className="dark:bg-gray-900 py-8 md:py-16 lg:py-24  p-4 bg-muted rounded-lg shadow-md w-full">
+            <section className="dark:bg-muted py-8 md:py-16 lg:py-24 p-4 bg-muted rounded-lg shadow-md w-full">
                 <div className="container px-4 md:px-6">
                     <div className="grid gap-6 lg:grid-cols-3">
-                        <div className="p-6 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-gray-900 dark:text-gray-100 text-center mb-4">
-                                Collect Money
+                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
+                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
+                                Collect
                             </h2>
-                            <p className="mt-2 text-gray-700 dark:text-gray-300 md:text-lg text-justify">
+                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
                                 Our platform ensures seamless integration with the payment method you want, making it easy for your customers to pay.
                             </p>
                         </div>
-                        <div className="p-6 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-gray-900 dark:text-gray-100 text-center mb-4">
-                                Manage Money
+                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
+                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
+                                Manage
                             </h2>
-                            <p className="mt-2 text-gray-700 dark:text-gray-300 md:text-lg text-justify">
-                                Orchestrate and reconcile payments seamlessly across different methods and providers. Our robust tools help you manage your finances efficiently and accurately.
+                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
+                                Orchestrate and reconcile payments seamlessly across different methods. Our tools help you manage your finances efficiently and accurately.
                             </p>
                         </div>
-                        <div className="p-6 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-gray-900 dark:text-gray-100 text-center mb-4">
-                                Send Money
+                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
+                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
+                                Send
                             </h2>
-                            <p className="mt-2 text-gray-700 dark:text-gray-300 md:text-lg text-justify">
-                                Send payouts quickly and efficiently to anywhere your money needs to go. Our secure system ensures that your funds reach their destination safely.
+                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
+                                Send payouts quickly and efficiently to anywhere your money needs to go. We make sure that your funds reach their destination.
                             </p>
                         </div>
                     </div>
@@ -104,39 +120,35 @@ const Products = () => {
             </section>
 
             {/* Section for Integrations */}
-            <section className="bg-white py-8 md:py-16 lg:py-24 dark:bg-muted">
+            <section className="bg-background py-8 md:py-16 lg:py-24 dark:bg-background">
                 <div className="container px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center space-y-4 text-center">
                         <div className="space-y-2">
-                            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-gray-900 dark:text-gray-100">Payment Channel Partners</h2>
-                            <p className="max-w-[900px] text-gray-700 dark:text-gray-300 md:text-xl">
-                                Our platform integrates with a variety of services to enhance your business operations.
+                            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-foreground dark:text-foreground">Payment Channel Partners</h2>
+                            <p className="max-w-[900px] text-muted-foreground dark:text-muted-foreground md:text-xl">
+                                lomi. integrates with a variety of providers to enable your customers where they are.
                             </p>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                             <IntegrationAccordion
                                 title="Mobile Money"
-                                icon="📱"
                             >
-                                {["Orange", "MTN", "Airtel"]}
+                                {[orangeLogo, mtnLogo]}
                             </IntegrationAccordion>
                             <IntegrationAccordion
                                 title="e-wallets"
-                                icon="💳"
                             >
-                                {["Wave", "MTN"]}
+                                {[waveLogo]}
                             </IntegrationAccordion>
                             <IntegrationAccordion
                                 title="Pay by bank"
-                                icon="🏦"
                             >
-                                {["Ecobank", "UBA"]}
+                                {[ecobankLogo, sepaLogo]}
                             </IntegrationAccordion>
                             <IntegrationAccordion
                                 title="Pay by card"
-                                icon="💳"
                             >
-                                {["Visa", "Mastercard", "Apple Pay"]}
+                                {[visaLogo, mastercardLogo, applePayLogo]}
                             </IntegrationAccordion>
                         </div>
                     </div>

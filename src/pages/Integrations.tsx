@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
+import './home/home.css'; // Import the home.css file
 
 const integrationOptions = [
     {
@@ -24,7 +25,6 @@ const integrationOptions = [
 ];
 
 const Integrations = () => {
-    // Initialize expandedIndices with the index of the "No Code" option (index 2)
     const [expandedIndices, setExpandedIndices] = useState<number[]>([2]);
 
     const toggleExpand = (index: number) => {
@@ -36,31 +36,32 @@ const Integrations = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-500 font-poppins">
+        <div className="flex flex-col min-h-screen bg-background dark:bg-background font-poppins">
             <Navbar />
-            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-gray-50 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
+            <div className="h-20"></div>
+            <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-background dark:bg-background border-b border-gray-300 dark:border-gray-700">
                 <div className="container mx-auto">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-gray-800 dark:text-white">Integration made easy</h2>
-                        <p className="mt-4 text-lg text-gray-600 dark:text-gray-50">Choose the integration option that best suits your needs</p>
+                        <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl text-foreground dark:text-foreground">Integration made easy</h2>
+                        <p className="mt-4 text-lg text-muted-foreground dark:text-muted-foreground">Choose the integration option that best suits your needs</p>
                     </div>
                     <div className="space-y-12 w-full max-w-3xl mx-auto">
                         {integrationOptions.map((option, index) => (
                             <div
                                 key={index}
-                                className="p-12 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                                className="p-12 bg-card dark:bg-card rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
                             >
                                 <div
                                     className="flex justify-between items-center cursor-pointer"
                                     onClick={() => toggleExpand(index)}
                                 >
-                                    <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200">{option.title}</h2>
-                                    <button className="text-3xl text-gray-600 dark:text-gray-400">{expandedIndices.includes(index) ? '×' : '+'}</button>
+                                    <h2 className="text-3xl font-semibold text-card-foreground dark:text-card-foreground">{option.title}</h2>
+                                    <button className="text-3xl text-muted-foreground dark:text-muted-foreground">{expandedIndices.includes(index) ? '×' : '+'}</button>
                                 </div>
                                 {expandedIndices.includes(index) && (
                                     <div className="mt-6 text-left">
-                                        <p className="text-gray-700 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: option.description }}></p>
-                                        <p className="mt-4 text-gray-600 dark:text-gray-400" dangerouslySetInnerHTML={{ __html: option.details }}></p>
+                                        <p className="text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.description }}></p>
+                                        <p className="mt-4 text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.details }}></p>
                                         <a href={option.link} className="text-blue-500 dark:text-blue-400 font-semibold mt-6 inline-block">
                                             {option.link.includes('mailto') ? 'Contact us to learn more →' : 'Explore our developer docs →'}
                                         </a>

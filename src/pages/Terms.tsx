@@ -25,6 +25,8 @@ const Terms = () => {
             <Navbar />
             <SideNav items={navItems} /> {/* Pass the navigation items as props */}
             <div className="bg-background text-dark-text dark:text-light-text"> {/* Adjust text color for light and dark modes */}
+                <div className="h-24"></div>
+
                 <main className="container mx-auto max-w-6xl px-8 py-12 sm:px-10 lg:px-12">
                     <div className="space-y-12"> {/* Increased space between sections */}
                         <div>

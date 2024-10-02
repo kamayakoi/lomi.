@@ -109,7 +109,7 @@ export const Footer = () => {
               Terms of Service
             </a>
             <a href="" className="hover:underline  text-gray-600 dark:text-gray-300">
-              Leave a testimony
+              Leave us a testimony
             </a>
             <a href="" className="hover:underline text-gray-600 dark:text-gray-300">
               Join our Slack
