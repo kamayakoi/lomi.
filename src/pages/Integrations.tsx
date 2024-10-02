@@ -49,7 +49,7 @@ const Integrations = () => {
                         {integrationOptions.map((option, index) => (
                             <div
                                 key={index}
-                                className="p-12 bg-card dark:bg-card rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                                className="p-12 bg-muted/50 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
                             >
                                 <div
                                     className="flex justify-between items-center cursor-pointer"

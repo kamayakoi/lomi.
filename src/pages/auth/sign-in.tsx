@@ -1,6 +1,6 @@
 import { UserAuthForm } from './components/user-auth-form'
-import Icon from '/inner-radius.png'
 import { Link } from 'react-router-dom'
+import { AnimatedBeamMultipleOutputDemo } from '../../../components-to-implement/AnimatedBeamMultipleOutputs'
 
 export default function SignIn() {
   return (
@@ -12,15 +12,7 @@ export default function SignIn() {
             Portal
           </Link>
           <div className='relative z-20 flex items-center justify-center flex-grow'>
-            <Link to="/">
-              <img
-                src={Icon}
-                className='relative hover:opacity-80 transition-opacity'
-                width={301}
-                height={60}
-                alt='lomi. Logo'
-              />
-            </Link>
+            <AnimatedBeamMultipleOutputDemo />
           </div>
           <div className='relative z-20 mt-auto'>
             <blockquote className='space-y-2'>

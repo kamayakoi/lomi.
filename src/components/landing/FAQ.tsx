@@ -13,23 +13,23 @@ interface FAQProps {
 
 const FAQList: FAQProps[] = [
   {
-    question: "How quickly can I get started with lomi.?",
-    answer: "Our onboarding process is simple and quick. You can start accepting payments the same day you set up your account.",
+    question: "How quickly can I get started with Lomi?",
+    answer: "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our Terms of Service, you can start accepting payments the same day.",
     value: "item-1",
   },
   {
     question: "How do I create an account to start accepting payments?",
-    answer: "To get access to our platform, click on the 'Contact Sales' button and follow the instructions to complete the registration process.",
+    answer: "To access our platform, simply click the 'Connect' button and follow the steps to create your account.",
     value: "item-2",
   },
   {
-    question: "Can I schedule a demo to see how your solution can help my business grow?",
-    answer: "Yes, you can schedule a demo by contacting our sales team through our website.",
+    question: "Can I schedule a demo to see how Lomi can help my business?",
+    answer: "Absolutely! You can schedule a demo by contacting our team through the contact form. We will respond promptly and guide you through the setup and integration process.",
     value: "item-5",
   },
   {
-    question: "What are the criteria for website or app registration?",
-    answer: "Your website or app should meet our security and compliance standards. For detailed criteria, please refer to our registration guidelines. After registration, you'll have to verify your email and complete the KYC process. Once verified, you can integrate our API and start accepting payments.",
+    question: "What are the requirements for registering my website or app?",
+    answer: "Your website or app must meet our security and compliance standards. After registration, complete the KYC process. Once verified, you can integrate our API and begin accepting payments.",
     value: "item-6",
   },
 ];

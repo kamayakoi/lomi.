@@ -1,6 +1,8 @@
 import { Button } from "../ui/button";
 import { HeroCards } from "./HeroCards";
 import { useState } from "react"; // Import useState
+import { Link } from "react-router-dom";
+import PulsatingButton from '@/components/ui/pulsating-button';
 
 // Image import
 import africanledger from "/africanledger_round.png";
@@ -28,20 +30,22 @@ export const Hero = () => {
         <p className="text-2xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0 text-left lg:text-start"> {/* Added text-left for mobile */}
           We offer an easy-to-use API & financial gateway that connects with banks and networks across West Africa — making it simple for your business to handle transactions and scale faster.
         </p>
-        <div className="space-y-4 md:space-y-0 md:space-x-4">
+        <div className="space-y-4 md:space-y-0 md:space-x-4 flex flex-col md:flex-row items-center">
           <Button
-            className="w-full md:w-1/2 lg:w-1/5 text-2xl  px-20 py-7" // Increased font size and padding for height
+            className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7"
             onClick={() => setIsFormOpen(true)}
           >
             Learn more
           </Button>
 
-          <Button
-            className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7 bg-transparent border border-gray-300 text-black hover:border-[#2563EB] dark:text-white rounded-lg transition-colors duration-200 hover:bg-transparent" // Added hover:bg-transparent
-            onClick={() => window.location.href = "https://developers.lomi.africa/"}
-          >
-            Resources
-          </Button>
+          <Link to="/sign-in" className="w-full md:w-1/2 lg:w-1/5 mt-4 md:mt-0">
+            <PulsatingButton
+              className="w-full text-2xl px-20 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
+              pulseColor="#2563EB"
+            >
+              <span className="font-bold text-white">Connect</span>
+            </PulsatingButton>
+          </Link>
         </div>
 
         {/* New section */}

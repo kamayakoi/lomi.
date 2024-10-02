@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import icon from "/icon.png";
 import icon11 from "/WAR2.png"
-import paymentg from "/payment-gateway.png";
 import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
 import kwameadjei from "/kwameadjei.png";
@@ -37,16 +36,6 @@ export const AnotherIcon = () => {
   );
 };
 
-export const PaymentIcon = () => {
-  return (
-    <img
-      src={paymentg}
-      alt="orchestrate"
-      className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '45px', height: '45px' }}
-    />
-  );
-};
 
 export const VisitIcon = () => {
   return (

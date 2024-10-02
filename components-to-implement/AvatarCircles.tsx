@@ -9,5 +9,5 @@ const avatarUrls = [
 ];
 
 export function AvatarCirclesDemo() {
-    return <AvatarCircles numPeople={99} avatarUrls={avatarUrls} />;
+    return <AvatarCircles numPeople={12} avatarUrls={avatarUrls} />;
 }

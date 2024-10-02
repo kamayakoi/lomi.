@@ -1,10 +1,6 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
-import { VisitIcon, WalletIcon, ChartIcon, MagnifierIcon } from "./Icons";
-import { useTheme } from '@/lib/useTheme';
-import PulsatingButton from "@/components/ui/pulsating-button";
-import { Link } from "react-router-dom";
-import { Badge } from "../ui/badge";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { WalletIcon, ChartIcon, MagnifierIcon } from "./Icons";
+
 
 interface ServiceProps {
   title: string;
@@ -34,8 +30,6 @@ const serviceList: ServiceProps[] = [
 ];
 
 export const Services = () => {
-  const { theme } = useTheme();
-
   return (
     <section id="products" className="container py-24 sm:py-32">
       <div className="grid lg:grid-cols-[1fr,1fr] gap-8 place-items-center">
@@ -74,79 +68,19 @@ export const Services = () => {
           </div>
         </div>
 
-        <div className="hidden lg:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
-          {/* Shadow */}
-          <div className="shadow hero-card-shadow"></div>
-
-          {/* Testimonial */}
-          <Card className="absolute w-[350px] -top-[82px] left-[50px] drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
-            <CardHeader className="flex flex-row items-center gap-4 pb-2">
-              <VisitIcon />
-              <div className="flex flex-col ml-[-10px]">
-                <CardTitle className="text-lg">Jessy Diakité</CardTitle>
-                <CardDescription>@jessy_d</CardDescription>
-              </div>
-            </CardHeader>
-
-            <CardContent className="text-lg">
-              lomi. has been handling our mobile money integrations since we launched. Process was quick, and their support is great!
-            </CardContent>
-          </Card>
-
-          {/* Pricing */}
-          <Card className="absolute top-[123px] left-[50px] w-72 drop-shadow-xl shadow-black/10 dark:shadow-white/10 transform transition-transform duration-500 hover:scale-105">
-            <CardHeader>
-              <CardTitle className="flex item-center justify-between">
-                <Badge
-                  variant="secondary"
-                  className={`text-sm ${theme === 'dark' ? 'bg-white text-black' : 'text-primary'} mr-[-4px]`}
-                >
-                  Mobile money
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  className={`text-sm ${theme === 'dark' ? 'bg-white text-black' : 'text-primary'} mr-[12px]`}
-                >
-                  Pay by bank
-                </Badge>
-              </CardTitle>
-
-              <div style={{ marginTop: '15px' }}>
-                <span className="text-3xl font-bold">3. — 3.70%</span>
-                <span className="text-muted-foreground"> per transaction</span>
-              </div>
-
-              <CardDescription className="text-lg text-gray-800 dark:text-gray-200">
-                Our pricing ensures you get the best value for quality payment processing.
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-              <div className="flex justify-center">
-                <Link to="/sign-in">
-                  <PulsatingButton className="px-6 py-4 rounded-md shadow-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700">
-                    <span className="font-bold">Start</span>
-                    <span className="text-lg ml-2">— in minutes</span>
-                  </PulsatingButton>
-                </Link>
-              </div>
-            </CardContent>
-
-            <hr className="w-4/5 m-auto mb-4" />
-
-            <CardFooter className="flex">
-              <div className="space-y-4">
-                {["Simple integration", "24/7 Support", "Secure Transactions"].map(
-                  (benefit: string) => (
-                    <span key={benefit} className="flex">
-                      <Check className="text-green-500" />{" "}
-                      <h3 className="ml-2">{benefit}</h3>
-                    </span>
-                  )
-                )}
-              </div>
-            </CardFooter>
-          </Card>
+        <div className="hidden lg:block relative overflow-hidden z-[-100]">
+          <div className="right-0 w-screen">
+            <img
+              src="/portal2.png"
+              alt="Portal"
+              className="w-[3000px] h-[800px] -ml-[-500px] -padding-top-[-60px] border-6 border-gray-300 dark:border-gray-600 rounded-md shadow-md transition duration-300 ease-in-out hover:shadow-lg hover:scale-102 block dark:hidden"
+            />
+            <img
+              src="/portal.png"
+              alt="Portal"
+              className="w-[3000px] h-[800px] -ml-[-500px] -padding-top-[-60px] border-6 border-gray-300 dark:border-gray-600 rounded-md shadow-md transition duration-300 ease-in-out hover:shadow-lg hover:scale-102 hidden dark:block"
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -140,38 +140,6 @@ const Products = () => {
                 </div>
             </section>
 
-            {/* Sections for Collect Money, Manage Money, and Send Money */}
-            <section className="bg-background py-8 md:py-16 lg:py-24 dark:bg-muted">
-                <div className="container px-4 md:px-6">
-                    <div className="grid gap-6 lg:grid-cols-3">
-                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
-                                Collect
-                            </h2>
-                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
-                                Our platform ensures seamless integration with the payment method you want, making it easy for your customers to pay.
-                            </p>
-                        </div>
-                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
-                                Manage
-                            </h2>
-                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
-                                Orchestrate and reconcile payments seamlessly across different methods. Our tools help you manage your finances efficiently and accurately.
-                            </p>
-                        </div>
-                        <div className="p-6 bg-card dark:bg-card rounded-lg shadow-md">
-                            <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl text-card-foreground dark:text-card-foreground text-center mb-4">
-                                Send
-                            </h2>
-                            <p className="mt-2 text-muted-foreground dark:text-muted-foreground md:text-lg text-justify">
-                                Send payouts quickly and efficiently to anywhere your money needs to go. We make sure that your funds reach their destination.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <Footer />
         </div>
     );
