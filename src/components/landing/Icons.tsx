@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import icon from "/icon.png";
+import icon11 from "/WAR2.png"
 import paymentg from "/payment-gateway.png";
 import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
@@ -25,6 +26,16 @@ export const LogoIcon = () => {
   );
 };
 
+export const AnotherIcon = () => {
+  return (
+    <img
+      src={icon11}
+      alt="lomi.africa"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '40px', height: '40px' }}
+    />
+  );
+};
 
 export const PaymentIcon = () => {
   return (

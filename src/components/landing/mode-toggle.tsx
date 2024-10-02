@@ -41,7 +41,7 @@ export function ModeToggle({ className }: ModeToggleProps) {
     <Button
       variant="ghost"
       size="icon"
-      className={`ghost ${className}`} // Apply the passed className
+      className={`ghost ${className} focus:outline-none focus:ring-0`}
       onClick={toggleTheme} // Toggle theme on button click
     >
       <Sun className={`h-[1.1rem] w-[1.2rem] transition-all ${currentTheme === 'dark' ? 'rotate-90 scale-0' : 'rotate-0 scale-100'}`} />
