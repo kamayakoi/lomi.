@@ -5,12 +5,14 @@ import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Services } from "@/components/landing/Services";
+import Particles from "@/components/ui/particles";
 
 // import { Sponsors } from "@/components/landing/Sponsors";
 
 function Homepage() {
   return (
     <>
+      <Particles className="fixed inset-0 -z-10" color="#000000" />
       <Navbar />
       <div className="h-16"></div>
       <Hero />

@@ -110,7 +110,7 @@ export const Footer = () => {
             <a href="/terms" className="hover:underline text-gray-600 dark:text-gray-300">
               Terms of Service
             </a>
-            <a href="javascript:void(0)" className="hover:underline  text-gray-600 dark:text-gray-300">
+            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
               Leave us a testimony
             </a>
             <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
@@ -162,7 +162,9 @@ export const Footer = () => {
               Abidjan, Côte d&apos;Ivoire
             </a>
             <div className="flex items-center gap-1">
-              <p>Cookie Preferences </p>
+              <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+                Cookie Preferences
+              </a>
             </div>
             <div className="relative" ref={dropdownRef}>
               <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
