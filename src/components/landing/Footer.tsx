@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { AnotherIcon } from "./Icons";
 import { faGithub, faLinkedin, faTwitter, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 import { ModeToggle } from "./mode-toggle";
 import SystemOperational from "@/components/custom/System-operational";
