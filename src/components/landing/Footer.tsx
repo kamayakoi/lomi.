@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faLinkedin, faTwitter, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faGithub, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { ModeToggle } from "./mode-toggle";
-import SystemOperational from "@/components/custom/System-operational";
+import SystemOperational from "@/components/custom/system-operational";
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
@@ -135,7 +136,7 @@ export const Footer = () => {
               <FontAwesomeIcon icon={faTwitter} /> X | Twitter
             </a>
             <a href="https://wa.me/31687533993" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faWhatsapp} /> Newsletters
+              <FontAwesomeIcon icon={faEnvelope} /> Newsletters
             </a>
           </nav>
         </div>

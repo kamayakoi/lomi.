@@ -6,24 +6,15 @@ import { Navbar } from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Services } from "@/components/landing/Services";
 
-// import "./Home.css";
-
-{/* import { About } from "@/components/landing/About";* /}
-{/* import { Newsletter } from "./components/landing/Newsletter";* /}
-{/* import { Pricing } from "./components/landing/Pricing"; */ }
-{/* import { Sponsors } from "./components/landing/Sponsors"; */ }
-{/* import { Team } from "./components/landing/Team"; */ }
-{/* import { Testimonials } from "./components/landing/Testimonials"; */ }
-{/*import { Products } from "./components/landing/Products";*/ }
-{/* import { Cta } from "./components/landing/Cta"; */ }
+// import { Sponsors } from "@/components/landing/Sponsors";
 
 function Homepage() {
   return (
     <>
       <Navbar />
-      {/* Spacer div */}
-      <div className="h-16"></div> {/* Adjust the height as needed */}
+      <div className="h-16"></div>
       <Hero />
+      {/* <Sponsors /> */}
       <HowItWorks />
       <Services />
       <FAQ />
