@@ -40,3 +40,18 @@
 .navbar-contact-sales {
   margin-right: 1rem;
 }
+
+@media (max-width: 767px) {
+  .navbar-logo-container {
+    margin-right: 0;
+    padding-left: 0.5rem;
+  }
+
+  .navbar-contact-sales {
+    margin-left: 0;
+  }
+
+  .navbar-logo-container a {
+    align-items: center;
+  }
+}

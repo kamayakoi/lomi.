@@ -38,7 +38,7 @@ const Integrations = () => {
     return (
         <div className="flex flex-col min-h-screen bg-background dark:bg-background font-poppins">
             <Navbar />
-            <div className="h-20"></div>
+            <div className="h-24"></div>
             <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-background dark:bg-background border-b border-gray-300 dark:border-gray-700">
                 <div className="container mx-auto">
                     <div className="text-center mb-12">
@@ -49,7 +49,7 @@ const Integrations = () => {
                         {integrationOptions.map((option, index) => (
                             <div
                                 key={index}
-                                className="p-12 bg-muted/50 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                                className="p-12 bg-[#F8F9FB] dark:bg-[#0D0D15] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
                             >
                                 <div
                                     className="flex justify-between items-center cursor-pointer"
@@ -73,7 +73,6 @@ const Integrations = () => {
                 </div>
             </div>
             {/* Add border-b to create a line after the last section */}
-            <div className="border-b border-gray-300 dark:border-gray-700"></div>
             <Footer />
         </div>
     );

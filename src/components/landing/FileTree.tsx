@@ -1,5 +1,4 @@
-import React from "react";
-import { File, Folder, Tree } from "../src/components/ui/file-tree";
+import { File, Folder, Tree } from "../ui/file-tree";
 
 export function FileTreeDemo() {
     return (

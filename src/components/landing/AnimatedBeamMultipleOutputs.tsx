@@ -1,7 +1,7 @@
 import React, { forwardRef, useRef } from "react";
 
-import { cn } from "../src/lib/utils";
-import { AnimatedBeam } from "../src/components/ui/animated-beam";
+import { cn } from "../../lib/utils";
+import { AnimatedBeam } from "../ui/animated-beam";
 
 const Square = forwardRef<
     HTMLDivElement,
@@ -11,7 +11,7 @@ const Square = forwardRef<
         <div
             ref={ref}
             className={cn(
-                "z-10 flex size-12 items-center justify-center border-[0.5px] bg-white p-1 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]",
+                "z-10 flex size-12 items-center justify-center p-1 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] border-[0.5px] border-white rounded",
                 className,
             )}
         >
@@ -21,6 +21,25 @@ const Square = forwardRef<
 });
 
 Square.displayName = "Square";
+
+const UserIconCircle = forwardRef<
+    HTMLDivElement,
+    { className?: string; children?: React.ReactNode }
+>(({ className, children }, ref) => {
+    return (
+        <div
+            ref={ref}
+            className={cn(
+                "z-10 size-12 border-[0.5px] bg-white p-1 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] rounded-full flex items-center justify-center",
+                className,
+            )}
+        >
+            {children}
+        </div>
+    );
+});
+
+UserIconCircle.displayName = "UserIconCircle";
 
 export function AnimatedBeamMultipleOutputDemo({
     className,
@@ -35,6 +54,8 @@ export function AnimatedBeamMultipleOutputDemo({
     const div5Ref = useRef<HTMLDivElement>(null);
     const div6Ref = useRef<HTMLDivElement>(null);
     const div7Ref = useRef<HTMLDivElement>(null);
+    const div8Ref = useRef<HTMLDivElement>(null);
+    const div9Ref = useRef<HTMLDivElement>(null);
 
     return (
         <div
@@ -45,10 +66,16 @@ export function AnimatedBeamMultipleOutputDemo({
             ref={containerRef}
         >
             <div className="flex size-full max-w-lg flex-row items-stretch justify-between gap-10">
-                <div className="flex flex-col justify-center">
-                    <Square ref={div7Ref}>
+                <div className="flex flex-col justify-center gap-4">
+                    <UserIconCircle ref={div7Ref}>
                         <Icons.user />
-                    </Square>
+                    </UserIconCircle>
+                    <UserIconCircle ref={div8Ref}>
+                        <Icons.user />
+                    </UserIconCircle>
+                    <UserIconCircle ref={div9Ref}>
+                        <Icons.user />
+                    </UserIconCircle>
                 </div>
                 <div className="flex flex-col justify-center">
                     <Square ref={div6Ref} className="size-12">
@@ -109,6 +136,18 @@ export function AnimatedBeamMultipleOutputDemo({
                 containerRef={containerRef}
                 fromRef={div6Ref}
                 toRef={div7Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div6Ref}
+                toRef={div8Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div6Ref}
+                toRef={div9Ref}
                 duration={3}
             />
         </div>

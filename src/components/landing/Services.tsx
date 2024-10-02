@@ -12,7 +12,7 @@ const serviceList: ServiceProps[] = [
   {
     title: "Collect Money",
     description:
-      "Accept payments via Card, Mobile Money, e-wallets, and pay-by-bank using an interface uniquely built for West Africa.",
+      "Accept payments via Card, Mobile Money, e-wallets, and bank transfers using an interface uniquely built for West Africa.",
     icon: <WalletIcon />,
   },
   {
@@ -51,7 +51,7 @@ export const Services = () => {
 
           <div className="flex flex-col gap-8">
             {serviceList.map(({ icon, title, description }: ServiceProps) => (
-              <Card key={title}>
+              <Card key={title} className="bg-[#F8F9FB] dark:bg-[#0D0D15]">
                 <CardHeader className="space-y-1 flex md:flex-row justify-start items-start gap-4">
                   <div className="mt-1 bg-primary/10 p-1 rounded-2xl">
                     {icon}

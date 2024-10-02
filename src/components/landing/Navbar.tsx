@@ -52,13 +52,13 @@ export const Navbar = () => {
       <header className="navbar-dock">
         <NavigationMenu className="mx-auto">
           <NavigationMenuList className="container flex items-center justify-between">
-            <div className="navbar-logo-container">
+            <div className="navbar-logo-container flex items-center">
               <NavigationMenuItem className="font-bold flex items-center">
                 <a
                   rel="lomi.africa"
                   href="/"
                   className="font-bold text-xl flex items-center"
-                  style={{ fontSize: '1.5rem' }}
+                  style={{ fontSize: '1.2rem' }}
                 >
                   <LogoIcon />
                   <span className="ml-2">lomi.africa</span>
@@ -67,36 +67,45 @@ export const Navbar = () => {
             </div>
 
             {/* mobile */}
-            <span className="flex md:hidden">
+            <span className="md:hidden flex items-center">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger className="px-2">
                   <Menu
-                    className="flex md:hidden h-5 w-5"
+                    className="h-6 w-6"
                     onClick={() => setIsOpen(true)}
                   >
                     <span className="sr-only"></span>
                   </Menu>
                 </SheetTrigger>
 
-                <SheetContent side={"left"}>
+                <SheetContent side={"left"} className="w-3/4"> {/* Increased sheet width */}
                   <SheetHeader>
                     <SheetTitle className="font-bold text-xl" style={{ fontSize: '1.2rem' }}>
                       lomi.africa
                     </SheetTitle>
                   </SheetHeader>
-                  <nav className="flex flex-col justify-center items-center gap-2 mt-4">
+                  <nav className="flex flex-col justify-center items-start gap-4 mt-6 px-4"> {/* Adjusted spacing and alignment */}
                     {routeList.map(({ href, label }: RouteProps) => (
                       <a
                         rel="noreferrer noopener"
                         key={label}
                         href={href}
                         onClick={() => setIsOpen(false)}
-                        className={buttonVariants({ variant: "ghost" })}
-                        style={{ fontSize: '1.06rem' }}
+                        className={`text-lg ${buttonVariants({ variant: "ghost" })}`}
                       >
                         {label}
                       </a>
                     ))}
+                    <button
+                      onClick={() => {
+                        setIsFormOpen(true);
+                        setIsOpen(false);
+                      }}
+                      className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })}`}
+                      style={{ padding: '0.75rem 1rem' }}
+                    >
+                      Contact sales
+                    </button>
                   </nav>
                 </SheetContent>
               </Sheet>

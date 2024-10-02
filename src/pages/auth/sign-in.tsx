@@ -1,6 +1,6 @@
 import { UserAuthForm } from './components/user-auth-form'
 import { Link } from 'react-router-dom'
-import { AnimatedBeamMultipleOutputDemo } from '../../../components-to-implement/AnimatedBeamMultipleOutputs'
+import { AnimatedBeamMultipleOutputDemo } from '../../components/landing/AnimatedBeamMultipleOutputs'
 
 export default function SignIn() {
   return (

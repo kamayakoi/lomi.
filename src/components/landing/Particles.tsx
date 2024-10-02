@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useTheme from "react-use-theme"
 
-import Particles from "../src/components/ui/particles";
+import Particles from "../ui/particles";
 
 export function ParticlesDemo() {
     const { theme } = useTheme("light", "#ffffff");

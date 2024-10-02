@@ -3,6 +3,7 @@ import { HeroCards } from "./HeroCards";
 import { useState } from "react"; // Import useState
 import { Link } from "react-router-dom";
 import PulsatingButton from '@/components/ui/pulsating-button';
+import AvatarCircles from "@/components/ui/avatar-circles";
 
 // Image import
 import africanledger from "/africanledger_round.png";
@@ -48,23 +49,21 @@ export const Hero = () => {
           </Link>
         </div>
 
-        {/* New section */}
+        {/* New section using AvatarCircles component */}
         <div className="flex items-center mt-6">
-          <div className="flex -space-x-3"> {/* Adjusted space for better overlap */}
-            <div className="w-8 h-8 rounded-full overflow-hidden z-30"> {/* Removed border */}
-              <img src={africanledger} alt="Person 1" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-8 h-8 rounded-full overflow-hidden z-20"> {/* Removed border */}
-              <img src={testimony2} alt="Person 2" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-8 h-8 rounded-full overflow-hidden z-10"> {/* Removed border */}
-              <img src={testimony3} alt="Person 3" className="w-full h-full object-cover" />
-            </div>
-          </div>
+          <AvatarCircles
+            avatarUrls={[
+              africanledger,
+              testimony2,
+              testimony3
+            ]}
+            numPeople={99}
+          />
           <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300 ml-4">
             Loved by dozens of businesses and entrepreneurs.
           </span>
         </div>
+        <div className="h-12 md:hidden"></div> {/* Add space only for mobile devices */}
       </div>
 
       {/* Hero cards sections */}

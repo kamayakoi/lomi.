@@ -5,6 +5,11 @@ import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
 import kwameadjei from "/kwameadjei.png";
 import iconDark from "/icon_dark.svg";
+import mtnLogo from '/mtn.png';
+import waveLogo from '/wave.png';
+import applePayLogo from '/apple-pay.png';
+import war2Logo from '/ecobank2.png';
+
 import { useTheme } from '@/lib/useTheme';
 
 export const LogoIcon = () => {
@@ -31,11 +36,54 @@ export const AnotherIcon = () => {
       src={icon11}
       alt="lomi.africa"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '40px', height: '40px' }}
+      style={{ width: '38px', height: '38px' }}
     />
   );
 };
 
+export const MtnLogo = () => {
+  return (
+    <img
+      src={mtnLogo}
+      alt="mtn"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+    />
+  );
+};
+
+export const WaveLogo = () => {
+  return (
+    <img
+      src={waveLogo}
+      alt="wave"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+    />
+  );
+};
+
+export const ApplePayLogo = () => {
+  return (
+    <img
+      src={applePayLogo}
+      alt="apple pay"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+    />
+  );
+};
+
+export const War2Logo = () => {
+  return (
+    <img
+      src={war2Logo}
+      alt="war2"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+    />
+  );
+};
 
 export const VisitIcon = () => {
   return (

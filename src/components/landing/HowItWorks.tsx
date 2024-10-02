@@ -33,7 +33,7 @@ const products: ProductProps[] = [
       </div>
     ), // Adjust size as needed
     title: "Scalability",
-    description: "Our platform is built to scale with your business, ensuring reliable and fast processing regardless of volume.",
+    description: "Our platform is built to scale with your business, ensuring fast processing regardless of volume.",
   },
   {
     icon: (
@@ -66,7 +66,7 @@ export const HowItWorks = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map(({ icon, title, description }: ProductProps) => (
-          <Card key={title} className="bg-muted/50">
+          <Card key={title} className="bg-[#F8F9FB] dark:bg-[#0D0D15]">
             <CardHeader>
               <CardTitle className="grid gap-4 place-items-center">
                 {icon}

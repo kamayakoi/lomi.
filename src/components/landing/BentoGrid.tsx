@@ -5,8 +5,7 @@ import {
     GlobeIcon,
     InputIcon,
 } from "@radix-ui/react-icons";
-import React from "react";
-import { BentoCard, BentoGrid } from "../src/components/ui/bento-grid";
+import { BentoCard, BentoGrid } from "../ui/bento-grid";
 
 const features = [
     {

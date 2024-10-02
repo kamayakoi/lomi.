@@ -29,7 +29,7 @@ const About = () => {
                 <div className="relative z-10">
                     {/* Hero Section */}
                     <section className="w-full h-[1100px] flex flex-col justify-center items-center px-4 md:px-6">
-                        <p className="text-5xl tracking-tighter sm:text-6xl md:text-6xl lg:text-5xl text-center text-white mt-[-295px] mx-auto max-w-6xl">
+                        <p className="text-5xl tracking-tighter sm:text-6xl md:text-6xl lg:text-5xl text-center text-white mt-[-295px] mx-auto max-w-6xl font-bold">
                             Our mission is to make online payments simple, secure, and accessible for businesses across West Africa.
                         </p>
                     </section>
@@ -46,7 +46,7 @@ const About = () => {
                                     Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. The payment providers are ever-increasing, and entrepreneurs don&apos;t necessarly have the tools to orchestrate them effectively.
                                 </p>
                                 <p className="text-white dark:text-white md:text-xl">
-                                    We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use most.
+                                    We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use the most.
                                 </p>
                                 {/* Get Started Button */}
                                 <Link to="/integrations">
