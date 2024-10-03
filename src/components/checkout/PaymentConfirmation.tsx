@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
-import { useRouter } from 'next/router'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle } from 'lucide-react'
 import { useCheckoutContext } from './useCheckoutContext'
 
 export default function PaymentConfirmation() {
-    const router = useRouter()
     const { customerDetails, setOrderStatus } = useCheckoutContext()
 
     useEffect(() => {
@@ -27,7 +25,7 @@ export default function PaymentConfirmation() {
                     <p>Your order has been successfully processed and a confirmation email has been sent to {customerDetails.email}.</p>
                 </CardContent>
                 <CardFooter className="flex justify-end">
-                    <Button onClick={() => router.push('/')}>Return to Homepage</Button>
+                    <Button onClick={() => window.location.href = '/'}>Return to Homepage</Button>
                 </CardFooter>
             </Card>
         </div>

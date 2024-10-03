@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import { AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -35,29 +34,29 @@ const errorTypes: { [key: string]: ErrorDetails } = {
 }
 
 export default function ErrorPage() {
-    const router = useRouter()
     const [errorDetails, setErrorDetails] = useState<ErrorDetails>(errorTypes.default)
 
     useEffect(() => {
-        const { errorType } = router.query
-        if (typeof errorType === 'string' && errorType in errorTypes) {
-            setErrorDetails(errorTypes[errorType])
+        const searchParams = new URLSearchParams(window.location.search)
+        const errorType = searchParams.get('errorType')
+        if (errorType && errorType in errorTypes) {
+            setErrorDetails(errorTypes[errorType as keyof typeof errorTypes])
         }
-    }, [router.query])
+    }, [])
 
     const handleAction = () => {
         switch (errorDetails.action) {
             case 'Return to Checkout':
-                router.push('/checkout')
+                window.location.href = '/checkout'
                 break
             case 'Review Cart':
-                router.push('/cart')
+                window.location.href = '/cart'
                 break
             case 'Return to Homepage':
-                router.push('/')
+                window.location.href = '/'
                 break
             default:
-                router.reload()
+                window.location.reload()
         }
     }
 
@@ -78,7 +77,7 @@ export default function ErrorPage() {
                     </Alert>
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                    <Button variant="outline" onClick={() => router.push('/')}>Return to Homepage</Button>
+                    <Button variant="outline" onClick={() => window.location.href = '/'}>Return to Homepage</Button>
                     <Button onClick={handleAction}>{errorDetails.action}</Button>
                 </CardFooter>
             </Card>

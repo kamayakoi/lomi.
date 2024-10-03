@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { CheckCircle, XCircle } from 'lucide-react'
 
 interface PaymentMethod {
@@ -16,15 +15,15 @@ type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure'
 
 export default function StripeCheckoutPage() {
     const [selectedMethod, setSelectedMethod] = useState('')
-    const [cardDetails, setCardDetails] = useState({ name: '', number: '', expiry: '', cvc: '' })
+    const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
     const paymentMethods: PaymentMethod[] = [
         { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards.png', color: 'bg-gray-100' },
         { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png', color: 'bg-gray-100' },
         { id: 'GOOGLE_PAY', name: 'Google Pay', icon: '/google-pay.png', color: 'bg-gray-100' },
-        { id: 'WAVE_PAYMENT', name: 'Wave', icon: '/wave.png', color: 'bg-blue-500' },
-        { id: 'ORANGE_PAYMENT', name: 'Orange', icon: '/orange.png', color: 'bg-gray-100' },
-        { id: 'MTN Momo', name: 'Momo', icon: '/mtn.png', color: 'bg-gray-100' },
+        { id: 'WAVE', name: 'Wave', icon: '/wave.png', color: 'bg-blue-500' },
+        { id: 'ORANGE', name: 'Orange', icon: '/orange.png', color: 'bg-gray-100' },
+        { id: 'MTN_MOMO', name: 'Momo', icon: '/mtn.png', color: 'bg-gray-100' },
     ]
 
     const handleMethodSelect = (methodId: string) => {
@@ -34,7 +33,17 @@ export default function StripeCheckoutPage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
-        setCardDetails(prev => ({ ...prev, [name]: value }))
+        if (name === 'expiry') {
+            // Automatically format expiry date
+            const formatted = value.replace(/\D/g, '').slice(0, 4)
+            if (formatted.length > 2) {
+                setCardDetails(prev => ({ ...prev, [name]: `${formatted.slice(0, 2)}/${formatted.slice(2)}` }))
+            } else {
+                setCardDetails(prev => ({ ...prev, [name]: formatted }))
+            }
+        } else {
+            setCardDetails(prev => ({ ...prev, [name]: value }))
+        }
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -94,6 +103,10 @@ export default function StripeCheckoutPage() {
             default:
                 return null
         }
+    }
+
+    const isPaymentFormValid = () => {
+        return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
     }
 
     return (
@@ -174,31 +187,24 @@ export default function StripeCheckoutPage() {
                                     onSubmit={handleSubmit}
                                     className="space-y-4 bg-white rounded-md p-4"
                                 >
-                                    <div>
-                                        <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name on Card</Label>
-                                        <Input
-                                            id="name"
-                                            name="name"
-                                            value={cardDetails.name}
-                                            onChange={handleInputChange}
-                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <Label htmlFor="number" className="text-sm font-medium text-gray-700">Card Number</Label>
+                                    <div className="relative">
                                         <Input
                                             id="number"
                                             name="number"
                                             value={cardDetails.number}
                                             onChange={handleInputChange}
-                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                            placeholder="1234 1234 1234 1234"
+                                            className="mt-1 block w-full pr-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                                             required
                                         />
+                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1">
+                                            <img src="/checkout-visa.png" alt="Visa" className="h-4 w-auto" />
+                                            <img src="/checkout-mastercard.png" alt="Mastercard" className="h-4 w-auto" />
+                                            <img src="/checkout-amer.png" alt="American Express" className="h-4 w-auto" />
+                                        </div>
                                     </div>
                                     <div className="flex space-x-4">
                                         <div className="flex-1">
-                                            <Label htmlFor="expiry" className="text-sm font-medium text-gray-700">Expiry Date</Label>
                                             <Input
                                                 id="expiry"
                                                 name="expiry"
@@ -210,18 +216,22 @@ export default function StripeCheckoutPage() {
                                             />
                                         </div>
                                         <div className="flex-1">
-                                            <Label htmlFor="cvc" className="text-sm font-medium text-gray-700">CVC</Label>
                                             <Input
                                                 id="cvc"
                                                 name="cvc"
                                                 value={cardDetails.cvc}
                                                 onChange={handleInputChange}
+                                                placeholder="CVC"
                                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                                                 required
                                             />
                                         </div>
                                     </div>
-                                    <Button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md"
+                                        disabled={!isPaymentFormValid()}
+                                    >
                                         Pay
                                     </Button>
                                 </motion.form>
