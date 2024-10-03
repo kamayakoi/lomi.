@@ -71,7 +71,7 @@
     "cmdk": "1.0.0",
     "dayjs": "1.11.10",
     "express": "^4.21.0",
-    "framer-motion": "^11.9.0",
+    "framer-motion": "^11.10.0",
     "glob": "10.3.10",
     "inflight": "1.0.6",
     "lru-cache": "10.2.0",

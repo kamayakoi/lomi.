@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { MagicCard } from "../ui/magic-card";
 import { MedalIcon, MapIcon, PlaneIcon, ShieldIcon } from "./Icons";
 
 interface ProductProps {
@@ -13,7 +13,7 @@ const products: ProductProps[] = [
       <div style={{ width: '40px', height: '40px' }}>
         <MedalIcon />
       </div>
-    ), // Adjust size as needed
+    ),
     title: "Accessibility",
     description: "Easily integrate our API to start accepting payments from multiple channels.",
   },
@@ -22,7 +22,7 @@ const products: ProductProps[] = [
       <div style={{ width: '40px', height: '40px' }}>
         <MapIcon />
       </div>
-    ), // Adjust size as needed
+    ),
     title: "Support",
     description: "Our resources and support can help make integration quick and straightforward.",
   },
@@ -31,7 +31,7 @@ const products: ProductProps[] = [
       <div style={{ width: '40px', height: '40px' }}>
         <PlaneIcon />
       </div>
-    ), // Adjust size as needed
+    ),
     title: "Scalability",
     description: "Our platform is built to scale with your business, ensuring fast processing regardless of volume.",
   },
@@ -40,7 +40,7 @@ const products: ProductProps[] = [
       <div style={{ width: '40px', height: '40px' }}>
         <ShieldIcon />
       </div>
-    ), // Adjust size as needed
+    ),
     title: "Security",
     description: "Advanced security features to protect your funds and customer data at all times.",
   },
@@ -49,7 +49,6 @@ const products: ProductProps[] = [
 export const HowItWorks = () => {
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
-      {/* New section name */}
       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
         Key Benefits
       </h3>
@@ -66,15 +65,18 @@ export const HowItWorks = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map(({ icon, title, description }: ProductProps) => (
-          <Card key={title} className="bg-[#F8F9FB] dark:bg-[#0D0D15]">
-            <CardHeader>
-              <CardTitle className="grid gap-4 place-items-center">
-                {icon}
-                {title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent style={{ fontSize: '1.06rem' }}>{description}</CardContent> {/* Applied custom font size directly */}
-          </Card>
+          <MagicCard
+            key={title}
+            className="p-6"
+            gradientColor="#e5e7eb" // Light gray color for the gradient
+            gradientOpacity={0.4} // Very low opacity for an almost invisible effect
+          >
+            <div className="grid gap-4 place-items-center">
+              {icon}
+              <h3 className="text-xl font-semibold">{title}</h3>
+            </div>
+            <p className="mt-4 text-lg">{description}</p>
+          </MagicCard>
         ))}
       </div>
     </section>
