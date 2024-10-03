@@ -78,7 +78,6 @@ import CheckoutTest from './pages/test/CheckoutTest.tsx'
 import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx'
 import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx'
 import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx'
-import CheckoutProviderTest from './pages/test/CheckoutProviderTest.tsx'
 
 const AppRouter = () => (
     <Router>
@@ -163,7 +162,6 @@ const AppRouter = () => (
                     <Route path="checkout-form" element={<CheckoutFormTest />} />
                     <Route path="checkout-summary" element={<CheckoutSummaryTest />} />
                     <Route path="payment-method-selector" element={<PaymentMethodSelectorTest />} />
-                    <Route path="checkout-provider" element={<CheckoutProviderTest />} />
                 </Route>
 
                 {/* Error routes */}
