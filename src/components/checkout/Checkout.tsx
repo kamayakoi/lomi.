@@ -19,7 +19,7 @@ export default function StripeCheckoutPage() {
     const [cardDetails, setCardDetails] = useState({ name: '', number: '', expiry: '', cvc: '' })
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
     const paymentMethods: PaymentMethod[] = [
-        { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards3.png', color: 'bg-gray-100' },
+        { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards.png', color: 'bg-gray-100' },
         { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png', color: 'bg-gray-100' },
         { id: 'GOOGLE_PAY', name: 'Google Pay', icon: '/google-pay.png', color: 'bg-gray-100' },
         { id: 'WAVE_PAYMENT', name: 'Wave', icon: '/wave.png', color: 'bg-blue-500' },

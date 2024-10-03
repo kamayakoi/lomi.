@@ -93,7 +93,7 @@ export function AnimatedBeamMultipleOutputDemo({
                         <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full" />
                     </Square>
                     <Square ref={div4Ref}>
-                        <img src="/stripe.png" alt="Stripe" className="object-cover w-full h-full" />
+                        <img src="/apple-pay.png" alt="Apple Pay" className="object-cover w-full h-full" />
                     </Square>
                     <Square ref={div5Ref}>
                         <img src="/ecobank2.png" alt="Ecobank" className="object-cover w-full h-full" />
