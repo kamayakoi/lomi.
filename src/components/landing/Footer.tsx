@@ -41,17 +41,17 @@ export const Footer = () => {
             Company
           </h4>
           <nav className="grid gap-2">
-            <a href="/solutions" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
               Solutions
-            </a>
-            <a href="/products" className="hover:underline text-gray-600 dark:text-gray-300">
-              Features
             </a>
             <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
               Case Studies
             </a>
             <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
               Customers
+            </a>
+            <a href="/about" className="hover:underline text-gray-600 dark:text-gray-300">
+              About us
             </a>
           </nav>
         </div>

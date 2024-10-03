@@ -122,7 +122,7 @@ const Products = () => {
                                 title="Pay by bank"
                                 logos={[
                                     { src: ecobankLogo, alt: "Ecobank" },
-                                    { src: sepaLogo, alt: "SEPA | Bank Transfer" }
+                                    { src: sepaLogo, alt: "Bank Transfer" }
                                 ]}
                             />
                             <IntegrationAccordion

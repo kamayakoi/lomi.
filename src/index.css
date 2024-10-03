@@ -31,7 +31,7 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%; /* This is #06060A in HSL */
+    --background: 240 10% 4.3%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -41,7 +41,7 @@
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 244 31% 10%; /* Dark theme - equivalent to #141822 */
+    --muted: 244 31% 6.5%; /* Dark theme */
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;

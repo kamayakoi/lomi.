@@ -25,14 +25,14 @@ const integrationOptions = [
 ];
 
 const Integrations = () => {
-    const [expandedIndices, setExpandedIndices] = useState<number[]>([2]);
+    const [expandedStates, setExpandedStates] = useState<boolean[]>([false, false, true]);
 
     const toggleExpand = (index: number) => {
-        setExpandedIndices((prevIndices) =>
-            prevIndices.includes(index)
-                ? prevIndices.filter((i) => i !== index)
-                : [...prevIndices, index]
-        );
+        setExpandedStates(prevStates => {
+            const newStates = [...prevStates];
+            newStates[index] = !newStates[index];
+            return newStates;
+        });
     };
 
     return (
@@ -49,16 +49,20 @@ const Integrations = () => {
                         {integrationOptions.map((option, index) => (
                             <div
                                 key={index}
-                                className="p-12 bg-[#F8F9FB] dark:bg-[#0D0D15] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                                className={`p-12 bg-[#F8F9FB] dark:bg-[#0D0D15] rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${expandedStates[index] ? 'md:col-span-3' : ''}`}
                             >
-                                <div
-                                    className="flex justify-between items-center cursor-pointer"
+                                <button
+                                    className="w-full text-left focus:outline-none"
                                     onClick={() => toggleExpand(index)}
                                 >
-                                    <h2 className="text-3xl font-semibold text-card-foreground dark:text-card-foreground">{option.title}</h2>
-                                    <button className="text-3xl text-muted-foreground dark:text-muted-foreground">{expandedIndices.includes(index) ? '×' : '+'}</button>
-                                </div>
-                                {expandedIndices.includes(index) && (
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-3xl font-semibold text-card-foreground dark:text-card-foreground">{option.title}</h2>
+                                        <span className="text-3xl text-muted-foreground dark:text-muted-foreground">
+                                            {expandedStates[index] ? '×' : '+'}
+                                        </span>
+                                    </div>
+                                </button>
+                                {expandedStates[index] && (
                                     <div className="mt-6 text-left">
                                         <p className="text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.description }}></p>
                                         <p className="mt-4 text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.details }}></p>
@@ -72,7 +76,6 @@ const Integrations = () => {
                     </div>
                 </div>
             </div>
-            {/* Add border-b to create a line after the last section */}
             <Footer />
         </div>
     );
