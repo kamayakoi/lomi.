@@ -64,6 +64,7 @@ import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx'
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
 import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
+import Status from './pages/Status.tsx';
 
 import Activation from './pages/auth/kyc/activation.tsx';
 
@@ -91,6 +92,7 @@ const AppRouter = () => (
                 <Route path="/careers" element={<Careers />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/status" element={<Status />} />
 
                 {/* Dashboard routes */}
                 {/* {config.isPortal ? ( */}
