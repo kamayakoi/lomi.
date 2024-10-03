@@ -12,23 +12,29 @@ interface Item {
 let notifications = [
     {
         name: "Payment received",
-        description: "Ashanti Shoes",
+        description: "ashantishoes.com",
         time: "12m ago",
-
         icon: "💸",
         color: "#00C9A7",
     },
     {
         name: "Subscription created",
-        description: "Ashanti Shoes",
+        description: "The African Ledger",
         time: "10m ago",
         icon: "👤",
         color: "#FFB800",
     },
     {
         name: "Payment received",
-        description: "Ashanti Shoes",
+        description: "ashantishoes.com",
         time: "5m ago",
+        icon: "💸",
+        color: "#00C9A7",
+    },
+    {
+        name: "Payout processed",
+        description: "The African Ledger",
+        time: "42m ago",
         icon: "💸",
         color: "#00C9A7",
     },
@@ -85,7 +91,7 @@ export function AnimatedListDemo({
                 className,
             )}
         >
-            <AnimatedList delay={40000}>
+            <AnimatedList delay={13000}>
                 {notifications.map((item, idx) => (
                     <Notification {...item} key={idx} />
                 ))}

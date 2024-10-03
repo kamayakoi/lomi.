@@ -47,7 +47,7 @@ export const MtnLogo = () => {
       src={mtnLogo}
       alt="mtn"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '120px', height: '80px', borderRadius: '50%' }}
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
     />
   );
 };
@@ -58,7 +58,7 @@ export const WaveLogo = () => {
       src={waveLogo}
       alt="wave"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '120px', height: '80px', borderRadius: '50%' }}
+      style={{ width: '180px', height: '100px', borderRadius: '50%' }}
     />
   );
 };
@@ -69,7 +69,7 @@ export const ApplePayLogo = () => {
       src={applePayLogo}
       alt="apple pay"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '120px', height: '80px', borderRadius: '50%' }}
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
     />
   );
 };
@@ -80,7 +80,7 @@ export const War2Logo = () => {
       src={war2Logo}
       alt="war2"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '120px', height: '80px', borderRadius: '50%' }}
+      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
     />
   );
 };

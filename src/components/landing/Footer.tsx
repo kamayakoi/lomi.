@@ -89,7 +89,7 @@ export const Footer = () => {
             <a href="https://developers.lomi.africa/api-documentation" className="hover:underline text-gray-600 dark:text-gray-300">
               Recipes
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a href="mailto:hello@lomi.africa?subject=[Support] — Question" className="hover:underline text-gray-600 dark:text-gray-300">
               Support
             </a>
             <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">

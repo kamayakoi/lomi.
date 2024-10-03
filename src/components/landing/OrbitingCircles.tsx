@@ -10,7 +10,7 @@ export function OrbitingCirclesDemo() {
 
             {/* Inner Circles */}
             <OrbitingCircles
-                className="size-[40px] bg-transparent"
+                className="size-[95px] bg-transparent"
                 duration={20}
                 delay={20}
                 radius={80}
@@ -18,7 +18,7 @@ export function OrbitingCirclesDemo() {
                 <Icons.MtnLogo />
             </OrbitingCircles>
             <OrbitingCircles
-                className="size-[40px] bg-transparent"
+                className="size-[95px] bg-transparent"
                 duration={20}
                 delay={10}
                 radius={80}
@@ -28,7 +28,7 @@ export function OrbitingCirclesDemo() {
 
             {/* Outer Circles (reverse) */}
             <OrbitingCircles
-                className="size-[50px] bg-transparent"
+                className="size-[95px] bg-transparent"
                 radius={190}
                 duration={20}
                 reverse
@@ -36,7 +36,7 @@ export function OrbitingCirclesDemo() {
                 <Icons.ApplePayLogo />
             </OrbitingCircles>
             <OrbitingCircles
-                className="size-[50px] bg-transparent"
+                className="size-[95px] bg-transparent"
                 radius={190}
                 duration={20}
                 delay={20}

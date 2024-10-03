@@ -46,8 +46,8 @@ const BentoCard = ({
       "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
       // light styles
       "bg-white [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-      // dark styles (updated for better contrast and readability)
-      "transform-gpu dark:bg-neutral-800 dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_4px_16px_rgba(0,0,0,.2)]",
+      // dark styles (updated with #0D0D15 background and transparent hover)
+      "transform-gpu dark:bg-[#0D0D15] dark:[border:1px_solid_rgba(255,255,255,.1)]",
       className,
     )}
   >
@@ -72,7 +72,7 @@ const BentoCard = ({
         </a>
       </Button>
     </div>
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-700/20" />
+    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-white/10" />
   </div>
 );
 

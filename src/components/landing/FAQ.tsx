@@ -14,7 +14,7 @@ interface FAQProps {
 const FAQList: FAQProps[] = [
   {
     question: "How quickly can I get started with Lomi?",
-    answer: "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our Terms of Service, you can start accepting payments the same day.",
+    answer: "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our Terms of Service, you can start accepting payments.",
     value: "item-1",
   },
   {

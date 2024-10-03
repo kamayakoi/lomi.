@@ -57,7 +57,7 @@ export const Hero = () => {
               testimony2,
               testimony3
             ]}
-            numPeople={99}
+            numPeople={12}
           />
           <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300 ml-4">
             Loved by dozens of businesses and entrepreneurs.
