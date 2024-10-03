@@ -1,5 +1,5 @@
-import OrbitingCircles from "../src/components/ui/orbiting-circles";
-import * as Icons from "../src/components/landing/Icons";
+import OrbitingCircles from "@/components/ui/orbiting-circles";
+import * as Icons from "@/components/landing/Icons";
 
 export function OrbitingCirclesDemo() {
     return (

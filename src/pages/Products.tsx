@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
 import PulsatingButton from '@/components/ui/pulsating-button';
-import { OrbitingCirclesDemo } from '../../components-to-implement/OrbitingCircles';
+import { OrbitingCirclesDemo } from '../components/landing/OrbitingCircles';
 
 // Import the logo images
 import orangeLogo from '/orange.png';

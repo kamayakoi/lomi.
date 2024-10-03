@@ -1,53 +1,54 @@
-import { GlobeIcon } from "@radix-ui/react-icons";
-import { BentoCard, BentoGrid } from "../ui/bento-grid";
-import { CreditCardIcon } from "lucide-react";
+import { CreditCardIcon, ReceiptIcon, Share2Icon } from "lucide-react";
+import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { AnimatedBeamMultipleOutputDemo } from "./AnimatedBeamMultipleOutputs";
+import { AnimatedListDemo } from "./AnimatedList";
 
 const features = [
     {
-        Icon: CreditCardIcon,
-        name: "Unified Checkout",
-        description: "Seamless integration of various payment methods through a single interface.",
-        href: "/features/checkout",
+        Icon: Share2Icon,
+        name: "Integrations",
+        description: "Supports 5+ integrations and counting.",
+        href: "#",
         cta: "Learn more",
-        background: <img src="/images/checkout-bg.webp" alt="Checkout background" className="absolute -right-20 -top-20 opacity-60" />,
+        className: "col-span-3 lg:col-span-2",
+        background: (
+            <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
+        ),
+    },
+    {
+        Icon: CreditCardIcon,
+        name: "Checkout",
+        description: "Streamline your customer checkout process with a flexible, customizable interface tailored to your business needs.",
+        href: "/features/checkout",
+        cta: "Set up your checkout",
+        background: (
+            <div className="absolute inset-0 overflow-hidden">
+                <AnimatedListDemo />
+            </div>
+        ),
         className: "lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2",
     },
     {
-        Icon: GlobeIcon,
-        name: "Global Reach",
-        description: "Expand your business globally with support for international payments.",
-        href: "/features/global",
-        cta: "Learn more",
-        background: <img src="/images/global-bg.webp" alt="Global background" className="absolute -right-20 -top-20 opacity-60" />,
-        className: "lg:row-start-3 lg:row-end-4 lg:col-start-2 lg:col-end-3",
+        Icon: ReceiptIcon,
+        name: "Payment Orchestration",
+        description: "Manage all your payments, subscriptions, refunds, and payouts in one single place.",
+        href: "/features/transactions",
+        cta: "View demo dashboard",
+        background: (
+            <div className="absolute inset-0 overflow-hidden opacity-25">
+                <img src="/portal.png" alt="Portal background" className="object-cover w-full h-5% -ml-1" />
+            </div>
+        ),
+        className: "col-span-3 lg:col-span-2",
     },
-    {
-        Icon: GlobeIcon,
-        name: "Global Reach",
-        description: "Expand your business globally with support for international payments.",
-        href: "/features/global",
-        cta: "Learn more",
-        background: <img src="/images/global-bg.webp" alt="Global background" className="absolute -right-20 -top-20 opacity-60" />,
-        className: "lg:row-start-3 lg:row-end-4 lg:col-start-2 lg:col-end-3",
-    },
-    {
-        Icon: GlobeIcon,
-        name: "Global Reach",
-        description: "Expand your business globally with support for international payments.",
-        href: "/features/global",
-        cta: "Learn more",
-        background: <img src="/images/global-bg.webp" alt="Global background" className="absolute -right-20 -top-20 opacity-60" />,
-        className: "lg:row-start-3 lg:row-end-4 lg:col-start-2 lg:col-end-3",
-    },
-
 ];
 
-export const BentoDemo = () => {
+export function BentoDemo() {
     return (
-        <BentoGrid className="lg:grid-rows-2 w-full max-w-4xl">
-            {features.map((feature) => (
-                <BentoCard key={feature.name} {...feature} className="p-6 text-lg" />
+        <BentoGrid>
+            {features.map((feature, idx) => (
+                <BentoCard key={idx} {...feature} />
             ))}
         </BentoGrid>
     );
-};
+}

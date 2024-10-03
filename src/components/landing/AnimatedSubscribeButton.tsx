@@ -1,7 +1,6 @@
-import React from "react";
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
 
-import { AnimatedSubscribeButton } from "../src/components/ui/animated-subscribe-button";
+import { AnimatedSubscribeButton } from "../ui/animated-subscribe-button";
 
 export function AnimatedSubscribeButtonDemo() {
     return (

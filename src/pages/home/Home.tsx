@@ -4,7 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
-import { Services } from "@/components/landing/Services";
+import { Services } from "@/components/landing/NewServices";
 // import Particles from "@/components/ui/particles";
 // import { Sponsors } from "@/components/landing/Sponsors";
 
