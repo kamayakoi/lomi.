@@ -313,7 +313,7 @@ const usePinInput = ({
 
     for (let i = 0; i < length; i++) {
       if (i < copyArr.length) {
-        updateInputField(copyArr[i], i)
+        updateInputField(copyArr[i] || '', i)
       }
     }
 

@@ -163,7 +163,7 @@ const Tree = forwardRef<HTMLDivElement, TreeViewProps>(
               value={expandedItems}
               className="flex flex-col gap-1"
               onValueChange={(value) =>
-                setExpandedItems((prev) => [...(prev ?? []), value[0]])
+                setExpandedItems((prev) => [...(prev ?? []), value[0] as string])
               }
               dir={dir as Direction}
             >
@@ -266,7 +266,7 @@ const Folder = forwardRef<
             defaultValue={expandedItems}
             value={expandedItems}
             onValueChange={(value) => {
-              setExpandedItems?.((prev) => [...(prev ?? []), value[0]]);
+              setExpandedItems?.((prev) => [...(prev ?? []), value[0] as string]);
             }}
           >
             {children}

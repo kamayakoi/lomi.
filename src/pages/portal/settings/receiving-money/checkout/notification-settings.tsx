@@ -41,8 +41,10 @@ export function NotificationSettings() {
 
     const updateMerchantRecipient = (index: number, field: keyof MerchantRecipient, value: string) => {
         const updatedRecipients = [...merchantRecipients]
-        updatedRecipients[index][field] = value
-        setMerchantRecipients(updatedRecipients)
+        if (updatedRecipients[index]) {
+            updatedRecipients[index][field] = value
+            setMerchantRecipients(updatedRecipients)
+        }
     }
 
     return (

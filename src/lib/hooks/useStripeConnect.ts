@@ -29,7 +29,7 @@ export const useStripeConnect = (connectedAccountId: string | null) => {
 
                 try {
                     const stripeConnectInstance = await loadConnectAndInitialize({
-                        publishableKey: process.env.VITE_STRIPE_PUBLISHABLE_KEY as string,
+                        publishableKey: import.meta.env['VITE_STRIPE_PUBLISHABLE_KEY'] as string,
                         fetchClientSecret,
                         appearance: {
                             overlays: "dialog",

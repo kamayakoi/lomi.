@@ -27,11 +27,11 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0]
-            if (file.size > 1024 * 1024) {
+            if (file && file.size > 1024 * 1024) {
                 toast({ title: "Error", description: "File size must be less than 1MB" })
                 return
             }
-            setSelectedFile(file)
+            setSelectedFile(file || null)
             setIsDialogOpen(true)
         }
     }

@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils'
 
 interface PinInputProps {
   children:
-    | React.ReactElement<typeof PinInputField>
-    | React.ReactElement<typeof PinInputField>[]
+  | React.ReactElement<typeof PinInputField>
+  | React.ReactElement<typeof PinInputField>[]
   /**
    * className for the input container
    */
@@ -384,7 +384,7 @@ const usePinInput = ({
 
     for (let i = 0; i < length; i++) {
       if (i < copyArr.length) {
-        updateInputField(copyArr[i], i)
+        updateInputField(copyArr[i] ?? '', i)
       }
     }
 
@@ -401,11 +401,11 @@ const usePinInput = ({
     if (type === 'numeric') {
       const canTypeSign =
         key === 'Backspace' ||
-        key === 'Tab' ||
-        key === 'Control' ||
-        key === 'Delete' ||
-        (ctrlKey && key === 'v') ||
-        (metaKey && key === 'v')
+          key === 'Tab' ||
+          key === 'Control' ||
+          key === 'Delete' ||
+          (ctrlKey && key === 'v') ||
+          (metaKey && key === 'v')
           ? true
           : !Number.isNaN(Number(key))
 
@@ -448,7 +448,7 @@ const usePinInput = ({
 const getValidChildren = (children: React.ReactNode) =>
   React.Children.toArray(children).filter((child) => {
     if (React.isValidElement(child)) {
-      return React.isValidElement(child)
+      return true
     }
     throw new Error(`${PinInput.displayName} contains invalid children.`)
   }) as React.ReactElement[]
@@ -456,8 +456,9 @@ const getValidChildren = (children: React.ReactNode) =>
 const getInputFieldCount = (children: React.ReactNode) =>
   React.Children.toArray(children).filter((child) => {
     if (React.isValidElement(child) && child.type === PinInputField) {
-      return React.isValidElement(child)
+      return true
     }
+    return false
   }).length
 
 export { PinInput, PinInputField }

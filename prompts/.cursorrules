@@ -27,6 +27,12 @@ UI and Styling
 - Use Shadcn UI, Radix, and Tailwind for components and styling.
 - Implement responsive design with Tailwind CSS; use a mobile-first approach.
 
+Code Splitting and Lazy Loading
+- Use React's `lazy` function for dynamic imports of components.
+- Wrap lazily loaded components with React's `Suspense` component.
+- Provide a fallback UI (e.g., loading spinner) for `Suspense` while components are loading.
+- Split code at the route level for optimal performance.
+
 Performance Optimization
 - Use Vite's code splitting features for optimal loading.
 - Implement lazy loading for components and routes.

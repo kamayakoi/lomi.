@@ -239,7 +239,7 @@ const NewOnboarding: React.FC = () => {
             <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl">
                 <CardHeader>
                     <CardTitle className="text-2xl font-bold text-center">
-                        {steps[currentStep].title}
+                        {steps[currentStep]?.title}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

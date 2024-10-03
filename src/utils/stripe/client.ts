@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-const stripeSecretKey = process.env.VITE_STRIPE_SECRET_KEY;
+const stripeSecretKey = import.meta.env['VITE_STRIPE_SECRET_KEY'];
 
 if (!stripeSecretKey) {
   throw new Error('VITE_STRIPE_SECRET_KEY is not defined in the environment variables');
