@@ -9,7 +9,7 @@ import {
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import SidebarNav from './components/sidebar-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
@@ -26,7 +26,7 @@ export default function Settings() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </Layout.Header>

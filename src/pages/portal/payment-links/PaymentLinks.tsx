@@ -17,7 +17,7 @@ import { Layout as DashboardLayout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 
 export default function PaymentLinksPage() {
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
@@ -34,7 +34,7 @@ export default function PaymentLinksPage() {
       <DashboardLayout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </DashboardLayout.Header>

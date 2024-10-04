@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon, Plug } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { Link } from 'react-router-dom'
 import { Settings2 } from 'lucide-react'
 import { Layout } from '@/components/custom/layout'
@@ -20,7 +20,7 @@ export default function Dashboard() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </Layout.Header>

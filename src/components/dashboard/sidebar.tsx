@@ -70,7 +70,7 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        `fixed left-0 right-0 top-0 z-50 w-full border-r-2 border-r-muted transition-[width] md:bottom-0 md:right-auto md:h-svh md:w-64`,
+        `fixed left-0 right-0 top-0 z-50 w-full border-r-[1.25px] border-gray-200 dark:border-gray-700 transition-[width] md:bottom-0 md:right-auto md:h-svh md:w-64`,
         className
       )}
     >
@@ -84,7 +84,7 @@ export default function Sidebar({ className }: SidebarProps) {
         {/* Header */}
         <Layout.Header
           sticky
-          className='z-50 flex justify-between px-4 py-3 shadow-sm md:px-4'
+          className='z-50 flex justify-between px-4 py-3 md:px-4'
         >
           <a href="/portal" className="flex items-center gap-2">
             <div className="flex items-center justify-center rounded-full h-[40px] w-[40px] border-2 border-transparent">
@@ -113,6 +113,8 @@ export default function Sidebar({ className }: SidebarProps) {
             {navOpened ? <IconX /> : <IconMenu2 />}
           </Button>
         </Layout.Header>
+
+        <Separator className="my-0 border-t-[1.25px] border-gray-200 dark:border-gray-700" />
 
         {/* Navigation links */}
         <Nav

@@ -1,4 +1,4 @@
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -47,7 +47,7 @@ export default function ReportingPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
-                    <ThemeSwitch />
+                    <Notifications />
                     <UserNav />
                 </div>
             </Layout.Header>

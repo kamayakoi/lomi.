@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
 import { providers, Provider } from './data'
@@ -103,7 +103,7 @@ export default function PaymentChannels() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </Layout.Header>

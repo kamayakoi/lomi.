@@ -12,7 +12,7 @@ import { CalendarIcon, InfoIcon, Search, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
@@ -166,7 +166,7 @@ export default function SubscriptionsPage() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </Layout.Header>

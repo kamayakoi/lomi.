@@ -1,8 +1,8 @@
 import { Layout } from '@/components/custom/layout'
-import ThemeSwitch from '@/components/dashboard/theme-switch'
+import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
-import { integrationOptions } from './data'
+import { integrationOptions } from './data.tsx'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
@@ -26,7 +26,7 @@ export default function Providers() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
-          <ThemeSwitch />
+          <Notifications />
           <UserNav />
         </div>
       </Layout.Header>
