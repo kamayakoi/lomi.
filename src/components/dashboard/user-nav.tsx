@@ -22,29 +22,23 @@ export function UserNav() {
   useEffect(() => {
     const fetchAvatar = async () => {
       if (user) {
-        const cachedAvatarUrl = localStorage.getItem(`avatarUrl_${user.id}`);
-        if (cachedAvatarUrl) {
-          setAvatarUrl(cachedAvatarUrl);
+        const { data: avatarPath, error: avatarError } = await supabase
+          .rpc('fetch_user_avatar', { p_user_id: user.id });
+
+        if (avatarError) {
+          console.error('Error fetching avatar URL:', avatarError);
         } else {
-          const { data: avatarPath, error: avatarError } = await supabase
-            .rpc('fetch_user_avatar', { p_user_id: user.id });
+          if (avatarPath) {
+            const { data: avatarData, error: downloadError } = await supabase
+              .storage
+              .from('avatars')
+              .download(avatarPath);
 
-          if (avatarError) {
-            console.error('Error fetching avatar URL:', avatarError);
-          } else {
-            if (avatarPath) {
-              const { data: avatarData, error: downloadError } = await supabase
-                .storage
-                .from('avatars')
-                .download(avatarPath);
-
-              if (downloadError) {
-                console.error('Error downloading avatar:', downloadError);
-              } else {
-                const url = URL.createObjectURL(avatarData);
-                setAvatarUrl(url);
-                localStorage.setItem(`avatarUrl_${user.id}`, url);
-              }
+            if (downloadError) {
+              console.error('Error downloading avatar:', downloadError);
+            } else {
+              const url = URL.createObjectURL(avatarData);
+              setAvatarUrl(url);
             }
           }
         }

@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '../components/content-section'
-import ProfilePictureUploader from '../../../auth/components/avatar-uploader'
 import { supabase } from '@/utils/supabase/client'
 import { countryCodes } from '@/data/onboarding'
+import LoadingButton from '@/components/dashboard/loader'
+
+const ProfilePictureUploader = React.lazy(() => import('../../../auth/components/avatar-uploader'))
 
 interface MerchantDetails {
     merchant_id: string;
@@ -256,11 +258,7 @@ export default function Profile() {
     }
 
     if (loading) {
-        return (
-            <ContentSection title="Profile" desc="Loading...">
-                <div>Loading...</div>
-            </ContentSection>
-        )
+        return <LoadingButton />
     }
 
     if (!merchant) {
@@ -284,11 +282,13 @@ export default function Profile() {
             <div>
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4">
-                        <ProfilePictureUploader
-                            currentAvatar={avatarUrl}
-                            onAvatarUpdate={handleAvatarUpdate}
-                            name={merchant?.name || ''}
-                        />
+                        <Suspense fallback={<div>Loading avatar uploader...</div>}>
+                            <ProfilePictureUploader
+                                currentAvatar={avatarUrl}
+                                onAvatarUpdate={handleAvatarUpdate}
+                                name={merchant?.name || ''}
+                            />
+                        </Suspense>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
