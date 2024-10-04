@@ -1,6 +1,6 @@
 -- Create the 'logos' bucket
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('logos', 'logos', false)
+VALUES ('logos', 'logos', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Policy for selecting (reading) logos
@@ -27,7 +27,7 @@ FOR DELETE TO authenticated USING (
 
 -- Create the 'avatars' bucket
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', false)
+VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Policy for selecting (reading) avatars

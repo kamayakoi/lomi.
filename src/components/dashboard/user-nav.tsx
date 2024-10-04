@@ -12,10 +12,41 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/utils/supabase/client';
+import { useEffect, useState } from 'react';
 
 export function UserNav() {
   const { user } = useUser();
   const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (user) {
+        const { data: avatarPath, error: avatarError } = await supabase
+          .rpc('fetch_user_avatar', { p_user_id: user.id });
+
+        if (avatarError) {
+          console.error('Error fetching avatar URL:', avatarError);
+        } else {
+          if (avatarPath) {
+            const { data: avatarData, error: downloadError } = await supabase
+              .storage
+              .from('avatars')
+              .download(avatarPath);
+
+            if (downloadError) {
+              console.error('Error downloading avatar:', downloadError);
+            } else {
+              const url = URL.createObjectURL(avatarData);
+              setAvatarUrl(url);
+            }
+          }
+        }
+      }
+    };
+
+    fetchAvatar();
+  }, [user]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -27,16 +58,21 @@ export function UserNav() {
   };
 
   if (!user) {
-    return null; // Don't render anything if user data is not available yet
+    return null;
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user.user_metadata['avatar_url']} alt={user.email || ''} />
-            <AvatarFallback>{user.email ? getInitials(user.email) : ''}</AvatarFallback>
+        <Button variant="ghost" className="relative h-[40px] w-[40px] rounded-full">
+          <Avatar className="h-[40px] w-[40px]">
+            {avatarUrl ? (
+              <AvatarImage src={avatarUrl} alt={user.email || ''} className="h-full w-full rounded-full" />
+            ) : (
+              <AvatarFallback className="h-full w-full rounded-full flex items-center justify-center text-lg font-semibold uppercase">
+                {user.email ? getInitials(user.email) : ''}
+              </AvatarFallback>
+            )}
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

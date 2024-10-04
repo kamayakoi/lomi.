@@ -15,7 +15,7 @@ BEGIN
         m.merchant_id,
         m.name,
         m.email,
-        COALESCE(m.avatar_url, ''),
+        m.avatar_url,
         m.phone_number,
         m.referral_code,
         m.pin_code

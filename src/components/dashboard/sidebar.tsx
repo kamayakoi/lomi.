@@ -15,10 +15,11 @@ type SidebarProps = React.HTMLAttributes<HTMLElement>
 
 export default function Sidebar({ className }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [organizationName, setOrganizationName] = useState<string | null>(null)
   const [organizationLogo, setOrganizationLogo] = useState<string | null>(null)
   const [merchantName, setMerchantName] = useState<string | null>(null)
+  const [merchantRole, setMerchantRole] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchSidebarData = async () => {
@@ -31,33 +32,26 @@ export default function Sidebar({ className }: SidebarProps) {
           console.error('Error fetching sidebar data:', error)
         } else {
           setOrganizationName(data[0].organization_name)
-          setOrganizationLogo(data[0].organization_logo_url)
           setMerchantName(data[0].merchant_name)
+          setMerchantRole(data[0].merchant_role)
+
+          // Download the organization logo image
+          const { data: logoData, error: logoError } = await supabase
+            .storage
+            .from('logos')
+            .download(data[0].organization_logo_url)
+
+          if (logoError) {
+            console.error('Error downloading organization logo:', logoError)
+          } else {
+            const logoUrl = URL.createObjectURL(logoData)
+            setOrganizationLogo(logoUrl)
+          }
         }
       }
     }
 
     fetchSidebarData()
-  }, [])
-
-  useEffect(() => {
-    const fetchOrganizationData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data, error } = await supabase
-          .rpc('fetch_organization_data', { user_id: user.id })
-
-        if (error) {
-          console.error('Error fetching organization data:', error)
-        } else {
-          setOrganizationName(data.name)
-          setOrganizationLogo(data.logo)
-          setMerchantName(data.merchant_name)
-        }
-      }
-    }
-
-    fetchOrganizationData()
   }, [])
 
   useEffect(() => {
@@ -67,6 +61,11 @@ export default function Sidebar({ className }: SidebarProps) {
       document.body.classList.remove('overflow-hidden')
     }
   }, [navOpened])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  };
 
   return (
     <aside
@@ -88,7 +87,7 @@ export default function Sidebar({ className }: SidebarProps) {
           className='z-50 flex justify-between px-4 py-3 shadow-sm md:px-4'
         >
           <a href="/portal" className="flex items-center gap-2">
-            <div className="flex items-center justify-center rounded h-10 w-10">
+            <div className="flex items-center justify-center rounded-full h-[40px] w-[40px] border-2 border-transparent">
               <img
                 src={theme === 'dark' ? iconDark : iconLight}
                 alt="lomi. Logo"
@@ -124,7 +123,7 @@ export default function Sidebar({ className }: SidebarProps) {
         />
 
         {/* Organization info */}
-        {organizationName && (
+        {merchantName && (
           <div className="mt-auto px-4 py-4">
             <Separator className="mb-4" />
             <div className="flex items-center space-x-4">
@@ -132,21 +131,22 @@ export default function Sidebar({ className }: SidebarProps) {
                 <img
                   src={organizationLogo}
                   alt="Organization logo"
-                  className="h-10 w-10 rounded-full"
+                  className="h-[40px] w-[40px] rounded border-2 border-transparent cursor-pointer"
+                  onClick={toggleTheme}
                 />
               ) : (
-                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                <div className="h-[38px] w-[38px] rounded-full bg-muted flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
                   <span className="text-xl font-semibold uppercase text-muted-foreground">
-                    {organizationName[0]}
+                    {merchantName[0]}
                   </span>
                 </div>
               )}
               <div>
                 <div className="text-sm font-semibold text-foreground">
-                  {organizationName}
+                  {merchantName}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {merchantName}
+                  {merchantRole} • {organizationName}
                 </div>
               </div>
             </div>

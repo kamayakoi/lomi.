@@ -60,7 +60,7 @@ BEGIN
   INSERT INTO merchant_organization_links (
     merchant_id, organization_id, role
   ) VALUES (
-    new_merchant_id, org_id, 'admin'
+    new_merchant_id, org_id, 'Admin'
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

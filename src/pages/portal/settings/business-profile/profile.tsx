@@ -44,7 +44,23 @@ export default function Profile() {
             if (error) throw error;
             if (data && data.length > 0) {
                 setMerchant(data[0] as MerchantDetails);
-                setAvatarUrl(data[0].avatar_url || null);
+
+                // Download the merchant avatar
+                if (data[0].avatar_url) {
+                    const { data: avatarData, error: avatarError } = await supabase
+                        .storage
+                        .from('avatars')
+                        .download(data[0].avatar_url);
+
+                    if (avatarError) {
+                        console.error('Error downloading avatar:', avatarError);
+                    } else {
+                        const avatarUrl = URL.createObjectURL(avatarData);
+                        setAvatarUrl(avatarUrl);
+                    }
+                } else {
+                    setAvatarUrl(null);
+                }
             } else {
                 throw new Error('No merchant found');
             }

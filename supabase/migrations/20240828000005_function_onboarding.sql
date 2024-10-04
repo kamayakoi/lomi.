@@ -35,7 +35,7 @@ BEGIN
         country = p_country,
         onboarded = true,
         preferred_language = p_preferred_language,
-        avatar_url = p_avatar_url,
+        avatar_url = REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', ''),
         updated_at = NOW()
     WHERE merchant_id = p_merchant_id;
 
@@ -57,7 +57,7 @@ BEGIN
         p_org_industry,
         p_org_employee_number,
         'XOF',
-        p_logo_url
+        REPLACE(p_logo_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/logos/', '')
     )
     RETURNING organization_id INTO v_organization_id;
 
@@ -91,7 +91,7 @@ BEGIN
     ) VALUES (
         p_merchant_id,
         v_organization_id,
-        'admin',
+        'Admin',
         'Founder',
         p_workspace_handle,
         p_how_did_you_hear_about_us

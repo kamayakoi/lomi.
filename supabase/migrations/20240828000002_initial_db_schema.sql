@@ -136,7 +136,7 @@ CREATE TABLE merchant_organization_links (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   workspace_handle VARCHAR UNIQUE NOT NULL,
   how_did_you_hear_about_us VARCHAR,
-  role VARCHAR NOT NULL CHECK (role IN ('admin', 'user')),
+  role VARCHAR NOT NULL CHECK (role IN ('Admin', 'Member')),
   organization_position VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (merchant_id, organization_id)

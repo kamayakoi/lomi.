@@ -40,7 +40,19 @@ export default function Business() {
             if (error) throw error;
             if (data && data.length > 0) {
                 setOrganization(data[0] as OrganizationDetails);
-                setLogoUrl(data[0].logo_url || null);
+
+                // Download the organization logo
+                const { data: logoData, error: logoError } = await supabase
+                    .storage
+                    .from('logos')
+                    .download(data[0].logo_url);
+
+                if (logoError) {
+                    console.error('Error downloading logo:', logoError);
+                } else {
+                    const logoUrl = URL.createObjectURL(logoData);
+                    setLogoUrl(logoUrl);
+                }
             } else {
                 throw new Error('No organization found');
             }
