@@ -70,7 +70,7 @@ const sidebarNavItems = [
   {
     title: 'Receiving Money',
     icon: <IconCreditCard size={18} />,
-    href: '/settings/receiving-money/payment-methods',
+    href: '/portal/settings/receiving-money/payment-methods',
     subItems: [
       { title: 'Payment Methods', href: '/portal/settings/receiving-money/payment-methods' },
       { title: 'Checkout', href: '/portal/settings/receiving-money/checkout' },
@@ -79,7 +79,7 @@ const sidebarNavItems = [
   {
     title: 'Sending Money',
     icon: <IconSend size={18} />,
-    href: '/settings/sending-money/disbursements',
+    href: '/portal/settings/sending-money/disbursements',
     subItems: [
       { title: 'Disbursements', href: '/portal/settings/sending-money/disbursements' },
       { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
@@ -88,7 +88,7 @@ const sidebarNavItems = [
   // {
   //   title: 'Your Team',
   //   icon: <IconUsers size={18} />,
-  //   href: '/settings/team/members',
+  //   href: 'portal/settings/team/members',
   //   subItems: [
   //     { title: 'Members', href: '/portal/settings/team/members' },
   //     { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
@@ -97,7 +97,7 @@ const sidebarNavItems = [
   {
     title: 'Billing and Fees',
     icon: <IconReceipt size={18} />,
-    href: '/settings/billing/statements',
+    href: '/portal/settings/billing/statements',
     subItems: [
       { title: 'Billing', href: '/portal/settings/billing/statements' },
       { title: 'Fee Structure', href: '/portal/settings/billing/fee-structure' },
@@ -106,7 +106,7 @@ const sidebarNavItems = [
   {
     title: 'Developers',
     icon: <IconCode size={18} />,
-    href: '/settings/developers/api-keys',
+    href: '/portal/settings/developers/api-keys',
     subItems: [
       { title: 'API Keys', href: '/portal/settings/developers/api-keys' },
       { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
@@ -116,7 +116,7 @@ const sidebarNavItems = [
   {
     title: 'Withdrawals',
     icon: <IconWallet size={18} />,
-    href: '/settings/withdrawals/bank-accounts',
+    href: '/portal/settings/withdrawals/bank-accounts',
     subItems: [
       { title: 'Bank Accounts', href: '/portal/settings/withdrawals/bank-accounts' },
       { title: 'Phone numbers', href: '/portal/settings/withdrawals/phone-numbers' },

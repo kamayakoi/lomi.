@@ -100,7 +100,7 @@ CREATE TABLE organization_addresses (
   city VARCHAR,
   district VARCHAR,
   postal_code VARCHAR,
-  address VARCHAR,
+  street VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

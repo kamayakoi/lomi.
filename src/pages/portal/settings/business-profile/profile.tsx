@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '../components/content-section'
 import { supabase } from '@/utils/supabase/client'
-import { countryCodes } from '@/data/onboarding'
-import LoadingButton from '@/components/dashboard/loader'
+import LoadingButton from '@/components/dashboard/loader-settings'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
 const ProfilePictureUploader = React.lazy(() => import('../../../auth/components/avatar-uploader'))
 
@@ -17,7 +17,6 @@ interface MerchantDetails {
     email: string;
     avatar_url: string | null;
     phone_number: string;
-    referral_code: string;
     pin_code: string;
 }
 
@@ -43,7 +42,11 @@ export default function Profile() {
             const { data, error } = await supabase
                 .rpc('fetch_merchant_details', { p_user_id: user.id });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase function error:', error);
+                throw error;
+            }
+
             if (data && data.length > 0) {
                 setMerchant(data[0] as MerchantDetails);
 
@@ -64,6 +67,7 @@ export default function Profile() {
                     setAvatarUrl(null);
                 }
             } else {
+                console.error('No merchant data found');
                 throw new Error('No merchant found');
             }
         } catch (error) {
@@ -122,7 +126,6 @@ export default function Profile() {
         try {
             const { error } = await supabase.auth.updateUser({
                 password: newPassword,
-                // currentPassword is not a valid property, so we need to handle this differently
             })
 
             if (error) throw error
@@ -138,41 +141,6 @@ export default function Profile() {
             toast({
                 title: "Error",
                 description: "Failed to change password",
-                variant: "destructive",
-            })
-        }
-    }
-
-    const generateReferralCode = async () => {
-        if (!merchant) return
-
-        try {
-            const { data, error } = await supabase.rpc('generate_referral_code')
-            if (error) throw error
-
-            const newReferralCode = data as string
-
-            const { error: updateError } = await supabase.rpc('update_merchant_details', {
-                p_merchant_id: merchant.merchant_id,
-                p_name: merchant.name,
-                p_email: merchant.email,
-                p_phone_number: merchant.phone_number,
-                p_pin_code: merchant.pin_code,
-                p_referral_code: newReferralCode
-            })
-
-            if (updateError) throw updateError
-
-            setMerchant({ ...merchant, referral_code: newReferralCode })
-            toast({
-                title: "Success",
-                description: "Referral code generated successfully",
-            })
-        } catch (error) {
-            console.error('Error generating referral code:', error)
-            toast({
-                title: "Error",
-                description: "Failed to generate referral code",
                 variant: "destructive",
             })
         }
@@ -200,7 +168,6 @@ export default function Profile() {
                 p_email: updatedMerchant.email,
                 p_phone_number: updatedMerchant.phone_number,
                 p_pin_code: updatedMerchant.pin_code,
-                p_referral_code: updatedMerchant.referral_code
             })
 
             if (error) throw error
@@ -217,41 +184,6 @@ export default function Profile() {
             toast({
                 title: "Error",
                 description: "Failed to update PIN",
-                variant: "destructive",
-            })
-        }
-    }
-
-    const handleFieldChange = (field: keyof MerchantDetails, value: string) => {
-        if (merchant) {
-            setMerchant({ ...merchant, [field]: value })
-        }
-    }
-
-    const handleSaveChanges = async () => {
-        if (!merchant) return
-
-        try {
-            const { error } = await supabase.rpc('update_merchant_details', {
-                p_merchant_id: merchant.merchant_id,
-                p_name: merchant.name,
-                p_email: merchant.email,
-                p_phone_number: merchant.phone_number,
-                p_pin_code: merchant.pin_code,
-                p_referral_code: merchant.referral_code
-            })
-
-            if (error) throw error
-
-            toast({
-                title: "Success",
-                description: "Changes saved successfully",
-            })
-        } catch (error) {
-            console.error('Error saving changes:', error)
-            toast({
-                title: "Error",
-                description: "Failed to save changes",
                 variant: "destructive",
             })
         }
@@ -277,7 +209,7 @@ export default function Profile() {
     return (
         <ContentSection
             title="Profile"
-            desc="Update your profile details, adjust your security settings, and find your referral code here."
+            desc="Update your profile details and adjust your security settings."
         >
             <div>
                 <div className="space-y-6">
@@ -294,38 +226,15 @@ export default function Profile() {
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="name">Full name</Label>
-                            <div className="flex">
-                                <Input id="name" value={merchant.name} onChange={(e) => handleFieldChange('name', e.target.value)} />
-                                <Button variant="outline" onClick={handleSaveChanges}>Save</Button>
-                            </div>
+                            <Input id="name" value={merchant.name} readOnly className="bg-muted" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
-                            <div className="flex">
-                                <Input id="email" value={merchant.email} onChange={(e) => handleFieldChange('email', e.target.value)} />
-                                <Button variant="outline" onClick={handleSaveChanges}>Save</Button>
-                            </div>
+                            <Input id="email" value={merchant.email} readOnly className="bg-muted" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="phone">Phone number</Label>
-                            <div className="flex">
-                                <select className="bg-muted" onChange={(e) => handleFieldChange('phone_number', e.target.value)}>
-                                    {countryCodes.map((code, index) => (
-                                        <option key={index} value={code}>{code}</option>
-                                    ))}
-                                </select>
-                                <Input id="phone" value={merchant.phone_number} onChange={(e) => handleFieldChange('phone_number', e.target.value)} />
-                                <Button variant="outline" onClick={handleSaveChanges}>Save</Button>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="referral-code">Referral Code</Label>
-                            <div className="flex">
-                                <Input id="referral-code" value={merchant.referral_code || ''} readOnly className="rounded-r-none bg-muted" />
-                                <Button variant="outline" className="rounded-l-none" onClick={generateReferralCode}>
-                                    Generate
-                                </Button>
-                            </div>
+                            <Input id="phone" value={merchant.phone_number} readOnly className="bg-muted" />
                         </div>
                     </div>
 
@@ -334,29 +243,47 @@ export default function Profile() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="current-password">Current password</Label>
-                                <Input
-                                    id="current-password"
-                                    type="password"
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                />
+                                <div className="relative">
+                                    <Input
+                                        id="current-password"
+                                        type="password"
+                                        value={currentPassword}
+                                        onChange={(e) => setCurrentPassword(e.target.value)}
+                                        className="pr-10"
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="new-password">New password</Label>
-                                <div className="flex">
+                                <div className="relative flex items-center">
                                     <Input
                                         id="new-password"
                                         type={showNewPassword ? "text" : "password"}
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
+                                        className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
                                     />
-                                    <Button variant="outline" onClick={() => setShowNewPassword(!showNewPassword)}>
-                                        {showNewPassword ? "Hide" : "Show"}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 mr-16"
+                                    >
+                                        {showNewPassword ? (
+                                            <EyeOffIcon className="h-5 w-5" />
+                                        ) : (
+                                            <EyeIcon className="h-5 w-5" />
+                                        )}
+                                    </button>
+                                    <Button
+                                        size="sm"
+                                        onClick={handlePasswordChange}
+                                        className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                    >
+                                        Save
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                        <Button onClick={handlePasswordChange}>Change Password</Button>
                     </div>
 
                     <div className="space-y-4">
@@ -381,12 +308,8 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    <Button onClick={handleSaveChanges} className="w-full">
-                        Save Changes
-                    </Button>
-
                     <p className="text-sm text-muted-foreground mt-4">
-                        Contact hello@lomi.africa if you want to update your business details.
+                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Profile information" className="underline">hello@lomi.africa</a> if you want to update your profile details.
                     </p>
                 </div>
 

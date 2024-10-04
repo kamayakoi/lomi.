@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import LoadingButton from '@/components/dashboard/loader'
+import LoadingButton from '@/components/dashboard/loader-settings'
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const LogoUploader = React.lazy(() => import('../../../auth/components/logo-uploader'))
 
@@ -17,8 +18,10 @@ interface OrganizationDetails {
     logo_url: string | null;
     website_url: string | null;
     country: string;
-    address: string;
+    region: string;
     city: string;
+    district: string;
+    street: string;
     postal_code: string;
 }
 
@@ -39,7 +42,11 @@ export default function Business() {
             const { data, error } = await supabase
                 .rpc('fetch_organization_details', { p_merchant_id: user.id });
 
-            if (error) throw error;
+            if (error) {
+                console.error('Supabase function error:', error);
+                throw error;
+            }
+
             if (data && data.length > 0) {
                 setOrganization(data[0] as OrganizationDetails);
 
@@ -56,7 +63,8 @@ export default function Business() {
                     setLogoUrl(logoUrl);
                 }
             } else {
-                throw new Error('No organization found');
+                console.error('No organization data found');
+                throw new Error('No organization found.');
             }
         } catch (error) {
             console.error('Error fetching organization:', error);
@@ -108,22 +116,30 @@ export default function Business() {
     }
 
     if (!organization) {
-        return <div>No organization found</div>
+        return (
+            <ContentSection
+                title="Business Not Found"
+                desc="We couldn't find your business profile."
+            >
+                <div>
+                    No business found. Please ensure you&apos;re logged in and have business data associated with your account.
+                </div>
+            </ContentSection>
+        )
     }
 
     return (
         <ContentSection
-            title="Your Business"
-            desc="Upload your business logo and view your public contact information"
+            title="Business"
+            desc="Upload your business logo and view your public contact information."
         >
             <>
                 <div className="space-y-6">
-                    <div>
-                        <h2 className="text-lg font-medium">Business information</h2>
-                        <p className="text-sm text-muted-foreground">
+                    <Alert variant="info">
+                        <AlertDescription>
                             This information helps customers recognize your business, and may appear in your payment statements, invoices, and receipts.
-                        </p>
-                    </div>
+                        </AlertDescription>
+                    </Alert>
 
                     <Suspense fallback={<div>Loading logo uploader...</div>}>
                         <LogoUploader
@@ -156,24 +172,29 @@ export default function Business() {
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="website">Business website URL</Label>
+                            <Label htmlFor="website">Website URL</Label>
                             <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
                         </div>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="grid gap-2">
-                            <Label htmlFor="country">Country of operation</Label>
+                            <Label htmlFor="country">Billing country</Label>
                             <Input id="country" value={organization.country || ''} readOnly className="bg-muted" />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="address">Business address</Label>
-                            <Input id="address" value={`${organization.address || ''}, ${organization.city || ''}, ${organization.postal_code || ''}`} readOnly className="bg-muted" />
+                            <Input
+                                id="address"
+                                value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
+                                readOnly
+                                className="bg-muted"
+                            />
                         </div>
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                        Contact hello@lomi.africa if you want to update your business details.
+                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Business information" className="underline">hello@lomi.africa</a> if you want to update your business details.
                     </p>
                 </div>
             </>

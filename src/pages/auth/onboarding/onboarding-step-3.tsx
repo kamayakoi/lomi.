@@ -32,7 +32,7 @@ const onboardingStep3Schema = z.object({
     orgCity: z.string().min(1, 'City is required'),
     orgDistrict: z.string().min(1, 'District is required'),
     orgPostalCode: z.string().min(1, 'Postal code is required'),
-    orgAddress: z.string().min(1, 'Address is required'),
+    orgStreet: z.string().min(1, 'Street is required'),
 });
 
 type OnboardingStep3Data = z.infer<typeof onboardingStep3Schema>;
@@ -51,7 +51,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
             orgCity: data.orgCity,
             orgDistrict: data.orgDistrict,
             orgPostalCode: data.orgPostalCode,
-            orgAddress: data.orgAddress,
+            orgStreet: data.orgStreet,
         },
     });
 
@@ -196,18 +196,18 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                         {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgAddress" className="block mb-2">Address</Label>
+                        <Label htmlFor="orgStreet" className="block mb-2">Street</Label>
                         <Input
-                            id="orgAddress"
-                            placeholder="Enter your address"
-                            {...onboardingForm.register("orgAddress")}
+                            id="orgStreet"
+                            placeholder="Enter your street"
+                            {...onboardingForm.register("orgStreet")}
                             className={cn(
                                 "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
-                        {onboardingForm.formState.errors.orgAddress && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgAddress.message}</p>}
+                        {onboardingForm.formState.errors.orgStreet && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgStreet.message}</p>}
                     </div>
                 </div>
             </div>

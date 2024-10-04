@@ -7,8 +7,10 @@ RETURNS TABLE (
     logo_url VARCHAR,
     website_url VARCHAR,
     country VARCHAR,
-    address VARCHAR,
+    region VARCHAR,
     city VARCHAR,
+    district VARCHAR,
+    street VARCHAR,
     postal_code VARCHAR
 ) AS $$
 BEGIN
@@ -20,8 +22,10 @@ BEGIN
         o.logo_url,
         o.website_url,
         oa.country,
-        oa.address,
+        oa.region,
         oa.city,
+        oa.district,
+        oa.street,
         oa.postal_code
     FROM 
         organizations o

@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_org_region VARCHAR,
     p_org_city VARCHAR,
     p_org_district VARCHAR,
-    p_org_address VARCHAR,
+    p_org_street VARCHAR,
     p_org_postal_code VARCHAR,
     p_org_industry VARCHAR,
     p_org_website_url VARCHAR,
@@ -68,7 +68,7 @@ BEGIN
         region,
         city,
         district,
-        address,
+        street,
         postal_code
     ) VALUES (
         v_organization_id,
@@ -76,7 +76,7 @@ BEGIN
         p_org_region,
         p_org_city,
         p_org_district,
-        p_org_address,
+        p_org_street,
         p_org_postal_code
     );
 
@@ -92,7 +92,7 @@ BEGIN
         p_merchant_id,
         v_organization_id,
         'Admin',
-        'Founder',
+        organization_position,
         p_workspace_handle,
         p_how_did_you_hear_about_us
     );
