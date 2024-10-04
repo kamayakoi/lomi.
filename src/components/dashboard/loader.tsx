@@ -1,10 +1,12 @@
-import { IconLoader } from '@tabler/icons-react'
+import { Loader2 } from "lucide-react"
 
-export default function Loader() {
+export default function LoadingButton() {
   return (
-    <div className='w-full h-svh flex justify-center items-center'>
-      <IconLoader className='animate-spin' size={32} />
-      <span className='sr-only'>loading</span>
+    <div className="flex h-screen items-center justify-center">
+      <div className="flex items-center gap-2 text-gray-700">
+        <Loader2 className="h-5 w-5 animate-spin" />
+        <span>Loading</span>
+      </div>
     </div>
   )
 }

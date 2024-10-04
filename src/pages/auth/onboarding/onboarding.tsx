@@ -10,6 +10,7 @@ import OnboardingStep2 from './onboarding-step-2';
 import OnboardingStep3 from './onboarding-step-3';
 import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
+import LoadingButton from '@/components/dashboard/loader';
 
 const steps = [
     { title: 'Let\'s get to know you', component: OnboardingStep1 },
@@ -200,14 +201,7 @@ const NewOnboarding: React.FC = () => {
     };
 
     if (loading) {
-        return (
-            <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
-                <Card className={cn('p-6', 'dark:bg-gray-800')}>
-                    <h1 className='text-2xl font-semibold tracking-tight'>Loading...</h1>
-                    <p>Please wait while we set up your account.</p>
-                </Card>
-            </div>
-        );
+        return <LoadingButton />;
     }
 
     if (!isEmailVerified) {
