@@ -22,23 +22,29 @@ export function UserNav() {
   useEffect(() => {
     const fetchAvatar = async () => {
       if (user) {
-        const { data: avatarPath, error: avatarError } = await supabase
-          .rpc('fetch_user_avatar', { p_user_id: user.id });
-
-        if (avatarError) {
-          console.error('Error fetching avatar URL:', avatarError);
+        const cachedAvatarUrl = localStorage.getItem(`avatarUrl_${user.id}`);
+        if (cachedAvatarUrl) {
+          setAvatarUrl(cachedAvatarUrl);
         } else {
-          if (avatarPath) {
-            const { data: avatarData, error: downloadError } = await supabase
-              .storage
-              .from('avatars')
-              .download(avatarPath);
+          const { data: avatarPath, error: avatarError } = await supabase
+            .rpc('fetch_user_avatar', { p_user_id: user.id });
 
-            if (downloadError) {
-              console.error('Error downloading avatar:', downloadError);
-            } else {
-              const url = URL.createObjectURL(avatarData);
-              setAvatarUrl(url);
+          if (avatarError) {
+            console.error('Error fetching avatar URL:', avatarError);
+          } else {
+            if (avatarPath) {
+              const { data: avatarData, error: downloadError } = await supabase
+                .storage
+                .from('avatars')
+                .download(avatarPath);
+
+              if (downloadError) {
+                console.error('Error downloading avatar:', downloadError);
+              } else {
+                const url = URL.createObjectURL(avatarData);
+                setAvatarUrl(url);
+                localStorage.setItem(`avatarUrl_${user.id}`, url);
+              }
             }
           }
         }
@@ -67,7 +73,12 @@ export function UserNav() {
         <Button variant="ghost" className="relative h-[40px] w-[40px] rounded-full">
           <Avatar className="h-[40px] w-[40px]">
             {avatarUrl ? (
-              <AvatarImage src={avatarUrl} alt={user.email || ''} className="h-full w-full rounded-full" />
+              <AvatarImage
+                src={avatarUrl}
+                alt={user.email || ''}
+                className="h-full w-full rounded-full"
+                loading="lazy"
+              />
             ) : (
               <AvatarFallback className="h-full w-full rounded-full flex items-center justify-center text-lg font-semibold uppercase">
                 {user.email ? getInitials(user.email) : ''}
