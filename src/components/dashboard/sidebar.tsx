@@ -9,6 +9,7 @@ import { useTheme } from '@/lib/useTheme'
 import iconLight from "/icon.png"
 import iconDark from "/icon_dark.svg"
 import { supabase } from '@/utils/supabase/client'
+import { Separator } from "@/components/ui/separator"
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -16,23 +17,47 @@ export default function Sidebar({ className }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
   const { theme } = useTheme()
   const [organizationName, setOrganizationName] = useState<string | null>(null)
+  const [organizationLogo, setOrganizationLogo] = useState<string | null>(null)
+  const [merchantName, setMerchantName] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchOrganizationName = async () => {
+    const fetchSidebarData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { data, error } = await supabase
-          .rpc('fetch_organization_name', { user_id: user.id })
+          .rpc('fetch_sidebar_data', { p_merchant_id: user.id })
 
         if (error) {
-          console.error('Error fetching organization name:', error)
+          console.error('Error fetching sidebar data:', error)
         } else {
-          setOrganizationName(data)
+          setOrganizationName(data[0].organization_name)
+          setOrganizationLogo(data[0].organization_logo_url)
+          setMerchantName(data[0].merchant_name)
         }
       }
     }
 
-    fetchOrganizationName()
+    fetchSidebarData()
+  }, [])
+
+  useEffect(() => {
+    const fetchOrganizationData = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data, error } = await supabase
+          .rpc('fetch_organization_data', { user_id: user.id })
+
+        if (error) {
+          console.error('Error fetching organization data:', error)
+        } else {
+          setOrganizationName(data.name)
+          setOrganizationLogo(data.logo)
+          setMerchantName(data.merchant_name)
+        }
+      }
+    }
+
+    fetchOrganizationData()
   }, [])
 
   useEffect(() => {
@@ -98,10 +123,33 @@ export default function Sidebar({ className }: SidebarProps) {
           links={sidelinks}
         />
 
-        {/* Organization name */}
+        {/* Organization info */}
         {organizationName && (
-          <div className="px-4 py-2 text-sm font-semibold text-muted-foreground">
-            {organizationName}
+          <div className="mt-auto px-4 py-4">
+            <Separator className="mb-4" />
+            <div className="flex items-center space-x-4">
+              {organizationLogo ? (
+                <img
+                  src={organizationLogo}
+                  alt="Organization logo"
+                  className="h-10 w-10 rounded-full"
+                />
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <span className="text-xl font-semibold uppercase text-muted-foreground">
+                    {organizationName[0]}
+                  </span>
+                </div>
+              )}
+              <div>
+                <div className="text-sm font-semibold text-foreground">
+                  {organizationName}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {merchantName}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </Layout>
