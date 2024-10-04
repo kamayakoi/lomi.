@@ -4,7 +4,7 @@ import icon11 from "/WAR2.png"
 import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
 import kwameadjei from "/kwameadjei.png";
-import iconDark from "/icon_dark.svg";
+import iconDark from "/whiteblack.png";
 import mtnLogo from '/mtn.png';
 import waveLogo from '/wave.png';
 import applePayLogo from '/apple-pay.png';
@@ -25,7 +25,7 @@ export const LogoIcon = () => {
       src={currentIcon}
       alt="lomi.africa"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '38px', height: '38px' }}
+      style={{ width: '38px', height: '38px', borderRadius: '5%' }}
     />
   );
 };
@@ -40,6 +40,18 @@ export const AnotherIcon = () => {
     />
   );
 };
+
+export const AboutIcon = () => {
+  return (
+    <img
+      src={iconDark}
+      alt="lomi.africa"
+      className="lucide lucide-panels-top-left mr-2"
+      style={{ width: '38px', height: '38px', borderRadius: '5%' }}
+    />
+  );
+};
+
 
 export const MtnLogo = () => {
   return (

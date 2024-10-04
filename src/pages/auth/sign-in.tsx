@@ -19,7 +19,7 @@ export default function SignIn() {
               <p className='text-lg text-sage-100'>
                 &ldquo;We&apos;re just getting started.&rdquo;
               </p>
-              <footer className='text-sm text-sage-200'>lomi&apos;s Team</footer>
+              <footer className='text-sm text-sage-200'>Founder</footer>
             </blockquote>
           </div>
         </div>

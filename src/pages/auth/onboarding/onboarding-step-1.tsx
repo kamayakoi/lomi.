@@ -17,7 +17,7 @@ const onboardingStep1Schema = z.object({
     countryCode: z.string().regex(/^\+\d+$/, 'Country code must start with + followed by numbers'),
     phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
     country: z.string().min(1, 'Country is required'),
-    role: z.string().min(1, 'Role is required'),
+    position: z.string().min(1, 'Position is required'),
 });
 
 type OnboardingStep1Data = z.infer<typeof onboardingStep1Schema> & {
@@ -39,7 +39,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             countryCode: data.countryCode || '+225',
             phoneNumber: data.phoneNumber,
             country: data.country,
-            role: data.role,
+            position: data.position,
         },
     });
 
@@ -186,23 +186,23 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                         {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.country.message}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="role" className="block mb-2">Your role</Label>
+                        <Label htmlFor="position" className="block mb-2">Your Position</Label>
                         <select
-                            id="role"
-                            {...onboardingForm.register("role")}
+                            id="position"
+                            {...onboardingForm.register("position")}
                             className={cn(
                                 "w-full mb-2 p-2 border rounded-md",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         >
-                            {organizationPositions.map((orgRole) => (
-                                <option key={orgRole} value={orgRole}>
-                                    {orgRole}
+                            {organizationPositions.map((position) => (
+                                <option key={position} value={position}>
+                                    {position}
                                 </option>
                             ))}
                         </select>
-                        {onboardingForm.formState.errors.role && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.role.message}</p>}
+                        {onboardingForm.formState.errors.position && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.position.message}</p>}
                     </div>
                 </div>
             </div>

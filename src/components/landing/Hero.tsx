@@ -50,7 +50,7 @@ export const Hero = () => {
         </div>
 
         {/* New section using AvatarCircles component */}
-        <div className="flex items-center mt-6">
+        <div className="hidden sm:flex items-center mt-6">
           <AvatarCircles
             avatarUrls={[
               africanledger,

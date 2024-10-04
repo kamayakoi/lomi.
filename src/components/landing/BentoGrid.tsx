@@ -22,8 +22,19 @@ const features = [
         href: "/portal/payment-channels",
         cta: "Set up your checkout",
         background: (
-            <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute inset-0 overflow-hidden sm:opacity-100 opacity-10">
                 <AnimatedListDemo />
+            </div>
+        ),
+        content: (
+            <div className="relative z-10 p-4 bg-white sm:bg-opacity-80 bg-opacity-100 rounded-lg mt-8">
+                <h3 className="text-lg font-semibold mb-2">Checkout</h3>
+                <p className="text-sm">
+                    Streamline your customer checkout process with a flexible, customizable interface tailored to your business needs.
+                </p>
+                <a href="/portal/payment-channels" className="text-blue-600 hover:underline mt-2 inline-block">
+                    Set up your checkout
+                </a>
             </div>
         ),
         className: "lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2",

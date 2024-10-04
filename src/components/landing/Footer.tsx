@@ -31,12 +31,12 @@ export const Footer = () => {
     <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 mb-16 px-4">
         {/* Logo Section */}
-        <div className="col-span-1 md:col-span-12 ml-8">
+        <div className="col-span-1 md:col-span-12 ml-8 md:ml-0">
           {/* Add logo or any other content */}
         </div>
 
         {/* Company Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Company
           </h4>
@@ -57,7 +57,7 @@ export const Footer = () => {
         </div>
 
         {/* Products Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Products
           </h4>
@@ -78,7 +78,7 @@ export const Footer = () => {
         </div>
 
         {/* Resources Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Resources
           </h4>
@@ -99,7 +99,7 @@ export const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Links
           </h4>
@@ -123,7 +123,7 @@ export const Footer = () => {
         <div className="hidden md:block md:col-span-1 border-r border-gray-300 dark:border-gray-700"></div>
 
         {/* Community Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-2 md:col-span-3 ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-2 md:col-span-3 ml-8 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Community
           </h4>
@@ -175,7 +175,7 @@ export const Footer = () => {
                   <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                     English
                   </a>
-                  <a href="/fr" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
                     French
                   </a>
                 </div>

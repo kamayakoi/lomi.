@@ -22,7 +22,8 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_workspace_handle VARCHAR,
     p_how_did_you_hear_about_us VARCHAR,
     p_avatar_url VARCHAR,
-    p_logo_url VARCHAR
+    p_logo_url VARCHAR,
+    p_organization_position VARCHAR
 )
 RETURNS VOID AS $$
 DECLARE
@@ -92,7 +93,7 @@ BEGIN
         p_merchant_id,
         v_organization_id,
         'Admin',
-        organization_position,
+        p_organization_position,
         p_workspace_handle,
         p_how_did_you_hear_about_us
     );

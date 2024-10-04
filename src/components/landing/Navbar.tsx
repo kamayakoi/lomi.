@@ -52,16 +52,16 @@ export const Navbar = () => {
       <header className="navbar-dock">
         <NavigationMenu className="mx-auto">
           <NavigationMenuList className="container flex items-center justify-between">
-            <div className="navbar-logo-container flex items-center">
+            <div className="navbar-logo-container flex items-center ml-8"> {/* Add left margin here */}
               <NavigationMenuItem className="font-bold flex items-center">
                 <a
                   rel="lomi.africa"
                   href="/"
                   className="font-bold text-xl flex items-center"
-                  style={{ fontSize: '1.2rem' }}
+                  style={{ fontSize: '1.65rem' }} // Increase the font size here
                 >
                   <LogoIcon />
-                  <span className="ml-2">lomi.africa</span>
+                  <span className="ml-1">lomi.africa</span>
                 </a>
               </NavigationMenuItem>
             </div>

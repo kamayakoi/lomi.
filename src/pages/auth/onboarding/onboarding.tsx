@@ -25,7 +25,7 @@ const initialOnboardingData = {
     countryCode: '',
     phoneNumber: '',
     country: '',
-    role: '',
+    position: '',
     orgName: '',
     orgEmail: '',
     orgEmployees: '',
@@ -159,6 +159,7 @@ const NewOnboarding: React.FC = () => {
                 p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
                 p_avatar_url: formData.avatarUrl,
                 p_logo_url: formData.logoUrl,
+                p_organization_position: formData.position,
             });
 
             if (error) {

@@ -11,7 +11,7 @@ const Square = forwardRef<
         <div
             ref={ref}
             className={cn(
-                "z-10 flex size-12 items-center justify-center p-1 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)] border-[0.5px] border-white rounded",
+                "z-10 flex size-12 items-center justify-center p-1 border-2 border-transparent rounded-sm",
                 className,
             )}
         >
@@ -78,25 +78,25 @@ export function AnimatedBeamMultipleOutputDemo({
                     </UserIconCircle>
                 </div>
                 <div className="flex flex-col justify-center">
-                    <Square ref={div6Ref} className="size-12">
-                        <img src="/7.png" alt="lomi." className="object-cover w-full h-full" />
+                    <Square ref={div6Ref} className="size-20">
+                        <img src="/whiteblack.png" alt="lomi." className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
-                <div className="flex flex-col justify-center gap-2">
-                    <Square ref={div1Ref}>
-                        <img src="/wave.png" alt="Wave" className="object-cover w-full h-full" />
+                <div className="flex flex-col justify-center gap-1">
+                    <Square ref={div1Ref} className="size-14">
+                        <img src="/wave.png" alt="Wave" className="object-cover w-full h-full rounded-sm" />
                     </Square>
-                    <Square ref={div2Ref}>
-                        <img src="/orange.png" alt="Orange" className="object-cover w-full h-full" />
+                    <Square ref={div2Ref} className="size-14">
+                        <img src="/orange.png" alt="Orange" className="object-cover w-full h-full rounded-sm" />
                     </Square>
-                    <Square ref={div3Ref}>
-                        <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full" />
+                    <Square ref={div3Ref} className="size-14">
+                        <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full rounded-sm" />
                     </Square>
-                    <Square ref={div4Ref}>
-                        <img src="/apple-pay.png" alt="Apple Pay" className="object-cover w-full h-full" />
+                    <Square ref={div4Ref} className="size-14">
+                        <img src="/apple-pay2.png" alt="Apple Pay" className="object-cover w-full h-full rounded-sm" />
                     </Square>
-                    <Square ref={div5Ref}>
-                        <img src="/ecobank2.png" alt="Ecobank" className="object-cover w-full h-full" />
+                    <Square ref={div5Ref} className="size-14">
+                        <img src="/ecobank2.png" alt="Ecobank" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
             </div>

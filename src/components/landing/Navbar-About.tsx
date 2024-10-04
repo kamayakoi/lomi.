@@ -14,7 +14,7 @@ import {
 
 import { buttonVariants } from '@/lib/button-utils';
 import { Menu } from "lucide-react";
-import { LogoIcon } from "./Icons";
+import { AboutIcon } from "./Icons";
 import { Dock } from "@/components/ui/dock";
 
 import "./Navbar.css";
@@ -53,15 +53,15 @@ export const NavbarAbout = () => {
                 <NavigationMenu className="mx-auto">
                     <NavigationMenuList className="container flex items-center justify-between">
                         <div className="navbar-logo-container">
-                            <NavigationMenuItem className="font-bold flex items-center">
+                            <NavigationMenuItem className="font-bold flex items-center ml-8">
                                 <a
                                     rel="lomi.africa"
                                     href="/"
                                     className="font-bold text-xl flex items-center text-white"
-                                    style={{ fontSize: '1.5rem' }}
+                                    style={{ fontSize: '1.65rem' }}
                                 >
-                                    <LogoIcon />
-                                    <span className="ml-2">lomi.africa</span>
+                                    <AboutIcon />
+                                    <span className="ml-1">lomi.africa</span>
                                 </a>
                             </NavigationMenuItem>
                         </div>
