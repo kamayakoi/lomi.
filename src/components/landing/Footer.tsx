@@ -31,12 +31,12 @@ export const Footer = () => {
     <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
       <div className="container max-w-8xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8 mb-16 px-4">
         {/* Logo Section */}
-        <div className="col-span-1 md:col-span-12 ml-8 md:ml-0">
+        <div className="col-span-1 md:col-span-12 ml-2 md:ml-0">
           {/* Add logo or any other content */}
         </div>
 
         {/* Company Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Company
           </h4>
@@ -57,7 +57,7 @@ export const Footer = () => {
         </div>
 
         {/* Products Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Products
           </h4>
@@ -78,7 +78,7 @@ export const Footer = () => {
         </div>
 
         {/* Resources Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Resources
           </h4>
@@ -99,7 +99,7 @@ export const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-8 md:ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Links
           </h4>
@@ -123,7 +123,7 @@ export const Footer = () => {
         <div className="hidden md:block md:col-span-1 border-r border-gray-300 dark:border-gray-700"></div>
 
         {/* Community Section */}
-        <div className="grid gap-2 col-span-1 sm:col-span-2 md:col-span-3 ml-8 md:ml-14">
+        <div className="grid gap-2 col-span-1 sm:col-span-2 md:col-span-3 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
             Community
           </h4>
@@ -148,38 +148,36 @@ export const Footer = () => {
       <div className="h-10 md:h-20"></div>
 
       <div className="container max-w-8xl mt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 dark:text-gray-300 px-4">
-        <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0 ml-[55px] ">
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 ml-2 md:ml-[55px]">
           <div className="flex items-center gap-2">
             <AnotherIcon />
             <SystemOperational />
             <ModeToggle />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-4 md:gap-6">
             <p>&copy; 2024 lomi.africa, Inc. </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300">
-              Abidjan, Côte d&apos;Ivoire
+            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
+              Abidjan,<br className="md:hidden" /> Côte d&apos;Ivoire
             </a>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-4 md:gap-6">
               <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
                 Cookie Preferences
               </a>
-            </div>
-            <div className="relative" ref={dropdownRef}>
-              <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
-                Language
-              </button>
-              {showLanguages && (
-                <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-[#06060A] border border-gray-300 dark:border-gray-700 rounded shadow-lg">
-                  <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    English
-                  </a>
-                  <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    French
-                  </a>
-                </div>
-              )}
+              <div className="relative" ref={dropdownRef}>
+                <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
+                  Language
+                </button>
+                {showLanguages && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-[#06060A] border border-gray-300 dark:border-gray-700 rounded shadow-lg">
+                    <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      English
+                    </a>
+                    <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      French
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
