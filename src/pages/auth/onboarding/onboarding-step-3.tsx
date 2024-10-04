@@ -6,6 +6,27 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type OnboardingData } from './onboarding';
+import {
+    senegalCities,
+    cotedIvoireCities,
+    dakarDistricts,
+    abidjanDistricts,
+    beninCities,
+    togoCities,
+    ghanaCities,
+    lomeDistricts,
+    cotonouDistricts,
+    accraDistricts,
+    nigeriaCities,
+    abujaDistricts,
+    lagosDistricts,
+    nigerCities,
+    niameyDistricts,
+    maliCities,
+    bamakoDistricts,
+    burkinaFasoCities,
+    ouagadougouDistricts,
+} from '@/data/onboarding';
 
 const onboardingStep3Schema = z.object({
     orgCity: z.string().min(1, 'City is required'),
@@ -38,38 +59,124 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
         onNext(data);
     };
 
+    const selectedCountry = data.orgCountry;
+    const selectedCity = onboardingForm.watch('orgCity');
+
+    const showCityField = ['Senegal', 'Côte d\'Ivoire', 'Benin', 'Togo', 'Ghana', 'Nigeria', 'Niger', 'Mali', 'Burkina Faso'].includes(selectedCountry);
+    const showDistrictField = (selectedCity === 'Dakar' && selectedCountry === 'Senegal') ||
+        (selectedCity === 'Abidjan' && selectedCountry === 'Côte d\'Ivoire') ||
+        (selectedCity === 'Lomé' && selectedCountry === 'Togo') ||
+        (selectedCity === 'Cotonou' && selectedCountry === 'Benin') ||
+        (selectedCity === 'Accra' && selectedCountry === 'Ghana') ||
+        (selectedCity === 'Abuja' && selectedCountry === 'Nigeria') ||
+        (selectedCity === 'Lagos' && selectedCountry === 'Nigeria') ||
+        (selectedCity === 'Niamey' && selectedCountry === 'Niger') ||
+        (selectedCity === 'Bamako' && selectedCountry === 'Mali') ||
+        (selectedCity === 'Ouagadougou' && selectedCountry === 'Burkina Faso');
+
+    const cities = {
+        'Senegal': senegalCities,
+        'Côte d\'Ivoire': cotedIvoireCities,
+        'Benin': beninCities,
+        'Togo': togoCities,
+        'Ghana': ghanaCities,
+        'Nigeria': nigeriaCities,
+        'Niger': nigerCities,
+        'Mali': maliCities,
+        'Burkina Faso': burkinaFasoCities,
+    }[selectedCountry] || [];
+
+    const districts = {
+        'Dakar': dakarDistricts,
+        'Abidjan': abidjanDistricts,
+        'Lomé': lomeDistricts,
+        'Cotonou': cotonouDistricts,
+        'Accra': accraDistricts,
+        'Abuja': abujaDistricts,
+        'Lagos': lagosDistricts,
+        'Niamey': niameyDistricts,
+        'Bamako': bamakoDistricts,
+        'Ouagadougou': ouagadougouDistricts,
+    }[selectedCity] || [];
+
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="mb-6">
                 <div className="flex space-x-2">
-                    <div className="flex-1">
-                        <Label htmlFor="orgCity" className="block mb-2">City</Label>
-                        <Input
-                            id="orgCity"
-                            placeholder="Abidjan"
-                            {...onboardingForm.register("orgCity")}
-                            className={cn(
-                                "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
-                    </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
-                        <Input
-                            id="orgDistrict"
-                            placeholder="Cocody"
-                            {...onboardingForm.register("orgDistrict")}
-                            className={cn(
-                                "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgDistrict && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDistrict.message}</p>}
-                    </div>
+                    {showCityField ? (
+                        <div className="flex-1">
+                            <Label htmlFor="orgCity" className="block mb-2">City</Label>
+                            <select
+                                id="orgCity"
+                                {...onboardingForm.register("orgCity")}
+                                className={cn(
+                                    "w-full mb-2 p-2 border rounded-md",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            >
+                                <option value="">Select a city</option>
+                                {cities.map((city) => (
+                                    <option key={city} value={city}>
+                                        {city}
+                                    </option>
+                                ))}
+                            </select>
+                            {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
+                        </div>
+                    ) : (
+                        <div className="flex-1">
+                            <Label htmlFor="orgCity" className="block mb-2">City</Label>
+                            <Input
+                                id="orgCity"
+                                placeholder="Enter your city"
+                                {...onboardingForm.register("orgCity")}
+                                className={cn(
+                                    "w-full mb-2",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            />
+                            {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
+                        </div>
+                    )}
+                    {showDistrictField ? (
+                        <div className="flex-1">
+                            <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
+                            <select
+                                id="orgDistrict"
+                                {...onboardingForm.register("orgDistrict")}
+                                className={cn(
+                                    "w-full mb-2 p-2 border rounded-md",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            >
+                                <option value="">Select a district</option>
+                                {districts.map((district) => (
+                                    <option key={district} value={district}>
+                                        {district}
+                                    </option>
+                                ))}
+                            </select>
+                            {onboardingForm.formState.errors.orgDistrict && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDistrict.message}</p>}
+                        </div>
+                    ) : (
+                        <div className="flex-1">
+                            <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
+                            <Input
+                                id="orgDistrict"
+                                placeholder="Enter your district"
+                                {...onboardingForm.register("orgDistrict")}
+                                className={cn(
+                                    "w-full mb-2",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            />
+                            {onboardingForm.formState.errors.orgDistrict && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDistrict.message}</p>}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="mb-6">
@@ -78,7 +185,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                         <Label htmlFor="orgPostalCode" className="block mb-2">Postal code</Label>
                         <Input
                             id="orgPostalCode"
-                            placeholder="01012"
+                            placeholder="Enter your postal code"
                             {...onboardingForm.register("orgPostalCode")}
                             className={cn(
                                 "w-full mb-2",
@@ -92,7 +199,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                         <Label htmlFor="orgAddress" className="block mb-2">Address</Label>
                         <Input
                             id="orgAddress"
-                            placeholder="123 Rue des Jardins"
+                            placeholder="Enter your address"
                             {...onboardingForm.register("orgAddress")}
                             className={cn(
                                 "w-full mb-2",

@@ -28,6 +28,26 @@ export const organizationPositions = [
   'Other',
 ];
 
+
+export const operatingCountries = [
+  'Côte d\'Ivoire',
+  'Senegal',
+  'Ghana',
+  'Nigeria',
+  'Benin',
+  'Togo',
+  'Mali',
+  'Niger',
+  // 'Burkina Faso',
+  // 'Cape Verde',
+  // 'Gambia',
+  // 'Mauritania',
+  // 'Sierra Leone',
+  // 'Guinea',
+  // 'Guinea-Bissau',
+  // 'Liberia',
+];
+
 export const countries = [
   'Ghana',
   'Côte d\'Ivoire',
@@ -499,3 +519,371 @@ export const timezones = [
   'UTC+05:00', // Pakistan Standard Time
   'UTC+08:00', // China Standard Time
 ];
+
+export const senegalRegions = [
+  'Dakar',
+  'Diourbel',
+  'Fatick',
+  'Kaffrine',
+  'Kaolack',
+  'Kédougou',
+  'Kolda',
+  'Louga',
+  'Matam',
+  'Saint-Louis',
+  'Sédhiou',
+  'Tambacounda',
+  'Thiès',
+  'Ziguinchor',
+];
+
+export const senegalCities = [
+  'Dakar',
+  'Thiès',
+  'Saint-Louis',
+  'Kaolack',
+  'Ziguinchor',
+  'Kolda',
+  'Louga',
+  'Tambacounda',
+  'Kédougou',
+  'Matam',
+  'Diourbel',
+  'Fatick',
+  'Sédhiou',
+  'Kaffrine',
+  'Mbour',
+  'Rufisque',
+  'Guédiawaye',
+  'Pikine',
+];
+
+export const dakarDistricts = [
+  'Mermoz-Sacré-Cœur',
+  'Ngor',
+  'Ouakam',
+  'Yoff',
+  'Fann-Point E-Amitié',
+  'Gorée',
+  'Gueule Tapée-Fass-Colobane',
+  'Médina',
+  'Plateau',
+  'Biscuiterie',
+  'Dieuppeul-Derklé',
+  'Grand Dakar',
+  'Hann-Bel Air',
+  'HLM',
+  'Sicap-Liberté',
+  'Cambérène',
+  'Grand Yoff',
+  'Parcelles Assainies',
+  'Patte d\'Oie',
+];
+
+export const cotedIvoireRegions = [
+  'Bas-Sassandra',
+  'Comoé',
+  'Denguélé',
+  'Gôh-Djiboua',
+  'Lacs',
+  'Lagunes',
+  'Montagnes',
+  'Sassandra-Marahoué',
+  'Savanes',
+  'Vallée du Bandama',
+  'Woroba',
+  'Yamoussoukro',
+  'Zanzan',
+];
+
+export const cotedIvoireCities = [
+  'Abidjan',
+  'Yamoussoukro',
+  'Bouaké',
+  'Daloa',
+  'San-Pédro',
+  'Korhogo',
+  'Man',
+  'Gagnoa',
+  'Abengourou',
+  'Divo',
+  'Odienné',
+  'Bondoukou',
+  'Soubré',
+  'Anyama',
+  'Séguéla',
+];
+
+export const abidjanDistricts = [
+  'Abobo',
+  'Adjamé',
+  'Yopougon',
+  'Plateau',
+  'Attécoubé',
+  'Cocody',
+  'Koumassi',
+  'Marcory',
+  'Port-Bouët',
+  'Treichville',
+  'Île Boulay',
+];
+
+export const beninRegions = [
+  'Alibori',
+  'Atakora',
+  'Atlantique',
+  'Borgou',
+  'Collines',
+  'Donga',
+  'Kouffo',
+  'Littoral',
+  'Mono',
+  'Ouémé',
+  'Plateau',
+  'Zou',
+];
+
+export const beninCities = [
+  'Cotonou',
+  'Porto-Novo',
+  'Parakou',
+  'Abomey',
+  'Ouidah',
+  'Djougou',
+  'Bohicon',
+  'Natitingou',
+  'Lokossa',
+  'Savalou',
+];
+
+export const lomeDistricts = [
+  'Fidjrosse',
+  'Zongo',
+  'Vedoko',
+  'Akpakpa',
+  'Dantokpa',
+  'Ganhi',
+  'Avotrou',
+  'Agla',
+  'Tokpa',
+  'Kindonou',
+];
+
+export const togoRegions = [
+  'Maritime',
+  'Plateaux',
+  'Centrale',
+  'Kara',
+  'Savanes',
+];
+
+export const togoCities = [
+  'Lomé',
+  'Sokodé',
+  'Kpalimé',
+  'Atakpamé',
+  'Dapaong',
+  'Tsévié',
+  'Aného',
+  'Mango',
+  'Bassar',
+];
+
+export const cotonouDistricts = [
+  'Nyekonakpoé',
+  'Baguida',
+  'Amoutivé',
+  'Ablogamé',
+  'Agoe',
+  'Totsi',
+  'Adidogome',
+  'Hedzranawoé',
+  'Tokoin',
+  'Kodzoviakope',
+];
+
+export const ghanaRegions = [
+  'Ahafo',
+  'Ashanti',
+  'Bono',
+  'Bono East',
+  'Central',
+  'Eastern',
+  'Greater Accra',
+  'North East',
+  'Northern',
+  'Oti',
+  'Savannah',
+  'Upper East',
+  'Upper West',
+  'Volta',
+  'Western',
+  'Western North',
+];
+
+export const ghanaCities = [
+  'Accra',
+  'Kumasi',
+  'Tamale',
+  'Takoradi',
+  'Cape Coast',
+  'Sunyani',
+  'Bolgatanga',
+  'Ho',
+  'Wa',
+  'Tema',
+];
+
+export const accraDistricts = [
+  'Osu',
+  'Labadi',
+  'Cantonments',
+  'Dzorwulu',
+  'Adabraka',
+  'Nima',
+  'Bantama',
+  'Manhyia',
+  'Oforikrom',
+  'Suame',
+];
+
+export const nigeriaRegions = [
+  'Abia',
+  'Adamawa',
+  'Akwa Ibom',
+  'Anambra',
+  'Bauchi',
+  'Bayelsa',
+  'Benue',
+];
+
+export const nigeriaCities = [
+  'Lagos',
+  'Abuja',
+  'Kano',
+  'Ibadan',
+  'Port Harcourt',
+  'Enugu',
+  'Aba',
+];
+
+export const abujaDistricts = [
+  'Garki',
+  'Karu',
+  'Kuje',
+  'Maitama',
+  'Nasarawa',
+  'Suleja',
+  'Wuse',
+];
+
+export const lagosDistricts = [
+  'Ikeja',
+  'Surulere',
+  'Mushin',
+  'Ajah',
+  'Ikoyi',
+  'Victoria Island',
+  'Lekki',
+  'Ikota',
+  'Festac Town',
+  'Amuwo-Odofin',
+  'Badagry',
+];
+
+export const nigerRegions = [
+  'Agadez',
+  'Diffa',
+  'Dosso',
+  'Maradi',
+  'Niamey',
+  'Tahoua',
+  'Tillabéri',
+  'Zinder',
+];
+
+export const nigerCities = [
+  'Niamey',
+  'Zinder',
+  'Maradi',
+  'Agadez',
+  'Tahoua',
+  'Dosso',
+  'Tillabéri',
+  'Diffa',
+];
+
+export const niameyDistricts = [
+  'Niamey I',
+  'Niamey II',
+  'Niamey III',
+  'Niamey IV',
+  'Niamey V',
+];
+
+export const maliRegions = [
+  'Bamako',
+  'Gao',
+  'Kayes',
+  'Kidal',
+  'Koulikoro',
+  'Mopti',
+  'Ségou',
+  'Sikasso',
+  'Tombouctou',
+];
+
+export const maliCities = [
+  'Bamako',
+  'Sikasso',
+  'Mopti',
+  'Koutiala',
+  'Ségou',
+  'Kayes',
+  'Kati',
+  'Gao',
+];
+
+export const bamakoDistricts = [
+  'Bamako I',
+  'Bamako II',
+  'Bamako III',
+  'Bamako IV',
+  'Bamako V',
+  'Bamako VI',
+];
+
+export const burkinaFasoRegions = [
+  'Boucle du Mouhoun',
+  'Cascades',
+  'Centre',
+  'Centre-Est',
+  'Centre-Nord',
+  'Centre-Ouest',
+  'Centre-Sud',
+  'Est',
+  'Hauts-Bassins',
+  'Nord',
+  'Plateau-Central',
+  'Sahel',
+  'Sud-Ouest',
+];
+
+export const burkinaFasoCities = [
+  'Ouagadougou',
+  'Bobo-Dioulasso',
+  'Koudougou',
+  'Banfora',
+  'Ouahigouya',
+  'Dédougou',
+  'Kaya',
+  'Tenkodogo',
+];
+
+export const ouagadougouDistricts = [
+  'Bogodogo',
+  'Boulmiougou',
+  'Nongremassom',
+  'Sig-Nonghin',
+  'Baskuy',
+]

@@ -12,7 +12,7 @@ BEGIN
     WHERE 
         merchant_id = p_merchant_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update organization logo
 CREATE OR REPLACE FUNCTION public.update_organization_logo(
@@ -28,4 +28,4 @@ BEGIN
     WHERE 
         organization_id = p_organization_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

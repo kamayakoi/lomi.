@@ -9,6 +9,18 @@ import * as z from 'zod';
 import LogoUploader from '@/pages/auth/components/logo-uploader';
 import { useState, useEffect } from 'react';
 import { type OnboardingData } from './onboarding';
+import {
+    operatingCountries,
+    senegalRegions,
+    cotedIvoireRegions,
+    beninRegions,
+    togoRegions,
+    ghanaRegions,
+    nigeriaRegions,
+    nigerRegions,
+    maliRegions,
+    burkinaFasoRegions,
+} from '@/data/onboarding';
 
 const onboardingStep2Schema = z.object({
     orgName: z.string().min(1, 'Organization name is required'),
@@ -67,6 +79,21 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
         return () => subscription.unsubscribe();
     }, [onboardingForm]);
 
+    const selectedCountry = onboardingForm.watch('orgCountry');
+    const showRegionField = ['Senegal', 'Côte d\'Ivoire', 'Benin', 'Togo', 'Ghana', 'Nigeria', 'Niger', 'Mali', 'Burkina Faso'].includes(selectedCountry);
+
+    const regions = {
+        'Senegal': senegalRegions,
+        'Côte d\'Ivoire': cotedIvoireRegions,
+        'Benin': beninRegions,
+        'Togo': togoRegions,
+        'Ghana': ghanaRegions,
+        'Nigeria': nigeriaRegions,
+        'Niger': nigerRegions,
+        'Mali': maliRegions,
+        'Burkina Faso': burkinaFasoRegions,
+    }[selectedCountry] || [];
+
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="mb-6">
@@ -123,33 +150,62 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgCountry" className="block mb-2">Billing country</Label>
-                        <Input
+                        <Label htmlFor="orgCountry" className="block mb-2">Operating country</Label>
+                        <select
                             id="orgCountry"
-                            placeholder="Côte d'Ivoire"
                             {...onboardingForm.register("orgCountry")}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 p-2 border rounded-md",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
-                        />
+                        >
+                            <option value="">Select a country</option>
+                            {operatingCountries.map((country) => (
+                                <option key={country} value={country}>
+                                    {country}
+                                </option>
+                            ))}
+                        </select>
                         {onboardingForm.formState.errors.orgCountry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCountry.message}</p>}
                     </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgRegion" className="block mb-2">Region</Label>
-                        <Input
-                            id="orgRegion"
-                            placeholder="Lagunes"
-                            {...onboardingForm.register("orgRegion")}
-                            className={cn(
-                                "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgRegion && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgRegion.message}</p>}
-                    </div>
+                    {showRegionField ? (
+                        <div className="flex-1">
+                            <Label htmlFor="orgRegion" className="block mb-2">Region</Label>
+                            <select
+                                id="orgRegion"
+                                {...onboardingForm.register("orgRegion")}
+                                className={cn(
+                                    "w-full mb-2 p-2 border rounded-md",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            >
+                                <option value="">Select a region</option>
+                                {regions.map((region) => (
+                                    <option key={region} value={region}>
+                                        {region}
+                                    </option>
+                                ))}
+                            </select>
+                            {onboardingForm.formState.errors.orgRegion && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgRegion.message}</p>}
+                        </div>
+                    ) : (
+                        <div className="flex-1">
+                            <Label htmlFor="orgRegion" className="block mb-2">Region</Label>
+                            <Input
+                                id="orgRegion"
+                                placeholder="Enter your region"
+                                {...onboardingForm.register("orgRegion")}
+                                className={cn(
+                                    "w-full mb-2",
+                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                )}
+                            />
+                            {onboardingForm.formState.errors.orgRegion && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgRegion.message}</p>}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="mb-6 flex space-x-8">

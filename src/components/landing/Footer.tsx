@@ -41,13 +41,13 @@ export const Footer = () => {
             Company
           </h4>
           <nav className="grid gap-2">
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Solutions
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Case Studies
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Customers
             </a>
             <a href="/about" className="hover:underline text-gray-600 dark:text-gray-300">
@@ -62,16 +62,16 @@ export const Footer = () => {
             Products
           </h4>
           <nav className="grid gap-2">
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Payments
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Subscriptions
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Checkout
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Payouts
             </a>
           </nav>
@@ -92,7 +92,7 @@ export const Footer = () => {
             <a href="mailto:hello@lomi.africa?subject=[Support] — Question" className="hover:underline text-gray-600 dark:text-gray-300">
               Support
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Pricing
             </a>
           </nav>
@@ -110,10 +110,10 @@ export const Footer = () => {
             <a href="/terms" className="hover:underline text-gray-600 dark:text-gray-300">
               Terms of Service
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
               Leave us a testimony
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
               Help center
             </a>
           </nav>
@@ -137,7 +137,7 @@ export const Footer = () => {
             <a href="https://x.com/intent/follow?screen_name=lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
               <FontAwesomeIcon icon={faTwitter} /> X | Twitter
             </a>
-            <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
+            <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
               <FontAwesomeIcon icon={faEnvelope} /> Newsletters
             </a>
           </nav>
@@ -162,7 +162,7 @@ export const Footer = () => {
               Abidjan, Côte d&apos;Ivoire
             </a>
             <div className="flex items-center gap-1">
-              <a href="javascript:void(0)" className="hover:underline text-gray-600 dark:text-gray-300">
+              <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
                 Cookie Preferences
               </a>
             </div>

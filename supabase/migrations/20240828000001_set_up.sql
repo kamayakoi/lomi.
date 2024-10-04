@@ -16,13 +16,14 @@ BEGIN
     NEW.updated_at = now(); 
     RETURN NEW; 
 END;
-$$ LANGUAGE 'plpgsql';
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Function to delete a storage object
 CREATE OR REPLACE FUNCTION delete_storage_object(bucket TEXT, object TEXT, OUT status INT, OUT content TEXT)
 RETURNS RECORD
-LANGUAGE 'plpgsql'
+LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   project_url TEXT := 'https://injlwsgidvxehdmwdoov.supabase.co';
@@ -44,8 +45,9 @@ $$;
 -- Function to delete a storage object from a bucket
 CREATE OR REPLACE FUNCTION delete_storage_object_from_bucket(bucket_name TEXT, object_path TEXT, OUT status INT, OUT content TEXT)
 RETURNS RECORD
-LANGUAGE 'plpgsql'
+LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   SELECT

@@ -11,7 +11,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger to call the function on user creation
 CREATE TRIGGER on_auth_user_created
@@ -30,7 +30,7 @@ BEGIN
   WHERE merchant_id = NEW.id;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger to call the update function on user update
 CREATE TRIGGER on_auth_user_updated
@@ -63,4 +63,4 @@ BEGIN
     new_merchant_id, org_id, 'admin'
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

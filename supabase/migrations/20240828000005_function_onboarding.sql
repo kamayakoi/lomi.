@@ -97,4 +97,4 @@ BEGIN
         p_how_did_you_hear_about_us
     );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

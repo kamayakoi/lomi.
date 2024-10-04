@@ -24,7 +24,7 @@ BEGIN
     WHERE 
         m.merchant_id = p_user_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update merchant details
 CREATE OR REPLACE FUNCTION public.update_merchant_details(
@@ -48,4 +48,4 @@ BEGIN
     WHERE 
         merchant_id = p_merchant_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -14,7 +15,7 @@ interface FAQProps {
 const FAQList: FAQProps[] = [
   {
     question: "How quickly can I get started with Lomi?",
-    answer: "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our Terms of Service, you can start accepting payments.",
+    answer: "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our <a href='/terms' class='text-primary hover:underline'>Terms of Service</a>, you can start accepting payments.",
     value: "item-1",
   },
   {
@@ -34,7 +35,7 @@ const FAQList: FAQProps[] = [
   },
 ];
 
-export const FAQ = () => {
+export const FAQ: React.FC = () => {
   return (
     <section
       id="faq"
@@ -64,7 +65,9 @@ export const FAQ = () => {
               {question}
             </AccordionTrigger>
 
-            <AccordionContent style={{ fontSize: '1.06rem' }}>{answer}</AccordionContent>
+            <AccordionContent style={{ fontSize: '1.06rem' }}>
+              <div dangerouslySetInnerHTML={{ __html: answer }} />
+            </AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
@@ -73,7 +76,7 @@ export const FAQ = () => {
         Still have questions?{" "}
         <a
           rel="noreferrer noopener"
-          href="https://developers.lomi.africa/" // Updated link
+          href="https://developers.lomi.africa/"
           className="text-primary transition-all border-primary hover:border-b-2"
         >
           Visit our support center
