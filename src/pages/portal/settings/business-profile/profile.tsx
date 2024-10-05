@@ -147,10 +147,10 @@ export default function Profile() {
     }
 
     const handlePinChange = async () => {
-        if (!merchant || !newPin || newPin.length !== 6) {
+        if (!merchant || !newPin || newPin.length !== 4) {
             toast({
                 title: "Error",
-                description: "Please enter a valid 6-digit PIN",
+                description: "Please enter a valid 4-digit PIN",
                 variant: "destructive",
             })
             return
