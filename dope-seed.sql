@@ -4,19 +4,20 @@ INSERT INTO providers (name, code, description) VALUES
   ('Orange', 'ORANGE', 'Mobile money and eWallet provider'),
   ('MTN', 'MTN', 'Mobile money provider'),
   ('Wave', 'WAVE', 'Mobile money and eWallet provider'),
-  ('Ecobank', 'ECOBANK', 'Bank transfer provider');
+  ('Ecobank', 'ECOBANK', 'Bank transfer provider'),
+  ('PayPal', 'PAYPAL', 'Online payment provider'),
+  ('Partner', 'PARTNER', 'Partner payment provider');
 
--- Payment methods table
+-- Payment methods table  
 INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
-  ('CARDS', 'STRIPE'), 
+  ('CREDIT_CARD', 'STRIPE'), 
   ('BANK_TRANSFER', 'STRIPE'),
-  ('PAYPAL', 'STRIPE'),
+  ('PAYPAL', 'PAYPAL'),
   ('MOBILE_MONEY', 'ORANGE'),  
   ('MOBILE_MONEY', 'MTN'),     
   ('MOBILE_MONEY', 'WAVE'),
   ('BANK_TRANSFER', 'ECOBANK'),
-  ('APPLE_PAY', 'STRIPE'),     
-  ('GOOGLE_PAY', 'STRIPE');
+  ('E_WALLET', 'PARTNER');
 
 -- Currencies table
 INSERT INTO currencies (code, name) VALUES
@@ -36,7 +37,7 @@ INSERT INTO currencies (code, name) VALUES
   ('MRO', 'Mauritanian ouguiya'),
   ('XAF', 'Central African CFA franc');
 
--- Fees table
+-- Fees table  
 INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, currency_code, payment_method_code, provider_code) VALUES
   -- USD COMPANY FEES
   ('USD Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 29.99, 'USD', NULL, NULL),
@@ -69,8 +70,8 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
   ('EUR/STRIPE BANK_TRANSFER Fee', 'payment', 'processing', 1.4, 1.00, 'EUR', 'BANK_TRANSFER', 'STRIPE'),
 
   -- PAYPAL FEES
-  ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'STRIPE'),
-  ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'STRIPE'),
+  ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'PAYPAL'),
+  ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'PAYPAL'),
 
   -- ORANGE FEES
   ('XOF/ORANGE Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'XOF', 'MOBILE_MONEY', 'ORANGE'),
@@ -84,10 +85,6 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
   -- ECOBANK FEES
   ('USD/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 1.00, 'USD', 'BANK_TRANSFER', 'ECOBANK'),
   ('XOF/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 256.00, 'XOF', 'BANK_TRANSFER', 'ECOBANK'),
-
-  -- LOMI FEES
-  ('XOF/LOMI STANDARD FEE',  'payment', 'processing', 3.3, 56.00, 'XOF', 'CASH', 'LOMI'),
-  ('XOF/LOMI COMMERCE FEE',  'payment', 'processing', 2.9, 0.00, 'XOF', 'E_WALLET', 'LOMI'),
 
   -- PARTNER FEES
   ('USD/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'USD', 'E_WALLET', 'PARTNER'),
