@@ -1,8 +1,8 @@
 :root {
   --navbar-logo-margin-right: 33rem;
   --navbar-logo-padding-left: 1rem;
-  --navbar-menu-gap: 1rem;
-  --navbar-contact-sales-margin-left: 1rem;
+  --navbar-menu-gap: 0.35rem;
+  --navbar-contact-sales-margin-right: 1rem; 
 }
 
 .navbar-dock {
@@ -43,7 +43,7 @@
 
 @media (max-width: 767px) {
   .navbar-logo-container {
-    margin-right: 0;
+    margin-right: 7.8rem;
     padding-left: 0.5rem;
   }
 

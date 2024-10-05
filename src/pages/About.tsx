@@ -49,14 +49,16 @@ const About = () => {
                                     We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use the most.
                                 </p>
                                 {/* Get Started Button */}
-                                <Link to="/integrations">
-                                    <PulsatingButton
-                                        className="text-xl mt-4 px-6 py-3 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-800 transition-colors duration-300"
-                                        pulseColor="#ff4d4d"
-                                    >
-                                        Get started
-                                    </PulsatingButton>
-                                </Link>
+                                <div className="flex justify-center lg:justify-start">
+                                    <Link to="/integrations">
+                                        <PulsatingButton
+                                            className="text-xl mt-4 px-6 py-3 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-800 transition-colors duration-300"
+                                            pulseColor="#ff4d4d"
+                                        >
+                                            Get started
+                                        </PulsatingButton>
+                                    </Link>
+                                </div>
                             </div>
 
                             {/* Our Values Section */}

@@ -67,38 +67,45 @@ export const NavbarAbout = () => {
                         </div>
 
                         {/* mobile */}
-                        <span className="flex md:hidden">
+                        <span className="md:hidden flex items-center">
                             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                                 <SheetTrigger className="px-2">
                                     <Menu
-                                        className="flex md:hidden h-5 w-5 text-white"
+                                        className="h-6 w-6 text-white"
                                         onClick={() => setIsOpen(true)}
                                     >
-                                        <span className="sr-only">Toggle menu</span>
+                                        <span className="sr-only"></span>
                                     </Menu>
                                 </SheetTrigger>
-                                <SheetContent
-                                    side="right"
-                                    className="bg-gray-900 text-white"
-                                >
+
+                                <SheetContent side="right" className="bg-gray-900 text-white w-3/4">
                                     <SheetHeader>
                                         <SheetTitle className="font-bold text-xl text-white" style={{ fontSize: '1.2rem' }}>
                                             lomi.africa
                                         </SheetTitle>
                                     </SheetHeader>
-                                    <nav className="flex flex-col justify-center items-center gap-2 mt-4">
+                                    <nav className="flex flex-col justify-center items-start gap-4 mt-6 px-4">
                                         {routeList.map(({ href, label }: RouteProps) => (
                                             <a
                                                 rel="noreferrer noopener"
                                                 key={label}
                                                 href={href}
                                                 onClick={() => setIsOpen(false)}
-                                                className={buttonVariants({ variant: "ghost" }) + " text-white"}
-                                                style={{ fontSize: '1.06rem' }}
+                                                className={`text-lg ${buttonVariants({ variant: "ghost" })} text-white`}
                                             >
                                                 {label}
                                             </a>
                                         ))}
+                                        <button
+                                            onClick={() => {
+                                                setIsFormOpen(true);
+                                                setIsOpen(false);
+                                            }}
+                                            className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })} text-white`}
+                                            style={{ padding: '0.75rem 1rem' }}
+                                        >
+                                            Contact sales
+                                        </button>
                                     </nav>
                                 </SheetContent>
                             </Sheet>

@@ -89,7 +89,7 @@ const Products = () => {
                         </div>
                     </div>
                     <div className="lg:w-1/2 mt-8 lg:mt-0 flex justify-center items-center">
-                        <div className="w-full max-w-3xl relative">
+                        <div className="w-full max-w-3xl relative hidden lg:block">
                             <OrbitingCirclesDemo />
                         </div>
                     </div>
