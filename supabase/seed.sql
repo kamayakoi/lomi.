@@ -212,9 +212,9 @@ VALUES ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF1001')
 
 
 -- Seed data for payouts table
-INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status)
-VALUES ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com') AND currency_code = 'USD'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 1000.00, 'USD', 'bank_transfer', 'completed')
-     , ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com') AND currency_code = 'XOF'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 500000.00, 'XOF', 'mobile_money', 'pending');
+INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status, provider_code)
+VALUES ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com') AND currency_code = 'USD'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 1000.00, 'USD', 'bank_transfer', 'completed', 'ECOBANK')
+     , ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com') AND currency_code = 'XOF'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 500000.00, 'XOF', 'mobile_money', 'pending', 'ORANGE');
 
 
 -- Seed data for entries table
@@ -246,6 +246,20 @@ INSERT INTO webhooks (merchant_id, organization_id, url, events)
 VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'https://techinnovate.com/webhooks/transactions', ARRAY['transaction.created', 'transaction.updated'])
      , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'https://africanledger.com/webhooks/payouts', ARRAY['payout.created', 'payout.failed']);
 
+-- Seed data for webhooks table
+UPDATE webhooks 
+SET last_payload = '{"event": "transaction.created", "transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}',
+    last_response_status = 200,
+    last_response_body = 'OK',
+    last_delivery_time = 50.0
+WHERE url = 'https://techinnovate.com/webhooks/transactions';
+
+UPDATE webhooks
+SET last_payload = '{"event": "payout.failed", "payout_id": "p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1"}',
+    last_response_status = 500,
+    last_response_body = 'Internal Server Error',
+    last_delivery_time = 100.0
+WHERE url = 'https://africanledger.com/webhooks/payouts';
 
 -- Seed data for logs table
 INSERT INTO logs (merchant_id, action, details, severity)
@@ -266,21 +280,15 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SE
 
 
 -- Seed data for customer_api_interactions table
-INSERT INTO customer_api_interactions (organization_id, endpoint, request_method, request_payload, response_status, response_payload, response_time)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), '/api/v1/transactions', 'POST', '{"amount": 100.00, "currency": "USD"}', 201, '{"transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}', 250.0)
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), '/api/v1/payouts', 'GET', NULL, 200, '[{"payout_id": "p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1", "amount": 500000.00, "currency": "XOF", "status": "pending"}]', 150.0);
-
-
--- Seed data for webhook_delivery_logs table
-INSERT INTO webhook_delivery_logs (webhook_id, payload, response_status, response_body, delivery_time)
-VALUES ((SELECT webhook_id FROM webhooks WHERE url = 'https://techinnovate.com/webhooks/transactions'), '{"event": "transaction.created", "transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}', 200, 'OK', 50.0)
-     , ((SELECT webhook_id FROM webhooks WHERE url = 'https://africanledger.com/webhooks/payouts'), '{"event": "payout.failed", "payout_id": "p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1"}', 500, 'Internal Server Error', 100.0);
+INSERT INTO customer_api_interactions (organization_id, endpoint, request_method, request_payload, response_status, response_payload, response_time, api_key)
+VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), '/api/v1/transactions', 'POST', '{"amount": 100.00, "currency": "USD"}', 201, '{"transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}', 250.0, 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6')
+     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), '/api/v1/payouts', 'GET', NULL, 200, '[{"payout_id": "p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1", "amount": 500000.00, "currency": "XOF", "status": "pending"}]', 150.0, 'p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1');
 
 
 -- Seed data for api_rate_limits table
 INSERT INTO api_rate_limits (organization_id, api_key, endpoint, requests_limit, time_window)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'tk_live_1234567890', '/api/v1/transactions', 100, INTERVAL '1 minute')
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'tk_test_0987654321', '/api/v1/payouts', 50, INTERVAL '1 hour');
+VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6', '/api/v1/transactions', 100, INTERVAL '1 minute')
+     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1', '/api/v1/payouts', 50, INTERVAL '1 hour');
 
 
 -- Seed data for platform_metrics table
@@ -291,7 +299,7 @@ VALUES ('merchant', 'total_transactions', 1000, NOW() - INTERVAL '1 month')
 
 
 -- Seed data for error_logs table
-INSERT INTO error_logs (error_type, error_message, stack_trace, context)
+INSERT INTO api_error_logs (error_type, error_message, stack_trace, context)
 VALUES ('PayoutFailedError', 'Payout failed for transaction: REF1002', 'Error: Payout failed for transaction: REF1002\n    at processPayouts (payouts.ts:50:11)\n    at ...',  '{"payout_id": "p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1", "transaction_id": "REF1002"}')
      , ('InvalidRequestError', 'Invalid request payload', 'Error: Invalid request payload\n    at validateRequest (validation.ts:20:5)\n    at ...', '{"endpoint": "/api/v1/transactions", "payload": {"amount": -100.00}}');
 
@@ -309,9 +317,9 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SE
 
 
 -- Seed data for customer_invoices table
-INSERT INTO customer_invoices (merchant_id, organization_id, customer_id, amount, description, currency_code, due_date, status)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 100.00, 'Product purchase invoice', 'USD', NOW() + INTERVAL '15 days', 'sent')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 75000.00, 'Service invoice', 'XOF', NOW() + INTERVAL '30 days', 'draft');
+INSERT INTO customer_invoices (merchant_id, customer_id, amount, description, currency_code, due_date, status)
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 100.00, 'Product purchase invoice', 'USD', NOW() + INTERVAL '15 days', 'sent')
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 75000.00, 'Service invoice', 'XOF', NOW() + INTERVAL '30 days', 'draft');
 
 
 -- Seed data for disputes table

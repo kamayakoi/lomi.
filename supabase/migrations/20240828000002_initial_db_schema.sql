@@ -154,12 +154,6 @@ CREATE TABLE providers (
   name VARCHAR NOT NULL,
   code provider_code NOT NULL UNIQUE,
   description TEXT,
-  logo_url VARCHAR,
-  website_url VARCHAR,
-  api_base_url VARCHAR,
-  api_key VARCHAR,
-  api_secret VARCHAR,
-  webhook_url VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -252,6 +246,7 @@ CREATE TABLE merchant_accounts (
 );
 
 CREATE INDEX idx_merchant_accounts_merchant_id ON merchant_accounts(merchant_id);
+CREATE INDEX idx_merchant_accounts_currency_code ON merchant_accounts(currency_code);
 
 COMMENT ON TABLE merchant_accounts IS 'Represents the account for each merchant, storing their balance in each currency';
 
@@ -298,6 +293,7 @@ CREATE TABLE merchant_products (
 );
 
 CREATE INDEX idx_merchant_products_merchant_id ON merchant_products(merchant_id);
+CREATE INDEX idx_merchant_products_currency_code ON merchant_products(currency_code);
 
 COMMENT ON TABLE merchant_products IS 'Stores products and services offered by merchants';
 
@@ -333,6 +329,7 @@ CREATE INDEX idx_subscriptions_organization_id ON subscriptions(organization_id)
 CREATE INDEX idx_subscriptions_customer_id ON subscriptions(customer_id);
 CREATE INDEX idx_subscriptions_product_id ON subscriptions(product_id);
 CREATE INDEX idx_subscriptions_payment_method ON subscriptions(payment_method_code, provider_code);
+CREATE INDEX idx_subscriptions_currency_code ON subscriptions(currency_code);
 
 COMMENT ON TABLE subscriptions IS 'Stores information for recurring payments and subscriptions';
 COMMENT ON COLUMN subscriptions.next_billing_date IS 'The next billing date of the subscription';
@@ -360,6 +357,7 @@ CREATE INDEX idx_fees_fee_type ON fees(fee_type);
 CREATE INDEX idx_fees_currency_code ON fees(currency_code);
 CREATE INDEX idx_fees_payment_method_code ON fees(payment_method_code);
 CREATE INDEX idx_fees_provider_code ON fees(provider_code);
+CREATE INDEX idx_fees_payment_method_provider ON fees(payment_method_code, provider_code);
 
 COMMENT ON TABLE fees IS 'Defines fee structures for different transaction types and payment methods';
 
@@ -402,6 +400,7 @@ CREATE INDEX idx_transactions_pending ON transactions(transaction_id) WHERE stat
 CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE status = 'completed';
 CREATE INDEX idx_transactions_provider_code ON transactions(provider_code);
 CREATE INDEX idx_transactions_fee_reference ON transactions(fee_reference);
+CREATE INDEX idx_transactions_payment_method_provider ON transactions(payment_method_code, provider_code);
 
 COMMENT ON TABLE transactions IS 'Records all financial transactions in the system';
 COMMENT ON COLUMN transactions.metadata IS 'Additional transaction-specific data in JSON format';
@@ -447,13 +446,15 @@ CREATE TABLE payouts (
     metadata JSONB,
     status payout_status NOT NULL DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    provider_code provider_code REFERENCES providers(code)
 );
 
 CREATE INDEX idx_payouts_account_id ON payouts(account_id);
 CREATE INDEX idx_payouts_organization_id ON payouts(organization_id);
 CREATE INDEX idx_payouts_currency_code ON payouts(currency_code);
 CREATE INDEX idx_payouts_created_at ON payouts(created_at);
+CREATE INDEX idx_payouts_provider_code ON payouts(provider_code);
 
 COMMENT ON TABLE payouts IS 'Tracks payouts from the system to external accounts or services, including merchant payouts';
 
@@ -476,6 +477,7 @@ CREATE TABLE entries (
 CREATE INDEX idx_entries_account_id ON entries(account_id);
 CREATE INDEX idx_entries_transaction_id ON entries(transaction_id);
 CREATE INDEX idx_entries_created_at ON entries(created_at);
+CREATE INDEX idx_entries_payout_id ON entries(payout_id);
 
 COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes';
 
@@ -535,8 +537,10 @@ CREATE TABLE webhooks (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_triggered_at TIMESTAMPTZ,
+  last_payload JSONB,
   last_response_status INT,
-  last_response_time FLOAT,
+  last_response_body TEXT,
+  last_delivery_time FLOAT,
   retry_count INT DEFAULT 0,
   next_retry_at TIMESTAMPTZ,
   cache_key VARCHAR(255),
@@ -575,13 +579,14 @@ CREATE TABLE platform_invoices (
     description TEXT,
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
-    status invoice_status NOT NULL DEFAULT 'draft',
+    status invoice_status NOT NULL DEFAULT 'sent',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_platform_invoices_merchant_id ON platform_invoices(merchant_id);
 CREATE INDEX idx_platform_invoices_organization_id ON platform_invoices(organization_id);
+CREATE INDEX idx_platform_invoices_currency_code ON platform_invoices(currency_code);
 
 COMMENT ON TABLE platform_invoices IS 'Stores invoice information for merchants and organizations';
 
@@ -590,7 +595,6 @@ COMMENT ON TABLE platform_invoices IS 'Stores invoice information for merchants 
 CREATE TABLE customer_invoices (
     customer_invoice_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT,
@@ -602,8 +606,8 @@ CREATE TABLE customer_invoices (
 );
 
 CREATE INDEX idx_customer_invoices_merchant_id ON customer_invoices(merchant_id);
-CREATE INDEX idx_customer_invoices_organization_id ON customer_invoices(organization_id);
 CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id);
+CREATE INDEX idx_customer_invoices_currency_code ON customer_invoices(currency_code);
 
 COMMENT ON TABLE customer_invoices IS 'Stores invoice information for customers of merchants';
 
@@ -683,6 +687,8 @@ CREATE TABLE support_tickets (
 
 CREATE INDEX idx_support_tickets_merchant_id ON support_tickets(merchant_id);
 CREATE INDEX idx_support_tickets_status ON support_tickets(status);
+CREATE INDEX idx_support_tickets_customer_id ON support_tickets(customer_id);
+CREATE INDEX idx_support_tickets_organization_id ON support_tickets(organization_id);
 
 COMMENT ON TABLE support_tickets IS 'Stores merchant support tickets';
 
@@ -714,32 +720,19 @@ CREATE TABLE customer_api_interactions (
     response_status INT,
     response_payload JSONB,
     response_time FLOAT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    api_key VARCHAR NOT NULL REFERENCES api_keys(api_key)
 );
 
 CREATE INDEX idx_customer_api_interactions_organization_id ON customer_api_interactions(organization_id);
+CREATE INDEX idx_customer_api_interactions_api_key ON customer_api_interactions(api_key);
 
 COMMENT ON TABLE customer_api_interactions IS 'Logs customer interactions with the API for debugging and analysis';
-
--- Webhook Delivery Logs table
-CREATE TABLE webhook_delivery_logs (
-    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    webhook_id UUID NOT NULL REFERENCES webhooks(webhook_id),
-    payload JSONB,
-    response_status INT,
-    response_body TEXT,
-    delivery_time FLOAT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_webhook_delivery_logs_webhook_id ON webhook_delivery_logs(webhook_id);
-
-COMMENT ON TABLE webhook_delivery_logs IS 'Tracks the delivery status and details of webhook notifications';
 
 -- API Rate Limits table
 CREATE TABLE api_rate_limits (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    api_key VARCHAR NOT NULL,
+    api_key VARCHAR NOT NULL REFERENCES api_keys(api_key),
     endpoint VARCHAR(255) NOT NULL,
     requests_limit INT NOT NULL,
     time_window INTERVAL NOT NULL,
@@ -749,12 +742,13 @@ CREATE TABLE api_rate_limits (
 );
 
 CREATE INDEX idx_api_rate_limits_organization_id ON api_rate_limits(organization_id);
+CREATE INDEX idx_api_rate_limits_api_key ON api_rate_limits(api_key);
 
 COMMENT ON TABLE api_rate_limits IS 'Stores rate limiting information for API endpoints per organization and API key';
 
 
 -- Error Logs table
-CREATE TABLE error_logs (
+CREATE TABLE api_error_logs (
     error_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     error_type VARCHAR(50) NOT NULL,
     error_message TEXT NOT NULL,
@@ -763,10 +757,10 @@ CREATE TABLE error_logs (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_error_logs_error_type ON error_logs(error_type);
-CREATE INDEX idx_error_logs_created_at ON error_logs(created_at);
+CREATE INDEX idx_error_logs_error_type ON api_error_logs(error_type);
+CREATE INDEX idx_error_logs_created_at ON api_error_logs(created_at);
 
-COMMENT ON TABLE error_logs IS 'Records system errors for debugging and monitoring purposes';
+COMMENT ON TABLE api_error_logs IS 'Records system errors for debugging and monitoring purposes';
 
 
 -- Pages table
@@ -818,6 +812,7 @@ CREATE INDEX idx_payment_links_organization_id ON payment_links(organization_id)
 CREATE INDEX idx_payment_links_page_id ON payment_links(page_id);
 CREATE INDEX idx_payment_links_product_id ON payment_links(product_id);
 CREATE INDEX idx_payment_links_subscription_id ON payment_links(subscription_id);
+CREATE INDEX idx_payment_links_currency_code ON payment_links(currency_code);
 
 COMMENT ON TABLE payment_links IS 'Stores payment links for one-time payments, subscriptions, and instant links';
 
