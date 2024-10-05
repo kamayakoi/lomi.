@@ -43,7 +43,7 @@ const About = () => {
                                     Founded in 2024, lomi. emerged to address the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.
                                 </p>
                                 <p className="text-white dark:text-white md:text-xl">
-                                    Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. The payment providers are ever-increasing, and entrepreneurs don&apos;t necessarly have the tools to orchestrate them effectively.
+                                    Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. The payment providers are ever-increasing, and companies don&apos;t necessarly have the tools to orchestrate them effectively.
                                 </p>
                                 <p className="text-white dark:text-white md:text-xl">
                                     We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use the most.
@@ -90,7 +90,7 @@ const About = () => {
                                 </div>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
-                                        Speed and Measurement
+                                        Speed
                                     </h3>
                                     <p className="text-white mt-1">
                                         Delivering fast results with a focus on merchant-centered metrics.
