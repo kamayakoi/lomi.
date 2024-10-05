@@ -24,8 +24,10 @@ const AvatarCircles = ({
         />
       ))}
       <a
-        className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-black text-center text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800 dark:bg-white dark:text-black"
-        onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }}
+        className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-blue-600 text-center text-xs font-medium text-white hover:bg-blue-700 dark:border-gray-800"
+        onClick={(e) => e.preventDefault()}
+        href="#"
+        style={{ cursor: 'default' }}
       >
         +{numPeople}
       </a>

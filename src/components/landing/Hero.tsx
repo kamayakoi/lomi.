@@ -16,22 +16,24 @@ export const Hero = () => {
   return (
     <section className="container grid lg:grid-cols-2 place-items-center py-20 md:py-32 gap-10">
       <div className="text-center lg:text-start space-y-6">
-        <main className="text-5xl md:text-6xl font-bold text-left lg:text-start"> {/* Added text-left for mobile */}
-          <h1 className="inline">
-            <span className="inline bg-gradient-to-r from-[#F596D3]  to-[#D247BF] text-transparent bg-clip-text">
+        <main className="text-5xl md:text-6xl font-bold text-center lg:text-left mb-6">
+          <h1>
+            <span className="bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
               One integration
             </span>{" "}
             for all your{" "}
-            <span className="inline bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text"> {/* Applied the blue gradient */}
+            <span className="bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text">
               payment needs.
             </span>
           </h1>
         </main>
 
-        <p className="text-2xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0 text-left lg:text-start"> {/* Added text-left for mobile */}
-          We offer an easy-to-use API & financial gateway that connects with banks and networks across West Africa — making it simple for your business to handle transactions and scale faster.
+        <p className="text-xl md:text-2xl text-muted-foreground text-center lg:text-left mb-8">
+          We offer an easy-to-use API & financial gateway that connects with banks and networks across West
+          Africa — making it simple for your business to handle transactions and scale faster.
         </p>
-        <div className="space-y-4 md:space-y-0 md:space-x-4 flex flex-col md:flex-row items-center">
+
+        <div className="flex flex-col md:flex-row justify-center lg:justify-start space-y-4 md:space-y-0 md:space-x-4 mb-8">
           <Button
             className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7"
             onClick={() => setIsFormOpen(true)}
@@ -49,8 +51,7 @@ export const Hero = () => {
           </Link>
         </div>
 
-        {/* New section using AvatarCircles component */}
-        <div className="hidden sm:flex items-center mt-6">
+        <div className="flex items-center justify-center lg:justify-start">
           <AvatarCircles
             avatarUrls={[
               africanledger,
@@ -59,7 +60,7 @@ export const Hero = () => {
             ]}
             numPeople={12}
           />
-          <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300 ml-4">
+          <span className="text-sm md:text-base text-muted-foreground ml-4">
             Loved by dozens of businesses and entrepreneurs.
           </span>
         </div>
