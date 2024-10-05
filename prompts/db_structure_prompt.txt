@@ -1,0 +1,77 @@
+Database Structure and App Overview
+
+1. The database uses PostgreSQL and is managed through Supabase.
+
+2. Key tables in the database include:
+   - merchants: Stores information about merchants using the system.
+   - organizations: Represents businesses or entities using the application.
+   - customers: Stores information about the customers of the merchants.
+   - transactions: Records all financial transactions in the system.
+   - subscriptions: Stores information for recurring payments and subscriptions.
+   - payment_methods: Defines available payment methods and their associated providers.
+   - providers: Lists payment providers integrated with the system (e.g., MTN, WAVE, ORANGE, STRIPE, PAYPAL).
+   - fees: Defines fee structures for different transaction types and payment methods.
+   - payouts: Tracks payouts from the system to external accounts or services, including merchant payouts.
+   - disputes: Stores dispute information for transactions.
+   - refunds: Tracks refunds linked to transactions.
+   - platform_invoices: Stores invoice information for merchants and organizations.
+   - customer_invoices: Stores invoice information for customers of merchants.
+   - api_keys: Stores API keys for authenticated access to the system.
+   - webhooks: Configures webhook endpoints for real-time event notifications.
+   - pages: Stores custom checkout pages created by merchants.
+   - payment_links: Stores payment links for one-time payments, subscriptions, and instant links.
+
+3. The schema defines several enum types for status fields and codes, ensuring data consistency:
+   - transaction_status: pending, completed, failed, refunded
+   - transaction_type: payment, refund, transfer, subscription, payout
+   - organization_status: active, inactive, suspended
+   - provider_code: ORANGE, WAVE, ECOBANK, MTN, STRIPE, PAYPAL, LOMI, PARTNER
+   - recurring_transaction_type: subscription, installment, debt, utility, other
+   - transfer_status: pending, processing, completed, failed, cancelled
+   - refund_status: pending, processing, completed, failed, cancelled
+   - invoice_status: draft, sent, paid, overdue, cancelled
+   - frequency: daily, weekly, bi-weekly, monthly, yearly, one-time
+   - recurring_transaction_status: active, paused, cancelled, expired
+   - entry_type: debit, credit
+   - payment_method_code: CREDIT_CARD, DEBIT_CARD, MOBILE_MONEY, BANK_TRANSFER, SEPA, PAYPAL, etc.
+   - currency_code: XOF, XAF, NGN, GHS, KES, ZAR, EGP, MAD, RWF, ETB, ZMW, NAD, USD, EUR, MRO
+   - payout_status: pending, processing, completed, failed
+   - dispute_status: open, under_review, resolved, closed
+   - kyc_status: pending, approved, rejected
+   - entity_type: merchant, organization, platform
+   - feedback_status: open, reviewed, implemented, closed
+   - ticket_status: open, in_progress, resolved, closed
+
+4. Key relationships between tables:
+   - merchants and organizations have a many-to-many relationship through the merchant_organization_links table.
+   - transactions are linked to merchants, organizations, and customers.
+   - subscriptions are linked to merchants, organizations, customers, and products.
+   - payouts are linked to merchant accounts and organizations.
+   - disputes and refunds are linked to transactions and customers.
+   - platform_invoices are linked to merchants and organizations.
+   - customer_invoices are linked to merchants and customers.
+   - api_keys and webhooks are linked to organizations.
+   - pages and payment_links are linked to merchants and organizations.
+
+5. The schema includes tables for logging, metrics, and error tracking:
+   - logs: Audit log for tracking important actions and events in the system.
+   - platform_metrics: Stores metrics for merchants, organizations, and the platform.
+   - api_error_logs: Records system errors for debugging and monitoring purposes.
+
+6. Tables for user feedback and support:
+   - merchant_feedback: Stores merchant feedback, bug reports, or feature requests.
+   - support_tickets: Stores merchant support tickets.
+   - notifications: Stores notifications for merchants and organizations.
+
+7. API usage and rate limiting tables:
+   - api_usage: Tracks API usage statistics for each organization and API key.
+   - customer_api_interactions: Logs customer interactions with the API for debugging and analysis.
+   - api_rate_limits: Stores rate limiting information for API endpoints per organization and API key.
+
+8. The schema is designed to support a multi-tenant architecture, with data segmented by merchant and organization.
+
+9. Indexing is applied to foreign keys and frequently queried columns to optimize query performance.
+
+10. The schema follows a consistent naming convention for tables, columns, and constraints.
+
+When developing the application, keep in mind the relationships between tables and the data flow across different components. Use the provided enums and statuses to maintain data consistency and integrity. Leverage the logging and error tracking tables for monitoring and debugging purposes. Optimize queries by utilizing the indexed columns and foreign key relationships. Ensure proper data segmentation and access control based on the multi-tenant architecture.
