@@ -99,3 +99,17 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to check if a merchant has completed the onboarding process
+CREATE OR REPLACE FUNCTION public.check_onboarding_status(p_merchant_id UUID)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_onboarded BOOLEAN;
+BEGIN
+    SELECT onboarded INTO v_onboarded
+    FROM merchants
+    WHERE merchant_id = p_merchant_id;
+
+    RETURN v_onboarded;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

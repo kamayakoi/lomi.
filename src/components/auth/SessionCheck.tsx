@@ -1,35 +1,25 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { checkSession } from '@/utils/supabase/client'
-// import { config } from '@/utils/config'
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
 
-interface SessionCheckProps {
-    children: React.ReactNode
-}
-
-export function SessionCheck({ children }: SessionCheckProps) {
-    const [isLoading, setIsLoading] = useState(true)
-    const navigate = useNavigate()
-    const location = useLocation()
+export function SessionCheck({ children }: { children: React.ReactNode }) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { isLoading, isAuthenticated } = useAuthStatus();
 
     useEffect(() => {
-        const checkUserSession = async () => {
-            const session = await checkSession()
-            if (session) {
-                if (location.pathname === '/sign-in' || location.pathname === '/sign-up') {
-                    navigate('/portal')
-                    // navigate(config.isPortal ? '/' : '/portal')
-                }
+        if (!isLoading) {
+            if (!isAuthenticated && location.pathname !== '/sign-in' && location.pathname !== '/sign-up') {
+                navigate('/sign-in');
+            } else if (isAuthenticated && (location.pathname === '/sign-in' || location.pathname === '/sign-up')) {
+                navigate('/portal');
             }
-            setIsLoading(false)
         }
-
-        checkUserSession()
-    }, [navigate, location])
+    }, [isLoading, isAuthenticated, location, navigate]);
 
     if (isLoading) {
-        return null
+        return null;
     }
 
-    return <>{children}</>
+    return <>{children}</>;
 }

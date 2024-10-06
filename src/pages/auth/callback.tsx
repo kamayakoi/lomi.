@@ -1,33 +1,23 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/utils/supabase/client';
+import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
 import LoadingButton from '@/components/dashboard/loader';
 
-const AuthCallback: React.FC = () => {
+const AuthCallback = () => {
     const navigate = useNavigate();
+    const { isLoading, isOnboarded } = useAuthStatus();
 
     useEffect(() => {
-        const handleAuthCallback = async () => {
-            const { data, error } = await supabase.auth.getSession();
-            if (error) {
-                console.error('Error getting session:', error);
-                navigate('/sign-in');
-                return;
-            }
-
-            if (data?.session) {
-                navigate('/onboarding'); // Redirect to the onboarding route
+        if (!isLoading) {
+            if (!isOnboarded) {
+                navigate('/onboarding');
             } else {
-                navigate('/sign-in');
+                navigate('/portal');
             }
-        };
+        }
+    }, [isLoading, isOnboarded, navigate]);
 
-        handleAuthCallback();
-    }, [navigate]);
-
-    return (
-        <LoadingButton />
-    );
+    return <LoadingButton />;
 };
 
 export default AuthCallback;
