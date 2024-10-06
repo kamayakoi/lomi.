@@ -35,7 +35,6 @@ CREATE TABLE merchants (
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR UNIQUE,
   onboarded BOOLEAN NOT NULL DEFAULT false,
-  verified BOOLEAN NOT NULL DEFAULT false,
   country VARCHAR,
   metadata JSONB,
   avatar_url TEXT,
@@ -66,9 +65,8 @@ CREATE TABLE organizations (
   name VARCHAR NOT NULL,
   email VARCHAR UNIQUE NOT NULL,
   phone_number VARCHAR NOT NULL,
-  tax_number VARCHAR,
+  verified BOOLEAN NOT NULL DEFAULT false,
   website_url VARCHAR,
-  business_platform_url VARCHAR,
   logo_url VARCHAR,
   status organization_status NOT NULL DEFAULT 'active',
   default_currency currency_code NOT NULL DEFAULT 'XOF',
@@ -112,21 +110,30 @@ COMMENT ON TABLE organization_addresses IS 'Stores address information for organ
 -- Organization KYC table
 CREATE TABLE organization_kyc (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-  document_type VARCHAR NOT NULL,
-  document_url VARCHAR NOT NULL,
-  authorized_signatory JSONB,
+  legal_organization_name VARCHAR,
+  legal_country VARCHAR,
+  legal_region VARCHAR,
+  legal_city VARCHAR,
+  legal_postal_code VARCHAR,
+  legal_street VARCHAR,
+  proof_of_business VARCHAR,
+  business_platform_url VARCHAR,
+  authorized_signatory_name VARCHAR,
+  authorized_signatory_email VARCHAR,
+  authorized_signatory_phone_number VARCHAR,
+  registration_certificate VARCHAR,
+  tax_number VARCHAR,
+  legal_representative_ID_url VARCHAR,
+  business_license_url VARCHAR,
   status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   kyc_submitted_at TIMESTAMPTZ,
   kyc_approved_at TIMESTAMPTZ,
-  uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  reviewed_at TIMESTAMPTZ,
-  PRIMARY KEY (organization_id, document_type)
+  PRIMARY KEY (organization_id)
 );
 
 CREATE INDEX idx_organization_kyc_organization_id ON organization_kyc(organization_id);
 
 COMMENT ON TABLE organization_kyc IS 'Stores KYC information for organizations';
-COMMENT ON COLUMN organization_kyc.authorized_signatory IS 'Information about the authorized signatory for the organization';
 
 
 -- Merchant-Organization links table

@@ -3,6 +3,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
 import { SessionCheck } from '@/components/auth/SessionCheck';
 import ResetPassword from './pages/auth/reset-password.tsx';
+import { ActivationRoute } from './components/auth/ActivationRoute';
 // import { config } from '@/utils/config';
 
 // Home and landing Pages
@@ -136,7 +137,11 @@ const AppRouter = () => (
                         <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
                         <Route path="withdrawals/phone-numbers" element={<PhoneNumbers />} />
                     </Route>
-                    <Route path="activation" element={<Activation />} />
+                    <Route path="activation" element={
+                        <ActivationRoute>
+                            <Activation />
+                        </ActivationRoute>
+                    } />
                 </Route>
 
                 {/* Login/Signup routes */}

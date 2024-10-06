@@ -15,7 +15,9 @@ import {
   IconLinkPlus,
   IconWallet,
   IconSend,
+  IconFlag,
 } from '@tabler/icons-react'
+
 
 export interface NavLink {
   title: string
@@ -29,7 +31,8 @@ export interface SubNavLink extends NavLink {
 }
 
 export interface SideLink extends NavLink {
-  sub?: SubNavLink[]
+  sub?: SubNavLink[];
+  condition?: string;
 }
 
 export interface SectionTitle {
@@ -40,6 +43,12 @@ export interface SectionTitle {
 export type SidebarItem = SideLink | SectionTitle
 
 export const sidelinks: SidebarItem[] = [
+  {
+    title: 'Activation',
+    href: '/portal/activation',
+    icon: <IconFlag className="text-red-500" size={18} />,
+    condition: 'isActivationRequired',
+  },
   { type: 'section', title: 'MAIN MENU' },
   {
     title: 'Home',

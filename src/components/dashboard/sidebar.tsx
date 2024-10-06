@@ -10,12 +10,14 @@ import iconLight from "/icon.png"
 import iconDark from "/icon_dark.svg"
 import { supabase } from '@/utils/supabase/client'
 import { Separator } from "@/components/ui/separator"
+import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
 export default function Sidebar({ className }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
   const { theme, setTheme } = useTheme()
+  const { isActivated } = useActivationStatus()
   const [organizationName, setOrganizationName] = useState<string | null>(null)
   const [organizationLogo, setOrganizationLogo] = useState<string | null>(null)
   const [merchantName, setMerchantName] = useState<string | null>(null)
@@ -121,7 +123,12 @@ export default function Sidebar({ className }: SidebarProps) {
           id='sidebar-menu'
           className={`z-40 h-full flex-1 overflow-auto ${navOpened ? 'max-h-screen' : 'max-h-0 py-0 md:max-h-screen md:py-1'}`}
           closeNav={() => setNavOpened(false)}
-          links={sidelinks}
+          links={sidelinks.filter((link) => {
+            if ('condition' in link) {
+              return link.condition === 'isActivationRequired' ? !isActivated : true
+            }
+            return true
+          })}
         />
 
         {/* Organization info */}

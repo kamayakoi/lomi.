@@ -1,15 +1,13 @@
 -- Seed data for merchants table
-INSERT INTO merchants (name, email, phone_number, onboarded, verified, country, metadata, avatar_url, preferred_language, timezone, referral_code, pin_code, mrr, arr, merchant_lifetime_value)
-VALUES ('Walid Lebbos', 'walid@gmail.com', '+221777777777', TRUE, TRUE, 'Senegal', NULL, 'https://example.com/avatars/walid.jpg', 'en', 'UTCr', 'WALID2024', '1234', 1000.00, 12000.00, 50000.00)
-
-     , ('Babacar Diop', 'babacar@africanledgertest.com', '+221666666666', TRUE, TRUE, 'Senegal', NULL, 'https://example.com/avatars/babacar.jpg', 'fr', 'UTC', 'BABACAR2024', '5678', 2000.00, 24000.00, 100000.00);
+INSERT INTO merchants (name, email, phone_number, onboarded, country, metadata, avatar_url, preferred_language, timezone, referral_code, pin_code, mrr, arr, merchant_lifetime_value)
+VALUES ('Walid Lebbos', 'walid@gmail.com', '+221777777777', TRUE, 'Senegal', NULL, 'https://example.com/avatars/walid.jpg', 'en', 'UTCr', 'WALID2024', '1234', 1000.00, 12000.00, 50000.00)
+     , ('Babacar Diop', 'babacar@africanledgertest.com', '+221666666666', TRUE, 'Senegal', NULL, 'https://example.com/avatars/babacar.jpg', 'fr', 'UTC', 'BABACAR2024', '5678', 2000.00, 24000.00, 100000.00);
 
 
 -- Seed data for organizations table
-INSERT INTO organizations (name, email, phone_number, tax_number, website_url, business_platform_url, logo_url, status, default_currency, total_revenue, total_transactions, total_merchants, total_customers, metadata, employee_number, industry)
-VALUES ('TechInnovate', 'contact@techinnovate.com', '+221777777778', 'SN123456789', 'https://techinnovate.com', 'https://shop.techinnovate.com', 'https://example.com/logos/techinnovate.png', 'active', 'XOF', 500000.00, 1000, 1, 5000, NULL, '10-50', 'Technology')
-
-     , ('African Ledger', 'info@africanledger.com', '+221666666667', 'SN987654321', 'https://africanledger.com', 'https://app.africanledger.com', 'https://example.com/logos/africanledger.png', 'active', 'XOF', 1000000.00, 5000, 1, 10000, NULL, '51-200', 'Finance');
+INSERT INTO organizations (name, email, phone_number, verified, website_url, logo_url, status, default_currency, total_revenue, total_transactions, total_merchants, total_customers, metadata, employee_number, industry)
+VALUES ('TechInnovate', 'info@techinnovate.com', '+221778901234', TRUE, 'https://techinnovate.com', 'https://example.com/logos/techinnovate.png', 'active', 'XOF', 10000000.00, 5000, 50, 1000, '{"founded_year": 2020}', '10-50', 'Technology')
+     , ('African Ledger', 'contact@africanledger.com', '+221339876543', TRUE, 'https://africanledger.com', 'https://example.com/logos/africanledger.png', 'active', 'XOF', 5000000.00, 2500, 30, 500, '{"founded_year": 2022}', '5-10', 'Finance');
 
 
 -- Seed data for organization_addresses table
@@ -20,9 +18,9 @@ VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
 
 
 -- Seed data for organization_kyc table
-INSERT INTO organization_kyc (organization_id, document_type, document_url, authorized_signatory, status, kyc_submitted_at, kyc_approved_at)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'business_registration', 'https://example.com/docs/techinnovate_reg.pdf', NULL, 'approved', NOW() - INTERVAL '30 days', NOW() - INTERVAL '25 days')
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'tax_certificate', 'https://example.com/docs/africanledger_tax.pdf', NULL, 'pending', NOW() - INTERVAL '10 days', NULL);
+INSERT INTO organization_kyc (organization_id, legal_organization_name, legal_country, legal_region, legal_city, legal_postal_code, legal_street, proof_of_business, business_platform_url, authorized_signatory_name, authorized_signatory_email, authorized_signatory_phone_number, registration_certificate, tax_number, legal_representative_ID_url, business_license_url, status)
+VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'TechInnovate LLC', 'Senegal', 'Dakar', 'Dakar', '12345', '123 Innovation Street', 'https://example.com/proofs/techinnovate.pdf', 'https://techinnovate.com', 'Amadou Diallo', 'amadou.diallo@techinnovate.com', '+221770123456', 'https://example.com/certificates/techinnovate.pdf', 'TIN123456', 'https://example.com/ids/amadou_diallo.jpg', 'https://example.com/licenses/techinnovate.pdf', 'approved')
+     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'African Ledger Inc', 'Senegal', 'Dakar', 'Dakar', '54321', '456 Blockchain Avenue', 'https://example.com/proofs/africanledger.pdf', 'https://africanledger.com', 'Fatou Ndiaye', 'fatou.ndiaye@africanledger.com', '+221339012345', 'https://example.com/certificates/africanledger.pdf', 'TIN654321', 'https://example.com/ids/fatou_ndiaye.jpg', 'https://example.com/licenses/africanledger.pdf', 'approved');
 
 
 -- Seed data for merchant_organization_links table
