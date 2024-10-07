@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { countryCodes, countries, organizationPositions } from '@/data/onboarding';
 import ProfilePictureUploader from '@/pages/auth/components/avatar-uploader';
 
-const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
 const onboardingStep1Schema = z.object({
     firstName: z.string().min(1, 'First name is required'),
@@ -53,6 +53,12 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             code.toLowerCase().includes(lowercaseSearch)
         ))).slice(0, 5); // Limit to 5 results
     }, [countryCodeSearch]);
+
+    const handleAvatarUpdate = async (newAvatarUrl: string) => {
+        // Extract the relative path from the full URL
+        const relativeAvatarPath = newAvatarUrl.replace(/^.*\/avatars\//, '');
+        setAvatarUrl(relativeAvatarPath);
+    };
 
     const onSubmit = (data: OnboardingStep1Data) => {
         onNext({ ...data, avatarUrl });
@@ -142,8 +148,10 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                         <Label htmlFor="phoneNumber" className="block mb-2">Phone number</Label>
                         <Input
                             id="phoneNumber"
-                            placeholder="0160223401"
-                            {...onboardingForm.register("phoneNumber")}
+                            placeholder="Enter your phone number"
+                            {...onboardingForm.register("phoneNumber", {
+                                setValueAs: (value) => value.replace(/\s/g, ''),
+                            })}
                             className={cn(
                                 "w-full mb-2",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -160,7 +168,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                     <div className="ml-8">
                         <ProfilePictureUploader
                             currentAvatar={avatarUrl}
-                            onAvatarUpdate={setAvatarUrl}
+                            onAvatarUpdate={handleAvatarUpdate}
                             name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
                         />
                     </div>

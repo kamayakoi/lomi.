@@ -20,7 +20,8 @@ const integrationOptions = [
         title: "No Code",
         description: "<strong>No developers? No problem. Use our no-code option to get started today.</strong>",
         details: "Easily create a one-time payment link from your lomi.'s dashboard and send it to your buyer for payment. Buyers will select their payment terms and method using the generated order URL.<br><br>No integration necessary!",
-        link: "mailto:hello@lomi.africa"
+        link: "/sign-up",
+        linkText: "Get started now →"
     }
 ];
 
@@ -67,7 +68,7 @@ const Integrations = () => {
                                         <p className="text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.description }}></p>
                                         <p className="mt-4 text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.details }}></p>
                                         <a href={option.link} className="text-blue-500 dark:text-blue-400 font-semibold mt-6 inline-block">
-                                            {option.link.includes('mailto') ? 'Contact us to learn more →' : 'Explore our developer docs →'}
+                                            {option.linkText || (option.link.includes('mailto') ? 'Contact us to learn more →' : 'Explore our developer docs →')}
                                         </a>
                                     </div>
                                 )}

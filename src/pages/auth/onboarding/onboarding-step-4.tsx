@@ -11,8 +11,9 @@ import { type OnboardingData } from './onboarding';
 const onboardingStep4Schema = z.object({
     orgWebsite: z.string().min(1, 'Website is required').refine((value) => {
         if (!value) return false;
+        const normalizedValue = value.replace(/^(https?:\/\/)?(www\.)?/i, '');
         try {
-            new URL(value.startsWith('http') ? value : `https://${value}`);
+            new URL(`https://${normalizedValue}`);
             return true;
         } catch {
             return false;

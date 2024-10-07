@@ -1,33 +1,35 @@
 -- Seed data for merchants table
-INSERT INTO merchants (name, email, phone_number, onboarded, country, metadata, avatar_url, preferred_language, timezone, referral_code, pin_code, mrr, arr, merchant_lifetime_value)
-VALUES ('Walid Lebbos', 'walid@gmail.com', '+221777777777', TRUE, 'Senegal', NULL, 'https://example.com/avatars/walid.jpg', 'en', 'UTCr', 'WALID2024', '1234', 1000.00, 12000.00, 50000.00)
-     , ('Babacar Diop', 'babacar@africanledgertest.com', '+221666666666', TRUE, 'Senegal', NULL, 'https://example.com/avatars/babacar.jpg', 'fr', 'UTC', 'BABACAR2024', '5678', 2000.00, 24000.00, 100000.00);
+INSERT INTO merchants (name, email, phone_number, onboarded, country, avatar_url, preferred_language, timezone, referral_code, pin_code, mrr, arr, merchant_lifetime_value, metadata)
+VALUES ('Walid Lebbos', 'walid@gmail.com', '+221777777777', TRUE, 'Senegal', 'https://example.com/avatars/walid.jpg', 'en', 'UTC', 'WALID2024', '1234', 1000.00, 12000.00, 50000.00, '{"preferred_contact_method": "email"}')
+     , ('Babacar Diop', 'babacar@africanledgertest.com', '+221666666666', TRUE, 'Senegal', 'https://example.com/avatars/babacar.jpg', 'fr', 'UTC', 'BABACAR2024', '5678', 2000.00, 24000.00, 100000.00, '{"preferred_contact_method": "phone"}');
 
 
 -- Seed data for organizations table
-INSERT INTO organizations (name, email, phone_number, verified, website_url, logo_url, status, default_currency, total_revenue, total_transactions, total_merchants, total_customers, metadata, employee_number, industry)
-VALUES ('TechInnovate', 'info@techinnovate.com', '+221778901234', TRUE, 'https://techinnovate.com', 'https://example.com/logos/techinnovate.png', 'active', 'XOF', 10000000.00, 5000, 50, 1000, '{"founded_year": 2020}', '10-50', 'Technology')
-     , ('African Ledger', 'contact@africanledger.com', '+221339876543', TRUE, 'https://africanledger.com', 'https://example.com/logos/africanledger.png', 'active', 'XOF', 5000000.00, 2500, 30, 500, '{"founded_year": 2022}', '5-10', 'Finance');
+INSERT INTO organizations (name, email, phone_number, verified, website_url, logo_url, status, default_currency, total_revenue, total_transactions, total_merchants, total_customers, employee_number, industry, metadata)
+VALUES ('TechInnovate', 'info@techinnovate.com', '+221778901234', TRUE, 'https://techinnovate.com', 'https://example.com/logos/techinnovate.png', 'active', 'XOF', 10000000.00, 5000, 50, 1000, '10-50', 'Technology', '{"founded_year": 2020}')
+     , ('African Ledger', 'contact@africanledger.com', '+221339876543', TRUE, 'https://africanledger.com', 'https://example.com/logos/africanledger.png', 'active', 'XOF', 5000000.00, 2500, 30, 500, '5-10', 'Finance', '{"founded_year": 2022}');
 
 
 -- Seed data for organization_addresses table
-INSERT INTO organization_addresses (organization_id, country, region, city, district, postal_code, street)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'Senegal', 'Dakar', 'Dakar', 'Plateau', '12345', '123 Innovation Street')
-
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'Senegal', 'Dakar', 'Dakar', 'Almadies', '54321', '456 Blockchain Avenue');
+INSERT INTO organization_addresses (organization_id, country, region, city, district, street, postal_code)
+VALUES 
+((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'Senegal', 'Dakar', 'Dakar', 'Plateau', '123 Innovation Street', '12345'),
+((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'Senegal', 'Dakar', 'Dakar', 'Almadies', '456 Blockchain Avenue', '54321');
 
 
 -- Seed data for organization_kyc table
-INSERT INTO organization_kyc (organization_id, legal_organization_name, legal_country, legal_region, legal_city, legal_postal_code, legal_street, proof_of_business, business_platform_url, authorized_signatory_name, authorized_signatory_email, authorized_signatory_phone_number, registration_certificate, tax_number, legal_representative_ID_url, business_license_url, status)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'TechInnovate LLC', 'Senegal', 'Dakar', 'Dakar', '12345', '123 Innovation Street', 'https://example.com/proofs/techinnovate.pdf', 'https://techinnovate.com', 'Amadou Diallo', 'amadou.diallo@techinnovate.com', '+221770123456', 'https://example.com/certificates/techinnovate.pdf', 'TIN123456', 'https://example.com/ids/amadou_diallo.jpg', 'https://example.com/licenses/techinnovate.pdf', 'approved')
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'African Ledger Inc', 'Senegal', 'Dakar', 'Dakar', '54321', '456 Blockchain Avenue', 'https://example.com/proofs/africanledger.pdf', 'https://africanledger.com', 'Fatou Ndiaye', 'fatou.ndiaye@africanledger.com', '+221339012345', 'https://example.com/certificates/africanledger.pdf', 'TIN654321', 'https://example.com/ids/fatou_ndiaye.jpg', 'https://example.com/licenses/africanledger.pdf', 'approved');
+INSERT INTO organization_kyc (organization_id, legal_organization_name, tax_number, business_description, legal_country, legal_region, legal_city, legal_postal_code, legal_street, proof_of_business, business_platform_url, authorized_signatory_name, authorized_signatory_email, authorized_signatory_phone_number, legal_representative_ID_url, address_proof_url, business_registration_url, status)
+VALUES 
+((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'TechInnovate Inc.', 'TAX123456', 'Innovative technology solutions provider', 'Senegal', 'Dakar', 'Dakar', '12345', '123 Innovation Street', 'https://example.com/proof_of_business_techinnovate.pdf', 'https://techinnovate.com', 'John Doe', 'john.doe@techinnovate.com', '+221777777778', 'https://example.com/legal_representative_id_techinnovate.pdf', 'https://example.com/address_proof_techinnovate.pdf', 'https://example.com/business_registration_techinnovate.pdf', 'approved'),
+((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'African Ledger Ltd.', 'TAX789012', 'Blockchain and financial technology company', 'Senegal', 'Dakar', 'Dakar', '54321', '456 Blockchain Avenue', 'https://example.com/proof_of_business_africanledger.pdf', 'https://africanledger.com', 'Jane Smith', 'jane.smith@africanledger.com', '+221666666667', 'https://example.com/legal_representative_id_africanledger.pdf', 'https://example.com/address_proof_africanledger.pdf', 'https://example.com/business_registration_africanledger.pdf', 'pending');
 
 
 -- Seed data for merchant_organization_links table
-INSERT INTO merchant_organization_links (merchant_id, organization_id, workspace_handle, how_did_you_hear_about_us, role, organization_position)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'techinnovate-workspace', 'Online Search', 'Admin', 'CEO')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'africanledger-workspace', 'Referral', 'Admin', 'CTO');
-
+INSERT INTO merchant_organization_links (merchant_id, organization_id, role, workspace_handle, how_did_you_hear_about_us, organization_position)
+VALUES 
+((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'Admin', 'techinnovate-walid', 'Online search', 'CEO'),
+((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'Admin', 'africanledger-babacar', 'Referral', 'CTO'),
+((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'Member', 'africanledger-walid', NULL, 'Advisor');
 
 -- Seed data for providers table
 INSERT INTO providers (name, code, description) VALUES
@@ -53,10 +55,16 @@ INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
 
 
 -- Seed data for organization_providers_settings table
-INSERT INTO organization_providers_settings (organization_id, provider_code, is_connected, phone_number, complementary_information)
-VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'ORANGE', TRUE, '+221777777779', NULL)
-     , ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'STRIPE', TRUE, NULL, '{"stripe_account_id": "acct_1234567890"}')
-     , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'WAVE', TRUE, '+221666666668', NULL);
+INSERT INTO organization_providers_settings (organization_id, provider_code, is_connected, phone_number, card_number, bank_account_number, bank_account_name, bank_name, bank_code)
+VALUES 
+  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'STRIPE', TRUE, NULL, '4242424242424242', NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'ORANGE', TRUE, '+221778901234', NULL, NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'WAVE', TRUE, '+221778901234', NULL, NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'ECOBANK', TRUE, NULL, NULL, '1234567890', 'TechInnovate Ltd', 'Ecobank', 'ECO123'),
+  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'STRIPE', TRUE, NULL, '5555555555554444', NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'MTN', TRUE, '+221339876543', NULL, NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'PAYPAL', TRUE, NULL, NULL, NULL, NULL, NULL, NULL),
+  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'PARTNER', TRUE, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 -- Seed data for currencies table
@@ -95,15 +103,15 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 100
 
 
 -- Seed data for merchant_products table
-INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, frequency, image_url)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'Premium Plan', 'Premium subscription plan', 50.00, 'USD', 'monthly', 'https://example.com/images/premium.jpg')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 'Gold Package', 'Gold subscription package', 100.00, 'EUR', 'yearly', 'https://example.com/images/gold.jpg');
+INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, image_url)
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'Premium Plan', 'Premium subscription plan', 50.00, 'USD', 'https://example.com/images/premium.jpg')
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 'Gold Package', 'Gold subscription package', 100.00, 'EUR', 'https://example.com/images/gold.jpg');
 
 
 -- Seed data for subscriptions table
-INSERT INTO subscriptions (merchant_id, organization_id, customer_id, product_id, status, start_date, billing_frequency, amount, currency_code, payment_method_code, provider_code)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), 'active', NOW(), 'monthly', 50.00, 'USD', 'CREDIT_CARD', 'STRIPE')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), 'active', NOW(), 'yearly', 100.00, 'EUR', 'CREDIT_CARD', 'STRIPE');
+INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, product_id, status, start_date, billing_frequency, amount, currency_code)
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), 'active', NOW(), 'monthly', 50.00, 'USD')
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), 'active', NOW(), 'yearly', 100.00, 'EUR');
 
 
 -- Seed data for fees table
@@ -310,8 +318,8 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SE
 
 -- Seed data for payment_links table
 INSERT INTO payment_links (merchant_id, organization_id, page_id, product_id, subscription_id, title, public_description, price, currency_code, frequency, is_active)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT page_id FROM pages WHERE slug = 'premium-subscription'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), (SELECT subscription_id FROM subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan')), 'Premium Plan Payment Link', 'Pay for your premium plan subscription', 50.00, 'USD', 'monthly', TRUE)
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT page_id FROM pages WHERE slug = 'gold-package'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), (SELECT subscription_id FROM subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Gold Package')), 'Gold Package Payment Link', 'Pay for your gold package upgrade', 100.00, 'EUR', 'yearly', TRUE);
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT page_id FROM pages WHERE slug = 'premium-subscription'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan')), 'Premium Plan Payment Link', 'Pay for your premium plan subscription', 50.00, 'USD', 'monthly', TRUE)
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT page_id FROM pages WHERE slug = 'gold-package'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Gold Package')), 'Gold Package Payment Link', 'Pay for your gold package upgrade', 100.00, 'EUR', 'yearly', TRUE);
 
 
 -- Seed data for customer_invoices table

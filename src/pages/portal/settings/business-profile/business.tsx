@@ -78,36 +78,40 @@ export default function Business() {
         }
     }
 
-    const handleLogoUpdate = async (newLogoUrl: string) => {
-        setLogoUrl(newLogoUrl)
-        if (!organization) return
+    async function handleLogoUpdate(newLogoUrl: string) {
+        setLogoUrl(newLogoUrl);
+        if (!organization) return;
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('No user found')
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            // Extract the relative path from the full URL
+            const relativeLogoPath = newLogoUrl.replace(/^.*\/logos\//, '');
 
             const { error: updateError } = await supabase.rpc('update_organization_logo', {
                 p_organization_id: organization.organization_id,
-                p_logo_url: newLogoUrl
-            })
+                p_logo_url: relativeLogoPath
+            });
 
-            if (updateError) throw updateError
+            if (updateError) throw updateError;
 
-            setOrganization({ ...organization, logo_url: newLogoUrl })
+            // Update the local state with the new logo URL
+            setOrganization({ ...organization, logo_url: relativeLogoPath });
             toast({
                 title: "Success",
                 description: "Logo updated successfully",
-            })
+            });
 
             // Refresh the organization data to ensure we have the latest information
-            await fetchOrganization()
+            await fetchOrganization();
         } catch (error) {
-            console.error('Error uploading logo:', error)
+            console.error('Error uploading logo:', error);
             toast({
                 title: "Error",
                 description: "Failed to upload logo",
                 variant: "destructive",
-            })
+            });
         }
     }
 

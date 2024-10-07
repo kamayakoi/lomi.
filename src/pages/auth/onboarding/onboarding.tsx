@@ -131,8 +131,8 @@ const NewOnboarding: React.FC = () => {
 
             const formData = { ...onboardingData, ...stepData };
 
-            // Prepend "https://" to the website URL if not present
-            const websiteUrl = formData.orgWebsite ? (formData.orgWebsite.startsWith('http') ? formData.orgWebsite : `https://${formData.orgWebsite}`) : '';
+            // Normalize the website URL
+            const websiteUrl = formData.orgWebsite ? formData.orgWebsite.replace(/^(https?:\/\/)?(www\.)?/i, '') : '';
 
             // Prepend "portal.lomi.africa/" to the workspace handle
             const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
@@ -140,11 +140,11 @@ const NewOnboarding: React.FC = () => {
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
                 p_merchant_id: user.id,
-                p_phone_number: `${formData.countryCode}${formData.phoneNumber}`,
+                p_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
                 p_country: formData.country,
                 p_org_name: formData.orgName,
                 p_org_email: formData.orgEmail,
-                p_org_phone_number: `${formData.countryCode}${formData.phoneNumber}`,
+                p_org_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
                 p_org_country: formData.orgCountry,
                 p_org_region: formData.orgRegion,
                 p_org_city: formData.orgCity,
@@ -152,7 +152,7 @@ const NewOnboarding: React.FC = () => {
                 p_org_district: formData.orgDistrict,
                 p_org_postal_code: formData.orgPostalCode,
                 p_org_industry: formData.orgIndustry,
-                p_org_website_url: websiteUrl,
+                p_org_website_url: `https://${websiteUrl}`,
                 p_org_employee_number: formData.orgEmployees,
                 p_preferred_language: formData.orgDefaultLanguage,
                 p_workspace_handle: completeWorkspaceHandle,

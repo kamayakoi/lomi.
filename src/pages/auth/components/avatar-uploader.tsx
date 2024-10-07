@@ -117,16 +117,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                     if (data) {
                         const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path);
                         onAvatarUpdate(publicUrl);
-
-                        // Update the merchant's avatar URL in the database
-                        const { data: { user } } = await supabase.auth.getUser();
-                        if (user) {
-                            await supabase.rpc('update_merchant_avatar', {
-                                p_merchant_id: user.id,
-                                p_avatar_url: publicUrl,
-                            });
-                        }
-
                         toast({
                             title: "Success",
                             description: "Profile picture updated successfully",

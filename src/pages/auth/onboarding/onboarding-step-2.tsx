@@ -57,6 +57,12 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
 
     const [logoUrl, setLogoUrl] = useState('');
 
+    const handleLogoUpdate = async (newLogoUrl: string) => {
+        // Extract the relative path from the full URL
+        const relativeLogoPath = newLogoUrl.replace(/^.*\/logos\//, '');
+        setLogoUrl(relativeLogoPath);
+    };
+
     const onSubmit = (data: OnboardingStep2Data) => {
         onNext({ ...data, logoUrl });
     };
@@ -214,7 +220,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                     <div className="ml-8">
                         <LogoUploader
                             currentLogo={logoUrl}
-                            onLogoUpdate={setLogoUrl}
+                            onLogoUpdate={handleLogoUpdate}
                             companyName={onboardingForm.watch('orgName')}
                         />
                     </div>

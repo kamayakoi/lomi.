@@ -12,41 +12,64 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/utils/supabase/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export function UserNav() {
   const { user } = useUser();
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (user) {
-        const { data: avatarPath, error: avatarError } = await supabase
-          .rpc('fetch_user_avatar', { p_user_id: user.id });
+  const fetchAvatar = useCallback(async () => {
+    if (user) {
+      const { data: avatarPath, error: avatarError } = await supabase
+        .rpc('fetch_user_avatar', { p_user_id: user.id });
 
-        if (avatarError) {
-          console.error('Error fetching avatar URL:', avatarError);
-        } else {
-          if (avatarPath) {
-            const { data: avatarData, error: downloadError } = await supabase
-              .storage
-              .from('avatars')
-              .download(avatarPath);
+      if (avatarError) {
+        console.error('Error fetching avatar URL:', avatarError);
+      } else {
+        if (avatarPath) {
+          const { data: avatarData, error: downloadError } = await supabase
+            .storage
+            .from('avatars')
+            .download(avatarPath);
 
-            if (downloadError) {
-              console.error('Error downloading avatar:', downloadError);
-            } else {
-              const url = URL.createObjectURL(avatarData);
-              setAvatarUrl(url);
-            }
+          if (downloadError) {
+            console.error('Error downloading avatar:', downloadError);
+          } else {
+            const url = URL.createObjectURL(avatarData);
+            setAvatarUrl(url);
+            localStorage.setItem(`avatarUrl_${user.id}`, url);
           }
         }
       }
-    };
-
-    fetchAvatar();
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchAvatar();
+  }, [fetchAvatar]);
+
+  useEffect(() => {
+    const merchantsChannel = supabase
+      .channel('merchants')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'merchants',
+          filter: `merchant_id=eq.${user?.id}`,
+        },
+        () => {
+          fetchAvatar();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(merchantsChannel);
+    };
+  }, [user, fetchAvatar]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

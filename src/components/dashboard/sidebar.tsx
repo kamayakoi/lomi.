@@ -121,7 +121,7 @@ export default function Sidebar({ className }: SidebarProps) {
         {/* Navigation links */}
         <Nav
           id='sidebar-menu'
-          className={`z-40 h-full flex-1 overflow-auto ${navOpened ? 'max-h-screen' : 'max-h-0 py-0 md:max-h-screen md:py-1'}`}
+          className={`z-40 h-full flex-1 overflow-auto scrollbar-hide ${navOpened ? 'max-h-screen' : 'max-h-0 py-0 md:max-h-screen md:py-1'}`}
           closeNav={() => setNavOpened(false)}
           links={sidelinks.filter((link) => {
             if ('condition' in link) {
@@ -162,6 +162,20 @@ export default function Sidebar({ className }: SidebarProps) {
           </div>
         )}
       </Layout>
+
+      {/* CSS to hide scrollbar */}
+      <style>{`
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+      `}</style>
     </aside>
   )
 }

@@ -36,7 +36,6 @@ CREATE TABLE merchants (
   phone_number VARCHAR UNIQUE,
   onboarded BOOLEAN NOT NULL DEFAULT false,
   country VARCHAR,
-  metadata JSONB,
   avatar_url TEXT,
   preferred_language VARCHAR(10),
   timezone VARCHAR NOT NULL DEFAULT 'UTC',
@@ -45,6 +44,7 @@ CREATE TABLE merchants (
   mrr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   arr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   merchant_lifetime_value NUMERIC(15,2) NOT NULL DEFAULT 0.00,
+  metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   is_deleted BOOLEAN NOT NULL DEFAULT false,
@@ -74,9 +74,9 @@ CREATE TABLE organizations (
   total_transactions INT DEFAULT 0,
   total_merchants INT DEFAULT 0,
   total_customers INT DEFAULT 0,
-  metadata JSONB,
   employee_number VARCHAR,
   industry VARCHAR,
+  metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   is_deleted BOOLEAN NOT NULL DEFAULT false,
@@ -97,8 +97,8 @@ CREATE TABLE organization_addresses (
   region VARCHAR,
   city VARCHAR,
   district VARCHAR,
-  postal_code VARCHAR,
   street VARCHAR,
+  postal_code VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -111,6 +111,8 @@ COMMENT ON TABLE organization_addresses IS 'Stores address information for organ
 CREATE TABLE organization_kyc (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   legal_organization_name VARCHAR,
+  tax_number VARCHAR,
+  business_description VARCHAR,
   legal_country VARCHAR,
   legal_region VARCHAR,
   legal_city VARCHAR,
@@ -121,10 +123,9 @@ CREATE TABLE organization_kyc (
   authorized_signatory_name VARCHAR,
   authorized_signatory_email VARCHAR,
   authorized_signatory_phone_number VARCHAR,
-  registration_certificate VARCHAR,
-  tax_number VARCHAR,
   legal_representative_ID_url VARCHAR,
-  business_license_url VARCHAR,
+  address_proof_url VARCHAR,
+  business_registration_url VARCHAR,
   status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
   kyc_submitted_at TIMESTAMPTZ,
   kyc_approved_at TIMESTAMPTZ,
@@ -141,9 +142,9 @@ CREATE TABLE merchant_organization_links (
   merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+  role VARCHAR NOT NULL CHECK (role IN ('Admin', 'Member')),
   workspace_handle VARCHAR UNIQUE NOT NULL,
   how_did_you_hear_about_us VARCHAR,
-  role VARCHAR NOT NULL CHECK (role IN ('Admin', 'Member')),
   organization_position VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (merchant_id, organization_id)
@@ -191,11 +192,11 @@ CREATE TABLE organization_providers_settings (
     is_connected BOOLEAN NOT NULL DEFAULT false,
     phone_number VARCHAR,
     card_number VARCHAR,
-    complementary_information JSONB,
     bank_account_number VARCHAR,
     bank_account_name VARCHAR,
     bank_name VARCHAR,
     bank_code VARCHAR,
+    complementary_information JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (organization_id, provider_code),
@@ -225,9 +226,9 @@ CREATE TABLE customers (
     name VARCHAR NOT NULL,
     email VARCHAR,
     phone_number VARCHAR,
-    address VARCHAR,
-    city VARCHAR,
     country VARCHAR,
+    city VARCHAR,
+    address VARCHAR,
     postal_code VARCHAR,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -292,7 +293,6 @@ CREATE TABLE merchant_products (
     description TEXT,
     price NUMERIC(10,2) NOT NULL CHECK (price >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    frequency frequency NOT NULL,
     image_url TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -305,8 +305,8 @@ CREATE INDEX idx_merchant_products_currency_code ON merchant_products(currency_c
 COMMENT ON TABLE merchant_products IS 'Stores products and services offered by merchants';
 
 
--- Subscriptions table
-CREATE TABLE subscriptions (
+-- Merchant Subscriptions table
+CREATE TABLE merchant_subscriptions (
     subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
@@ -319,28 +319,24 @@ CREATE TABLE subscriptions (
     billing_frequency frequency NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payment_method_code payment_method_code NOT NULL,
-    provider_code provider_code NOT NULL,
     retry_payment_every INT DEFAULT 0,
     total_retries INT DEFAULT 0,
     failed_payment_action VARCHAR,
     email_notifications JSONB,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_subscriptions_merchant_id ON subscriptions(merchant_id);
-CREATE INDEX idx_subscriptions_organization_id ON subscriptions(organization_id);
-CREATE INDEX idx_subscriptions_customer_id ON subscriptions(customer_id);
-CREATE INDEX idx_subscriptions_product_id ON subscriptions(product_id);
-CREATE INDEX idx_subscriptions_payment_method ON subscriptions(payment_method_code, provider_code);
-CREATE INDEX idx_subscriptions_currency_code ON subscriptions(currency_code);
+CREATE INDEX idx_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
+CREATE INDEX idx_subscriptions_organization_id ON merchant_subscriptions(organization_id);
+CREATE INDEX idx_subscriptions_customer_id ON merchant_subscriptions(customer_id);
+CREATE INDEX idx_subscriptions_product_id ON merchant_subscriptions(product_id);
+CREATE INDEX idx_subscriptions_currency_code ON merchant_subscriptions(currency_code);
 
-COMMENT ON TABLE subscriptions IS 'Stores information for recurring payments and subscriptions';
-COMMENT ON COLUMN subscriptions.next_billing_date IS 'The next billing date of the subscription';
-COMMENT ON COLUMN subscriptions.status IS 'Current status of the subscription (active, paused, cancelled, expired)';
+COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions';
+COMMENT ON COLUMN merchant_subscriptions.next_billing_date IS 'The next billing date of the subscription';
+COMMENT ON COLUMN merchant_subscriptions.status IS 'Current status of the subscription (active, paused, cancelled, expired)';
 
 
 -- Fees table
@@ -496,7 +492,6 @@ CREATE TABLE api_keys (
     name VARCHAR(100) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT true,
     expiration_date TIMESTAMPTZ,
-    last_used_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (organization_id, api_key)
@@ -541,8 +536,6 @@ CREATE TABLE webhooks (
   secret VARCHAR,
   metadata JSONB,
   is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_triggered_at TIMESTAMPTZ,
   last_payload JSONB,
   last_response_status INT,
@@ -552,6 +545,8 @@ CREATE TABLE webhooks (
   next_retry_at TIMESTAMPTZ,
   cache_key VARCHAR(255),
   cache_expiry TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (merchant_id, url, organization_id)
 );
 
@@ -587,6 +582,7 @@ CREATE TABLE platform_invoices (
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
     status invoice_status NOT NULL DEFAULT 'sent',
+    metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -608,6 +604,7 @@ CREATE TABLE customer_invoices (
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
     status invoice_status NOT NULL DEFAULT 'draft',
+    metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -627,7 +624,6 @@ CREATE TABLE disputes (
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     fee_amount NUMERIC(10,2) NOT NULL DEFAULT 0.00,
     reason TEXT NOT NULL,
-    metadata JSONB,
     status dispute_status NOT NULL DEFAULT 'open',
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
     resolution_date DATE,
@@ -653,6 +649,7 @@ CREATE TABLE platform_metrics (
   metric_name VARCHAR NOT NULL,
   metric_value NUMERIC(10,2) NOT NULL,
   metric_date DATE NOT NULL,
+  metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -679,25 +676,6 @@ CREATE INDEX idx_merchant_feedback_status ON merchant_feedback(status);
 
 COMMENT ON TABLE merchant_feedback IS 'Stores merchant feedback, bug reports, or feature requests';
 
--- Support tickets table
-CREATE TABLE support_tickets (
-  ticket_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-  customer_id UUID REFERENCES customers(customer_id),
-  organization_id UUID REFERENCES organizations(organization_id),
-  message TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  resolution_date TIMESTAMPTZ,
-  resolution_details TEXT,
-  status ticket_status NOT NULL DEFAULT 'open'
-);
-
-CREATE INDEX idx_support_tickets_merchant_id ON support_tickets(merchant_id);
-CREATE INDEX idx_support_tickets_status ON support_tickets(status);
-CREATE INDEX idx_support_tickets_customer_id ON support_tickets(customer_id);
-CREATE INDEX idx_support_tickets_organization_id ON support_tickets(organization_id);
-
-COMMENT ON TABLE support_tickets IS 'Stores merchant support tickets';
 
 -- Notifications table
 CREATE TABLE notifications (
@@ -799,7 +777,7 @@ CREATE TABLE payment_links (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     page_id UUID REFERENCES pages(page_id),
     product_id UUID REFERENCES merchant_products(product_id),
-    subscription_id UUID REFERENCES subscriptions(subscription_id),
+    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
     title VARCHAR(255) NOT NULL,
     public_description TEXT,
     private_description TEXT,

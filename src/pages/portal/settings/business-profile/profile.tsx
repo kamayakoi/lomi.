@@ -83,33 +83,40 @@ export default function Profile() {
         }
     };
 
-    const handleAvatarUpdate = async (newAvatarUrl: string) => {
-        setAvatarUrl(newAvatarUrl)
-        if (!merchant) return
+    async function handleAvatarUpdate(newAvatarUrl: string) {
+        setAvatarUrl(newAvatarUrl);
+        if (!merchant) return;
 
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            // Extract the relative path from the full URL
+            const relativeAvatarPath = newAvatarUrl.replace(/^.*\/avatars\//, '');
+
             const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
-                p_merchant_id: merchant.merchant_id,
-                p_avatar_url: newAvatarUrl
-            })
+                p_merchant_id: user.id,
+                p_avatar_url: relativeAvatarPath
+            });
 
-            if (updateError) throw updateError
+            if (updateError) throw updateError;
 
-            setMerchant({ ...merchant, avatar_url: newAvatarUrl })
+            // Update the local state with the new avatar URL
+            setMerchant({ ...merchant, avatar_url: relativeAvatarPath });
             toast({
                 title: "Success",
                 description: "Profile picture updated successfully",
-            })
+            });
 
             // Refresh the merchant data to ensure we have the latest information
-            await fetchMerchant()
+            await fetchMerchant();
         } catch (error) {
-            console.error('Error uploading avatar:', error)
+            console.error('Error uploading avatar:', error);
             toast({
                 title: "Error",
                 description: "Failed to upload profile picture",
                 variant: "destructive",
-            })
+            });
         }
     }
 
