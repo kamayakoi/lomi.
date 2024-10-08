@@ -52,13 +52,13 @@ export const Navbar = () => {
       <header className="navbar-dock">
         <NavigationMenu className="mx-auto">
           <NavigationMenuList className="container flex items-center justify-between">
-            <div className="navbar-logo-container flex items-center ml-8"> {/* Add left margin here */}
+            <div className="navbar-logo-container flex items-center ml-8">
               <NavigationMenuItem className="font-bold flex items-center">
                 <a
                   rel="lomi.africa"
                   href="/"
                   className="font-bold text-xl flex items-center"
-                  style={{ fontSize: '1.65rem' }} // Increase the font size here
+                  style={{ fontSize: '1.65rem' }}
                 >
                   <LogoIcon />
                   <span className="ml-1">lomi.africa</span>
@@ -78,13 +78,13 @@ export const Navbar = () => {
                   </Menu>
                 </SheetTrigger>
 
-                <SheetContent side={"left"} className="w-3/4"> {/* Increased sheet width */}
+                <SheetContent side={"left"} className="w-3/4">
                   <SheetHeader>
                     <SheetTitle className="font-bold text-xl" style={{ fontSize: '1.2rem' }}>
                       lomi.africa
                     </SheetTitle>
                   </SheetHeader>
-                  <nav className="flex flex-col justify-center items-start gap-4 mt-6 px-4"> {/* Adjusted spacing and alignment */}
+                  <nav className="flex flex-col justify-center items-start gap-4 mt-6 px-4">
                     {routeList.map(({ href, label }: RouteProps) => (
                       <a
                         rel="noreferrer noopener"
@@ -112,7 +112,7 @@ export const Navbar = () => {
             </span>
 
             {/* desktop */}
-            <nav className="navbar-desktop-menu">
+            <nav className="navbar-desktop-menu" style={{ marginLeft: '-10rem' }}>
               {routeList.map((route: RouteProps, i) => (
                 <a
                   rel="noreferrer noopener"
@@ -136,7 +136,6 @@ export const Navbar = () => {
                 </button>
               </div>
             </nav>
-            {/* Remove the ModeToggle from here */}
           </NavigationMenuList>
         </NavigationMenu>
       </header>

@@ -112,7 +112,7 @@ export const NavbarAbout = () => {
                         </span>
 
                         {/* desktop */}
-                        <nav className="navbar-desktop-menu">
+                        <nav className="navbar-desktop-menu" style={{ marginLeft: '-10rem' }}>
                             {routeList.map((route: RouteProps, i) => (
                                 <a
                                     rel="noreferrer noopener"
