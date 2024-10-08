@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '../components/content-section'
 import { supabase } from '@/utils/supabase/client'
-import LoadingButton from '@/components/dashboard/loader-settings'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { Skeleton } from "@/components/ui/skeleton.tsx"
 
 const ProfilePictureUploader = React.lazy(() => import('../../../auth/components/avatar-uploader'))
 
@@ -197,7 +197,68 @@ export default function Profile() {
     }
 
     if (loading) {
-        return <LoadingButton />
+        return (
+            <ContentSection
+                title="Profile"
+                desc="Update your profile details and adjust your security settings."
+            >
+                <div className="space-y-6">
+                    <div className="flex items-center space-x-4">
+                        <Skeleton className="h-[100px] w-[100px] rounded-full" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[150px]" />
+                            <Skeleton className="h-4 w-[100px]" />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-6 w-[200px]" />
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-[150px]" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-[150px]" />
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-6 w-[200px]" />
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <Skeleton className="h-4 w-[100px]" />
+                                    <Skeleton className="h-4 w-[150px]" />
+                                </div>
+                                <Skeleton className="h-10 w-[100px]" />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <Skeleton className="h-4 w-[150px]" />
+                                    <Skeleton className="h-4 w-[200px]" />
+                                </div>
+                                <Skeleton className="h-6 w-[40px] rounded-full" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ContentSection>
+        )
     }
 
     if (!merchant) {

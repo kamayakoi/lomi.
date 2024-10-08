@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import LoadingButton from '@/components/dashboard/loader-settings'
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton.tsx"
 
 const LogoUploader = React.lazy(() => import('../../../auth/components/logo-uploader'))
 
@@ -116,7 +116,40 @@ export default function Business() {
     }
 
     if (loading) {
-        return <LoadingButton />
+        return (
+            <ContentSection
+                title="Business"
+                desc="Upload your business logo and view your public contact information."
+            >
+                <div className="space-y-6">
+                    <Skeleton className="h-[100px] w-[100px] rounded-full" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-[250px]" />
+                        <Skeleton className="h-4 w-[200px]" />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-[100px]" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                </div>
+            </ContentSection>
+        )
     }
 
     if (!organization) {

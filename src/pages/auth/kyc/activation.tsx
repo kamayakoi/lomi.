@@ -213,7 +213,7 @@ const Activation: React.FC = () => {
                             ))}
                         </div>
                         <div className="md:w-2/3 md:border-l md:pl-6">
-                            <div className="space-y-6 h-[420px] overflow-y-auto scrollbar-hide p-2">
+                            <div className="space-y-6 h-[445px] overflow-y-auto scrollbar-hide p-2">
                                 {renderStep()}
                             </div>
                         </div>
