@@ -67,7 +67,7 @@ import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.
 import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 import Status from './pages/Status.tsx';
 
-import Activation from './pages/auth/kyc/activation.tsx';
+import Activation from './pages/auth/activation/activation.tsx';
 
 // API pages
 import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
