@@ -35,7 +35,7 @@ import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
 import Integrators from './pages/portal/integrators/Integrators.tsx';
 import Settings from './pages/portal/settings/settings.tsx';
 import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
-import Logs from './pages/portal/logsP/Logs.tsx'
+import Logs from './pages/portal/logs-page/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
 import Cards from './pages/portal/accept-payments/cards/Cards.tsx'
 import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'

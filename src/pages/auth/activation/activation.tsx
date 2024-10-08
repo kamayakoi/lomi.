@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Check } from 'lucide-react'
 import ActivationStep1 from './activation-step-1'
@@ -6,11 +5,13 @@ import ActivationStep2 from './activation-step-2'
 import ActivationStep3 from './activation-step-3'
 import ActivationStep4 from './activation-step-4'
 import ActivationStep5 from './activation-step-5'
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
 import LoadingButton from '@/components/dashboard/loader';
-import { useLocalStorage } from '@/lib/hooks/uselocalstorage.ts';
+import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
+import { useEffect, useCallback } from 'react';
+import { useUser } from '@/lib/useUser';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -77,31 +78,48 @@ const Activation: React.FC = () => {
     const supabase = useSupabaseClient();
     const { toast } = useToast();
     const { isLoading, isActivated, error } = useActivationStatus();
-    const [organizationId, setOrganizationId] = useState<string | null>(null);
-    const [userId, setUserId] = useState<string | null>(null);
+    const session = useSession();
+    const { user, session: sessionFromUser } = useUser();
 
-    useEffect(() => {
-        const fetchUserAndOrganization = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                if (userId !== user.id) {
-                    // New user detected, reset local storage
-                    setCurrentStep(0);
-                    setActivationData(initialActivationData);
-                    setUserId(user.id);
-                }
+    const checkActivationStatus = useCallback(async () => {
+        if (session) {
+            console.log('Session:', session); // Log the session object
 
-                const { data, error } = await supabase.rpc('check_activation_status', { p_merchant_id: user.id });
-                if (error) {
-                    console.error('Error fetching activation status:', error);
-                } else if (data) {
-                    setOrganizationId(data);
+            const { data: orgLink, error: orgLinkError } = await supabase
+                .from('merchant_organization_links')
+                .select('organization_id')
+                .eq('merchant_id', session.user.id)
+                .single();
+
+            if (orgLinkError) {
+                console.error('Error fetching organization link:', orgLinkError);
+                return;
+            }
+
+            const { data, error } = await supabase.rpc('check_activation_state', {
+                p_organization_id: orgLink.organization_id
+            });
+            if (error) {
+                console.error('Error checking activation status:', error);
+            } else {
+                if (data === 'approved') {
+                    setCurrentStep(5); // Move to final step
+                } else if (data === 'pending') {
+                    setCurrentStep(4); // Move to verification in progress step
                 }
             }
-        };
+        } else {
+            console.log('No session found'); // Log if no session is available
+        }
+    }, [session, supabase, setCurrentStep]);
 
-        fetchUserAndOrganization();
-    }, [supabase, setCurrentStep, setActivationData, userId]);
+    useEffect(() => {
+        if (session) {
+            checkActivationStatus();
+        } else {
+            console.log('No session found in useEffect'); // Log if no session is available
+        }
+    }, [session, checkActivationStatus]);
 
     const handleNext = (stepData: Partial<ActivationData>) => {
         setActivationData((prevData) => ({ ...prevData, ...stepData }));
@@ -116,14 +134,21 @@ const Activation: React.FC = () => {
         try {
             setActivationData(completeData);
 
-            if (!organizationId) {
-                throw new Error("Organization not found");
+            console.log('User in onSubmit:', user);
+            console.log('Session in onSubmit:', sessionFromUser);
+
+            if (!user || !sessionFromUser) {
+                toast({
+                    title: "Error",
+                    description: "User session not found. Please log in and try again.",
+                    variant: "destructive",
+                });
+                // Redirect to the login page or show an error message
+                return;
             }
 
-            console.log('Submitting KYC details:', completeData);
-
-            const { error } = await supabase.rpc('update_organization_kyc_details', {
-                p_organization_id: organizationId,
+            const { error } = await supabase.rpc('complete_activation', {
+                p_merchant_id: user.id,
                 p_legal_organization_name: completeData.legalName,
                 p_tax_number: completeData.taxNumber,
                 p_business_description: completeData.businessDescription,
@@ -142,12 +167,7 @@ const Activation: React.FC = () => {
                 p_business_registration_url: completeData.businessRegistration,
             });
 
-            if (error) {
-                console.error('Error from update_organization_kyc_details:', error);
-                throw error;
-            }
-
-            console.log('KYC details submitted successfully');
+            if (error) throw error;
 
             toast({
                 title: "KYC Submitted",
@@ -185,9 +205,8 @@ const Activation: React.FC = () => {
             case 2:
                 return <ActivationStep3 onNext={(data) => handleNext(data)} onPrevious={handlePrevious} data={activationData} />;
             case 3:
-                return <ActivationStep4 onSubmit={onSubmit} onPrevious={handlePrevious} data={activationData} organizationId={organizationId} />;
+                return <ActivationStep4 onSubmit={onSubmit} onPrevious={handlePrevious} data={activationData} />;
             case 4:
-            case 5:
                 return <ActivationStep5 />;
             default:
                 return null;

@@ -2,13 +2,13 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { WalletIcon, ChartIcon, MagnifierIcon } from "./Icons";
 
 
-interface ServiceProps {
+interface ProductProps {
   title: string;
   description: string;
   icon: React.ReactNode;
 }
 
-const serviceList: ServiceProps[] = [
+const ProductList: ProductProps[] = [
   {
     title: "Collect Money",
     description:
@@ -29,7 +29,7 @@ const serviceList: ServiceProps[] = [
   },
 ];
 
-export const Services = () => {
+export const Products = () => {
   return (
     <section id="products" className="container py-24 sm:py-32">
       <div className="grid lg:grid-cols-[1fr,1fr] gap-8 place-items-center">
@@ -50,7 +50,7 @@ export const Services = () => {
           </p>
 
           <div className="flex flex-col gap-8">
-            {serviceList.map(({ icon, title, description }: ServiceProps) => (
+            {ProductList.map(({ icon, title, description }: ProductProps) => (
               <Card key={title} className="bg-[#F8F9FB] dark:bg-[#0D0D15]">
                 <CardHeader className="space-y-1 flex md:flex-row justify-start items-start gap-4">
                   <div className="mt-1 bg-primary/10 p-1 rounded-2xl">

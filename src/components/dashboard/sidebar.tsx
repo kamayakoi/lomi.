@@ -133,7 +133,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
         {/* Organization info */}
         {merchantName && (
-          <div className={`mt-auto px-4 py-4 ${navOpened ? 'block' : 'hidden'} md:block`}>
+          <div className={`mt-auto px-4 py-4 hidden md:block`}>
             <Separator className="mb-4" />
             <div className="flex items-center space-x-4">
               {organizationLogo ? (

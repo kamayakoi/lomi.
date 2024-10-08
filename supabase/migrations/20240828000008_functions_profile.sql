@@ -6,7 +6,8 @@ RETURNS TABLE (
     email VARCHAR,
     avatar_url TEXT,
     phone_number VARCHAR,
-    pin_code VARCHAR
+    pin_code VARCHAR,
+    onboarded BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -16,7 +17,8 @@ BEGIN
         m.email,
         m.avatar_url,
         m.phone_number,
-        m.pin_code
+        m.pin_code,
+        m.onboarded
     FROM 
         merchants m
     WHERE 
