@@ -7,7 +7,7 @@ import { toast } from "@/components/ui/use-toast"
 import ContentSection from '../components/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { Skeleton } from "@/components/ui/skeleton.tsx"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const ProfilePictureUploader = React.lazy(() => import('../../../auth/components/avatar-uploader'))
 

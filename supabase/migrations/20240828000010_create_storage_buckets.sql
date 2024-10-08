@@ -57,21 +57,16 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('kyc_documents', 'kyc_documents', false)
 ON CONFLICT (id) DO NOTHING;
 
--- Create subfolders for different types of KYC documents
-DO $$
-DECLARE
-  subfolder_names TEXT[] := ARRAY['identity_proof', 'address_proof', 'business_registration'];
-  subfolder_name TEXT;
-BEGIN
-  FOREACH subfolder_name IN ARRAY subfolder_names
-  LOOP
-    EXECUTE format('INSERT INTO storage.objects (bucket_id, name) VALUES (''kyc_documents'', ''%s/'') ON CONFLICT DO NOTHING', subfolder_name);
-  END LOOP;
-END $$;
-
 -- Policy for inserting (uploading) KYC documents
 CREATE POLICY "Allow authenticated users to upload KYC documents" ON storage.objects
 FOR INSERT TO authenticated WITH CHECK (bucket_id = 'kyc_documents');
+
+-- Policy for selecting (reading) KYC documents
+CREATE POLICY "Allow authenticated users to read their own KYC documents" ON storage.objects
+FOR SELECT TO authenticated USING (
+    bucket_id = 'kyc_documents' 
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);
 
 -- Policy for updating KYC documents
 CREATE POLICY "Allow authenticated users to update their own KYC documents" ON storage.objects

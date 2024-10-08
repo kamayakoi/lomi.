@@ -7,7 +7,7 @@ import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Skeleton } from "@/components/ui/skeleton.tsx"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const LogoUploader = React.lazy(() => import('../../../auth/components/logo-uploader'))
 
