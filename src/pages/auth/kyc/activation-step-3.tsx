@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { countryCodes } from '@/data/onboarding';
 import { ActivationData } from "./activation";
+import { Button } from "@/components/ui/button";
 
-const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
+const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$/;
 
 const activationStep3Schema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -19,30 +20,26 @@ const activationStep3Schema = z.object({
 type ActivationStep3Data = z.infer<typeof activationStep3Schema>;
 
 interface ActivationStep3Props {
-    formData: ActivationData;
-    onFormDataChange: (data: Partial<ActivationData>) => void;
-    setIsFormValid: (isValid: boolean) => void;
+    onNext: (data: ActivationStep3Data) => void;
+    onPrevious: () => void;
+    data: ActivationData;
 }
 
-const ActivationStep3: React.FC<ActivationStep3Props> = ({ formData, onFormDataChange, setIsFormValid }) => {
-    const { control, handleSubmit, formState: { errors, isValid } } = useForm<ActivationStep3Data>({
+const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, data }) => {
+    const { control, handleSubmit, formState: { errors } } = useForm<ActivationStep3Data>({
         resolver: zodResolver(activationStep3Schema),
         mode: 'onChange',
         defaultValues: {
-            fullName: formData.fullName,
-            email: formData.email,
-            countryCode: formData.countryCode,
-            mobileNumber: formData.mobileNumber,
+            fullName: data.fullName,
+            email: data.email,
+            countryCode: data.countryCode,
+            mobileNumber: data.mobileNumber,
         },
     });
 
-    const onSubmit = useCallback((data: ActivationStep3Data) => {
-        onFormDataChange(data);
-    }, [onFormDataChange]);
-
-    useEffect(() => {
-        setIsFormValid(isValid);
-    }, [isValid, setIsFormValid]);
+    const onSubmit = (data: ActivationStep3Data) => {
+        onNext(data);
+    };
 
     const [countryCodeSearch, setCountryCodeSearch] = useState('');
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
@@ -134,22 +131,28 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ formData, onFormDataC
                         />
                         {errors.countryCode && <p className="text-red-500 text-sm mt-1">{errors.countryCode.message}</p>}
                     </div>
-                    <Controller
-                        name="mobileNumber"
-                        control={control}
-                        render={({ field }) => (
-                            <Input
-                                id="mobileNumber"
-                                className="flex-1 ml-2"
-                                placeholder="01 60 223 401"
-                                {...field}
-                            />
-                        )}
-                    />
+                    <div className="flex-1 ml-2">
+                        <Controller
+                            name="mobileNumber"
+                            control={control}
+                            render={({ field }) => (
+                                <Input
+                                    id="mobileNumber"
+                                    placeholder="01 60 223 401"
+                                    {...field}
+                                />
+                            )}
+                        />
+                        {errors.mobileNumber && <p className="text-red-500 text-sm mt-1">{errors.mobileNumber.message}</p>}
+                    </div>
                 </div>
-                {errors.mobileNumber && <p className="text-red-500 text-sm mt-1">{errors.mobileNumber.message}</p>}
             </div>
-            <button type="submit" className="hidden">Submit</button>
+            <div className="flex justify-between">
+                <Button type="button" variant="outline" onClick={onPrevious}>
+                    Back
+                </Button>
+                <Button type="submit">Next</Button>
+            </div>
         </form>
     )
 }

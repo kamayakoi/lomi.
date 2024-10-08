@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,11 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ActivationData } from "./activation";
 import { countries } from "@/data/onboarding";
+import { Button } from "@/components/ui/button";
 
 const activationStep2Schema = z.object({
     legalName: z.string().min(1, "Legal company name is required"),
     taxNumber: z.string().optional(),
-    businessDescription: z.string().min(10, "Business description must be at least 10 characters"),
+    businessDescription: z.string().min(40, "Business description must be at least 40 characters"),
     country: z.string().min(1, "Country is required"),
     region: z.string().min(1, "Region is required"),
     city: z.string().min(1, "City is required"),
@@ -25,25 +26,21 @@ const activationStep2Schema = z.object({
 type ActivationStep2Data = z.infer<typeof activationStep2Schema>;
 
 interface ActivationStep2Props {
-    formData: ActivationData;
-    onFormDataChange: (data: Partial<ActivationData>) => void;
-    setIsFormValid: (isValid: boolean) => void;
+    onNext: (data: ActivationStep2Data) => void;
+    onPrevious: () => void;
+    data: ActivationData;
 }
 
-const ActivationStep2: React.FC<ActivationStep2Props> = ({ formData, onFormDataChange, setIsFormValid }) => {
-    const { control, handleSubmit, formState: { errors, isValid } } = useForm<ActivationStep2Data>({
+const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, data }) => {
+    const { control, handleSubmit, formState: { errors } } = useForm<ActivationStep2Data>({
         resolver: zodResolver(activationStep2Schema),
-        defaultValues: formData,
+        defaultValues: data,
         mode: 'onChange',
     });
 
-    const onSubmit = useCallback((data: ActivationStep2Data) => {
-        onFormDataChange(data);
-    }, [onFormDataChange]);
-
-    useEffect(() => {
-        setIsFormValid(isValid);
-    }, [isValid, setIsFormValid]);
+    const onSubmit = (data: ActivationStep2Data) => {
+        onNext(data);
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -206,6 +203,13 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ formData, onFormDataC
                     <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
                 </svg>
                 <p>Please ensure that the information provided matches your legal documents.</p>
+            </div>
+
+            <div className="flex justify-between">
+                <Button type="button" variant="outline" onClick={onPrevious}>
+                    Back
+                </Button>
+                <Button type="submit">Next</Button>
             </div>
 
             <button type="submit" className="hidden">Submit</button>

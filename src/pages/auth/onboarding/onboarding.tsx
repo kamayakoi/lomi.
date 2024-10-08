@@ -46,7 +46,7 @@ const initialOnboardingData = {
 
 export type OnboardingData = typeof initialOnboardingData;
 
-const NewOnboarding: React.FC = () => {
+const Onboarding: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -272,4 +272,4 @@ const NewOnboarding: React.FC = () => {
     );
 };
 
-export default NewOnboarding;
+export default Onboarding;

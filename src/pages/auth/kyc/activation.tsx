@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
 import ActivationStep1 from './activation-step-1'
 import ActivationStep2 from './activation-step-2'
@@ -8,8 +7,10 @@ import ActivationStep3 from './activation-step-3'
 import ActivationStep4 from './activation-step-4'
 import ActivationStep5 from './activation-step-5'
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from '@/components/ui/use-toast';
+import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
+import LoadingButton from '@/components/dashboard/loader';
+import { useLocalStorage } from '@/lib/hooks/uselocalstorage.ts';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -36,9 +37,29 @@ export type ActivationData = {
     email: string;
     countryCode: string;
     mobileNumber: string;
-    identityProof: string;
-    addressProof: string;
-    businessRegistration: string;
+    identityProof?: string;
+    addressProof?: string;
+    businessRegistration?: string;
+};
+
+const initialActivationData: ActivationData = {
+    legalName: '',
+    taxNumber: '',
+    businessDescription: '',
+    country: '',
+    region: '',
+    city: '',
+    postalCode: '',
+    street: '',
+    proofOfBusiness: '',
+    businessUrl: '',
+    fullName: '',
+    email: '',
+    countryCode: '',
+    mobileNumber: '',
+    identityProof: '',
+    addressProof: '',
+    businessRegistration: '',
 };
 
 const steps = [
@@ -51,128 +72,88 @@ const steps = [
 ]
 
 const Activation: React.FC = () => {
-    const [currentStep, setCurrentStep] = useState(0)
-    const [activationData, setActivationData] = useState<ActivationData>({
-        legalName: '',
-        taxNumber: '',
-        businessDescription: '',
-        country: '',
-        region: '',
-        city: '',
-        postalCode: '',
-        street: '',
-        proofOfBusiness: '',
-        businessUrl: '',
-        fullName: '',
-        email: '',
-        countryCode: '',
-        mobileNumber: '',
-        identityProof: '',
-        addressProof: '',
-        businessRegistration: '',
-    });
+    const [currentStep, setCurrentStep] = useLocalStorage('kycCurrentStep', 0);
+    const [activationData, setActivationData] = useLocalStorage<ActivationData>('kycActivationData', initialActivationData);
     const supabase = useSupabaseClient();
-    const [showConfirmation, setShowConfirmation] = useState(false);
-    const [isFormValid, setIsFormValid] = useState(false);
     const { toast } = useToast();
+    const { isLoading, isActivated, error } = useActivationStatus();
+    const [organizationId, setOrganizationId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchActivationStatus = async () => {
+        const fetchUserAndOrganization = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                if (userId !== user.id) {
+                    // New user detected, reset local storage
+                    setCurrentStep(0);
+                    setActivationData(initialActivationData);
+                    setUserId(user.id);
+                }
+
                 const { data, error } = await supabase.rpc('check_activation_status', { p_merchant_id: user.id });
                 if (error) {
                     console.error('Error fetching activation status:', error);
                 } else if (data) {
-                    const { data: kycData, error: kycError } = await supabase
-                        .from('organization_kyc')
-                        .select('status')
-                        .eq('organization_id', data)
-                        .single();
-
-                    if (kycError) {
-                        console.error('Error fetching KYC status:', kycError);
-                    } else if (kycData && kycData.status === 'pending') {
-                        setCurrentStep(4);
-                    }
+                    setOrganizationId(data);
                 }
             }
         };
 
-        fetchActivationStatus();
-    }, [supabase]);
+        fetchUserAndOrganization();
+    }, [supabase, setCurrentStep, setActivationData, userId]);
 
-    const handleNext = async () => {
-        if (currentStep === steps.length - 3) {
-            handleSubmit();
-        } else {
-            if (currentStep === 0 || isFormValid) {
-                setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
-            } else {
-                // Trigger form validation
-                setIsFormValid(false);
-            }
-        }
-    }
-
-    const handlePrevious = () => {
-        setCurrentStep((prevStep) => Math.max(prevStep - 1, 0))
-    }
-
-    const handleActivationDataChange = (data: Partial<ActivationData>) => {
-        setActivationData((prevData) => ({ ...prevData, ...data }));
+    const handleNext = (stepData: Partial<ActivationData>) => {
+        setActivationData((prevData) => ({ ...prevData, ...stepData }));
+        setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
     };
 
-    const handleSubmit = async () => {
-        if (!showConfirmation) {
-            setShowConfirmation(true);
-            return;
-        }
+    const handlePrevious = () => {
+        setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));
+    };
 
+    const onSubmit = async (completeData: ActivationData) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                throw new Error("User not found");
-            }
+            setActivationData(completeData);
 
-            const { data: organizationData, error: organizationError } = await supabase
-                .rpc('fetch_organization_details_for_kyc_by_merchant', { p_merchant_id: user.id });
-
-            if (organizationError || !organizationData || organizationData.length === 0) {
+            if (!organizationId) {
                 throw new Error("Organization not found");
             }
 
-            const organizationId = organizationData[0].organization_id;
+            console.log('Submitting KYC details:', completeData);
 
             const { error } = await supabase.rpc('update_organization_kyc_details', {
                 p_organization_id: organizationId,
-                p_legal_organization_name: activationData.legalName,
-                p_tax_number: activationData.taxNumber,
-                p_business_description: activationData.businessDescription,
-                p_legal_country: activationData.country,
-                p_legal_region: activationData.region,
-                p_legal_city: activationData.city,
-                p_legal_postal_code: activationData.postalCode,
-                p_legal_street: activationData.street,
-                p_proof_of_business: activationData.proofOfBusiness,
-                p_business_platform_url: activationData.businessUrl,
-                p_authorized_signatory_name: activationData.fullName,
-                p_authorized_signatory_email: activationData.email,
-                p_authorized_signatory_phone_number: activationData.countryCode + activationData.mobileNumber,
-                p_legal_representative_ID_url: activationData.identityProof,
-                p_address_proof_url: activationData.addressProof,
-                p_business_registration_url: activationData.businessRegistration,
+                p_legal_organization_name: completeData.legalName,
+                p_tax_number: completeData.taxNumber,
+                p_business_description: completeData.businessDescription,
+                p_legal_country: completeData.country,
+                p_legal_region: completeData.region,
+                p_legal_city: completeData.city,
+                p_legal_postal_code: completeData.postalCode,
+                p_legal_street: completeData.street,
+                p_proof_of_business: completeData.proofOfBusiness,
+                p_business_platform_url: completeData.businessUrl,
+                p_authorized_signatory_name: completeData.fullName,
+                p_authorized_signatory_email: completeData.email,
+                p_authorized_signatory_phone_number: completeData.countryCode + completeData.mobileNumber,
+                p_legal_representative_ID_url: completeData.identityProof,
+                p_address_proof_url: completeData.addressProof,
+                p_business_registration_url: completeData.businessRegistration,
             });
 
             if (error) {
+                console.error('Error from update_organization_kyc_details:', error);
                 throw error;
             }
+
+            console.log('KYC details submitted successfully');
 
             toast({
                 title: "KYC Submitted",
                 description: "Your KYC details have been submitted successfully.",
             });
-            setCurrentStep(4);
+            setCurrentStep(4); // Redirect to activation-step-5.tsx
         } catch (error) {
             console.error('Error submitting KYC details:', error);
             toast({
@@ -183,16 +164,28 @@ const Activation: React.FC = () => {
         }
     };
 
+    if (isLoading) {
+        return <LoadingButton />;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (isActivated) {
+        return <div>Account already activated</div>;
+    }
+
     const renderStep = () => {
         switch (currentStep) {
             case 0:
-                return <ActivationStep1 />;
+                return <ActivationStep1 onNext={(data) => handleNext(data)} />;
             case 1:
-                return <ActivationStep2 formData={activationData} onFormDataChange={handleActivationDataChange} setIsFormValid={setIsFormValid} />;
+                return <ActivationStep2 onNext={(data) => handleNext(data)} onPrevious={handlePrevious} data={activationData} />;
             case 2:
-                return <ActivationStep3 formData={activationData} onFormDataChange={handleActivationDataChange} setIsFormValid={setIsFormValid} />;
+                return <ActivationStep3 onNext={(data) => handleNext(data)} onPrevious={handlePrevious} data={activationData} />;
             case 3:
-                return <ActivationStep4 formData={activationData} onFormDataChange={handleActivationDataChange} setIsFormValid={setIsFormValid} />;
+                return <ActivationStep4 onSubmit={onSubmit} onPrevious={handlePrevious} data={activationData} organizationId={organizationId} />;
             case 4:
             case 5:
                 return <ActivationStep5 />;
@@ -205,22 +198,6 @@ const Activation: React.FC = () => {
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <Card className="w-full max-w-4xl">
                 <CardContent className="p-6">
-                    <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Final Review</DialogTitle>
-                                <DialogDescription>
-                                    Please review your information carefully. Once confirmed, you cannot make further changes. Are you ready to proceed?
-                                </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSubmit}>Confirm</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
                     <div className="flex flex-col md:flex-row">
                         <div className="md:w-1/3 pr-6 mb-6 md:mb-0">
                             <h1 className="text-2xl font-bold tracking-tight mb-6">Account Activation</h1>
@@ -239,16 +216,6 @@ const Activation: React.FC = () => {
                             <div className="space-y-6 h-[420px] overflow-y-auto scrollbar-hide p-2">
                                 {renderStep()}
                             </div>
-                            {currentStep < 4 && ( // Only show back and next buttons for steps before ActivationStep5
-                                <div className="flex justify-between mt-6">
-                                    <Button variant="outline" onClick={handlePrevious} disabled={currentStep === 0}>
-                                        Back
-                                    </Button>
-                                    <Button onClick={handleNext} disabled={currentStep === steps.length - 1}>
-                                        {currentStep === steps.length - 3 ? 'Submit' : 'Next'}
-                                    </Button>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </CardContent>

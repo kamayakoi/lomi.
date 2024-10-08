@@ -1,7 +1,12 @@
 import React from 'react';
 import { CheckCircle, ChevronRight } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
-const ActivationStep1: React.FC = () => {
+interface ActivationStep1Props {
+    onNext: (data: Record<string, never>) => void;
+}
+
+const ActivationStep1: React.FC<ActivationStep1Props> = ({ onNext }) => {
     return (
         <div className="space-y-6">
             <div className="flex items-center space-x-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
@@ -33,6 +38,7 @@ const ActivationStep1: React.FC = () => {
                     This verification ensures the security of our platform and compliance with regulations in your country and in the Republic of Côte d&apos;Ivoire.
                 </p>
             </div>
+            <Button onClick={() => onNext({})}>Next</Button>
         </div>
     );
 };

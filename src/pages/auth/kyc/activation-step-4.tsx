@@ -1,73 +1,45 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { FileUp } from "lucide-react";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { ActivationData } from "./activation";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import FileUploader from "@/components/file-uploader";
+
+type ActivationStep4Data = {
+    identityProof: string;
+    addressProof: string;
+    businessRegistration: string;
+};
 
 interface ActivationStep4Props {
-    formData: ActivationData;
-    onFormDataChange: (data: Partial<ActivationData>) => void;
-    setIsFormValid: (isValid: boolean) => void;
+    onSubmit: (data: ActivationData) => void;
+    onPrevious: () => void;
+    data: ActivationData;
+    organizationId: string | null;
 }
 
-const ActivationStep4: React.FC<ActivationStep4Props> = ({ formData, onFormDataChange, setIsFormValid }) => {
-    const supabase = useSupabaseClient();
+const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious, data, organizationId }) => {
+    const [documents, setDocuments] = useState<ActivationStep4Data>({
+        identityProof: data.identityProof || '',
+        addressProof: data.addressProof || '',
+        businessRegistration: data.businessRegistration || '',
+    });
 
-    const [identityProof, setIdentityProof] = useState(formData.identityProof);
-    const [addressProof, setAddressProof] = useState(formData.addressProof);
-    const [businessRegistration, setBusinessRegistration] = useState(formData.businessRegistration);
-    const [uploadError, setUploadError] = useState<string | null>(null);
+    const handleFileUploaded = (docType: keyof ActivationStep4Data) => async (url: string) => {
+        console.log(`File uploaded for ${docType}:`, url);
+        setDocuments(prev => ({ ...prev, [docType]: url }));
+    };
 
-    const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>, docType: 'identityProof' | 'addressProof' | 'businessRegistration') => {
-        const file = event.target.files?.[0];
-        if (file) {
-            onFormDataChange({ [docType]: file.name });
-
-            const { data, error } = await supabase.storage
-                .from('kyc_documents')
-                .upload(`${docType}/${file.name}`, file);
-
-            if (error) {
-                console.error('Error uploading file:', error);
-                setUploadError('Failed to upload the file. Please try again.');
-            } else {
-                const { data: publicUrlData } = supabase.storage
-                    .from('kyc_documents')
-                    .getPublicUrl(data.path);
-
-                onFormDataChange({ [docType]: publicUrlData.publicUrl });
-                switch (docType) {
-                    case 'identityProof':
-                        setIdentityProof(publicUrlData.publicUrl);
-                        break;
-                    case 'addressProof':
-                        setAddressProof(publicUrlData.publicUrl);
-                        break;
-                    case 'businessRegistration':
-                        setBusinessRegistration(publicUrlData.publicUrl);
-                        break;
-                }
-                setUploadError(null);
-            }
-        }
-    }, [onFormDataChange, supabase]);
-
-    useEffect(() => {
-        const isValid = Boolean(identityProof && addressProof && businessRegistration);
-        setIsFormValid(isValid);
-    }, [identityProof, addressProof, businessRegistration, setIsFormValid]);
+    const handleSubmit = () => {
+        const completeData: ActivationData = {
+            ...data,
+            ...documents
+        };
+        onSubmit(completeData);
+    };
 
     return (
         <div className="space-y-6 overflow-hidden">
             <h2 className="text-lg font-semibold mb-2">Documents</h2>
-            {uploadError && (
-                <Alert variant="destructive">
-                    <AlertTitle>Upload Error</AlertTitle>
-                    <AlertDescription>{uploadError}</AlertDescription>
-                </Alert>
-            )}
             {[
                 { id: "identityProof", label: "Identity proof", description: "National ID, Passport" },
                 { id: "addressProof", label: "Address proof", description: "Utility Bill, Bank Statement" },
@@ -80,20 +52,14 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ formData, onFormDataC
                     </Label>
                     <p className="text-xs text-muted-foreground -mt-0.5">{doc.description}</p>
                     <div className="flex items-center space-x-2">
-                        <Input
-                            id={doc.id}
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.pdf"
-                            className="hidden"
-                            onChange={(e) => handleFileUpload(e, doc.id as keyof Pick<ActivationData, 'identityProof' | 'addressProof' | 'businessRegistration'>)}
+                        <FileUploader
+                            bucketName="kyc_documents"
+                            folderPath={`${organizationId}/${doc.id}`}
+                            onFileUploaded={handleFileUploaded(doc.id as keyof ActivationStep4Data)}
                         />
-                        <div
-                            onClick={() => document.getElementById(doc.id)?.click()}
-                            className="w-full px-2 py-1 text-sm border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer flex items-center"
-                        >
-                            <FileUp className="mr-2 h-3 w-3" />
-                            <span>{formData[doc.id as keyof Pick<ActivationData, 'identityProof' | 'addressProof' | 'businessRegistration'>] || 'Choose file'}</span>
-                        </div>
+                        {documents[doc.id as keyof ActivationStep4Data] && (
+                            <span className="text-sm text-muted-foreground">File uploaded</span>
+                        )}
                     </div>
                 </div>
             ))}
@@ -102,8 +68,15 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ formData, onFormDataC
                     Please ensure all documents are clear, legible, and in PDF, JPG, or PNG format. Maximum file size: 3MB per document.
                 </p>
             </div>
+            <div className="flex justify-between">
+                <Button type="button" variant="outline" onClick={onPrevious}>
+                    Back
+                </Button>
+                <Button onClick={handleSubmit}>Submit</Button>
+            </div>
         </div>
     )
 }
 
 export default ActivationStep4;
+export type { ActivationStep4Data };
