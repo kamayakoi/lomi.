@@ -35,6 +35,8 @@ export default function Profile() {
     }, [])
 
     const fetchMerchant = async () => {
+        if (typeof window === 'undefined') return
+
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No user found');
@@ -51,24 +53,20 @@ export default function Profile() {
                 setMerchant(data[0] as MerchantDetails);
 
                 // Download the merchant avatar
-                if (data[0].avatar_url) {
-                    const { data: avatarData, error: avatarError } = await supabase
-                        .storage
-                        .from('avatars')
-                        .download(data[0].avatar_url);
+                const { data: avatarData, error: avatarError } = await supabase
+                    .storage
+                    .from('avatars')
+                    .download(data[0].avatar_url);
 
-                    if (avatarError) {
-                        console.error('Error downloading avatar:', avatarError);
-                    } else {
-                        const avatarUrl = URL.createObjectURL(avatarData);
-                        setAvatarUrl(avatarUrl);
-                    }
+                if (avatarError) {
+                    console.error('Error downloading avatar:', avatarError);
                 } else {
-                    setAvatarUrl(null);
+                    const avatarUrl = URL.createObjectURL(avatarData);
+                    setAvatarUrl(avatarUrl);
                 }
             } else {
                 console.error('No merchant data found');
-                throw new Error('No merchant found');
+                throw new Error('No merchant found.');
             }
         } catch (error) {
             console.error('Error fetching merchant:', error);
@@ -77,11 +75,10 @@ export default function Profile() {
                 description: "Failed to fetch merchant details",
                 variant: "destructive",
             });
-            setAvatarUrl(null); // Set fallback avatar URL or placeholder
         } finally {
             setLoading(false);
         }
-    };
+    }
 
     async function handleAvatarUpdate(newAvatarUrl: string) {
         setAvatarUrl(newAvatarUrl);
@@ -196,7 +193,7 @@ export default function Profile() {
         }
     }
 
-    if (loading) {
+    if (typeof window === 'undefined' || loading) {
         return (
             <ContentSection
                 title="Profile"
@@ -219,6 +216,8 @@ export default function Profile() {
                             <Skeleton className="h-4 w-[100px]" />
                             <Skeleton className="h-10 w-full" />
                         </div>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-[100px]" />
                             <Skeleton className="h-10 w-full" />

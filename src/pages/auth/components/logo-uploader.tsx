@@ -114,20 +114,18 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         // Update the organization's logo URL in the database
                         const { data: { user } } = await supabase.auth.getUser();
                         if (user) {
-                            const { data: profile, error: profileError } = await supabase
-                                .from('merchant_organization_links')
-                                .select('organization_id')
-                                .eq('merchant_id', user.id)
-                                .single();
+                            const { data: organizationDetails, error: organizationError } = await supabase
+                                .rpc('fetch_organization_details', { p_merchant_id: user.id });
 
-                            if (profileError) {
-                                console.error('Error fetching organization ID:', profileError);
-                                throw new Error('Failed to fetch organization ID');
+                            if (organizationError) {
+                                console.error('Error fetching organization details:', organizationError);
+                                throw new Error('Failed to fetch organization details');
                             }
 
-                            if (profile && profile.organization_id) {
+                            if (organizationDetails && organizationDetails.length > 0) {
+                                const organizationId = organizationDetails[0].organization_id;
                                 await supabase.rpc('update_organization_logo', {
-                                    p_organization_id: profile.organization_id,
+                                    p_organization_id: organizationId,
                                     p_logo_url: publicUrl,
                                 });
                             }

@@ -37,17 +37,22 @@ export default function Sidebar({ className }: SidebarProps) {
           setMerchantName(data[0].merchant_name)
           setMerchantRole(data[0].merchant_role)
 
-          // Download the organization logo image
-          const { data: logoData, error: logoError } = await supabase
-            .storage
-            .from('logos')
-            .download(data[0].organization_logo_url)
+          // Extract the relative path from the organization logo URL
+          const logoPath = data[0].organization_logo_url?.replace(/^.*\/logos\//, '')
 
-          if (logoError) {
-            console.error('Error downloading organization logo:', logoError)
-          } else {
-            const logoUrl = URL.createObjectURL(logoData)
-            setOrganizationLogo(logoUrl)
+          if (logoPath) {
+            // Download the organization logo image using the relative path
+            const { data: logoData, error: logoError } = await supabase
+              .storage
+              .from('logos')
+              .download(logoPath)
+
+            if (logoError) {
+              console.error('Error downloading organization logo:', logoError)
+            } else {
+              const logoUrl = URL.createObjectURL(logoData)
+              setOrganizationLogo(logoUrl)
+            }
           }
         }
       }

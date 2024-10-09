@@ -35,6 +35,8 @@ export default function Business() {
     }, [])
 
     const fetchOrganization = async () => {
+        if (typeof window === 'undefined') return
+
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No user found');
@@ -50,17 +52,22 @@ export default function Business() {
             if (data && data.length > 0) {
                 setOrganization(data[0] as OrganizationDetails);
 
-                // Download the organization logo
-                const { data: logoData, error: logoError } = await supabase
-                    .storage
-                    .from('logos')
-                    .download(data[0].logo_url);
+                // Extract the relative path from the logo URL
+                const logoPath = data[0].logo_url?.replace(/^.*\/logos\//, '');
 
-                if (logoError) {
-                    console.error('Error downloading logo:', logoError);
-                } else {
-                    const logoUrl = URL.createObjectURL(logoData);
-                    setLogoUrl(logoUrl);
+                if (logoPath) {
+                    // Download the organization logo using the relative path
+                    const { data: logoData, error: logoError } = await supabase
+                        .storage
+                        .from('logos')
+                        .download(logoPath);
+
+                    if (logoError) {
+                        console.error('Error downloading logo:', logoError);
+                    } else {
+                        const logoUrl = URL.createObjectURL(logoData);
+                        setLogoUrl(logoUrl);
+                    }
                 }
             } else {
                 console.error('No organization data found');
@@ -115,7 +122,7 @@ export default function Business() {
         }
     }
 
-    if (loading) {
+    if (typeof window === 'undefined' || loading) {
         return (
             <ContentSection
                 title="Business"
