@@ -85,9 +85,7 @@ export default function Notifications() {
 
     const markNotificationAsRead = async (id: string) => {
         await supabase
-            .from('notifications')
-            .update({ is_read: true })
-            .eq('notification_id', id)
+            .rpc('mark_notification_read', { p_notification_id: id })
 
         setNotifications(notifications.map(notif =>
             notif.notification_id === id ? { ...notif, is_read: true } : notif

@@ -39,5 +39,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to mark a specific notification as read
+CREATE OR REPLACE FUNCTION public.mark_notification_read(p_notification_id UUID)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE notifications
+    SET is_read = true
+    WHERE notification_id = p_notification_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.mark_all_notifications_read(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.mark_notification_read(UUID) TO authenticated;
