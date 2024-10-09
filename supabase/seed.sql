@@ -18,10 +18,10 @@ VALUES
 
 
 -- Seed data for organization_kyc table
-INSERT INTO organization_kyc (organization_id, legal_organization_name, tax_number, business_description, legal_country, legal_region, legal_city, legal_postal_code, legal_street, proof_of_business, business_platform_url, authorized_signatory_name, authorized_signatory_email, authorized_signatory_phone_number, legal_representative_ID_url, address_proof_url, business_registration_url, status)
+INSERT INTO organization_kyc (organization_id, merchant_id, legal_organization_name, tax_number, business_description, legal_country, legal_region, legal_city, legal_postal_code, legal_street, proof_of_business, business_platform_url, authorized_signatory_name, authorized_signatory_email, authorized_signatory_phone_number, legal_representative_ID_url, address_proof_url, business_registration_url, status)
 VALUES 
-((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'TechInnovate Inc.', 'TAX123456', 'Innovative technology solutions provider', 'Senegal', 'Dakar', 'Dakar', '12345', '123 Innovation Street', 'https://example.com/proof_of_business_techinnovate.pdf', 'https://techinnovate.com', 'John Doe', 'john.doe@techinnovate.com', '+221777777778', 'https://example.com/legal_representative_id_techinnovate.pdf', 'https://example.com/address_proof_techinnovate.pdf', 'https://example.com/business_registration_techinnovate.pdf', 'approved'),
-((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'African Ledger Ltd.', 'TAX789012', 'Blockchain and financial technology company', 'Senegal', 'Dakar', 'Dakar', '54321', '456 Blockchain Avenue', 'https://example.com/proof_of_business_africanledger.pdf', 'https://africanledger.com', 'Jane Smith', 'jane.smith@africanledger.com', '+221666666667', 'https://example.com/legal_representative_id_africanledger.pdf', 'https://example.com/address_proof_africanledger.pdf', 'https://example.com/business_registration_africanledger.pdf', 'pending');
+((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'TechInnovate Inc.', 'TAX123456', 'Innovative technology solutions provider', 'Senegal', 'Dakar', 'Dakar', '12345', '123 Innovation Street', 'https://example.com/proof_of_business_techinnovate.pdf', 'https://techinnovate.com', 'John Doe', 'john.doe@techinnovate.com', '+221777777778', 'https://example.com/legal_representative_id_techinnovate.pdf', 'https://example.com/address_proof_techinnovate.pdf', 'https://example.com/business_registration_techinnovate.pdf', 'approved'),
+((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 'African Ledger Ltd.', 'TAX789012', 'Blockchain and financial technology company', 'Senegal', 'Dakar', 'Dakar', '54321', '456 Blockchain Avenue', 'https://example.com/proof_of_business_africanledger.pdf', 'https://africanledger.com', 'Jane Smith', 'jane.smith@africanledger.com', '+221666666667', 'https://example.com/legal_representative_id_africanledger.pdf', 'https://example.com/address_proof_africanledger.pdf', 'https://example.com/business_registration_africanledger.pdf', 'pending');
 
 
 -- Seed data for merchant_organization_links table
@@ -245,13 +245,6 @@ VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
 INSERT INTO api_usage (organization_id, api_key, endpoint, request_count, last_request_at, request_method, response_status, response_time)
 VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6', '/api/v1/transactions', 100, NOW(), 'GET', 200, 150.5)
      , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1', '/api/v1/payouts', 50, NOW(), 'POST', 201, 250.8);
-
-
--- Seed data for webhooks table
-INSERT INTO webhooks (merchant_id, organization_id, url, events)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'https://techinnovate.com/webhooks/transactions', ARRAY['transaction.created', 'transaction.updated'])
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'https://africanledger.com/webhooks/payouts', ARRAY['payout.created', 'payout.failed']);
-
 -- Seed data for webhooks table
 UPDATE webhooks 
 SET last_payload = '{"event": "transaction.created", "transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}',
@@ -277,12 +270,6 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'tr
 INSERT INTO platform_invoices (merchant_id, organization_id, amount, description, currency_code, due_date, status)
 VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 1000.00, 'Monthly platform fees', 'USD', NOW() + INTERVAL '30 days', 'sent')
      , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 500000.00, 'Annual platform subscription', 'XOF', NOW() + INTERVAL '1 year', 'draft');
-
-
--- Seed data for notifications table
-INSERT INTO notifications (merchant_id, organization_id, type, message, is_read)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'transaction.created', 'New transaction created: REF1001', FALSE)
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'payout.failed', 'Payout failed for transaction: REF1002', FALSE);
 
 
 -- Seed data for customer_api_interactions table
