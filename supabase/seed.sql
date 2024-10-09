@@ -38,52 +38,31 @@ INSERT INTO providers (name, code, description) VALUES
   ('MTN', 'MTN', 'Mobile money provider'),
   ('Wave', 'WAVE', 'Mobile money and eWallet provider'),
   ('Ecobank', 'ECOBANK', 'Bank transfer provider'),
-  ('PayPal', 'PAYPAL', 'Online payment provider'),
-  ('Partner', 'PARTNER', 'Partner payment provider');
+  ('Other', 'OTHER', 'Other payment provider');
 
 
 -- Seed data for payment_methods table
 INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
-  ('CREDIT_CARD', 'STRIPE'), 
+  ('CARDS', 'STRIPE'), 
   ('BANK_TRANSFER', 'STRIPE'),
-  ('PAYPAL', 'PAYPAL'),
   ('MOBILE_MONEY', 'ORANGE'),  
   ('MOBILE_MONEY', 'MTN'),     
   ('MOBILE_MONEY', 'WAVE'),
   ('BANK_TRANSFER', 'ECOBANK'),
-  ('E_WALLET', 'PARTNER');
+  ('USSD', 'OTHER'),
+  ('QR_CODE', 'OTHER'),
+  ('E_WALLET', 'OTHER');
 
 
 -- Seed data for organization_providers_settings table
-INSERT INTO organization_providers_settings (organization_id, provider_code, is_connected, phone_number, card_number, bank_account_number, bank_account_name, bank_name, bank_code)
-VALUES 
-  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'STRIPE', TRUE, NULL, '4242424242424242', NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'ORANGE', TRUE, '+221778901234', NULL, NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'WAVE', TRUE, '+221778901234', NULL, NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'ECOBANK', TRUE, NULL, NULL, '1234567890', 'TechInnovate Ltd', 'Ecobank', 'ECO123'),
-  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'STRIPE', TRUE, NULL, '5555555555554444', NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'MTN', TRUE, '+221339876543', NULL, NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'PAYPAL', TRUE, NULL, NULL, NULL, NULL, NULL, NULL),
-  ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'PARTNER', TRUE, NULL, NULL, NULL, NULL, NULL, NULL);
+
 
 
 -- Seed data for currencies table
 INSERT INTO currencies (code, name) VALUES
   ('XOF', 'West African CFA franc'), 
-  ('NGN', 'Nigerian naira'),     
-  ('GHS', 'Ghanaian cedi'),
-  ('KES', 'Kenyan shilling'),       
-  ('ZAR', 'South African rand'), 
-  ('EGP', 'Egyptian pound'),
-  ('MAD', 'Moroccan dirham'),       
-  ('RWF', 'Rwandan franc'),     
-  ('ETB', 'Ethiopian birr'),
-  ('ZMW', 'Zambian kwacha'),        
-  ('NAD', 'Namibian dollar'),   
   ('USD', 'United States dollar'),
-  ('EUR', 'Euro'),                  
-  ('MRO', 'Mauritanian ouguiya'),
-  ('XAF', 'Central African CFA franc');
+  ('EUR', 'Euro');
 
 
 -- Seed data for customers table
@@ -122,33 +101,17 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
   ('USD High Volume Discount','payment', 'volume_discount',    -0.5, 0.00, 'USD', NULL, NULL),
   ('USD Referral Discount', 'payment', 'referral_discount',  -0.5, 0.00, 'USD', NULL, NULL),
 
-  -- EUR COMPANY FEES
-  ('EUR Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 26.99, 'EUR', NULL, NULL),
-  ('EUR Enterprise Tier Yearly Subscription Fee',  'subscription', 'yearly',  0.0, 269.99, 'EUR', NULL, NULL),
-  ('EUR High Volume Discount', 'payment', 'volume_discount',    -0.5, 0.00, 'EUR', NULL, NULL),
-  ('EUR Referral Discount','payment', 'referral_discount',  -0.5, 0.00, 'EUR', NULL, NULL),
-
   -- XOF COMPANY FEES
   ('XOF Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 15000.00, 'XOF', NULL, NULL),
   ('XOF Enterprise Tier Yearly Subscription Fee',  'subscription', 'yearly',  0.0, 150000.00, 'XOF', NULL, NULL),
   ('XOF High Volume Discount', 'payment', 'volume_discount',    -0.5, 0.00, 'XOF', NULL, NULL),
   ('XOF Referral Discount', 'payment', 'referral_discount',  -0.5, 0.00, 'XOF', NULL, NULL),
 
-  -- GHS COMPANY FEES
-  ('GHS Enterprise Tier Monthly Subscription Fee', 'subscription', 'monthly', 0.0, 300.99, 'GHS', NULL, NULL),
-  ('GHS Enterprise Tier Yearly Subscription Fee',  'subscription', 'yearly',  0.0, 3000.00, 'GHS', NULL, NULL),
-  ('GHS High Volume Discount','payment', 'volume_discount',    -0.5, 0.00, 'GHS', NULL, NULL),
-  ('GHS Referral Discount', 'payment', 'referral_discount',  -0.5, 0.00, 'GHS', NULL, NULL),
-
   -- STRIPE FEES
-  ('USD/STRIPE CARDS Fee', 'payment', 'processing', 2.9, 0.00, 'USD', 'CREDIT_CARD', 'STRIPE'),
+  ('USD/STRIPE CARDS Fee', 'payment', 'processing', 2.9, 0.00, 'USD', 'CARDS', 'STRIPE'),
   ('USD/STRIPE BANK_TRANSFER Fee', 'payment', 'processing', 1.4, 1.00, 'USD', 'BANK_TRANSFER', 'STRIPE'),
-  ('EUR/STRIPE CARDS Fee', 'payment', 'processing', 2.9, 0.00, 'EUR', 'CREDIT_CARD', 'STRIPE'),
+  ('EUR/STRIPE CARDS Fee', 'payment', 'processing', 2.9, 0.00, 'EUR', 'CARDS', 'STRIPE'),
   ('EUR/STRIPE BANK_TRANSFER Fee', 'payment', 'processing', 1.4, 1.00, 'EUR', 'BANK_TRANSFER', 'STRIPE'),
-
-  -- PAYPAL FEES
-  ('USD/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'USD', 'PAYPAL', 'PAYPAL'),
-  ('EUR/PAYPAL Payment Fee', 'payment', 'processing', 3.4, 0.30, 'EUR', 'PAYPAL', 'PAYPAL'),
 
   -- ORANGE FEES
   ('XOF/ORANGE Mobile Money Fee', 'payment', 'processing', 2, 66.00, 'XOF', 'MOBILE_MONEY', 'ORANGE'),
@@ -164,51 +127,44 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
   ('XOF/ECOBANK Bank Transfer Fee', 'payment', 'processing', 2.5, 256.00, 'XOF', 'BANK_TRANSFER', 'ECOBANK'),
 
   -- PARTNER FEES
-  ('USD/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'USD', 'E_WALLET', 'PARTNER'),
-  ('EUR/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'EUR', 'E_WALLET', 'PARTNER'),
-  ('XOF/PARTNER Payout Fee',  'payout',  'processing', 2.9, 66.00, 'XOF', 'E_WALLET', 'PARTNER'),
-  ('GHS/PARTNER Payout Fee',  'payout',  'processing', 2.9, 22.00, 'GHS', 'E_WALLET', 'PARTNER'),
+  ('USD/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'USD', 'E_WALLET', 'OTHER'),
+  ('EUR/PARTNER Payment Fee', 'payment', 'processing', 2.9, 1.2, 'EUR', 'E_WALLET', 'OTHER'),
+  ('XOF/PARTNER Payout Fee',  'payment',  'processing', 2.9, 66.00, 'XOF', 'E_WALLET', 'OTHER'),
 
   -- CURRENCY CONVERSION FEE
   ('USD Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'USD', NULL, NULL),
   ('EUR Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'EUR', NULL, NULL),
   ('XOF Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'XOF', NULL, NULL),
-  ('GHS Currency Conversion Fee', 'payment', 'conversion', 1.5, 0.00, 'GHS', NULL, NULL),
 
   -- CHARGEBACK FEE
   ('USD Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'USD', NULL, NULL),
   ('EUR Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'EUR', NULL, NULL),
   ('XOF Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'XOF', NULL, NULL),
-  ('GHS Chargeback Fee', 'payment', 'chargeback', 0.0, 5.00, 'GHS', NULL, NULL),
 
   -- RECURRING PAYMENT SETUP FEE
   ('USD Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'USD', NULL, NULL),
   ('EUR Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'EUR', NULL, NULL),
   ('XOF Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'XOF', NULL, NULL),
-  ('GHS Recurring Payment Setup Fee', 'payment', 'recurring_setup', 3.0, 0.0, 'GHS', NULL, NULL),
 
   -- EXPRESS PAYOUT FEE
-  ('USD Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'USD', NULL, NULL),
-  ('EUR Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'EUR', NULL, NULL),
-  ('XOF Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'XOF', NULL, NULL),
-  ('GHS Express Payout Fee', 'payout', 'express', 0.0, 2.00, 'GHS', NULL, NULL),
+  ('USD Express Payout Fee', 'payment', 'express', 0.0, 2.00, 'USD', NULL, NULL),
+  ('EUR Express Payout Fee', 'payment', 'express', 0.0, 2.00, 'EUR', NULL, NULL),
+  ('XOF Express Payout Fee', 'payment', 'express', 0.0, 2.00, 'XOF', NULL, NULL),
 
   -- REFUND FEES
   ('USD Refund Processing Fee', 'refund', 'processing', 1.5, 0.00, 'USD', NULL, NULL),
   ('EUR Refund Processing Fee', 'refund', 'processing', 1.5, 0.00, 'EUR', NULL, NULL),
   ('XOF Refund Processing Fee', 'refund', 'processing', 2.2, 0.00, 'XOF', NULL, NULL),
-  ('GHS Refund Processing Fee', 'refund', 'processing', 2.2, 0.00, 'GHS', NULL, NULL),
 
   -- PAYOUT PROCESSING FEES
-  ('USD Payout Processing Fee', 'payout', 'processing', 2.0, 0.50, 'USD', NULL, NULL),
-  ('EUR Payout Processing Fee', 'payout', 'processing', 1.8, 0.40, 'EUR', NULL, NULL),
-  ('XOF Payout Processing Fee', 'payout', 'processing', 2.2, 0.00, 'XOF', NULL, NULL),
-  ('GHS Payout Processing Fee', 'payout', 'processing', 2.1, 0.00, 'GHS', NULL, NULL);
+  ('USD Payout Processing Fee', 'payment', 'processing', 2.0, 0.50, 'USD', NULL, NULL),
+  ('EUR Payout Processing Fee', 'payment', 'processing', 1.8, 0.40, 'EUR', NULL, NULL),
+  ('XOF Payout Processing Fee', 'payment', 'processing', 2.2, 0.00, 'XOF', NULL, NULL);
 
 
 -- Seed data for transactions table
 INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'completed', 'Premium plan subscription', 'REF1001', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CREDIT_CARD')
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'completed', 'Premium plan subscription', 'REF1001', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS')
      , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'ibrahima.diallo@example.com'), 'payment', 'completed', 'Product purchase', 'REF1002', NULL, 75.00, 1.13, 73.87, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY');
 
 
@@ -245,6 +201,8 @@ VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
 INSERT INTO api_usage (organization_id, api_key, endpoint, request_count, last_request_at, request_method, response_status, response_time)
 VALUES ((SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6', '/api/v1/transactions', 100, NOW(), 'GET', 200, 150.5)
      , ((SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 'p6o5n4m3-l2k1-j0i9-h8g7-f6e5d4c3b2a1', '/api/v1/payouts', 50, NOW(), 'POST', 201, 250.8);
+
+
 -- Seed data for webhooks table
 UPDATE webhooks 
 SET last_payload = '{"event": "transaction.created", "transaction_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}',
@@ -269,7 +227,7 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'tr
 -- Seed data for platform_invoices table
 INSERT INTO platform_invoices (merchant_id, organization_id, amount, description, currency_code, due_date, status)
 VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 1000.00, 'Monthly platform fees', 'USD', NOW() + INTERVAL '30 days', 'sent')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 500000.00, 'Annual platform subscription', 'XOF', NOW() + INTERVAL '1 year', 'draft');
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 500000.00, 'Annual platform subscription', 'XOF', NOW() + INTERVAL '1 year', 'sent');
 
 
 -- Seed data for customer_api_interactions table
@@ -306,16 +264,16 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SE
 -- Seed data for payment_links table
 INSERT INTO payment_links (merchant_id, organization_id, page_id, product_id, subscription_id, title, public_description, price, currency_code, frequency, is_active)
 VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT page_id FROM pages WHERE slug = 'premium-subscription'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan')), 'Premium Plan Payment Link', 'Pay for your premium plan subscription', 50.00, 'USD', 'monthly', TRUE)
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT page_id FROM pages WHERE slug = 'gold-package'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Gold Package')), 'Gold Package Payment Link', 'Pay for your gold package upgrade', 100.00, 'EUR', 'yearly', TRUE);
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT page_id FROM pages WHERE slug = 'gold-package'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Gold Package')), 'Gold Package Payment Link', 'Pay for your gold package upgrade', 100.00, 'USD', 'yearly', TRUE);
 
 
 -- Seed data for customer_invoices table
 INSERT INTO customer_invoices (merchant_id, customer_id, amount, description, currency_code, due_date, status)
 VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 100.00, 'Product purchase invoice', 'USD', NOW() + INTERVAL '15 days', 'sent')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 75000.00, 'Service invoice', 'XOF', NOW() + INTERVAL '30 days', 'draft');
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 75000.00, 'Service invoice', 'XOF', NOW() + INTERVAL '30 days', 'sent');
 
 
 -- Seed data for disputes table
 INSERT INTO disputes (transaction_id, customer_id, amount, fee_amount, reason, status, currency_code)
-VALUES ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF1001'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 50.00, 5.00, 'Product not received', 'open', 'USD')
+VALUES ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF1001'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 50.00, 5.00, 'Product not received', 'pending', 'USD')
      , ((SELECT transaction_id FROM transactions WHERE reference_id = 'REF1002'), (SELECT customer_id FROM customers WHERE email = 'ibrahima.diallo@example.com'), 75.00, 7.50, 'Incorrect amount charged', 'resolved', 'XOF');

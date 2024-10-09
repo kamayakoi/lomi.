@@ -32,8 +32,8 @@ export const organizationPositions = [
 export const operatingCountries = [
   'Côte d\'Ivoire',
   'Senegal',
-  'Ghana',
-  'Nigeria',
+  // 'Ghana',
+  // 'Nigeria',
   'Benin',
   'Togo',
   'Mali',

@@ -1,35 +1,23 @@
 --------------- ENUM TYPES ---------------
 
-CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
-CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'transfer', 'subscription', 'payout');
+CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed');
+CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'subscription');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'PAYPAL', 'LOMI', 'PARTNER');
-CREATE TYPE recurring_transaction_type AS ENUM ('subscription', 'installment', 'debt', 'utility', 'other');
-CREATE TYPE transfer_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
-CREATE TYPE invoice_status AS ENUM ('draft', 'sent', 'paid', 'overdue', 'cancelled');
+CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'yearly', 'one-time');
 CREATE TYPE recurring_transaction_status AS ENUM ('active', 'paused', 'cancelled', 'expired');
 CREATE TYPE entry_type AS ENUM ('debit', 'credit');
-CREATE TYPE payment_method_code AS ENUM (
-    'CREDIT_CARD', 'DEBIT_CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'SEPA', 'PAYPAL',
-    'APPLE_PAY', 'GOOGLE_PAY', 'CASH', 'CRYPTOCURRENCY', 'IDEAL', 'COUNTER', 'WAVE',
-    'AIRTEL_MONEY', 'MPESA', 'AIRTIME', 'POS', 'BANK_USSD', 'E_WALLET', 'QR_CODE', 'USSD', 'PARTNER'
-);
-CREATE TYPE currency_code AS ENUM (
-    'XOF', 'XAF', 'NGN', 'GHS', 'KES', 'ZAR', 'EGP', 'MAD', 'RWF', 'ETB', 'ZMW', 'NAD', 'USD', 'EUR', 'MRO'
-);
+CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
+CREATE TYPE currency_code AS ENUM ('XOF','USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
-CREATE TYPE dispute_status AS ENUM ('open', 'under_review', 'resolved', 'closed');
+CREATE TYPE dispute_status AS ENUM ('pending', 'resolved', 'closed');
 CREATE TYPE kyc_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE entity_type AS ENUM ('merchant', 'organization', 'platform');
 CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed');
-CREATE TYPE ticket_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
-CREATE TYPE notification_type AS ENUM (
-    'onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 
-    'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 
-    'subscription', 'webhook', 'chargeback'
-);
+CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
+CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 'subscription', 'webhook', 'chargeback');
 
 --------------- TABLES ---------------
 
@@ -609,7 +597,7 @@ CREATE TABLE customer_invoices (
     description TEXT,
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     due_date DATE NOT NULL,
-    status invoice_status NOT NULL DEFAULT 'draft',
+    status invoice_status NOT NULL DEFAULT 'sent',
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -630,7 +618,7 @@ CREATE TABLE disputes (
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     fee_amount NUMERIC(10,2) NOT NULL DEFAULT 0.00,
     reason TEXT NOT NULL,
-    status dispute_status NOT NULL DEFAULT 'open',
+    status dispute_status NOT NULL DEFAULT 'pending',
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
     resolution_date DATE,
     resolution_details TEXT,
