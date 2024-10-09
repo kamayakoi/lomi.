@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Bell, Check, X, Info, AlertCircle } from 'lucide-react'
+import { Bell, Check, InfoIcon, AlertTriangle, ShieldAlert, RefreshCw, AlertOctagon, FileText, Settings, Repeat, Webhook, ArrowLeftRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { supabase } from '@/utils/supabase/client'
@@ -15,14 +15,49 @@ interface Notification {
 }
 
 const NotificationIcon = ({ type }: { type: string }) => {
-    switch (type) {
-        case 'onboarding':
-            return <Info className="h-4 w-4 text-green-500" />
-        case 'tip':
-            return <AlertCircle className="h-4 w-4 text-yellow-500" />
-        default:
-            return null
-    }
+    return (
+        <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center">
+            {(() => {
+                switch (type) {
+                    case 'onboarding':
+                        return <InfoIcon className="w-4 h-4 text-green-500" />
+                    case 'tip':
+                        return <InfoIcon className="w-4 h-4 text-green-500" />
+                    case 'alert':
+                    case 'security_alert':
+                        return <AlertOctagon className="w-4 h-4 text-red-500" />
+                    case 'update':
+                        return <RefreshCw className="w-4 h-4 text-cyan-500" />
+                    case 'maintenance':
+                        return <Settings className="w-4 h-4 text-gray-500" />
+                    case 'compliance':
+                        return <ShieldAlert className="w-4 h-4 text-indigo-500" />
+                    case 'billing':
+                        return <FileText className="w-4 h-4 text-purple-500" />
+                    case 'invoice':
+                        return <FileText className="w-4 h-4 text-blue-500" />
+                    case 'provider_status':
+                        return <AlertTriangle className="w-4 h-4 text-orange-500" />
+                    case 'dispute':
+                        return <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    case 'subscription':
+                        return <Repeat className="w-4 h-4 text-teal-500" />
+                    case 'webhook':
+                        return <Webhook className="w-4 h-4 text-indigo-500" />
+                    case 'transaction':
+                        return <InfoIcon className="w-4 h-4 text-green-500" />
+                    case 'payout':
+                        return <InfoIcon className="w-4 h-4 text-green-500" />
+                    case 'refund':
+                        return <ArrowLeftRight className="w-4 h-4 text-yellow-500" />
+                    case 'chargeback':
+                        return <ArrowLeftRight className="w-4 h-4 text-red-500" />
+                    default:
+                        return <InfoIcon className="w-4 h-4 text-blue-500" />
+                }
+            })()}
+        </div>
+    )
 }
 
 export default function Notifications() {
@@ -59,13 +94,17 @@ export default function Notifications() {
         ))
     }
 
-    const removeNotification = async (id: string) => {
-        await supabase
-            .from('notifications')
-            .delete()
-            .eq('notification_id', id)
+    const markAllNotificationsAsRead = async () => {
+        if (user) {
+            const { error } = await supabase
+                .rpc('mark_all_notifications_read', { p_merchant_id: user.id })
 
-        setNotifications(notifications.filter(notif => notif.notification_id !== id))
+            if (error) {
+                console.error('Error marking all notifications as read:', error)
+            } else {
+                setNotifications(notifications.map(notif => ({ ...notif, is_read: true })))
+            }
+        }
     }
 
     return (
@@ -78,57 +117,51 @@ export default function Notifications() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 sm:w-96 bg-white dark:bg-[#0a0f1c] border border-border shadow-lg rounded-lg">
+            <PopoverContent
+                className="w-80 sm:w-96 bg-white dark:bg-[#0a0f1c] border border-border shadow-lg rounded-lg"
+                align="end"
+                alignOffset={-15}
+            >
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-foreground">Notifications</h3>
-                    <Button variant="ghost" size="sm" onClick={() => setNotifications(notifications.filter(notif => !notif.is_read))} className="text-muted-foreground hover:text-foreground">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={markAllNotificationsAsRead}
+                        className="text-muted-foreground hover:text-foreground"
+                    >
                         Clear all
                     </Button>
                 </div>
-                {notifications.length === 0 ? (
+                {notifications.length === 0 || notifications.every(notif => notif.is_read) ? (
                     <div className="text-center py-4">
                         <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
                         <p className="text-muted-foreground">All caught up!</p>
                     </div>
                 ) : (
                     <ul className="space-y-2 max-h-[60vh] overflow-auto">
-                        {notifications.map((notif) => (
+                        {notifications.filter(notif => !notif.is_read).map((notif) => (
                             <li
                                 key={notif.notification_id}
-                                className={`flex items-start justify-between p-3 rounded-md transition-colors duration-200 ${notif.is_read
-                                    ? 'bg-gray-50 dark:bg-[#141a2e]'
-                                    : 'bg-blue-50 dark:bg-blue-900'
-                                    }`}
+                                className="flex items-start p-3 rounded-md transition-colors duration-200 bg-blue-50 dark:bg-blue-900"
                             >
-                                <div className="flex items-start space-x-3">
+                                <div className="flex items-start space-x-3 flex-grow">
                                     <NotificationIcon type={notif.type} />
-                                    <div>
-                                        <p className="text-sm text-foreground">{notif.message}</p>
+                                    <div className="flex-grow">
+                                        <p className="text-sm text-foreground text-justify">{notif.message}</p>
                                         <p className="text-xs text-muted-foreground mt-1">
                                             {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    {!notif.is_read && (
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => markNotificationAsRead(notif.notification_id)}
-                                            className="text-muted-foreground hover:text-foreground"
-                                        >
-                                            <Check className="h-4 w-4" />
-                                        </Button>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => removeNotification(notif.notification_id)}
-                                        className="text-muted-foreground hover:text-foreground"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => markNotificationAsRead(notif.notification_id)}
+                                    className="text-muted-foreground hover:text-foreground ml-4 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
+                                >
+                                    <Check className="h-4 w-4" />
+                                </Button>
                             </li>
                         ))}
                     </ul>
