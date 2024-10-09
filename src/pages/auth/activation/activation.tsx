@@ -5,13 +5,13 @@ import ActivationStep2 from './activation-step-2'
 import ActivationStep3 from './activation-step-3'
 import ActivationStep4 from './activation-step-4'
 import ActivationStep5 from './activation-step-5'
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
 import LoadingButton from '@/components/dashboard/loader';
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
-import { useEffect, useCallback } from 'react';
-import { useUser } from '@/lib/useUser';
+import { useEffect, useState } from 'react';
+import { useUser } from '@/lib/hooks/useUser';
+import { supabase } from '@/utils/supabase/client';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -75,51 +75,35 @@ const steps = [
 const Activation: React.FC = () => {
     const [currentStep, setCurrentStep] = useLocalStorage('kycCurrentStep', 0);
     const [activationData, setActivationData] = useLocalStorage<ActivationData>('kycActivationData', initialActivationData);
-    const supabase = useSupabaseClient();
     const { toast } = useToast();
-    const { isLoading, isActivated, error } = useActivationStatus();
-    const session = useSession();
-    const { user, session: sessionFromUser } = useUser();
-
-    const checkActivationStatus = useCallback(async () => {
-        if (session) {
-            console.log('Session:', session); // Log the session object
-
-            const { data: orgLink, error: orgLinkError } = await supabase
-                .from('merchant_organization_links')
-                .select('organization_id')
-                .eq('merchant_id', session.user.id)
-                .single();
-
-            if (orgLinkError) {
-                console.error('Error fetching organization link:', orgLinkError);
-                return;
-            }
-
-            const { data, error } = await supabase.rpc('check_activation_state', {
-                p_organization_id: orgLink.organization_id
-            });
-            if (error) {
-                console.error('Error checking activation status:', error);
-            } else {
-                if (data === 'approved') {
-                    setCurrentStep(5); // Move to final step
-                } else if (data === 'pending') {
-                    setCurrentStep(4); // Move to verification in progress step
-                }
-            }
-        } else {
-            console.log('No session found'); // Log if no session is available
-        }
-    }, [session, supabase, setCurrentStep]);
+    const { isLoading: activationStatusLoading, isActivated, error: activationStatusError } = useActivationStatus();
+    const { user, isLoading: userLoading } = useUser();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (session) {
+        const checkActivationStatus = async () => {
+            if (user) {
+                try {
+                    const { data, error } = await supabase.rpc('check_activation_status', {
+                        p_merchant_id: user.id
+                    });
+                    if (error) throw error;
+                    if (data === true) {
+                        setCurrentStep(5); // Move to final step
+                    } else if (currentStep === 4) {
+                        // If currently on step 4 (verification in progress), stay there
+                        setCurrentStep(4);
+                    }
+                } catch (error) {
+                    console.error('Error checking activation status:', error);
+                }
+            }
+        };
+
+        if (!userLoading && user) {
             checkActivationStatus();
-        } else {
-            console.log('No session found in useEffect'); // Log if no session is available
         }
-    }, [session, checkActivationStatus]);
+    }, [user, userLoading, setCurrentStep, currentStep]);
 
     const handleNext = (stepData: Partial<ActivationData>) => {
         setActivationData((prevData) => ({ ...prevData, ...stepData }));
@@ -132,18 +116,15 @@ const Activation: React.FC = () => {
 
     const onSubmit = async (completeData: ActivationData) => {
         try {
+            setLoading(true);
             setActivationData(completeData);
 
-            console.log('User in onSubmit:', user);
-            console.log('Session in onSubmit:', sessionFromUser);
-
-            if (!user || !sessionFromUser) {
+            if (!user) {
                 toast({
                     title: "Error",
-                    description: "User session not found. Please log in and try again.",
+                    description: "User not found. Please log in and try again.",
                     variant: "destructive",
                 });
-                // Redirect to the login page or show an error message
                 return;
             }
 
@@ -173,7 +154,7 @@ const Activation: React.FC = () => {
                 title: "KYC Submitted",
                 description: "Your KYC details have been submitted successfully.",
             });
-            setCurrentStep(4); // Redirect to activation-step-5.tsx
+            setCurrentStep(4); // Move to verification in progress step
         } catch (error) {
             console.error('Error submitting KYC details:', error);
             toast({
@@ -181,15 +162,17 @@ const Activation: React.FC = () => {
                 description: "There was a problem submitting your KYC details. Please try again.",
                 variant: "destructive",
             });
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (isLoading) {
+    if (userLoading || activationStatusLoading || loading) {
         return <LoadingButton />;
     }
 
-    if (error) {
-        return <div>Error: {error}</div>;
+    if (activationStatusError) {
+        return <div>Error: {activationStatusError}</div>;
     }
 
     if (isActivated) {
