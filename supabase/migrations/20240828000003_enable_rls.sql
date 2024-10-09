@@ -12,8 +12,7 @@ USING (merchant_id = auth.uid());
 -- Create a policy to allow SELECT access to the onboarded column for authenticated users
 CREATE POLICY "Allow select access to onboarded column for authenticated users"
 ON public.merchants
-FOR SELECT (onboarded)
-TO authenticated
+FOR SELECT
 USING (merchant_id = auth.uid());
 
 -- Create a policy to allow SELECT access to merchant_organization_links table for authenticated users

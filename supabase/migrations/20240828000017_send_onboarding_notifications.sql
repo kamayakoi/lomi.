@@ -10,8 +10,8 @@ BEGIN
         false
     );
 
-    -- Schedule the dark mode tip notification to be sent after 2 days
-    INSERT INTO notifications (merchant_id, type, message, created_at, is_read)
+    -- Schedule the dark mode tip notification
+    INSERT INTO notifications (merchant_id, type, message, is_read)
     VALUES (
         NEW.merchant_id,
         'tip'::notification_type,
