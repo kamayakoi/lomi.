@@ -16,7 +16,9 @@ const stripe = new Stripe(
     }
 );
 
+// Serve static files from the 'dist' directory
 app.use(express.static(path.join(__dirname, "..", "..", "..", "dist")));
+
 app.use(express.json());
 
 app.post("/account_session", async (req, res) => {
@@ -73,6 +75,7 @@ app.post("/account", async (req, res) => {
     }
 });
 
+// Handle all other routes by serving the index.html file
 app.get("*", (_req, res) => {
     res.sendFile(path.join(__dirname, "..", "..", "..", "dist", "index.html"));
 });

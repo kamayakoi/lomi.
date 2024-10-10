@@ -133,7 +133,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     Previous
                 </Button>
                 <Button type="submit" className="mt-6">
-                    Complete Onboarding
+                    Let&apos;s Go!
                 </Button>
             </div>
         </form>

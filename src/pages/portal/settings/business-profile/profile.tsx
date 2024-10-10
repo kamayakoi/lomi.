@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -8,8 +8,7 @@ import ContentSection from '../../../../components/dashboard/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
-
-const ProfilePictureUploader = React.lazy(() => import('../../../../components/auth/avatar-uploader'))
+import ProfilePictureUploader from '../../../../components/auth/avatar-uploader'
 
 interface MerchantDetails {
     merchant_id: string;
@@ -281,13 +280,11 @@ export default function Profile() {
             <div>
                 <div className="space-y-6">
                     <div className="flex items-center space-x-4">
-                        <Suspense fallback={<div>Loading avatar uploader...</div>}>
-                            <ProfilePictureUploader
-                                currentAvatar={avatarUrl}
-                                onAvatarUpdate={handleAvatarUpdate}
-                                name={merchant?.name || ''}
-                            />
-                        </Suspense>
+                        <ProfilePictureUploader
+                            currentAvatar={avatarUrl}
+                            onAvatarUpdate={handleAvatarUpdate}
+                            name={merchant?.name || ''}
+                        />
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">

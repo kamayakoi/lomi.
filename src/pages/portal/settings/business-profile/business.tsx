@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import ContentSection from '../../../../components/dashboard/content-section'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,8 +8,7 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
-
-const LogoUploader = React.lazy(() => import('../../../../components/auth/logo-uploader'))
+import LogoUploader from '../../../../components/auth/logo-uploader'
 
 interface OrganizationDetails {
     organization_id: string;
@@ -185,13 +184,11 @@ export default function Business() {
                         </AlertDescription>
                     </Alert>
 
-                    <Suspense fallback={<div>Loading logo uploader...</div>}>
-                        <LogoUploader
-                            currentLogo={logoUrl}
-                            onLogoUpdate={handleLogoUpdate}
-                            companyName={organization?.name || ''}
-                        />
-                    </Suspense>
+                    <LogoUploader
+                        currentLogo={logoUrl}
+                        onLogoUpdate={handleLogoUpdate}
+                        companyName={organization?.name || ''}
+                    />
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="grid gap-2">

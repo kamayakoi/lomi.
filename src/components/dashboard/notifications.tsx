@@ -116,7 +116,7 @@ export default function Notifications() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-80 sm:w-96 bg-white dark:bg-[#0a0f1c] border border-border shadow-lg rounded-lg"
+                className="w-80 sm:w-96 bg-white dark:bg-[#121317] border border-border shadow-lg rounded-lg"
                 align="end"
                 alignOffset={-15}
             >
@@ -141,7 +141,7 @@ export default function Notifications() {
                         {notifications.filter(notif => !notif.is_read).map((notif) => (
                             <li
                                 key={notif.notification_id}
-                                className="flex items-start p-3 rounded-md transition-colors duration-200 bg-blue-50 dark:bg-blue-900"
+                                className="flex items-start p-3 rounded-md transition-colors duration-200 bg-muted dark:bg-[#1c1f2a]"
                             >
                                 <div className="flex items-start space-x-3 flex-grow">
                                     <NotificationIcon type={notif.type} />
