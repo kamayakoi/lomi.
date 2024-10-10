@@ -34,10 +34,21 @@ export default function Profile() {
     const [currentPinInput, setCurrentPinInput] = useState(['', '', '', ''])
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
     const [currentPinError, setCurrentPinError] = useState('')
+    const [isPasswordAuth, setIsPasswordAuth] = useState(false)
 
     useEffect(() => {
         fetchMerchant()
     }, [])
+
+    useEffect(() => {
+        const checkAuthMethod = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setIsPasswordAuth(user.app_metadata.provider === 'email');
+            }
+        };
+        checkAuthMethod();
+    }, []);
 
     useEffect(() => {
         if (showPinModal) {
@@ -143,27 +154,46 @@ export default function Profile() {
         }
 
         try {
-            const { error } = await supabase.auth.updateUser({
-                password: newPassword,
-            })
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
 
-            if (error) throw error
+            // Verify the current password
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+                email: user.email || '',
+                password: currentPassword,
+            });
+
+            if (signInError) {
+                toast({
+                    title: "Error",
+                    description: "Current password is incorrect",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Update the password
+            const { error: updateError } = await supabase.auth.updateUser({
+                password: newPassword,
+            });
+
+            if (updateError) throw updateError;
 
             toast({
                 title: "Success",
                 description: "Password updated successfully",
-            })
-            setNewPassword('')
-            setCurrentPassword('')
+            });
+            setNewPassword('');
+            setCurrentPassword('');
         } catch (error) {
-            console.error('Error changing password:', error)
+            console.error('Error changing password:', error);
             toast({
                 title: "Error",
                 description: "Failed to change password",
                 variant: "destructive",
-            })
+            });
         }
-    }
+    };
 
     const handlePinChange = (index: number, value: string) => {
         const newPinArray = [...newPin]
@@ -428,53 +458,55 @@ export default function Profile() {
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-medium">Change password</h3>
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="current-password">Current password</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="current-password"
-                                            type="password"
-                                            value={currentPassword}
-                                            onChange={(e) => setCurrentPassword(e.target.value)}
-                                            className="pr-10"
-                                        />
+                        {isPasswordAuth && (
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Change password</h3>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="current-password">Current password</Label>
+                                        <div className="relative">
+                                            <Input
+                                                id="current-password"
+                                                type="password"
+                                                value={currentPassword}
+                                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                                className="pr-10"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="new-password">New password</Label>
-                                    <div className="relative flex items-center">
-                                        <Input
-                                            id="new-password"
-                                            type={showNewPassword ? "text" : "password"}
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowNewPassword(!showNewPassword)}
-                                            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 mr-16"
-                                        >
-                                            {showNewPassword ? (
-                                                <EyeOffIcon className="h-5 w-5" />
-                                            ) : (
-                                                <EyeIcon className="h-5 w-5" />
-                                            )}
-                                        </button>
-                                        <Button
-                                            size="sm"
-                                            onClick={handlePasswordChange}
-                                            className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                        >
-                                            Save
-                                        </Button>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="new-password">New password</Label>
+                                        <div className="relative flex items-center">
+                                            <Input
+                                                id="new-password"
+                                                type={showNewPassword ? "text" : "password"}
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 mr-16"
+                                            >
+                                                {showNewPassword ? (
+                                                    <EyeOffIcon className="h-5 w-5" />
+                                                ) : (
+                                                    <EyeIcon className="h-5 w-5" />
+                                                )}
+                                            </button>
+                                            <Button
+                                                size="sm"
+                                                onClick={handlePasswordChange}
+                                                className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                            >
+                                                Save
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="space-y-4">
                             <h3 className="text-lg font-medium">Additional security</h3>

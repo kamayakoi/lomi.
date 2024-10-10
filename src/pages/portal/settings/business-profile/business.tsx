@@ -200,123 +200,136 @@ export default function Business() {
     }
 
     return (
-        <ContentSection
-            title="Business"
-            desc="Upload your business logo and view your public contact information."
-        >
-            <>
-                <div className="space-y-6">
-                    <Alert variant="info">
-                        <AlertDescription>
-                            This information helps customers recognize your business, and may appear in your payment statements, invoices, and receipts.
-                        </AlertDescription>
-                    </Alert>
+        <div style={{
+            overflowY: 'auto',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+            <ContentSection
+                title="Business"
+                desc="Upload your business logo and view your public contact information."
+            >
+                <>
+                    <div className="space-y-6">
+                        <Alert variant="info">
+                            <AlertDescription>
+                                This information helps customers recognize your business, and may appear in your payment statements, invoices, and receipts.
+                            </AlertDescription>
+                        </Alert>
 
-                    <LogoUploader
-                        currentLogo={logoUrl}
-                        onLogoUpdate={handleLogoUpdate}
-                        companyName={organization?.name || ''}
-                    />
+                        <LogoUploader
+                            currentLogo={logoUrl}
+                            onLogoUpdate={handleLogoUpdate}
+                            companyName={organization?.name || ''}
+                        />
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Business name</Label>
-                            <Input id="name" value={organization.name} readOnly className="bg-muted" />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Business email</Label>
-                            <Input id="email" type="email" value={organization.email || ''} readOnly className="bg-muted" />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="business-id">Business ID</Label>
-                            <div className="flex">
-                                <Input id="business-id" value={organization.organization_id} readOnly className="rounded-r-none bg-muted" />
-                                <Button
-                                    variant={isCopied ? "default" : "outline"}
-                                    className={`rounded-l-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
-                                    onClick={copyBusinessId}
-                                >
-                                    {isCopied ? (
-                                        "Copied"
-                                    ) : (
-                                        <>
-                                            <CopyIcon className="h-4 w-4 mr-2" />
-                                            Copy
-                                        </>
-                                    )}
-                                </Button>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label htmlFor="name">Business name</Label>
+                                <Input id="name" value={organization.name} readOnly className="bg-muted" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="email">Business email</Label>
+                                <Input id="email" type="email" value={organization.email || ''} readOnly className="bg-muted" />
                             </div>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="website">Website URL</Label>
-                            <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
-                        </div>
-                    </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="verified">Status</Label>
-                            <Input
-                                id="verified"
-                                value={organization.verified ? 'Verified' : 'Unverified'}
-                                readOnly
-                                className="bg-muted"
-                            />
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label htmlFor="business-id">Business ID</Label>
+                                <div className="flex">
+                                    <Input id="business-id" value={organization.organization_id} readOnly className="rounded-r-none bg-muted" />
+                                    <Button
+                                        variant={isCopied ? "default" : "outline"}
+                                        className={`rounded-l-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                        onClick={copyBusinessId}
+                                    >
+                                        {isCopied ? (
+                                            "Copied"
+                                        ) : (
+                                            <>
+                                                <CopyIcon className="h-4 w-4 mr-2" />
+                                                Copy
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="website">Website URL</Label>
+                                <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
+                            </div>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="default_currency">Currency</Label>
-                            <Input
-                                id="default_currency"
-                                value={
-                                    organization.default_currency === 'XOF'
-                                        ? 'XOF — Franc CFA'
-                                        : organization.default_currency
-                                }
-                                readOnly
-                                className="bg-muted"
-                            />
-                        </div>
-                    </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="country">Billing country</Label>
-                            <Input id="country" value={organization.country || ''} readOnly className="bg-muted" />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="address">Business address</Label>
-                            <div className="relative">
-                                <textarea
-                                    ref={addressRef}
-                                    id="address"
-                                    value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label htmlFor="verified">Status</Label>
+                                <Input
+                                    id="verified"
+                                    value={organization.verified ? 'Verified' : 'Unverified'}
                                     readOnly
-                                    className="bg-muted w-full px-3 py-2 rounded-md border border-input text-sm resize-none focus:outline-none"
-                                    style={{
-                                        minHeight: '2.5rem',
-                                        overflow: 'hidden',
-                                        lineHeight: '1.5',
-                                        whiteSpace: 'pre-wrap',
-                                        wordBreak: 'break-word'
-                                    }}
-                                    onChange={() => {
-                                        if (addressRef.current) {
-                                            adjustTextareaHeight(addressRef.current);
-                                        }
-                                    }}
+                                    className="bg-muted"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="default_currency">Currency</Label>
+                                <Input
+                                    id="default_currency"
+                                    value={
+                                        organization.default_currency === 'XOF'
+                                            ? 'XOF — Franc CFA'
+                                            : organization.default_currency
+                                    }
+                                    readOnly
+                                    className="bg-muted"
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    <p className="text-sm text-muted-foreground">
-                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Business information" className="underline">hello@lomi.africa</a> if you want to update your business details.
-                    </p>
-                </div>
-            </>
-        </ContentSection>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-2">
+                                <Label htmlFor="country">Billing country</Label>
+                                <Input id="country" value={organization.country || ''} readOnly className="bg-muted" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="address">Business address</Label>
+                                <div className="relative">
+                                    <textarea
+                                        ref={addressRef}
+                                        id="address"
+                                        value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
+                                        readOnly
+                                        className="bg-muted w-full px-3 py-2 rounded-md border border-input text-sm resize-none focus:outline-none"
+                                        style={{
+                                            minHeight: '2.5rem',
+                                            overflow: 'hidden',
+                                            lineHeight: '1.5',
+                                            whiteSpace: 'pre-wrap',
+                                            wordBreak: 'break-word'
+                                        }}
+                                        onChange={() => {
+                                            if (addressRef.current) {
+                                                adjustTextareaHeight(addressRef.current);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground">
+                            Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Business information" className="underline">hello@lomi.africa</a> if you want to update your business details.
+                        </p>
+                    </div>
+                </>
+            </ContentSection>
+        </div>
     )
 }

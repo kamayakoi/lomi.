@@ -6,7 +6,7 @@ import Nav from './nav'
 import { cn } from '@/lib/actions/utils'
 import { sidelinks } from '../../utils/data/sidelinks'
 import { useTheme } from '@/lib/hooks/useTheme'
-import iconLight from "/icon.png"
+import iconLight from "/iconportal.png"
 import iconDark from "/icon_dark.png"
 import { supabase } from '@/utils/supabase/client'
 import { Separator } from "@/components/ui/separator"
@@ -103,7 +103,7 @@ export default function Sidebar({ className }: SidebarProps) {
           className='z-50 flex justify-between px-4 py-3 md:px-4'
         >
           <a href="/portal" className="flex items-center gap-2">
-            <div className="flex items-center justify-center rounded-full h-[40px] w-[40px] border-2 border-transparent">
+            <div className="flex items-center justify-center h-[40px] w-[40px] rounded border-6 border-transparent">
               <img
                 src={theme === 'dark' ? iconDark : iconLight}
                 alt="lomi. Logo"
@@ -149,7 +149,7 @@ export default function Sidebar({ className }: SidebarProps) {
                 <img
                   src={organizationLogo}
                   alt="Organization logo"
-                  className="h-[40px] w-[40px] rounded border-2 border-transparent cursor-pointer"
+                  className="h-[40px] w-[40px] rounded border-6 border-transparent cursor-pointer"
                   onClick={toggleTheme}
                 />
               ) : (
