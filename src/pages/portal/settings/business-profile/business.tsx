@@ -16,6 +16,8 @@ interface OrganizationDetails {
     email: string;
     logo_url: string | null;
     website_url: string | null;
+    verified: boolean;
+    default_currency: string;
     country: string;
     region: string;
     city: string;
@@ -249,8 +251,33 @@ export default function Business() {
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="website">Business website URL</Label>
+                            <Label htmlFor="website">Website URL</Label>
                             <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
+                        </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                        <div className="grid gap-2">
+                            <Label htmlFor="verified">Status</Label>
+                            <Input
+                                id="verified"
+                                value={organization.verified ? 'Verified' : 'Unverified'}
+                                readOnly
+                                className="bg-muted"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="default_currency">Currency</Label>
+                            <Input
+                                id="default_currency"
+                                value={
+                                    organization.default_currency === 'XOF'
+                                        ? 'XOF — Franc CFA'
+                                        : organization.default_currency
+                                }
+                                readOnly
+                                className="bg-muted"
+                            />
                         </div>
                     </div>
 

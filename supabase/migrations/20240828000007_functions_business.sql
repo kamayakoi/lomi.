@@ -6,6 +6,8 @@ RETURNS TABLE (
     email VARCHAR,
     logo_url VARCHAR,
     website_url VARCHAR,
+    verified BOOLEAN,
+    default_currency VARCHAR,
     country VARCHAR,
     region VARCHAR,
     city VARCHAR,
@@ -21,6 +23,8 @@ BEGIN
         o.email,
         o.logo_url,
         o.website_url,
+        o.verified,
+        o.default_currency,
         oa.country,
         oa.region,
         oa.city,
@@ -43,7 +47,9 @@ CREATE OR REPLACE FUNCTION public.update_organization_details(
     p_organization_id UUID,
     p_name VARCHAR,
     p_email VARCHAR,
-    p_website_url VARCHAR
+    p_website_url VARCHAR,
+    p_verified BOOLEAN,
+    p_default_currency VARCHAR
 )
 RETURNS VOID AS $$
 BEGIN
@@ -52,6 +58,8 @@ BEGIN
         name = p_name,
         email = p_email,
         website_url = p_website_url,
+        verified = p_verified,
+        default_currency = p_default_currency,
         updated_at = NOW()
     WHERE 
         organization_id = p_organization_id;
