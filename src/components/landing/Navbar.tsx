@@ -17,7 +17,7 @@ import { Menu } from "lucide-react";
 import { LogoIcon } from "./Icons";
 import { Dock } from "@/components/ui/dock";
 
-import "@/lib/styles/Navbar.css";
+import "@/lib/styles/navbar.css";
 
 interface RouteProps {
   href: string;
