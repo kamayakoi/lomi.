@@ -1,6 +1,11 @@
 import { motion } from 'framer-motion'
+import { useTheme } from '@/lib/hooks/useTheme'
 
 export default function AnimatedLogoLoader() {
+  const { theme } = useTheme()
+
+  const logoColor = theme === 'dark' ? '#60a5fa' : '#FF0000'
+
   const draw = {
     hidden: { pathLength: 0, opacity: 0 },
     visible: (i: number) => {
@@ -17,7 +22,7 @@ export default function AnimatedLogoLoader() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-transparent dark:bg-transparent">
       <motion.svg
         width="40"
         height="40"
@@ -29,7 +34,7 @@ export default function AnimatedLogoLoader() {
         <motion.path
           d="M10 10 L90 10 L90 30 L30 30 L30 90 L10 90 Z"
           fill="none"
-          stroke="#FF0000"
+          stroke={logoColor}
           strokeWidth="6"
           variants={draw}
           custom={0}
@@ -37,7 +42,7 @@ export default function AnimatedLogoLoader() {
         <motion.path
           d="M30 30 L90 30 L90 50 L50 50 L50 90 L30 90 Z"
           fill="none"
-          stroke="#FF0000"
+          stroke={logoColor}
           strokeWidth="6"
           variants={draw}
           custom={1}
@@ -45,7 +50,7 @@ export default function AnimatedLogoLoader() {
         <motion.path
           d="M50 50 L90 50 L90 70 L70 70 L70 90 L50 90 Z"
           fill="none"
-          stroke="#FF0000"
+          stroke={logoColor}
           strokeWidth="6"
           variants={draw}
           custom={2}
