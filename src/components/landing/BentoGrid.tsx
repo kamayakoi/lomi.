@@ -6,8 +6,8 @@ import { AnimatedListDemo } from "./AnimatedList";
 const features = [
     {
         Icon: Share2Icon,
-        name: "Integrations",
-        description: "Supports 5+ providers and more than 10 payment channels and counting.",
+        name: "Payment channels",
+        description: "Supports 5+ providers and more than 10 payment methods and counting.",
         href: "/portal",
         cta: "Get started",
         className: "col-span-3 lg:col-span-2",
@@ -41,7 +41,7 @@ const features = [
     },
     {
         Icon: ReceiptIcon,
-        name: "Payment Orchestration",
+        name: "Orchestration",
         description: "Manage all your payments, subscriptions, payouts and more in one single place.",
         href: "/products",
         cta: "Learn more",

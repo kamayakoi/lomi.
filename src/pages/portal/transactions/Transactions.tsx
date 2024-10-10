@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Download, Search, ArrowDownIcon, ArrowUpIcon, Filter, ArrowUpDown } from 'lucide-react'
+import { CalendarIcon, Download, Search, ArrowDownIcon, Filter, ArrowUpDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
+import { supabase } from '@/utils/supabase/client'
 
 type Transaction = {
     transaction_id: string
@@ -29,21 +30,63 @@ type Transaction = {
     date: string
 }
 
-const mockTransactions: Transaction[] = [
-    // ... (same as before)
-]
+type FetchedTransaction = {
+    transaction_id: string
+    customer_name: string
+    gross_amount: number
+    net_amount: number
+    currency_code: string
+    payment_method_code: string
+    status: string
+    transaction_type: string
+    created_at: string
+}
 
 export default function TransactionsPage() {
+    const [transactions, setTransactions] = useState<Transaction[]>([])
     const [date, setDate] = useState<DateRange | undefined>()
     const [showFilters, setShowFilters] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+    const [totalIncomingAmount, setTotalIncomingAmount] = useState(0)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
+
+    useEffect(() => {
+        fetchTransactions()
+        fetchTotalIncomingAmount()
+    }, [])
+
+    const fetchTransactions = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const { data, error } = await supabase.rpc('fetch_transactions', {
+            p_merchant_id: user?.id,
+        })
+
+        if (error) {
+            console.error('Error fetching transactions:', error)
+            return
+        }
+
+        const formattedTransactions = data.map((transaction: FetchedTransaction) => ({
+            transaction_id: transaction.transaction_id,
+            customer: transaction.customer_name,
+            gross_amount: transaction.gross_amount,
+            net_amount: transaction.net_amount,
+            currency: transaction.currency_code,
+            payment_method: transaction.payment_method_code,
+            status: transaction.status,
+            type: transaction.transaction_type,
+            date: format(new Date(transaction.created_at), 'yyyy-MM-dd'),
+        }))
+
+        setTransactions(formattedTransactions)
+    }
 
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
@@ -54,7 +97,7 @@ export default function TransactionsPage() {
         }
     }
 
-    const filteredAndSortedTransactions = mockTransactions
+    const filteredAndSortedTransactions = transactions
         .filter(transaction =>
             Object.values(transaction).some(value =>
                 value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,6 +109,21 @@ export default function TransactionsPage() {
             if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1
             return 0
         })
+
+    const fetchTotalIncomingAmount = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
+            p_merchant_id: user?.id,
+        })
+
+        if (error) {
+            console.error('Error fetching total incoming amount:', error)
+            return
+        }
+
+        setTotalIncomingAmount(data)
+    }
 
     return (
         <Layout fixed>
@@ -91,18 +149,8 @@ export default function TransactionsPage() {
                                     <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">XOF 0</div>
-                                    <p className="text-xs text-muted-foreground">0 transactions</p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Total Outgoing Amount</CardTitle>
-                                    <ArrowUpIcon className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">XOF 0</div>
-                                    <p className="text-xs text-muted-foreground">0 transactions</p>
+                                    <div className="text-2xl font-bold">XOF {totalIncomingAmount}</div>
+                                    <p className="text-xs text-muted-foreground">{transactions.length} transactions</p>
                                 </CardContent>
                             </Card>
                         </div>
