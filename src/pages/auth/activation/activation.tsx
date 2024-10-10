@@ -84,15 +84,32 @@ const Activation: React.FC = () => {
         const checkActivationStatus = async () => {
             if (user) {
                 try {
-                    const { data, error } = await supabase.rpc('check_activation_status', {
+                    const { data: status, error } = await supabase.rpc('check_activation_state', {
                         p_merchant_id: user.id
                     });
                     if (error) throw error;
-                    if (data === true) {
-                        setCurrentStep(5); // Move to final step
-                    } else if (currentStep === 4) {
-                        // If currently on step 4 (verification in progress), stay there
-                        setCurrentStep(4);
+
+                    switch (status) {
+                        case 'approved':
+                            setCurrentStep(5); // Move to final step
+                            break;
+                        case 'rejected':
+                            setCurrentStep(0); // Restart from step 1
+                            setActivationData(initialActivationData); // Reset activation data
+                            break;
+                        case 'pending':
+                            if (currentStep === 4) {
+                                // If currently on step 4 (verification in progress), stay there
+                                setCurrentStep(4);
+                            }
+                            break;
+                        default:
+                            // If not submitted and no activation data stored, reset to initial state
+                            if (Object.keys(activationData).length === 0) {
+                                setCurrentStep(0);
+                                setActivationData(initialActivationData);
+                            }
+                            break;
                     }
                 } catch (error) {
                     console.error('Error checking activation status:', error);
@@ -103,7 +120,7 @@ const Activation: React.FC = () => {
         if (!userLoading && user) {
             checkActivationStatus();
         }
-    }, [user, userLoading, setCurrentStep, currentStep]);
+    }, [user, userLoading, setCurrentStep, currentStep, setActivationData, activationData]);
 
     const handleNext = (stepData: Partial<ActivationData>) => {
         setActivationData((prevData) => ({ ...prevData, ...stepData }));
@@ -143,7 +160,7 @@ const Activation: React.FC = () => {
                 p_authorized_signatory_name: completeData.fullName,
                 p_authorized_signatory_email: completeData.email,
                 p_authorized_signatory_phone_number: completeData.countryCode + completeData.mobileNumber,
-                p_legal_representative_ID_url: completeData.identityProof,
+                p_legal_representative_id_url: completeData.identityProof,
                 p_address_proof_url: completeData.addressProof,
                 p_business_registration_url: completeData.businessRegistration,
             });

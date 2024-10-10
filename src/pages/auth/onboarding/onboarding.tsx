@@ -66,19 +66,17 @@ const Onboarding: React.FC = () => {
             if (session?.user) {
                 setUser(session.user);
                 setIsEmailVerified(session.user.email_confirmed_at !== null);
-                const { data: profile, error: profileError } = await supabase
-                    .from('merchants')
-                    .select('onboarded')
-                    .eq('merchant_id', session.user.id)
-                    .single();
 
-                if (profileError) {
-                    console.error('Error fetching user profile:', profileError);
+                const { data: isOnboarded, error: onboardingError } = await supabase
+                    .rpc('check_onboarding_status', { p_merchant_id: session.user.id });
+
+                if (onboardingError) {
+                    console.error('Error checking onboarding status:', onboardingError);
                     setLoading(false);
                     return;
                 }
 
-                if (profile && profile.onboarded) {
+                if (isOnboarded) {
                     navigate('/portal');
                 } else {
                     setLoading(false);

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { Button } from "@/components/ui/button";
 import { FileUp } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { useUser } from '@/lib/hooks/useUser';
+import { supabase } from '@/utils/supabase/client'; // Import the Supabase client
 
 interface KYCFileUploaderProps {
     documentType: 'legal_representative_ID' | 'address_proof' | 'business_registration';
@@ -17,9 +18,9 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
     currentFile,
     organizationId
 }) => {
-    const supabase = useSupabaseClient();
     const [isUploading, setIsUploading] = useState(false);
     const [fileName, setFileName] = useState<string | null>(currentFile ?? null);
+    const { user } = useUser(); // Get the current user using the useUser hook
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -30,8 +31,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
             }
             setIsUploading(true);
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) throw new Error('No user found');
+                if (!user) throw new Error('No user found'); // Check if user exists
 
                 const fileExt = file.name.split('.').pop();
                 const uniqueFileName = `${organizationId}/${documentType}_${Date.now()}.${fileExt}`;

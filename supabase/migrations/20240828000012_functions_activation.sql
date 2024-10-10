@@ -32,7 +32,7 @@ CREATE OR REPLACE FUNCTION public.complete_activation(
     p_authorized_signatory_name VARCHAR,
     p_authorized_signatory_email VARCHAR,
     p_authorized_signatory_phone_number VARCHAR,
-    p_legal_representative_ID_url VARCHAR,
+    p_legal_representative_id_url VARCHAR,
     p_address_proof_url VARCHAR,
     p_business_registration_url VARCHAR
 ) RETURNS VOID AS $$
@@ -59,7 +59,7 @@ BEGIN
         authorized_signatory_name,
         authorized_signatory_email,
         authorized_signatory_phone_number,
-        legal_representative_ID_url,
+        legal_representative_id_url,
         address_proof_url,
         business_registration_url,
         kyc_submitted_at
@@ -79,7 +79,7 @@ BEGIN
         p_authorized_signatory_name,
         p_authorized_signatory_email,
         p_authorized_signatory_phone_number,
-        p_legal_representative_ID_url,
+        p_legal_representative_id_url,
         p_address_proof_url,
         p_business_registration_url,
         CURRENT_TIMESTAMP
@@ -97,10 +97,30 @@ BEGIN
         authorized_signatory_name = EXCLUDED.authorized_signatory_name,
         authorized_signatory_email = EXCLUDED.authorized_signatory_email,
         authorized_signatory_phone_number = EXCLUDED.authorized_signatory_phone_number,
-        legal_representative_ID_url = EXCLUDED.legal_representative_ID_url,
+        legal_representative_id_url = EXCLUDED.legal_representative_id_url,
         address_proof_url = EXCLUDED.address_proof_url,
         business_registration_url = EXCLUDED.business_registration_url,
         kyc_submitted_at = CURRENT_TIMESTAMP,
         status = 'pending';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to check activation status
+CREATE OR REPLACE FUNCTION public.check_activation_state(p_merchant_id UUID)
+RETURNS VARCHAR AS $$
+DECLARE
+    v_status VARCHAR;
+BEGIN
+    SELECT status INTO v_status
+    FROM organization_kyc
+    WHERE merchant_id = p_merchant_id
+    ORDER BY kyc_submitted_at DESC
+    LIMIT 1;
+
+    IF v_status IS NULL THEN
+        RETURN 'not_submitted';
+    ELSE
+        RETURN v_status;
+    END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import useLocalStorage from './use-local-storage'
+import useLocalStorage from './use-sidebar-collapsed-state'
 
 export default function useIsCollapsed() {
   const [isCollapsed, setIsCollapsed] = useLocalStorage({

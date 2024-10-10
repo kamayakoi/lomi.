@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
@@ -74,6 +74,15 @@ export default function Sidebar({ className }: SidebarProps) {
     setTheme(newTheme);
   };
 
+  const filteredLinks = useMemo(() => {
+    return sidelinks.filter((link) => {
+      if ('condition' in link) {
+        return link.condition === 'isActivationRequired' ? !isActivated : true;
+      }
+      return true;
+    });
+  }, [isActivated]);
+
   return (
     <aside
       className={cn(
@@ -128,12 +137,7 @@ export default function Sidebar({ className }: SidebarProps) {
           id='sidebar-menu'
           className={`z-40 h-full flex-1 overflow-auto scrollbar-hide ${navOpened ? 'max-h-screen' : 'max-h-0 py-0 md:max-h-screen md:py-1'}`}
           closeNav={() => setNavOpened(false)}
-          links={sidelinks.filter((link) => {
-            if ('condition' in link) {
-              return link.condition === 'isActivationRequired' ? !isActivated : true
-            }
-            return true
-          })}
+          links={filteredLinks}
         />
 
         {/* Organization info */}

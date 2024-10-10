@@ -91,7 +91,7 @@ export function AnimatedListDemo({
                 className,
             )}
         >
-            <AnimatedList delay={13000}>
+            <AnimatedList delay={10000}>
                 {notifications.map((item, idx) => (
                     <Notification {...item} key={idx} />
                 ))}
