@@ -14,7 +14,7 @@ BEGIN
 
     RETURN v_organization_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to complete activation (renamed from upsert_organization_kyc)
 CREATE OR REPLACE FUNCTION public.complete_activation(
@@ -103,7 +103,7 @@ BEGIN
         kyc_submitted_at = CURRENT_TIMESTAMP,
         status = 'pending';
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to check activation status
 CREATE OR REPLACE FUNCTION public.check_activation_state(p_merchant_id UUID)
@@ -123,4 +123,4 @@ BEGIN
         RETURN v_status;
     END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

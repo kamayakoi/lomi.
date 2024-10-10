@@ -96,3 +96,98 @@
     display: none;
   }
 }
+
+@media (min-width: 760px) and (max-width: 1360px) {
+  .navbar-logo-container {
+    margin-right: 0;
+    padding-left: 0;
+  }
+
+  .navbar-desktop-menu {
+    display: none;
+  }
+
+  .navbar-mobile-menu {
+    display: flex;
+  }
+
+  .navbar-logo-container a {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-logo-container a span {
+    display: inline;
+    margin-left: 0.5rem;
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1360px) {
+  .navbar-logo-container {
+    margin-right: 0;
+    padding-left: 0;
+    display: flex; /* Ensure the logo container is displayed */
+  }
+
+  .navbar-desktop-menu {
+    display: none;
+  }
+
+  .navbar-mobile-menu {
+    display: flex;
+  }
+
+  .navbar-logo-container a {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-logo-container a span {
+    display: inline;
+    margin-left: 0.5rem;
+  }
+
+  /* Adjust the layout for the about navbar */
+  .navbar-dock {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+  }
+
+  .navbar-logo-container {
+    flex: 1;
+  }
+
+  /* Style for the mobile menu button */
+  .navbar-mobile-menu {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-mobile-menu button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+}
+
+/* Ensure the mobile menu is visible on smaller screens */
+@media (max-width: 759px) {
+  .navbar-mobile-menu {
+    display: flex;
+  }
+}
+
+/* Hide mobile menu on larger screens */
+@media (min-width: 1361px) {
+  .navbar-mobile-menu {
+    display: none;
+  }
+
+  .navbar-desktop-menu {
+    display: flex;
+  }
+}

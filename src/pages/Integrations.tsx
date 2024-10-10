@@ -68,7 +68,7 @@ const Integrations = () => {
                                     <div className="mt-6 text-left">
                                         <p className="text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.description }}></p>
                                         <p className="mt-4 text-muted-foreground dark:text-muted-foreground" dangerouslySetInnerHTML={{ __html: option.details }}></p>
-                                        <a href={option.link} className="text-blue-500 dark:text-blue-400 font-semibold mt-6 inline-block">
+                                        <a href={option.link} className="text-blue-600 dark:text-blue-400 font-semibold mt-6 inline-block">
                                             {option.linkText || (option.link.includes('mailto') ? 'Contact us to learn more →' : 'Explore our developer docs →')}
                                         </a>
                                     </div>

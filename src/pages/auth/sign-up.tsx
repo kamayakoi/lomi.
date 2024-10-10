@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { SignUpForm } from '@/components/auth/sign-up-form'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
+import { Link } from 'react-router-dom'
 
 export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false)
@@ -77,7 +78,7 @@ export default function SignUp() {
 
   return (
     <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
-      <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
+      <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[500px] lg:p-8'>
         <Card className='p-6'>
           <div className='mb-2 flex flex-col space-y-2 text-left'>
             <h1 className='text-2xl font-semibold tracking-tight'>
@@ -94,19 +95,19 @@ export default function SignUp() {
           />
           <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
             By creating an account, you agree to our{' '}
-            <a
-              href='/terms'
-              className='underline underline-offset-4 hover:text-primary'
+            <Link
+              to='/terms'
+              className='text-blue-600 hover:underline'
             >
               Terms of Service
-            </a>{' '}
+            </Link>{' '}
             and{' '}
-            <a
-              href='/privacy'
-              className='underline underline-offset-4 hover:text-primary'
+            <Link
+              to='/privacy'
+              className='text-blue-600 hover:underline'
             >
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </Card>

@@ -12,4 +12,4 @@ BEGIN
         business_registration_url = CASE WHEN p_document_type = 'business_registration' THEN p_document_url ELSE business_registration_url END
     WHERE organization_id = p_organization_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

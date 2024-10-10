@@ -35,7 +35,7 @@ const NotificationIcon = ({ type }: { type: string }) => {
                     case 'billing':
                         return <FileText className="w-4 h-4 text-purple-500" />
                     case 'invoice':
-                        return <FileText className="w-4 h-4 text-blue-500" />
+                        return <FileText className="w-4 h-4 text-blue-600" />
                     case 'provider_status':
                         return <AlertTriangle className="w-4 h-4 text-orange-500" />
                     case 'dispute':
@@ -53,7 +53,7 @@ const NotificationIcon = ({ type }: { type: string }) => {
                     case 'chargeback':
                         return <ArrowLeftRight className="w-4 h-4 text-red-500" />
                     default:
-                        return <InfoIcon className="w-4 h-4 text-blue-500" />
+                        return <InfoIcon className="w-4 h-4 text-blue-600" />
                 }
             })()}
         </div>

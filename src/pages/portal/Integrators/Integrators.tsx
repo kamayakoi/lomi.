@@ -73,7 +73,7 @@ export default function Providers() {
                   <h2 className='mb-2 text-lg font-semibold'>{integration.title}</h2>
                   <p className='text-gray-500' dangerouslySetInnerHTML={{ __html: integration.description }}></p>
                   {integration.link && (
-                    <a href={integration.link} className='text-blue-500 dark:text-blue-400 font-semibold mt-4 flex items-center'>
+                    <a href={integration.link} className='text-blue-600 dark:text-blue-400 font-semibold mt-4 flex items-center'>
                       <span>Learn more</span>
                     </a>
                   )}

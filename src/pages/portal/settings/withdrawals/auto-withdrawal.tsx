@@ -20,7 +20,7 @@ export default function AutoWithdrawal() {
                         <h2 className="text-lg font-semibold">Auto-Withdrawal</h2>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="link" className="text-blue-500 hover:text-blue-600">
+                                <Button variant="link" className="text-blue-600 hover:text-blue-600">
                                     Learn more <ChevronRightIcon className="ml-1 h-4 w-4" />
                                 </Button>
                             </DialogTrigger>

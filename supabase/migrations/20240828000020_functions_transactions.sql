@@ -30,7 +30,7 @@ BEGIN
     WHERE 
         t.merchant_id = p_merchant_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to fetch total incoming amount for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_total_incoming_amount(p_merchant_id UUID)
@@ -49,7 +49,7 @@ BEGIN
         
     RETURN v_total_incoming;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to fetch total outgoing amount for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_total_outgoing_amount(p_merchant_id UUID)
@@ -69,4 +69,4 @@ BEGIN
         
     RETURN v_total_outgoing;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

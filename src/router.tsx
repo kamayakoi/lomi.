@@ -11,7 +11,7 @@ import Home from "./pages/Home.tsx";
 import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
 import Integrations from './pages/Integrations.tsx';
-import Careers from './pages/Careers.tsx';
+// import Careers from './pages/Careers.tsx';
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
@@ -90,7 +90,6 @@ const AppRouter = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/integrations" element={<Integrations />} />
-                <Route path="/careers" element={<Careers />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/status" element={<Status />} />

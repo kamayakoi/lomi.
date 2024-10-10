@@ -21,7 +21,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger the function after inserting a new merchant
 CREATE TRIGGER send_onboarding_notifications_trigger
@@ -37,7 +37,7 @@ BEGIN
     SET is_read = true
     WHERE merchant_id = p_merchant_id AND is_read = false;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to mark a specific notification as read
 CREATE OR REPLACE FUNCTION public.mark_notification_read(p_notification_id UUID)
@@ -47,7 +47,7 @@ BEGIN
     SET is_read = true
     WHERE notification_id = p_notification_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.mark_all_notifications_read(UUID) TO authenticated;

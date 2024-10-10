@@ -207,7 +207,7 @@ export default function BalancePage() {
                             </div>
                         </div>
                     </div>
-                    <DialogDescription className="text-sm text-blue-500">
+                    <DialogDescription className="text-sm text-blue-600">
                         Your top-up experience on live mode may be different
                     </DialogDescription>
                     <div className="flex justify-between">

@@ -53,7 +53,7 @@ export const sidelinks: SidebarItem[] = [
   {
     title: 'Home',
     href: '/portal',
-    icon: <IconLayoutDashboard className="text-blue-500" size={18} />,
+    icon: <IconLayoutDashboard className="text-blue-600" size={18} />,
   },
   {
     title: 'Balance',
