@@ -198,6 +198,11 @@ export default function Profile() {
         const nextIndex = newPinArray.findIndex((digit: string) => digit === '')
         const focusIndex = nextIndex === -1 ? 3 : nextIndex
         inputRefs.current[focusIndex]?.focus()
+
+        // Automatically transition to the new PIN input after entering the 4-digit current PIN
+        if (newPinArray.every((digit: string) => digit !== '')) {
+            inputRefs.current[4]?.focus()
+        }
     }
 
     const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -378,190 +383,203 @@ export default function Profile() {
     }
 
     return (
-        <ContentSection
-            title="Profile"
-            desc="Update your profile details and adjust your security settings."
-        >
-            <div>
-                <div className="space-y-6">
-                    <div className="flex items-center space-x-4">
-                        <ProfilePictureUploader
-                            currentAvatar={avatarUrl}
-                            onAvatarUpdate={handleAvatarUpdate}
-                            name={merchant?.name || ''}
-                        />
-                    </div>
+        <div style={{
+            overflowY: 'auto',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+            <ContentSection
+                title="Profile"
+                desc="Update your profile details and adjust your security settings."
+            >
+                <div>
+                    <div className="space-y-6">
+                        <div className="flex items-center space-x-4">
+                            <ProfilePictureUploader
+                                currentAvatar={avatarUrl}
+                                onAvatarUpdate={handleAvatarUpdate}
+                                name={merchant?.name || ''}
+                            />
+                        </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Full name</Label>
-                            <Input id="name" value={merchant.name} readOnly className="bg-muted" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" value={merchant.email} readOnly className="bg-muted" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone number</Label>
-                            <Input id="phone" value={merchant.phone_number} readOnly className="bg-muted" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="language">Language</Label>
-                            <Input id="language" value={merchant.preferred_language} readOnly className="bg-muted" />
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Change password</h3>
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label htmlFor="current-password">Current password</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="current-password"
-                                        type="password"
-                                        value={currentPassword}
-                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className="pr-10"
-                                    />
-                                </div>
+                                <Label htmlFor="name">Full name</Label>
+                                <Input id="name" value={merchant.name} readOnly className="bg-muted" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="new-password">New password</Label>
-                                <div className="relative flex items-center">
-                                    <Input
-                                        id="new-password"
-                                        type={showNewPassword ? "text" : "password"}
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNewPassword(!showNewPassword)}
-                                        className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 mr-16"
-                                    >
-                                        {showNewPassword ? (
-                                            <EyeOffIcon className="h-5 w-5" />
-                                        ) : (
-                                            <EyeIcon className="h-5 w-5" />
-                                        )}
-                                    </button>
-                                    <Button
-                                        size="sm"
-                                        onClick={handlePasswordChange}
-                                        className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
-                                    >
-                                        Save
-                                    </Button>
+                                <Label htmlFor="email">Email</Label>
+                                <Input id="email" value={merchant.email} readOnly className="bg-muted" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="phone">Phone number</Label>
+                                <Input id="phone" value={merchant.phone_number} readOnly className="bg-muted" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="language">Language</Label>
+                                <Input id="language" value={merchant.preferred_language} readOnly className="bg-muted" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium">Change password</h3>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="current-password">Current password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="current-password"
+                                            type="password"
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className="pr-10"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="new-password">New password</Label>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                            id="new-password"
+                                            type={showNewPassword ? "text" : "password"}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 mr-16"
+                                        >
+                                            {showNewPassword ? (
+                                                <EyeOffIcon className="h-5 w-5" />
+                                            ) : (
+                                                <EyeIcon className="h-5 w-5" />
+                                            )}
+                                        </button>
+                                        <Button
+                                            size="sm"
+                                            onClick={handlePasswordChange}
+                                            className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium">Additional security</h3>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-sm font-medium">PIN</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        Required for payouts.
+                                    </p>
+                                </div>
+                                <Button variant="outline" onClick={() => setShowPinModal(true)}>
+                                    {hasPIN ? 'Update your PIN' : 'Set your PIN'}
+                                </Button>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-sm font-medium">2-factor Authentication</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        Require a security key in addition to your password.
+                                    </p>
+                                </div>
+                                <Switch disabled />
+                            </div>
+                        </div>
+
+                        <p className="text-sm text-muted-foreground mt-4">
+                            Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Profile information" className="underline">hello@lomi.africa</a> if you want to update your profile details.
+                        </p>
                     </div>
 
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Additional security</h3>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h4 className="text-sm font-medium">PIN</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Required for payouts.
-                                </p>
-                            </div>
-                            <Button variant="outline" onClick={() => setShowPinModal(true)}>
-                                {hasPIN ? 'Update your PIN' : 'Set your PIN'}
-                            </Button>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h4 className="text-sm font-medium">2-factor Authentication</h4>
-                                <p className="text-sm text-muted-foreground">
-                                    Require a security key in addition to your password.
-                                </p>
-                            </div>
-                            <Switch disabled />
-                        </div>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground mt-4">
-                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Profile information" className="underline">hello@lomi.africa</a> if you want to update your profile details.
-                    </p>
-                </div>
-
-                {showPinModal && (
-                    <Dialog open={showPinModal} onOpenChange={setShowPinModal}>
-                        <DialogContent className="sm:max-w-[350px]">
-                            <DialogHeader>
-                                <DialogTitle className="text-center flex items-center justify-center gap-2">
-                                    <KeyRound className="w-4 h-4" />
-                                    {hasPIN ? 'Change your PIN' : 'Set your PIN'}
-                                </DialogTitle>
+                    {showPinModal && (
+                        <Dialog open={showPinModal} onOpenChange={setShowPinModal}>
+                            <DialogContent className="sm:max-w-[350px]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-center flex items-center justify-center gap-2">
+                                        <KeyRound className="w-4 h-4" />
+                                        {hasPIN ? 'Change your PIN' : 'Set your PIN'}
+                                    </DialogTitle>
+                                    {hasPIN && (
+                                        <DialogDescription className="text-center mt-2">
+                                            Enter your current PIN to change it
+                                        </DialogDescription>
+                                    )}
+                                </DialogHeader>
                                 {hasPIN && (
-                                    <DialogDescription className="text-center mt-2">
-                                        Enter your current PIN to change it
-                                    </DialogDescription>
+                                    <div className="flex flex-col items-center gap-3 my-4">
+                                        <div className="flex justify-center gap-2">
+                                            {Array.from({ length: 4 }).map((_, index) => (
+                                                <input
+                                                    key={index}
+                                                    ref={el => inputRefs.current[index] = el}
+                                                    type={currentPinInput.join('').length === 4 ? 'password' : 'text'}
+                                                    inputMode="numeric"
+                                                    pattern="\d*"
+                                                    maxLength={1}
+                                                    value={currentPinInput[index] || ''}
+                                                    onChange={(e) => handleCurrentPinChange(index, e.target.value)}
+                                                    onKeyDown={(e) => handleCurrentPinKeyDown(index, e)}
+                                                    className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                                    aria-label={`Current PIN digit ${index + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        {currentPinError && (
+                                            <p className="text-sm text-red-500">{currentPinError}</p>
+                                        )}
+                                    </div>
                                 )}
-                            </DialogHeader>
-                            {hasPIN && (
                                 <div className="flex flex-col items-center gap-3 my-4">
                                     <div className="flex justify-center gap-2">
                                         {Array.from({ length: 4 }).map((_, index) => (
                                             <input
                                                 key={index}
-                                                ref={el => inputRefs.current[index] = el}
-                                                type={currentPinInput.join('').length === 4 ? 'password' : 'text'}
+                                                ref={el => inputRefs.current[index + (hasPIN ? 4 : 0)] = el}
+                                                type={newPin.join('').length === 4 ? 'password' : 'text'}
                                                 inputMode="numeric"
                                                 pattern="\d*"
                                                 maxLength={1}
-                                                value={currentPinInput[index] || ''}
-                                                onChange={(e) => handleCurrentPinChange(index, e.target.value)}
-                                                onKeyDown={(e) => handleCurrentPinKeyDown(index, e)}
+                                                value={newPin[index] || ''}
+                                                onChange={(e) => handlePinChange(index, e.target.value)}
+                                                onKeyDown={(e) => handleKeyDown(index, e)}
                                                 className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                                aria-label={`Current PIN digit ${index + 1}`}
+                                                aria-label={`New PIN digit ${index + 1}`}
                                             />
                                         ))}
                                     </div>
-                                    {currentPinError && (
-                                        <p className="text-sm text-red-500">{currentPinError}</p>
-                                    )}
+                                    <div className="flex items-center justify-center text-xs text-muted-foreground text-center mt-1">
+                                        <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 mb-2" />
+                                        <p>This code is crucial for transaction security.<br />Kindly store it safely.</p>
+                                    </div>
                                 </div>
-                            )}
-                            <div className="flex flex-col items-center gap-3 my-4">
-                                <div className="flex justify-center gap-2">
-                                    {Array.from({ length: 4 }).map((_, index) => (
-                                        <input
-                                            key={index}
-                                            ref={el => inputRefs.current[index + (hasPIN ? 4 : 0)] = el}
-                                            type={newPin.join('').length === 4 ? 'password' : 'text'}
-                                            inputMode="numeric"
-                                            pattern="\d*"
-                                            maxLength={1}
-                                            value={newPin[index] || ''}
-                                            onChange={(e) => handlePinChange(index, e.target.value)}
-                                            onKeyDown={(e) => handleKeyDown(index, e)}
-                                            className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                            aria-label={`New PIN digit ${index + 1}`}
-                                        />
-                                    ))}
-                                </div>
-                                <div className="flex items-center justify-center text-xs text-muted-foreground text-center mt-1">
-                                    <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 mb-2" />
-                                    <p>This code is crucial for transaction security.<br />Kindly store it safely.</p>
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button
-                                    onClick={handleSavePIN}
-                                    disabled={newPin.some((digit: string) => digit === '') || (hasPIN && currentPinInput.some((digit: string) => digit === ''))}
-                                    className="w-full"
-                                >
-                                    {hasPIN ? 'Change' : 'Save'}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                )}
-            </div>
-        </ContentSection>
+                                <DialogFooter>
+                                    <Button
+                                        onClick={handleSavePIN}
+                                        disabled={newPin.some((digit: string) => digit === '') || (hasPIN && currentPinInput.some((digit: string) => digit === ''))}
+                                        className="w-full"
+                                    >
+                                        {hasPIN ? 'Change' : 'Save'}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    )}
+                </div>
+            </ContentSection>
+        </div>
     )
 }
