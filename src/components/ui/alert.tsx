@@ -1,5 +1,5 @@
 import { cva, VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/actions/utils'
 import { Info, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react'
 
 const alertVariants = cva(

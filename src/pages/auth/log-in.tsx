@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card'
-import { UserAuthForm } from './components/user-auth-form'
+import { UserAuthForm } from '@/components/auth/user-auth-form'
 
 export default function Login() {
   return (

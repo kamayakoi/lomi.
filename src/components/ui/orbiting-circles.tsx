@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/actions/utils";
 
 export interface OrbitingCirclesProps {
   className?: string;

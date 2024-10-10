@@ -1,6 +1,6 @@
 import React, { forwardRef, useRef } from "react";
 
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/actions/utils";
 import { AnimatedBeam } from "../ui/animated-beam";
 
 const Square = forwardRef<
@@ -93,10 +93,10 @@ export function AnimatedBeamMultipleOutputDemo({
                         <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div4Ref} className="size-14">
-                        <img src="/apple-pay2.png" alt="Apple Pay" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/apple-pay-2.png" alt="Apple Pay" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div5Ref} className="size-14">
-                        <img src="/ecobank2.png" alt="Ecobank" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/ecobank-2.png" alt="Ecobank" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
             </div>

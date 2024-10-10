@@ -3,11 +3,11 @@ import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
 import Nav from './nav'
-import { cn } from '@/lib/utils'
-import { sidelinks } from '../../pages/portal/dashboard/data/sidelinks'
-import { useTheme } from '@/lib/useTheme'
+import { cn } from '@/lib/actions/utils'
+import { sidelinks } from '../../utils/data/sidelinks'
+import { useTheme } from '@/lib/hooks/useTheme'
 import iconLight from "/icon.png"
-import iconDark from "/icon_dark.svg"
+import iconDark from "/icon_dark.png"
 import { supabase } from '@/utils/supabase/client'
 import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus'

@@ -1,7 +1,7 @@
 import { NavbarAbout } from '../components/landing/Navbar-About';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
-import { useTheme } from '@/lib/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { useEffect } from 'react';
 
 const About = () => {

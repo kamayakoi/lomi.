@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { ActivationData } from "./activation";
 import { Button } from "@/components/ui/button";
-import KYCFileUploader from "@/pages/auth/components/kyc-file-uploader";
+import KYCFileUploader from "@/components/auth/kyc-file-uploader";
 import { useUser } from '@/lib/hooks/useUser';
 
 type ActivationStep4Data = {

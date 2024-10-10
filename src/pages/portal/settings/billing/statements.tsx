@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import ContentSection from '../components/content-section'
+import ContentSection from '../../../../components/dashboard/content-section'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"

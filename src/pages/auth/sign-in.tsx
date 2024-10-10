@@ -1,4 +1,4 @@
-import { UserAuthForm } from './components/user-auth-form'
+import { UserAuthForm } from '@/components/auth/user-auth-form'
 import { Link } from 'react-router-dom'
 import { AnimatedBeamMultipleOutputDemo } from '../../components/landing/AnimatedBeamMultipleOutputs'
 

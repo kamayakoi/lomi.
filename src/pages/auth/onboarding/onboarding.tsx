@@ -4,7 +4,7 @@ import { supabase } from '@/utils/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { User as SupabaseUser } from '@supabase/supabase-js';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/actions/utils'
 import OnboardingStep1 from './onboarding-step-1';
 import OnboardingStep2 from './onboarding-step-2';
 import OnboardingStep3 from './onboarding-step-3';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { useTheme } from '@/lib/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { Moon, Sun } from "lucide-react";
 
 // Define the props interface to include className

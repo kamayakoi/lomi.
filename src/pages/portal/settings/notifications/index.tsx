@@ -1,5 +1,5 @@
 import { NotificationsForm } from './notifications-form'
-import ContentSection from '../components/content-section'
+import ContentSection from '../../../../components/dashboard/content-section'
 
 export default function SettingsNotifications() {
   return (

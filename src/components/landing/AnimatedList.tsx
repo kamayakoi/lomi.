@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/actions/utils";
 import { AnimatedList } from "@/components/ui/animated-list";
 
 interface Item {

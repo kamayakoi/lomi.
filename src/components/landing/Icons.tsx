@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import icon from "/icon.png";
-import icon11 from "/WAR2.png"
+import icon11 from "/lomi-icon.png"
 import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
 import kwameadjei from "/kwameadjei.png";
@@ -8,9 +8,9 @@ import iconDark from "/whiteblack.png";
 import mtnLogo from '/mtn.png';
 import waveLogo from '/wave.png';
 import applePayLogo from '/apple-pay.png';
-import war2Logo from '/ecobank2.png';
+import ecobankLogo from '/ecobank-2.png';
 
-import { useTheme } from '@/lib/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 export const LogoIcon = () => {
   const { theme } = useTheme();
@@ -86,11 +86,11 @@ export const ApplePayLogo = () => {
   );
 };
 
-export const War2Logo = () => {
+export const EcobankLogo = () => {
   return (
     <img
-      src={war2Logo}
-      alt="war2"
+      src={ecobankLogo}
+      alt="ecobank"
       className="lucide lucide-panels-top-left mr-2"
       style={{ width: '100px', height: '100px', borderRadius: '50%' }}
     />

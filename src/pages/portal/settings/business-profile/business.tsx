@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react'
-import ContentSection from '../components/content-section'
+import ContentSection from '../../../../components/dashboard/content-section'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const LogoUploader = React.lazy(() => import('../../../auth/components/logo-uploader'))
+const LogoUploader = React.lazy(() => import('../../../../components/auth/logo-uploader'))
 
 interface OrganizationDetails {
     organization_id: string;

@@ -42,7 +42,7 @@ export function OrbitingCirclesDemo() {
                 delay={20}
                 reverse
             >
-                <Icons.War2Logo />
+                <Icons.EcobankLogo />
             </OrbitingCircles>
         </div>
     );

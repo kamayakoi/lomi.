@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { SignUpForm } from './components/sign-up-form'
+import { SignUpForm } from '@/components/auth/sign-up-form'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 

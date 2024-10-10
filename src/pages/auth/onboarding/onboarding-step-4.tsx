@@ -1,8 +1,8 @@
-import { industries, languages } from '@/data/onboarding';
+import { industries, languages } from '@/utils/data/onboarding';
 import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/actions/utils'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';

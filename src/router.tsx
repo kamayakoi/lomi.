@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
-import { OnboardingRoute } from '@/components/auth/OnboardingRoute';
-import { SessionCheck } from '@/components/auth/SessionCheck';
-import ResetPassword from './pages/auth/reset-password.tsx';
-import { ActivationRoute } from './components/auth/ActivationRoute';
+import { ProtectedRoute } from './lib/routes/ProtectedRoute';
+import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
+import { SessionCheck } from '@/lib/routes/SessionCheck';
+import ResetPassword from './pages/auth/reset-password';
+import { ActivationRoute } from '@/lib/routes/ActivationRoute';
 // import { config } from '@/utils/config';
 
 // Home and landing Pages
-import Home from "./pages/home/Home.tsx";
+import Home from "./pages/Home.tsx";
 import About from './pages/About.tsx';
 import Products from './pages/Products.tsx';
 import Integrations from './pages/Integrations.tsx';
@@ -16,12 +16,12 @@ import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 
 // Connect Pages
-import Signin from './pages/auth/sign-in.tsx';
-import Login from './pages/auth/log-in.tsx';
-import Signup from './pages/auth/sign-up.tsx';
-import Forgot from './pages/auth/forgot-password.tsx';
-import OTP from './pages/auth/otp.tsx';
-import Onboarding from './pages/auth/onboarding/onboarding.tsx';
+import Signin from './pages/auth/sign-in';
+import Login from './pages/auth/log-in';
+import Signup from './pages/auth/sign-up';
+import Forgot from './pages/auth/forgot-password';
+import OTP from './pages/auth/otp';
+import Onboarding from './pages/auth/onboarding/onboarding';
 import AuthCallback from './pages/auth/callback';
 
 // Error Pages
@@ -67,7 +67,7 @@ import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.
 import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 import Status from './pages/Status.tsx';
 
-import Activation from './pages/auth/activation/activation.tsx';
+import Activation from './pages/auth/activation/activation';
 
 // API pages
 import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';

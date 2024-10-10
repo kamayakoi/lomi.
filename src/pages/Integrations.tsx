@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Navbar } from '../components/landing/Navbar';
 import { Footer } from '../components/landing/Footer';
-import './home/home.css'; // Import the home.css file
+
+import '@/lib/styles/home.css';
 
 const integrationOptions = [
     {

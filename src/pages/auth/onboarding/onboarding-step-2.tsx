@@ -1,12 +1,12 @@
-import { employeeRanges } from '@/data/onboarding';
+import { employeeRanges } from '@/utils/data/onboarding';
 import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/actions/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import LogoUploader from '@/pages/auth/components/logo-uploader';
+import LogoUploader from '@//components/auth/logo-uploader';
 import { useState, useEffect } from 'react';
 import { type OnboardingData } from './onboarding';
 import {
@@ -20,7 +20,7 @@ import {
     nigerRegions,
     maliRegions,
     burkinaFasoRegions,
-} from '@/data/onboarding';
+} from '@/utils/data/onboarding';
 
 const onboardingStep2Schema = z.object({
     orgName: z.string().min(1, 'Organization name is required'),

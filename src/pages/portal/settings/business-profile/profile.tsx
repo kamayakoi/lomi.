@@ -4,12 +4,12 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
-import ContentSection from '../components/content-section'
+import ContentSection from '../../../../components/dashboard/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 
-const ProfilePictureUploader = React.lazy(() => import('../../../auth/components/avatar-uploader'))
+const ProfilePictureUploader = React.lazy(() => import('../../../../components/auth/avatar-uploader'))
 
 interface MerchantDetails {
     merchant_id: string;

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ActivationData } from "./activation";
-import { countries } from "@/data/onboarding";
+import { countries } from "@/utils/data/onboarding";
 import { Button } from "@/components/ui/button";
 
 const activationStep2Schema = z.object({

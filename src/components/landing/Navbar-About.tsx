@@ -12,12 +12,12 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { buttonVariants } from '@/lib/button-utils';
+import { buttonVariants } from '@/lib/actions/button-utils';
 import { Menu } from "lucide-react";
 import { AboutIcon } from "./Icons";
 import { Dock } from "@/components/ui/dock";
 
-import "./Navbar.css";
+import "@/lib/styles/Navbar.css";
 
 interface RouteProps {
     href: string;

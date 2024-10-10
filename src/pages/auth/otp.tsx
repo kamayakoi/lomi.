@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
-import { OtpForm } from './components/otp-form'
+import { OtpForm } from '@/components/auth/otp-form'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 

@@ -1,7 +1,7 @@
 import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/actions/utils'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,7 +26,7 @@ import {
     bamakoDistricts,
     burkinaFasoCities,
     ouagadougouDistricts,
-} from '@/data/onboarding';
+} from '@/utils/data/onboarding';
 
 const onboardingStep3Schema = z.object({
     orgCity: z.string().min(1, 'City is required'),

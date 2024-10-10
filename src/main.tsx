@@ -5,7 +5,6 @@ import { ThemeProvider } from "@/components/landing/theme-provider.tsx";
 import { UserProvider } from '@/lib/contexts/UserContext';
 import AppRouter from "./router";
 import "./index.css";
-import { Loader } from "lucide-react";
 
 const rootElement = document.getElementById("root");
 if (rootElement) {
@@ -13,9 +12,7 @@ if (rootElement) {
     <React.StrictMode>
       <ThemeProvider>
         <UserProvider>
-          <React.Suspense fallback={<div><Loader /></div>}>
-            <AppRouter />
-          </React.Suspense>
+          <AppRouter />
           <Analytics />
         </UserProvider>
       </ThemeProvider>

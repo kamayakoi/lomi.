@@ -6,9 +6,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/actions/utils'
 import useCheckActiveNav from '@/lib/hooks/use-check-active-nav'
-import { SideLink, SidebarItem } from '../../pages/portal/dashboard/data/sidelinks'
+import { SideLink, SidebarItem } from '../../utils/data/sidelinks'
 import { useLocation } from 'react-router-dom'
 
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
