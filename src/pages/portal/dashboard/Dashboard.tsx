@@ -14,7 +14,7 @@ import { Video } from 'lucide-react'
 export default function Dashboard() {
   const topNav = [
     { title: 'Home', href: '/portal', isActive: true },
-    { title: 'Settings', href: '/portal/settings', isActive: false },
+    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
   return (

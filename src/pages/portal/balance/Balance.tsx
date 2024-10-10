@@ -27,7 +27,7 @@ export default function BalancePage() {
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     const handleTopUp = () => {

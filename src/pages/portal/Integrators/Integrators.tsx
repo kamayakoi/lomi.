@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 export default function Providers() {
   const topNav = [
     { title: 'Integrations', href: '/portal/integrations', isActive: true },
-    { title: 'Settings', href: '/portal/settings', isActive: false },
+    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
   const sortedIntegrations = integrationOptions.sort((a, b) =>

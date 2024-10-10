@@ -57,7 +57,7 @@ export default function LogsPage() {
 
     const topNav = [
         { title: 'Logs', href: '/portal/logs', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (

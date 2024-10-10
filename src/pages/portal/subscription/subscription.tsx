@@ -146,7 +146,7 @@ export default function SubscriptionsPage() {
 
   const topNav = [
     { title: 'Subscriptions', href: '/portal/subscription', isActive: true },
-    { title: 'Settings', href: '/portal/settings', isActive: false },
+    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
   const handleCloseAlert = () => {

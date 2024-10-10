@@ -39,7 +39,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 export default function ReportingPage() {
     const topNav = [
         { title: 'Reporting', href: '/portal/reporting', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (

@@ -42,7 +42,7 @@ export default function PayoutLinksPage() {
 
     const topNav = [
         { title: 'Payout Links', href: '/portal/payout-links', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (

@@ -38,7 +38,7 @@ export default function PaymentChannels() {
 
   const topNav = [
     { title: 'Payment Channels', href: '/portal/payment-channels', isActive: true },
-    { title: 'Settings', href: '/portal/settings', isActive: false },
+    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
   useEffect(() => {

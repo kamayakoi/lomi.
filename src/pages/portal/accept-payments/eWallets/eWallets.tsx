@@ -20,7 +20,7 @@ export default function EWalletsPage() {
 
     const topNav = [
         { title: 'E-Wallets', href: '/portal/e-wallets', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (

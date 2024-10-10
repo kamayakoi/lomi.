@@ -42,7 +42,7 @@ export default function TransactionsPage() {
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     const handleSort = (column: keyof Transaction) => {

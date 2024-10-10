@@ -20,7 +20,7 @@ export default function CardsPage() {
 
     const topNav = [
         { title: 'Cards', href: '/portal/cards', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (

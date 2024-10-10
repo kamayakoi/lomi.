@@ -30,7 +30,7 @@ export default function CustomersPage() {
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     const handleAddCustomer = (event: React.FormEvent<HTMLFormElement>) => {

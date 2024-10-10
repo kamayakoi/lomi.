@@ -29,7 +29,7 @@ export default function WebhooksPage() {
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
-        { title: 'Settings', href: '/portal/settings', isActive: false },
+        { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
     return (
