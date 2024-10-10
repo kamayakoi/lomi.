@@ -120,7 +120,7 @@ CREATE TABLE organization_kyc (
   legal_representative_ID_url VARCHAR,
   address_proof_url VARCHAR,
   business_registration_url VARCHAR,
-  status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'not_authorized', 'approved', 'rejected')),
   kyc_submitted_at TIMESTAMPTZ,
   kyc_approved_at TIMESTAMPTZ,
   PRIMARY KEY (organization_id, merchant_id)

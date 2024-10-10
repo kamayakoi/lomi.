@@ -93,15 +93,18 @@ const Activation: React.FC = () => {
                         case 'approved':
                             setCurrentStep(5); // Move to final step
                             break;
-                        case 'rejected':
-                            setCurrentStep(0); // Restart from step 1
-                            setActivationData(initialActivationData); // Reset activation data
-                            break;
                         case 'pending':
-                            if (currentStep === 4) {
-                                // If currently on step 4 (verification in progress), stay there
-                                setCurrentStep(4);
-                            }
+                            // If activation is pending, stay on step 5
+                            setCurrentStep(4);
+                            break;
+                        case 'rejected':
+                            // If rejected, reset activation data but allow proceeding through steps
+                            setActivationData(initialActivationData);
+                            break;
+                        case 'not_authorized':
+                            // If not authorized, stay on step 1 and reset activation data
+                            setCurrentStep(0);
+                            setActivationData(initialActivationData);
                             break;
                         default:
                             // If not submitted and no activation data stored, reset to initial state
@@ -120,7 +123,7 @@ const Activation: React.FC = () => {
         if (!userLoading && user) {
             checkActivationStatus();
         }
-    }, [user, userLoading, setCurrentStep, currentStep, setActivationData, activationData]);
+    }, [user, userLoading, setCurrentStep, setActivationData, activationData]);
 
     const handleNext = (stepData: Partial<ActivationData>) => {
         setActivationData((prevData) => ({ ...prevData, ...stepData }));
