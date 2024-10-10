@@ -51,7 +51,7 @@ export const Hero = () => {
           </Link>
         </div>
 
-        <div className="flex items-center justify-center lg:justify-start">
+        <div className="hidden lg:flex items-center justify-start">
           <AvatarCircles
             avatarUrls={[
               africanledger,

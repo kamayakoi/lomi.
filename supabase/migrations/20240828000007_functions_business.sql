@@ -7,7 +7,7 @@ RETURNS TABLE (
     logo_url VARCHAR,
     website_url VARCHAR,
     verified BOOLEAN,
-    default_currency VARCHAR,
+    default_currency currency_code,
     country VARCHAR,
     region VARCHAR,
     city VARCHAR,

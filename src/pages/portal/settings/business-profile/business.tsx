@@ -285,7 +285,11 @@ export default function Business() {
                                     value={
                                         organization.default_currency === 'XOF'
                                             ? 'XOF — Franc CFA'
-                                            : organization.default_currency
+                                            : organization.default_currency === 'USD'
+                                                ? 'USD — United States Dollar'
+                                                : organization.default_currency === 'EUR'
+                                                    ? 'EUR — Euro'
+                                                    : organization.default_currency
                                     }
                                     readOnly
                                     className="bg-muted"
