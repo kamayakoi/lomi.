@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 import { supabase } from '@/utils/supabase/client'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
-import ProfilePictureUploader from '../../../../components/auth/avatar-uploader'
+import ProfilePictureUploader from '@/components/auth/avatar-uploader'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 
 interface MerchantDetails {
     merchant_id: string;
@@ -17,6 +18,7 @@ interface MerchantDetails {
     avatar_url: string | null;
     phone_number: string;
     pin_code: string;
+    preferred_language: string;
 }
 
 export default function Profile() {
@@ -27,11 +29,21 @@ export default function Profile() {
     const [currentPassword, setCurrentPassword] = useState('')
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showPinModal, setShowPinModal] = useState(false)
-    const [newPin, setNewPin] = useState('')
+    const [newPin, setNewPin] = useState(['', '', '', ''])
+    const [hasPIN, setHasPIN] = useState(false)
+    const [currentPinInput, setCurrentPinInput] = useState(['', '', '', ''])
+    const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+    const [currentPinError, setCurrentPinError] = useState('')
 
     useEffect(() => {
         fetchMerchant()
     }, [])
+
+    useEffect(() => {
+        if (showPinModal) {
+            inputRefs.current[0]?.focus()
+        }
+    }, [showPinModal])
 
     const fetchMerchant = async () => {
         if (typeof window === 'undefined') return
@@ -50,18 +62,22 @@ export default function Profile() {
 
             if (data && data.length > 0) {
                 setMerchant(data[0] as MerchantDetails);
+                setHasPIN(data[0].pin_code !== null && data[0].pin_code !== ''); // Set hasPIN based on pin_code value
 
-                // Download the merchant avatar
-                const { data: avatarData, error: avatarError } = await supabase
-                    .storage
-                    .from('avatars')
-                    .download(data[0].avatar_url);
+                // Check if avatar_url is not null before attempting to download
+                if (data[0].avatar_url) {
+                    // Download the merchant avatar
+                    const { data: avatarData, error: avatarError } = await supabase
+                        .storage
+                        .from('avatars')
+                        .download(data[0].avatar_url);
 
-                if (avatarError) {
-                    console.error('Error downloading avatar:', avatarError);
-                } else {
-                    const avatarUrl = URL.createObjectURL(avatarData);
-                    setAvatarUrl(avatarUrl);
+                    if (avatarError) {
+                        console.error('Error downloading avatar:', avatarError);
+                    } else {
+                        const avatarUrl = URL.createObjectURL(avatarData);
+                        setAvatarUrl(avatarUrl);
+                    }
                 }
             } else {
                 console.error('No merchant data found');
@@ -149,46 +165,135 @@ export default function Profile() {
         }
     }
 
-    const handlePinChange = async () => {
-        if (!merchant || !newPin || newPin.length !== 4) {
-            toast({
-                title: "Error",
-                description: "Please enter a valid 4-digit PIN",
-                variant: "destructive",
-            })
-            return
+    const handlePinChange = (index: number, value: string) => {
+        const newPinArray = [...newPin]
+        const filteredValue = value.replace(/\D/g, '') || ''
+
+        for (let i = 0; i < filteredValue.length; i++) {
+            if (index + i < 4) {
+                newPinArray[index + i] = filteredValue[i] as string
+            }
         }
 
-        try {
-            const updatedMerchant: MerchantDetails = {
-                ...merchant,
-                pin_code: newPin
+        setNewPin(newPinArray)
+
+        const nextIndex = newPinArray.findIndex((digit: string) => digit === '')
+        const focusIndex = nextIndex === -1 ? 3 : nextIndex
+        inputRefs.current[focusIndex + (hasPIN ? 4 : 0)]?.focus() // Adjust focus based on hasPIN
+    }
+
+    const handleCurrentPinChange = (index: number, value: string) => {
+        const newPinArray = [...currentPinInput]
+        const filteredValue = value.replace(/\D/g, '') || ''
+
+        for (let i = 0; i < filteredValue.length; i++) {
+            if (index + i < 4) {
+                newPinArray[index + i] = filteredValue[i] as string
+            }
+        }
+
+        setCurrentPinInput(newPinArray)
+        setCurrentPinError('') // Clear the error message when the current PIN is changed
+
+        const nextIndex = newPinArray.findIndex((digit: string) => digit === '')
+        const focusIndex = nextIndex === -1 ? 3 : nextIndex
+        inputRefs.current[focusIndex]?.focus()
+    }
+
+    const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace') {
+            const newPinArray = [...newPin];
+            let currentIndex = index;
+
+            while (currentIndex >= 0) {
+                newPinArray[currentIndex] = '';
+                currentIndex--;
             }
 
-            const { error } = await supabase.rpc('update_merchant_details', {
-                p_merchant_id: updatedMerchant.merchant_id,
-                p_name: updatedMerchant.name,
-                p_email: updatedMerchant.email,
-                p_phone_number: updatedMerchant.phone_number,
-                p_pin_code: updatedMerchant.pin_code,
-            })
+            setNewPin(newPinArray);
 
-            if (error) throw error
+            if (newPinArray.every((digit: string) => digit === '')) {
+                inputRefs.current[0 + (hasPIN ? 4 : 0)]?.focus();
+            } else {
+                const prevIndex = newPinArray.slice(0, index).lastIndexOf('');
+                if (prevIndex !== -1) {
+                    inputRefs.current[prevIndex + (hasPIN ? 4 : 0)]?.focus();
+                }
+            }
+        } else if (e.key === 'Enter' && newPin.every((digit: string) => digit !== '')) {
+            handleSavePIN();
+        }
+    };
 
-            setMerchant(updatedMerchant)
-            toast({
-                title: "Success",
-                description: "PIN updated successfully",
-            })
-            setShowPinModal(false)
-            setNewPin('')
-        } catch (error) {
-            console.error('Error updating PIN:', error)
-            toast({
-                title: "Error",
-                description: "Failed to update PIN",
-                variant: "destructive",
-            })
+    const handleCurrentPinKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace') {
+            const newPinArray = [...currentPinInput];
+            let currentIndex = index;
+
+            while (currentIndex >= 0) {
+                newPinArray[currentIndex] = '';
+                currentIndex--;
+            }
+
+            setCurrentPinInput(newPinArray);
+
+            if (newPinArray.every((digit: string) => digit === '')) {
+                inputRefs.current[0]?.focus();
+            } else {
+                const prevIndex = newPinArray.slice(0, index).lastIndexOf('');
+                if (prevIndex !== -1) {
+                    inputRefs.current[prevIndex]?.focus();
+                }
+            }
+        } else if (e.key === 'Enter' && currentPinInput.every((digit: string) => digit !== '')) {
+            handleSavePIN();
+        }
+    };
+
+    const handleSavePIN = async () => {
+        if (newPin.every((digit: string) => digit !== '')) {
+            try {
+                if (!merchant) {
+                    throw new Error('Merchant details not found');
+                }
+
+                if (hasPIN && currentPinInput.join('') !== merchant.pin_code) {
+                    setCurrentPinError('Current PIN is incorrect')
+                    return
+                }
+
+                const updatedMerchant: MerchantDetails = {
+                    ...merchant,
+                    pin_code: newPin.join('')
+                }
+
+                const { error } = await supabase.rpc('update_merchant_details', {
+                    p_merchant_id: updatedMerchant.merchant_id,
+                    p_name: updatedMerchant.name,
+                    p_email: updatedMerchant.email,
+                    p_phone_number: updatedMerchant.phone_number,
+                    p_pin_code: updatedMerchant.pin_code,
+                })
+
+                if (error) throw error
+
+                setMerchant(updatedMerchant)
+                setHasPIN(true)
+                toast({
+                    title: "Success",
+                    description: "PIN updated successfully",
+                })
+                setShowPinModal(false)
+                setNewPin(['', '', '', ''])
+                setCurrentPinInput(['', '', '', ''])
+            } catch (error) {
+                console.error('Error updating PIN:', error)
+                toast({
+                    title: "Error",
+                    description: error instanceof Error ? error.message : "Failed to update PIN",
+                    variant: "destructive",
+                })
+            }
         }
     }
 
@@ -300,6 +405,10 @@ export default function Profile() {
                             <Label htmlFor="phone">Phone number</Label>
                             <Input id="phone" value={merchant.phone_number} readOnly className="bg-muted" />
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="language">Language</Label>
+                            <Input id="language" value={merchant.preferred_language} readOnly className="bg-muted" />
+                        </div>
                     </div>
 
                     <div className="space-y-4">
@@ -356,16 +465,18 @@ export default function Profile() {
                             <div>
                                 <h4 className="text-sm font-medium">PIN</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Required for fund transfers
+                                    Required for payouts.
                                 </p>
                             </div>
-                            <Button variant="outline" onClick={() => setShowPinModal(true)}>Set your PIN</Button>
+                            <Button variant="outline" onClick={() => setShowPinModal(true)}>
+                                {hasPIN ? 'Update your PIN' : 'Set your PIN'}
+                            </Button>
                         </div>
                         <div className="flex items-center justify-between">
                             <div>
                                 <h4 className="text-sm font-medium">2-factor Authentication</h4>
                                 <p className="text-sm text-muted-foreground">
-                                    Require a security key in addition to your password
+                                    Require a security key in addition to your password.
                                 </p>
                             </div>
                             <Switch disabled />
@@ -378,31 +489,77 @@ export default function Profile() {
                 </div>
 
                 {showPinModal && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg">
-                            <h3 className="text-lg font-medium mb-4">Set your PIN</h3>
-                            <div className="flex space-x-2">
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                    <Input
-                                        key={index}
-                                        type="password"
-                                        maxLength={1}
-                                        value={newPin[index] || ''}
-                                        onChange={(e) => {
-                                            const newPinArray = newPin.split('')
-                                            newPinArray[index] = e.target.value
-                                            setNewPin(newPinArray.join(''))
-                                        }}
-                                        className="w-12 text-center"
-                                    />
-                                ))}
+                    <Dialog open={showPinModal} onOpenChange={setShowPinModal}>
+                        <DialogContent className="sm:max-w-[350px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-center flex items-center justify-center gap-2">
+                                    <KeyRound className="w-4 h-4" />
+                                    {hasPIN ? 'Change your PIN' : 'Set your PIN'}
+                                </DialogTitle>
+                                {hasPIN && (
+                                    <DialogDescription className="text-center mt-2">
+                                        Enter your current PIN to change it
+                                    </DialogDescription>
+                                )}
+                            </DialogHeader>
+                            {hasPIN && (
+                                <div className="flex flex-col items-center gap-3 my-4">
+                                    <div className="flex justify-center gap-2">
+                                        {Array.from({ length: 4 }).map((_, index) => (
+                                            <input
+                                                key={index}
+                                                ref={el => inputRefs.current[index] = el}
+                                                type={currentPinInput.join('').length === 4 ? 'password' : 'text'}
+                                                inputMode="numeric"
+                                                pattern="\d*"
+                                                maxLength={1}
+                                                value={currentPinInput[index] || ''}
+                                                onChange={(e) => handleCurrentPinChange(index, e.target.value)}
+                                                onKeyDown={(e) => handleCurrentPinKeyDown(index, e)}
+                                                className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                                aria-label={`Current PIN digit ${index + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    {currentPinError && (
+                                        <p className="text-sm text-red-500">{currentPinError}</p>
+                                    )}
+                                </div>
+                            )}
+                            <div className="flex flex-col items-center gap-3 my-4">
+                                <div className="flex justify-center gap-2">
+                                    {Array.from({ length: 4 }).map((_, index) => (
+                                        <input
+                                            key={index}
+                                            ref={el => inputRefs.current[index + (hasPIN ? 4 : 0)] = el}
+                                            type={newPin.join('').length === 4 ? 'password' : 'text'}
+                                            inputMode="numeric"
+                                            pattern="\d*"
+                                            maxLength={1}
+                                            value={newPin[index] || ''}
+                                            onChange={(e) => handlePinChange(index, e.target.value)}
+                                            onKeyDown={(e) => handleKeyDown(index, e)}
+                                            className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                            aria-label={`New PIN digit ${index + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex items-center justify-center text-xs text-muted-foreground text-center mt-1">
+                                    <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 mb-2" />
+                                    <p>This code is crucial for transaction security.<br />Kindly store it safely.</p>
+                                </div>
                             </div>
-                            <div className="mt-4 flex justify-end space-x-2">
-                                <Button variant="outline" onClick={() => setShowPinModal(false)}>Cancel</Button>
-                                <Button onClick={handlePinChange}>Save</Button>
-                            </div>
-                        </div>
-                    </div>
+                            <DialogFooter>
+                                <Button
+                                    onClick={handleSavePIN}
+                                    disabled={newPin.some((digit: string) => digit === '') || (hasPIN && currentPinInput.some((digit: string) => digit === ''))}
+                                    className="w-full"
+                                >
+                                    {hasPIN ? 'Change' : 'Save'}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 )}
             </div>
         </ContentSection>

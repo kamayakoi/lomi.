@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ContentSection from '../../../../components/dashboard/content-section'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,6 +28,8 @@ export default function Business() {
     const [organization, setOrganization] = useState<OrganizationDetails | null>(null)
     const [loading, setLoading] = useState(true)
     const [logoUrl, setLogoUrl] = useState<string | null>(null)
+    const addressRef = useRef<HTMLTextAreaElement>(null);
+    const [isCopied, setIsCopied] = useState(false);
 
     useEffect(() => {
         fetchOrganization()
@@ -84,6 +86,17 @@ export default function Business() {
         }
     }
 
+    useEffect(() => {
+        if (addressRef.current) {
+            adjustTextareaHeight(addressRef.current);
+        }
+    }, [organization]);
+
+    const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
+        element.style.height = 'auto';
+        element.style.height = `${element.scrollHeight}px`;
+    };
+
     async function handleLogoUpdate(newLogoUrl: string) {
         setLogoUrl(newLogoUrl);
         if (!organization) return;
@@ -120,6 +133,19 @@ export default function Business() {
             });
         }
     }
+
+    const copyBusinessId = () => {
+        if (organization?.organization_id) {
+            navigator.clipboard.writeText(organization.organization_id);
+            setIsCopied(true);
+            toast({
+                title: "Copied!",
+                description: "Business ID has been copied to clipboard",
+                duration: 3000,
+            });
+            setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
+        }
+    };
 
     if (typeof window === 'undefined' || loading) {
         return (
@@ -206,14 +232,24 @@ export default function Business() {
                             <Label htmlFor="business-id">Business ID</Label>
                             <div className="flex">
                                 <Input id="business-id" value={organization.organization_id} readOnly className="rounded-r-none bg-muted" />
-                                <Button variant="outline" className="rounded-l-none" onClick={() => navigator.clipboard.writeText(organization.organization_id)}>
-                                    <CopyIcon className="h-4 w-4" />
-                                    Copy
+                                <Button
+                                    variant={isCopied ? "default" : "outline"}
+                                    className={`rounded-l-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                    onClick={copyBusinessId}
+                                >
+                                    {isCopied ? (
+                                        "Copied"
+                                    ) : (
+                                        <>
+                                            <CopyIcon className="h-4 w-4 mr-2" />
+                                            Copy
+                                        </>
+                                    )}
                                 </Button>
                             </div>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="website">Website URL</Label>
+                            <Label htmlFor="website">Business website URL</Label>
                             <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
                         </div>
                     </div>
@@ -225,12 +261,27 @@ export default function Business() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="address">Business address</Label>
-                            <Input
-                                id="address"
-                                value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
-                                readOnly
-                                className="bg-muted"
-                            />
+                            <div className="relative">
+                                <textarea
+                                    ref={addressRef}
+                                    id="address"
+                                    value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
+                                    readOnly
+                                    className="bg-muted w-full px-3 py-2 rounded-md border border-input text-sm resize-none focus:outline-none"
+                                    style={{
+                                        minHeight: '2.5rem',
+                                        overflow: 'hidden',
+                                        lineHeight: '1.5',
+                                        whiteSpace: 'pre-wrap',
+                                        wordBreak: 'break-word'
+                                    }}
+                                    onChange={() => {
+                                        if (addressRef.current) {
+                                            adjustTextareaHeight(addressRef.current);
+                                        }
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
 

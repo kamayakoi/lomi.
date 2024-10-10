@@ -112,7 +112,7 @@ export default function Sidebar({ className }: SidebarProps) {
             </div>
             <div className="flex flex-col justify-center truncate visible w-auto">
               <span className='font-medium leading-tight'>lomi.</span>
-              <span className='text-xs leading-tight'>Mission Control Portal</span>
+              <span className='text-xs leading-tight'>Control Portal</span>
             </div>
           </a>
 
