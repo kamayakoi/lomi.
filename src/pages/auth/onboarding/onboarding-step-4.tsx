@@ -74,9 +74,10 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             id="orgIndustry"
                             {...onboardingForm.register("orgIndustry")}
                             className={cn(
-                                "w-full mb-2 p-2 border rounded-md",
+                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                "appearance-none"
                             )}
                         >
                             {industries.map((industry) => (
@@ -93,9 +94,10 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}
                             className={cn(
-                                "w-full mb-2 p-2 border rounded-md",
+                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                "appearance-none"
                             )}
                         >
                             {languages.map((language) => (

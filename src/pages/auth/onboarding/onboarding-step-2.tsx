@@ -138,9 +138,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             id="orgEmployees"
                             {...onboardingForm.register("orgEmployees")}
                             className={cn(
-                                "w-full mb-2 p-2 border rounded-md",
+                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                "appearance-none"
                             )}
                         >
                             {employeeRanges.map((range) => (
@@ -161,9 +162,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             id="orgCountry"
                             {...onboardingForm.register("orgCountry")}
                             className={cn(
-                                "w-full mb-2 p-2 border rounded-md",
+                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                "appearance-none"
                             )}
                         >
                             <option value="">Select a country</option>
@@ -182,9 +184,10 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 id="orgRegion"
                                 {...onboardingForm.register("orgRegion")}
                                 className={cn(
-                                    "w-full mb-2 p-2 border rounded-md",
+                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                     "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                    "appearance-none"
                                 )}
                             >
                                 <option value="">Select a region</option>

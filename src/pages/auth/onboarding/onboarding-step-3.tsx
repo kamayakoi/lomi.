@@ -110,9 +110,10 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 id="orgCity"
                                 {...onboardingForm.register("orgCity")}
                                 className={cn(
-                                    "w-full mb-2 p-2 border rounded-md",
+                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                     "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                    "appearance-none"
                                 )}
                             >
                                 <option value="">Select a city</option>
@@ -147,9 +148,10 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 id="orgDistrict"
                                 {...onboardingForm.register("orgDistrict")}
                                 className={cn(
-                                    "w-full mb-2 p-2 border rounded-md",
+                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
                                     "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                    "appearance-none"
                                 )}
                             >
                                 <option value="">Select a district</option>
