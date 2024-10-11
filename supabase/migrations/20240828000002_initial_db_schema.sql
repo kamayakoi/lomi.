@@ -1,13 +1,12 @@
 --------------- ENUM TYPES ---------------
 
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed');
-CREATE TYPE transaction_type AS ENUM ('payment', 'refund', 'subscription');
+CREATE TYPE transaction_type AS ENUM ('payment', 'instalment');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
 CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'OTHER');
-CREATE TYPE refund_status AS ENUM ('pending', 'processing', 'completed', 'failed', 'cancelled');
+CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
-CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'yearly', 'one-time');
-CREATE TYPE recurring_transaction_status AS ENUM ('active', 'paused', 'cancelled', 'expired');
+CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly' , 'yearly', 'one-time');
 CREATE TYPE entry_type AS ENUM ('debit', 'credit');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF','USD', 'EUR');

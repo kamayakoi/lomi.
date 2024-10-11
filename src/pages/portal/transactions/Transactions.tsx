@@ -17,7 +17,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { supabase } from '@/utils/supabase/client'
-import { currency_code, payment_method_code, transaction_status, transaction_type, provider_code } from './types'
+import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
 
 type Transaction = {
     transaction_id: string
@@ -58,6 +58,7 @@ export default function TransactionsPage() {
     const [selectedTypes, setSelectedTypes] = useState<string[]>([])
     const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([])
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
+    const [transactionCount, setTransactionCount] = useState(0)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -66,6 +67,17 @@ export default function TransactionsPage() {
 
     const fetchTransactions = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
+
+        console.log('Fetching transactions for merchant:', user?.id)
+        console.log('Filter parameters:', {
+            p_start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
+            p_end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : null,
+            p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
+            p_status: selectedStatuses,
+            p_type: selectedTypes,
+            p_currency: selectedCurrencies,
+            p_payment_method: selectedPaymentMethods,
+        })
 
         const { data, error } = await supabase.rpc('fetch_transactions', {
             p_merchant_id: user?.id,
@@ -83,6 +95,8 @@ export default function TransactionsPage() {
             return
         }
 
+        console.log('Fetched transactions:', data)
+
         const formattedTransactions = data.map((transaction: FetchedTransaction) => ({
             transaction_id: transaction.transaction_id,
             customer: transaction.customer_name,
@@ -96,12 +110,16 @@ export default function TransactionsPage() {
             provider_code: transaction.provider_code,
         }))
 
+        console.log('Formatted transactions:', formattedTransactions)
+
         setTransactions(formattedTransactions)
+        setTransactionCount(data.length)
     }, [date, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods])
 
     useEffect(() => {
         fetchTransactions()
         fetchTotalIncomingAmount()
+        fetchTransactionCount()
     }, [fetchTransactions])
 
     const handleSort = (column: keyof Transaction) => {
@@ -129,6 +147,8 @@ export default function TransactionsPage() {
     const fetchTotalIncomingAmount = async () => {
         const { data: { user } } = await supabase.auth.getUser()
 
+        console.log('Fetching total incoming amount for merchant:', user?.id)
+
         const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
             p_merchant_id: user?.id,
         })
@@ -139,6 +159,21 @@ export default function TransactionsPage() {
         }
 
         setTotalIncomingAmount(data)
+    }
+
+    const fetchTransactionCount = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const { data, error } = await supabase.rpc('fetch_transaction_count', {
+            p_merchant_id: user?.id,
+        })
+
+        if (error) {
+            console.error('Error fetching transaction count:', error)
+            return
+        }
+
+        setTransactionCount(data)
     }
 
     return (
@@ -166,7 +201,7 @@ export default function TransactionsPage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">XOF {totalIncomingAmount}</div>
-                                    <p className="text-xs text-muted-foreground">{transactions.length} transactions</p>
+                                    <p className="text-xs text-muted-foreground">{transactionCount} transactions</p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -288,7 +323,7 @@ export default function TransactionsPage() {
                                         <div>
                                             <h3 className="font-semibold mb-2">Type</h3>
                                             <div className="space-y-2">
-                                                {['payment', 'refund', 'subscription'].map((type) => (
+                                                {['payment', 'instalment'].map((type) => (
                                                     <div key={type} className="flex items-center">
                                                         <Checkbox
                                                             id={`type-${type}`}

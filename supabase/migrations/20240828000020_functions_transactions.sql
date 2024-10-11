@@ -22,6 +22,9 @@ RETURNS TABLE (
     provider_code provider_code
 ) AS $$
 BEGIN
+    RAISE NOTICE 'Fetching transactions for merchant_id: %, start_date: %, end_date: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
+        p_merchant_id, p_start_date, p_end_date, p_provider_code, p_status, p_type, p_currency, p_payment_method;
+
     RETURN QUERY
     SELECT 
         t.transaction_id,
@@ -47,6 +50,11 @@ BEGIN
         (p_type IS NULL OR t.transaction_type = ANY(p_type)) AND
         (p_currency IS NULL OR t.currency_code = ANY(p_currency)) AND
         (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method));
+        
+    IF NOT FOUND THEN
+        RAISE NOTICE 'No transactions found for merchant_id: %, start_date: %, end_date: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
+            p_merchant_id, p_start_date, p_end_date, p_provider_code, p_status, p_type, p_currency, p_payment_method;
+    END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -57,15 +65,17 @@ DECLARE
     v_total_incoming NUMERIC(15,2);
 BEGIN
     SELECT 
-        COALESCE(SUM(net_amount), 0) INTO v_total_incoming
+        COALESCE(SUM(t.net_amount), 0) - COALESCE(SUM(r.refunded_amount), 0) INTO v_total_incoming
     FROM 
-        transactions
+        transactions t
+    LEFT JOIN
+        refunds r ON t.transaction_id = r.transaction_id
     WHERE 
-        merchant_id = p_merchant_id AND
-        status = 'completed' AND
-        transaction_type = 'payment';
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.transaction_type = 'payment';
         
-    RETURN v_total_incoming;
+    RETURN ROUND(v_total_incoming, 2);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -86,5 +96,22 @@ BEGIN
         r.status = 'completed';
         
     RETURN v_total_outgoing;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch the number of transactions for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_transaction_count(p_merchant_id UUID)
+RETURNS INTEGER AS $$
+DECLARE
+    v_transaction_count INTEGER;
+BEGIN
+    SELECT 
+        COUNT(*) INTO v_transaction_count
+    FROM 
+        transactions
+    WHERE 
+        merchant_id = p_merchant_id;
+        
+    RETURN v_transaction_count;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

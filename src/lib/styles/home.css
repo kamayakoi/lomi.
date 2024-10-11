@@ -75,3 +75,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (min-width: 765px) and (max-width: 1022px) {
+  .hero-card {
+    display: none;
+  }
+
+  .hero-section {
+    margin-bottom: -8rem; /* Adjust this value to reduce the space */
+  }
+}

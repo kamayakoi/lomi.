@@ -8,6 +8,7 @@ import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/actions/utils'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
+import { AlertCircle } from "lucide-react"
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
@@ -129,6 +130,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               }
             )}
           />
+          {errorMessage && (
+            <div className="flex items-center gap-2 bg-red-50 text-red-900 px-4 py-3 rounded-lg">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <p className="text-sm font-medium">{errorMessage}</p>
+            </div>
+          )}
           <Button
             className='w-full h-12'
             type='submit'
@@ -140,9 +147,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               <span className="text-base font-semibold">Connect</span>
             )}
           </Button>
-          {errorMessage && (
-            <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
-          )}
         </div>
       </form>
       <div className='relative'>
