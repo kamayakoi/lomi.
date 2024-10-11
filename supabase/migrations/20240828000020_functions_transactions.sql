@@ -1,8 +1,6 @@
 -- Function to fetch transactions for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_transactions(
     p_merchant_id UUID,
-    p_start_date DATE DEFAULT NULL,
-    p_end_date DATE DEFAULT NULL,
     p_provider_code provider_code DEFAULT NULL,
     p_status transaction_status[] DEFAULT NULL,
     p_type transaction_type[] DEFAULT NULL,
@@ -22,8 +20,8 @@ RETURNS TABLE (
     provider_code provider_code
 ) AS $$
 BEGIN
-    RAISE NOTICE 'Fetching transactions for merchant_id: %, start_date: %, end_date: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
-        p_merchant_id, p_start_date, p_end_date, p_provider_code, p_status, p_type, p_currency, p_payment_method;
+    RAISE NOTICE 'Fetching transactions for merchant_id: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
+        p_merchant_id, p_provider_code, p_status, p_type, p_currency, p_payment_method;
 
     RETURN QUERY
     SELECT 
@@ -43,8 +41,6 @@ BEGIN
         customers c ON t.customer_id = c.customer_id
     WHERE 
         t.merchant_id = p_merchant_id AND
-        (p_start_date IS NULL OR t.created_at >= p_start_date) AND
-        (p_end_date IS NULL OR t.created_at <= p_end_date) AND
         (p_provider_code IS NULL OR t.provider_code = p_provider_code) AND
         (p_status IS NULL OR t.status = ANY(p_status)) AND
         (p_type IS NULL OR t.transaction_type = ANY(p_type)) AND
@@ -52,8 +48,8 @@ BEGIN
         (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method));
         
     IF NOT FOUND THEN
-        RAISE NOTICE 'No transactions found for merchant_id: %, start_date: %, end_date: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
-            p_merchant_id, p_start_date, p_end_date, p_provider_code, p_status, p_type, p_currency, p_payment_method;
+        RAISE NOTICE 'No transactions found for merchant_id: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
+            p_merchant_id, p_provider_code, p_status, p_type, p_currency, p_payment_method;
     END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
@@ -65,7 +61,7 @@ DECLARE
     v_total_incoming NUMERIC(15,2);
 BEGIN
     SELECT 
-        COALESCE(SUM(t.net_amount), 0) - COALESCE(SUM(r.refunded_amount), 0) INTO v_total_incoming
+        COALESCE(SUM(t.net_amount), 0) - COALESCE(SUM(r.amount), 0) INTO v_total_incoming
     FROM 
         transactions t
     LEFT JOIN
@@ -76,26 +72,6 @@ BEGIN
         t.transaction_type = 'payment';
         
     RETURN ROUND(v_total_incoming, 2);
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
--- Function to fetch total outgoing amount for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_total_outgoing_amount(p_merchant_id UUID)
-RETURNS NUMERIC(15,2) AS $$
-DECLARE
-    v_total_outgoing NUMERIC(15,2);
-BEGIN
-    SELECT 
-        COALESCE(SUM(refunded_amount), 0) INTO v_total_outgoing
-    FROM 
-        refunds r
-    JOIN
-        transactions t ON r.transaction_id = t.transaction_id
-    WHERE 
-        t.merchant_id = p_merchant_id AND
-        r.status = 'completed';
-        
-    RETURN v_total_outgoing;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

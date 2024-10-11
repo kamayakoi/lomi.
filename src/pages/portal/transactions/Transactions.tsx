@@ -47,7 +47,6 @@ type FetchedTransaction = {
 
 export default function TransactionsPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([])
-    const [date, setDate] = useState<DateRange | undefined>()
     const [showFilters, setShowFilters] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
@@ -59,6 +58,8 @@ export default function TransactionsPage() {
     const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([])
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
     const [transactionCount, setTransactionCount] = useState(0)
+    const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null)
+    const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -68,34 +69,19 @@ export default function TransactionsPage() {
     const fetchTransactions = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
 
-        console.log('Fetching transactions for merchant:', user?.id)
-        console.log('Filter parameters:', {
-            p_start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
-            p_end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : null,
-            p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
-            p_status: selectedStatuses,
-            p_type: selectedTypes,
-            p_currency: selectedCurrencies,
-            p_payment_method: selectedPaymentMethods,
-        })
-
         const { data, error } = await supabase.rpc('fetch_transactions', {
             p_merchant_id: user?.id,
-            p_start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
-            p_end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : null,
             p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
-            p_status: selectedStatuses,
-            p_type: selectedTypes,
-            p_currency: selectedCurrencies,
-            p_payment_method: selectedPaymentMethods,
+            p_status: selectedStatuses.length > 0 ? selectedStatuses : null,
+            p_type: selectedTypes.length > 0 ? selectedTypes : null,
+            p_currency: selectedCurrencies.length > 0 ? selectedCurrencies : null,
+            p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods : null,
         })
 
         if (error) {
             console.error('Error fetching transactions:', error)
             return
         }
-
-        console.log('Fetched transactions:', data)
 
         const formattedTransactions = data.map((transaction: FetchedTransaction) => ({
             transaction_id: transaction.transaction_id,
@@ -110,11 +96,8 @@ export default function TransactionsPage() {
             provider_code: transaction.provider_code,
         }))
 
-        console.log('Formatted transactions:', formattedTransactions)
-
         setTransactions(formattedTransactions)
-        setTransactionCount(data.length)
-    }, [date, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods])
+    }, [selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods])
 
     useEffect(() => {
         fetchTransactions()
@@ -131,18 +114,25 @@ export default function TransactionsPage() {
         }
     }
 
-    const filteredAndSortedTransactions = transactions
-        .filter(transaction =>
-            Object.values(transaction).some(value =>
-                value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        )
-        .sort((a, b) => {
-            if (!sortColumn) return 0
+    const sortTransactions = (transactions: Transaction[]) => {
+        if (!sortColumn) return transactions
+
+        return transactions.sort((a, b) => {
             if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1
             if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1
             return 0
         })
+    }
+
+    const applySearch = (transactions: Transaction[]) => {
+        if (!searchTerm) return transactions
+
+        return transactions.filter(transaction =>
+            Object.values(transaction).some(value =>
+                value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        )
+    }
 
     const fetchTotalIncomingAmount = async () => {
         const { data: { user } } = await supabase.auth.getUser()
@@ -174,6 +164,55 @@ export default function TransactionsPage() {
         }
 
         setTransactionCount(data)
+    }
+
+    const handleDateRangeChange = (range: string) => {
+        setSelectedDateRange(range)
+    }
+
+    const applyDateFilter = (transactions: Transaction[]) => {
+        if (selectedDateRange === 'custom' && customDateRange?.from && customDateRange?.to) {
+            return transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date)
+                return transactionDate >= customDateRange.from && transactionDate <= customDateRange.to
+            })
+        }
+
+        if (!selectedDateRange) return transactions
+
+        const today = new Date()
+        let startDate: Date
+
+        switch (selectedDateRange) {
+            case '24H':
+                startDate = new Date(today.getTime() - 24 * 60 * 60 * 1000)
+                break
+            case '7D':
+                startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+                break
+            case '1M':
+                startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
+                break
+            case '3M':
+                startDate = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate())
+                break
+            case 'YTD':
+                startDate = new Date(today.getFullYear(), 0, 1)
+                break
+            default:
+                return transactions
+        }
+
+        return transactions.filter(transaction => {
+            const transactionDate = new Date(transaction.date)
+            return transactionDate >= startDate && transactionDate <= today
+        })
+    }
+
+    const handleCustomDateRangeApply = () => {
+        if (customDateRange?.from && customDateRange?.to) {
+            setSelectedDateRange('custom')
+        }
     }
 
     return (
@@ -211,39 +250,36 @@ export default function TransactionsPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <div className="space-y-2">
                                         <Label>Date Range</Label>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
+                                        <div className="space-x-2">
+                                            {['24H', '7D', '1M', '3M', 'YTD'].map(range => (
                                                 <Button
-                                                    id="date"
-                                                    variant="outline"
-                                                    className="w-full justify-start text-left font-normal"
+                                                    key={range}
+                                                    variant={selectedDateRange === range ? 'default' : 'ghost'}
+                                                    onClick={() => handleDateRangeChange(range)}
                                                 >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {date?.from ? (
-                                                        date.to ? (
-                                                            <>
-                                                                {format(date.from, "LLL dd, y")} -{" "}
-                                                                {format(date.to, "LLL dd, y")}
-                                                            </>
-                                                        ) : (
-                                                            format(date.from, "LLL dd, y")
-                                                        )
-                                                    ) : (
-                                                        <span>Pick a date range</span>
-                                                    )}
+                                                    {range}
                                                 </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    initialFocus
-                                                    mode="range"
-                                                    defaultMonth={date?.from}
-                                                    selected={date}
-                                                    onSelect={setDate}
-                                                    numberOfMonths={2}
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
+                                            ))}
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button variant={selectedDateRange === 'custom' ? 'default' : 'ghost'}>
+                                                        Custom
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        initialFocus
+                                                        mode="range"
+                                                        selected={customDateRange}
+                                                        onSelect={setCustomDateRange}
+                                                        numberOfMonths={2}
+                                                    />
+                                                    <div className="flex justify-end p-2">
+                                                        <Button onClick={handleCustomDateRangeApply}>Apply</Button>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">
@@ -394,7 +430,7 @@ export default function TransactionsPage() {
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead className="font-bold">
+                                                <TableHead>
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('transaction_id')}
@@ -405,114 +441,24 @@ export default function TransactionsPage() {
                                                         )}
                                                     </Button>
                                                 </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('customer')}
-                                                    >
-                                                        Customer
-                                                        {sortColumn === 'customer' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold text-right">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('gross_amount')}
-                                                    >
-                                                        Gross Amount
-                                                        {sortColumn === 'gross_amount' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold text-right">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('net_amount')}
-                                                    >
-                                                        Net Amount
-                                                        {sortColumn === 'net_amount' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('currency')}
-                                                    >
-                                                        Currency
-                                                        {sortColumn === 'currency' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('payment_method')}
-                                                    >
-                                                        Payment Method
-                                                        {sortColumn === 'payment_method' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('status')}
-                                                    >
-                                                        Status
-                                                        {sortColumn === 'status' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('type')}
-                                                    >
-                                                        Type
-                                                        {sortColumn === 'type' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('date')}
-                                                    >
-                                                        Date
-                                                        {sortColumn === 'date' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="font-bold">
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('provider_code')}
-                                                    >
-                                                        Provider
-                                                        {sortColumn === 'provider_code' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
+                                                <TableHead>Customer</TableHead>
+                                                <TableHead>Gross Amount</TableHead>
+                                                <TableHead>Net Amount</TableHead>
+                                                <TableHead>Currency</TableHead>
+                                                <TableHead>Payment Method</TableHead>
+                                                <TableHead>Status</TableHead>
+                                                <TableHead>Type</TableHead>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Provider</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {filteredAndSortedTransactions.map((transaction) => (
+                                            {applySearch(sortTransactions(applyDateFilter(transactions))).map((transaction) => (
                                                 <TableRow key={transaction.transaction_id}>
                                                     <TableCell>{transaction.transaction_id}</TableCell>
                                                     <TableCell>{transaction.customer}</TableCell>
-                                                    <TableCell className="text-right">{transaction.gross_amount}</TableCell>
-                                                    <TableCell className="text-right">{transaction.net_amount}</TableCell>
+                                                    <TableCell>{transaction.gross_amount}</TableCell>
+                                                    <TableCell>{transaction.net_amount}</TableCell>
                                                     <TableCell>{transaction.currency}</TableCell>
                                                     <TableCell>{transaction.payment_method}</TableCell>
                                                     <TableCell>{transaction.status}</TableCell>
