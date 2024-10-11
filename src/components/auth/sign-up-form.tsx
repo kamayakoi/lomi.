@@ -19,7 +19,7 @@ interface SignUpFormProps {
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  fullName: z.string().min(1, 'Full name is required'),
+  fullName: z.string().regex(/^[\p{L}']+ [\p{L}']+/u, 'Please enter both first and last name'),
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, errorMessage, ...props }: SignUpFormProps) {
@@ -139,7 +139,9 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             type="submit"
             disabled={isLoading || !isValidEmail || !isValidPassword || !isValidFullName}
           >
-            {isLoading ? 'Creating account...' : 'Create account'}
+            <span className="text-base font-semibold">
+              {isLoading ? 'Creating account...' : 'Create account'}
+            </span>
           </Button>
           {errorMessage && (
             <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>

@@ -43,11 +43,11 @@ export default function Settings() {
           </p>
         </div>
         <Separator className='my-4 lg:my-6' />
-        <div className='flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-12 lg:space-y-0'>
-          <aside className='top-0 lg:sticky lg:w-1/5 h-full overflow-y-auto'>
+        <div className='flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-8 lg:space-y-0'>
+          <aside className='top-0 lg:sticky lg:w-1/4 h-full overflow-y-auto'>
             <SidebarNav items={sidebarNavItems} />
           </aside>
-          <div className='flex w-full p-1 pr-4 md:overflow-y-auto'>
+          <div className='flex-1 lg:max-w-3xl p-1 pr-4 md:overflow-y-auto'>
             <Outlet />
           </div>
         </div>

@@ -12,7 +12,10 @@ const features = [
         cta: "Get started",
         className: "col-span-3 lg:col-span-2",
         background: (
-            <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-105" />
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
+                <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_8%,#000_54%)] group-hover:scale-105" />
+            </div>
         ),
     },
     {
@@ -22,12 +25,13 @@ const features = [
         href: "/portal/payment-channels",
         cta: "Set up your checkout",
         background: (
-            <div className="absolute inset-0 overflow-hidden sm:opacity-100 opacity-10">
-                <AnimatedListDemo />
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
+                <AnimatedListDemo className="opacity-90" />
             </div>
         ),
         content: (
-            <div className="relative z-10 p-4 bg-white sm:bg-opacity-80 bg-opacity-100 rounded-lg mt-8">
+            <div className="relative z-10 p-4 bg-white/90 dark:bg-gray-800/60 rounded-lg mt-8">
                 <h3 className="text-lg font-semibold mb-2">Checkout</h3>
                 <p className="text-sm">
                     Streamline your customer checkout process with a flexible, customizable interface tailored to your business needs.
@@ -46,8 +50,9 @@ const features = [
         href: "/products",
         cta: "Learn more",
         background: (
-            <div className="absolute inset-0 overflow-hidden opacity-25">
-                <img src="/portal.png" alt="Portal background" className="object-cover w-full h-5% -ml-1" />
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
+                <img src="/portal.png" alt="Portal background" className="object-cover w-full h-5% -ml-1 opacity-30" />
             </div>
         ),
         className: "col-span-3 lg:col-span-2",

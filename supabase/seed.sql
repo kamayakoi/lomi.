@@ -164,8 +164,12 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
 
 -- Seed data for transactions table
 INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'completed', 'Premium plan subscription', 'REF1001', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'ibrahima.diallo@example.com'), 'payment', 'completed', 'Product purchase', 'REF1002', NULL, 75.00, 1.13, 73.87, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY');
+VALUES 
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'completed', 'Premium plan subscription', 'REF1001', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'), 'payment', 'completed', 'Product purchase', 'REF1002', NULL, 100.00, 3.50, 96.50, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'pending', 'Subscription renewal', 'REF1003', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'), 'refund', 'completed', 'Product refund', 'REF1004', NULL, 50.00, 0.00, 50.00, 'USD Refund Processing Fee', 'USD', 'STRIPE', 'CARDS'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'payment', 'completed', 'Subscription payment', 'REF1005', NULL, 50.00, 1.75, 48.25, 'USD/STRIPE CARDS Fee', 'USD', 'STRIPE', 'CARDS');
 
 
 -- Seed data for refunds table

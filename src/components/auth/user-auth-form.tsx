@@ -134,7 +134,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             type='submit'
             disabled={isLoading || !isValidEmail || !isValidPassword}
           >
-            {isLoading ? 'Processing...' : 'Connect'}
+            {isLoading ? (
+              <span className="text-sm">Processing...</span>
+            ) : (
+              <span className="text-base font-semibold">Connect</span>
+            )}
           </Button>
           {errorMessage && (
             <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>

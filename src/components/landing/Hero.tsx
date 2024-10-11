@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { HeroCards } from "./HeroCards";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import PulsatingButton from '@/components/ui/pulsating-button';
 import AvatarCircles from "@/components/ui/avatar-circles";

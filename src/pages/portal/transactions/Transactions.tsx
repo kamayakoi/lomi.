@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,17 +17,19 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { supabase } from '@/utils/supabase/client'
+import { currency_code, payment_method_code, transaction_status, transaction_type, provider_code } from './types'
 
 type Transaction = {
     transaction_id: string
     customer: string
     gross_amount: number
     net_amount: number
-    currency: 'XOF' | 'USD'
-    payment_method: 'Cards' | 'Mobile Money' | 'Bank Transfer' | 'Apple Pay' | 'Google Pay' | 'USSD' | 'QR Code'
-    status: 'pending' | 'completed' | 'failed'
-    type: 'payment' | 'refund' | 'subscription'
+    currency: currency_code
+    payment_method: payment_method_code
+    status: transaction_status
+    type: transaction_type
     date: string
+    provider_code: provider_code
 }
 
 type FetchedTransaction = {
@@ -35,11 +37,12 @@ type FetchedTransaction = {
     customer_name: string
     gross_amount: number
     net_amount: number
-    currency_code: string
-    payment_method_code: string
-    status: string
-    transaction_type: string
+    currency_code: currency_code
+    payment_method_code: payment_method_code
+    status: transaction_status
+    transaction_type: transaction_type
     created_at: string
+    provider_code: provider_code
 }
 
 export default function TransactionsPage() {
@@ -50,22 +53,29 @@ export default function TransactionsPage() {
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
     const [totalIncomingAmount, setTotalIncomingAmount] = useState(0)
+    const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
+    const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+    const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([])
+    const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    useEffect(() => {
-        fetchTransactions()
-        fetchTotalIncomingAmount()
-    }, [])
-
-    const fetchTransactions = async () => {
+    const fetchTransactions = useCallback(async () => {
         const { data: { user } } = await supabase.auth.getUser()
 
         const { data, error } = await supabase.rpc('fetch_transactions', {
             p_merchant_id: user?.id,
+            p_start_date: date?.from ? format(date.from, 'yyyy-MM-dd') : null,
+            p_end_date: date?.to ? format(date.to, 'yyyy-MM-dd') : null,
+            p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
+            p_status: selectedStatuses,
+            p_type: selectedTypes,
+            p_currency: selectedCurrencies,
+            p_payment_method: selectedPaymentMethods,
         })
 
         if (error) {
@@ -83,10 +93,16 @@ export default function TransactionsPage() {
             status: transaction.status,
             type: transaction.transaction_type,
             date: format(new Date(transaction.created_at), 'yyyy-MM-dd'),
+            provider_code: transaction.provider_code,
         }))
 
         setTransactions(formattedTransactions)
-    }
+    }, [date, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods])
+
+    useEffect(() => {
+        fetchTransactions()
+        fetchTotalIncomingAmount()
+    }, [fetchTransactions])
 
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
@@ -197,7 +213,10 @@ export default function TransactionsPage() {
 
                                     <div className="space-y-2">
                                         <Label>Provider</Label>
-                                        <Select>
+                                        <Select
+                                            value={selectedProvider || undefined}
+                                            onValueChange={(value) => setSelectedProvider(value)}
+                                        >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select provider" />
                                             </SelectTrigger>
@@ -250,7 +269,17 @@ export default function TransactionsPage() {
                                             <div className="space-y-2">
                                                 {['pending', 'completed', 'failed'].map((status) => (
                                                     <div key={status} className="flex items-center">
-                                                        <Checkbox id={`status-${status}`} />
+                                                        <Checkbox
+                                                            id={`status-${status}`}
+                                                            checked={selectedStatuses.includes(status)}
+                                                            onChange={(e) => {
+                                                                if ((e.target as HTMLInputElement).checked) {
+                                                                    setSelectedStatuses([...selectedStatuses, status])
+                                                                } else {
+                                                                    setSelectedStatuses(selectedStatuses.filter(s => s !== status))
+                                                                }
+                                                            }}
+                                                        />
                                                         <label htmlFor={`status-${status}`} className="ml-2 text-sm capitalize">{status}</label>
                                                     </div>
                                                 ))}
@@ -261,7 +290,17 @@ export default function TransactionsPage() {
                                             <div className="space-y-2">
                                                 {['payment', 'refund', 'subscription'].map((type) => (
                                                     <div key={type} className="flex items-center">
-                                                        <Checkbox id={`type-${type}`} />
+                                                        <Checkbox
+                                                            id={`type-${type}`}
+                                                            checked={selectedTypes.includes(type)}
+                                                            onChange={(e) => {
+                                                                if ((e.target as HTMLInputElement).checked) {
+                                                                    setSelectedTypes([...selectedTypes, type])
+                                                                } else {
+                                                                    setSelectedTypes(selectedTypes.filter(t => t !== type))
+                                                                }
+                                                            }}
+                                                        />
                                                         <label htmlFor={`type-${type}`} className="ml-2 text-sm capitalize">{type}</label>
                                                     </div>
                                                 ))}
@@ -270,9 +309,19 @@ export default function TransactionsPage() {
                                         <div>
                                             <h3 className="font-semibold mb-2">Currency</h3>
                                             <div className="space-y-2">
-                                                {['XOF', 'USD'].map((currency) => (
+                                                {['XOF', 'USD', 'EUR'].map((currency) => (
                                                     <div key={currency} className="flex items-center">
-                                                        <Checkbox id={`currency-${currency}`} />
+                                                        <Checkbox
+                                                            id={`currency-${currency}`}
+                                                            checked={selectedCurrencies.includes(currency)}
+                                                            onChange={(e) => {
+                                                                if ((e.target as HTMLInputElement).checked) {
+                                                                    setSelectedCurrencies([...selectedCurrencies, currency])
+                                                                } else {
+                                                                    setSelectedCurrencies(selectedCurrencies.filter(c => c !== currency))
+                                                                }
+                                                            }}
+                                                        />
                                                         <label htmlFor={`currency-${currency}`} className="ml-2 text-sm">{currency}</label>
                                                     </div>
                                                 ))}
@@ -281,9 +330,19 @@ export default function TransactionsPage() {
                                         <div>
                                             <h3 className="font-semibold mb-2">Payment Method</h3>
                                             <div className="space-y-2">
-                                                {['Cards', 'Mobile Money', 'Bank Transfer', 'Apple Pay', 'Google Pay', 'USSD', 'QR Code'].map((method) => (
+                                                {['CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE'].map((method) => (
                                                     <div key={method} className="flex items-center">
-                                                        <Checkbox id={`method-${method}`} />
+                                                        <Checkbox
+                                                            id={`method-${method}`}
+                                                            checked={selectedPaymentMethods.includes(method)}
+                                                            onChange={(e) => {
+                                                                if ((e.target as HTMLInputElement).checked) {
+                                                                    setSelectedPaymentMethods([...selectedPaymentMethods, method])
+                                                                } else {
+                                                                    setSelectedPaymentMethods(selectedPaymentMethods.filter(m => m !== method))
+                                                                }
+                                                            }}
+                                                        />
                                                         <label htmlFor={`method-${method}`} className="ml-2 text-sm">{method}</label>
                                                     </div>
                                                 ))}
@@ -301,57 +360,113 @@ export default function TransactionsPage() {
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('transaction_id')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('transaction_id')}
+                                                    >
                                                         Transaction ID
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'transaction_id' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('customer')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('customer')}
+                                                    >
                                                         Customer
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'customer' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold text-right">
-                                                    <Button variant="ghost" onClick={() => handleSort('gross_amount')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('gross_amount')}
+                                                    >
                                                         Gross Amount
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'gross_amount' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold text-right">
-                                                    <Button variant="ghost" onClick={() => handleSort('net_amount')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('net_amount')}
+                                                    >
                                                         Net Amount
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'net_amount' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('currency')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('currency')}
+                                                    >
                                                         Currency
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'currency' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('payment_method')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('payment_method')}
+                                                    >
                                                         Payment Method
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'payment_method' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('status')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('status')}
+                                                    >
                                                         Status
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'status' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('type')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('type')}
+                                                    >
                                                         Type
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'type' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="font-bold">
-                                                    <Button variant="ghost" onClick={() => handleSort('date')}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('date')}
+                                                    >
                                                         Date
-                                                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                                                        {sortColumn === 'date' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="font-bold">
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('provider_code')}
+                                                    >
+                                                        Provider
+                                                        {sortColumn === 'provider_code' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
                                                     </Button>
                                                 </TableHead>
                                             </TableRow>
@@ -368,6 +483,7 @@ export default function TransactionsPage() {
                                                     <TableCell>{transaction.status}</TableCell>
                                                     <TableCell>{transaction.type}</TableCell>
                                                     <TableCell>{transaction.date}</TableCell>
+                                                    <TableCell>{transaction.provider_code}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

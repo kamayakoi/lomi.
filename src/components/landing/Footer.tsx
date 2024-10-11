@@ -2,13 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { ModeToggle } from "./mode-toggle";
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
+import { useTheme } from '@/lib/hooks/useTheme';
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { theme, setTheme } = useTheme();
 
   const toggleLanguages = () => {
     setShowLanguages(!showLanguages);
@@ -26,6 +27,11 @@ export const Footer = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  };
 
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
@@ -150,9 +156,10 @@ export const Footer = () => {
       <div className="container max-w-8xl mt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 dark:text-gray-300 px-4">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 ml-2 md:ml-[55px]">
           <div className="flex items-center gap-2">
-            <AnotherIcon />
+            <div className="cursor-pointer" onClick={toggleTheme}>
+              <AnotherIcon />
+            </div>
             <SystemOperational />
-            <ModeToggle />
           </div>
           <div className="flex items-center gap-4 md:gap-6">
             <p>&copy; 2024 <br className="md:hidden" /> lomi.africa, Inc. </p>

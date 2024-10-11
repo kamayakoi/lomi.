@@ -80,7 +80,7 @@ export default function SidebarNav({
               <CollapsibleTrigger
                 className={cn(
                   buttonVariants({ variant: 'ghost' }),
-                  'justify-between w-full'
+                  'justify-between w-full text-left whitespace-nowrap' // Added text-left and whitespace-nowrap
                 )}
                 onClick={() => toggleSection(item.href)}
               >
@@ -89,7 +89,7 @@ export default function SidebarNav({
                   {item.title}
                 </div>
                 {item.subItems && (
-                  openSections[item.href] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                  openSections[item.href] ? <ChevronUp className="h-4 w-4 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 flex-shrink-0" />
                 )}
               </CollapsibleTrigger>
               <CollapsibleContent
@@ -104,7 +104,7 @@ export default function SidebarNav({
                       pathname === subItem.href
                         ? 'bg-muted hover:bg-muted'
                         : 'hover:bg-transparent hover:underline',
-                      'justify-start block'
+                      'justify-start block whitespace-nowrap' // Added whitespace-nowrap
                     )}
                   >
                     {subItem.title}
