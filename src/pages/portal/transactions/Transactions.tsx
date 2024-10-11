@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Download, Search, ArrowDownIcon, Filter, ArrowUpDown } from 'lucide-react'
+import { Download, Search, ArrowDownIcon, Filter, ArrowUpDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
@@ -134,13 +134,15 @@ export default function TransactionsPage() {
         )
     }
 
-    const fetchTotalIncomingAmount = async () => {
+    const fetchTotalIncomingAmount = async (startDate?: Date, endDate?: Date) => {
         const { data: { user } } = await supabase.auth.getUser()
 
         console.log('Fetching total incoming amount for merchant:', user?.id)
 
         const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
             p_merchant_id: user?.id,
+            p_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
+            p_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
         })
 
         if (error) {
@@ -151,11 +153,13 @@ export default function TransactionsPage() {
         setTotalIncomingAmount(data)
     }
 
-    const fetchTransactionCount = async () => {
+    const fetchTransactionCount = async (startDate?: Date, endDate?: Date) => {
         const { data: { user } } = await supabase.auth.getUser()
 
         const { data, error } = await supabase.rpc('fetch_transaction_count', {
             p_merchant_id: user?.id,
+            p_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
+            p_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
         })
 
         if (error) {
@@ -168,36 +172,71 @@ export default function TransactionsPage() {
 
     const handleDateRangeChange = (range: string) => {
         setSelectedDateRange(range)
+
+        const now = new Date()
+        let startDate: Date | undefined
+        let endDate: Date | undefined
+
+        switch (range) {
+            case '24H':
+                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+                endDate = now
+                break
+            case '7D':
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+                endDate = now
+                break
+            case '1M':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+                endDate = now
+                break
+            case '3M':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
+                endDate = now
+                break
+            case 'YTD':
+                startDate = new Date(now.getFullYear(), 0, 1)
+                endDate = now
+                break
+            default:
+                startDate = undefined
+                endDate = undefined
+        }
+
+        fetchTotalIncomingAmount(startDate, endDate)
+        fetchTransactionCount(startDate, endDate)
     }
 
     const applyDateFilter = (transactions: Transaction[]) => {
-        if (selectedDateRange === 'custom' && customDateRange?.from && customDateRange?.to) {
+        if (selectedDateRange === 'custom' && customDateRange) {
             return transactions.filter(transaction => {
                 const transactionDate = new Date(transaction.date)
-                return transactionDate >= customDateRange.from && transactionDate <= customDateRange.to
+                return customDateRange.from && customDateRange.to &&
+                    transactionDate >= customDateRange.from &&
+                    transactionDate <= customDateRange.to
             })
         }
 
         if (!selectedDateRange) return transactions
 
-        const today = new Date()
+        const now = new Date()
         let startDate: Date
 
         switch (selectedDateRange) {
             case '24H':
-                startDate = new Date(today.getTime() - 24 * 60 * 60 * 1000)
+                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
                 break
             case '7D':
-                startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
                 break
             case '1M':
-                startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate())
+                startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
                 break
             case '3M':
-                startDate = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate())
+                startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
                 break
             case 'YTD':
-                startDate = new Date(today.getFullYear(), 0, 1)
+                startDate = new Date(now.getFullYear(), 0, 1)
                 break
             default:
                 return transactions
@@ -205,13 +244,15 @@ export default function TransactionsPage() {
 
         return transactions.filter(transaction => {
             const transactionDate = new Date(transaction.date)
-            return transactionDate >= startDate && transactionDate <= today
+            return transactionDate >= startDate && transactionDate <= now
         })
     }
 
     const handleCustomDateRangeApply = () => {
-        if (customDateRange?.from && customDateRange?.to) {
+        if (customDateRange && customDateRange.from && customDateRange.to) {
             setSelectedDateRange('custom')
+            fetchTotalIncomingAmount(customDateRange.from, customDateRange.to)
+            fetchTransactionCount(customDateRange.from, customDateRange.to)
         }
     }
 

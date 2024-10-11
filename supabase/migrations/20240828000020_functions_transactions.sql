@@ -55,7 +55,11 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to fetch total incoming amount for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_total_incoming_amount(p_merchant_id UUID)
+CREATE OR REPLACE FUNCTION public.fetch_total_incoming_amount(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
 RETURNS NUMERIC(15,2) AS $$
 DECLARE
     v_total_incoming NUMERIC(15,2);
@@ -69,14 +73,20 @@ BEGIN
     WHERE 
         t.merchant_id = p_merchant_id AND
         t.status = 'completed' AND
-        t.transaction_type = 'payment';
+        t.transaction_type = 'payment' AND
+        (p_start_date IS NULL OR t.created_at >= p_start_date) AND
+        (p_end_date IS NULL OR t.created_at <= p_end_date);
         
     RETURN ROUND(v_total_incoming, 2);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to fetch the number of transactions for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_transaction_count(p_merchant_id UUID)
+CREATE OR REPLACE FUNCTION public.fetch_transaction_count(
+    p_merchant_id UUID,
+    p_start_date DATE DEFAULT NULL,
+    p_end_date DATE DEFAULT NULL
+)
 RETURNS INTEGER AS $$
 DECLARE
     v_transaction_count INTEGER;
@@ -86,7 +96,9 @@ BEGIN
     FROM 
         transactions
     WHERE 
-        merchant_id = p_merchant_id;
+        merchant_id = p_merchant_id AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
         
     RETURN v_transaction_count;
 END;
