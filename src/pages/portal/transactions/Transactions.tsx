@@ -21,6 +21,7 @@ import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
+import AnimatedLogoLoader from '@/components/dashboard/loader'
 
 type Transaction = {
     transaction_id: string
@@ -123,11 +124,11 @@ export default function TransactionsPage() {
     }
 
     if (isUserLoading) {
-        return <div>Loading user data...</div>
+        return <AnimatedLogoLoader />
     }
 
     if (!user || !user.id) {
-        return <div>User data not available.</div>
+        return <div><AnimatedLogoLoader /> User data not available.</div>
     }
 
     return (

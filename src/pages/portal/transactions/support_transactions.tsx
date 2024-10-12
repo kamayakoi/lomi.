@@ -141,8 +141,8 @@ export const fetchTransactionCount = async (merchantId: string, selectedDateRang
 
     const { data, error } = await supabase.rpc('fetch_transaction_count', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
     })
 
     if (error) {

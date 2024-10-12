@@ -104,7 +104,7 @@ BEGIN
     WHERE 
         merchant_id = p_merchant_id AND
         transaction_type IN ('payment', 'instalment') AND
-        status = 'completed' AND
+        status IN ('completed', 'pending', 'refunded') AND
         (p_start_date IS NULL OR created_at >= p_start_date) AND
         (p_end_date IS NULL OR created_at <= p_end_date);
         
