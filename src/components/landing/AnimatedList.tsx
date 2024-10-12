@@ -7,6 +7,7 @@ interface Item {
     icon: string;
     color: string;
     time: string;
+    amount?: string;
 }
 
 let notifications = [
@@ -15,34 +16,46 @@ let notifications = [
         description: "ashantishoes.com",
         time: "12m ago",
         icon: "💸",
-        color: "#00C9A7",
+        color: "#00A0FF",
+        amount: "33,000 XOF",
     },
     {
-        name: "Subscription created",
+        name: "New monthly subscriber",
         description: "The African Ledger",
         time: "10m ago",
-        icon: "👤",
+        icon: "🎉",
         color: "#FFB800",
+        amount: "7,500 XOF",
+    },
+    {
+        name: "Payout processed",
+        description: "ashantishoes.com",
+        time: "42m ago",
+        icon: "🏦",
+        color: "#A7F3D0",
+        amount: "88,745 XOF",
     },
     {
         name: "Payment received",
         description: "ashantishoes.com",
         time: "5m ago",
         icon: "💸",
-        color: "#00C9A7",
+        color: "#00A0FF",
+        amount: "53,500 XOF",
     },
     {
         name: "Payout processed",
         description: "The African Ledger",
         time: "42m ago",
-        icon: "💸",
-        color: "#00C9A7",
+        icon: "🏦",
+        color: "#A7F3D0",
+        amount: "250,000 XOF",
     },
 ];
 
 notifications = Array.from({ length: 10 }, () => notifications).flat();
 
-const Notification = ({ name, description, icon, color, time }: Item) => {
+const Notification = ({ name, description, icon, color, time, amount }: Item) => {
     return (
         <figure
             className={cn(
@@ -64,26 +77,29 @@ const Notification = ({ name, description, icon, color, time }: Item) => {
                 >
                     <span className="text-lg">{icon}</span>
                 </div>
-                <div className="flex flex-col overflow-hidden">
-                    <figcaption className="flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white ">
-                        <span className="text-sm sm:text-lg">{name}</span>
+                <div className="flex flex-1 flex-col overflow-hidden">
+                    <figcaption className="flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white">
+                        <span className="truncate text-sm sm:text-lg">{name}</span>
                         <span className="mx-1">·</span>
                         <span className="text-xs text-gray-500">{time}</span>
                     </figcaption>
-                    <p className="text-sm font-normal dark:text-white/60">
-                        {description}
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <p className="truncate text-sm font-normal dark:text-white/60">
+                            {description}
+                        </p>
+                        {amount && (
+                            <div className="ml-2 flex min-w-[100px] max-w-[120px] items-center justify-center rounded-lg bg-green-100 px-2 py-1 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+                                {amount}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </figure>
     );
 };
 
-export function AnimatedListDemo({
-    className,
-}: {
-    className?: string;
-}) {
+export function AnimatedListDemo({ className }: { className?: string }) {
     return (
         <div
             className={cn(
@@ -91,9 +107,9 @@ export function AnimatedListDemo({
                 className,
             )}
         >
-            <AnimatedList delay={10000}>
+            <AnimatedList delay={9000}>
                 {notifications.map((item, idx) => (
-                    <Notification {...item} key={idx} />
+                    <Notification key={idx} {...item} />
                 ))}
             </AnimatedList>
         </div>

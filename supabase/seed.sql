@@ -87,9 +87,9 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'Pr
 
 
 -- Seed data for subscriptions table
-INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, product_id, status, start_date, billing_frequency, amount, currency_code)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), 'active', NOW(), 'monthly', 50.00, 'XOF')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), 'active', NOW(), 'yearly', 100.00, 'XOF');
+INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, status, image_url, start_date, billing_frequency, amount, currency_code)
+VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'active', 'https://example.com/images/premium_sub.jpg', NOW(), 'monthly', 50.00, 'XOF')
+     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 'active', 'https://example.com/images/gold_sub.jpg', NOW(), 'yearly', 100.00, 'XOF');
 
 
 -- Seed data for fees table
@@ -153,31 +153,41 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
 
 
 -- Seed data for transactions table
-INSERT INTO transactions (merchant_id, organization_id, customer_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code)
+INSERT INTO transactions (merchant_id, organization_id, customer_id, product_id, subscription_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code)
 VALUES 
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'),
+     (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'),
      'payment', 'completed', 'Sample transaction 1', 'REF1001', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'),
+     NULL,
+     NULL,
      'payment', 'pending', 'Sample transaction 2', 'REF1002', '{}', 50.00, 5.00, 45.00, 'XOF/WAVE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'African Ledger'),
      (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'),
+     (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com')),
      'payment', 'completed', 'Sample transaction 3', 'REF1003', '{}', 100.00, 5.00, 95.00, 'XOF/MTN Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'African Ledger'),
      (SELECT customer_id FROM customers WHERE email = 'ibrahima.diallo@example.com'),
+     NULL,
+     NULL,
      'payment', 'failed', 'Sample transaction 4', 'REF1004', '{}', 75.00, 5.00, 70.00, 'XOF/ECOBANK Bank Transfer Fee', 'XOF', 'ECOBANK', 'BANK_TRANSFER'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'),
+     NULL,
+     NULL,
      'payment', 'completed', 'Sample transaction 5', 'REF1005', '{}', 150.00, 5.00, 145.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'),
+     NULL,
+     NULL,
      'instalment', 'completed', 'Sample transaction 6', 'REF1006', '{}', 200.00, 5.00, 195.00, 'XOF/WAVE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY');
 
 -- Seed data for refunds table
@@ -263,9 +273,7 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SE
 
 
 -- Seed data for payment_links table
-INSERT INTO payment_links (merchant_id, organization_id, page_id, product_id, subscription_id, title, public_description, price, currency_code, frequency, is_active)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT page_id FROM pages WHERE slug = 'premium-subscription'), (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan')), 'Premium Plan Payment Link', 'Pay for your premium plan subscription', 50.00, 'XOF', 'monthly', TRUE)
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT page_id FROM pages WHERE slug = 'gold-package'), (SELECT product_id FROM merchant_products WHERE name = 'Gold Package'), (SELECT subscription_id FROM merchant_subscriptions WHERE product_id = (SELECT product_id FROM merchant_products WHERE name = 'Gold Package')), 'Gold Package Payment Link', 'Pay for your gold package upgrade', 100.00, 'XOF', 'yearly', TRUE);
+
 
 
 -- Seed data for customer_invoices table

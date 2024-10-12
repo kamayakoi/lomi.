@@ -12,6 +12,12 @@ CREATE OR REPLACE FUNCTION public.fetch_transactions(
 RETURNS TABLE (
     transaction_id UUID,
     customer_name VARCHAR,
+    customer_email VARCHAR,
+    customer_phone VARCHAR,
+    customer_country VARCHAR,
+    customer_city VARCHAR,
+    customer_address VARCHAR,
+    customer_postal_code VARCHAR,
     gross_amount NUMERIC(10,2),
     net_amount NUMERIC(10,2),
     currency_code currency_code,
@@ -19,16 +25,30 @@ RETURNS TABLE (
     status transaction_status,
     transaction_type transaction_type,
     created_at TIMESTAMPTZ,
-    provider_code provider_code
+    provider_code provider_code,
+    product_id UUID,
+    subscription_id UUID,
+    product_name VARCHAR,
+    product_description TEXT,
+    product_price NUMERIC(10,2),
+    subscription_status subscription_status,
+    subscription_start_date DATE,
+    subscription_end_date DATE,
+    subscription_next_billing_date DATE,
+    subscription_billing_frequency frequency,
+    subscription_amount NUMERIC(10,2)
 ) AS $$
 BEGIN
-    RAISE NOTICE 'Fetching transactions for merchant_id: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
-        p_merchant_id, p_provider_code, p_status, p_type, p_currency, p_payment_method;
-
     RETURN QUERY
     SELECT 
         t.transaction_id,
         c.name AS customer_name,
+        c.email AS customer_email,
+        c.phone_number AS customer_phone,
+        c.country AS customer_country,
+        c.city AS customer_city,
+        c.address AS customer_address,
+        c.postal_code AS customer_postal_code,
         t.gross_amount,
         t.net_amount,
         t.currency_code,
@@ -36,11 +56,26 @@ BEGIN
         t.status,
         t.transaction_type,
         t.created_at,
-        t.provider_code
+        t.provider_code,
+        t.product_id,
+        t.subscription_id,
+        p.name AS product_name,
+        p.description AS product_description,
+        p.price AS product_price,
+        s.status AS subscription_status,
+        s.start_date AS subscription_start_date,
+        s.end_date AS subscription_end_date,
+        s.next_billing_date AS subscription_next_billing_date,
+        s.billing_frequency AS subscription_billing_frequency,
+        s.amount AS subscription_amount
     FROM 
         transactions t
     JOIN
         customers c ON t.customer_id = c.customer_id
+    LEFT JOIN
+        merchant_products p ON t.product_id = p.product_id
+    LEFT JOIN
+        merchant_subscriptions s ON t.subscription_id = s.subscription_id
     WHERE 
         t.merchant_id = p_merchant_id AND
         (p_provider_code IS NULL OR t.provider_code = p_provider_code) AND
@@ -52,11 +87,6 @@ BEGIN
         t.created_at DESC
     LIMIT p_page_size
     OFFSET ((p_page - 1) * p_page_size);
-        
-    IF NOT FOUND THEN
-        RAISE NOTICE 'No transactions found for merchant_id: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
-            p_merchant_id, p_provider_code, p_status, p_type, p_currency, p_payment_method;
-    END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

@@ -8,6 +8,7 @@ CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly' , 'yearly', 'one-time');
 CREATE TYPE entry_type AS ENUM ('debit', 'credit');
+CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF','USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
@@ -304,8 +305,8 @@ CREATE TABLE merchant_subscriptions (
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
-    product_id UUID REFERENCES merchant_products(product_id),
-    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    status subscription_status NOT NULL DEFAULT 'pending',
+    image_url TEXT,
     start_date DATE NOT NULL,
     end_date DATE,
     next_billing_date DATE,
@@ -324,12 +325,24 @@ CREATE TABLE merchant_subscriptions (
 CREATE INDEX idx_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
 CREATE INDEX idx_subscriptions_organization_id ON merchant_subscriptions(organization_id);
 CREATE INDEX idx_subscriptions_customer_id ON merchant_subscriptions(customer_id);
-CREATE INDEX idx_subscriptions_product_id ON merchant_subscriptions(product_id);
 CREATE INDEX idx_subscriptions_currency_code ON merchant_subscriptions(currency_code);
 
 COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions';
 COMMENT ON COLUMN merchant_subscriptions.next_billing_date IS 'The next billing date of the subscription';
 COMMENT ON COLUMN merchant_subscriptions.status IS 'Current status of the subscription (active, paused, cancelled, expired)';
+
+-- Add comments to explain the subscription statuses
+COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
+- active: Subscription is currently active and payments are up-to-date
+- paused: Subscription is temporarily paused (e.g., at customer''s request)
+- cancelled: Subscription has been cancelled but may still be active until the end of the current billing period
+- expired: Subscription has reached its end date or maximum number of billing cycles
+- past_due: Payment is overdue but the subscription is still active
+- pending: Subscription has been created but is not yet active (e.g., waiting for initial payment)
+- trial: Subscription is in a trial period';
+
+-- Update the comment on the merchant_subscriptions table
+COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions, including status and visual representation';
 
 
 -- Fees table
@@ -364,6 +377,8 @@ CREATE TABLE transactions (
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
+    product_id UUID REFERENCES merchant_products(product_id),
+    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
     transaction_type transaction_type NOT NULL,
     status transaction_status NOT NULL DEFAULT 'pending',
     description TEXT,
@@ -388,6 +403,8 @@ CREATE INDEX idx_transactions_transaction_type ON transactions(transaction_type)
 CREATE INDEX idx_transactions_status ON transactions(status);
 CREATE INDEX idx_transactions_currency_code ON transactions(currency_code);
 CREATE INDEX idx_transactions_payment_method_code ON transactions(payment_method_code);
+CREATE INDEX idx_transactions_product_id ON transactions(product_id);
+CREATE INDEX idx_transactions_subscription_id ON transactions(subscription_id);
 CREATE INDEX idx_transactions_created_at ON transactions(created_at);
 CREATE INDEX idx_transactions_net_amount ON transactions(net_amount);
 CREATE INDEX idx_transactions_gross_amount ON transactions(gross_amount);

@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
-import { Transaction, FetchedTransaction } from './types'
+import { Transaction, FetchedTransaction, subscription_status } from './types'
 import { DateRange } from 'react-day-picker'
 import { useQuery, UseQueryOptions } from 'react-query'
 
@@ -37,7 +37,13 @@ export const fetchTransactions = async (
 
     return data.map((transaction: FetchedTransaction) => ({
         transaction_id: transaction.transaction_id,
-        customer: transaction.customer_name,
+        customer_name: transaction.customer_name,
+        customer_email: transaction.customer_email,
+        customer_phone: transaction.customer_phone,
+        customer_country: transaction.customer_country,
+        customer_city: transaction.customer_city,
+        customer_address: transaction.customer_address,
+        customer_postal_code: transaction.customer_postal_code,
         gross_amount: transaction.gross_amount,
         net_amount: transaction.net_amount,
         currency: transaction.currency_code,
@@ -46,6 +52,17 @@ export const fetchTransactions = async (
         type: transaction.transaction_type,
         date: format(new Date(transaction.created_at), 'yyyy-MM-dd HH:mm:ss'),
         provider_code: transaction.provider_code,
+        product_id: transaction.product_id,
+        product_name: transaction.product_name,
+        product_description: transaction.product_description,
+        product_price: transaction.product_price,
+        subscription_id: transaction.subscription_id,
+        subscription_status: transaction.subscription_status as subscription_status,
+        subscription_start_date: transaction.subscription_start_date,
+        subscription_end_date: transaction.subscription_end_date,
+        subscription_next_billing_date: transaction.subscription_next_billing_date,
+        subscription_billing_frequency: transaction.subscription_billing_frequency,
+        subscription_amount: transaction.subscription_amount,
     }))
 }
 

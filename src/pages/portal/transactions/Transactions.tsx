@@ -26,7 +26,7 @@ import TransactionActions from './actions_transactions'
 
 type Transaction = {
     transaction_id: string
-    customer: string
+    customer_name: string
     gross_amount: number
     net_amount: number
     currency: currency_code
@@ -405,7 +405,7 @@ export default function TransactionsPage() {
                                                             onClick={() => setSelectedTransaction(transaction)}
                                                         >
                                                             <TableCell className="text-center">{shortenTransactionId(transaction.transaction_id)}</TableCell>
-                                                            <TableCell className="text-center font-medium">{transaction.customer}</TableCell>
+                                                            <TableCell className="text-center font-medium">{transaction.customer_name}</TableCell>
                                                             <TableCell className="text-center">{transaction.gross_amount}</TableCell>
                                                             <TableCell className="text-center">{transaction.net_amount}</TableCell>
                                                             <TableCell className="text-center">{transaction.currency}</TableCell>
