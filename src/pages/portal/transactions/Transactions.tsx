@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
+import TransactionActions from './actions_transactions'
 
 type Transaction = {
     transaction_id: string
@@ -50,6 +51,7 @@ export default function TransactionsPage() {
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
     const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
     const pageSize = 50
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -364,7 +366,7 @@ export default function TransactionsPage() {
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead>
+                                                    <TableHead className="text-center">
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('transaction_id')}
@@ -375,15 +377,15 @@ export default function TransactionsPage() {
                                                             )}
                                                         </Button>
                                                     </TableHead>
-                                                    <TableHead>Customer</TableHead>
-                                                    <TableHead>Gross Amount</TableHead>
-                                                    <TableHead>Net Amount</TableHead>
-                                                    <TableHead>Currency</TableHead>
-                                                    <TableHead>Payment Method</TableHead>
-                                                    <TableHead>Status</TableHead>
-                                                    <TableHead>Type</TableHead>
-                                                    <TableHead>Date</TableHead>
-                                                    <TableHead>Provider</TableHead>
+                                                    <TableHead className="text-center">Customer</TableHead>
+                                                    <TableHead className="text-center">Gross Amount</TableHead>
+                                                    <TableHead className="text-center">Net Amount</TableHead>
+                                                    <TableHead className="text-center">Currency</TableHead>
+                                                    <TableHead className="text-center">Payment Method</TableHead>
+                                                    <TableHead className="text-center">Status</TableHead>
+                                                    <TableHead className="text-center">Type</TableHead>
+                                                    <TableHead className="text-center">Date</TableHead>
+                                                    <TableHead className="text-center">Provider</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -399,18 +401,41 @@ export default function TransactionsPage() {
                                                     applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
                                                         <TableRow
                                                             key={transaction.transaction_id}
-                                                            className={transaction.status === 'refunded' ? 'bg-pink-100' : ''}
+                                                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                            onClick={() => setSelectedTransaction(transaction)}
                                                         >
-                                                            <TableCell>{transaction.transaction_id}</TableCell>
-                                                            <TableCell>{transaction.customer}</TableCell>
-                                                            <TableCell>{transaction.gross_amount}</TableCell>
-                                                            <TableCell>{transaction.net_amount}</TableCell>
-                                                            <TableCell>{transaction.currency}</TableCell>
-                                                            <TableCell>{transaction.payment_method}</TableCell>
-                                                            <TableCell>{transaction.status}</TableCell>
-                                                            <TableCell>{transaction.type}</TableCell>
-                                                            <TableCell>{transaction.date}</TableCell>
-                                                            <TableCell>{transaction.provider_code}</TableCell>
+                                                            <TableCell className="text-center">{shortenTransactionId(transaction.transaction_id)}</TableCell>
+                                                            <TableCell className="text-center font-medium">{transaction.customer}</TableCell>
+                                                            <TableCell className="text-center">{transaction.gross_amount}</TableCell>
+                                                            <TableCell className="text-center">{transaction.net_amount}</TableCell>
+                                                            <TableCell className="text-center">{transaction.currency}</TableCell>
+                                                            <TableCell className="text-center">{formatPaymentMethod(transaction.payment_method)}</TableCell>
+                                                            <TableCell className="text-center">
+                                                                <span className={`
+                                                                    inline-block px-2 py-1 rounded-full text-xs font-semibold
+                                                                    ${transaction.status === 'refunded' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                                                    ${transaction.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                    ${transaction.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                                                                    ${transaction.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                                                `}>
+                                                                    {formatTransactionStatus(transaction.status)}
+                                                                </span>
+                                                            </TableCell>
+                                                            <TableCell className="text-center">{formatTransactionType(transaction.type)}</TableCell>
+                                                            <TableCell className="text-center">{formatDate(transaction.date)}</TableCell>
+                                                            <TableCell className="text-center">
+                                                                <span className={`
+                                                                    inline-block px-2 py-1 text-xs font-semibold
+                                                                    ${transaction.provider_code === 'ORANGE' ? 'bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200' : ''}
+                                                                    ${transaction.provider_code === 'WAVE' ? 'bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200' : ''}
+                                                                    ${transaction.provider_code === 'ECOBANK' ? 'bg-teal-200 text-teal-800 dark:bg-teal-800 dark:text-teal-200' : ''}
+                                                                    ${transaction.provider_code === 'MTN' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200' : ''}
+                                                                    ${transaction.provider_code === 'STRIPE' ? 'bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200' : ''}
+                                                                    ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
+                                                                `}>
+                                                                    {formatProviderCode(transaction.provider_code)}
+                                                                </span>
+                                                            </TableCell>
                                                         </TableRow>
                                                     ))
                                                 )}
@@ -423,6 +448,71 @@ export default function TransactionsPage() {
                     </div>
                 </div>
             </Layout.Body>
+            <TransactionActions
+                transaction={selectedTransaction}
+                isOpen={!!selectedTransaction}
+                onClose={() => setSelectedTransaction(null)}
+            />
         </Layout>
     )
+}
+
+function formatPaymentMethod(paymentMethod: payment_method_code): string {
+    switch (paymentMethod) {
+        case 'CARDS':
+            return 'Cards'
+        case 'MOBILE_MONEY':
+            return 'Mobile Money'
+        case 'E_WALLET':
+            return 'E-Wallet'
+        case 'BANK_TRANSFER':
+            return 'Bank Transfer'
+        case 'APPLE_PAY':
+            return 'Apple Pay'
+        case 'GOOGLE_PAY':
+            return 'Google Pay'
+        case 'USSD':
+            return 'USSD'
+        case 'QR_CODE':
+            return 'QR Code'
+        default:
+            return paymentMethod
+    }
+}
+
+function formatTransactionStatus(status: transaction_status): string {
+    return status.charAt(0).toUpperCase() + status.slice(1)
+}
+
+function formatTransactionType(type: transaction_type): string {
+    return type.charAt(0).toUpperCase() + type.slice(1)
+}
+
+function formatProviderCode(providerCode: provider_code): string {
+    switch (providerCode) {
+        case 'ORANGE':
+            return 'Orange'
+        case 'WAVE':
+            return 'Wave'
+        case 'ECOBANK':
+            return 'Ecobank'
+        case 'MTN':
+            return 'MTN'
+        case 'STRIPE':
+            return 'Stripe'
+        case 'OTHER':
+            return 'Other'
+        default:
+            return providerCode
+    }
+}
+
+function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+// Update the shortenTransactionId function
+function shortenTransactionId(transactionId: string): string {
+    return `${transactionId.slice(0, 8)}${transactionId.slice(8, 12)}-...`
 }
