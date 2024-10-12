@@ -208,6 +208,9 @@ export const applyDateFilter = (transactions: Transaction[], selectedDateRange: 
         case '3M':
             startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
             break
+        case '6M':
+            startDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+            break
         case 'YTD':
             startDate = new Date(now.getFullYear(), 0, 1)
             break

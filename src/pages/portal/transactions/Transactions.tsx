@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { ArrowDownIcon, ArrowUpDown } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
@@ -35,7 +34,6 @@ type Transaction = {
 
 export default function TransactionsPage() {
     const { user, isLoading: isUserLoading } = useUser()
-    const [showFilters, setShowFilters] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
@@ -196,103 +194,17 @@ export default function TransactionsPage() {
                             customDateRange={customDateRange}
                             setCustomDateRange={setCustomDateRange}
                             handleCustomDateRangeApply={handleCustomDateRangeApply}
-                            setShowFilters={setShowFilters}
+                            selectedStatuses={selectedStatuses}
+                            setSelectedStatuses={setSelectedStatuses}
+                            selectedTypes={selectedTypes}
+                            setSelectedTypes={setSelectedTypes}
+                            selectedCurrencies={selectedCurrencies}
+                            setSelectedCurrencies={setSelectedCurrencies}
+                            selectedPaymentMethods={selectedPaymentMethods}
+                            setSelectedPaymentMethods={setSelectedPaymentMethods}
                             columns={columns}
                             setColumns={setColumns}
                         />
-
-                        {showFilters && (
-                            <Card className="mb-6">
-                                <CardContent className="p-6">
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div>
-                                            <h3 className="font-semibold mb-2">Status</h3>
-                                            <div className="space-y-2">
-                                                {['pending', 'completed', 'failed'].map((status) => (
-                                                    <div key={status} className="flex items-center">
-                                                        <Checkbox
-                                                            id={`status-${status}`}
-                                                            checked={selectedStatuses.includes(status)}
-                                                            onChange={(e) => {
-                                                                if ((e.target as HTMLInputElement).checked) {
-                                                                    setSelectedStatuses([...selectedStatuses, status])
-                                                                } else {
-                                                                    setSelectedStatuses(selectedStatuses.filter(s => s !== status))
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor={`status-${status}`} className="ml-2 text-sm capitalize">{status}</label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold mb-2">Type</h3>
-                                            <div className="space-y-2">
-                                                {['payment', 'instalment'].map((type) => (
-                                                    <div key={type} className="flex items-center">
-                                                        <Checkbox
-                                                            id={`type-${type}`}
-                                                            checked={selectedTypes.includes(type)}
-                                                            onChange={(e) => {
-                                                                if ((e.target as HTMLInputElement).checked) {
-                                                                    setSelectedTypes([...selectedTypes, type])
-                                                                } else {
-                                                                    setSelectedTypes(selectedTypes.filter(t => t !== type))
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor={`type-${type}`} className="ml-2 text-sm capitalize">{type}</label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold mb-2">Currency</h3>
-                                            <div className="space-y-2">
-                                                {['XOF', 'USD', 'EUR'].map((currency) => (
-                                                    <div key={currency} className="flex items-center">
-                                                        <Checkbox
-                                                            id={`currency-${currency}`}
-                                                            checked={selectedCurrencies.includes(currency)}
-                                                            onChange={(e) => {
-                                                                if ((e.target as HTMLInputElement).checked) {
-                                                                    setSelectedCurrencies([...selectedCurrencies, currency])
-                                                                } else {
-                                                                    setSelectedCurrencies(selectedCurrencies.filter(c => c !== currency))
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor={`currency-${currency}`} className="ml-2 text-sm">{currency}</label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold mb-2">Payment Method</h3>
-                                            <div className="space-y-2">
-                                                {['CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE'].map((method) => (
-                                                    <div key={method} className="flex items-center">
-                                                        <Checkbox
-                                                            id={`method-${method}`}
-                                                            checked={selectedPaymentMethods.includes(method)}
-                                                            onChange={(e) => {
-                                                                if ((e.target as HTMLInputElement).checked) {
-                                                                    setSelectedPaymentMethods([...selectedPaymentMethods, method])
-                                                                } else {
-                                                                    setSelectedPaymentMethods(selectedPaymentMethods.filter(m => m !== method))
-                                                                }
-                                                            }}
-                                                        />
-                                                        <label htmlFor={`method-${method}`} className="ml-2 text-sm">{method}</label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
 
                         <Card>
                             <CardContent className="p-6">
