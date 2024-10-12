@@ -9,9 +9,8 @@ import "./index.css";
 
 const queryClient = new QueryClient()
 
-const rootElement = document.getElementById("root");
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(
+export function App() {
+  return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
@@ -23,6 +22,11 @@ if (rootElement) {
       </QueryClientProvider>
     </React.StrictMode>
   );
+}
+
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  ReactDOM.createRoot(rootElement).render(<App />);
 } else {
   console.error("Root element not found");
 }
