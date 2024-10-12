@@ -86,6 +86,10 @@ export default function TransactionActions({ transaction, isOpen, onClose }: Tra
                                             )}
                                             {transaction.subscription_id && (
                                                 <>
+                                                    <div className="font-medium">Subscription Name:</div>
+                                                    <div>{transaction.subscription_name || 'N/A'}</div>
+                                                    <div className="font-medium">Description:</div>
+                                                    <div>{transaction.subscription_description || 'N/A'}</div>
                                                     <div className="font-medium">Subscription Status:</div>
                                                     <div>{formatSubscriptionStatus(transaction.subscription_status)}</div>
                                                     <div className="font-medium">Start Date:</div>

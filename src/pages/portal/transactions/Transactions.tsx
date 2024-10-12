@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
-import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter } from './support_transactions'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate } from './support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -102,6 +102,13 @@ export default function TransactionsPage() {
         { enabled: !!user?.id }
     )
 
+    const { data: completionRate = { completed: 0, refunded: 0, failed: 0 }, isLoading: isCompletionRateLoading } = useCompletionRate(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
@@ -178,6 +185,31 @@ export default function TransactionsPage() {
                                             <Skeleton className="w-20 h-4" />
                                         ) : (
                                             `${transactionCount} transactions`
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">
+                                        {isCompletionRateLoading ? (
+                                            <Skeleton className="w-32 h-8" />
+                                        ) : (
+                                            `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
+                                        )}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {isCompletionRateLoading ? (
+                                            <Skeleton className="w-20 h-4" />
+                                        ) : (
+                                            <>
+                                                {completionRate.completed > 0 && `${completionRate.completed} completed`}
+                                                {completionRate.refunded > 0 && `, ${completionRate.refunded} refunded`}
+                                                {completionRate.failed > 0 && `, ${completionRate.failed} failed`}
+                                            </>
                                         )}
                                     </div>
                                 </CardContent>
@@ -368,7 +400,7 @@ export default function TransactionsPage() {
                                                                     <span className={`
                                                                         inline-block px-2 py-1 text-xs font-semibold
                                                                         ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-white dark:bg-[#71CDF4] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
                                                                         ${transaction.provider_code === 'STRIPE' ? 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white' : ''}
@@ -456,4 +488,9 @@ function formatDate(dateString: string): string {
 
 function shortenTransactionId(transactionId: string): string {
     return `${transactionId.slice(0, 8)}${transactionId.slice(8, 12)}-...`
+}
+
+function calculateCompletionRate(completed: number, refunded: number, failed: number): number {
+    const total = completed + refunded + failed
+    return total > 0 ? Math.round((completed / total) * 100) : 0
 }

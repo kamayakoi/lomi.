@@ -305,6 +305,8 @@ CREATE TABLE merchant_subscriptions (
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
     status subscription_status NOT NULL DEFAULT 'pending',
     image_url TEXT,
     start_date DATE NOT NULL,

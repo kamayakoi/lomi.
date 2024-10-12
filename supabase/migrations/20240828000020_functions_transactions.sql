@@ -31,6 +31,8 @@ RETURNS TABLE (
     product_name VARCHAR,
     product_description TEXT,
     product_price NUMERIC(10,2),
+    subscription_name VARCHAR,
+    subscription_description TEXT,
     subscription_status subscription_status,
     subscription_start_date DATE,
     subscription_end_date DATE,
@@ -62,6 +64,8 @@ BEGIN
         p.name AS product_name,
         p.description AS product_description,
         p.price AS product_price,
+        s.name AS subscription_name,
+        s.description AS subscription_description,
         s.status AS subscription_status,
         s.start_date AS subscription_start_date,
         s.end_date AS subscription_end_date,
@@ -139,5 +143,32 @@ BEGIN
         (p_end_date IS NULL OR created_at <= p_end_date);
         
     RETURN v_transaction_count;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch completion rate data for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_completion_rate(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS TABLE (
+    completed INTEGER,
+    refunded INTEGER,
+    failed INTEGER
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        COUNT(*) FILTER (WHERE status = 'completed') AS completed,
+        COUNT(*) FILTER (WHERE status = 'refunded') AS refunded,
+        COUNT(*) FILTER (WHERE status = 'failed') AS failed
+    FROM
+        transactions
+    WHERE
+        merchant_id = p_merchant_id AND
+        transaction_type IN ('payment', 'instalment') AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

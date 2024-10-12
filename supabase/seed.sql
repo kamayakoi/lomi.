@@ -87,9 +87,30 @@ VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 'Pr
 
 
 -- Seed data for subscriptions table
-INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, status, image_url, start_date, billing_frequency, amount, currency_code)
-VALUES ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 'active', 'https://example.com/images/premium_sub.jpg', NOW(), 'monthly', 50.00, 'XOF')
-     , ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 'active', 'https://example.com/images/gold_sub.jpg', NOW(), 'yearly', 100.00, 'XOF');
+INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, name, description, status, image_url, start_date, billing_frequency, amount, currency_code)
+VALUES 
+    ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
+     (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'), 
+     (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'), 
+     'Premium Monthly Plan', 
+     'Access to all premium features with monthly billing',
+     'active', 
+     'https://example.com/images/premium_sub.jpg', 
+     NOW(), 
+     'monthly', 
+     50.00, 
+     'XOF'),
+    ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 
+     (SELECT organization_id FROM organizations WHERE name = 'African Ledger'), 
+     (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'), 
+     'Gold Annual Package', 
+     'Our best value package with annual billing',
+     'active', 
+     'https://example.com/images/gold_sub.jpg', 
+     NOW(), 
+     'yearly', 
+     100.00, 
+     'XOF');
 
 
 -- Seed data for fees table

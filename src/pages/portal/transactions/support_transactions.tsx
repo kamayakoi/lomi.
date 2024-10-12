@@ -57,6 +57,8 @@ export const fetchTransactions = async (
         product_description: transaction.product_description,
         product_price: transaction.product_price,
         subscription_id: transaction.subscription_id,
+        subscription_name: transaction.subscription_name,
+        subscription_description: transaction.subscription_description,
         subscription_status: transaction.subscription_status as subscription_status,
         subscription_start_date: transaction.subscription_start_date,
         subscription_end_date: transaction.subscription_end_date,
@@ -66,12 +68,7 @@ export const fetchTransactions = async (
     }))
 }
 
-export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
-    if (!merchantId) {
-        console.warn('Merchant ID is empty. Skipping total incoming amount fetch.')
-        return 0
-    }
-
+const getDateRange = (selectedDateRange: string | null, customDateRange?: DateRange) => {
     let startDate: Date | undefined
     let endDate: Date | undefined
 
@@ -97,12 +94,27 @@ export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateR
                 startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
                 endDate = now
                 break
+            case '6M':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate())
+                endDate = now
+                break
             case 'YTD':
                 startDate = new Date(now.getFullYear(), 0, 1)
                 endDate = now
                 break
         }
     }
+
+    return { startDate, endDate }
+}
+
+export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping total incoming amount fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
 
     const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
         p_merchant_id: merchantId,
@@ -124,37 +136,7 @@ export const fetchTransactionCount = async (merchantId: string, selectedDateRang
         return 0
     }
 
-    let startDate: Date | undefined
-    let endDate: Date | undefined
-
-    if (selectedDateRange === 'custom' && customDateRange) {
-        startDate = customDateRange.from
-        endDate = customDateRange.to
-    } else {
-        const now = new Date()
-        switch (selectedDateRange) {
-            case '24H':
-                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-                endDate = now
-                break
-            case '7D':
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-                endDate = now
-                break
-            case '1M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-                endDate = now
-                break
-            case '3M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-                endDate = now
-                break
-            case 'YTD':
-                startDate = new Date(now.getFullYear(), 0, 1)
-                endDate = now
-                break
-        }
-    }
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
 
     const { data, error } = await supabase.rpc('fetch_transaction_count', {
         p_merchant_id: merchantId,
@@ -168,6 +150,28 @@ export const fetchTransactionCount = async (merchantId: string, selectedDateRang
     }
 
     return data
+}
+
+export const fetchCompletionRate = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping completion rate fetch.')
+        return { completed: 0, refunded: 0, failed: 0 }
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_completion_rate', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching completion rate:', error)
+        return { completed: 0, refunded: 0, failed: 0 }
+    }
+
+    return data[0]
 }
 
 export const applySearch = (transactions: Transaction[], searchTerm: string) => {
@@ -264,6 +268,18 @@ export const useTransactionCount = (
 ) => {
     return useQuery(['transactionCount', merchantId, selectedDateRange, customDateRange], () =>
         fetchTransactionCount(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}
+
+export const useCompletionRate = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<{ completed: number; refunded: number; failed: number }, unknown, { completed: number; refunded: number; failed: number }, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['completionRate', merchantId, selectedDateRange, customDateRange], () =>
+        fetchCompletionRate(merchantId, selectedDateRange, customDateRange),
         options
     )
 }

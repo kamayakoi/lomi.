@@ -28,6 +28,8 @@ export type Transaction = {
     product_description?: string
     product_price?: number
     subscription_id?: string
+    subscription_name?: string
+    subscription_description?: string
     subscription_status?: subscription_status
     subscription_start_date?: string
     subscription_end_date?: string
@@ -58,6 +60,8 @@ export type FetchedTransaction = {
     product_description: string
     product_price: number
     subscription_id: string
+    subscription_name?: string
+    subscription_description?: string
     subscription_status: subscription_status
     subscription_start_date: string
     subscription_end_date: string

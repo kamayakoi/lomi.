@@ -77,10 +77,10 @@ export default function TransactionFilters({
     }
 
     return (
-        <div className="w-full bg-white shadow-sm rounded-lg p-4">
+        <div className="w-full bg-card shadow-sm rounded-lg p-4 text-card-foreground">
             <div className="flex flex-wrap items-end gap-4">
                 <div className="w-full sm:w-auto flex-grow">
-                    <label htmlFor="date-range" className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                    <label htmlFor="date-range" className="block text-sm font-medium mb-1">Date Range</label>
                     <div className="flex rounded-md shadow-sm w-full max-w-2xl">
                         {['24H', '7D', '1M', '3M', '6M', 'YTD'].map((range) => (
                             <Button
@@ -89,8 +89,8 @@ export default function TransactionFilters({
                                 onClick={() => setSelectedDateRange(range)}
                                 className={`
                   px-2 py-2 text-sm font-medium transition-colors duration-150 h-10
-                  ${selectedDateRange === range ? 'bg-gray-100 text-gray-900' : 'bg-white text-gray-600'}
-                  rounded-none border border-gray-300
+                  ${selectedDateRange === range ? 'bg-muted text-muted-foreground' : 'bg-card text-card-foreground'}
+                  rounded-none border border-border
                   focus:outline-none focus:ring-2 focus:ring-primary focus:z-10
                   flex-1
                 `}
@@ -104,8 +104,8 @@ export default function TransactionFilters({
                                     variant="outline"
                                     className={`
                     px-3 py-2 text-sm font-medium transition-colors duration-150 h-10
-                    ${selectedDateRange === 'custom' ? 'bg-gray-100 text-gray-900' : 'bg-white text-gray-600'}
-                    rounded-none border border-gray-300
+                    ${selectedDateRange === 'custom' ? 'bg-muted text-muted-foreground' : 'bg-card text-card-foreground'}
+                    rounded-none border border-border
                     focus:outline-none focus:ring-2 focus:ring-primary focus:z-10
                     flex-1
                   `}
@@ -124,7 +124,7 @@ export default function TransactionFilters({
                                     )}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                            <PopoverContent className="w-auto p-0 bg-card text-card-foreground" align="start">
                                 <CalendarComponent
                                     initialFocus
                                     mode="range"
@@ -142,12 +142,12 @@ export default function TransactionFilters({
                 </div>
 
                 <div className="w-full sm:w-64">
-                    <label htmlFor="provider" className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                    <label htmlFor="provider" className="block text-sm font-medium mb-1">Provider</label>
                     <Select
                         value={selectedProvider || undefined}
                         onValueChange={(value) => setSelectedProvider(value)}
                     >
-                        <SelectTrigger id="provider" className="w-full bg-white border-gray-300 h-10 rounded-none">
+                        <SelectTrigger id="provider" className="w-full bg-card border-border h-10 rounded-none">
                             <SelectValue placeholder="Select provider" />
                         </SelectTrigger>
                         <SelectContent>
@@ -163,15 +163,15 @@ export default function TransactionFilters({
                 </div>
 
                 <div className="w-full sm:w-64">
-                    <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                    <label htmlFor="search" className="block text-sm font-medium mb-1">Search</label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                            <Search className="h-5 w-5 text-muted-foreground" />
                         </div>
                         <Input
                             type="text"
                             id="search"
-                            className="block w-full pl-10 sm:text-sm border-gray-300 h-10 rounded-none"
+                            className="block w-full pl-10 sm:text-sm border-border h-10 rounded-none bg-card"
                             placeholder="Search transactions"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -182,12 +182,12 @@ export default function TransactionFilters({
                 <div className="flex space-x-2 ml-auto">
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button variant="outline" className="border-gray-300 text-gray-700 h-10 rounded-none">
+                            <Button variant="outline" className="border-border text-card-foreground h-10 rounded-none">
                                 <Filter className="h-5 w-5" />
                                 <span className="ml-2">Filters</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                        <SheetContent side="right" className="w-[400px] sm:w-[540px] bg-card text-card-foreground">
                             <div className="flex flex-col space-y-4 p-4">
                                 <h3 className="text-lg font-semibold">Filters</h3>
                                 <div>
@@ -296,12 +296,12 @@ export default function TransactionFilters({
                     </Sheet>
                     <Popover open={isColumnsPopoverOpen} onOpenChange={setIsColumnsPopoverOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="border-gray-300 text-gray-700 px-2 h-10 rounded-none">
+                            <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
                                 <Settings className="h-5 w-5" />
                                 <span className="sr-only">Columns</span>
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-4">
+                        <PopoverContent className="w-[200px] p-4 bg-card text-card-foreground">
                             <h4 className="mb-4 text-sm font-medium">Columns</h4>
                             {allColumns.map((column) => (
                                 <div key={column} className="flex items-center space-x-2 mb-2">
@@ -317,7 +317,7 @@ export default function TransactionFilters({
                             ))}
                         </PopoverContent>
                     </Popover>
-                    <Button variant="outline" className="border-gray-300 text-gray-700 px-2 h-10 rounded-none">
+                    <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
                         <Download className="h-5 w-5" />
                         <span className="sr-only">Export</span>
                     </Button>
