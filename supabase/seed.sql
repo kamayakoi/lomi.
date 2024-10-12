@@ -159,36 +159,38 @@ VALUES
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'),
      (SELECT product_id FROM merchant_products WHERE name = 'Premium Plan'),
+     NULL, -- subscription_id
      'payment', 'completed', 'Sample transaction 1', 'REF1001', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'),
-     NULL,
-     NULL,
+     NULL, -- product_id
+     NULL, -- subscription_id
      'payment', 'pending', 'Sample transaction 2', 'REF1002', '{}', 50.00, 5.00, 45.00, 'XOF/WAVE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'African Ledger'),
      (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com'),
+     NULL, -- product_id
      (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE email = 'aminata.sow@example.com')),
-     'payment', 'completed', 'Sample transaction 3', 'REF1003', '{}', 100.00, 5.00, 95.00, 'XOF/MTN Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY'),
+     'payment', 'refunded', 'Sample transaction 3', 'REF1003', '{}', 100.00, 5.00, 95.00, 'XOF/MTN Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'babacar@africanledgertest.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'African Ledger'),
      (SELECT customer_id FROM customers WHERE email = 'ibrahima.diallo@example.com'),
-     NULL,
-     NULL,
+     NULL, -- product_id
+     NULL, -- subscription_id
      'payment', 'failed', 'Sample transaction 4', 'REF1004', '{}', 75.00, 5.00, 70.00, 'XOF/ECOBANK Bank Transfer Fee', 'XOF', 'ECOBANK', 'BANK_TRANSFER'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'fatou.diop@example.com'),
-     NULL,
-     NULL,
+     NULL, -- product_id
+     NULL, -- subscription_id
      'payment', 'completed', 'Sample transaction 5', 'REF1005', '{}', 150.00, 5.00, 145.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY'),
     ((SELECT merchant_id FROM merchants WHERE email = 'walid@gmail.com'), 
      (SELECT organization_id FROM organizations WHERE name = 'TechInnovate'),
      (SELECT customer_id FROM customers WHERE email = 'moussa.ndiaye@example.com'),
-     NULL,
-     NULL,
-     'instalment', 'completed', 'Sample transaction 6', 'REF1006', '{}', 200.00, 5.00, 195.00, 'XOF/WAVE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY');
+     NULL, -- product_id
+     NULL, -- subscription_id
+     'instalment', 'refunded', 'Sample transaction 6', 'REF1006', '{}', 200.00, 5.00, 195.00, 'XOF/WAVE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY');
 
 -- Seed data for refunds table
 INSERT INTO refunds (transaction_id, amount, refunded_amount, fee_amount, reason, status)
