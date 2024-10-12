@@ -4,9 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { Navbar } from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Products } from "@/components/landing/Products"
-// import { HowItWorks } from "@/components/landing/HowItWorks";
-
-import "@/lib/styles/home.css"
+import { HowItWorks } from "@/components/landing/HowItWorks";
 
 function Homepage() {
   return (
@@ -16,6 +14,7 @@ function Homepage() {
       <div className="hero-section">
         <Hero />
       </div>
+      <HowItWorks />
       <Products />
       <FAQ />
       <div className="border-b border-gray-300 dark:border-gray-700"></div>

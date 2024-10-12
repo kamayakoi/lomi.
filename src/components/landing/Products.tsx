@@ -4,7 +4,7 @@ export const Products = () => {
   return (
     <section id="products" className="container py-24 sm:py-32">
       <div className="text-center mb-12">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
+        <h3 className="text-sm font-semibold text-blue-600 dark:text-blue-600 tracking-wide uppercase mb-4">
           CUSTOMER LOVE
         </h3>
         <h2 className="text-3xl md:text-4xl font-bold">

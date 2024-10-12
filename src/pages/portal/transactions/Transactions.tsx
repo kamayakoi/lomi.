@@ -1,18 +1,13 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Download, Search, ArrowDownIcon, Filter, ArrowUpDown } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpDown } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
@@ -23,6 +18,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
 import TransactionActions from './actions_transactions'
+import TransactionFilters from './filters_transactions'
 
 type Transaction = {
     transaction_id: string
@@ -52,6 +48,18 @@ export default function TransactionsPage() {
     const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
     const pageSize = 50
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
+    const [columns, setColumns] = useState<string[]>([
+        'Transaction ID',
+        'Customer',
+        'Gross Amount',
+        'Net Amount',
+        'Currency',
+        'Payment Method',
+        'Status',
+        'Type',
+        'Date',
+        'Provider',
+    ])
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -109,14 +117,17 @@ export default function TransactionsPage() {
         if (!sortColumn) return transactions
 
         return transactions.sort((a, b) => {
-            if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1
-            if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1
-            return 0
-        })
-    }
+            const aValue = a[sortColumn]
+            const bValue = b[sortColumn]
 
-    const handleDateRangeChange = (range: string) => {
-        setSelectedDateRange(range)
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+            } else {
+                return 0
+            }
+        })
     }
 
     const handleCustomDateRangeApply = () => {
@@ -175,91 +186,20 @@ export default function TransactionsPage() {
                             </Card>
                         </div>
 
-                        <Card className="mb-6">
-                            <CardContent className="p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>Date Range</Label>
-                                        <div className="space-x-2">
-                                            {['24H', '7D', '1M', '3M', 'YTD'].map(range => (
-                                                <Button
-                                                    key={range}
-                                                    variant={selectedDateRange === range ? 'default' : 'ghost'}
-                                                    onClick={() => handleDateRangeChange(range)}
-                                                >
-                                                    {range}
-                                                </Button>
-                                            ))}
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <Button variant={selectedDateRange === 'custom' ? 'default' : 'ghost'}>
-                                                        Custom
-                                                    </Button>
-                                                </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar
-                                                        initialFocus
-                                                        mode="range"
-                                                        selected={customDateRange}
-                                                        onSelect={setCustomDateRange}
-                                                        numberOfMonths={2}
-                                                    />
-                                                    <div className="flex justify-end p-2">
-                                                        <Button onClick={handleCustomDateRangeApply}>Apply</Button>
-                                                    </div>
-                                                </PopoverContent>
-                                            </Popover>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label>Provider</Label>
-                                        <Select
-                                            value={selectedProvider || undefined}
-                                            onValueChange={(value) => setSelectedProvider(value)}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select provider" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">All Providers</SelectItem>
-                                                <SelectItem value="ORANGE">Orange</SelectItem>
-                                                <SelectItem value="WAVE">Wave</SelectItem>
-                                                <SelectItem value="ECOBANK">Ecobank</SelectItem>
-                                                <SelectItem value="MTN">MTN</SelectItem>
-                                                <SelectItem value="STRIPE">Stripe</SelectItem>
-                                                <SelectItem value="OTHER">Other</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="search">Search</Label>
-                                        <div className="relative">
-                                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                            <Input
-                                                id="search"
-                                                placeholder="Search transactions"
-                                                className="pl-8"
-                                                value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-end space-x-2">
-                                        <Button onClick={() => setShowFilters(!showFilters)}>
-                                            <Filter className="mr-2 h-4 w-4" />
-                                            Filters
-                                        </Button>
-                                        <Button>
-                                            <Download className="mr-2 h-4 w-4" />
-                                            Export
-                                        </Button>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <TransactionFilters
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                            selectedProvider={selectedProvider}
+                            setSelectedProvider={setSelectedProvider}
+                            selectedDateRange={selectedDateRange}
+                            setSelectedDateRange={setSelectedDateRange}
+                            customDateRange={customDateRange}
+                            setCustomDateRange={setCustomDateRange}
+                            handleCustomDateRangeApply={handleCustomDateRangeApply}
+                            setShowFilters={setShowFilters}
+                            columns={columns}
+                            setColumns={setColumns}
+                        />
 
                         {showFilters && (
                             <Card className="mb-6">
@@ -366,26 +306,106 @@ export default function TransactionsPage() {
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
-                                                    <TableHead className="text-center">
-                                                        <Button
-                                                            variant="ghost"
-                                                            onClick={() => handleSort('transaction_id')}
-                                                        >
-                                                            Transaction ID
-                                                            {sortColumn === 'transaction_id' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                    <TableHead className="text-center">Customer</TableHead>
-                                                    <TableHead className="text-center">Gross Amount</TableHead>
-                                                    <TableHead className="text-center">Net Amount</TableHead>
-                                                    <TableHead className="text-center">Currency</TableHead>
-                                                    <TableHead className="text-center">Payment Method</TableHead>
-                                                    <TableHead className="text-center">Status</TableHead>
-                                                    <TableHead className="text-center">Type</TableHead>
-                                                    <TableHead className="text-center">Date</TableHead>
-                                                    <TableHead className="text-center">Provider</TableHead>
+                                                    {columns.includes('Transaction ID') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')}>
+                                                                Transaction ID
+                                                                {sortColumn === 'transaction_id' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Customer') && (
+                                                        <TableHead className="text-left">
+                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')}>
+                                                                Customer
+                                                                {sortColumn === 'customer_name' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Gross Amount') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')}>
+                                                                Gross Amount
+                                                                {sortColumn === 'gross_amount' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Net Amount') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')}>
+                                                                Net Amount
+                                                                {sortColumn === 'net_amount' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Currency') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('currency')}>
+                                                                Currency
+                                                                {sortColumn === 'currency' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Payment Method') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')}>
+                                                                Payment Method
+                                                                {sortColumn === 'payment_method' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Status') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('status')}>
+                                                                Status
+                                                                {sortColumn === 'status' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Type') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('type')}>
+                                                                Type
+                                                                {sortColumn === 'type' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Date') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('date')}>
+                                                                Date
+                                                                {sortColumn === 'date' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Provider') && (
+                                                        <TableHead className="text-center">
+                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')}>
+                                                                Provider
+                                                                {sortColumn === 'provider_code' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -404,38 +424,48 @@ export default function TransactionsPage() {
                                                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                             onClick={() => setSelectedTransaction(transaction)}
                                                         >
-                                                            <TableCell className="text-center">{shortenTransactionId(transaction.transaction_id)}</TableCell>
-                                                            <TableCell className="text-center font-medium">{transaction.customer_name}</TableCell>
-                                                            <TableCell className="text-center">{transaction.gross_amount}</TableCell>
-                                                            <TableCell className="text-center">{transaction.net_amount}</TableCell>
-                                                            <TableCell className="text-center">{transaction.currency}</TableCell>
-                                                            <TableCell className="text-center">{formatPaymentMethod(transaction.payment_method)}</TableCell>
-                                                            <TableCell className="text-center">
-                                                                <span className={`
-                                                                    inline-block px-2 py-1 rounded-full text-xs font-semibold
-                                                                    ${transaction.status === 'refunded' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                                                    ${transaction.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                                    ${transaction.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                    ${transaction.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                                                `}>
-                                                                    {formatTransactionStatus(transaction.status)}
-                                                                </span>
-                                                            </TableCell>
-                                                            <TableCell className="text-center">{formatTransactionType(transaction.type)}</TableCell>
-                                                            <TableCell className="text-center">{formatDate(transaction.date)}</TableCell>
-                                                            <TableCell className="text-center">
-                                                                <span className={`
-                                                                    inline-block px-2 py-1 text-xs font-semibold
-                                                                    ${transaction.provider_code === 'ORANGE' ? 'bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200' : ''}
-                                                                    ${transaction.provider_code === 'WAVE' ? 'bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200' : ''}
-                                                                    ${transaction.provider_code === 'ECOBANK' ? 'bg-teal-200 text-teal-800 dark:bg-teal-800 dark:text-teal-200' : ''}
-                                                                    ${transaction.provider_code === 'MTN' ? 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200' : ''}
-                                                                    ${transaction.provider_code === 'STRIPE' ? 'bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200' : ''}
-                                                                    ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
-                                                                `}>
-                                                                    {formatProviderCode(transaction.provider_code)}
-                                                                </span>
-                                                            </TableCell>
+                                                            {columns.includes('Transaction ID') && (
+                                                                <TableCell className="text-center">{shortenTransactionId(transaction.transaction_id)}</TableCell>
+                                                            )}
+                                                            {columns.includes('Customer') && (
+                                                                <TableCell className="text-left font-medium">{transaction.customer_name}</TableCell>
+                                                            )}
+                                                            {columns.includes('Gross Amount') && <TableCell className="text-center">{transaction.gross_amount}</TableCell>}
+                                                            {columns.includes('Net Amount') && <TableCell className="text-center">{transaction.net_amount}</TableCell>}
+                                                            {columns.includes('Currency') && <TableCell className="text-center">{transaction.currency}</TableCell>}
+                                                            {columns.includes('Payment Method') && (
+                                                                <TableCell className="text-center">{formatPaymentMethod(transaction.payment_method)}</TableCell>
+                                                            )}
+                                                            {columns.includes('Status') && (
+                                                                <TableCell className="text-center">
+                                                                    <span className={`
+                                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                        ${transaction.status === 'refunded' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                                                        ${transaction.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                        ${transaction.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                                                                        ${transaction.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                                                    `}>
+                                                                        {formatTransactionStatus(transaction.status)}
+                                                                    </span>
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Type') && <TableCell className="text-center">{formatTransactionType(transaction.type)}</TableCell>}
+                                                            {columns.includes('Date') && <TableCell className="text-center">{formatDate(transaction.date)}</TableCell>}
+                                                            {columns.includes('Provider') && (
+                                                                <TableCell className="text-center">
+                                                                    <span className={`
+                                                                        inline-block px-2 py-1 text-xs font-semibold
+                                                                        ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-white dark:bg-[#71CDF4] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
+                                                                        ${transaction.provider_code === 'STRIPE' ? 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
+                                                                    `}>
+                                                                        {formatProviderCode(transaction.provider_code)}
+                                                                    </span>
+                                                                </TableCell>
+                                                            )}
                                                         </TableRow>
                                                     ))
                                                 )}
@@ -512,7 +542,6 @@ function formatDate(dateString: string): string {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
-// Update the shortenTransactionId function
 function shortenTransactionId(transactionId: string): string {
     return `${transactionId.slice(0, 8)}${transactionId.slice(8, 12)}-...`
 }
