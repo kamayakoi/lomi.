@@ -83,6 +83,8 @@
     "react-dom": "18.2.0",
     "react-easy-crop": "^5.0.8",
     "react-hook-form": "^7.43.9",
+    "react-infinite-scroll-component": "^6.1.0",
+    "react-query": "^3.39.3",
     "react-router-dom": "^6.22.3",
     "recharts": "2.12.2",
     "rimraf": "5.0.5",

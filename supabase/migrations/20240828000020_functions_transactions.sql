@@ -73,7 +73,7 @@ BEGIN
     WHERE 
         t.merchant_id = p_merchant_id AND
         t.status = 'completed' AND
-        t.transaction_type = 'payment' AND
+        t.transaction_type IN ('payment', 'instalment') AND
         (p_start_date IS NULL OR t.created_at >= p_start_date) AND
         (p_end_date IS NULL OR t.created_at <= p_end_date);
         
@@ -84,8 +84,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Function to fetch the number of transactions for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_transaction_count(
     p_merchant_id UUID,
-    p_start_date DATE DEFAULT NULL,
-    p_end_date DATE DEFAULT NULL
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
 )
 RETURNS INTEGER AS $$
 DECLARE
@@ -97,6 +97,7 @@ BEGIN
         transactions
     WHERE 
         merchant_id = p_merchant_id AND
+        transaction_type IN ('payment', 'instalment') AND
         (p_start_date IS NULL OR created_at >= p_start_date) AND
         (p_end_date IS NULL OR created_at <= p_end_date);
         

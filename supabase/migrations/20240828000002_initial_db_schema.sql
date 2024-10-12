@@ -1,6 +1,6 @@
 --------------- ENUM TYPES ---------------
 
-CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed');
+CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 CREATE TYPE transaction_type AS ENUM ('payment', 'instalment');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
 CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'OTHER');

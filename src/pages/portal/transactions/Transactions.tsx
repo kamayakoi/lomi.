@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -7,7 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Download, Search, ArrowDownIcon, Filter, ArrowUpDown } from 'lucide-react'
-import { format } from 'date-fns'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
@@ -16,8 +15,10 @@ import { Separator } from '@/components/ui/separator'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
-import { supabase } from '@/utils/supabase/client'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
+import { useTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter } from './support_transactions'
+import { useUser } from '@/lib/hooks/useUser'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Transaction = {
     transaction_id: string
@@ -32,33 +33,18 @@ type Transaction = {
     provider_code: provider_code
 }
 
-type FetchedTransaction = {
-    transaction_id: string
-    customer_name: string
-    gross_amount: number
-    net_amount: number
-    currency_code: currency_code
-    payment_method_code: payment_method_code
-    status: transaction_status
-    transaction_type: transaction_type
-    created_at: string
-    provider_code: provider_code
-}
-
 export default function TransactionsPage() {
-    const [transactions, setTransactions] = useState<Transaction[]>([])
+    const { user } = useUser()
     const [showFilters, setShowFilters] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-    const [totalIncomingAmount, setTotalIncomingAmount] = useState(0)
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
     const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
     const [selectedTypes, setSelectedTypes] = useState<string[]>([])
     const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([])
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
-    const [transactionCount, setTransactionCount] = useState(0)
-    const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null)
+    const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
     const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
 
     const topNav = [
@@ -66,44 +52,26 @@ export default function TransactionsPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const fetchTransactions = useCallback(async () => {
-        const { data: { user } } = await supabase.auth.getUser()
+    const { data: transactions = [], isLoading: isTransactionsLoading } = useTransactions(
+        user?.id || '',
+        selectedProvider,
+        selectedStatuses,
+        selectedTypes,
+        selectedCurrencies,
+        selectedPaymentMethods
+    )
 
-        const { data, error } = await supabase.rpc('fetch_transactions', {
-            p_merchant_id: user?.id,
-            p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
-            p_status: selectedStatuses.length > 0 ? selectedStatuses : null,
-            p_type: selectedTypes.length > 0 ? selectedTypes : null,
-            p_currency: selectedCurrencies.length > 0 ? selectedCurrencies : null,
-            p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods : null,
-        })
+    const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange
+    )
 
-        if (error) {
-            console.error('Error fetching transactions:', error)
-            return
-        }
-
-        const formattedTransactions = data.map((transaction: FetchedTransaction) => ({
-            transaction_id: transaction.transaction_id,
-            customer: transaction.customer_name,
-            gross_amount: transaction.gross_amount,
-            net_amount: transaction.net_amount,
-            currency: transaction.currency_code,
-            payment_method: transaction.payment_method_code,
-            status: transaction.status,
-            type: transaction.transaction_type,
-            date: format(new Date(transaction.created_at), 'yyyy-MM-dd'),
-            provider_code: transaction.provider_code,
-        }))
-
-        setTransactions(formattedTransactions)
-    }, [selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods])
-
-    useEffect(() => {
-        fetchTransactions()
-        fetchTotalIncomingAmount()
-        fetchTransactionCount()
-    }, [fetchTransactions])
+    const { data: transactionCount = 0, isLoading: isTransactionCountLoading } = useTransactionCount(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange
+    )
 
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
@@ -124,135 +92,13 @@ export default function TransactionsPage() {
         })
     }
 
-    const applySearch = (transactions: Transaction[]) => {
-        if (!searchTerm) return transactions
-
-        return transactions.filter(transaction =>
-            Object.values(transaction).some(value =>
-                value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        )
-    }
-
-    const fetchTotalIncomingAmount = async (startDate?: Date, endDate?: Date) => {
-        const { data: { user } } = await supabase.auth.getUser()
-
-        console.log('Fetching total incoming amount for merchant:', user?.id)
-
-        const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
-            p_merchant_id: user?.id,
-            p_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
-            p_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
-        })
-
-        if (error) {
-            console.error('Error fetching total incoming amount:', error)
-            return
-        }
-
-        setTotalIncomingAmount(data)
-    }
-
-    const fetchTransactionCount = async (startDate?: Date, endDate?: Date) => {
-        const { data: { user } } = await supabase.auth.getUser()
-
-        const { data, error } = await supabase.rpc('fetch_transaction_count', {
-            p_merchant_id: user?.id,
-            p_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
-            p_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
-        })
-
-        if (error) {
-            console.error('Error fetching transaction count:', error)
-            return
-        }
-
-        setTransactionCount(data)
-    }
-
     const handleDateRangeChange = (range: string) => {
         setSelectedDateRange(range)
-
-        const now = new Date()
-        let startDate: Date | undefined
-        let endDate: Date | undefined
-
-        switch (range) {
-            case '24H':
-                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-                endDate = now
-                break
-            case '7D':
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-                endDate = now
-                break
-            case '1M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-                endDate = now
-                break
-            case '3M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-                endDate = now
-                break
-            case 'YTD':
-                startDate = new Date(now.getFullYear(), 0, 1)
-                endDate = now
-                break
-            default:
-                startDate = undefined
-                endDate = undefined
-        }
-
-        fetchTotalIncomingAmount(startDate, endDate)
-        fetchTransactionCount(startDate, endDate)
-    }
-
-    const applyDateFilter = (transactions: Transaction[]) => {
-        if (selectedDateRange === 'custom' && customDateRange) {
-            return transactions.filter(transaction => {
-                const transactionDate = new Date(transaction.date)
-                return customDateRange.from && customDateRange.to &&
-                    transactionDate >= customDateRange.from &&
-                    transactionDate <= customDateRange.to
-            })
-        }
-
-        if (!selectedDateRange) return transactions
-
-        const now = new Date()
-        let startDate: Date
-
-        switch (selectedDateRange) {
-            case '24H':
-                startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-                break
-            case '7D':
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-                break
-            case '1M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-                break
-            case '3M':
-                startDate = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate())
-                break
-            case 'YTD':
-                startDate = new Date(now.getFullYear(), 0, 1)
-                break
-            default:
-                return transactions
-        }
-
-        return transactions.filter(transaction => {
-            const transactionDate = new Date(transaction.date)
-            return transactionDate >= startDate && transactionDate <= now
-        })
     }
 
     const handleCustomDateRangeApply = () => {
         if (customDateRange && customDateRange.from && customDateRange.to) {
             setSelectedDateRange('custom')
-            fetchTotalIncomingAmount(customDateRange.from, customDateRange.to)
-            fetchTransactionCount(customDateRange.from, customDateRange.to)
         }
     }
 
@@ -280,8 +126,20 @@ export default function TransactionsPage() {
                                     <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">XOF {totalIncomingAmount}</div>
-                                    <p className="text-xs text-muted-foreground">{transactionCount} transactions</p>
+                                    <div className="text-2xl font-bold">
+                                        {isTotalIncomingAmountLoading ? (
+                                            <Skeleton className="w-32 h-8" />
+                                        ) : (
+                                            `XOF ${totalIncomingAmount}`
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        {isTransactionCountLoading ? (
+                                            <Skeleton className="w-20 h-4" />
+                                        ) : (
+                                            `${transactionCount} transactions`
+                                        )}
+                                    </p>
                                 </CardContent>
                             </Card>
                         </div>
@@ -494,20 +352,33 @@ export default function TransactionsPage() {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {applySearch(sortTransactions(applyDateFilter(transactions))).map((transaction) => (
-                                                <TableRow key={transaction.transaction_id}>
-                                                    <TableCell>{transaction.transaction_id}</TableCell>
-                                                    <TableCell>{transaction.customer}</TableCell>
-                                                    <TableCell>{transaction.gross_amount}</TableCell>
-                                                    <TableCell>{transaction.net_amount}</TableCell>
-                                                    <TableCell>{transaction.currency}</TableCell>
-                                                    <TableCell>{transaction.payment_method}</TableCell>
-                                                    <TableCell>{transaction.status}</TableCell>
-                                                    <TableCell>{transaction.type}</TableCell>
-                                                    <TableCell>{transaction.date}</TableCell>
-                                                    <TableCell>{transaction.provider_code}</TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {isTransactionsLoading ? (
+                                                Array.from({ length: 5 }).map((_, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell colSpan={10}>
+                                                            <Skeleton className="w-full h-8" />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
+                                                    <TableRow
+                                                        key={transaction.transaction_id}
+                                                        className={transaction.status === 'refunded' ? 'bg-pink-100' : ''}
+                                                    >
+                                                        <TableCell>{transaction.transaction_id}</TableCell>
+                                                        <TableCell>{transaction.customer}</TableCell>
+                                                        <TableCell>{transaction.gross_amount}</TableCell>
+                                                        <TableCell>{transaction.net_amount}</TableCell>
+                                                        <TableCell>{transaction.currency}</TableCell>
+                                                        <TableCell>{transaction.payment_method}</TableCell>
+                                                        <TableCell>{transaction.status}</TableCell>
+                                                        <TableCell>{transaction.type}</TableCell>
+                                                        <TableCell>{transaction.date}</TableCell>
+                                                        <TableCell>{transaction.provider_code}</TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </div>
