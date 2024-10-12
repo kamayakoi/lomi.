@@ -49,7 +49,7 @@ const products: ProductProps[] = [
 export const HowItWorks = () => {
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
-      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-wide uppercase mb-4">
+      <h3 className="text-sm font-semibold tracking-wide uppercase mb-4" style={{ color: '#D247BF' }}>
         Key Benefits
       </h3>
 
