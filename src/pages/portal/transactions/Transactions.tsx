@@ -16,9 +16,11 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
-import { useTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter } from './support_transactions'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter } from './support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useInfiniteQuery } from 'react-query'
 
 type Transaction = {
     transaction_id: string
@@ -34,7 +36,7 @@ type Transaction = {
 }
 
 export default function TransactionsPage() {
-    const { user } = useUser()
+    const { user, isLoading: isUserLoading } = useUser()
     const [showFilters, setShowFilters] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
@@ -46,31 +48,49 @@ export default function TransactionsPage() {
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
     const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
+    const pageSize = 50
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: transactions = [], isLoading: isTransactionsLoading } = useTransactions(
-        user?.id || '',
-        selectedProvider,
-        selectedStatuses,
-        selectedTypes,
-        selectedCurrencies,
-        selectedPaymentMethods
+    const { data: transactionsData, isLoading: isTransactionsLoading, fetchNextPage } = useInfiniteQuery(
+        ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods],
+        ({ pageParam = 1 }) =>
+            fetchTransactions(
+                user?.id || '',
+                selectedProvider,
+                selectedStatuses,
+                selectedTypes,
+                selectedCurrencies,
+                selectedPaymentMethods,
+                pageParam,
+                pageSize
+            ),
+        {
+            getNextPageParam: (lastPage, allPages) => {
+                const nextPage = allPages.length + 1
+                return lastPage.length !== 0 ? nextPage : undefined
+            },
+            enabled: !!user?.id,
+        }
     )
+
+    const transactions = transactionsData?.pages?.flatMap((page) => page) || []
 
     const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        { enabled: !!user?.id }
     )
 
     const { data: transactionCount = 0, isLoading: isTransactionCountLoading } = useTransactionCount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        { enabled: !!user?.id }
     )
 
     const handleSort = (column: keyof Transaction) => {
@@ -100,6 +120,14 @@ export default function TransactionsPage() {
         if (customDateRange && customDateRange.from && customDateRange.to) {
             setSelectedDateRange('custom')
         }
+    }
+
+    if (isUserLoading) {
+        return <div>Loading user data...</div>
+    }
+
+    if (!user || !user.id) {
+        return <div>User data not available.</div>
     }
 
     return (
@@ -133,13 +161,13 @@ export default function TransactionsPage() {
                                             `XOF ${totalIncomingAmount}`
                                         )}
                                     </div>
-                                    <p className="text-xs text-muted-foreground">
+                                    <div className="text-xs text-muted-foreground">
                                         {isTransactionCountLoading ? (
                                             <Skeleton className="w-20 h-4" />
                                         ) : (
                                             `${transactionCount} transactions`
                                         )}
-                                    </p>
+                                    </div>
                                 </CardContent>
                             </Card>
                         </div>
@@ -326,61 +354,68 @@ export default function TransactionsPage() {
                         <Card>
                             <CardContent className="p-6">
                                 <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => handleSort('transaction_id')}
-                                                    >
-                                                        Transaction ID
-                                                        {sortColumn === 'transaction_id' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead>Customer</TableHead>
-                                                <TableHead>Gross Amount</TableHead>
-                                                <TableHead>Net Amount</TableHead>
-                                                <TableHead>Currency</TableHead>
-                                                <TableHead>Payment Method</TableHead>
-                                                <TableHead>Status</TableHead>
-                                                <TableHead>Type</TableHead>
-                                                <TableHead>Date</TableHead>
-                                                <TableHead>Provider</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {isTransactionsLoading ? (
-                                                Array.from({ length: 5 }).map((_, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell colSpan={10}>
-                                                            <Skeleton className="w-full h-8" />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            ) : (
-                                                applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
-                                                    <TableRow
-                                                        key={transaction.transaction_id}
-                                                        className={transaction.status === 'refunded' ? 'bg-pink-100' : ''}
-                                                    >
-                                                        <TableCell>{transaction.transaction_id}</TableCell>
-                                                        <TableCell>{transaction.customer}</TableCell>
-                                                        <TableCell>{transaction.gross_amount}</TableCell>
-                                                        <TableCell>{transaction.net_amount}</TableCell>
-                                                        <TableCell>{transaction.currency}</TableCell>
-                                                        <TableCell>{transaction.payment_method}</TableCell>
-                                                        <TableCell>{transaction.status}</TableCell>
-                                                        <TableCell>{transaction.type}</TableCell>
-                                                        <TableCell>{transaction.date}</TableCell>
-                                                        <TableCell>{transaction.provider_code}</TableCell>
-                                                    </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                    </Table>
+                                    <InfiniteScroll
+                                        dataLength={transactions.length}
+                                        next={() => fetchNextPage()}
+                                        hasMore={transactionsData?.pages[transactionsData.pages.length - 1].length === pageSize}
+                                        loader={<Skeleton className="w-full h-8" />}
+                                    >
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={() => handleSort('transaction_id')}
+                                                        >
+                                                            Transaction ID
+                                                            {sortColumn === 'transaction_id' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead>Customer</TableHead>
+                                                    <TableHead>Gross Amount</TableHead>
+                                                    <TableHead>Net Amount</TableHead>
+                                                    <TableHead>Currency</TableHead>
+                                                    <TableHead>Payment Method</TableHead>
+                                                    <TableHead>Status</TableHead>
+                                                    <TableHead>Type</TableHead>
+                                                    <TableHead>Date</TableHead>
+                                                    <TableHead>Provider</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {isTransactionsLoading ? (
+                                                    Array.from({ length: 5 }).map((_, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell colSpan={10}>
+                                                                <Skeleton className="w-full h-8" />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
+                                                        <TableRow
+                                                            key={transaction.transaction_id}
+                                                            className={transaction.status === 'refunded' ? 'bg-pink-100' : ''}
+                                                        >
+                                                            <TableCell>{transaction.transaction_id}</TableCell>
+                                                            <TableCell>{transaction.customer}</TableCell>
+                                                            <TableCell>{transaction.gross_amount}</TableCell>
+                                                            <TableCell>{transaction.net_amount}</TableCell>
+                                                            <TableCell>{transaction.currency}</TableCell>
+                                                            <TableCell>{transaction.payment_method}</TableCell>
+                                                            <TableCell>{transaction.status}</TableCell>
+                                                            <TableCell>{transaction.type}</TableCell>
+                                                            <TableCell>{transaction.date}</TableCell>
+                                                            <TableCell>{transaction.provider_code}</TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </InfiniteScroll>
                                 </div>
                             </CardContent>
                         </Card>

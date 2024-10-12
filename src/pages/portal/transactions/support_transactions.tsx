@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
 import { Transaction, FetchedTransaction } from './types'
 import { DateRange } from 'react-day-picker'
-import { useQuery } from 'react-query'
+import { useQuery, UseQueryOptions } from 'react-query'
 
 export const fetchTransactions = async (
     merchantId: string,
@@ -10,8 +10,15 @@ export const fetchTransactions = async (
     selectedStatuses: string[],
     selectedTypes: string[],
     selectedCurrencies: string[],
-    selectedPaymentMethods: string[]
+    selectedPaymentMethods: string[],
+    page: number,
+    pageSize: number
 ) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping transactions fetch.')
+        return []
+    }
+
     const { data, error } = await supabase.rpc('fetch_transactions', {
         p_merchant_id: merchantId,
         p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
@@ -19,6 +26,8 @@ export const fetchTransactions = async (
         p_type: selectedTypes.length > 0 ? selectedTypes : null,
         p_currency: selectedCurrencies.length > 0 ? selectedCurrencies : null,
         p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods : null,
+        p_page: page,
+        p_page_size: pageSize,
     })
 
     if (error) {
@@ -35,12 +44,17 @@ export const fetchTransactions = async (
         payment_method: transaction.payment_method_code,
         status: transaction.status,
         type: transaction.transaction_type,
-        date: format(new Date(transaction.created_at), 'yyyy-MM-dd'),
+        date: format(new Date(transaction.created_at), 'yyyy-MM-dd HH:mm:ss'),
         provider_code: transaction.provider_code,
     }))
 }
 
 export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping total incoming amount fetch.')
+        return 0
+    }
+
     let startDate: Date | undefined
     let endDate: Date | undefined
 
@@ -88,6 +102,11 @@ export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateR
 }
 
 export const fetchTransactionCount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping transaction count fetch.')
+        return 0
+    }
+
     let startDate: Date | undefined
     let endDate: Date | undefined
 
@@ -185,20 +204,46 @@ export const applyDateFilter = (transactions: Transaction[], selectedDateRange: 
     })
 }
 
-export const useTransactions = (merchantId: string, selectedProvider: string | null, selectedStatuses: string[], selectedTypes: string[], selectedCurrencies: string[], selectedPaymentMethods: string[]) => {
-    return useQuery(['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods], () =>
-        fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods)
+export const useTransactions = (
+    merchantId: string,
+    selectedProvider: string | null,
+    selectedStatuses: string[],
+    selectedTypes: string[],
+    selectedCurrencies: string[],
+    selectedPaymentMethods: string[],
+    page: number,
+    pageSize: number
+) => {
+    return useQuery(['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize], () =>
+        fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize),
+        {
+            keepPreviousData: true,
+            cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
+            staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
+        }
     )
 }
 
-export const useTotalIncomingAmount = (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+export const useTotalIncomingAmount = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
     return useQuery(['totalIncomingAmount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchTotalIncomingAmount(merchantId, selectedDateRange, customDateRange)
+        fetchTotalIncomingAmount(merchantId, selectedDateRange, customDateRange),
+        options
     )
 }
 
-export const useTransactionCount = (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+export const useTransactionCount = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
     return useQuery(['transactionCount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchTransactionCount(merchantId, selectedDateRange, customDateRange)
+        fetchTransactionCount(merchantId, selectedDateRange, customDateRange),
+        options
     )
 }

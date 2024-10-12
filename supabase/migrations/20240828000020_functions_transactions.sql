@@ -5,7 +5,9 @@ CREATE OR REPLACE FUNCTION public.fetch_transactions(
     p_status transaction_status[] DEFAULT NULL,
     p_type transaction_type[] DEFAULT NULL,
     p_currency currency_code[] DEFAULT NULL,
-    p_payment_method payment_method_code[] DEFAULT NULL
+    p_payment_method payment_method_code[] DEFAULT NULL,
+    p_page INTEGER DEFAULT 1,
+    p_page_size INTEGER DEFAULT 50
 )
 RETURNS TABLE (
     transaction_id UUID,
@@ -45,7 +47,11 @@ BEGIN
         (p_status IS NULL OR t.status = ANY(p_status)) AND
         (p_type IS NULL OR t.transaction_type = ANY(p_type)) AND
         (p_currency IS NULL OR t.currency_code = ANY(p_currency)) AND
-        (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method));
+        (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method))
+    ORDER BY
+        t.created_at DESC
+    LIMIT p_page_size
+    OFFSET ((p_page - 1) * p_page_size);
         
     IF NOT FOUND THEN
         RAISE NOTICE 'No transactions found for merchant_id: %, provider_code: %, status: %, type: %, currency: %, payment_method: %', 
@@ -98,6 +104,7 @@ BEGIN
     WHERE 
         merchant_id = p_merchant_id AND
         transaction_type IN ('payment', 'instalment') AND
+        status = 'completed' AND
         (p_start_date IS NULL OR created_at >= p_start_date) AND
         (p_end_date IS NULL OR created_at <= p_end_date);
         
