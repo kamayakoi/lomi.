@@ -1,18 +1,8 @@
-import { useState, useEffect } from 'react'
 import { Bell, Check, InfoIcon, AlertTriangle, ShieldAlert, RefreshCw, AlertOctagon, FileText, Settings, Repeat, Webhook, ArrowLeftRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { supabase } from '@/utils/supabase/client'
 import { formatDistanceToNow } from 'date-fns'
-import { useUser } from '@/lib/hooks/useUser'
-
-interface Notification {
-    notification_id: string
-    type: string
-    message: string
-    is_read: boolean
-    created_at: string
-}
+import { useNotifications } from '@/lib/hooks/useNotifications'
 
 const NotificationIcon = ({ type }: { type: string }) => {
     return (
@@ -61,49 +51,7 @@ const NotificationIcon = ({ type }: { type: string }) => {
 }
 
 export default function Notifications() {
-    const [notifications, setNotifications] = useState<Notification[]>([])
-    const { user, isLoading } = useUser()
-
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            if (user) {
-                const { data, error } = await supabase
-                    .rpc('fetch_notifications', { p_merchant_id: user.id })
-
-                if (error) {
-                    console.error('Error fetching notifications:', error)
-                } else {
-                    setNotifications(data)
-                }
-            }
-        }
-
-        if (!isLoading) {
-            fetchNotifications()
-        }
-    }, [user, isLoading])
-
-    const markNotificationAsRead = async (id: string) => {
-        await supabase
-            .rpc('mark_notification_read', { p_notification_id: id })
-
-        setNotifications(notifications.map(notif =>
-            notif.notification_id === id ? { ...notif, is_read: true } : notif
-        ))
-    }
-
-    const markAllNotificationsAsRead = async () => {
-        if (user) {
-            const { error } = await supabase
-                .rpc('mark_all_notifications_read', { p_merchant_id: user.id })
-
-            if (error) {
-                console.error('Error marking all notifications as read:', error)
-            } else {
-                setNotifications(notifications.map(notif => ({ ...notif, is_read: true })))
-            }
-        }
-    }
+    const { notifications, markNotificationAsRead, markAllNotificationsAsRead } = useNotifications();
 
     return (
         <Popover>

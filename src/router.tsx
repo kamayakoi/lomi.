@@ -1,144 +1,143 @@
+import React from 'react';
+import Loader from '@/components/dashboard/loader.tsx'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
 import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
 import { SessionCheck } from '@/lib/routes/SessionCheck';
-import ResetPassword from './pages/auth/reset-password';
 import { ActivationRoute } from '@/lib/routes/ActivationRoute';
-// import { config } from '@/utils/config';
 
-// Home and landing Pages
-import Home from "./pages/Home.tsx";
-import About from './pages/About.tsx';
-import Products from './pages/Products.tsx';
-import Integrations from './pages/Integrations.tsx';
-// import Careers from './pages/Careers.tsx';
+// Import non-portal / non-essential pages normally
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
-
-// Connect Pages
-import Signin from './pages/auth/sign-in';
-import Login from './pages/auth/log-in';
-import Signup from './pages/auth/sign-up';
-import Forgot from './pages/auth/forgot-password';
-import OTP from './pages/auth/otp';
-import Onboarding from './pages/auth/onboarding/onboarding';
-import AuthCallback from './pages/auth/callback';
-
-// Error Pages
-import GeneralError from './pages/errors/general-error.tsx';
-import NotFoundError from './pages/errors/not-found-error.tsx';
-import MaintenanceError from './pages/errors/maintenance-error.tsx';
-
-// Dashboard
-import AppShell from './components/dashboard/app-shell';
-import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Integrators from './pages/portal/integrators/Integrators.tsx';
-import Settings from './pages/portal/settings/settings.tsx';
-import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
-import Logs from './pages/portal/logs-page/Logs.tsx'
-import Balance from './pages/portal/balance/Balance.tsx'
-import Cards from './pages/portal/accept-payments/cards/Cards.tsx'
-import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'
-import Transactions from './pages/portal/transactions/Transactions.tsx'
-import Reporting from './pages/portal/reporting/Reporting.tsx'
-import Webhooks from './pages/portal/webhooks/Webhooks.tsx'
-import PayoutLinks from './pages/portal/payout-links/PayoutLinks.tsx'
-import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
-import Customers from './pages/portal/customers/Customers.tsx';
-import Subscription from "./pages/portal/subscription/Subscription.tsx"
-
-// Settings pages
-import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
-import CheckoutSettings from './pages/portal/settings/receiving-money/checkout/checkout-settings.tsx';
-import Disbursements from './pages/portal/settings/sending-money/disbursements.tsx';
-import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
-import Business from './pages/portal/settings/business-profile/business';
-import Profile from './pages/portal/settings/business-profile/profile';
-// import TeamMembers from './pages/portal/settings/team/members.tsx';
-// import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
-import BillingStatements from './pages/portal/settings/billing/statements.tsx';
-import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
-import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
-import IpAllowlist from './pages/portal/settings/developers/ip-allowlist.tsx';
-import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
-import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
-import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
-import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
-import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 import Status from './pages/Status.tsx';
 
-import Activation from './pages/auth/activation/activation';
+// Import non-portal test pages normally
+import Test from './pages/test/test.tsx';
+import CheckoutTest from './pages/test/CheckoutTest.tsx';
+import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx';
+import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx';
+import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx';
 
-// API pages
-import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
-import StripeConnectLanding from "../providers/stripe/StripeConnectLanding";
+// Lazy load main pages
+const Home = React.lazy(() => import('./pages/Home.tsx'));
+const About = React.lazy(() => import('./pages/About.tsx'));
+const Products = React.lazy(() => import('./pages/Products.tsx'));
+const Integrations = React.lazy(() => import('./pages/Integrations.tsx'));
 
-// // Test pages
-import Test from './pages/test/test.tsx'
-import CheckoutTest from './pages/test/CheckoutTest.tsx'
-import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx'
-import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx'
-import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx'
+// Lazy load auth pages
+const Signin = React.lazy(() => import('./pages/auth/sign-in'));
+const Login = React.lazy(() => import('./pages/auth/log-in'));
+const Signup = React.lazy(() => import('./pages/auth/sign-up'));
+const Forgot = React.lazy(() => import('./pages/auth/forgot-password'));
+const OTP = React.lazy(() => import('./pages/auth/otp'));
+const Onboarding = React.lazy(() => import('./pages/auth/onboarding/onboarding'));
+const AuthCallback = React.lazy(() => import('./pages/auth/callback'));
+const Activation = React.lazy(() => import('./pages/auth/activation/activation'));
+
+// Lazy load error pages
+const GeneralError = React.lazy(() => import('./pages/errors/general-error.tsx'));
+const NotFoundError = React.lazy(() => import('./pages/errors/not-found-error.tsx'));
+const MaintenanceError = React.lazy(() => import('./pages/errors/maintenance-error.tsx'));
+
+// Lazy load Stripe-related pages
+const StripeCallback = React.lazy(() => import('../providers/stripe/callback/stripe-callback-index.tsx'));
+const StripeConnectLanding = React.lazy(() => import("../providers/stripe/StripeConnectLanding"));
+
+// Lazy load portal pages
+const AppShell = React.lazy(() => import('./components/dashboard/app-shell'));
+const Dashboard = React.lazy(() => import('./pages/portal/dashboard/Dashboard.tsx'));
+const Integrators = React.lazy(() => import('./pages/portal/integrators/Integrators.tsx'));
+const Settings = React.lazy(() => import('./pages/portal/settings/settings.tsx'));
+const PaymentChannels = React.lazy(() => import('./pages/portal/payment-channels/PaymentChannels.tsx'));
+const Logs = React.lazy(() => import('./pages/portal/logs-page/Logs.tsx'));
+const Balance = React.lazy(() => import('./pages/portal/balance/Balance.tsx'));
+const Cards = React.lazy(() => import('./pages/portal/accept-payments/cards/Cards.tsx'));
+const EWallets = React.lazy(() => import('./pages/portal/accept-payments/eWallets/eWallets.tsx'));
+const Transactions = React.lazy(() => import('./pages/portal/transactions/Transactions.tsx'));
+const Reporting = React.lazy(() => import('./pages/portal/reporting/Reporting.tsx'));
+const Webhooks = React.lazy(() => import('./pages/portal/webhooks/Webhooks.tsx'));
+const PayoutLinks = React.lazy(() => import('./pages/portal/payout-links/PayoutLinks.tsx'));
+const PaymentLinks = React.lazy(() => import('./pages/portal/payment-links/PaymentLinks.tsx'));
+const Customers = React.lazy(() => import('./pages/portal/customers/Customers.tsx'));
+const Subscription = React.lazy(() => import('./pages/portal/subscription/Subscription.tsx'));
+const PaymentMethods = React.lazy(() => import('./pages/portal/settings/receiving-money/payment-methods.tsx'));
+const CheckoutSettings = React.lazy(() => import('./pages/portal/settings/receiving-money/checkout/checkout-settings.tsx'));
+const Disbursements = React.lazy(() => import('./pages/portal/settings/sending-money/disbursements.tsx'));
+const DisbursementNotifications = React.lazy(() => import('./pages/portal/settings/sending-money/notifications.tsx'));
+const Business = React.lazy(() => import('./pages/portal/settings/business-profile/business'));
+const Profile = React.lazy(() => import('./pages/portal/settings/business-profile/profile'));
+const BillingStatements = React.lazy(() => import('./pages/portal/settings/billing/statements.tsx'));
+const FeeStructure = React.lazy(() => import('./pages/portal/settings/billing/fee-structure.tsx'));
+const ApiKeys = React.lazy(() => import('./pages/portal/settings/developers/api-keys.tsx'));
+const IpAllowlist = React.lazy(() => import('./pages/portal/settings/developers/ip-allowlist.tsx'));
+const SettingsWebhooks = React.lazy(() => import('./pages/portal/settings/developers/webhooks.tsx'));
+const BankAccounts = React.lazy(() => import('./pages/portal/settings/withdrawals/bank-accounts.tsx'));
+const WithdrawalNotifications = React.lazy(() => import('./pages/portal/settings/withdrawals/email-notifications.tsx'));
+const AutoWithdrawal = React.lazy(() => import('./pages/portal/settings/withdrawals/auto-withdrawal.tsx'));
+const PhoneNumbers = React.lazy(() => import('./pages/portal/settings/withdrawals/phone-numbers.tsx'));
 
 const AppRouter = () => (
     <Router>
         <SessionCheck>
             <Routes>
                 {/* Website routes */}
-                <Route path="/" element={<Home />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/integrations" element={<Integrations />} />
+                <Route path="/" element={<React.Suspense fallback={<Loader />}><Home /></React.Suspense>} />
+                <Route path="/home" element={<React.Suspense fallback={<Loader />}><Home /></React.Suspense>} />
+                <Route path="/about" element={<React.Suspense fallback={<Loader />}><About /></React.Suspense>} />
+                <Route path="/products" element={<React.Suspense fallback={<Loader />}><Products /></React.Suspense>} />
+                <Route path="/integrations" element={<React.Suspense fallback={<Loader />}><Integrations /></React.Suspense>} />
+
+                {/* Non-essential Website routes */}
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/status" element={<Status />} />
 
                 {/* Dashboard routes */}
-                {/* {config.isPortal ? ( */}
                 <Route path="/portal" element={
                     <ProtectedRoute>
-                        <AppShell />
+                        <React.Suspense fallback={<Loader />}>
+                            <AppShell />
+                        </React.Suspense>
                     </ProtectedRoute>
                 }>
-                    <Route index element={<Dashboard />} />
-                    <Route path="integrations" element={<Integrators />} />
-                    <Route path="subscription" element={<Subscription />} />
-                    <Route path="payment-channels" element={<PaymentChannels />} />
-                    <Route path="logs" element={<Logs />} />
-                    <Route path="balance" element={<Balance />} />
-                    <Route path="cards" element={<Cards />} />
-                    <Route path="e-wallets" element={<EWallets />} />
-                    <Route path="transactions" element={<Transactions />} />
-                    <Route path="reporting" element={<Reporting />} />
-                    <Route path="webhooks" element={<Webhooks />} />
-                    <Route path="payout-links" element={<PayoutLinks />} />
-                    <Route path="payment-links" element={<PaymentLinks />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="stripe-connect-landing" element={<StripeConnectLanding />} />
+                    <Route index element={<React.Suspense fallback={<Loader />}><Dashboard /></React.Suspense>} />
+                    <Route path="integrations" element={<React.Suspense fallback={<Loader />}><Integrators /></React.Suspense>} />
+                    <Route path="subscription" element={<React.Suspense fallback={<Loader />}><Subscription /></React.Suspense>} />
+                    <Route path="payment-channels" element={<React.Suspense fallback={<Loader />}><PaymentChannels /></React.Suspense>} />
+                    <Route path="logs" element={<React.Suspense fallback={<Loader />}><Logs /></React.Suspense>} />
+                    <Route path="balance" element={<React.Suspense fallback={<Loader />}><Balance /></React.Suspense>} />
+                    <Route path="cards" element={<React.Suspense fallback={<Loader />}><Cards /></React.Suspense>} />
+                    <Route path="e-wallets" element={<React.Suspense fallback={<Loader />}><EWallets /></React.Suspense>} />
+                    <Route path="transactions" element={<React.Suspense fallback={<Loader />}><Transactions /></React.Suspense>} />
+                    <Route path="reporting" element={<React.Suspense fallback={<Loader />}><Reporting /></React.Suspense>} />
+                    <Route path="webhooks" element={<React.Suspense fallback={<Loader />}><Webhooks /></React.Suspense>} />
+                    <Route path="payout-links" element={<React.Suspense fallback={<Loader />}><PayoutLinks /></React.Suspense>} />
+                    <Route path="payment-links" element={<React.Suspense fallback={<Loader />}><PaymentLinks /></React.Suspense>} />
+                    <Route path="customers" element={<React.Suspense fallback={<Loader />}><Customers /></React.Suspense>} />
+                    <Route path="stripe-connect-landing" element={<React.Suspense fallback={<Loader />}><StripeConnectLanding /></React.Suspense>} />
 
-                    <Route path="settings" element={<Settings />}>
-                        <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
-                        <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
-                        <Route path="sending-money/disbursements" element={<Disbursements />} />
-                        <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
-                        <Route path="business" element={<Business />} />
-                        <Route path="profile" element={<Profile />} />
-                        {/* <Route path="team/members" element={<TeamMembers />} />
-                        <Route path="team/email-recipients" element={<EmailRecipients />} /> */}
-                        <Route path="billing/statements" element={<BillingStatements />} />
-                        <Route path="billing/fee-structure" element={<FeeStructure />} />
-                        <Route path="developers/api-keys" element={<ApiKeys />} />
-                        <Route path="developers/ip-allowlist" element={<IpAllowlist />} />
-                        <Route path="developers/webhooks" element={<SettingsWebhooks />} />
-                        <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
-                        <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
-                        <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
-                        <Route path="withdrawals/phone-numbers" element={<PhoneNumbers />} />
+                    <Route path="settings" element={<React.Suspense fallback={<Loader />}><Settings /></React.Suspense>}>
+                        <Route path="receiving-money/payment-methods" element={<React.Suspense fallback={<Loader />}><PaymentMethods /></React.Suspense>} />
+                        <Route path="receiving-money/checkout" element={<React.Suspense fallback={<Loader />}><CheckoutSettings /></React.Suspense>} />
+                        <Route path="sending-money/disbursements" element={<React.Suspense fallback={<Loader />}><Disbursements /></React.Suspense>} />
+                        <Route path="sending-money/notifications" element={<React.Suspense fallback={<Loader />}><DisbursementNotifications /></React.Suspense>} />
+                        <Route path="business" element={<React.Suspense fallback={<Loader />}><Business /></React.Suspense>} />
+                        <Route path="profile" element={<React.Suspense fallback={<Loader />}><Profile /></React.Suspense>} />
+                        <Route path="billing/statements" element={<React.Suspense fallback={<Loader />}><BillingStatements /></React.Suspense>} />
+                        <Route path="billing/fee-structure" element={<React.Suspense fallback={<Loader />}><FeeStructure /></React.Suspense>} />
+                        <Route path="developers/api-keys" element={<React.Suspense fallback={<Loader />}><ApiKeys /></React.Suspense>} />
+                        <Route path="developers/ip-allowlist" element={<React.Suspense fallback={<Loader />}><IpAllowlist /></React.Suspense>} />
+                        <Route path="developers/webhooks" element={<React.Suspense fallback={<Loader />}><SettingsWebhooks /></React.Suspense>} />
+                        <Route path="withdrawals/bank-accounts" element={<React.Suspense fallback={<Loader />}><BankAccounts /></React.Suspense>} />
+                        <Route path="withdrawals/email-notifications" element={<React.Suspense fallback={<Loader />}><WithdrawalNotifications /></React.Suspense>} />
+                        <Route path="withdrawals/auto-withdrawal" element={<React.Suspense fallback={<Loader />}><AutoWithdrawal /></React.Suspense>} />
+                        <Route path="withdrawals/phone-numbers" element={<React.Suspense fallback={<Loader />}><PhoneNumbers /></React.Suspense>} />
                     </Route>
                     <Route path="activation" element={
                         <ActivationRoute>
-                            <Activation />
+                            <React.Suspense fallback={<Loader />}>
+                                <Activation />
+                            </React.Suspense>
                         </ActivationRoute>
                     } />
                 </Route>
@@ -149,7 +148,6 @@ const AppRouter = () => (
                 <Route path="/sign-up" element={<Signup />} />
                 <Route path="/forgot-password" element={<Forgot />} />
                 <Route path="/otp" element={<OTP />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />} />
                 <Route path="/onboarding" element={
                     <OnboardingRoute>
                         <Onboarding />
