@@ -1,3 +1,4 @@
+-- Function to send onboarding notifications
 CREATE OR REPLACE FUNCTION public.send_onboarding_notifications()
 RETURNS TRIGGER AS $$
 BEGIN

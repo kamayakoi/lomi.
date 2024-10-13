@@ -1,3 +1,4 @@
+-- Function to update KYC documents URLs
 CREATE OR REPLACE FUNCTION public.update_kyc_document_url(
     p_organization_id UUID,
     p_document_type VARCHAR,

@@ -1,4 +1,4 @@
--- Funtion to get or
+-- Funtion to get Merchant-Org ID
 CREATE OR REPLACE FUNCTION public.get_merchant_organization_id(p_merchant_id UUID)
 RETURNS UUID AS $$
 DECLARE
