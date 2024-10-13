@@ -137,7 +137,18 @@ function formatCurrency(amount: number, currency: string): string {
 }
 
 function formatTransactionStatus(status: transaction_status): string {
-    return status.charAt(0).toUpperCase() + status.slice(1)
+    switch (status) {
+        case 'pending':
+            return 'Pending'
+        case 'completed':
+            return 'Completed'
+        case 'failed':
+            return 'Failed'
+        case 'refunded':
+            return 'Refunded'
+        default:
+            return status
+    }
 }
 
 function formatTransactionType(type: transaction_type): string {

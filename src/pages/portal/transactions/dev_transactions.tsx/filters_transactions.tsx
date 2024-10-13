@@ -142,13 +142,13 @@ export default function TransactionFilters({
                 </div>
 
                 <div className="w-full sm:w-64">
-                    <label htmlFor="provider" className="block text-sm font-medium mb-1">Provider</label>
+                    <label htmlFor="provider" className="block text-sm font-medium mb-1">Providers</label>
                     <Select
                         value={selectedProvider || undefined}
                         onValueChange={(value) => setSelectedProvider(value)}
                     >
                         <SelectTrigger id="provider" className="w-full bg-card border-border h-10 rounded-none">
-                            <SelectValue placeholder="Select provider" />
+                            <SelectValue placeholder="Select a specific provider" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Providers</SelectItem>
@@ -193,7 +193,7 @@ export default function TransactionFilters({
                                 <div>
                                     <h4 className="mb-2 font-medium">Status</h4>
                                     <div className="space-y-2">
-                                        {['pending', 'completed', 'failed'].map((status) => (
+                                        {['pending', 'completed', 'failed', 'refunded'].map((status) => (
                                             <div key={status} className="flex items-center">
                                                 <Checkbox
                                                     id={`status-${status}`}
