@@ -389,3 +389,71 @@ export const useAverageTransactionValue = (
         options
     )
 }
+
+export const fetchAverageCustomerLifetimeValue = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping average customer lifetime value fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_average_customer_lifetime_value', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching average customer lifetime value:', error)
+        return 0
+    }
+
+    return data
+}
+
+export const fetchAverageRetentionRate = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping average retention rate fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_average_retention_rate', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching average retention rate:', error)
+        return 0
+    }
+
+    return data
+}
+
+export const useAverageCustomerLifetimeValue = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['averageCustomerLifetimeValue', merchantId, selectedDateRange, customDateRange], () =>
+        fetchAverageCustomerLifetimeValue(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}
+
+export const useAverageRetentionRate = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['averageRetentionRate', merchantId, selectedDateRange, customDateRange], () =>
+        fetchAverageRetentionRate(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}

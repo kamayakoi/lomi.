@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
-import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue } from './dev_transactions.tsx/support_transactions'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue, useAverageCustomerLifetimeValue, useAverageRetentionRate } from './dev_transactions.tsx/support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -61,6 +61,7 @@ export default function TransactionsPage() {
     ])
     const [showTotalBreakdown, setShowTotalBreakdown] = useState(false)
     const [showAverageValue, setShowAverageValue] = useState(false)
+    const [showAverageRetentionRate, setShowAverageRetentionRate] = useState(false)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -133,6 +134,20 @@ export default function TransactionsPage() {
         { enabled: !!user?.id }
     )
 
+    const { data: averageCustomerLifetimeValue = 0, isLoading: isAverageCustomerLifetimeValueLoading } = useAverageCustomerLifetimeValue(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
+    const { data: averageRetentionRate = 0, isLoading: isAverageRetentionRateLoading } = useAverageRetentionRate(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
@@ -190,10 +205,10 @@ export default function TransactionsPage() {
                     <div className="space-y-4 pb-8">
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Transactions</h1>
 
-                        <div className="grid gap-4 md:grid-cols-2 mb-6">
+                        <div className="grid gap-4 md:grid-cols-3 mb-6">
                             <Card className="cursor-pointer" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Total Incoming Amount</CardTitle>
+                                    <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                                     <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
@@ -215,7 +230,7 @@ export default function TransactionsPage() {
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {isTransactionCountLoading ? (
-                                                        <Skeleton className="w-20 h-4" />
+                                                        <Skeleton className="w-20 h-4 inline-block" />
                                                     ) : (
                                                         `${transactionCount} transactions`
                                                     )}
@@ -229,34 +244,37 @@ export default function TransactionsPage() {
                                                 exit={{ opacity: 0, y: -20 }}
                                                 transition={{ duration: 0.2 }}
                                             >
-                                                <div className="space-y-1">
-                                                    <p className="text-sm">
-                                                        Gross : <span className="font-semibold">
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm">Gross</span>
+                                                        <span className="text-sm font-medium">
                                                             {isGrossAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
                                                                 `XOF ${grossAmount}`
                                                             )}
                                                         </span>
-                                                    </p>
-                                                    <p className="text-sm">
-                                                        Fees : <span className="font-semibold">
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm">Fees</span>
+                                                        <span className="text-sm font-medium">
                                                             {isFeeAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
                                                                 `XOF ${feeAmount}`
                                                             )}
                                                         </span>
-                                                    </p>
-                                                    <p className="text-sm font-medium">
-                                                        Net : <span className="font-bold">
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm">Net</span>
+                                                        <span className="text-sm font-medium">
                                                             {isTotalIncomingAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
                                                                 `XOF ${totalIncomingAmount}`
                                                             )}
                                                         </span>
-                                                    </p>
+                                                    </div>
                                                 </div>
                                             </motion.div>
                                         )}
@@ -267,7 +285,7 @@ export default function TransactionsPage() {
                             <Card className="cursor-pointer" onClick={() => setShowAverageValue(!showAverageValue)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">
-                                        {showAverageValue ? "Average Transaction Value" : "Completion Rate"}
+                                        {showAverageValue ? "Avg. Order Value" : "Completion Rate"}
                                     </CardTitle>
                                     {showAverageValue ? (
                                         <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
@@ -316,12 +334,64 @@ export default function TransactionsPage() {
                                                     {isAverageTransactionValueLoading ? (
                                                         <Skeleton className="w-32 h-8" />
                                                     ) : (
-                                                        `XOF ${averageTransactionValue.toFixed(2)}`
+                                                        `XOF ${averageTransactionValue ? averageTransactionValue.toFixed(2) : '0.00'}`
                                                     )}
                                                 </div>
-                                                <p className="text-xs text-muted-foreground">
+                                                <div className="text-xs text-muted-foreground">
                                                     Per transaction
-                                                </p>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="cursor-pointer" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">
+                                        {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Lifetime Value"}
+                                    </CardTitle>
+                                    {showAverageRetentionRate ? (
+                                        <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                                    ) : (
+                                        <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
+                                    )}
+                                </CardHeader>
+                                <CardContent>
+                                    <AnimatePresence mode="wait">
+                                        {!showAverageRetentionRate ? (
+                                            <motion.div
+                                                key="lifetime"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isAverageCustomerLifetimeValueLoading ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `XOF ${averageCustomerLifetimeValue ? averageCustomerLifetimeValue.toFixed(2) : '0.00'}`
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">Per customer</div>
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="retention"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isAverageRetentionRateLoading ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `${averageRetentionRate ? averageRetentionRate.toFixed(2) : '0.00'}%`
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">of returning customers</div>
                                             </motion.div>
                                         )}
                                     </AnimatePresence>

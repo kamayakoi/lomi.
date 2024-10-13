@@ -247,3 +247,85 @@ BEGIN
     RETURN ROUND(v_average_transaction_value, 2);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch average customer lifetime value for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_average_customer_lifetime_value(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS NUMERIC(15,2) AS $$
+DECLARE
+    v_average_customer_lifetime_value NUMERIC(15,2);
+BEGIN
+    WITH customer_transactions AS (
+        SELECT
+            c.customer_id,
+            SUM(t.net_amount) AS total_net_amount,
+            COUNT(t.transaction_id) AS total_transactions
+        FROM
+            customers c
+        JOIN
+            transactions t ON c.customer_id = t.customer_id
+        WHERE
+            c.merchant_id = p_merchant_id AND
+            t.status = 'completed' AND
+            (p_start_date IS NULL OR t.created_at >= p_start_date) AND
+            (p_end_date IS NULL OR t.created_at <= p_end_date)
+        GROUP BY
+            c.customer_id
+    )
+    SELECT
+        COALESCE(AVG(ct.total_net_amount * ct.total_transactions), 0) INTO v_average_customer_lifetime_value
+    FROM
+        customer_transactions ct;
+
+    RETURN ROUND(v_average_customer_lifetime_value, 2);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch average retention rate for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_average_retention_rate(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS NUMERIC(5,2) AS $$
+DECLARE
+    v_total_customers INTEGER;
+    v_returning_customers INTEGER;
+    v_average_retention_rate NUMERIC(5,2);
+BEGIN
+    SELECT
+        COUNT(DISTINCT customer_id) INTO v_total_customers
+    FROM
+        transactions
+    WHERE
+        merchant_id = p_merchant_id AND
+        status = 'completed' AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
+
+    SELECT
+        COUNT(DISTINCT customer_id) INTO v_returning_customers
+    FROM
+        transactions
+    WHERE
+        merchant_id = p_merchant_id AND
+        status = 'completed' AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date)
+    GROUP BY
+        customer_id
+    HAVING
+        COUNT(transaction_id) > 1;
+
+    IF v_total_customers > 0 THEN
+        v_average_retention_rate := (v_returning_customers * 100.0) / v_total_customers;
+    ELSE
+        v_average_retention_rate := 0;
+    END IF;
+
+    RETURN ROUND(v_average_retention_rate, 2);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
