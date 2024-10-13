@@ -171,7 +171,11 @@ export const fetchCompletionRate = async (merchantId: string, selectedDateRange:
         return { completed: 0, refunded: 0, failed: 0 }
     }
 
-    return data[0]
+    return {
+        completed: Number(data[0].completed),
+        refunded: Number(data[0].refunded),
+        failed: Number(data[0].failed),
+    }
 }
 
 export const applySearch = (transactions: Transaction[], searchTerm: string) => {

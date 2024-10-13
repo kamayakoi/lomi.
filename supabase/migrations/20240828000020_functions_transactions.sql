@@ -153,16 +153,16 @@ CREATE OR REPLACE FUNCTION public.fetch_completion_rate(
     p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
 )
 RETURNS TABLE (
-    completed INTEGER,
-    refunded INTEGER,
-    failed INTEGER
+    completed BIGINT,
+    refunded BIGINT,
+    failed BIGINT
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
-        COUNT(*) FILTER (WHERE status = 'completed') AS completed,
-        COUNT(*) FILTER (WHERE status = 'refunded') AS refunded,
-        COUNT(*) FILTER (WHERE status = 'failed') AS failed
+        COUNT(*) FILTER (WHERE status = 'completed')::BIGINT AS completed,
+        COUNT(*) FILTER (WHERE status = 'refunded')::BIGINT AS refunded,
+        COUNT(*) FILTER (WHERE status = 'failed')::BIGINT AS failed
     FROM
         transactions
     WHERE
