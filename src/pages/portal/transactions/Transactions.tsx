@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowDownIcon, ArrowUpDown } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
-import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate } from './dev_transactions.tsx/support_transactions'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue } from './dev_transactions.tsx/support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -18,6 +18,7 @@ import { useInfiniteQuery } from 'react-query'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
 import TransactionActions from './dev_transactions.tsx/actions_transactions'
 import TransactionFilters from './dev_transactions.tsx/filters_transactions'
+import { motion, AnimatePresence } from "framer-motion"
 
 type Transaction = {
     transaction_id: string
@@ -58,6 +59,8 @@ export default function TransactionsPage() {
         'Date',
         'Provider',
     ])
+    const [showTotalBreakdown, setShowTotalBreakdown] = useState(false)
+    const [showAverageValue, setShowAverageValue] = useState(false)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -103,6 +106,27 @@ export default function TransactionsPage() {
     )
 
     const { data: completionRate = { completed: 0, refunded: 0, failed: 0 }, isLoading: isCompletionRateLoading } = useCompletionRate(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
+    const { data: grossAmount = 0, isLoading: isGrossAmountLoading } = useGrossAmount(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
+    const { data: feeAmount = 0, isLoading: isFeeAmountLoading } = useFeeAmount(
+        user?.id || '',
+        selectedDateRange,
+        customDateRange,
+        { enabled: !!user?.id }
+    )
+
+    const { data: averageTransactionValue = 0, isLoading: isAverageTransactionValueLoading } = useAverageTransactionValue(
         user?.id || '',
         selectedDateRange,
         customDateRange,
@@ -167,51 +191,140 @@ export default function TransactionsPage() {
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Transactions</h1>
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
-                            <Card>
+                            <Card className="cursor-pointer" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">Total Incoming Amount</CardTitle>
                                     <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">
-                                        {isTotalIncomingAmountLoading ? (
-                                            <Skeleton className="w-32 h-8" />
+                                    <AnimatePresence mode="wait">
+                                        {!showTotalBreakdown ? (
+                                            <motion.div
+                                                key="total"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isTotalIncomingAmountLoading ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `XOF ${totalIncomingAmount}`
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    {isTransactionCountLoading ? (
+                                                        <Skeleton className="w-20 h-4" />
+                                                    ) : (
+                                                        `${transactionCount} transactions`
+                                                    )}
+                                                </div>
+                                            </motion.div>
                                         ) : (
-                                            `XOF ${totalIncomingAmount}`
+                                            <motion.div
+                                                key="breakdown"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="space-y-1">
+                                                    <p className="text-sm">
+                                                        Gross : <span className="font-semibold">
+                                                            {isGrossAmountLoading ? (
+                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                            ) : (
+                                                                `XOF ${grossAmount}`
+                                                            )}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        Fees : <span className="font-semibold">
+                                                            {isFeeAmountLoading ? (
+                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                            ) : (
+                                                                `XOF ${feeAmount}`
+                                                            )}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm font-medium">
+                                                        Net : <span className="font-bold">
+                                                            {isTotalIncomingAmountLoading ? (
+                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                            ) : (
+                                                                `XOF ${totalIncomingAmount}`
+                                                            )}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </motion.div>
                                         )}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                        {isTransactionCountLoading ? (
-                                            <Skeleton className="w-20 h-4" />
-                                        ) : (
-                                            `${transactionCount} transactions`
-                                        )}
-                                    </div>
+                                    </AnimatePresence>
                                 </CardContent>
                             </Card>
-                            <Card>
+
+                            <Card className="cursor-pointer" onClick={() => setShowAverageValue(!showAverageValue)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                                    <CardTitle className="text-sm font-medium">
+                                        {showAverageValue ? "Average Transaction Value" : "Completion Rate"}
+                                    </CardTitle>
+                                    {showAverageValue ? (
+                                        <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
+                                    ) : (
+                                        <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                                    )}
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">
-                                        {isCompletionRateLoading ? (
-                                            <Skeleton className="w-32 h-8" />
+                                    <AnimatePresence mode="wait">
+                                        {!showAverageValue ? (
+                                            <motion.div
+                                                key="completion"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isCompletionRateLoading ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground">
+                                                    {isCompletionRateLoading ? (
+                                                        <Skeleton className="w-20 h-4" />
+                                                    ) : (
+                                                        <>
+                                                            {completionRate.completed > 0 && `${completionRate.completed} completed`}
+                                                            {completionRate.refunded > 0 && `, ${completionRate.refunded} refunded`}
+                                                            {completionRate.failed > 0 && `, ${completionRate.failed} failed`}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </motion.div>
                                         ) : (
-                                            `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
+                                            <motion.div
+                                                key="average"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isAverageTransactionValueLoading ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `XOF ${averageTransactionValue.toFixed(2)}`
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Per transaction
+                                                </p>
+                                            </motion.div>
                                         )}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                        {isCompletionRateLoading ? (
-                                            <Skeleton className="w-20 h-4" />
-                                        ) : (
-                                            <>
-                                                {completionRate.completed > 0 && `${completionRate.completed} completed`}
-                                                {completionRate.refunded > 0 && `, ${completionRate.refunded} refunded`}
-                                                {completionRate.failed > 0 && `, ${completionRate.failed} failed`}
-                                            </>
-                                        )}
-                                    </div>
+                                    </AnimatePresence>
                                 </CardContent>
                             </Card>
                         </div>

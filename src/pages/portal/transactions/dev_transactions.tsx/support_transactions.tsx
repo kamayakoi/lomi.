@@ -178,6 +178,72 @@ export const fetchCompletionRate = async (merchantId: string, selectedDateRange:
     }
 }
 
+export const fetchGrossAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping gross amount fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_gross_amount', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching gross amount:', error)
+        return 0
+    }
+
+    return data
+}
+
+export const fetchFeeAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping fee amount fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_fee_amount', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching fee amount:', error)
+        return 0
+    }
+
+    return data
+}
+
+export const fetchAverageTransactionValue = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
+    if (!merchantId) {
+        console.warn('Merchant ID is empty. Skipping average transaction value fetch.')
+        return 0
+    }
+
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const { data, error } = await supabase.rpc('fetch_average_transaction_value', {
+        p_merchant_id: merchantId,
+        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+    })
+
+    if (error) {
+        console.error('Error fetching average transaction value:', error)
+        return 0
+    }
+
+    return data
+}
+
 export const applySearch = (transactions: Transaction[], searchTerm: string) => {
     if (!searchTerm) return transactions
 
@@ -284,6 +350,42 @@ export const useCompletionRate = (
 ) => {
     return useQuery(['completionRate', merchantId, selectedDateRange, customDateRange], () =>
         fetchCompletionRate(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}
+
+export const useGrossAmount = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['grossAmount', merchantId, selectedDateRange, customDateRange], () =>
+        fetchGrossAmount(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}
+
+export const useFeeAmount = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['feeAmount', merchantId, selectedDateRange, customDateRange], () =>
+        fetchFeeAmount(merchantId, selectedDateRange, customDateRange),
+        options
+    )
+}
+
+export const useAverageTransactionValue = (
+    merchantId: string,
+    selectedDateRange: string | null,
+    customDateRange?: DateRange,
+    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
+) => {
+    return useQuery(['averageTransactionValue', merchantId, selectedDateRange, customDateRange], () =>
+        fetchAverageTransactionValue(merchantId, selectedDateRange, customDateRange),
         options
     )
 }

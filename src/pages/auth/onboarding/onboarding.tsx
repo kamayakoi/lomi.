@@ -53,6 +53,7 @@ const Onboarding: React.FC = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>(initialOnboardingData);
+    const [showWelcome, setShowWelcome] = useState(true);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -199,6 +200,14 @@ const Onboarding: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowWelcome(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     if (loading) {
         return <LoadingButton />;
     }
@@ -229,43 +238,53 @@ const Onboarding: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-            <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl">
-                <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center">
-                        {steps[currentStep]?.title}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="mb-8">
-                        <div className="flex h-2 w-full bg-gray-200 dark:bg-gray-700">
-                            {steps.map((_, index) => (
-                                <div key={index} className="flex-1 flex">
+            {showWelcome ? (
+                <Card className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-xl">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">
+                            Welcome to lomi. !
+                        </CardTitle>
+                    </CardHeader>
+                </Card>
+            ) : (
+                <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl">
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold text-center">
+                            {steps[currentStep]?.title}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="mb-8">
+                            <div className="flex h-2 w-full bg-gray-200 dark:bg-gray-700">
+                                {steps.map((_, index) => (
+                                    <div key={index} className="flex-1 flex">
+                                        <div
+                                            className={`flex-1 ${index <= currentStep ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                                                } transition-all duration-300 ease-out`}
+                                        />
+                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-gray-800" />}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex justify-between mt-2">
+                                {steps.map((step, index) => (
                                     <div
-                                        className={`flex-1 ${index <= currentStep ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                                            } transition-all duration-300 ease-out`}
-                                    />
-                                    {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-gray-800" />}
-                                </div>
-                            ))}
+                                        key={index}
+                                        className={`text-xs ${index <= currentStep
+                                            ? 'text-blue-600 dark:text-blue-400 font-bold'
+                                            : 'text-gray-400 dark:text-gray-500'
+                                            }`}
+                                    >
+                                        {step.title}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="flex justify-between mt-2">
-                            {steps.map((step, index) => (
-                                <div
-                                    key={index}
-                                    className={`text-xs ${index <= currentStep
-                                        ? 'text-blue-600 dark:text-blue-400 font-bold'
-                                        : 'text-gray-400 dark:text-gray-500'
-                                        }`}
-                                >
-                                    {step.title}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    {renderStep()}
-                </CardContent>
-            </Card>
+                        {renderStep()}
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 };

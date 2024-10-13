@@ -172,3 +172,78 @@ BEGIN
         (p_end_date IS NULL OR created_at <= p_end_date);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch gross amount for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_gross_amount(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS NUMERIC(15,2) AS $$
+DECLARE
+    v_gross_amount NUMERIC(15,2);
+BEGIN
+    SELECT 
+        COALESCE(SUM(gross_amount), 0) INTO v_gross_amount
+    FROM 
+        transactions
+    WHERE 
+        merchant_id = p_merchant_id AND
+        status = 'completed' AND
+        transaction_type IN ('payment', 'instalment') AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
+        
+    RETURN ROUND(v_gross_amount, 2);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch fee amount for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_fee_amount(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS NUMERIC(15,2) AS $$
+DECLARE
+    v_fee_amount NUMERIC(15,2);
+BEGIN
+    SELECT 
+        COALESCE(SUM(fee_amount), 0) INTO v_fee_amount
+    FROM 
+        transactions
+    WHERE 
+        merchant_id = p_merchant_id AND
+        status = 'completed' AND
+        transaction_type IN ('payment', 'instalment') AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
+        
+    RETURN ROUND(v_fee_amount, 2);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch average transaction value for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_average_transaction_value(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+)
+RETURNS NUMERIC(15,2) AS $$
+DECLARE
+    v_average_transaction_value NUMERIC(15,2);
+BEGIN
+    SELECT 
+        COALESCE(AVG(gross_amount), 0) INTO v_average_transaction_value
+    FROM 
+        transactions
+    WHERE 
+        merchant_id = p_merchant_id AND
+        status = 'completed' AND
+        transaction_type IN ('payment', 'instalment') AND
+        (p_start_date IS NULL OR created_at >= p_start_date) AND
+        (p_end_date IS NULL OR created_at <= p_end_date);
+        
+    RETURN ROUND(v_average_transaction_value, 2);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
