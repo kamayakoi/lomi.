@@ -1,6 +1,8 @@
 import React from 'react';
 import Loader from '@/components/dashboard/loader.tsx'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+// Import route utility components normally
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
 import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
 import { SessionCheck } from '@/lib/routes/SessionCheck';
@@ -11,25 +13,25 @@ import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
 import Status from './pages/Status.tsx';
 
-// Import non-portal test pages normally
-import Test from './pages/test/test.tsx';
-import CheckoutTest from './pages/test/CheckoutTest.tsx';
-import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx';
-import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx';
-import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx';
+// // Import non-portal test pages normally
+// import Test from './pages/test/test.tsx';
+// import CheckoutTest from './pages/test/CheckoutTest.tsx';
+// import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx';
+// import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx';
+// import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx';
 
-// Lazy load main pages
+// Lazy load main home pages
 const Home = React.lazy(() => import('./pages/Home.tsx'));
 const About = React.lazy(() => import('./pages/About.tsx'));
 const Products = React.lazy(() => import('./pages/Products.tsx'));
 const Integrations = React.lazy(() => import('./pages/Integrations.tsx'));
 
 // Lazy load auth pages
-const Signin = React.lazy(() => import('./pages/auth/sign-in'));
-const Login = React.lazy(() => import('./pages/auth/log-in'));
-const Signup = React.lazy(() => import('./pages/auth/sign-up'));
-const Forgot = React.lazy(() => import('./pages/auth/forgot-password'));
-const OTP = React.lazy(() => import('./pages/auth/otp'));
+import Signin from './pages/auth/sign-in';
+import Login from './pages/auth/log-in';
+import Signup from './pages/auth/sign-up';
+import Forgot from './pages/auth/forgot-password';
+import OTP from './pages/auth/otp';
 const Onboarding = React.lazy(() => import('./pages/auth/onboarding/onboarding'));
 const AuthCallback = React.lazy(() => import('./pages/auth/callback'));
 const Activation = React.lazy(() => import('./pages/auth/activation/activation'));
@@ -150,21 +152,23 @@ const AppRouter = () => (
                 <Route path="/otp" element={<OTP />} />
                 <Route path="/onboarding" element={
                     <OnboardingRoute>
-                        <Onboarding />
+                        <React.Suspense fallback={<Loader />}>
+                            <Onboarding />
+                        </React.Suspense>
                     </OnboardingRoute>
                 } />
-                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/callback" element={<React.Suspense fallback={<Loader />}><AuthCallback /></React.Suspense>} />
 
                 {/* API routes */}
                 <Route path="api/stripe/callback" element={<StripeCallback />} />
 
-                {/* Test routes */}
+                {/* Test routes
                 <Route path="test" element={<Test />}>
                     <Route path="checkout" element={<CheckoutTest />} />
                     <Route path="checkout-form" element={<CheckoutFormTest />} />
                     <Route path="checkout-summary" element={<CheckoutSummaryTest />} />
                     <Route path="payment-method-selector" element={<PaymentMethodSelectorTest />} />
-                </Route>
+                </Route> */}
 
                 {/* Error routes */}
                 <Route path="/500" element={<GeneralError />} />

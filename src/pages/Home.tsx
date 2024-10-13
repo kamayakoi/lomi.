@@ -2,9 +2,9 @@ import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
 import { Navbar } from "@/components/landing/Navbar";
-import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Products } from "@/components/landing/Products"
 import { HowItWorks } from "@/components/landing/HowItWorks";
+// import { ScrollToTop } from "@/components/landing/ScrollToTop";
 
 function Homepage() {
   return (
@@ -19,7 +19,7 @@ function Homepage() {
       <FAQ />
       <div className="border-b border-gray-300 dark:border-gray-700"></div>
       <Footer />
-      <ScrollToTop />
+      {/* <ScrollToTop /> */}
     </>
   );
 }
