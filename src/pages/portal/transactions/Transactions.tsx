@@ -10,14 +10,14 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
-import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate } from './support_transactions'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate } from './dev_transactions.tsx/support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
-import TransactionActions from './actions_transactions'
-import TransactionFilters from './filters_transactions'
+import TransactionActions from './dev_transactions.tsx/actions_transactions'
+import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 
 type Transaction = {
     transaction_id: string

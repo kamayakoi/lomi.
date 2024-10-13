@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
@@ -8,9 +8,9 @@ import { sidelinks } from '../../utils/data/sidelinks'
 import { useTheme } from '@/lib/hooks/useTheme'
 import iconLight from "/iconportal.png"
 import iconDark from "/icon_dark.png"
-import { supabase } from '@/utils/supabase/client'
 import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
+import { useSidebar } from '@/lib/hooks/useSidebar'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -18,56 +18,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const [navOpened, setNavOpened] = useState(false)
   const { theme, setTheme } = useTheme()
   const { isActivated } = useActivationStatus()
-  const [organizationName, setOrganizationName] = useState<string | null>(null)
-  const [organizationLogo, setOrganizationLogo] = useState<string | null>(null)
-  const [merchantName, setMerchantName] = useState<string | null>(null)
-  const [merchantRole, setMerchantRole] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchSidebarData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data, error } = await supabase
-          .rpc('fetch_sidebar_data', { p_merchant_id: user.id })
-
-        if (error) {
-          console.error('Error fetching sidebar data:', error)
-        } else {
-          setOrganizationName(data[0].organization_name)
-          setMerchantName(data[0].merchant_name)
-          setMerchantRole(data[0].merchant_role)
-
-          // Extract the relative path from the organization logo URL
-          const logoPath = data[0].organization_logo_url?.replace(/^.*\/logos\//, '')
-
-          if (logoPath) {
-            // Download the organization logo image using the relative path
-            const { data: logoData, error: logoError } = await supabase
-              .storage
-              .from('logos')
-              .download(logoPath)
-
-            if (logoError) {
-              console.error('Error downloading organization logo:', logoError)
-            } else {
-              const logoUrl = URL.createObjectURL(logoData)
-              setOrganizationLogo(logoUrl)
-            }
-          }
-        }
-      }
-    }
-
-    fetchSidebarData()
-  }, [])
-
-  useEffect(() => {
-    if (navOpened) {
-      document.body.classList.add('overflow-hidden')
-    } else {
-      document.body.classList.remove('overflow-hidden')
-    }
-  }, [navOpened])
+  const { sidebarData } = useSidebar()
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -141,13 +92,13 @@ export default function Sidebar({ className }: SidebarProps) {
         />
 
         {/* Organization info */}
-        {merchantName && (
+        {sidebarData.merchantName && (
           <div className={`mt-auto px-4 py-4 hidden md:block`}>
             <Separator className="mb-4" />
             <div className="flex items-center space-x-4">
-              {organizationLogo ? (
+              {sidebarData.organizationLogo ? (
                 <img
-                  src={organizationLogo}
+                  src={sidebarData.organizationLogo}
                   alt="Organization logo"
                   className="h-[40px] w-[40px] rounded border-6 border-transparent cursor-pointer"
                   onClick={toggleTheme}
@@ -155,16 +106,16 @@ export default function Sidebar({ className }: SidebarProps) {
               ) : (
                 <div className="h-[38px] w-[38px] rounded-full bg-muted flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
                   <span className="text-xl font-semibold uppercase text-muted-foreground">
-                    {merchantName[0]}
+                    {sidebarData.merchantName[0]}
                   </span>
                 </div>
               )}
               <div>
                 <div className="text-sm font-semibold text-foreground">
-                  {merchantName}
+                  {sidebarData.merchantName}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {merchantRole} • {organizationName}
+                  {sidebarData.merchantRole} • {sidebarData.organizationName}
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
-import { Transaction, FetchedTransaction, subscription_status } from './types'
+import { Transaction, FetchedTransaction, subscription_status } from '../types'
 import { DateRange } from 'react-day-picker'
 import { useQuery, UseQueryOptions } from 'react-query'
 

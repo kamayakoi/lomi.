@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Transaction, transaction_status, transaction_type, provider_code, subscription_status } from './types'
+import { Transaction, transaction_status, transaction_type, provider_code, subscription_status } from '../types'
 import { ArrowDownToLine, RefreshCcw, LifeBuoy } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 

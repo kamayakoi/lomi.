@@ -12,42 +12,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/utils/supabase/client';
-import { useEffect, useState, useCallback } from 'react';
+import { useUserAvatar } from '@/lib/hooks/useUserAvatar';
+import { useEffect } from 'react';
 
 export function UserNav() {
   const { user } = useUser();
   const navigate = useNavigate();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  const fetchAvatar = useCallback(async () => {
-    if (user) {
-      const { data: avatarPath, error: avatarError } = await supabase
-        .rpc('fetch_user_avatar', { p_user_id: user.id });
-
-      if (avatarError) {
-        console.error('Error fetching avatar URL:', avatarError);
-      } else {
-        if (avatarPath) {
-          const { data: avatarData, error: downloadError } = await supabase
-            .storage
-            .from('avatars')
-            .download(avatarPath);
-
-          if (downloadError) {
-            console.error('Error downloading avatar:', downloadError);
-          } else {
-            const url = URL.createObjectURL(avatarData);
-            setAvatarUrl(url);
-            localStorage.setItem(`avatarUrl_${user.id}`, url);
-          }
-        }
-      }
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchAvatar();
-  }, [fetchAvatar]);
+  const { avatarUrl, fetchUserAvatar } = useUserAvatar();
 
   useEffect(() => {
     const merchantsChannel = supabase
@@ -61,7 +32,7 @@ export function UserNav() {
           filter: `merchant_id=eq.${user?.id}`,
         },
         () => {
-          fetchAvatar();
+          fetchUserAvatar();
         }
       )
       .subscribe();
@@ -69,7 +40,7 @@ export function UserNav() {
     return () => {
       supabase.removeChannel(merchantsChannel);
     };
-  }, [user, fetchAvatar]);
+  }, [user, fetchUserAvatar]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
