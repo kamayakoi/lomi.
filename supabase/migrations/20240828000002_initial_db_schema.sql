@@ -462,7 +462,6 @@ CREATE TABLE payouts (
     status payout_status NOT NULL DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    provider_code provider_code REFERENCES providers(code)
 );
 
 CREATE INDEX idx_payouts_account_id ON payouts(account_id);

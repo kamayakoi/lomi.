@@ -575,8 +575,16 @@ export default function TransactionsPage() {
                                                             {columns.includes('Customer') && (
                                                                 <TableCell className="text-left font-medium">{transaction.customer_name}</TableCell>
                                                             )}
-                                                            {columns.includes('Gross Amount') && <TableCell className="text-center">{transaction.gross_amount}</TableCell>}
-                                                            {columns.includes('Net Amount') && <TableCell className="text-center">{transaction.net_amount}</TableCell>}
+                                                            {columns.includes('Gross Amount') && (
+                                                                <TableCell className="text-center">
+                                                                    {formatAmount(transaction.gross_amount)}
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Net Amount') && (
+                                                                <TableCell className="text-center">
+                                                                    {formatAmount(transaction.net_amount)}
+                                                                </TableCell>
+                                                            )}
                                                             {columns.includes('Currency') && <TableCell className="text-center">{transaction.currency}</TableCell>}
                                                             {columns.includes('Payment Method') && (
                                                                 <TableCell className="text-center">{formatPaymentMethod(transaction.payment_method)}</TableCell>
@@ -599,9 +607,9 @@ export default function TransactionsPage() {
                                                             {columns.includes('Provider') && (
                                                                 <TableCell className="text-center">
                                                                     <span className={`
-                                                                        inline-block px-2 py-1 text-xs font-semibold
+                                                                        inline-block px-2 py-1 rounded-full text-xs font-semibold
                                                                         ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
                                                                         ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
                                                                         ${transaction.provider_code === 'STRIPE' ? 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white' : ''}
@@ -694,4 +702,8 @@ function shortenTransactionId(transactionId: string): string {
 function calculateCompletionRate(completed: number, refunded: number, failed: number): number {
     const total = completed + refunded + failed
     return total > 0 ? Math.round((completed / total) * 100) : 0
+}
+
+function formatAmount(amount: number): string {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }

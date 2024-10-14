@@ -41,7 +41,6 @@ export default function TransactionFilters({
     setSelectedDateRange,
     customDateRange,
     setCustomDateRange,
-    handleCustomDateRangeApply,
     selectedStatuses,
     setSelectedStatuses,
     selectedTypes,
@@ -133,9 +132,6 @@ export default function TransactionFilters({
                                     onSelect={setCustomDateRange}
                                     numberOfMonths={2}
                                 />
-                                <div className="flex justify-end p-2">
-                                    <Button onClick={handleCustomDateRangeApply}>Apply</Button>
-                                </div>
                             </PopoverContent>
                         </Popover>
                     </div>

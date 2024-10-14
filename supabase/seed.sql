@@ -190,10 +190,10 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 1800.00, 'XOF');
 
 -- Seed data for payouts table
-INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status, provider_code)
+INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status)
 VALUES 
-  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 1685.00, 'XOF', 'Bank Transfer', 'completed', 'ECOBANK'),
-  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2')), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 1650.00, 'XOF', 'Mobile Money', 'completed', 'ORANGE');
+  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 1685.00, 'XOF', 'Bank Transfer', 'completed'),
+  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2')), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 1650.00, 'XOF', 'Mobile Money', 'completed');
 
 -- Seed data for organization_kyc table
 

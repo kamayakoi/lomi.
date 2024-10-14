@@ -171,7 +171,7 @@ function RevenueTransactionsChart({
                                 yAxisId="left"
                                 orientation="left"
                                 stroke="currentColor"
-                                tickFormatter={(value) => `${value.toLocaleString('en-US')} XOF`}
+                                tickFormatter={(value) => `${formatAmount(value)} XOF`}
                                 width={100}
                                 fontSize={12}
                             />
@@ -184,7 +184,7 @@ function RevenueTransactionsChart({
                             />
                             <Tooltip
                                 formatter={(value: number, name: string) => [
-                                    name === 'Revenue' ? `${value.toLocaleString('en-US')} XOF` : value,
+                                    name === 'Revenue' ? `${formatAmount(value)} XOF` : formatAmount(value),
                                     name
                                 ]}
                                 labelStyle={{ color: 'black' }}
@@ -203,6 +203,10 @@ function RevenueTransactionsChart({
             </CardContent>
         </Card>
     )
+}
+
+function formatAmount(amount: number): string {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }
 
 function TopPerformingItemsCard({

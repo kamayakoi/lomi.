@@ -133,7 +133,7 @@ export default function TransactionActions({ transaction, isOpen, onClose }: Tra
 }
 
 function formatCurrency(amount: number, currency: string): string {
-    return `${amount} ${currency}`;
+    return `${amount.toLocaleString('en-US', { minimumFractionDigits: 0 })} ${currency}`;
 }
 
 function formatTransactionStatus(status: transaction_status): string {

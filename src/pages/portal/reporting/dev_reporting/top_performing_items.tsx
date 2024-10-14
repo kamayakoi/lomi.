@@ -98,7 +98,7 @@ function ProductList({ products }: { products: TopPerformingProduct[] }) {
                                     <p className="text-sm text-gray-600 dark:text-gray-400">{product.sales_count} sales</p>
                                 </div>
                                 <div className="ml-2 flex min-w-[100px] max-w-[120px] items-center justify-center rounded-lg bg-green-100 px-2 py-1 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    {product.total_revenue} XOF
+                                    {formatAmount(product.total_revenue)} XOF
                                 </div>
                             </CardContent>
                         </Card>
@@ -132,7 +132,7 @@ function SubscriptionList({ subscriptions }: { subscriptions: TopPerformingSubsc
                                     <p className="text-sm text-gray-600 dark:text-gray-400">{subscription.sales_count} sales</p>
                                 </div>
                                 <div className="ml-2 flex min-w-[100px] max-w-[120px] items-center justify-center rounded-lg bg-green-100 px-2 py-1 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    {subscription.total_revenue} XOF
+                                    {formatAmount(subscription.total_revenue)} XOF
                                 </div>
                             </CardContent>
                         </Card>
@@ -141,4 +141,8 @@ function SubscriptionList({ subscriptions }: { subscriptions: TopPerformingSubsc
             )}
         </motion.div>
     )
+}
+
+function formatAmount(amount: number): string {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }
