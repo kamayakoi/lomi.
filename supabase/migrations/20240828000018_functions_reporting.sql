@@ -221,10 +221,11 @@ BEGIN
     FROM 
         transactions t
     JOIN 
-        subscriptions s ON t.subscription_id = s.subscription_id
+        merchant_subscriptions s ON t.subscription_id = s.subscription_id
     WHERE 
         t.merchant_id = p_merchant_id AND
         t.status = 'completed' AND
+        t.transaction_type = 'instalment' AND
         (p_start_date IS NULL OR t.created_at >= p_start_date) AND
         (p_end_date IS NULL OR t.created_at <= p_end_date)
     GROUP BY 

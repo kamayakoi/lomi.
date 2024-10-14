@@ -16,7 +16,7 @@ import { format, subDays, subMonths, startOfYear } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import TopPerformingItems from './dev_reporting/top_performing_items'
 import ProviderDistribution from './dev_reporting/provider_distribution'
-import { ArrowUpIcon } from "lucide-react"
+import { ArrowUpIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 
 export default function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -150,6 +150,20 @@ export default function ReportingPage() {
                             <CardContent>
                                 {isRevenueLoading ? (
                                     <div>Loading...</div>
+                                ) : revenueData.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full pt-12">
+                                        <div className="text-center">
+                                            <div className="flex justify-center mb-6">
+                                                <div className="rounded-full bg-gray-100 p-4">
+                                                    <CurrencyDollarIcon className="h-12 w-12 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-semibold mb-2">No revenue data yet</h3>
+                                            <p className="text-gray-500 max-w-xs mx-auto">
+                                                Start processing transactions to see your revenue chart.
+                                            </p>
+                                        </div>
+                                    </div>
                                 ) : (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={getChartData(revenueData, selectedDateRange)}>
@@ -170,6 +184,20 @@ export default function ReportingPage() {
                             <CardContent>
                                 {isTransactionVolumeLoading ? (
                                     <div>Loading...</div>
+                                ) : transactionVolumeData.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full pt-12">
+                                        <div className="text-center">
+                                            <div className="flex justify-center mb-6">
+                                                <div className="rounded-full bg-gray-100 p-4">
+                                                    <ChartBarIcon className="h-12 w-12 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-semibold mb-2">No transaction data yet</h3>
+                                            <p className="text-gray-500 max-w-xs mx-auto">
+                                                Process your first transaction to see volume statistics.
+                                            </p>
+                                        </div>
+                                    </div>
                                 ) : (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={getChartData(transactionVolumeData, selectedDateRange)}>

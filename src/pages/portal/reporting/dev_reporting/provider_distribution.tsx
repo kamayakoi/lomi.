@@ -1,6 +1,7 @@
 import type { ProviderDistribution, provider_code } from './reporting-types'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { COLORS } from './reporting-types'
+import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
 
 interface ProviderDistributionProps {
     providerDistribution: ProviderDistribution[]
@@ -41,6 +42,24 @@ export default function ProviderDistribution({
 
     if (isLoading) {
         return <div>Loading...</div>
+    }
+
+    if (providerDistribution.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full pt-12">
+                <div className="text-center">
+                    <div className="flex justify-center mb-6">
+                        <div className="rounded-full bg-gray-100 p-4">
+                            <CurrencyDollarIcon className="h-12 w-12 text-gray-400" />
+                        </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">No provider data yet</h3>
+                    <p className="text-gray-500 max-w-xs mx-auto">
+                        Start processing transactions to see your provider distribution.
+                    </p>
+                </div>
+            </div>
+        )
     }
 
     return (

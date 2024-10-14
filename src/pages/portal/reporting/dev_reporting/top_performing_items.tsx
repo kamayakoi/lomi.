@@ -1,4 +1,5 @@
 import { TopPerformingProduct, TopPerformingSubscription } from './reporting-types'
+import { CubeIcon } from '@heroicons/react/24/outline'
 
 interface TopPerformingItemsProps {
     topPerformingProducts: TopPerformingProduct[]
@@ -16,7 +17,21 @@ export default function TopPerformingItems({
     }
 
     if (topPerformingProducts.length === 0 && topPerformingSubscriptions.length === 0) {
-        return <div>No top-performing products or subscriptions found.</div>
+        return (
+            <div className="flex flex-col items-center justify-center h-full pt-12"> {/* Added pt-12 for top padding */}
+                <div className="text-center">
+                    <div className="flex justify-center mb-6"> {/* Increased margin-bottom */}
+                        <div className="rounded-full bg-gray-100 p-4"> {/* Increased padding */}
+                            <CubeIcon className="h-12 w-12 text-gray-400" />
+                        </div>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">No items yet</h3>
+                    <p className="text-gray-500 max-w-xs mx-auto">
+                        You haven&apos;t started selling any products or subscriptions yet. They&apos;ll appear here once you do.
+                    </p>
+                </div>
+            </div>
+        )
     }
 
     return (
