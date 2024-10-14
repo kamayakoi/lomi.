@@ -28,21 +28,6 @@ export type Transaction = {
     updated_at: string
 }
 
-export type Customer = {
-    customer_id: string
-    merchant_id: string
-    organization_id: string
-    name: string
-    email?: string
-    phone_number?: string
-    country?: string
-    city?: string
-    address?: string
-    postal_code?: string
-    created_at: string
-    updated_at: string
-}
-
 export type Product = {
     product_id: string
     merchant_id: string
@@ -123,29 +108,10 @@ export type FetchTopPerformingProductsParams = {
     limit?: number
 }
 
-export type FetchNewCustomerCountParams = {
-    merchantId: MerchantId
-    startDate?: string
-    endDate?: string
-}
-
-export type CalculateConversionRateParams = {
-    merchantId: MerchantId
-    startDate?: string
-    endDate?: string
-}
-
-export type FetchNewCustomerCountChangeParams = {
-    merchantId: MerchantId
-    startDate?: string
-    endDate?: string
-}
-
-export type FetchConversionRateChangeParams = {
-    merchantId: MerchantId
-    startDate?: string
-    endDate?: string
-}
+export type FetchNewCustomerCountParams = never
+export type CalculateConversionRateParams = never
+export type FetchNewCustomerCountChangeParams = never
+export type FetchConversionRateChangeParams = never
 
 export type TopPerformingSubscription = {
     subscription_name: string

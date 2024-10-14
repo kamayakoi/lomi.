@@ -1,9 +1,17 @@
 import type { ProviderDistribution, provider_code } from './reporting-types'
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { COLORS } from './reporting-types'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { WalletIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent } from '@/components/ui/card'
 
+const COLORS = {
+    ORANGE: '#FC6307',
+    WAVE: '#71CDF4',
+    ECOBANK: '#074367',
+    MTN: '#F7CE46',
+    STRIPE: '#625BF6',
+    OTHER: '#E5E7EB',
+}
 
 interface ProviderDistributionProps {
     providerDistribution: ProviderDistribution[]
@@ -16,8 +24,18 @@ export default function ProviderDistribution({
 }: ProviderDistributionProps) {
     if (isLoading) {
         return (
-            <div className="h-64">
-                <Skeleton className="h-full" />
+            <div className="space-y-4">
+                {[...Array(5)].map((_, index) => (
+                    <Card key={index}>
+                        <CardContent className="flex justify-between items-center p-3">
+                            <div className="w-1/2">
+                                <Skeleton className="h-4 w-3/4 mb-2" />
+                                <Skeleton className="h-3 w-1/2" />
+                            </div>
+                            <Skeleton className="h-4 w-1/4" />
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         )
     }
@@ -35,7 +53,7 @@ export default function ProviderDistribution({
             case 'STRIPE':
                 return 'Stripe'
             default:
-                return provider
+                return 'Other'
         }
     }
 
@@ -72,46 +90,50 @@ export default function ProviderDistribution({
     const data = getProviderDistributionPercentage()
 
     return (
-        <ResponsiveContainer width="100%" height={400}>
-            <PieChart>
-                <Pie
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={120}
-                    fill="#8884d8"
-                    dataKey="transaction_count"
-                >
-                    {data.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip
-                    contentStyle={{
-                        background: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                    }}
-                    labelStyle={{ fontWeight: 'bold', color: '#374151' }}
-                    formatter={(value, name) => [`${value} transactions`, formatProvider(name as provider_code)]}
-                />
-                <Legend
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                    iconType="circle"
-                    iconSize={10}
-                    formatter={(value) => value}
-                    wrapperStyle={{
-                        paddingLeft: '24px',
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '14px',
-                        color: '#374151',
-                    }}
-                />
-            </PieChart>
-        </ResponsiveContainer>
+        <div className="space-y-0">
+            <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                    <Pie
+                        data={data}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={120}
+                        fill="#8884d8"
+                        dataKey="transaction_count"
+                    >
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[entry.provider_code] || COLORS.OTHER} />
+                        ))}
+                    </Pie>
+                    <Tooltip
+                        contentStyle={{
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                        }}
+                        labelStyle={{ color: 'black' }}
+                        formatter={(_, __, { payload }) => [
+                            `${payload.transaction_count} transactions`,
+                            formatProvider(payload.provider_code as provider_code)
+                        ]}
+                    />
+                </PieChart>
+            </ResponsiveContainer>
+            <div className="grid grid-cols-3 gap-2">
+                {data.map((provider, index) => (
+                    <Card key={index} className="hover:bg-gray-50 dark:hover:bg-[#0c0d10] transition-colors">
+                        <CardContent className="flex items-center justify-between p-3">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[provider.provider_code] || COLORS.OTHER }}></div>
+                                <p className="text-sm font-semibold dark:text-white">{formatProvider(provider.provider_code)}</p>
+                            </div>
+                            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                {provider.percentage}%
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
     )
 }
