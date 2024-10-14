@@ -149,11 +149,28 @@ export default function PayoutFilters({
                             >
                                 <div className="flex items-center space-x-2 truncate">
                                     {selectedStatuses.length > 0 ? (
-                                        selectedStatuses.map((id) => (
-                                            <Badge key={id} variant="secondary" className="mr-1">
-                                                {statusOptions.find((opt) => opt.id === id)?.label}
-                                            </Badge>
-                                        ))
+                                        selectedStatuses.map((id) => {
+                                            const status = statusOptions.find((opt) => opt.id === id)
+                                            let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                                            if (status?.id === 'pending') {
+                                                badgeColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                                            } else if (status?.id === 'processing') {
+                                                badgeColor = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                                            } else if (status?.id === 'completed') {
+                                                badgeColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                            } else if (status?.id === 'failed') {
+                                                badgeColor = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                            }
+                                            return (
+                                                <Badge
+                                                    key={id}
+                                                    className={`mr-1 ${badgeColor} rounded-md transition-none hover:bg-opacity-100 hover:opacity-100`}
+                                                    style={{ pointerEvents: 'none' }}
+                                                >
+                                                    {status?.label}
+                                                </Badge>
+                                            )
+                                        })
                                     ) : (
                                         <span className="text-muted-foreground">Select status</span>
                                     )}

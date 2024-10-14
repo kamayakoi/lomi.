@@ -195,8 +195,8 @@ function RevenueTransactionsChart({
                                 }}
                             />
                             <Legend />
-                            <Bar yAxisId="left" dataKey="revenue" fill="#4CAF50" name="Revenue" fillOpacity={1} />
-                            <Bar yAxisId="right" dataKey="transaction_count" fill="#00A0FF" name="Transactions" fillOpacity={1} />
+                            <Bar yAxisId="left" dataKey="revenue" fill="#22c55e" name="Revenue" fillOpacity={1} />
+                            <Bar yAxisId="right" dataKey="transaction_count" fill="#3b82f6" name="Transactions" fillOpacity={1} />
                         </BarChart>
                     </ResponsiveContainer>
                 )}
