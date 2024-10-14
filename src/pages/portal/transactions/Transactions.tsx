@@ -9,7 +9,7 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
-import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './types'
+import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './dev_transactions.tsx/types'
 import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue, useAverageCustomerLifetimeValue, useAverageRetentionRate } from './dev_transactions.tsx/support_transactions'
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'

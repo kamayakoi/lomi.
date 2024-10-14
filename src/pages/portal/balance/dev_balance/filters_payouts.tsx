@@ -49,6 +49,7 @@ export default function PayoutFilters({
     setColumns,
 }: PayoutFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
+    const [isStatusPopoverOpen, setIsStatusPopoverOpen] = useState(false)
 
     const allColumns = [
         'Payout ID',
@@ -139,16 +140,18 @@ export default function PayoutFilters({
 
                 <div className="w-full sm:w-64">
                     <label htmlFor="status" className="block text-sm font-medium mb-1">Status</label>
-                    <Popover>
+                    <Popover open={isStatusPopoverOpen} onOpenChange={setIsStatusPopoverOpen}>
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
                                 role="combobox"
-                                aria-expanded={false}
+                                aria-expanded={isStatusPopoverOpen}
                                 className="w-full justify-between h-10 rounded-none bg-card border-border text-card-foreground"
                             >
                                 <div className="flex items-center space-x-2 truncate">
-                                    {selectedStatuses.length > 0 ? (
+                                    {selectedStatuses.length === statusOptions.length ? (
+                                        <span className="text-muted-foreground">Select status</span>
+                                    ) : selectedStatuses.length > 0 ? (
                                         selectedStatuses.map((id) => {
                                             const status = statusOptions.find((opt) => opt.id === id)
                                             let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
@@ -195,15 +198,7 @@ export default function PayoutFilters({
                                     </label>
                                 </div>
                             ))}
-                            <div className="flex justify-end mt-4">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSelectedStatuses([])}
-                                >
-                                    Clear
-                                </Button>
-                            </div>
+
                         </PopoverContent>
                     </Popover>
                 </div>

@@ -7,7 +7,7 @@ CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE',
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly' , 'yearly', 'one-time');
-CREATE TYPE entry_type AS ENUM ('debit', 'credit');
+-- CREATE TYPE entry_type AS ENUM ('debit', 'credit');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
@@ -446,54 +446,71 @@ COMMENT ON COLUMN refunds.refunded_amount IS 'Amount refunded to the customer';
 COMMENT ON COLUMN refunds.fee_amount IS 'Fee charged for processing the refund';
 
 
+-- Create the merchant_bank_accounts table
+CREATE TABLE merchant_bank_accounts (
+    bank_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    account_number VARCHAR NOT NULL,
+    account_name VARCHAR NOT NULL,
+    bank_name VARCHAR NOT NULL,
+    bank_code VARCHAR,
+    branch_code VARCHAR,
+    country VARCHAR,
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    is_valid BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (merchant_id, account_number)
+);
+
+CREATE INDEX idx_merchant_bank_accounts_merchant_id ON merchant_bank_accounts(merchant_id);
+
+COMMENT ON TABLE merchant_bank_accounts IS 'Stores bank account information for merchants';
+
+
 -- Payouts table
 CREATE TABLE payouts (
     payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     account_id UUID NOT NULL REFERENCES merchant_accounts(account_id),
     organization_id UUID REFERENCES organizations(organization_id),
+    bank_account_id UUID REFERENCES merchant_bank_accounts(bank_account_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    payout_method VARCHAR NOT NULL,
-    bank_account_number VARCHAR,
-    bank_name VARCHAR,
-    bank_code VARCHAR,
-    phone_number VARCHAR,
-    metadata JSONB,
     status payout_status NOT NULL DEFAULT 'pending',
+    metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_payouts_account_id ON payouts(account_id);
 CREATE INDEX idx_payouts_organization_id ON payouts(organization_id);
+CREATE INDEX idx_payouts_bank_account_id ON payouts(bank_account_id);
 CREATE INDEX idx_payouts_currency_code ON payouts(currency_code);
 CREATE INDEX idx_payouts_created_at ON payouts(created_at);
-CREATE INDEX idx_payouts_provider_code ON payouts(provider_code);
 
-COMMENT ON TABLE payouts IS 'Tracks payouts from the system to external accounts or services, including merchant payouts';
+COMMENT ON TABLE payouts IS 'Tracks payouts from the system to merchant bank accounts';
 
+-- -- Entries table
+-- CREATE TABLE entries (
+--     entry_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     account_id UUID NOT NULL REFERENCES merchant_accounts(account_id),
+--     transaction_id UUID REFERENCES transactions(transaction_id),
+--     payout_id UUID REFERENCES payouts(payout_id),
+--     amount NUMERIC(10,2) NOT NULL CHECK (amount != 0),
+--     entry_type entry_type NOT NULL,
+--     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+--     CHECK (
+--         (transaction_id IS NOT NULL AND payout_id IS NULL) OR
+--         (transaction_id IS NULL AND payout_id IS NOT NULL)
+--     )
+-- );
 
--- Entries table
-CREATE TABLE entries (
-    entry_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    account_id UUID NOT NULL REFERENCES merchant_accounts(account_id),
-    transaction_id UUID REFERENCES transactions(transaction_id),
-    payout_id UUID REFERENCES payouts(payout_id),
-    amount NUMERIC(10,2) NOT NULL CHECK (amount != 0),
-    entry_type entry_type NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CHECK (
-        (transaction_id IS NOT NULL AND payout_id IS NULL) OR
-        (transaction_id IS NULL AND payout_id IS NOT NULL)
-    )
-);
+-- CREATE INDEX idx_entries_account_id ON entries(account_id);
+-- CREATE INDEX idx_entries_transaction_id ON entries(transaction_id);
+-- CREATE INDEX idx_entries_created_at ON entries(created_at);
+-- CREATE INDEX idx_entries_payout_id ON entries(payout_id);
 
-CREATE INDEX idx_entries_account_id ON entries(account_id);
-CREATE INDEX idx_entries_transaction_id ON entries(transaction_id);
-CREATE INDEX idx_entries_created_at ON entries(created_at);
-CREATE INDEX idx_entries_payout_id ON entries(payout_id);
-
-COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes';
+-- COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes';
 
 
 -- API Keys table

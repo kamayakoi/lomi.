@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { FetchRevenueByDateParams, FetchTopPerformingProductsParams, FetchTransactionVolumeByDateParams, FetchTopPerformingSubscriptionsParams, RevenueData, TopPerformingProduct, TransactionVolumeData, TopPerformingSubscription, FetchProviderDistributionParams, ProviderDistribution } from './reporting-types'
+import { FetchRevenueByDateParams, FetchTopPerformingProductsParams, FetchTransactionVolumeByDateParams, FetchTopPerformingSubscriptionsParams, RevenueData, TopPerformingProduct, TransactionVolumeData, TopPerformingSubscription, FetchProviderDistributionParams, ProviderDistribution } from './types'
 
 export const fetchRevenueByDate = async ({ merchantId, startDate, endDate, granularity = 'day' }: FetchRevenueByDateParams) => {
     let query = supabase.rpc('fetch_revenue_by_date', {

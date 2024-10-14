@@ -1,8 +1,9 @@
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
-import { FetchedPayout, Payout } from './types'
+import { FetchedPayout, Payout, payout_status } from './types'
 import { DateRange } from 'react-day-picker'
-import { subDays, subMonths, startOfYear } from 'date-fns'
+import { subDays, subMonths, startOfYear, format, parse } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 export async function fetchPayouts(
     merchantId: string,
@@ -46,12 +47,105 @@ export function applySearch(payouts: Payout[], searchTerm: string): Payout[] {
     if (!searchTerm) return payouts
 
     const lowerCaseSearchTerm = searchTerm.toLowerCase()
+    const frenchMonths = [
+        'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+    ]
 
-    return payouts.filter((payout) =>
-        Object.values(payout).some((value) =>
-            String(value).toLowerCase().includes(lowerCaseSearchTerm)
-        )
+    const keywordSearches: [string, (payout: Payout) => boolean][] = [
+        ['2 derniers jours', (payout) => {
+            const twoDaysAgo = subDays(new Date(), 2)
+            return new Date(payout.date) >= twoDaysAgo
+        }],
+        ['3 derniers mois', (payout) => {
+            const threeMonthsAgo = subMonths(new Date(), 3)
+            return new Date(payout.date) >= threeMonthsAgo
+        }],
+        ['derniers mois', (payout) => {
+            const sixMonthsAgo = subMonths(new Date(), 6)
+            return new Date(payout.date) >= sixMonthsAgo
+        }],
+        ['dernière année', (payout) => {
+            const oneYearAgo = subMonths(new Date(), 12)
+            return new Date(payout.date) >= oneYearAgo
+        }],
+        ['ce mois-ci', (payout) => {
+            const thisMonth = new Date()
+            return new Date(payout.date).getMonth() === thisMonth.getMonth() &&
+                new Date(payout.date).getFullYear() === thisMonth.getFullYear()
+        }],
+        ['aujourd\'hui', (payout) => {
+            const today = new Date()
+            return new Date(payout.date).toDateString() === today.toDateString()
+        }],
+        ['hier', (payout) => {
+            const yesterday = subDays(new Date(), 1)
+            return new Date(payout.date).toDateString() === yesterday.toDateString()
+        }],
+    ]
+
+    const keywordSearch = keywordSearches.find(([keyword]) =>
+        lowerCaseSearchTerm.includes(keyword)
     )
+
+    if (keywordSearch) {
+        return payouts.filter(keywordSearch[1])
+    }
+
+    const dateSearch = lowerCaseSearchTerm.match(/(\d{1,2})\s+(janv\.|févr\.|mars|avr\.|mai|juin|juil\.|août|sept\.|oct\.|nov\.|déc\.)\s+(\d{4})/i)
+    if (dateSearch) {
+        const [, day, month, year] = dateSearch
+        const searchDate = parse(`${day} ${month} ${year}`, 'dd MMM yyyy', new Date(), { locale: fr })
+        return payouts.filter((payout) => {
+            const payoutDate = new Date(payout.date)
+            return payoutDate.toDateString() === searchDate.toDateString()
+        })
+    }
+
+    const monthYearSearch = lowerCaseSearchTerm.match(/(janv\.|févr\.|mars|avr\.|mai|juin|juil\.|août|sept\.|oct\.|nov\.|déc\.)\s+(\d{4})/i)
+    if (monthYearSearch) {
+        const [, month, year] = monthYearSearch
+        const searchDate = parse(`01 ${month} ${year}`, 'dd MMM yyyy', new Date(), { locale: fr })
+        return payouts.filter((payout) => {
+            const payoutDate = new Date(payout.date)
+            return payoutDate.getMonth() === searchDate.getMonth() &&
+                payoutDate.getFullYear() === searchDate.getFullYear()
+        })
+    }
+
+    return payouts.filter((payout) => {
+        const { payout_id, amount, currency, payout_method, status, date } = payout
+        const lowerCasePayoutMethod = payout_method.toLowerCase()
+        const lowerCaseStatus = formatPayoutStatus(status).toLowerCase()
+        const formattedDate = format(new Date(date), 'MMM d, yyyy').toLowerCase()
+        const frenchFormattedDate = format(new Date(date), 'd MMM yyyy', { locale: fr }).toLowerCase()
+
+        return (
+            payout_id.toLowerCase().includes(lowerCaseSearchTerm) ||
+            amount.toString().includes(lowerCaseSearchTerm) ||
+            currency.toLowerCase().includes(lowerCaseSearchTerm) ||
+            lowerCasePayoutMethod.includes(lowerCaseSearchTerm) ||
+            lowerCaseStatus.includes(lowerCaseSearchTerm) ||
+            formattedDate.includes(lowerCaseSearchTerm) ||
+            frenchFormattedDate.includes(lowerCaseSearchTerm) ||
+            frenchMonths.some(month => frenchFormattedDate.includes(month) && month.includes(lowerCaseSearchTerm))
+        )
+    })
+}
+
+function formatPayoutStatus(status: payout_status): string {
+    switch (status) {
+        case 'pending':
+            return 'Pending'
+        case 'processing':
+            return 'Processing'
+        case 'completed':
+            return 'Completed'
+        case 'failed':
+            return 'Failed'
+        default:
+            return status
+    }
 }
 
 export function applyDateFilter(payouts: Payout[], dateRange: string | null, customDateRange?: DateRange): Payout[] {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TopPerformingProduct, TopPerformingSubscription } from './reporting-types'
+import { TopPerformingProduct, TopPerformingSubscription } from './types'
 import { CubeIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AnimatePresence, motion } from 'framer-motion'

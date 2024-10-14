@@ -1,4 +1,4 @@
-import type { ProviderDistribution, provider_code } from './reporting-types'
+import type { ProviderDistribution, provider_code } from './types'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { WalletIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
