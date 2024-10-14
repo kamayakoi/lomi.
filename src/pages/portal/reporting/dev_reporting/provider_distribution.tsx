@@ -49,12 +49,11 @@ export default function ProviderDistribution({
             <div className="flex flex-col items-center justify-center h-full pt-12">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="rounded-full bg-gray-100 p-4">
-                            <CurrencyDollarIcon className="h-12 w-12 text-gray-400" />
+                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">                            <CurrencyDollarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">No provider data yet</h3>
-                    <p className="text-gray-500 max-w-xs mx-auto">
+                    <h3 className="text-xl font-semibold mb-2 dark:text-white">No provider data yet</h3>
+                    <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
                         Start processing transactions to see your provider distribution.
                     </p>
                 </div>

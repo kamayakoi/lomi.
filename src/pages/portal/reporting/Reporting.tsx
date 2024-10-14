@@ -16,7 +16,7 @@ import { format, subDays, subMonths, startOfYear } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import TopPerformingItems from './dev_reporting/top_performing_items'
 import ProviderDistribution from './dev_reporting/provider_distribution'
-import { ArrowUpIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { ArrowUpIcon, UserIcon, ArrowDownIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 
 export default function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -132,7 +132,7 @@ export default function ReportingPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto p-8 bg-gray-50" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="h-full overflow-y-auto p-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                     <h1 className="text-3xl font-bold mb-6">Reporting</h1>
 
                     <ReportingFilters
@@ -154,12 +154,12 @@ export default function ReportingPage() {
                                     <div className="flex flex-col items-center justify-center h-full pt-12">
                                         <div className="text-center">
                                             <div className="flex justify-center mb-6">
-                                                <div className="rounded-full bg-gray-100 p-4">
-                                                    <CurrencyDollarIcon className="h-12 w-12 text-gray-400" />
+                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                    <CurrencyDollarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                                 </div>
                                             </div>
-                                            <h3 className="text-xl font-semibold mb-2">No revenue data yet</h3>
-                                            <p className="text-gray-500 max-w-xs mx-auto">
+                                            <h3 className="text-xl font-semibold mb-2 dark:text-white">No revenue data yet</h3>
+                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
                                                 Start processing transactions to see your revenue chart.
                                             </p>
                                         </div>
@@ -179,7 +179,7 @@ export default function ReportingPage() {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Transaction Volume</CardTitle>
+                                <CardTitle>Volume</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {isTransactionVolumeLoading ? (
@@ -188,12 +188,12 @@ export default function ReportingPage() {
                                     <div className="flex flex-col items-center justify-center h-full pt-12">
                                         <div className="text-center">
                                             <div className="flex justify-center mb-6">
-                                                <div className="rounded-full bg-gray-100 p-4">
-                                                    <ChartBarIcon className="h-12 w-12 text-gray-400" />
+                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                    <ChartBarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                                 </div>
                                             </div>
-                                            <h3 className="text-xl font-semibold mb-2">No transaction data yet</h3>
-                                            <p className="text-gray-500 max-w-xs mx-auto">
+                                            <h3 className="text-xl font-semibold mb-2 dark:text-white">No transaction data yet</h3>
+                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
                                                 Process your first transaction to see volume statistics.
                                             </p>
                                         </div>
@@ -213,7 +213,7 @@ export default function ReportingPage() {
 
                         <Card>
                             <CardHeader>
-                                <CardTitle>Top Performing Items</CardTitle>
+                                <CardTitle>Performing Items</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <TopPerformingItems
@@ -240,18 +240,39 @@ export default function ReportingPage() {
                     <div className="mt-6">
                         <Card>
                             <CardHeader>
-                                <CardTitle>New Customers</CardTitle>
+                                <CardTitle>Customers</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {isNewCustomerCountLoading || isNewCustomerCountChangeLoading ? (
                                     <div>Loading...</div>
+                                ) : newCustomerCount === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full pt-12">
+                                        <div className="text-center">
+                                            <div className="flex justify-center mb-6">
+                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                    <UserIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-xl font-semibold mb-2 dark:text-white">No customers yet</h3>
+                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                Start acquiring customers to see your growth metrics here.
+                                            </p>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <div className="flex items-center">
-                                        <p className="text-4xl font-bold mr-2">{newCustomerCount}</p>
-                                        <div className="flex items-center text-yellow-500">
-                                            <ArrowUpIcon className="h-4 w-4 mr-1" />
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">New Customers</p>
+                                            <p className="text-3xl font-bold">{newCustomerCount}</p>
+                                        </div>
+                                        <div className={`flex items-center ${newCustomerCountChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                            {newCustomerCountChange >= 0 ? (
+                                                <ArrowUpIcon className="h-4 w-4 mr-1" />
+                                            ) : (
+                                                <ArrowDownIcon className="h-4 w-4 mr-1" />
+                                            )}
                                             <span className="text-sm font-medium">
-                                                {newCustomerCountChange.toFixed(2)}% since last {selectedDateRange === '3M' ? '3 months' : selectedDateRange}
+                                                {Math.abs(newCustomerCountChange).toFixed(2)}% since last {selectedDateRange === '3M' ? '3 months' : selectedDateRange}
                                             </span>
                                         </div>
                                     </div>
