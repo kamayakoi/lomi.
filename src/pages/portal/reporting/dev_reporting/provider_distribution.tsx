@@ -46,12 +46,9 @@ export default function ProviderDistribution({
         )
         return providerDistribution.map((provider) => ({
             ...provider,
+            name: formatProvider(provider.provider_code),
             percentage: ((provider.transaction_count / totalTransactions) * 100).toFixed(2),
         }))
-    }
-
-    if (isLoading) {
-        return <div>Loading...</div>
     }
 
     if (providerDistribution.length === 0) {
@@ -59,7 +56,8 @@ export default function ProviderDistribution({
             <div className="flex flex-col items-center justify-center h-full pt-12">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">                            <WalletIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                            <WalletIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
                     </div>
                     <h3 className="text-xl font-semibold mb-2 dark:text-white">No provider data yet</h3>
@@ -71,20 +69,21 @@ export default function ProviderDistribution({
         )
     }
 
+    const data = getProviderDistributionPercentage()
+
     return (
         <ResponsiveContainer width="100%" height={400}>
             <PieChart>
                 <Pie
-                    data={getProviderDistributionPercentage()}
+                    data={data}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     outerRadius={120}
                     fill="#8884d8"
-                    dataKey="percentage"
-                    label={({ provider_code, percentage }) => `${formatProvider(provider_code)} ${percentage}%`}
+                    dataKey="transaction_count"
                 >
-                    {getProviderDistributionPercentage().map((_, index) => (
+                    {data.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>
@@ -96,7 +95,7 @@ export default function ProviderDistribution({
                         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                     }}
                     labelStyle={{ fontWeight: 'bold', color: '#374151' }}
-                    formatter={(value) => `${value}%`}
+                    formatter={(value, name) => [`${value} transactions`, formatProvider(name as provider_code)]}
                 />
                 <Legend
                     layout="vertical"
@@ -104,7 +103,7 @@ export default function ProviderDistribution({
                     align="right"
                     iconType="circle"
                     iconSize={10}
-                    formatter={(value) => formatProvider(value as provider_code)}
+                    formatter={(value) => value}
                     wrapperStyle={{
                         paddingLeft: '24px',
                         fontFamily: 'Inter, sans-serif',

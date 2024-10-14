@@ -106,13 +106,14 @@ export type FetchRevenueByDateParams = {
     merchantId: MerchantId
     startDate?: string
     endDate?: string
-    granularity?: 'hour' | 'day' | 'week' | 'month'
+    granularity?: '24H' | '7D' | '1M' | 'hour' | 'day' | 'week' | 'month'
 }
 
 export type FetchTransactionVolumeByDateParams = {
     merchantId: MerchantId
     startDate?: string
     endDate?: string
+    granularity?: '24H' | '7D' | '1M' | 'hour' | 'day' | 'week' | 'month'
 }
 
 export type FetchTopPerformingProductsParams = {

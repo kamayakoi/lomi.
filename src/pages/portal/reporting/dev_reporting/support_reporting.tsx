@@ -2,34 +2,73 @@ import { supabase } from '@/utils/supabase/client'
 import { FetchNewCustomerCountParams, FetchRevenueByDateParams, FetchTopPerformingProductsParams, RevenueData, TransactionVolumeData, TopPerformingProduct, FetchTransactionVolumeByDateParams, FetchNewCustomerCountChangeParams, FetchTopPerformingSubscriptionsParams, TopPerformingSubscription, FetchProviderDistributionParams, ProviderDistribution } from './reporting-types'
 
 export const fetchRevenueByDate = async ({ merchantId, startDate, endDate, granularity = 'day' }: FetchRevenueByDateParams) => {
-    const { data, error } = await supabase.rpc('fetch_revenue_by_date', {
+    let query = supabase.rpc('fetch_revenue_by_date', {
         p_merchant_id: merchantId,
         p_start_date: startDate,
         p_end_date: endDate,
         p_granularity: granularity,
     })
 
+    if (granularity === '24H') {
+        query = supabase.rpc('fetch_revenue_last_24_hours', {
+            p_merchant_id: merchantId,
+        })
+    } else if (granularity === '7D') {
+        query = supabase.rpc('fetch_revenue_last_7_days', {
+            p_merchant_id: merchantId,
+        })
+    } else if (granularity === '1M') {
+        query = supabase.rpc('fetch_revenue_last_1_month', {
+            p_merchant_id: merchantId,
+        })
+    }
+
+    const { data, error } = await query
+
     if (error) {
         console.error('Error fetching revenue by date:', error)
         return []
     }
 
-    return data as RevenueData[]
+    return data.map((item) => ({
+        date: item.date || item.hour,
+        revenue: parseFloat(item.revenue),
+    })) as RevenueData[]
 }
 
-export const fetchTransactionVolumeByDate = async ({ merchantId, startDate, endDate }: FetchTransactionVolumeByDateParams) => {
-    const { data, error } = await supabase.rpc('fetch_transaction_volume_by_date', {
+export const fetchTransactionVolumeByDate = async ({ merchantId, startDate, endDate, granularity = 'day' }: FetchTransactionVolumeByDateParams) => {
+    let query = supabase.rpc('fetch_transaction_volume_by_date', {
         p_merchant_id: merchantId,
         p_start_date: startDate,
         p_end_date: endDate,
+        p_granularity: granularity,
     })
+
+    if (granularity === '24H') {
+        query = supabase.rpc('fetch_transaction_volume_last_24_hours', {
+            p_merchant_id: merchantId,
+        })
+    } else if (granularity === '7D') {
+        query = supabase.rpc('fetch_transaction_volume_last_7_days', {
+            p_merchant_id: merchantId,
+        })
+    } else if (granularity === '1M') {
+        query = supabase.rpc('fetch_transaction_volume_last_1_month', {
+            p_merchant_id: merchantId,
+        })
+    }
+
+    const { data, error } = await query
 
     if (error) {
         console.error('Error fetching transaction volume by date:', error)
         return []
     }
 
-    return data as TransactionVolumeData[]
+    return data.map((item) => ({
+        date: item.date || item.hour,
+        transaction_count: parseInt(item.transaction_count),
+    })) as TransactionVolumeData[]
 }
 
 export const fetchTopPerformingProducts = async ({ merchantId, startDate, endDate, limit = 4 }: FetchTopPerformingProductsParams) => {

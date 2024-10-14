@@ -46,6 +46,7 @@ export default function ReportingPage() {
             merchantId: user?.id || '',
             startDate: getStartDate(selectedDateRange),
             endDate: getEndDate(selectedDateRange),
+            granularity: getGranularity(selectedDateRange),
         }),
         { enabled: !!user?.id }
     )
@@ -92,7 +93,7 @@ export default function ReportingPage() {
         if (selectedDateRange === 'custom' && customDateRange) {
             const { from, to } = customDateRange
             if (from && to) {
-                return data.map((d) => ({
+                return fillMissingDates(data, format(from, 'yyyy-MM-dd'), format(to, 'yyyy-MM-dd')).map((d) => ({
                     date: format(new Date(d.date), 'MMM dd'),
                     value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
                 }))
@@ -102,18 +103,21 @@ export default function ReportingPage() {
                 hour: format(new Date(d.date), 'HH:mm'),
                 value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
             }))
-            return data.map((d) => ({
+        } else if (selectedDateRange === '7D') {
+            return fillMissingDates(data, subDays(new Date(), 7).toISOString(), new Date().toISOString()).map((d) => ({
                 date: format(new Date(d.date), 'MMM dd'),
                 value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
             }))
         } else if (selectedDateRange === '1M') {
-            return data.map((d) => ({
+            return fillMissingDates(data, subMonths(new Date(), 1).toISOString(), new Date().toISOString()).map((d) => ({
                 date: format(new Date(d.date), 'MMM dd'),
                 value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
             }))
         } else if (selectedDateRange === '3M' || selectedDateRange === '6M' || selectedDateRange === 'YTD') {
-            return data.map((d) => ({
-                month: format(new Date(d.date), 'MMM'),
+            const startDate = getStartDate(selectedDateRange)
+            const endDate = getEndDate(selectedDateRange)
+            return fillMissingMonths(data, startDate, endDate).map((d) => ({
+                month: format(new Date(d.date), 'MMM yyyy'),
                 value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
             }))
         }
@@ -170,7 +174,7 @@ export default function ReportingPage() {
                                 ) : (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={getChartData(revenueData, selectedDateRange)}>
-                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : 'date'} />
+                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : (selectedDateRange === '3M' || selectedDateRange === '6M' || selectedDateRange === 'YTD' ? 'month' : 'date')} />
                                             <YAxis />
                                             <Tooltip />
                                             <Bar dataKey="value" fill="#8884d8" />
@@ -206,7 +210,7 @@ export default function ReportingPage() {
                                 ) : (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={getChartData(transactionVolumeData, selectedDateRange)}>
-                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : 'date'} />
+                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : (selectedDateRange === '3M' || selectedDateRange === '6M' || selectedDateRange === 'YTD' ? 'month' : 'date')} />
                                             <YAxis />
                                             <Tooltip />
                                             <Bar dataKey="value" fill="#82ca9d" />
@@ -301,12 +305,6 @@ export default function ReportingPage() {
 
 function getStartDate(selectedDateRange: string | null): string | undefined {
     switch (selectedDateRange) {
-        case '24H':
-            return format(subDays(new Date(), 1), 'yyyy-MM-dd HH:mm:ss')
-        case '7D':
-            return format(subDays(new Date(), 7), 'yyyy-MM-dd HH:mm:ss')
-        case '1M':
-            return format(subMonths(new Date(), 1), 'yyyy-MM-dd HH:mm:ss')
         case '3M':
             return format(subMonths(new Date(), 3), 'yyyy-MM-dd HH:mm:ss')
         case '6M':
@@ -319,19 +317,24 @@ function getStartDate(selectedDateRange: string | null): string | undefined {
 }
 
 function getEndDate(selectedDateRange: string | null): string | undefined {
-    if (selectedDateRange) {
-        return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+    switch (selectedDateRange) {
+        case '3M':
+        case '6M':
+        case 'YTD':
+            return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
+        default:
+            return undefined
     }
-    return undefined
 }
 
-function getGranularity(selectedDateRange: string | null): 'hour' | 'day' | 'week' | 'month' | undefined {
+function getGranularity(selectedDateRange: string | null): '24H' | '7D' | '1M' | 'hour' | 'day' | 'week' | 'month' | undefined {
     switch (selectedDateRange) {
         case '24H':
-            return 'hour'
+            return '24H'
         case '7D':
+            return '7D'
         case '1M':
-            return 'day'
+            return '1M'
         case '3M':
         case '6M':
         case 'YTD':
@@ -339,4 +342,81 @@ function getGranularity(selectedDateRange: string | null): 'hour' | 'day' | 'wee
         default:
             return undefined
     }
+}
+
+function fillMissingDates(data: RevenueData[] | TransactionVolumeData[], startDate?: string, endDate?: string): (RevenueData | TransactionVolumeData)[] {
+    if (!startDate || !endDate) {
+        return data
+    }
+
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const filledData: (RevenueData | TransactionVolumeData)[] = []
+
+    for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
+        const formattedDate = format(date, 'yyyy-MM-dd')
+        const existingData = data.find((d) => d.date === formattedDate)
+
+        if (existingData) {
+            filledData.push(existingData)
+        } else {
+            filledData.push({
+                date: formattedDate,
+                revenue: 0,
+                transaction_count: 0,
+            })
+        }
+    }
+
+    return filledData
+}
+
+function fillMissingHours(data: RevenueData[] | TransactionVolumeData[]): (RevenueData | TransactionVolumeData)[] {
+    const filledData: (RevenueData | TransactionVolumeData)[] = []
+    const startDate = subDays(new Date(), 1)
+    const endDate = new Date()
+
+    for (let date = startDate; date <= endDate; date.setHours(date.getHours() + 1)) {
+        const formattedDate = format(date, 'yyyy-MM-dd HH:mm:ss')
+        const existingData = data.find((d) => d.date === formattedDate)
+
+        if (existingData) {
+            filledData.push(existingData)
+        } else {
+            filledData.push({
+                date: formattedDate,
+                revenue: 0,
+                transaction_count: 0,
+            })
+        }
+    }
+
+    return filledData
+}
+
+function fillMissingMonths(data: RevenueData[] | TransactionVolumeData[], startDate?: string, endDate?: string): (RevenueData | TransactionVolumeData)[] {
+    if (!startDate || !endDate) {
+        return data
+    }
+
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const filledData: (RevenueData | TransactionVolumeData)[] = []
+
+    for (let date = start; date <= end; date.setMonth(date.getMonth() + 1)) {
+        const formattedDate = format(date, 'yyyy-MM-01')
+        const existingData = data.find((d) => d.date.slice(0, 7) === formattedDate.slice(0, 7))
+
+        if (existingData) {
+            filledData.push(existingData)
+        } else {
+            filledData.push({
+                date: formattedDate,
+                revenue: 0,
+                transaction_count: 0,
+            })
+        }
+    }
+
+    return filledData
 }

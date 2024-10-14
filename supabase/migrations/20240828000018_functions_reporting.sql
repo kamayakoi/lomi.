@@ -280,7 +280,6 @@ BEGIN
         CASE
             WHEN p_granularity = 'hour' THEN DATE_TRUNC('hour', t.created_at)
             WHEN p_granularity = 'day' THEN DATE_TRUNC('day', t.created_at)
-            WHEN p_granularity = 'week' THEN DATE_TRUNC('week', t.created_at)
             WHEN p_granularity = 'month' THEN DATE_TRUNC('month', t.created_at)
             ELSE DATE_TRUNC('day', t.created_at)
         END AS date,
@@ -296,7 +295,6 @@ BEGIN
         CASE
             WHEN p_granularity = 'hour' THEN DATE_TRUNC('hour', t.created_at)
             WHEN p_granularity = 'day' THEN DATE_TRUNC('day', t.created_at)
-            WHEN p_granularity = 'week' THEN DATE_TRUNC('week', t.created_at)
             WHEN p_granularity = 'month' THEN DATE_TRUNC('month', t.created_at)
             ELSE DATE_TRUNC('day', t.created_at)
         END
@@ -309,7 +307,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE OR REPLACE FUNCTION public.fetch_transaction_volume_by_date(
     p_merchant_id UUID,
     p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
-    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_granularity VARCHAR(10) DEFAULT 'day'
 )
 RETURNS TABLE (
     date TIMESTAMP WITH TIME ZONE,
@@ -318,7 +317,12 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT 
-        DATE_TRUNC('hour', t.created_at) AS date,
+        CASE
+            WHEN p_granularity = 'hour' THEN DATE_TRUNC('hour', t.created_at)
+            WHEN p_granularity = 'day' THEN DATE_TRUNC('day', t.created_at)
+            WHEN p_granularity = 'month' THEN DATE_TRUNC('month', t.created_at)
+            ELSE DATE_TRUNC('day', t.created_at)
+        END AS date,
         COUNT(*) AS transaction_count
     FROM 
         transactions t
@@ -328,8 +332,169 @@ BEGIN
         (p_start_date IS NULL OR t.created_at >= p_start_date) AND
         (p_end_date IS NULL OR t.created_at <= p_end_date)
     GROUP BY 
+        CASE
+            WHEN p_granularity = 'hour' THEN DATE_TRUNC('hour', t.created_at)
+            WHEN p_granularity = 'day' THEN DATE_TRUNC('day', t.created_at)
+            WHEN p_granularity = 'month' THEN DATE_TRUNC('month', t.created_at)
+            ELSE DATE_TRUNC('day', t.created_at)
+        END
+    ORDER BY 
+        date;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch revenue data for the last 24 hours
+CREATE OR REPLACE FUNCTION public.fetch_revenue_last_24_hours(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    hour TIMESTAMP WITH TIME ZONE,
+    revenue NUMERIC(15,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('hour', t.created_at) AS hour,
+        SUM(t.net_amount) AS revenue
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= NOW() - INTERVAL '24 hours'
+    GROUP BY 
         DATE_TRUNC('hour', t.created_at)
     ORDER BY 
-        DATE_TRUNC('hour', t.created_at);
+        hour;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch transaction volume for the last 24 hours
+CREATE OR REPLACE FUNCTION public.fetch_transaction_volume_last_24_hours(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    hour TIMESTAMP WITH TIME ZONE,
+    transaction_count BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('hour', t.created_at) AS hour,
+        COUNT(*) AS transaction_count
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= NOW() - INTERVAL '24 hours'
+    GROUP BY 
+        DATE_TRUNC('hour', t.created_at)
+    ORDER BY 
+        hour;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch revenue data for the last 7 days
+CREATE OR REPLACE FUNCTION public.fetch_revenue_last_7_days(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    date DATE,
+    revenue NUMERIC(15,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('day', t.created_at)::DATE AS date,
+        SUM(t.net_amount) AS revenue
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= NOW() - INTERVAL '7 days'
+    GROUP BY 
+        DATE_TRUNC('day', t.created_at)
+    ORDER BY 
+        date;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch transaction volume for the last 7 days
+CREATE OR REPLACE FUNCTION public.fetch_transaction_volume_last_7_days(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    date DATE,
+    transaction_count BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('day', t.created_at)::DATE AS date,
+        COUNT(*) AS transaction_count
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= NOW() - INTERVAL '7 days'
+    GROUP BY 
+        DATE_TRUNC('day', t.created_at)
+    ORDER BY 
+        date;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch revenue data for the last 1 month
+CREATE OR REPLACE FUNCTION public.fetch_revenue_last_1_month(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    date DATE,
+    revenue NUMERIC(15,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('day', t.created_at)::DATE AS date,
+        SUM(t.net_amount) AS revenue
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= DATE_TRUNC('month', NOW()) - INTERVAL '1 month'
+    GROUP BY 
+        DATE_TRUNC('day', t.created_at)
+    ORDER BY 
+        date;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch transaction volume for the last 1 month
+CREATE OR REPLACE FUNCTION public.fetch_transaction_volume_last_1_month(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    date DATE,
+    transaction_count BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        DATE_TRUNC('day', t.created_at)::DATE AS date,
+        COUNT(*) AS transaction_count
+    FROM 
+        transactions t
+    WHERE 
+        t.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.created_at >= DATE_TRUNC('month', NOW()) - INTERVAL '1 month'
+    GROUP BY 
+        DATE_TRUNC('day', t.created_at)
+    ORDER BY 
+        date;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
