@@ -371,29 +371,6 @@ function fillMissingDates(data: RevenueData[] | TransactionVolumeData[], startDa
     return filledData
 }
 
-function fillMissingHours(data: RevenueData[] | TransactionVolumeData[]): (RevenueData | TransactionVolumeData)[] {
-    const filledData: (RevenueData | TransactionVolumeData)[] = []
-    const startDate = subDays(new Date(), 1)
-    const endDate = new Date()
-
-    for (let date = startDate; date <= endDate; date.setHours(date.getHours() + 1)) {
-        const formattedDate = format(date, 'yyyy-MM-dd HH:mm:ss')
-        const existingData = data.find((d) => d.date === formattedDate)
-
-        if (existingData) {
-            filledData.push(existingData)
-        } else {
-            filledData.push({
-                date: formattedDate,
-                revenue: 0,
-                transaction_count: 0,
-            })
-        }
-    }
-
-    return filledData
-}
-
 function fillMissingMonths(data: RevenueData[] | TransactionVolumeData[], startDate?: string, endDate?: string): (RevenueData | TransactionVolumeData)[] {
     if (!startDate || !endDate) {
         return data

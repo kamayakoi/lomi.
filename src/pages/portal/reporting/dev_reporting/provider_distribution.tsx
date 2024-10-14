@@ -83,7 +83,7 @@ export default function ProviderDistribution({
                     fill="#8884d8"
                     dataKey="transaction_count"
                 >
-                    {data.map((entry, index) => (
+                    {data.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>

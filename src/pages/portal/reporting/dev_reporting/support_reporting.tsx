@@ -30,7 +30,13 @@ export const fetchRevenueByDate = async ({ merchantId, startDate, endDate, granu
         return []
     }
 
-    return data.map((item) => ({
+    interface RevenueDataItem {
+        date?: string
+        hour?: string
+        revenue: string
+    }
+
+    return data.map((item: RevenueDataItem) => ({
         date: item.date || item.hour,
         revenue: parseFloat(item.revenue),
     })) as RevenueData[]
@@ -65,7 +71,13 @@ export const fetchTransactionVolumeByDate = async ({ merchantId, startDate, endD
         return []
     }
 
-    return data.map((item) => ({
+    interface TransactionVolumeDataItem {
+        date?: string
+        hour?: string
+        transaction_count: string
+    }
+
+    return data.map((item: TransactionVolumeDataItem) => ({
         date: item.date || item.hour,
         transaction_count: parseInt(item.transaction_count),
     })) as TransactionVolumeData[]
