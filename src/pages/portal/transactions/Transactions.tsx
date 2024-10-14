@@ -19,6 +19,8 @@ import AnimatedLogoLoader from '@/components/dashboard/loader'
 import TransactionActions from './dev_transactions.tsx/actions_transactions'
 import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 import { motion, AnimatePresence } from "framer-motion"
+import { FcfaIcon } from '@/components/custom/cfa'
+
 
 type Transaction = {
     transaction_id: string
@@ -544,6 +546,22 @@ export default function TransactionsPage() {
                                                             </TableCell>
                                                         </TableRow>
                                                     ))
+                                                ) : transactions.length === 0 ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={10} className="text-center py-8">
+                                                            <div className="flex flex-col items-center justify-center space-y-4">
+                                                                <div className="rounded-full bg-transparent dark:bg-transparent p-4">
+                                                                    <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                                                </div>
+                                                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                    No transaction history found
+                                                                </p>
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                                                    Start processing transactions to see your transaction history here.
+                                                                </p>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
                                                 ) : (
                                                     applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
                                                         <TableRow

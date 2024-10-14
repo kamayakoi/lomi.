@@ -18,13 +18,13 @@ export type Provider = {
 export const providers: Provider[] = [
   {
     provider_code: 'ORANGE',
-    name: 'Orange Money',
+    name: 'Orange',
     logo: <img src="/orange.png" alt="Orange Money" className="w-12 h-12 object-contain" />,
     description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
   },
   {
     provider_code: 'WAVE',
-    name: 'Wave Mobile Money',
+    name: 'Wave',
     logo: <img src="/wave.png" alt="Wave" className="w-full h-full object-contain" />,
     description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
   },
