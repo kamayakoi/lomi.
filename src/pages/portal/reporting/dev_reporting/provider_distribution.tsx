@@ -2,6 +2,8 @@ import type { ProviderDistribution, provider_code } from './reporting-types'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { COLORS } from './reporting-types'
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
+import { Skeleton } from '@/components/ui/skeleton'
+
 
 interface ProviderDistributionProps {
     providerDistribution: ProviderDistribution[]
@@ -12,6 +14,14 @@ export default function ProviderDistribution({
     providerDistribution,
     isLoading,
 }: ProviderDistributionProps) {
+    if (isLoading) {
+        return (
+            <div className="h-64">
+                <Skeleton className="h-full" />
+            </div>
+        )
+    }
+
     const formatProvider = (provider: provider_code) => {
         switch (provider) {
             case 'ORANGE':

@@ -1,5 +1,6 @@
 import { TopPerformingProduct, TopPerformingSubscription } from './reporting-types'
 import { CubeIcon } from '@heroicons/react/24/outline'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface TopPerformingItemsProps {
     topPerformingProducts: TopPerformingProduct[]
@@ -13,7 +14,21 @@ export default function TopPerformingItems({
     isLoading,
 }: TopPerformingItemsProps) {
     if (isLoading) {
-        return <div>Loading...</div>
+        return (
+            <div className="space-y-4">
+                {[...Array(5)].map((_, index) => (
+                    <div key={index} className="flex justify-between items-center p-3">
+                        <div className="w-1/2">
+                            <Skeleton className="h-4 mb-2" />
+                            <Skeleton className="h-3" />
+                        </div>
+                        <div className="w-1/4">
+                            <Skeleton className="h-4" />
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )
     }
 
     if (topPerformingProducts.length === 0 && topPerformingSubscriptions.length === 0) {

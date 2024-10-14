@@ -17,6 +17,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import TopPerformingItems from './dev_reporting/top_performing_items'
 import ProviderDistribution from './dev_reporting/provider_distribution'
 import { ArrowUpIcon, UserIcon, ArrowDownIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -149,7 +150,9 @@ export default function ReportingPage() {
                             </CardHeader>
                             <CardContent>
                                 {isRevenueLoading ? (
-                                    <div>Loading...</div>
+                                    <div className="h-64">
+                                        <Skeleton className="h-full" />
+                                    </div>
                                 ) : revenueData.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full pt-12">
                                         <div className="text-center">
@@ -183,7 +186,9 @@ export default function ReportingPage() {
                             </CardHeader>
                             <CardContent>
                                 {isTransactionVolumeLoading ? (
-                                    <div>Loading...</div>
+                                    <div className="h-64">
+                                        <Skeleton className="h-full" />
+                                    </div>
                                 ) : transactionVolumeData.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full pt-12">
                                         <div className="text-center">
@@ -244,7 +249,15 @@ export default function ReportingPage() {
                             </CardHeader>
                             <CardContent>
                                 {isNewCustomerCountLoading || isNewCustomerCountChangeLoading ? (
-                                    <div>Loading...</div>
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <Skeleton className="h-4 mb-2 w-32" />
+                                            <Skeleton className="h-6 w-20" />
+                                        </div>
+                                        <div>
+                                            <Skeleton className="h-4 w-48" />
+                                        </div>
+                                    </div>
                                 ) : newCustomerCount === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full pt-12">
                                         <div className="text-center">
