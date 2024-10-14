@@ -79,12 +79,12 @@ export type Subscription = {
 }
 
 export type RevenueData = {
-    month: string
+    date: string
     revenue: number
 }
 
 export type TransactionVolumeData = {
-    day_of_week: string
+    date: string
     transaction_count: number
 }
 
@@ -92,11 +92,6 @@ export type TopPerformingProduct = {
     product_name: string
     sales_count: number
     total_revenue: number
-}
-
-export type PaymentChannelDistribution = {
-    payment_method_code: payment_method_code
-    transaction_count: number
 }
 
 export type CompletionRate = {
@@ -107,13 +102,14 @@ export type CompletionRate = {
 
 export type MerchantId = string
 
-export type FetchRevenueByMonthParams = {
+export type FetchRevenueByDateParams = {
     merchantId: MerchantId
     startDate?: string
     endDate?: string
+    granularity?: 'hour' | 'day' | 'week' | 'month'
 }
 
-export type FetchTransactionVolumeByDayParams = {
+export type FetchTransactionVolumeByDateParams = {
     merchantId: MerchantId
     startDate?: string
     endDate?: string
@@ -124,12 +120,6 @@ export type FetchTopPerformingProductsParams = {
     startDate?: string
     endDate?: string
     limit?: number
-}
-
-export type FetchPaymentChannelDistributionParams = {
-    merchantId: MerchantId
-    startDate?: string
-    endDate?: string
 }
 
 export type FetchNewCustomerCountParams = {
@@ -143,3 +133,41 @@ export type CalculateConversionRateParams = {
     startDate?: string
     endDate?: string
 }
+
+export type FetchNewCustomerCountChangeParams = {
+    merchantId: MerchantId
+    startDate?: string
+    endDate?: string
+}
+
+export type FetchConversionRateChangeParams = {
+    merchantId: MerchantId
+    startDate?: string
+    endDate?: string
+}
+
+export type TopPerformingSubscription = {
+    subscription_name: string
+    sales_count: number
+    total_revenue: number
+}
+
+export type FetchTopPerformingSubscriptionsParams = {
+    merchantId: MerchantId
+    startDate?: string
+    endDate?: string
+    limit?: number
+}
+
+export type ProviderDistribution = {
+    provider_code: provider_code
+    transaction_count: number
+}
+
+export type FetchProviderDistributionParams = {
+    merchantId: MerchantId
+    startDate?: string
+    endDate?: string
+}
+
+export const COLORS = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c']

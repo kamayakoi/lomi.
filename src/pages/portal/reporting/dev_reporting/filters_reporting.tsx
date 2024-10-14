@@ -22,7 +22,7 @@ export default function ReportingFilters({
     }
 
     return (
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2 mb-6">
             {['24H', '7D', '1M', '3M', '6M', 'YTD'].map((range) => (
                 <Button
                     key={range}

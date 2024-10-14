@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DateRange } from 'react-day-picker'
-import ReportingFilters from './dev_reporting.tsx/filters_reporting'
+import ReportingFilters from './dev_reporting/filters_reporting'
 import { useUser } from '@/lib/hooks/useUser'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
 import { Layout } from '@/components/custom/layout'
@@ -9,13 +9,14 @@ import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import { Separator } from '@/components/ui/separator'
-import { fetchRevenueByMonth, fetchTransactionVolumeByDay, fetchTopPerformingProducts, fetchPaymentChannelDistribution, fetchNewCustomerCount, calculateConversionRate } from './dev_reporting.tsx/support_reporting'
-import { RevenueData, TransactionVolumeData, TopPerformingProduct, PaymentChannelDistribution } from './reporting-types'
+import { fetchRevenueByDate, fetchTransactionVolumeByDate, fetchTopPerformingProducts, fetchTopPerformingSubscriptions, fetchNewCustomerCount, fetchNewCustomerCountChange, fetchProviderDistribution } from './dev_reporting/support_reporting'
+import { RevenueData, TransactionVolumeData, TopPerformingProduct, TopPerformingSubscription, ProviderDistribution as ProviderDistributionType } from './dev_reporting/reporting-types'
 import { useQuery } from 'react-query'
 import { format, subDays, subMonths, startOfYear } from 'date-fns'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, AreaChart, Area } from 'recharts'
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import TopPerformingItems from './dev_reporting/top_performing_items'
+import ProviderDistribution from './dev_reporting/provider_distribution'
+import { ArrowUpIcon } from "lucide-react"
 
 export default function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -28,14 +29,23 @@ export default function ReportingPage() {
     ]
 
     const { data: revenueData = [], isLoading: isRevenueLoading } = useQuery<RevenueData[]>(
-        ['revenueByMonth', user?.id, selectedDateRange],
-        () => fetchRevenueByMonth({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+        ['revenueByDate', user?.id, selectedDateRange],
+        () => fetchRevenueByDate({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange),
+            endDate: getEndDate(selectedDateRange),
+            granularity: getGranularity(selectedDateRange),
+        }),
         { enabled: !!user?.id }
     )
 
     const { data: transactionVolumeData = [], isLoading: isTransactionVolumeLoading } = useQuery<TransactionVolumeData[]>(
-        ['transactionVolumeByDay', user?.id, selectedDateRange],
-        () => fetchTransactionVolumeByDay({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+        ['transactionVolumeByDate', user?.id, selectedDateRange],
+        () => fetchTransactionVolumeByDate({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange),
+            endDate: getEndDate(selectedDateRange),
+        }),
         { enabled: !!user?.id }
     )
 
@@ -45,9 +55,9 @@ export default function ReportingPage() {
         { enabled: !!user?.id }
     )
 
-    const { data: paymentChannelDistribution = [], isLoading: isPaymentChannelDistributionLoading } = useQuery<PaymentChannelDistribution[]>(
-        ['paymentChannelDistribution', user?.id, selectedDateRange],
-        () => fetchPaymentChannelDistribution({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+    const { data: topPerformingSubscriptions = [], isLoading: isTopPerformingSubscriptionsLoading } = useQuery<TopPerformingSubscription[]>(
+        ['topPerformingSubscriptions', user?.id, selectedDateRange],
+        () => fetchTopPerformingSubscriptions({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
         { enabled: !!user?.id }
     )
 
@@ -57,9 +67,15 @@ export default function ReportingPage() {
         { enabled: !!user?.id }
     )
 
-    const { data: conversionRate = 0, isLoading: isConversionRateLoading } = useQuery<number>(
-        ['conversionRate', user?.id, selectedDateRange],
-        () => calculateConversionRate({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+    const { data: newCustomerCountChange = 0, isLoading: isNewCustomerCountChangeLoading } = useQuery<number>(
+        ['newCustomerCountChange', user?.id, selectedDateRange],
+        () => fetchNewCustomerCountChange({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+        { enabled: !!user?.id }
+    )
+
+    const { data: providerDistribution = [], isLoading: isProviderDistributionLoading } = useQuery<ProviderDistributionType[]>(
+        ['providerDistribution', user?.id, selectedDateRange],
+        () => fetchProviderDistribution({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
         { enabled: !!user?.id }
     )
 
@@ -69,6 +85,38 @@ export default function ReportingPage() {
 
     if (!user || !user.id) {
         return <div><AnimatedLogoLoader /> User data not available.</div>
+    }
+
+    const getChartData = (data: RevenueData[] | TransactionVolumeData[], selectedDateRange: string | null) => {
+        if (selectedDateRange === 'custom' && customDateRange) {
+            const { from, to } = customDateRange
+            if (from && to) {
+                return data.map((d) => ({
+                    date: format(new Date(d.date), 'MMM dd'),
+                    value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
+                }))
+            }
+        } else if (selectedDateRange === '24H') {
+            return data.map((d) => ({
+                hour: format(new Date(d.date), 'HH:mm'),
+                value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
+            }))
+            return data.map((d) => ({
+                date: format(new Date(d.date), 'MMM dd'),
+                value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
+            }))
+        } else if (selectedDateRange === '1M') {
+            return data.map((d) => ({
+                date: format(new Date(d.date), 'MMM dd'),
+                value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
+            }))
+        } else if (selectedDateRange === '3M' || selectedDateRange === '6M' || selectedDateRange === 'YTD') {
+            return data.map((d) => ({
+                month: format(new Date(d.date), 'MMM'),
+                value: (d as RevenueData).revenue || (d as TransactionVolumeData).transaction_count,
+            }))
+        }
+        return []
     }
 
     return (
@@ -84,150 +132,104 @@ export default function ReportingPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8">
-                        <h1 className="text-2xl font-bold tracking-tight mb-4">Reporting</h1>
+                <div className="h-full overflow-y-auto p-8 bg-gray-50" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <h1 className="text-3xl font-bold mb-6">Reporting</h1>
 
-                        <ReportingFilters
-                            selectedDateRange={selectedDateRange}
-                            setSelectedDateRange={setSelectedDateRange}
-                            customDateRange={customDateRange}
-                            setCustomDateRange={setCustomDateRange}
-                        />
+                    <ReportingFilters
+                        selectedDateRange={selectedDateRange}
+                        setSelectedDateRange={setSelectedDateRange}
+                        customDateRange={customDateRange}
+                        setCustomDateRange={setCustomDateRange}
+                    />
 
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Revenue</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isRevenueLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <ResponsiveContainer width="100%" height={300}>
-                                            <AreaChart data={revenueData}>
-                                                <defs>
-                                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                                                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <XAxis dataKey="month" />
-                                                <YAxis />
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <Tooltip />
-                                                <Area type="monotone" dataKey="revenue" stroke="#8884d8" fillOpacity={1} fill="url(#colorRevenue)" />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Revenue</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isRevenueLoading ? (
+                                    <div>Loading...</div>
+                                ) : (
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart data={getChartData(revenueData, selectedDateRange)}>
+                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : 'date'} />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Bar dataKey="value" fill="#8884d8" />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </CardContent>
+                        </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Transaction Volume</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isTransactionVolumeLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <ResponsiveContainer width="100%" height={300}>
-                                            <LineChart data={transactionVolumeData}>
-                                                <XAxis dataKey="day_of_week" />
-                                                <YAxis />
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <Tooltip />
-                                                <Legend />
-                                                <Line type="monotone" dataKey="transaction_count" stroke="#8884d8" activeDot={{ r: 8 }} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Transaction Volume</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isTransactionVolumeLoading ? (
+                                    <div>Loading...</div>
+                                ) : (
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart data={getChartData(transactionVolumeData, selectedDateRange)}>
+                                            <XAxis dataKey={selectedDateRange === '24H' ? 'hour' : 'date'} />
+                                            <YAxis />
+                                            <Tooltip />
+                                            <Bar dataKey="value" fill="#82ca9d" />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </CardContent>
+                        </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Top Performing Products</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isTopPerformingProductsLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <ResponsiveContainer width="100%" height={300}>
-                                            <BarChart data={topPerformingProducts}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="product_name" />
-                                                <YAxis />
-                                                <Tooltip />
-                                                <Legend />
-                                                <Bar dataKey="sales_count" fill="#8884d8" />
-                                                <Bar dataKey="total_revenue" fill="#82ca9d" />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Top Performing Items</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <TopPerformingItems
+                                    topPerformingProducts={topPerformingProducts}
+                                    topPerformingSubscriptions={topPerformingSubscriptions}
+                                    isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionsLoading}
+                                />
+                            </CardContent>
+                        </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Payment Channel Distribution</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isPaymentChannelDistributionLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <ResponsiveContainer width="100%" height={300}>
-                                            <PieChart>
-                                                <Pie
-                                                    data={paymentChannelDistribution}
-                                                    dataKey="transaction_count"
-                                                    nameKey="payment_method_code"
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    outerRadius={100}
-                                                    fill="#8884d8"
-                                                    label
-                                                >
-                                                    {paymentChannelDistribution.map((_, index) => (
-                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip />
-                                                <Legend />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Provider Distribution</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ProviderDistribution
+                                    providerDistribution={providerDistribution}
+                                    isLoading={isProviderDistributionLoading}
+                                />
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>New Customers</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isNewCustomerCountLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <div className="text-4xl font-bold">{newCustomerCount}</div>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Conversion Rate</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {isConversionRateLoading ? (
-                                        <div>Loading...</div>
-                                    ) : (
-                                        <div className="text-4xl font-bold">{conversionRate}%</div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
+                    <div className="mt-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>New Customers</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {isNewCustomerCountLoading || isNewCustomerCountChangeLoading ? (
+                                    <div>Loading...</div>
+                                ) : (
+                                    <div className="flex items-center">
+                                        <p className="text-4xl font-bold mr-2">{newCustomerCount}</p>
+                                        <div className="flex items-center text-yellow-500">
+                                            <ArrowUpIcon className="h-4 w-4 mr-1" />
+                                            <span className="text-sm font-medium">
+                                                {newCustomerCountChange.toFixed(2)}% since last {selectedDateRange === '3M' ? '3 months' : selectedDateRange}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </Layout.Body>
@@ -259,4 +261,20 @@ function getEndDate(selectedDateRange: string | null): string | undefined {
         return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
     }
     return undefined
+}
+
+function getGranularity(selectedDateRange: string | null): 'hour' | 'day' | 'week' | 'month' | undefined {
+    switch (selectedDateRange) {
+        case '24H':
+            return 'hour'
+        case '7D':
+        case '1M':
+            return 'day'
+        case '3M':
+        case '6M':
+        case 'YTD':
+            return 'month'
+        default:
+            return undefined
+    }
 }

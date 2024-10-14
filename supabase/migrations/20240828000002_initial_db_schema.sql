@@ -10,7 +10,7 @@ CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quate
 CREATE TYPE entry_type AS ENUM ('debit', 'credit');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
-CREATE TYPE currency_code AS ENUM ('XOF','USD', 'EUR');
+CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 CREATE TYPE dispute_status AS ENUM ('pending', 'resolved', 'closed');
 CREATE TYPE kyc_status AS ENUM ('pending', 'approved', 'rejected');
@@ -780,7 +780,8 @@ CREATE INDEX idx_pages_slug ON pages(slug);
 
 COMMENT ON TABLE pages IS 'Stores custom checkout pages created by merchants';
 
--- Payment Links table (updated version)
+
+-- Payment Links table
 CREATE TABLE payment_links (
     link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
