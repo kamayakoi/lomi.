@@ -16,7 +16,7 @@ import { format, subDays, subMonths, startOfYear } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import TopPerformingItems from './dev_reporting/top_performing_items'
 import ProviderDistribution from './dev_reporting/provider_distribution'
-import { ArrowUpIcon, UserIcon, ArrowDownIcon, CurrencyDollarIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { ArrowUpIcon, UserIcon, ArrowDownIcon, BanknotesIcon, ChartBarIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ReportingPage() {
@@ -158,7 +158,7 @@ export default function ReportingPage() {
                                         <div className="text-center">
                                             <div className="flex justify-center mb-6">
                                                 <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                    <CurrencyDollarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                    <BanknotesIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                                 </div>
                                             </div>
                                             <h3 className="text-xl font-semibold mb-2 dark:text-white">No revenue data yet</h3>

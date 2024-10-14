@@ -1,7 +1,7 @@
 import type { ProviderDistribution, provider_code } from './reporting-types'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { COLORS } from './reporting-types'
-import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
+import { BanknotesIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
 
 
@@ -59,7 +59,7 @@ export default function ProviderDistribution({
             <div className="flex flex-col items-center justify-center h-full pt-12">
                 <div className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">                            <CurrencyDollarIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">                            <BanknotesIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
                     </div>
                     <h3 className="text-xl font-semibold mb-2 dark:text-white">No provider data yet</h3>
