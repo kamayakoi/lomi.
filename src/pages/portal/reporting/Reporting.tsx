@@ -199,7 +199,7 @@ export default function ReportingPage() {
                                             </div>
                                             <h3 className="text-xl font-semibold mb-2 dark:text-white">No transaction data yet</h3>
                                             <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                                Process your first transaction to see volume statistics.
+                                                Process payments to see your volume statistics.
                                             </p>
                                         </div>
                                     </div>
@@ -268,7 +268,7 @@ export default function ReportingPage() {
                                             </div>
                                             <h3 className="text-xl font-semibold mb-2 dark:text-white">No customers yet</h3>
                                             <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                                Start acquiring customers to see your growth metrics here.
+                                                Acquire customers to view your growth metrics here.
                                             </p>
                                         </div>
                                     </div>
