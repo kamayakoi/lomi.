@@ -258,3 +258,27 @@ VALUES
 -- Seed data for merchant_feedback table
 
 -- Seed data for notifications table
+
+-- Seed data for logs table (Merchant 1)
+INSERT INTO logs (merchant_id, event, ip_address, operating_system, browser, details, severity, request_url, request_method, response_status, created_at)
+VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'user_login', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/login', 'POST', 200, '2024-10-01 09:00:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'edit_user_password', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/change-password', 'POST', 200, '2024-10-01 09:05:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_pin', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/create-pin', 'POST', 200, '2024-10-01 09:10:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'edit_user_details', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/edit-profile', 'POST', 200, '2024-10-01 09:15:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_user_2fa', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/enable-2fa', 'POST', 200, '2024-10-01 09:20:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'add_bank_account', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/add-bank-account', 'POST', 200, '2024-10-01 09:25:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_payout', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/create-payout', 'POST', 200, '2024-10-01 09:30:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_invoice', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/create-invoice', 'POST', 200, '2024-10-01 09:35:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'process_payment', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/process-payment', 'POST', 200, '2024-10-01 09:40:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_refund', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/create-refund', 'POST', 200, '2024-10-01 09:45:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'user_login', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/login', 'POST', 200, '2024-10-02 10:00:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'edit_user_password', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/change-password', 'POST', 200, '2024-10-02 10:05:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_pin', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'WARNING', '/create-pin', 'POST', 400, '2024-10-02 10:10:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'edit_user_details', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/edit-profile', 'POST', 200, '2024-10-02 10:15:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_user_2fa', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'ERROR', '/enable-2fa', 'POST', 500, '2024-10-02 10:20:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'add_bank_account', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/add-bank-account', 'POST', 200, '2024-10-02 10:25:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_payout', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'CRITICAL', '/create-payout', 'POST', 500, '2024-10-02 10:30:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_invoice', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/create-invoice', 'POST', 200, '2024-10-02 10:35:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'process_payment', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'WARNING', '/process-payment', 'POST', 400, '2024-10-02 10:40:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_refund', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/create-refund', 'POST', 200, '2024-10-02 10:45:00');

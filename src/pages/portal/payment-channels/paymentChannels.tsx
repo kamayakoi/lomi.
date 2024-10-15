@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  IconAdjustmentsHorizontal,
-  IconSortAscendingLetters,
-  IconSortDescendingLetters,
   IconExternalLink,
+  IconSearch,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Input } from '@/components/ui/input'
@@ -35,7 +33,6 @@ const integrationText = new Map<string, string>([
 ])
 
 export default function PaymentChannels() {
-  const [sort, setSort] = useState('ascending')
   const [integrationType, setIntegrationType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const { user, isLoading: isUserLoading } = useUser()
@@ -102,11 +99,6 @@ export default function PaymentChannels() {
   }
 
   const filteredProviders = providers
-    .sort((a, b) =>
-      sort === 'ascending'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
     .filter((provider) => {
       const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
       if (integrationType === 'connected' && !isConnected) return false
@@ -140,22 +132,25 @@ export default function PaymentChannels() {
       <Layout.Body className='flex flex-col'>
         <div style={{ marginBottom: '0.5rem' }}>
           <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>
-            Partners
+            Payment Channels
           </h1>
           <p className='text-muted-foreground'>
-            Below is a list of payment channels you can activate for your customers.
+            Below is a list of our partners, powering the payment methods that you can activate for your customers.
           </p>
         </div>
-        <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
-          <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
-            <Input
-              placeholder='Filter integrations...'
-              className='h-9 w-40 lg:w-[250px]'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        <div className='my-4 flex items-center justify-between sm:my-0'>
+          <div className='flex items-center space-x-4'>
+            <div className='relative w-64'>
+              <Input
+                placeholder='Filter integrations...'
+                className='w-full pl-10 pr-4 py-2 rounded-none'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <IconSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+            </div>
             <Select value={integrationType} onValueChange={setIntegrationType}>
-              <SelectTrigger className='w-36'>
+              <SelectTrigger className='w-[180px] rounded-none'>
                 <SelectValue>{integrationText.get(integrationType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -165,28 +160,6 @@ export default function PaymentChannels() {
               </SelectContent>
             </Select>
           </div>
-
-          <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className='w-16'>
-              <SelectValue>
-                <IconAdjustmentsHorizontal size={18} />
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent align='end'>
-              <SelectItem value='ascending'>
-                <div className='flex items-center gap-4'>
-                  <IconSortAscendingLetters size={16} />
-                  <span>Ascending</span>
-                </div>
-              </SelectItem>
-              <SelectItem value='descending'>
-                <div className='flex items-center gap-4'>
-                  <IconSortDescendingLetters size={16} />
-                  <span>Descending</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className='flex-grow overflow-auto' style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>

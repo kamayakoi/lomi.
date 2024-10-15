@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Download, Calendar, Settings } from 'lucide-react'
+import { Search, Download, Calendar, Settings, RefreshCw } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -34,6 +34,8 @@ interface PayoutFiltersProps {
     setSelectedStatuses: (value: string[]) => void
     columns: string[]
     setColumns: (value: string[]) => void
+    refetch: () => void
+    isRefreshing: boolean
 }
 
 export default function PayoutFilters({
@@ -47,6 +49,8 @@ export default function PayoutFilters({
     setSelectedStatuses,
     columns,
     setColumns,
+    refetch,
+    isRefreshing,
 }: PayoutFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
     const [isStatusPopoverOpen, setIsStatusPopoverOpen] = useState(false)
@@ -247,6 +251,15 @@ export default function PayoutFilters({
                     <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
                         <Download className="h-5 w-5" />
                         <span className="sr-only">Export</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => refetch()}
+                        className="border-border text-card-foreground px-2 h-10 rounded-none"
+                        disabled={isRefreshing}
+                    >
+                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span className="sr-only">Refresh</span>
                     </Button>
                 </div>
             </div>

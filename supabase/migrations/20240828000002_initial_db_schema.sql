@@ -18,6 +18,7 @@ CREATE TYPE entity_type AS ENUM ('merchant', 'organization', 'platform');
 CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed');
 CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
 CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 'subscription', 'webhook', 'chargeback');
+CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
 
 --------------- TABLES ---------------
 
@@ -584,12 +585,12 @@ COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event n
 CREATE TABLE logs (
     log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID REFERENCES merchants(merchant_id),
-    event VARCHAR NOT NULL,
+    event event_type NOT NULL,
     ip_address VARCHAR,
     operating_system VARCHAR,
     browser VARCHAR,
     details JSONB,
-    severity VARCHAR NOT NULL CHECK (severity IN ('INFO', 'WARNING', 'ERROR', 'CRITICAL')),
+    severity VARCHAR NOT NULL CHECK (severity IN ('NOTICE', 'WARNING', 'ERROR', 'CRITICAL')),
     request_url VARCHAR,
     request_method VARCHAR(10),
     response_status INTEGER,

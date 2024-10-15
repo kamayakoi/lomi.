@@ -50,15 +50,16 @@ export default function BalancePage() {
     const [selectedBankAccount, setSelectedBankAccount] = useState("")
     const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
     const { toast } = useToast()
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: balance, isLoading: isBalanceLoading } = useBalance(user?.id || null)
+    const { data: balance, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance(user?.id || null)
 
-    const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage } = useInfiniteQuery(
+    const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage, refetch: refetchPayouts } = useInfiniteQuery(
         ['payouts', user?.id || '', selectedStatuses],
         ({ pageParam = 1 }) =>
             fetchPayouts(
@@ -161,6 +162,12 @@ export default function BalancePage() {
         }
     }
 
+    const handleRefresh = async () => {
+        setIsRefreshing(true)
+        await Promise.all([refetchBalance(), refetchPayouts()])
+        setIsRefreshing(false)
+    }
+
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -193,7 +200,7 @@ export default function BalancePage() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">
-                                        {isBalanceLoading ? (
+                                        {isBalanceLoading || isRefreshing ? (
                                             <Skeleton className="w-32 h-8" />
                                         ) : (
                                             `XOF ${balance?.toLocaleString() || '0'}`
@@ -275,6 +282,8 @@ export default function BalancePage() {
                             setSelectedStatuses={setSelectedStatuses}
                             columns={columns}
                             setColumns={setColumns}
+                            refetch={handleRefresh}
+                            isRefreshing={isRefreshing}
                         />
 
                         <Card>
