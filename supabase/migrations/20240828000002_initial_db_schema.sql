@@ -184,13 +184,7 @@ CREATE TABLE organization_providers_settings (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(code),
     is_connected BOOLEAN NOT NULL DEFAULT false,
-    phone_number VARCHAR,
-    card_number VARCHAR,
-    bank_account_number VARCHAR,
-    bank_account_name VARCHAR,
-    bank_name VARCHAR,
-    bank_code VARCHAR,
-    complementary_information JSONB,
+    metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (organization_id, provider_code),
@@ -201,7 +195,7 @@ CREATE INDEX idx_org_providers_provider_code ON organization_providers_settings(
 
 COMMENT ON TABLE organization_providers_settings IS 'Links organizations to their chosen payment providers';
 COMMENT ON COLUMN organization_providers_settings.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';
-
+COMMENT ON COLUMN organization_providers_settings.metadata IS 'Save Organizations / Providers crucial information such as Stripe account ID or withdrawing phone numbers';
 
 -- Currencies table
 CREATE TABLE currencies (
@@ -590,16 +584,27 @@ COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event n
 CREATE TABLE logs (
     log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID REFERENCES merchants(merchant_id),
-    action VARCHAR NOT NULL,
+    event VARCHAR NOT NULL,
+    ip_address VARCHAR,
+    operating_system VARCHAR,
+    browser VARCHAR,
     details JSONB,
     severity VARCHAR NOT NULL CHECK (severity IN ('INFO', 'WARNING', 'ERROR', 'CRITICAL')),
+    request_url VARCHAR,
+    request_method VARCHAR(10),
+    response_status INTEGER,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_logs_merchant_id ON logs(merchant_id);
+CREATE INDEX idx_logs_event ON logs(event);
+CREATE INDEX idx_logs_severity ON logs(severity);
 CREATE INDEX idx_logs_created_at ON logs(created_at);
+CREATE INDEX idx_logs_request_url ON logs(request_url);
+CREATE INDEX idx_logs_request_method ON logs(request_method);
+CREATE INDEX idx_logs_response_status ON logs(response_status);
 
-COMMENT ON TABLE logs IS 'Audit log for tracking important actions and events in the system';
+COMMENT ON TABLE logs IS 'Audit log for tracking important events in the system';
 
 
 -- Platform Invoices table

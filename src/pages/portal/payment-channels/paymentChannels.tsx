@@ -23,6 +23,10 @@ import { providers, Provider } from './data'
 import { supabase } from '@/utils/supabase/client'
 import { Database } from '@/../database.types'
 import { TopNav } from '@/components/dashboard/top-nav'
+import { useUser } from '@/lib/hooks/useUser'
+import { useSidebarData } from '@/lib/hooks/useSidebarData'
+import { motion, AnimatePresence } from 'framer-motion'
+import Loader from '@/components/dashboard/loader'
 
 const integrationText = new Map<string, string>([
   ['all', 'All Integrations'],
@@ -34,7 +38,10 @@ export default function PaymentChannels() {
   const [sort, setSort] = useState('ascending')
   const [integrationType, setIntegrationType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [organizationProviders, setOrganizationProviders] = useState<Database['public']['Tables']['organization_providers_settings']['Row'][]>([])
+  const { user, isLoading: isUserLoading } = useUser()
+  const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
+  const [organizationProviders, setOrganizationProviders] = useState<Pick<Database['public']['Tables']['organization_providers_settings']['Row'], 'provider_code' | 'is_connected'>[]>([])
+  const [showMessage, setShowMessage] = useState<Record<string, boolean>>({})
 
   const topNav = [
     { title: 'Payment Channels', href: '/portal/payment-channels', isActive: true },
@@ -42,13 +49,14 @@ export default function PaymentChannels() {
   ]
 
   useEffect(() => {
-    fetchOrganizationProviders()
-  }, [])
+    if (user?.id && sidebarData?.organization_id) {
+      fetchOrganizationProviders(sidebarData.organization_id)
+    }
+  }, [user?.id, sidebarData?.organization_id])
 
-  const fetchOrganizationProviders = async () => {
+  const fetchOrganizationProviders = async (organizationId: string) => {
     const { data, error } = await supabase
-      .from('organization_providers_settings')
-      .select('*')
+      .rpc('fetch_organization_providers_settings', { p_organization_id: organizationId })
 
     if (error) {
       console.error('Error fetching organization providers:', error)
@@ -58,19 +66,34 @@ export default function PaymentChannels() {
   }
 
   const updateProviderConnection = async (providerCode: string, isConnected: boolean) => {
-    const { error } = await supabase
-      .from('organization_providers_settings')
-      .upsert({
-        provider_code: providerCode,
-        is_connected: isConnected
-      })
+    if (sidebarData?.organization_id) {
+      const { error } = await supabase
+        .rpc('update_organization_provider_connection', {
+          p_organization_id: sidebarData.organization_id,
+          p_provider_code: providerCode,
+          p_is_connected: isConnected,
+        })
 
-    if (error) {
-      console.error('Error updating provider connection:', error)
-    } else {
-      fetchOrganizationProviders()
+      if (error) {
+        console.error('Error updating provider connection:', error)
+      } else {
+        fetchOrganizationProviders(sidebarData.organization_id)
+        if (isConnected) {
+          setShowMessage((prevState) => ({
+            ...prevState,
+            [providerCode]: true,
+          }))
+        }
+      }
     }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMessage({})
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [showMessage])
 
   const navigate = useNavigate()
 
@@ -97,6 +120,10 @@ export default function PaymentChannels() {
   const isStripeProvider = (provider: Provider): provider is Provider & { includedPayments: Array<{ name: string; icon: JSX.Element }> } => {
     return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
   };
+
+  if (isUserLoading || isSidebarLoading) {
+    return <Loader />
+  }
 
   return (
     <Layout fixed>
@@ -165,30 +192,48 @@ export default function PaymentChannels() {
         <div className='flex-grow overflow-auto' style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
           <h2 className='text-xl font-semibold mb-4 mt-8'>Direct Integrations</h2>
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
-            {directProviders.map((provider) => (
-              <li
-                key={provider.provider_code}
-                className='rounded-lg border p-6 hover:shadow-md'
-              >
-                <div className='mb-8 flex items-center justify-between'>
-                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
-                    {provider.logo}
+            {directProviders.map((provider) => {
+              const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
+              return (
+                <li
+                  key={provider.provider_code}
+                  className='rounded-lg border p-6 hover:shadow-md'
+                >
+                  <div className='mb-8 flex items-center justify-between'>
+                    <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
+                      {provider.logo}
+                    </div>
+                    <motion.button
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out ${isConnected
+                        ? 'bg-[#00A0FF] text-white'
+                        : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      onClick={() => updateProviderConnection(provider.provider_code, !isConnected)}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {isConnected ? 'Disconnect' : 'Connect'}
+                    </motion.button>
                   </div>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => updateProviderConnection(provider.provider_code, !organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected))}
-                    className='flex items-center px-4 py-2 text-sm font-medium'
-                  >
-                    {organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected) ? 'Disconnect' : 'Connect'}
-                  </Button>
-                </div>
-                <div>
-                  <h2 className='mb-2 text-lg font-semibold'>{provider.name}</h2>
-                  <p className='line-clamp-3 text-gray-500'>{provider.description}</p>
-                </div>
-              </li>
-            ))}
+                  <div>
+                    <h2 className='mb-2 text-lg font-semibold'>{provider.name}</h2>
+                    <p className='line-clamp-3 text-gray-500'>{provider.description}</p>
+                  </div>
+                  <AnimatePresence>
+                    {showMessage[provider.provider_code] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className='mt-4 p-2 bg-[#00A0FF] bg-opacity-10 text-[#00A0FF] rounded-lg text-sm'
+                      >
+                        Successfully connected to {provider.name}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              )
+            })}
           </ul>
           <Separator className='my-8' />
           <h2 className='text-xl font-semibold mb-4'>Other</h2>
@@ -224,7 +269,7 @@ export default function PaymentChannels() {
                       <p className='text-sm font-medium mb-2'>Includes:</p>
                       <div className='flex flex-wrap gap-2'>
                         {stripeProvider.includedPayments.map((payment) => (
-                          <div key={payment.name} className='flex items-center bg-gray-100 rounded-full px-2 py-1'>
+                          <div key={payment.name} className='flex items-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 rounded-full px-2 py-1'>
                             <span className='mr-1'>{payment.icon}</span>
                             <span className='text-xs'>{payment.name}</span>
                           </div>

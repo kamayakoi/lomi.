@@ -140,10 +140,11 @@ DECLARE
     v_balance NUMERIC(10,2);
 BEGIN
     -- Get the account ID and organization ID for the merchant
-    SELECT ma.account_id, m.organization_id
+    SELECT ma.account_id, mol.organization_id
     INTO v_account_id, v_organization_id
     FROM merchant_accounts ma
     JOIN merchants m ON ma.merchant_id = m.merchant_id
+    JOIN merchant_organization_links mol ON m.merchant_id = mol.merchant_id
     WHERE m.merchant_id = p_merchant_id
     LIMIT 1;
 
@@ -157,9 +158,9 @@ BEGIN
         RETURN;
     END IF;
 
-    -- Create a new payout record
-    INSERT INTO payouts (account_id, organization_id, bank_account_id, amount, currency_code)
-    VALUES (v_account_id, v_organization_id, p_bank_account_id, p_amount, 'XOF');
+    -- Create a new payout record with 'pending' status
+    INSERT INTO payouts (merchant_id, account_id, organization_id, bank_account_id, amount, currency_code, status)
+    VALUES (p_merchant_id, v_account_id, v_organization_id, p_bank_account_id, p_amount, 'XOF', 'pending');
 
     -- Update the merchant account balance
     UPDATE merchant_accounts
