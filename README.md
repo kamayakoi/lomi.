@@ -1,18 +1,18 @@
 ## Get Started
 
-1. Clone the repository
+1. Clone the repo.
 2. Run `npm install`
 3. Run `npm update`
-4. Run `npm run dev` or `npm build` then `npm run server` to start the server
+4. Run `npm run dev` or `npm build` then `npm run server` to start the server.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for more details.
+This project is licensed under a strict proprietary license exclusive to lomi.africa. The software is confidential and may not be distributed in any manner. Only individuals employed by or officially associated with lomi.africa are modify this software. See the LICENSE file for full details.
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+This is a closed-source project. External contributions are not accepted. If you are an employee or official associate of lomi.africa and wish to contribute, please contact the project maintainers directly through internal channels.
 
 ## Contact
 
-For any questions, please contact the project maintainers at babacar@lomi.africa
+For any questions related to this project, please contact the project maintainer at babacar@lomi.africa. Note that no information about the project shall be shared with external parties.
