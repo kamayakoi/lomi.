@@ -17,6 +17,7 @@ import TopPerformingItems from './dev_reporting/top_performing_items'
 import ProviderDistribution from './dev_reporting/provider_distribution'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/actions/utils'
+import { ChartBarSquareIcon } from '@heroicons/react/24/outline'
 
 const topNav = [
     { title: 'Reporting', href: '/portal/reporting', isActive: true },
@@ -154,12 +155,17 @@ function RevenueTransactionsChart({
                     <div className="h-96">
                         <Skeleton className="h-full" />
                     </div>
-                ) : chartData.length === 0 ? (
+                ) : chartData === null ? (
                     <div className="flex flex-col items-center justify-center h-full pt-12">
                         <div className="text-center">
-                            <h3 className="text-xl font-semibold mb-2 dark:text-white">No data yet</h3>
+                            <div className="flex justify-center mb-6">
+                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                    <ChartBarSquareIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                </div>
+                            </div>
+                            <h3 className="text-xl font-semibold mb-2 dark:text-white">No data to show</h3>
                             <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                Start processing transactions to see your revenue and transactions chart.
+                                Process transactions to see your revenue and transactions chart.
                             </p>
                         </div>
                     </div>
@@ -257,6 +263,10 @@ function ProviderDistributionCard({
 }
 
 function getChartData(revenueData: RevenueData[], transactionVolumeData: TransactionVolumeData[], selectedDateRange: string | null) {
+    if (revenueData.length === 0 && transactionVolumeData.length === 0) {
+        return null
+    }
+
     if (selectedDateRange === '24H') {
         return revenueData.map((revenueItem, index) => ({
             hour: format(new Date(revenueItem.date), 'HH:mm'),

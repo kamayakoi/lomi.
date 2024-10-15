@@ -472,6 +472,7 @@ COMMENT ON TABLE merchant_bank_accounts IS 'Stores bank account information for 
 CREATE TABLE payouts (
     payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     account_id UUID NOT NULL REFERENCES merchant_accounts(account_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID REFERENCES organizations(organization_id),
     bank_account_id UUID REFERENCES merchant_bank_accounts(bank_account_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
@@ -483,6 +484,7 @@ CREATE TABLE payouts (
 );
 
 CREATE INDEX idx_payouts_account_id ON payouts(account_id);
+create INDEX idx_payouts_merchant_id ON payouts(merchant_id);
 CREATE INDEX idx_payouts_organization_id ON payouts(organization_id);
 CREATE INDEX idx_payouts_bank_account_id ON payouts(bank_account_id);
 CREATE INDEX idx_payouts_currency_code ON payouts(currency_code);

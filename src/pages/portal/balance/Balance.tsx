@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TopNav } from '@/components/dashboard/top-nav'
@@ -13,13 +13,19 @@ import PayoutFilters from './dev_balance/filters_balance.tsx'
 import PayoutActions from './dev_balance/actions_balance.tsx'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
-import { payout_status, Payout } from './dev_balance/types'
-import { fetchPayouts, applySearch, applyDateFilter } from './dev_balance/support_balance.ts'
+import { payout_status, Payout, BankAccount } from './dev_balance/types'
+import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiateWithdrawal } from './dev_balance/support_balance.ts'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
 import { ArrowUpDown } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Loader2 } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -35,17 +41,22 @@ export default function BalancePage() {
         'Payout ID',
         'Amount',
         'Currency',
-        'Payout Method',
         'Status',
         'Date',
     ])
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isWithdrawing, setIsWithdrawing] = useState(false)
+    const [withdrawalAmount, setWithdrawalAmount] = useState("")
+    const [selectedBankAccount, setSelectedBankAccount] = useState("")
+    const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
+    const { toast } = useToast()
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: balance = 0, isLoading: isBalanceLoading } = useBalance(user?.id || '')
+    const { data: balance, isLoading: isBalanceLoading } = useBalance(user?.id || null)
 
     const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage } = useInfiniteQuery(
         ['payouts', user?.id || '', selectedStatuses],
@@ -66,6 +77,12 @@ export default function BalancePage() {
     )
 
     const payouts = payoutsData?.pages?.flatMap((page) => page) || []
+
+    useEffect(() => {
+        if (user?.id) {
+            fetchBankAccounts(user.id).then(setBankAccounts)
+        }
+    }, [user?.id])
 
     const handleSort = (column: keyof Payout) => {
         if (sortColumn === column) {
@@ -96,6 +113,51 @@ export default function BalancePage() {
     const handleCustomDateRangeApply = () => {
         if (customDateRange && customDateRange.from && customDateRange.to) {
             setSelectedDateRange('custom')
+        }
+    }
+
+    const handleWithdraw = async () => {
+        if (!withdrawalAmount || !selectedBankAccount) {
+            toast({
+                title: "Error",
+                description: "Please enter an amount and select a bank account.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        const amount = parseFloat(withdrawalAmount)
+        if (isNaN(amount) || amount <= 0) {
+            toast({
+                title: "Invalid amount",
+                description: "Please enter a valid amount.",
+                variant: "destructive",
+            })
+            return
+        }
+
+        setIsWithdrawing(true)
+        try {
+            const result = await initiateWithdrawal(user?.id || '', amount, selectedBankAccount)
+            if (result.success) {
+                toast({
+                    title: "Withdrawal Successful",
+                    description: `XOF ${amount.toLocaleString()} has been withdrawn from your account.`,
+                })
+                setIsDialogOpen(false)
+                setWithdrawalAmount("")
+                setSelectedBankAccount("")
+            } else {
+                throw new Error(result.message)
+            }
+        } catch (error) {
+            toast({
+                title: "Withdrawal Failed",
+                description: error instanceof Error ? error.message : "An unexpected error occurred",
+                variant: "destructive",
+            })
+        } finally {
+            setIsWithdrawing(false)
         }
     }
 
@@ -134,11 +196,68 @@ export default function BalancePage() {
                                         {isBalanceLoading ? (
                                             <Skeleton className="w-32 h-8" />
                                         ) : (
-                                            `XOF ${balance.toLocaleString()}`
+                                            `XOF ${balance?.toLocaleString() || '0'}`
                                         )}
                                     </div>
                                     <div className="flex space-x-2 mt-4">
-                                        <Button>Withdraw</Button>
+                                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button variant="default">Withdraw</Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Withdraw</DialogTitle>
+                                                    <DialogDescription>
+                                                        Enter the amount you wish to withdraw and select your bank account.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="amount" className="text-right">Amount</Label>
+                                                        <Input
+                                                            id="amount"
+                                                            type="text"
+                                                            inputMode="numeric"
+                                                            pattern="[0-9]*"
+                                                            value={withdrawalAmount}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value.replace(/[^0-9]/g, '')
+                                                                setWithdrawalAmount(value)
+                                                            }}
+                                                            className="col-span-3"
+                                                            placeholder="Enter amount in XOF"
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                        <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                            <SelectTrigger className="col-span-3">
+                                                                <SelectValue placeholder="Select a bank account" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {bankAccounts.map((account) => (
+                                                                    <SelectItem key={account.bank_account_id} value={account.bank_account_id}>
+                                                                        {account.bank_name} - {account.account_number}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <DialogFooter>
+                                                    <Button onClick={handleWithdraw} disabled={isWithdrawing}>
+                                                        {isWithdrawing ? (
+                                                            <>
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                Processing...
+                                                            </>
+                                                        ) : (
+                                                            "Confirm Withdrawal"
+                                                        )}
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -192,19 +311,9 @@ export default function BalancePage() {
                                                     )}
                                                     {columns.includes('Currency') && (
                                                         <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('currency')}>
+                                                            <Button variant="ghost" onClick={() => handleSort('currency_code')}>
                                                                 Currency
-                                                                {sortColumn === 'currency' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Payout Method') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('payout_method')}>
-                                                                Payout Method
-                                                                {sortColumn === 'payout_method' && (
+                                                                {sortColumn === 'currency_code' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                                 )}
                                                             </Button>
@@ -222,9 +331,9 @@ export default function BalancePage() {
                                                     )}
                                                     {columns.includes('Date') && (
                                                         <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('date')}>
+                                                            <Button variant="ghost" onClick={() => handleSort('created_at')}>
                                                                 Date
-                                                                {sortColumn === 'date' && (
+                                                                {sortColumn === 'created_at' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                                 )}
                                                             </Button>
@@ -272,24 +381,21 @@ export default function BalancePage() {
                                                                     {formatAmount(payout.amount)}
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Currency') && <TableCell className="text-center">{payout.currency}</TableCell>}
-                                                            {columns.includes('Payout Method') && (
-                                                                <TableCell className="text-center">{payout.payout_method}</TableCell>
-                                                            )}
+                                                            {columns.includes('Currency') && <TableCell className="text-center">{payout.currency_code}</TableCell>}
                                                             {columns.includes('Status') && (
                                                                 <TableCell className="text-center">
                                                                     <span className={`
                                                                         inline-block px-2 py-1 rounded-full text-xs font-normal
                                                                         ${payout.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
                                                                         ${payout.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                                                                                    ${payout.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                                                        ${payout.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
                                                                     `}
                                                                     >
                                                                         {formatPayoutStatus(payout.status)}
                                                                     </span>
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Date') && <TableCell className="text-center">{formatDate(payout.date)}</TableCell>}
+                                                            {columns.includes('Date') && <TableCell className="text-center">{formatDate(payout.created_at)}</TableCell>}
                                                         </TableRow>
                                                     ))
                                                 )}

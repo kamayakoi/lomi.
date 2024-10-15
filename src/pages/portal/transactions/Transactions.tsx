@@ -227,7 +227,7 @@ export default function TransactionsPage() {
                                                     {isTotalIncomingAmountLoading ? (
                                                         <Skeleton className="w-32 h-8" />
                                                     ) : (
-                                                        `XOF ${totalIncomingAmount}`
+                                                        `XOF ${formatAmount(totalIncomingAmount)}`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
@@ -253,7 +253,7 @@ export default function TransactionsPage() {
                                                             {isGrossAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
-                                                                `XOF ${grossAmount}`
+                                                                `XOF ${formatAmount(grossAmount)}`
                                                             )}
                                                         </span>
                                                     </div>
@@ -263,7 +263,7 @@ export default function TransactionsPage() {
                                                             {isFeeAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
-                                                                `XOF ${feeAmount}`
+                                                                `XOF ${formatAmount(feeAmount)}`
                                                             )}
                                                         </span>
                                                     </div>
@@ -273,7 +273,7 @@ export default function TransactionsPage() {
                                                             {isTotalIncomingAmountLoading ? (
                                                                 <Skeleton className="w-20 h-4 inline-block" />
                                                             ) : (
-                                                                `XOF ${totalIncomingAmount}`
+                                                                `XOF ${formatAmount(totalIncomingAmount)}`
                                                             )}
                                                         </span>
                                                     </div>
@@ -317,9 +317,19 @@ export default function TransactionsPage() {
                                                         <Skeleton className="w-20 h-4" />
                                                     ) : (
                                                         <>
-                                                            {completionRate.completed > 0 && `${completionRate.completed} completed`}
-                                                            {completionRate.refunded > 0 && `, ${completionRate.refunded} refunded`}
-                                                            {completionRate.failed > 0 && `, ${completionRate.failed} failed`}
+                                                            {completionRate.completed > 0 && (
+                                                                <>
+                                                                    {completionRate.completed} completed
+                                                                    {(completionRate.refunded > 0 || completionRate.failed > 0) && ', '}
+                                                                </>
+                                                            )}
+                                                            {completionRate.refunded > 0 && (
+                                                                <>
+                                                                    {completionRate.refunded} refunded
+                                                                    {completionRate.failed > 0 && ', '}
+                                                                </>
+                                                            )}
+                                                            {completionRate.failed > 0 && `${completionRate.failed} failed`}
                                                         </>
                                                     )}
                                                 </div>
@@ -373,7 +383,7 @@ export default function TransactionsPage() {
                                                     {isAverageCustomerLifetimeValueLoading ? (
                                                         <Skeleton className="w-32 h-8" />
                                                     ) : (
-                                                        `XOF ${averageCustomerLifetimeValue ? averageCustomerLifetimeValue.toFixed(2) : '0.00'}`
+                                                        `XOF ${formatAmount(averageCustomerLifetimeValue)}`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">Per customer</div>
@@ -705,5 +715,20 @@ function calculateCompletionRate(completed: number, refunded: number, failed: nu
 }
 
 function formatAmount(amount: number): string {
-    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
+    const formatter = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    })
+
+    const formattedAmount = formatter.format(amount)
+    const decimalIndex = formattedAmount.indexOf('.')
+
+    if (decimalIndex !== -1) {
+        const decimalPart = formattedAmount.slice(decimalIndex + 1)
+        if (decimalPart.length === 2 && decimalPart[1] === '0') {
+            return formattedAmount.slice(0, decimalIndex + 2)
+        }
+    }
+
+    return formattedAmount
 }

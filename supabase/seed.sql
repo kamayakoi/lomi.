@@ -189,11 +189,35 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 2000.00, 'XOF'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 1800.00, 'XOF');
 
+-- Seed data for merchant_bank_accounts table
+INSERT INTO merchant_bank_accounts (merchant_id, account_number, account_name, bank_name, bank_code, branch_code, country, is_default, is_valid)
+VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), '1234567890', 'Merchant 1 Account', 'Bank A', 'BANKA', '1234', 'Country 1', true, true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), '0987654321', 'Merchant 1 Secondary Account', 'Bank B', 'BANKB', '5678', 'Country 1', false, true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), '1111111111', 'Merchant 2 Account', 'Bank C', 'BANKC', '2222', 'Country 2', true, true);
+
+
 -- Seed data for payouts table
-INSERT INTO payouts (account_id, organization_id, amount, currency_code, payout_method, status)
+INSERT INTO payouts (merchant_id, account_id, organization_id, bank_account_id, amount, currency_code, status)
 VALUES 
-  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 1685.00, 'XOF', 'Bank Transfer', 'completed'),
-  ((SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2')), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 1650.00, 'XOF', 'Mobile Money', 'completed');
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+    (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND is_default = true),
+    1685.00,
+    'XOF',
+    'completed'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'),
+    (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2')),
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 2'),
+    (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2') AND is_default = true),
+    1650.00,
+    'XOF',
+    'completed'
+  );
 
 -- Seed data for organization_kyc table
 

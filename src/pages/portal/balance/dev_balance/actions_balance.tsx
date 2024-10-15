@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Payout, payout_status } from './types'
+import { Payout, payout_status, BankAccount } from './types'
 import { Separator } from "@/components/ui/separator"
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { fetchBankAccountDetails } from './support_balance'
 
 type PayoutActionsProps = {
     payout: Payout | null
@@ -12,6 +14,14 @@ type PayoutActionsProps = {
 }
 
 export default function PayoutActions({ payout, isOpen, onClose }: PayoutActionsProps) {
+    const [bankAccount, setBankAccount] = useState<BankAccount | null>(null)
+
+    useEffect(() => {
+        if (payout?.bank_account_id) {
+            fetchBankAccountDetails(payout.bank_account_id).then(setBankAccount)
+        }
+    }, [payout?.bank_account_id])
+
     if (!payout) return null
 
     return (
@@ -29,41 +39,33 @@ export default function PayoutActions({ payout, isOpen, onClose }: PayoutActions
                                     <div className="font-medium">Payout ID:</div>
                                     <div>{payout.payout_id}</div>
                                     <div className="font-medium">Amount:</div>
-                                    <div>{formatCurrency(payout.amount, payout.currency)}</div>
+                                    <div>{formatCurrency(payout.amount, payout.currency_code)}</div>
                                     <div className="font-medium">Status:</div>
                                     <div>{formatPayoutStatus(payout.status)}</div>
                                     <div className="font-medium">Date:</div>
-                                    <div>{formatDate(payout.date)}</div>
+                                    <div>{formatDate(payout.created_at)}</div>
                                 </div>
                             </section>
                             <Separator />
                             <section>
                                 <h3 className="text-lg font-semibold mb-2">Payout Method</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div className="font-medium">Method:</div>
-                                    <div>{payout.payout_method}</div>
-                                    {payout.bank_account_number && (
+                                    {bankAccount?.account_number && (
                                         <>
                                             <div className="font-medium">Bank Account:</div>
-                                            <div>{payout.bank_account_number}</div>
+                                            <div>{bankAccount.account_number}</div>
                                         </>
                                     )}
-                                    {payout.bank_name && (
+                                    {bankAccount?.bank_name && (
                                         <>
                                             <div className="font-medium">Bank Name:</div>
-                                            <div>{payout.bank_name}</div>
+                                            <div>{bankAccount.bank_name}</div>
                                         </>
                                     )}
-                                    {payout.bank_code && (
+                                    {bankAccount?.bank_code && (
                                         <>
                                             <div className="font-medium">Bank Code:</div>
-                                            <div>{payout.bank_code}</div>
-                                        </>
-                                    )}
-                                    {payout.phone_number && (
-                                        <>
-                                            <div className="font-medium">Phone Number:</div>
-                                            <div>{payout.phone_number}</div>
+                                            <div>{bankAccount.bank_code}</div>
                                         </>
                                     )}
                                 </div>
