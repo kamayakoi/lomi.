@@ -20,6 +20,7 @@ import TransactionActions from './dev_transactions.tsx/actions_transactions'
 import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 
 type Transaction = {
@@ -195,6 +196,7 @@ export default function TransactionsPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>

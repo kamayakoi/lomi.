@@ -22,6 +22,7 @@ import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 export default function WebhooksPage() {
     const [startDate, setStartDate] = useState<Date | undefined>(new Date())
@@ -37,6 +38,7 @@ export default function WebhooksPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>

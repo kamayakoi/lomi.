@@ -29,7 +29,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
-
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 export default function LogsPage() {
     const { user } = useUser()
@@ -68,6 +68,7 @@ export default function LogsPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>
@@ -75,57 +76,54 @@ export default function LogsPage() {
 
             <Separator className='my-0' />
 
-            <Layout.Body>
-                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8 px-4">
-                        <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-bold tracking-tight">Activity Logs</h1>
-                        </div>
-
-                        <div className="flex items-center space-x-4">
-                            <div className="flex-grow">
-                                <div className="relative">
-                                    <Input
-                                        className="w-full pl-10 pr-4 py-2 rounded-none"
-                                        placeholder="Search logs..."
-                                        type="search"
-                                    />
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                </div>
+            <Layout.Body className='flex flex-col'>
+                <div className="space-y-4 pb-8">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">Activity Logs</h1>
+                    </div>
+                    <div className='my-4 flex items-center justify-between sm:my-0'>
+                        <div className='flex items-center space-x-4'>
+                            <div className='relative w-64'>
+                                <Input
+                                    placeholder='Search logs...'
+                                    className='w-full pl-10 pr-4 py-2 rounded-none'
+                                    type="search"
+                                />
+                                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                             </div>
                             <Select value={selectedEvent || undefined} onValueChange={setSelectedEvent}>
                                 <SelectTrigger className="w-[140px] rounded-none">
                                     <SelectValue placeholder="All Events" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Events</SelectItem>
-                                    <SelectItem value="user_login">User Login</SelectItem>
-                                    <SelectItem value="edit_user_password">Edit User Password</SelectItem>
-                                    <SelectItem value="create_pin">Create PIN</SelectItem>
-                                    <SelectItem value="edit_pin">Edit PIN</SelectItem>
-                                    <SelectItem value="edit_user_details">Edit User Details</SelectItem>
-                                    <SelectItem value="authorize_user_2fa">Authorize User 2FA</SelectItem>
-                                    <SelectItem value="create_user_2fa">Create User 2FA</SelectItem>
-                                    <SelectItem value="remove_user_2fa">Remove User 2FA</SelectItem>
-                                    <SelectItem value="edit_user_2fa">Edit User 2FA</SelectItem>
-                                    <SelectItem value="edit_user_phone">Edit User Phone</SelectItem>
-                                    <SelectItem value="set_callback_url">Set Callback URL</SelectItem>
-                                    <SelectItem value="update_ip_whitelist">Update IP Whitelist</SelectItem>
-                                    <SelectItem value="add_bank_account">Add Bank Account</SelectItem>
-                                    <SelectItem value="remove_bank_account">Remove Bank Account</SelectItem>
-                                    <SelectItem value="create_payout">Create Payout</SelectItem>
-                                    <SelectItem value="create_invoice">Create Invoice</SelectItem>
-                                    <SelectItem value="process_payment">Process Payment</SelectItem>
-                                    <SelectItem value="update_webhook">Update Webhook</SelectItem>
-                                    <SelectItem value="create_refund">Create Refund</SelectItem>
+                                    <SelectItem value="all">All events</SelectItem>
+                                    <SelectItem value="user_login">User logged in</SelectItem>
+                                    <SelectItem value="edit_user_password">User password edited</SelectItem>
+                                    <SelectItem value="create_pin">PIN created</SelectItem>
+                                    <SelectItem value="edit_pin">PIN edited</SelectItem>
+                                    <SelectItem value="edit_user_details">User details edited</SelectItem>
+                                    <SelectItem value="authorize_user_2fa">User 2FA authorized</SelectItem>
+                                    <SelectItem value="create_user_2fa">User 2FA created</SelectItem>
+                                    <SelectItem value="remove_user_2fa">User 2FA removed</SelectItem>
+                                    <SelectItem value="edit_user_2fa">User 2FA edited</SelectItem>
+                                    <SelectItem value="edit_user_phone">User phone edited</SelectItem>
+                                    <SelectItem value="set_callback_url">Callback URL set</SelectItem>
+                                    <SelectItem value="update_ip_whitelist">IP whitelist updated</SelectItem>
+                                    <SelectItem value="add_bank_account">Bank account added</SelectItem>
+                                    <SelectItem value="remove_bank_account">Bank account removed</SelectItem>
+                                    <SelectItem value="create_payout">Payout created</SelectItem>
+                                    <SelectItem value="create_invoice">Invoice created</SelectItem>
+                                    <SelectItem value="process_payment">Payment processed</SelectItem>
+                                    <SelectItem value="update_webhook">Webhook updated</SelectItem>
+                                    <SelectItem value="create_refund">Refund created</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Select value={selectedSeverity || undefined} onValueChange={setSelectedSeverity}>
                                 <SelectTrigger className="w-[140px] rounded-none">
-                                    <SelectValue placeholder="All Severities" />
+                                    <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Severities</SelectItem>
+                                    <SelectItem value="all">All severity</SelectItem>
                                     <SelectItem value="NOTICE">Notice</SelectItem>
                                     <SelectItem value="WARNING">Warning</SelectItem>
                                     <SelectItem value="ERROR">Error</SelectItem>
@@ -137,8 +135,10 @@ export default function LogsPage() {
                                 <span className="sr-only">Refresh</span>
                             </Button>
                         </div>
+                    </div>
 
-                        <div className="rounded-md border">
+                    <div className="rounded-md border">
+                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
                             <InfiniteScroll
                                 dataLength={logs.length}
                                 next={() => fetchNextPage()}
@@ -227,8 +227,46 @@ function formatDate(dateString: string): string {
 }
 
 function formatEventName(event: string): string {
-    return event
-        .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+    switch (event) {
+        case 'user_login':
+            return 'User logged in'
+        case 'edit_user_password':
+            return 'User password edited'
+        case 'create_pin':
+            return 'PIN created'
+        case 'edit_pin':
+            return 'PIN edited'
+        case 'edit_user_details':
+            return 'User details edited'
+        case 'authorize_user_2fa':
+            return 'User 2FA authorized'
+        case 'create_user_2fa':
+            return 'User 2FA created'
+        case 'remove_user_2fa':
+            return 'User 2FA removed'
+        case 'edit_user_2fa':
+            return 'User 2FA edited'
+        case 'edit_user_phone':
+            return 'User Phone edited'
+        case 'set_callback_url':
+            return 'Callback URL set'
+        case 'update_ip_whitelist':
+            return 'IP Whitelist updated'
+        case 'add_bank_account':
+            return 'Bank account added'
+        case 'remove_bank_account':
+            return 'Bank Account removed'
+        case 'create_payout':
+            return 'Payout created'
+        case 'create_invoice':
+            return 'Invoice created'
+        case 'process_payment':
+            return 'Payment processed'
+        case 'update_webhook':
+            return 'Webhook updated'
+        case 'create_refund':
+            return 'Refund created'
+        default:
+            return event
+    }
 }

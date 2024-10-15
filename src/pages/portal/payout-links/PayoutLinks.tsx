@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
+import FeedbackForm from "@/components/dashboard/feedback-form"
 
 export default function PayoutLinksPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -50,6 +51,7 @@ export default function PayoutLinksPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>

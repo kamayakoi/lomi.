@@ -11,6 +11,7 @@ import Notifications from '@/components/dashboard/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { DateRange } from 'react-day-picker'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 export default function CardsPage() {
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -28,6 +29,7 @@ export default function CardsPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>

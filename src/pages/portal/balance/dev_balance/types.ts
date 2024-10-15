@@ -28,3 +28,9 @@ export type BankAccount = {
     created_at: string
     updated_at: string
 }
+
+export type BalanceBreakdown = {
+    available_balance: number
+    pending_balance: number
+    total_balance: number
+}

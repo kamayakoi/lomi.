@@ -16,6 +16,7 @@ import Notifications from '@/components/dashboard/notifications'
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 
 
@@ -166,6 +167,7 @@ export default function SubscriptionsPage() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
+          <FeedbackForm />
           <Notifications />
           <UserNav />
         </div>

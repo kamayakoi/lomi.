@@ -219,6 +219,7 @@ CREATE TABLE customers (
     city VARCHAR,
     address VARCHAR,
     postal_code VARCHAR,
+    is_business BOOLEAN NOT NULL DEFAULT false,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -228,8 +229,11 @@ CREATE INDEX idx_customers_merchant_id ON customers(merchant_id);
 CREATE INDEX idx_customers_organization_id ON customers(organization_id);
 CREATE INDEX idx_customers_email ON customers(email);
 CREATE INDEX idx_customers_phone_number ON customers(phone_number);
+CREATE INDEX idx_customers_is_business ON customers(is_business);
 
-COMMENT ON TABLE customers IS 'Stores information about the customers of our merchants';
+COMMENT ON TABLE customers IS 'Stores information about the customers of our merchants, including both individual and business customers';
+COMMENT ON COLUMN customers.is_business IS 'Indicates whether the customer is a business (true) or an individual (false)';
+COMMENT ON COLUMN customers.metadata IS 'Additional customer-specific data in JSON format, can include business details if needed';
 
 
 -- Merchant Accounts table
@@ -699,9 +703,9 @@ COMMENT ON TABLE platform_metrics IS 'Stores metrics for merchants, organization
 
 -- Merchant Feedback table
 CREATE TABLE merchant_feedback (
-  merchant_feedback_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-  feedback_type VARCHAR(50) NOT NULL,
+  sentiment VARCHAR(30),
   message TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   status feedback_status NOT NULL DEFAULT 'open'

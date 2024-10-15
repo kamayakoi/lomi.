@@ -8,7 +8,7 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { useUser } from '@/lib/hooks/useUser'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
-import { useBalance } from './dev_balance/support_balance.ts'
+import { useBalanceBreakdown } from './dev_balance/support_balance.ts'
 import PayoutFilters from './dev_balance/filters_balance.tsx'
 import PayoutActions from './dev_balance/actions_balance.tsx'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -19,13 +19,15 @@ import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, ArrowDownIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { AnimatePresence, motion } from "framer-motion"
+import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
 
 export default function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -51,13 +53,14 @@ export default function BalancePage() {
     const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([])
     const { toast } = useToast()
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [showBalanceBreakdown, setShowBalanceBreakdown] = useState(false)
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: balance, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance(user?.id || null)
+    const { data: balanceBreakdown, isLoading: isBalanceBreakdownLoading, refetch: refetchBalanceBreakdown } = useBalanceBreakdown(user?.id || null)
 
     const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage, refetch: refetchPayouts } = useInfiniteQuery(
         ['payouts', user?.id || '', selectedStatuses],
@@ -164,7 +167,7 @@ export default function BalancePage() {
 
     const handleRefresh = async () => {
         setIsRefreshing(true)
-        await Promise.all([refetchBalance(), refetchPayouts()])
+        await Promise.all([refetchBalanceBreakdown(), refetchPayouts()])
         setIsRefreshing(false)
     }
 
@@ -181,6 +184,7 @@ export default function BalancePage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>
@@ -194,78 +198,122 @@ export default function BalancePage() {
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Balance</h1>
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
-                            <Card>
+                            <Card className="cursor-pointer" onClick={() => setShowBalanceBreakdown(!showBalanceBreakdown)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                                    <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">
-                                        {isBalanceLoading || isRefreshing ? (
-                                            <Skeleton className="w-32 h-8" />
+                                    <AnimatePresence mode="wait">
+                                        {!showBalanceBreakdown ? (
+                                            <motion.div
+                                                key="available"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="text-2xl font-bold">
+                                                    {isBalanceBreakdownLoading || isRefreshing ? (
+                                                        <Skeleton className="w-32 h-8" />
+                                                    ) : (
+                                                        `XOF ${balanceBreakdown?.available_balance?.toLocaleString() || '0'}`
+                                                    )}
+                                                </div>
+                                                <div className="flex space-x-2 mt-4">
+                                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                                        <DialogTrigger asChild>
+                                                            <Button variant="default">Withdraw</Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="sm:max-w-[425px]">
+                                                            <DialogHeader>
+                                                                <DialogTitle>Withdraw</DialogTitle>
+                                                                <DialogDescription>
+                                                                    Enter the amount you wish to withdraw and select your bank account.
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <div className="grid gap-4 py-4">
+                                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                                    <Label htmlFor="amount" className="text-right">Amount</Label>
+                                                                    <Input
+                                                                        id="amount"
+                                                                        type="text"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                        value={withdrawalAmount}
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value.replace(/[^0-9]/g, '')
+                                                                            setWithdrawalAmount(value)
+                                                                        }}
+                                                                        className="col-span-3"
+                                                                        placeholder="Enter amount in XOF"
+                                                                    />
+                                                                </div>
+                                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                                    <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                                    <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                        <SelectTrigger className="col-span-3">
+                                                                            <SelectValue placeholder="Select a bank account" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                            {bankAccounts.map((account) => (
+                                                                                <SelectItem key={account.bank_account_id} value={account.bank_account_id}>
+                                                                                    {account.bank_name} - {account.account_number}
+                                                                                </SelectItem>
+                                                                            ))}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                </div>
+                                                            </div>
+                                                            <DialogFooter>
+                                                                <Button onClick={handleWithdraw} disabled={isWithdrawing}>
+                                                                    {isWithdrawing ? (
+                                                                        <>
+                                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                            Processing...
+                                                                        </>
+                                                                    ) : (
+                                                                        "Confirm Withdrawal"
+                                                                    )}
+                                                                </Button>
+                                                            </DialogFooter>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </div>
+                                            </motion.div>
                                         ) : (
-                                            `XOF ${balance?.toLocaleString() || '0'}`
-                                        )}
-                                    </div>
-                                    <div className="flex space-x-2 mt-4">
-                                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                            <DialogTrigger asChild>
-                                                <Button variant="default">Withdraw</Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Withdraw</DialogTitle>
-                                                    <DialogDescription>
-                                                        Enter the amount you wish to withdraw and select your bank account.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="grid gap-4 py-4">
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="amount" className="text-right">Amount</Label>
-                                                        <Input
-                                                            id="amount"
-                                                            type="text"
-                                                            inputMode="numeric"
-                                                            pattern="[0-9]*"
-                                                            value={withdrawalAmount}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value.replace(/[^0-9]/g, '')
-                                                                setWithdrawalAmount(value)
-                                                            }}
-                                                            className="col-span-3"
-                                                            placeholder="Enter amount in XOF"
-                                                        />
+                                            <motion.div
+                                                key="breakdown"
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm">Pending</span>
+                                                        <span className="text-sm font-medium">
+                                                            {isBalanceBreakdownLoading || isRefreshing ? (
+                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                            ) : (
+                                                                `XOF ${balanceBreakdown?.pending_balance?.toLocaleString() || '0'}`
+                                                            )}
+                                                        </span>
                                                     </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
-                                                        <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
-                                                            <SelectTrigger className="col-span-3">
-                                                                <SelectValue placeholder="Select a bank account" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {bankAccounts.map((account) => (
-                                                                    <SelectItem key={account.bank_account_id} value={account.bank_account_id}>
-                                                                        {account.bank_name} - {account.account_number}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm">Total Balance</span>
+                                                        <span className="text-sm font-medium">
+                                                            {isBalanceBreakdownLoading || isRefreshing ? (
+                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                            ) : (
+                                                                `XOF ${balanceBreakdown?.total_balance?.toLocaleString() || '0'}`
+                                                            )}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <DialogFooter>
-                                                    <Button onClick={handleWithdraw} disabled={isWithdrawing}>
-                                                        {isWithdrawing ? (
-                                                            <>
-                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                Processing...
-                                                            </>
-                                                        ) : (
-                                                            "Confirm Withdrawal"
-                                                        )}
-                                                    </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </CardContent>
                             </Card>
                         </div>

@@ -6,6 +6,7 @@ import { integrationOptions } from './data.tsx'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
+import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
 
 export default function Providers() {
   const topNav = [
@@ -26,6 +27,7 @@ export default function Providers() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
+          <FeedbackForm />
           <Notifications />
           <UserNav />
         </div>

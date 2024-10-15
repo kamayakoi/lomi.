@@ -59,7 +59,6 @@ export default function PayoutFilters({
         'Payout ID',
         'Amount',
         'Currency',
-        'Payout Method',
         'Status',
         'Date',
     ]

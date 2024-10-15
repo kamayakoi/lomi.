@@ -9,6 +9,7 @@ import { Settings2 } from 'lucide-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Video } from 'lucide-react'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 
 export default function Dashboard() {
@@ -22,6 +23,7 @@ export default function Dashboard() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
+          <FeedbackForm />
           <Notifications />
           <UserNav />
         </div>

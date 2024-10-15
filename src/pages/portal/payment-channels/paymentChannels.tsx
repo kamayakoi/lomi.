@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   IconExternalLink,
   IconSearch,
+  IconPlus,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Input } from '@/components/ui/input'
@@ -25,6 +26,8 @@ import { useUser } from '@/lib/hooks/useUser'
 import { useSidebarData } from '@/lib/hooks/useSidebarData'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from '@/components/dashboard/loader'
+import FeedbackForm from '@/components/dashboard/feedback-form'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const integrationText = new Map<string, string>([
   ['all', 'All Integrations'],
@@ -39,6 +42,8 @@ export default function PaymentChannels() {
   const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
   const [organizationProviders, setOrganizationProviders] = useState<Pick<Database['public']['Tables']['organization_providers_settings']['Row'], 'provider_code' | 'is_connected'>[]>([])
   const [showMessage, setShowMessage] = useState<Record<string, boolean>>({})
+  const [disconnectingProvider, setDisconnectingProvider] = useState<string | null>(null)
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false)
 
   const topNav = [
     { title: 'Payment Channels', href: '/portal/payment-channels', isActive: true },
@@ -63,6 +68,11 @@ export default function PaymentChannels() {
   }
 
   const updateProviderConnection = async (providerCode: string, isConnected: boolean) => {
+    if (!isConnected) {
+      setDisconnectingProvider(providerCode)
+      return
+    }
+
     if (sidebarData?.organization_id) {
       const { error } = await supabase
         .rpc('update_organization_provider_connection', {
@@ -82,6 +92,24 @@ export default function PaymentChannels() {
           }))
         }
       }
+    }
+  }
+
+  const confirmDisconnect = async () => {
+    if (disconnectingProvider && sidebarData?.organization_id) {
+      const { error } = await supabase
+        .rpc('update_organization_provider_connection', {
+          p_organization_id: sidebarData.organization_id,
+          p_provider_code: disconnectingProvider,
+          p_is_connected: false,
+        })
+
+      if (error) {
+        console.error('Error disconnecting provider:', error)
+      } else {
+        fetchOrganizationProviders(sidebarData.organization_id)
+      }
+      setDisconnectingProvider(null)
     }
   }
 
@@ -113,6 +141,17 @@ export default function PaymentChannels() {
     return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
   };
 
+  const handleDisconnectClick = (providerCode: string) => {
+    setDisconnectingProvider(providerCode)
+    setDisconnectDialogOpen(true)
+  }
+
+  const handleConfirmDisconnect = () => {
+    confirmDisconnect()
+    setDisconnectDialogOpen(false)
+    setDisconnectingProvider(null)
+  }
+
   if (isUserLoading || isSidebarLoading) {
     return <Loader />
   }
@@ -122,6 +161,7 @@ export default function PaymentChannels() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
+          <FeedbackForm />
           <Notifications />
           <UserNav />
         </div>
@@ -181,7 +221,13 @@ export default function PaymentChannels() {
                         ? 'bg-[#00A0FF] text-white'
                         : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'
                         }`}
-                      onClick={() => updateProviderConnection(provider.provider_code, !isConnected)}
+                      onClick={() => {
+                        if (isConnected) {
+                          handleDisconnectClick(provider.provider_code)
+                        } else {
+                          updateProviderConnection(provider.provider_code, true)
+                        }
+                      }}
                       whileTap={{ scale: 0.95 }}
                     >
                       {isConnected ? 'Disconnect' : 'Connect'}
@@ -254,8 +300,48 @@ export default function PaymentChannels() {
               </li>
             )}
           </ul>
+
+          {/* Updated "Coming Soon" panel */}
+          <div className="mt-4 mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 rounded-lg p-8 shadow-lg relative overflow-hidden border border-blue-100 dark:border-indigo-700 transition-all duration-300 hover:shadow-xl hover:border-blue-200 dark:hover:border-indigo-600">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-full -mr-20 -mt-20 opacity-50"></div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-full -ml-16 -mb-16 opacity-50"></div>
+
+            <h2 className='text-2xl font-bold mb-4 relative z-10 text-gray-800 dark:text-white'>Exciting new payment channels — coming soon!</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 relative z-10">
+              We&apos;re continuously expanding our payment ecosystem to offer you more options. If there&apos;s a specific payment channel you need, let us know, and we&apos;ll fast-track its development for you.
+            </p>
+            <div className="flex space-x-4">
+              <a
+                href="mailto:hello@lomi.africa?subject=New Payment Channel Request"
+                className="relative z-10 bg-blue-600 text-white px-4 py-2 rounded-md inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-700"
+              >
+                <IconPlus className="mr-2 h-4 w-4" />
+                Request a new channel
+              </a>
+            </div>
+          </div>
         </div>
       </Layout.Body>
+      <Dialog open={disconnectDialogOpen} onOpenChange={setDisconnectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Disconnect {providers.find(p => p.provider_code === disconnectingProvider)?.name}?
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to disconnect this provider? This action will directly affect your customers&apos; checkout experience.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDisconnect}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   )
 }

@@ -18,6 +18,7 @@ import ProviderDistribution from './dev_reporting/provider_distribution'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/actions/utils'
 import { ChartBarSquareIcon } from '@heroicons/react/24/outline'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 
 const topNav = [
     { title: 'Reporting', href: '/portal/reporting', isActive: true },
@@ -81,6 +82,7 @@ export default function ReportingPage() {
             <Layout.Header>
                 <TopNav links={topNav} />
                 <div className='ml-auto flex items-center space-x-4'>
+                    <FeedbackForm />
                     <Notifications />
                     <UserNav />
                 </div>

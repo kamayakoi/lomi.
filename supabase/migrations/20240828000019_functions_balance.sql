@@ -65,26 +65,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to fetch the balance for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_balance(
-    p_merchant_id UUID
-)
-RETURNS NUMERIC AS $$
-DECLARE
-    v_balance NUMERIC;
-BEGIN
-    SELECT 
-        COALESCE(ma.balance, 0) INTO v_balance
-    FROM 
-        merchant_accounts ma
-        JOIN merchants m ON ma.merchant_id = m.merchant_id
-    WHERE 
-        m.merchant_id = p_merchant_id;
-        
-    RETURN v_balance;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
 -- Function to fetch bank accounts for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_bank_accounts(
     p_merchant_id UUID
@@ -168,5 +148,31 @@ BEGIN
     WHERE account_id = v_account_id;
 
     RETURN QUERY SELECT true, 'Withdrawal initiated successfully';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch the balance breakdown for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_balance_breakdown(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    available_balance NUMERIC,
+    pending_balance NUMERIC,
+    total_balance NUMERIC
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        COALESCE(ma.balance, 0) AS available_balance,
+        COALESCE(SUM(p.amount) FILTER (WHERE p.status IN ('pending', 'processing')), 0) AS pending_balance,
+        COALESCE(ma.balance, 0) + COALESCE(SUM(p.amount) FILTER (WHERE p.status IN ('pending', 'processing')), 0) AS total_balance
+    FROM
+        merchant_accounts ma
+        JOIN merchants m ON ma.merchant_id = m.merchant_id
+        LEFT JOIN payouts p ON ma.merchant_id = p.merchant_id
+    WHERE
+        m.merchant_id = p_merchant_id
+    GROUP BY
+        ma.balance;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

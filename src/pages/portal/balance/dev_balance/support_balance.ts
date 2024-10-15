@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
-import { Payout, payout_status, BankAccount } from './types'
+import { Payout, payout_status, BankAccount, BalanceBreakdown } from './types'
 import { DateRange } from 'react-day-picker'
 import { subDays, subMonths, startOfYear, format, parse } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -269,4 +269,27 @@ export async function fetchBankAccountDetails(bankAccountId: string): Promise<Ba
         console.error('Error fetching bank account details:', error)
         return null
     }
+}
+
+export function useBalanceBreakdown(userId: string | null) {
+    return useQuery(['balanceBreakdown', userId], async () => {
+        if (!userId) {
+            return {
+                available_balance: 0,
+                pending_balance: 0,
+                total_balance: 0,
+            }
+        }
+
+        const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
+            p_merchant_id: userId,
+        })
+
+        if (error) {
+            console.error('Error fetching balance breakdown:', error)
+            throw error
+        }
+
+        return data[0] as BalanceBreakdown
+    })
 }
