@@ -1,10 +1,15 @@
 import { useState } from "react";
+import { UserNav } from '@/components/dashboard/no-access-user-nav';
 
 export default function Component() {
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <div className="w-full max-w-2xl overflow-hidden rounded-3xl shadow-xl">
+        <div className="flex items-center justify-center min-h-screen p-4">
+            <div className="w-full max-w-4xl overflow-hidden rounded-3xl shadow-xl relative">
+                {/* Add UserNav and Notifications */}
+                <div className="absolute top-4 right-4 flex items-center space-x-4 z-10">
+                    <UserNav />
+                </div>
                 <div
                     className="relative h-64 sm:h-80"
                     style={{
@@ -31,7 +36,13 @@ export default function Component() {
                         <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">No Access</h1>
                         <p className="text-white text-sm sm:text-base max-w-md">
                             Your organization have not been given access yet.<br />
-                            Please reach out to hello@lomi.africa or <a href="#" onClick={(e) => { e.preventDefault(); setIsFormOpen(true); }} className="underline hover:text-sky-200 transition-colors">submit this form</a>.
+                            To gain access, you can either:
+                            <ul className="list-disc list-inside mt-2">
+                                <li>Go through our Activation process</li>
+                                <li>
+                                    Reach out to <a href="mailto:hello@lomi.africa" className="underline hover:text-sky-200 transition-colors">hello@lomi.africa</a> | Submit <a href="#" onClick={(e) => { e.preventDefault(); setIsFormOpen(true); }} className="underline hover:text-sky-200 transition-colors">this form</a>
+                                </li>
+                            </ul>
                         </p>
                     </div>
                 </div>

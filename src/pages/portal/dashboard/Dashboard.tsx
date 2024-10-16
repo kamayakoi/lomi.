@@ -10,9 +10,48 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Video } from 'lucide-react'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
+const developerResources = [
+  {
+    icon: <FileText className="h-10 w-10 text-blue-600 dark:text-blue-400 mb-4" />,
+    title: "Documentation",
+    description: "Familiarize yourself with lomi. products with our docs.",
+    link: "https://developers.lomi.africa/docs"
+  },
+  {
+    icon: <Code className="h-10 w-10 text-emerald-600 dark:text-emerald-400 mb-4" />,
+    title: "API reference",
+    description: "Find out how our APIs work and how you can deploy them.",
+    link: "https://developers.lomi.africa/api-reference"
+  },
+  {
+    icon: <BookOpen className="h-10 w-10 text-amber-600 dark:text-amber-400 mb-4" />,
+    title: "Integration guides",
+    description: "Step-by-step guides to integrate lomi. into your app.",
+    link: "https://developers.lomi.africa/guides"
+  },
+  {
+    icon: <FileCode className="h-10 w-10 text-purple-600 dark:text-purple-400 mb-4" />,
+    title: "Sample projects",
+    description: "Explore sample projects & apps to kickstart your integration.",
+    link: "https://github.com/lomiafrica"
+  },
+  {
+    icon: <HelpCircle className="h-10 w-10 text-cyan-600 dark:text-cyan-400 mb-4" />,
+    title: "Support",
+    description: "Get help and support from our team.",
+    link: "mailto:hello@lomi.africa?subject=[Support] — Question about integration"
+  },
+  {
+    icon: <Video className="h-10 w-10 text-red-600 dark:text-red-400 mb-4" />,
+    title: "Videos",
+    description: "Watch some videos to get you started very quickly.",
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  }
+]
 
-export default function Dashboard() {
+export function Dashboard() {
   const topNav = [
     { title: 'Home', href: '/portal', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
@@ -116,41 +155,8 @@ export default function Dashboard() {
   )
 }
 
-const developerResources = [
-  {
-    icon: <FileText className="h-10 w-10 text-blue-600 dark:text-blue-400 mb-4" />,
-    title: "Documentation",
-    description: "Familiarize yourself with lomi. products with our docs.",
-    link: "https://developers.lomi.africa/docs"
-  },
-  {
-    icon: <Code className="h-10 w-10 text-emerald-600 dark:text-emerald-400 mb-4" />,
-    title: "API reference",
-    description: "Find out how our APIs work and how you can deploy them.",
-    link: "https://developers.lomi.africa/api-reference"
-  },
-  {
-    icon: <BookOpen className="h-10 w-10 text-amber-600 dark:text-amber-400 mb-4" />,
-    title: "Integration guides",
-    description: "Step-by-step guides to integrate lomi. into your app.",
-    link: "https://developers.lomi.africa/guides"
-  },
-  {
-    icon: <FileCode className="h-10 w-10 text-purple-600 dark:text-purple-400 mb-4" />,
-    title: "Sample projects",
-    description: "Explore sample projects & apps to kickstart your integration.",
-    link: "https://github.com/lomiafrica"
-  },
-  {
-    icon: <HelpCircle className="h-10 w-10 text-cyan-600 dark:text-cyan-400 mb-4" />,
-    title: "Support",
-    description: "Get help and support from our team.",
-    link: "mailto:hello@lomi.africa?subject=[Support] — Question about integration"
-  },
-  {
-    icon: <Video className="h-10 w-10 text-red-600 dark:text-red-400 mb-4" />,
-    title: "Videos",
-    description: "Watch some videos to get you started very quickly.",
-    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  }
-]
+function DashboardWithActivationCheck() {
+  return withActivationCheck(Dashboard)({});
+}
+
+export default DashboardWithActivationCheck;
