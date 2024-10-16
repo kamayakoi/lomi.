@@ -7,7 +7,7 @@ BEGIN
     VALUES (
         NEW.merchant_id,
         'onboarding'::notification_type,
-        'Welcome to lomi.africa, ' || split_part(NEW.name, ' ', 1) || '! We''re excited to have you on board. To get started, activate your profile and set up your account settings.',
+        'Welcome to lomi., ' || split_part(NEW.name, ' ', 1) || '! To get started, activate your profile and set up your account settings.',
         false
     );
 

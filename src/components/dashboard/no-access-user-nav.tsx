@@ -59,7 +59,7 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-[40px] w-[40px] rounded-full">
-          <Avatar className="h-[40px] w-[40px]">
+          <Avatar className="h-[50px] w-[50px]">
             {avatarUrl ? (
               <AvatarImage
                 src={avatarUrl}
