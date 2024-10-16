@@ -404,7 +404,6 @@ export default function PaymentCustomizerWithCheckout() {
     return (
         <div className="flex flex-col h-screen">
             <header className="flex items-center p-4 border-b">
-                <X className="w-6 h-6 mr-2" />
                 <h1 className="text-xl font-semibold">New payment link</h1>
             </header>
             <div className="flex flex-1 overflow-hidden">
@@ -416,20 +415,18 @@ export default function PaymentCustomizerWithCheckout() {
                         <h2 className="text-2xl font-bold">Checkout preview</h2>
                         <div className="flex items-center space-x-2">
                             <Button
-                                variant={displayMode === 'phone' ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => setDisplayMode('phone')}
-                            >
-                                <Smartphone className="w-4 h-4 mr-2" />
-                                Phone
-                            </Button>
-                            <Button
                                 variant={displayMode === 'desktop' ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={() => setDisplayMode('desktop')}
                             >
-                                <Monitor className="w-4 h-4 mr-2" />
-                                Desktop
+                                <Monitor className="w-4 h-4" />
+                            </Button>
+                            <Button
+                                variant={displayMode === 'phone' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setDisplayMode('phone')}
+                            >
+                                <Smartphone className="w-4 h-4" />
                             </Button>
                         </div>
                     </div>
