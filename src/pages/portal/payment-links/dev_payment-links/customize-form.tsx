@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Plus, ExternalLink, CheckCircle, Search, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
+import { ExternalLink, CheckCircle, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -281,9 +281,9 @@ export default function PaymentCustomizerWithCheckout() {
             <div className={`${displayMode === 'desktop' ? 'p-12' : 'p-8'} text-center h-full flex flex-col justify-center`}>
                 {redirectToCustomPage ? (
                     <>
-                        <ExternalLink className={`mx-auto mb-4 text-blue-500 ${displayMode === 'desktop' ? 'h-20 w-20' : 'h-16 w-16'}`} />
+                        <ExternalLink className={`mx-auto mb-4 text-blue-600 ${displayMode === 'desktop' ? 'h-20 w-20' : 'h-16 w-16'}`} />
                         <h2 className={`font-bold mb-4 text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-2xl'}`}>Your transaction has been processed.</h2>
-                        <p className="text-gray-600 text-xs mb-8">Redirection to your custom URL.</p>
+                        <p className="text-blue-600 text-xs mb-8">Redirection to your custom URL.</p>
                     </>
                 ) : (
                     <>
@@ -314,35 +314,35 @@ export default function PaymentCustomizerWithCheckout() {
 
             {paymentType === 'product' && (
                 <div className="space-y-4">
-                    <Label htmlFor="product-search">Select a product</Label>
-                    <div className="relative">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            id="product-search"
-                            placeholder="Search product"
-                            className="pl-8 rounded-none"
-                        />
-                    </div>
-                    <Button className="w-full flex items-center justify-center rounded-none">
-                        <Plus className="mr-2 h-4 w-4" /> Create a product
-                    </Button>
+                    <Label htmlFor="product-select">Select a product</Label>
+                    <Select>
+                        <SelectTrigger id="product-select" className="w-full">
+                            <SelectValue placeholder="Select a product" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="create-product">
+                                Create a product
+                            </SelectItem>
+                            {/* Add more SelectItem components for existing products */}
+                        </SelectContent>
+                    </Select>
                 </div>
             )}
 
             {paymentType === 'plan' && (
                 <div className="space-y-4">
-                    <Label htmlFor="plan-search">Select a plan</Label>
-                    <div className="relative">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            id="plan-search"
-                            placeholder="Search plan"
-                            className="pl-8 rounded-none"
-                        />
-                    </div>
-                    <Button className="w-full flex items-center justify-center rounded-none">
-                        <Plus className="mr-2 h-4 w-4" /> Create a plan
-                    </Button>
+                    <Label htmlFor="plan-select">Select a plan</Label>
+                    <Select>
+                        <SelectTrigger id="plan-select" className="w-full">
+                            <SelectValue placeholder="Select a plan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="create-plan">
+                                Create a plan
+                            </SelectItem>
+                            {/* Add more SelectItem components for existing plans */}
+                        </SelectContent>
+                    </Select>
                 </div>
             )}
 
@@ -548,6 +548,9 @@ export default function PaymentCustomizerWithCheckout() {
                             </Button>
                         </div>
                     </div>
+                    <p className="text-sm text-muted-foreground mb-6 -mt-6">
+                        This preview approximates the actual checkout experience.
+                    </p>
                     <div className="mb-6">
                         <SegmentedControl
                             value={activeTab}
