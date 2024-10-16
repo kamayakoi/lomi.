@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Plus, X, ExternalLink, CheckCircle, Search, Calendar, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
+import { Plus, X, ExternalLink, CheckCircle, Search, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import DateFieldInput from "@/components/ui/date-field-input"
+import { DateValue } from "react-aria-components"
 
 interface PaymentMethod {
     id: string
@@ -71,7 +73,7 @@ const BrowserMockup: React.FC<{ url: string; children: React.ReactNode; displayM
             </div>
             <div className="flex-1 bg-white rounded-none px-2 py-1 text-sm text-gray-800 flex items-center justify-center relative">
                 <Lock className="h-3 w-3 absolute left-2 text-green-600" />
-                <span>{url}</span>
+                <span className="text-xs font-semibold text-gray-400">{url}</span>
             </div>
         </div>
         <div className={`bg-white ${displayMode === 'desktop' ? 'h-[600px]' : 'h-[565px]'} overflow-y-auto`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -87,7 +89,7 @@ interface PriceInputProps {
     price: PriceEntry;
     onAmountChange: (index: number, amount: string) => void;
     onCurrencyChange: (index: number, currency: string) => void;
-    onRemove: (index: number) => void;
+    onRemove?: (index: number) => void;  // Make onRemove optional
 }
 
 const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, onCurrencyChange, onRemove }) => {
@@ -141,7 +143,7 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
                     </SelectContent>
                 </Select>
             </div>
-            {index > 0 && (
+            {onRemove && index > 0 && (
                 <Button
                     variant="outline"
                     size="icon"
@@ -156,72 +158,25 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
 };
 
 interface ExpirationDateInputProps {
-    value: string;
-    onChange: (value: string) => void;
+    value: DateValue | null;
+    onChange: (value: DateValue | null) => void;
 }
 
 const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChange }) => {
-    const [localValue, setLocalValue] = useState(value);
-
-    useEffect(() => {
-        setLocalValue(value);
-    }, [value]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalValue(e.target.value);
-    };
-
-    const handleBlur = () => {
-        onChange(localValue);
+    const handleChange = (value: DateValue | null) => {
+        onChange(value);
     };
 
     return (
         <div>
             <Label htmlFor="expirationDate" className="mb-2 block">Expiration date</Label>
-            <div className="relative">
-                <Input
-                    id="expirationDate"
-                    type="text"
-                    placeholder="dd/mm/yyyy"
-                    value={localValue}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className="pl-10 w-full rounded-none"
-                />
-                <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-            </div>
+            <DateFieldInput
+                value={value}
+                onChange={handleChange}
+                className="w-full rounded-none"
+            />
             <p className="text-sm text-muted-foreground mt-1">Optional</p>
         </div>
-    );
-};
-
-interface AddPriceButtonProps {
-    onAddPrice: () => void;
-}
-
-const AddPriceButton: React.FC<AddPriceButtonProps> = ({ onAddPrice }) => {
-    const [isAdding, setIsAdding] = useState(false);
-
-    const handleClick = () => {
-        setIsAdding(true);
-        onAddPrice();
-    };
-
-    useEffect(() => {
-        if (isAdding) {
-            setIsAdding(false);
-        }
-    }, [isAdding]);
-
-    return (
-        <Button
-            onClick={handleClick}
-            variant="outline"
-            className="w-full rounded-none"
-            disabled={isAdding}
-        >
-            <Plus className="mr-2 h-4 w-4" /> Add a Price
-        </Button>
     );
 };
 
@@ -233,13 +188,13 @@ export default function PaymentCustomizerWithCheckout() {
         privateDescription: ''
     })
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
-    const [expirationDate, setExpirationDate] = useState('')
+    const [expirationDate, setExpirationDate] = useState<DateValue | null>(null);
     const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'Orange', 'Wave', 'CARDS', 'APPLE_PAY'])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
     const [advancedOpen, setAdvancedOpen] = useState(false)
-    const [displayMode, setDisplayMode] = useState<DisplayMode>('phone')
+    const [displayMode, setDisplayMode] = useState<DisplayMode>('desktop')
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
@@ -249,35 +204,11 @@ export default function PaymentCustomizerWithCheckout() {
         { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
     ]
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name.startsWith('instant')) {
-            setInstantLinkDetails(prev => ({ ...prev, [name.replace('instant', '').toLowerCase()]: value }));
-        } else if (name.startsWith('price')) {
-            if (name) {
-                const index = parseInt(name?.split('-')[1] ?? '0');
-                const field = name?.split('-')[2] as 'amount' | 'currency';
-                handlePriceChange(index, field, value);
-            }
-        } else if (name === 'customSuccessUrl') {
-            setCustomSuccessUrl(value);
-        }
-    };
-
     const handlePriceChange = (index: number, field: 'amount' | 'currency', value: string) => {
         const newPrices = [...prices]
         newPrices[index] = { ...newPrices[index], [field]: value }
         setPrices(newPrices)
     }
-
-    const addPrice = useCallback(() => {
-        const newCurrency = prices.length === 1 ? 'USD' : 'EUR'
-        setPrices(prevPrices => [...prevPrices, { amount: '', currency: newCurrency }])
-    }, [prices.length]);
-
-    const removePrice = useCallback((index: number) => {
-        setPrices(prevPrices => prevPrices.filter((_, i) => i !== index))
-    }, []);
 
     const togglePaymentMethod = useCallback((methodId: string) => {
         if (methodId !== 'CARDS') {
@@ -332,8 +263,8 @@ export default function PaymentCustomizerWithCheckout() {
                     </div>
                 </div>
                 <div className="mt-8 text-center">
-                    <span className="text-sm text-gray-500 font-semibold inline-block">
-                        Powered by <span className="text-gray-800">lomi.</span>
+                    <span className="text-sm text-gray-500 font-semibold inline-flex items-center justify-center">
+                        Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
                     </span>
                 </div>
             </div>
@@ -346,8 +277,8 @@ export default function PaymentCustomizerWithCheckout() {
                 {redirectToCustomPage ? (
                     <>
                         <ExternalLink className={`mx-auto mb-4 text-blue-500 ${displayMode === 'desktop' ? 'h-20 w-20' : 'h-16 w-16'}`} />
-                        <h2 className={`font-bold mb-4 text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-2xl'}`}>Redirecting</h2>
-                        <p className="text-gray-600 mb-8">Redirection to your custom URL</p>
+                        <h2 className={`font-bold mb-4 text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-2xl'}`}>Your transaction has been processed.</h2>
+                        <p className="text-gray-600 text-xs mb-8">Redirection to your custom URL.</p>
                     </>
                 ) : (
                     <>
@@ -453,6 +384,48 @@ export default function PaymentCustomizerWithCheckout() {
         </div>
     )
 
+    interface CustomUrlInputProps {
+        value: string;
+        onChange: (value: string) => void;
+    }
+
+    const CustomUrlInput: React.FC<CustomUrlInputProps> = ({ value, onChange }) => {
+        const [localValue, setLocalValue] = useState(value);
+
+        useEffect(() => {
+            setLocalValue(value);
+        }, [value]);
+
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            setLocalValue(e.target.value);
+        };
+
+        const handleBlur = () => {
+            onChange(localValue);
+        };
+
+        return (
+            <div>
+                <Label htmlFor="customSuccessUrl" className="mb-2 block">Custom success page URL</Label>
+                <div className="mt-1 flex rounded-none shadow-sm">
+                    <span className="inline-flex items-center rounded-none border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
+                        https://
+                    </span>
+                    <Input
+                        type="text"
+                        name="customSuccessUrl"
+                        id="customSuccessUrl"
+                        className="block w-full flex-1 rounded-none border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="example.com/success"
+                        value={localValue}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                    />
+                </div>
+            </div>
+        );
+    };
+
     const SuccessCustomizer = () => (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold">Set up the success page</h2>
@@ -467,23 +440,10 @@ export default function PaymentCustomizerWithCheckout() {
                 />
             </div>
             {redirectToCustomPage && (
-                <div>
-                    <Label htmlFor="customSuccessUrl" className="mb-2 block">Custom success page URL</Label>
-                    <div className="mt-1 flex rounded-none shadow-sm">
-                        <span className="inline-flex items-center rounded-none border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
-                            https://
-                        </span>
-                        <Input
-                            type="text"
-                            name="customSuccessUrl"
-                            id="customSuccessUrl"
-                            className="block w-full flex-1 rounded-none border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                            placeholder="example.com/success"
-                            value={customSuccessUrl}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                </div>
+                <CustomUrlInput
+                    value={customSuccessUrl}
+                    onChange={(value) => setCustomSuccessUrl(value)}
+                />
             )}
         </div>
     )
@@ -503,19 +463,12 @@ export default function PaymentCustomizerWithCheckout() {
                 onChange={handleInstantLinkChange}
                 optional
             />
-            {prices.map((price, index) => (
-                <PriceInput
-                    key={index}
-                    index={index}
-                    price={price}
-                    onAmountChange={(index, amount) => handlePriceChange(index, 'amount', amount)}
-                    onCurrencyChange={(index, currency) => handlePriceChange(index, 'currency', currency)}
-                    onRemove={removePrice}
-                />
-            ))}
-            {prices.length < 3 && (
-                <AddPriceButton onAddPrice={addPrice} />
-            )}
+            <PriceInput
+                index={0}
+                price={prices[0] || { amount: '', currency: 'XOF' }}
+                onAmountChange={(_, amount) => handlePriceChange(0, 'amount', amount)}
+                onCurrencyChange={(_, currency) => handlePriceChange(0, 'currency', currency)}
+            />
             <InstantLinkInput
                 name="privateDescription"
                 label="Private description"
@@ -535,7 +488,7 @@ export default function PaymentCustomizerWithCheckout() {
                 <div className="w-1/2 p-6 overflow-auto border-r">
                     {activeTab === 'checkout' ? <CheckoutCustomizer /> : <SuccessCustomizer />}
                 </div>
-                <div className="w-1/2 p-6 bg-gray-100 overflow-auto">
+                <div className="w-1/2 p-6 bg-transparent dark:bg-[#121317] overflow-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Checkout preview</h2>
                         <div className="flex items-center space-x-2">
