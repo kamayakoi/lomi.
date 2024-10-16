@@ -55,6 +55,7 @@ import PayoutLinks from './pages/portal/payout-links/PayoutLinks.tsx'
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/Subscription.tsx"
+import Product from "./pages/portal/product/Product.tsx"
 
 
 // Settings pages
@@ -115,6 +116,7 @@ const AppRouter = () => (
                     <Route index element={<Dashboard />} />
                     <Route path="integrations" element={<Integrators />} />
                     <Route path="subscription" element={<Subscription />} />
+                    <Route path="product" element={<Product />} />
                     <Route path="payment-channels" element={<PaymentChannels />} />
                     <Route path="logs" element={<Logs />} />
                     <Route path="balance" element={<Balance />} />

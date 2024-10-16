@@ -14,7 +14,7 @@ import {
   IconExchange,
   IconLinkPlus,
   IconWallet,
-  IconSend,
+  IconPackage,
   IconFlag,
 } from '@tabler/icons-react'
 
@@ -93,10 +93,15 @@ export const sidelinks: SidebarItem[] = [
     href: '/portal/payment-links',
     icon: <IconLinkPlus className="text-indigo-500" size={18} />,
   },
+  // {
+  //   title: 'Payout Links',
+  //   href: '/portal/payout-links',
+  //   icon: <IconSend className="text-orange-500" size={18} />,
+  // },
   {
-    title: 'Payout Links',
-    href: '/portal/payout-links',
-    icon: <IconSend className="text-orange-500" size={18} />,
+    title: 'Products',
+    href: '/portal/product',
+    icon: <IconPackage className="text-blue-400" size={18} />,
   },
   {
     title: 'Subscriptions',
