@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DateFieldInput from "@/components/ui/date-field-input"
@@ -89,7 +88,7 @@ interface PriceInputProps {
     price: PriceEntry;
     onAmountChange: (index: number, amount: string) => void;
     onCurrencyChange: (index: number, currency: string) => void;
-    onRemove?: (index: number) => void;  // Make onRemove optional
+    onRemove?: (index: number) => void;
 }
 
 const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, onCurrencyChange, onRemove }) => {
@@ -173,9 +172,8 @@ const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChan
             <DateFieldInput
                 value={value}
                 onChange={handleChange}
-                className="w-full rounded-none"
+                className="w-full rounded-none bg-background text-foreground"
             />
-            <p className="text-sm text-muted-foreground mt-1">Optional</p>
         </div>
     );
 };
@@ -193,7 +191,6 @@ export default function PaymentCustomizerWithCheckout() {
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
-    const [advancedOpen, setAdvancedOpen] = useState(false)
     const [displayMode, setDisplayMode] = useState<DisplayMode>('desktop')
 
     const paymentMethods: PaymentMethod[] = [
@@ -245,7 +242,7 @@ export default function PaymentCustomizerWithCheckout() {
                             return paymentMethod ? (
                                 <button
                                     key={paymentMethod.id}
-                                    className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200`}
+                                    className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black`}
                                 >
                                     <div className="flex items-center">
                                         <img src={paymentMethod.icon} alt={paymentMethod.name} className="w-8 h-8 mr-3" />
@@ -344,45 +341,55 @@ export default function PaymentCustomizerWithCheckout() {
             {paymentType === 'instant' && (
                 <div className="space-y-4">
                     <InstantLinkCustomizer />
-                    <Accordion type="single" collapsible value={advancedOpen ? "advanced" : ""} onValueChange={(value) => setAdvancedOpen(value === "advanced")}>
-                        <AccordionItem value="advanced">
-                            <AccordionTrigger>Advanced</AccordionTrigger>
-                            <AccordionContent>
-                                <div className="space-y-4">
-                                    <ExpirationDateInput
-                                        value={expirationDate}
-                                        onChange={setExpirationDate}
-                                    />
-                                    <div>
-                                        <Label className="mb-2 block">Payment methods</Label>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                            <Badge
-                                                key="CARDS"
-                                                variant="default"
-                                                className="cursor-default rounded-none"
-                                            >
-                                                Cards
-                                            </Badge>
-                                            {paymentMethods.slice(1).map((method) => (
-                                                <Badge
-                                                    key={method.id}
-                                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                                    className="cursor-pointer rounded-none"
-                                                    onClick={() => togglePaymentMethod(method.id)}
-                                                >
-                                                    {method.name}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                    <ExpirationDateInput
+                        value={expirationDate}
+                        onChange={setExpirationDate}
+                    />
+                    <div className="space-y-4"> {/* Increased space between label and badges */}
+                        <Label className="block">Payment methods</Label>
+                        <div className="flex flex-wrap gap-2">
+                            <Badge
+                                key="CARDS"
+                                variant="default"
+                                className="cursor-default rounded-none bg-[#625BF6] hover:bg-[#625BF6] text-white"
+                            >
+                                Cards
+                            </Badge>
+                            {paymentMethods.slice(1).map((method) => (
+                                <Badge
+                                    key={method.id}
+                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
+                                    className={`cursor-pointer rounded-none ${allowedPaymentMethods.includes(method.id)
+                                        ? getBadgeColor(method.id)
+                                        : 'bg-transparent hover:bg-transparent'
+                                        }`}
+                                    onClick={() => togglePaymentMethod(method.id)}
+                                >
+                                    {method.name}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
     )
+
+    // Add this function to determine the badge color
+    const getBadgeColor = (methodId: string) => {
+        switch (methodId) {
+            case 'WAVE':
+                return 'bg-[#71CDF4] hover:bg-[#71CDF4] text-black';
+            case 'ORANGE':
+                return 'bg-[#FC6307] hover:bg-[#FC6307] text-white';
+            case 'MTN':
+                return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
+            case 'APPLE_PAY':
+                return 'bg-[#808080] text-white';
+            default:
+                return '';
+        }
+    };
 
     interface CustomUrlInputProps {
         value: string;
@@ -485,7 +492,7 @@ export default function PaymentCustomizerWithCheckout() {
                 <h1 className="text-xl font-semibold">New payment link</h1>
             </header>
             <div className="flex flex-1 overflow-hidden">
-                <div className="w-1/2 p-6 overflow-auto border-r">
+                <div className="w-1/2 p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
                     {activeTab === 'checkout' ? <CheckoutCustomizer /> : <SuccessCustomizer />}
                 </div>
                 <div className="w-1/2 p-6 bg-transparent dark:bg-[#121317] overflow-auto">
