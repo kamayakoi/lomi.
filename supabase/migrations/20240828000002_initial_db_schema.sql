@@ -18,6 +18,7 @@ CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed'
 CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
 CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 'subscription', 'webhook', 'chargeback');
 CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
+CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
 
 --------------- TABLES ---------------
 
@@ -562,28 +563,23 @@ COMMENT ON TABLE api_usage IS 'Tracks API usage statistics for each organization
 CREATE TABLE webhooks (
   webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   url VARCHAR NOT NULL,
-  events JSONB NOT NULL,
-  secret VARCHAR,
-  metadata JSONB,
+  event webhook_event NOT NULL,
   is_active BOOLEAN NOT NULL DEFAULT true,
   last_triggered_at TIMESTAMPTZ,
   last_payload JSONB,
   last_response_status INT,
   last_response_body TEXT,
-  last_delivery_time FLOAT,
   retry_count INT DEFAULT 0,
-  next_retry_at TIMESTAMPTZ,
-  cache_key VARCHAR(255),
-  cache_expiry TIMESTAMPTZ,
+  metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (merchant_id, url, organization_id)
+  UNIQUE (merchant_id, event, url)
 );
 
 CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);
 CREATE INDEX idx_webhooks_organization_id ON webhooks(organization_id);
+CREATE INDEX idx_webhooks_event ON webhooks(event);
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';
 

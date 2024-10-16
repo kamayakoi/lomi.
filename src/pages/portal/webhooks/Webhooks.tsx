@@ -1,37 +1,57 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CalendarIcon, AlertTriangle } from 'lucide-react'
-import { format } from 'date-fns'
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
+import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
-import { Separator } from '@/components/ui/separator'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import { useUser } from '@/lib/hooks/useUser'
+import { fetchWebhooks } from './dev_webhooks/support_webhooks'
+import { Webhook, webhook_event } from './dev_webhooks/types'
+import { Skeleton } from '@/components/ui/skeleton'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useInfiniteQuery } from 'react-query'
+import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
+import { CreateWebhookForm } from './dev_webhooks/form_webhooks'
+import { WebhookFilters } from './dev_webhooks/filters_webhooks'
 
 export default function WebhooksPage() {
-    const [startDate, setStartDate] = useState<Date | undefined>(new Date())
-    const [endDate, setEndDate] = useState<Date | undefined>(new Date())
+    const { user } = useUser()
+    const [isCreateWebhookOpen, setIsCreateWebhookOpen] = useState(false)
+    const [selectedEvent, setSelectedEvent] = useState<webhook_event | null>(null)
+    const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+    const pageSize = 50
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
+
+    const { data: webhooksData, isLoading: isWebhooksLoading, fetchNextPage, refetch } = useInfiniteQuery(
+        ['webhooks', user?.id || '', selectedEvent, selectedStatus],
+        ({ pageParam = 1 }) =>
+            fetchWebhooks(
+                user?.id || '',
+                selectedEvent,
+                selectedStatus,
+                pageParam,
+                pageSize
+            ),
+        {
+            getNextPageParam: (lastPage: Webhook[], allPages: Webhook[][]) => {
+                const nextPage = allPages.length + 1
+                return lastPage.length !== 0 ? nextPage : undefined
+            },
+            enabled: !!user?.id,
+        }
+    )
+
+    const webhooks = webhooksData?.pages?.flatMap((page) => page) || []
+
+    const handleCreateWebhookSuccess = () => {
+        refetch()
+    }
 
     return (
         <Layout fixed>
@@ -47,84 +67,78 @@ export default function WebhooksPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className='space-y-4'>
-                    <h1 className='text-2xl font-bold tracking-tight'>Webhooks</h1>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-2xl font-bold tracking-tight">Webhooks</h1>
+                        <Button onClick={() => setIsCreateWebhookOpen(true)}>Create Webhook</Button>
+                    </div>
 
-                    <Alert variant="warning">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>Failed events will be redelivered automatically.</AlertTitle>
-                        <AlertDescription>
-                            Learn more about our retry policy <a href="https://devs.lomi.africa/docs/webhooks/retry-policy" className="font-medium underline underline-offset-4">here</a>.
-                        </AlertDescription>
-                    </Alert>
+                    <WebhookFilters
+                        selectedEvent={selectedEvent}
+                        setSelectedEvent={setSelectedEvent}
+                        selectedStatus={selectedStatus}
+                        setSelectedStatus={setSelectedStatus}
+                        refetch={refetch}
+                    />
 
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                        <div className="p-6 space-y-4">
-                            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
-                                <div className="flex-1">
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Filter (0)" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All Events</SelectItem>
-                                            <SelectItem value="failed">Failed Events</SelectItem>
-                                            <SelectItem value="successful">Successful Events</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="flex flex-1 items-center space-x-2">
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {startDate ? format(startDate, "PPP") : <span>Start date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={startDate}
-                                                onSelect={setStartDate}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                    <span>-</span>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                {endDate ? format(endDate, "PPP") : <span>End date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={endDate}
-                                                onSelect={setEndDate}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-
-                                <div className="flex flex-1 space-x-2">
-                                    <Input type="search" placeholder="Search..." className="md:w-[300px]" />
-                                    <Button variant="secondary">Custom Resend</Button>
-                                    <Button variant="outline">Resend</Button>
-                                </div>
-                            </div>
-
-                            <div className="mt-8 flex flex-col items-center justify-center space-y-4 py-12">
-                                <h2 className="text-2xl font-semibold">No webhook event found</h2>
-                                <p className="text-muted-foreground">Please adjust filter or create new webhooks</p>
-                            </div>
+                    <div className="rounded-md border mt-4">
+                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
+                            <InfiniteScroll
+                                dataLength={webhooks.length}
+                                next={() => fetchNextPage()}
+                                hasMore={webhooksData?.pages[webhooksData.pages.length - 1]?.length === pageSize}
+                                loader={<Skeleton className="w-full h-8" />}
+                            >
+                                {isWebhooksLoading ? (
+                                    Array.from({ length: 5 }).map((_, index) => (
+                                        <div key={index} className="py-4 px-6 border-b">
+                                            <Skeleton className="w-full h-8" />
+                                        </div>
+                                    ))
+                                ) : webhooks.length === 0 ? (
+                                    <div className="py-24 text-center">
+                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                            <div className="rounded-full bg-transparent dark:bg-transparent p-4">
+                                                <ClipboardDocumentListIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                            </div>
+                                            <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                No webhooks found
+                                            </p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                                Try changing your filter or create a new webhook.
+                                            </p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    webhooks.map((webhook: Webhook) => (
+                                        <div key={webhook.webhook_id} className="py-4 px-6 border-b">
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <p className="text-lg font-semibold">{webhook.url}</p>
+                                                    <p className="text-sm text-muted-foreground">{webhook.event}</p>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <span className={`
+                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                        ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                    `}>
+                                                        {webhook.is_active ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                    <Button variant="ghost" size="sm">
+                                                        View
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </InfiniteScroll>
                         </div>
                     </div>
                 </div>
             </Layout.Body>
+
+            {isCreateWebhookOpen && <CreateWebhookForm onClose={() => setIsCreateWebhookOpen(false)} onSuccess={handleCreateWebhookSuccess} />}
         </Layout>
     )
 }

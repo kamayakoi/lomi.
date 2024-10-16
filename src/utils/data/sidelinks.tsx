@@ -8,12 +8,9 @@ import {
   IconUsers,
   IconRepeat,
   IconWebhook,
-  IconCreditCardPay,
-  IconCreditCard,
   IconCurrencyDollar,
   IconExchange,
   IconLinkPlus,
-  IconWallet,
   IconPackage,
   IconFlag,
 } from '@tabler/icons-react'
@@ -71,23 +68,23 @@ export const sidelinks: SidebarItem[] = [
     icon: <IconChartHistogram className="text-yellow-500" size={18} />,
   },
   { type: 'section', title: 'PAYMENTS' },
-  {
-    title: 'Accept Payments',
-    href: '',
-    icon: <IconCreditCardPay className="text-pink-500" size={18} />,
-    sub: [
-      {
-        title: 'Credit | Debit Cards',
-        href: '/portal/cards',
-        icon: <IconCreditCard className="text-red-400" size={18} />,
-      },
-      {
-        title: 'eWallets',
-        href: '/portal/e-wallets',
-        icon: <IconWallet className="text-green-400" size={18} />,
-      },
-    ],
-  },
+  // {
+  //   title: 'Accept Payments',
+  //   href: '',
+  //   icon: <IconCreditCardPay className="text-pink-500" size={18} />,
+  //   sub: [
+  //     {
+  //       title: 'Credit | Debit Cards',
+  //       href: '/portal/cards',
+  //       icon: <IconCreditCard className="text-red-400" size={18} />,
+  //     },
+  //     {
+  //       title: 'eWallets',
+  //       href: '/portal/e-wallets',
+  //       icon: <IconWallet className="text-green-400" size={18} />,
+  //     },
+  //   ],
+  // },
   {
     title: 'Payment Links',
     href: '/portal/payment-links',

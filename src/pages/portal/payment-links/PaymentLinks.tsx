@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from "@/components/ui/calendar"
@@ -19,6 +16,7 @@ import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import PaymentCustomizerWithCheckout from './dev_payment-links/customize-form'
 
 export default function PaymentLinksPage() {
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
@@ -46,7 +44,7 @@ export default function PaymentLinksPage() {
       <DashboardLayout.Body>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold tracking-tight">Payment Links | Invoices</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Payment Links</h1>
             <div className="flex space-x-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -63,11 +61,6 @@ export default function PaymentLinksPage() {
           </div>
 
           <Tabs defaultValue="single">
-            <TabsList>
-              <TabsTrigger value="single">Single Payment Links</TabsTrigger>
-              <TabsTrigger value="multiple">Multiple Payment Links</TabsTrigger>
-            </TabsList>
-
             <TabsContent value="single">
               <Card>
                 <CardContent className="p-6">
@@ -148,30 +141,11 @@ export default function PaymentLinksPage() {
                     <div className="rounded-full bg-primary/10 p-3">
                       <Link2Icon className="h-6 w-6 text-primary" />
                     </div>
-                    <h2 className="text-xl font-semibold">No Payment Links Yet :(</h2>
+                    <h2 className="text-xl font-semibold">No Payment Links Yet</h2>
                     <p className="text-muted-foreground text-center">
                       Your customers might be looking for a way to pay you.<br />
                       To start accepting payments, create a Payment Link and share it with them.
                     </p>
-                    <Button onClick={() => setIsCreateLinkOpen(true)}>Create Payment Link</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="multiple">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex flex-col items-center justify-center space-y-4 py-12">
-                    <div className="rounded-full bg-primary/10 p-3">
-                      <Link2Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h2 className="text-xl font-semibold">No Multiple Payment Links Yet :(</h2>
-                    <p className="text-muted-foreground text-center">
-                      Your customers might be looking for a way to pay you.<br />
-                      To start accepting payments, create a Multiple Payment Link and share it with them.
-                    </p>
-                    <Button onClick={() => setIsCreateLinkOpen(true)}>Create Payment Link</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -181,42 +155,16 @@ export default function PaymentLinksPage() {
       </DashboardLayout.Body>
 
       <Dialog open={isCreateLinkOpen} onOpenChange={setIsCreateLinkOpen}>
-        <DialogContent className="sm:max-w-[725px]">
+        <DialogContent className="sm:max-w-full sm:h-full">
           <DialogHeader>
             <DialogTitle>Create Payment Link</DialogTitle>
             <DialogDescription>
               Fill in the details to create a new payment link.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="reference-id" className="text-right">
-                Reference ID
-              </Label>
-              <Input id="reference-id" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="amount" className="text-right">
-                Amount Due
-              </Label>
-              <Input id="amount" type="number" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Textarea id="description" className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Enable Multiple Payments</Label>
-              <Switch />
-            </div>
-          </div>
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={() => setIsCreateLinkOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => setIsCreateLinkOpen(false)}>Create Payment Link</Button>
+          {/* Render the PaymentCustomizerWithCheckout component */}
+          <div className="h-full">
+            <PaymentCustomizerWithCheckout />
           </div>
         </DialogContent>
       </Dialog>

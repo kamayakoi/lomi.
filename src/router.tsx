@@ -46,12 +46,12 @@ import Settings from './pages/portal/settings/settings.tsx';
 import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx'
 import Logs from './pages/portal/logs-page/Logs.tsx'
 import Balance from './pages/portal/balance/Balance.tsx'
-import Cards from './pages/portal/accept-payments/cards/Cards.tsx'
-import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'
+// import Cards from './pages/portal/accept-payments/cards/Cards.tsx'
+// import EWallets from './pages/portal/accept-payments/eWallets/eWallets.tsx'
+// import PayoutLinks from './pages/portal/payout-links/PayoutLinks.tsx'
 import Transactions from './pages/portal/transactions/Transactions.tsx'
 import Reporting from './pages/portal/reporting/Reporting.tsx'
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx'
-import PayoutLinks from './pages/portal/payout-links/PayoutLinks.tsx'
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/Subscription.tsx"
@@ -120,12 +120,12 @@ const AppRouter = () => (
                     <Route path="payment-channels" element={<PaymentChannels />} />
                     <Route path="logs" element={<Logs />} />
                     <Route path="balance" element={<Balance />} />
-                    <Route path="cards" element={<Cards />} />
-                    <Route path="e-wallets" element={<EWallets />} />
+                    {/* <Route path="cards" element={<Cards />} />
+                    <Route path="e-wallets" element={<EWallets />} /> 
+                    <Route path="payout-links" element={<PayoutLinks />} />*/}
                     <Route path="transactions" element={<Transactions />} />
                     <Route path="reporting" element={<Reporting />} />
                     <Route path="webhooks" element={<Webhooks />} />
-                    <Route path="payout-links" element={<PayoutLinks />} />
                     <Route path="payment-links" element={<PaymentLinks />} />
                     <Route path="customers" element={<Customers />} />
                     <Route path="stripe-connect-landing" element={<StripeConnectLanding />} />
