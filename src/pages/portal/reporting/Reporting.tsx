@@ -19,13 +19,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/actions/utils'
 import { ChartBarSquareIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 const topNav = [
     { title: 'Reporting', href: '/portal/reporting', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
 ]
 
-export default function ReportingPage() {
+function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
 
@@ -394,3 +395,9 @@ function fillMissingMonths(revenueData: RevenueData[], transactionVolumeData: Tr
 
     return filledData
 }
+
+function ReportingWithActivationCheck() {
+    return withActivationCheck(ReportingPage)({});
+}
+
+export default ReportingWithActivationCheck;

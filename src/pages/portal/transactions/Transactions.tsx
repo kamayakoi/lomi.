@@ -21,6 +21,7 @@ import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 
 type Transaction = {
@@ -36,7 +37,7 @@ type Transaction = {
     provider_code: provider_code
 }
 
-export default function TransactionsPage() {
+function TransactionsPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
@@ -651,6 +652,12 @@ export default function TransactionsPage() {
         </Layout>
     )
 }
+
+function TransactionsWithActivationCheck() {
+    return withActivationCheck(TransactionsPage)({});
+}
+
+export default TransactionsWithActivationCheck;
 
 function formatPaymentMethod(paymentMethod: payment_method_code): string {
     switch (paymentMethod) {

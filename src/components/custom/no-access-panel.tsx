@@ -33,9 +33,17 @@ export default function Component() {
                     <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
                         <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">No Access</h1>
                         <p className="text-white text-sm sm:text-base max-w-md">
-                            Your organization have not been given access yet.<br />
-                            <span className="whitespace-nowrap">To gain access, you need to go through the Activation process [5 minutes].</span>
-
+                            Your organization has not been given access yet.<br />
+                            <span className="whitespace-nowrap">
+                                To gain access, you can{' '}
+                                <a
+                                    href="mailto:hello@lomi.africa?subject=[Activation]%20—%20Contact%20sales"
+                                    className="text-primary text-white hover:underline"
+                                >
+                                    email us
+                                </a>{' '}
+                                or go through the Activation process [5 minutes].
+                            </span>
                         </p>
                     </div>
                 </div>

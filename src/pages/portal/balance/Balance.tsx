@@ -28,8 +28,9 @@ import { Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function BalancePage() {
+function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
     const [sortColumn, setSortColumn] = useState<keyof Payout | null>(null)
@@ -498,3 +499,9 @@ function formatDate(dateString: string): string {
 function formatAmount(amount: number): string {
     return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }
+
+function BalanceWithActivationCheck() {
+    return withActivationCheck(BalancePage)({});
+}
+
+export default BalanceWithActivationCheck;
