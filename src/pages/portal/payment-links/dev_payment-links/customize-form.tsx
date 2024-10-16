@@ -59,11 +59,11 @@ export default function PaymentCustomizerWithCheckout() {
 
 
     const paymentMethods: PaymentMethod[] = [
-        { id: 'MTN', name: 'MTN', icon: '/mtn.png' },
-        { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
-        { id: 'WAVE', name: 'Wave', icon: '/wave.png' },
         { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
         { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png' },
+        { id: 'WAVE', name: 'Wave', icon: '/wave.png' },
+        { id: 'MTN', name: 'MTN', icon: '/mtn.png' },
+        { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
     ]
 
     const handleMethodSelect = (methodId: string) => {
@@ -332,7 +332,7 @@ export default function PaymentCustomizerWithCheckout() {
                                                 <Badge
                                                     key={method.id}
                                                     variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                                    className="cursor-pointer"
+                                                    className="cursor-pointer rounded-none"
                                                     onClick={() => togglePaymentMethod(method.id)}
                                                 >
                                                     {method.name}
