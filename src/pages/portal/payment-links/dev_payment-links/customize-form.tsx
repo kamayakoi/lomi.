@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, X, CheckCircle, Search, Calendar, Circle, Smartphone, Monitor } from 'lucide-react'
+import { Plus, X, ExternalLink, CheckCircle, Search, Calendar, Circle, Smartphone, Monitor } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -50,8 +50,7 @@ export default function PaymentCustomizerWithCheckout() {
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
     const [selectedMethod, setSelectedMethod] = useState('')
     const [expirationDate, setExpirationDate] = useState('')
-    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'Orange', 'Wave', 'Cards', 'Apple Pay'])
-    const [allowCouponCode, setAllowCouponCode] = useState(false)
+    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'Orange', 'Wave', 'CARDS', 'APPLE_PAY'])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
@@ -102,9 +101,9 @@ export default function PaymentCustomizerWithCheckout() {
         setPrices(newPrices)
     }
 
-    const togglePaymentMethod = (method: string) => {
+    const togglePaymentMethod = (methodId: string) => {
         setAllowedPaymentMethods(prev =>
-            prev.includes(method) ? prev.filter(m => m !== method) : [...prev, method]
+            prev.includes(methodId) ? prev.filter(m => m !== methodId) : [...prev, methodId]
         )
     }
 
@@ -127,7 +126,7 @@ export default function PaymentCustomizerWithCheckout() {
                     <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-xl' : 'text-lg'}`}>Select a payment method</h3>
                     <div className="grid gap-4">
                         {allowedPaymentMethods.map((method) => {
-                            const paymentMethod = paymentMethods.find(m => m.id === method.toUpperCase())
+                            const paymentMethod = paymentMethods.find(m => m.id === method)
                             return paymentMethod ? (
                                 <button
                                     key={paymentMethod.id}
@@ -143,11 +142,6 @@ export default function PaymentCustomizerWithCheckout() {
                                         <div className="flex space-x-2">
                                             <img src="/checkout-visa.png" alt="Visa" className="h-6" />
                                             <img src="/checkout-mastercard.png" alt="Mastercard" className="h-6" />
-                                        </div>
-                                    )}
-                                    {paymentMethod.id === 'APPLE_PAY' && (
-                                        <div className="flex space-x-2">
-                                            <img src="/apple-pay-logo.png" alt="Apple Pay" className="h-6" />
                                         </div>
                                     )}
                                 </button>
@@ -169,17 +163,14 @@ export default function PaymentCustomizerWithCheckout() {
             <div className={`${displayMode === 'desktop' ? 'p-12' : 'p-8'} text-center`}>
                 {redirectToCustomPage ? (
                     <>
-                        <h2 className={`font-bold mb-4 text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-2xl'}`}>Redirecting...</h2>
-                        <p className="text-gray-600 mb-8">You will be redirected to: {customSuccessUrl}</p>
+                        <ExternalLink className={`mx-auto mb-4 text-blue-500 ${displayMode === 'desktop' ? 'h-20 w-20' : 'h-16 w-16'}`} />
+                        <p className="text-gray-600 mb-8">Redirect to your custom URL</p>
                     </>
                 ) : (
                     <>
                         <CheckCircle className={`mx-auto mb-4 text-green-500 ${displayMode === 'desktop' ? 'h-20 w-20' : 'h-16 w-16'}`} />
                         <h2 className={`font-bold mb-4 text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-2xl'}`}>Payment Successful!</h2>
                         <p className="text-gray-600 mb-8">Thank you for your purchase. Your order has been confirmed.</p>
-                        <Button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md">
-                            View Order Details
-                        </Button>
                     </>
                 )}
             </div>
@@ -340,22 +331,14 @@ export default function PaymentCustomizerWithCheckout() {
                                             {paymentMethods.map((method) => (
                                                 <Badge
                                                     key={method.id}
-                                                    variant={allowedPaymentMethods.includes(method.name) ? "default" : "outline"}
+                                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
                                                     className="cursor-pointer"
-                                                    onClick={() => togglePaymentMethod(method.name)}
+                                                    onClick={() => togglePaymentMethod(method.id)}
                                                 >
                                                     {method.name}
                                                 </Badge>
                                             ))}
                                         </div>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch
-                                            id="allowCouponCode"
-                                            checked={allowCouponCode}
-                                            onCheckedChange={setAllowCouponCode}
-                                        />
-                                        <Label htmlFor="allowCouponCode">Allow coupon code</Label>
                                     </div>
                                 </div>
                             </AccordionContent>
