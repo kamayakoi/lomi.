@@ -6,7 +6,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card, CardContent } from "@/components/ui/card"
-import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon } from 'lucide-react'
+import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon, PlusCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -56,7 +56,10 @@ export default function PaymentLinksPage() {
                   <DropdownMenuItem>Book a demo</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button onClick={() => setIsCreateLinkOpen(true)}>Create Payment Link</Button>
+              <Button onClick={() => setIsCreateLinkOpen(true)} className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Payment Link
+              </Button>
             </div>
           </div>
 

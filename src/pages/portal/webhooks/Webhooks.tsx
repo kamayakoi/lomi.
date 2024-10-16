@@ -15,6 +15,15 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateWebhookForm } from './dev_webhooks/form_webhooks'
 import { WebhookFilters } from './dev_webhooks/filters_webhooks'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { PlusCircle } from 'lucide-react'
 
 export default function WebhooksPage() {
     const { user } = useUser()
@@ -70,7 +79,23 @@ export default function WebhooksPage() {
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-bold tracking-tight">Webhooks</h1>
-                        <Button onClick={() => setIsCreateWebhookOpen(true)}>Create Webhook</Button>
+                        <Dialog open={isCreateWebhookOpen} onOpenChange={setIsCreateWebhookOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Create Webhook
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create Webhook</DialogTitle>
+                                    <DialogDescription>
+                                        Fill in the details to create a new webhook.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <CreateWebhookForm onClose={() => setIsCreateWebhookOpen(false)} onSuccess={handleCreateWebhookSuccess} />
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
                     <WebhookFilters
@@ -137,8 +162,6 @@ export default function WebhooksPage() {
                     </div>
                 </div>
             </Layout.Body>
-
-            {isCreateWebhookOpen && <CreateWebhookForm onClose={() => setIsCreateWebhookOpen(false)} onSuccess={handleCreateWebhookSuccess} />}
         </Layout>
     )
 }

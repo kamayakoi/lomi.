@@ -16,6 +16,15 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './dev_subscription/form_subscriptions'
 import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { PlusCircle } from 'lucide-react'
 
 export default function SubscriptionsPage() {
   const { user } = useUser()
@@ -69,7 +78,23 @@ export default function SubscriptionsPage() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
-            <Button onClick={() => setIsCreatePlanOpen(true)}>Create Plan</Button>
+            <Dialog open={isCreatePlanOpen} onOpenChange={setIsCreatePlanOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Plan
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Plan</DialogTitle>
+                  <DialogDescription>
+                    Fill in the details to create a new subscription plan.
+                  </DialogDescription>
+                </DialogHeader>
+                <CreatePlanForm onClose={() => setIsCreatePlanOpen(false)} onSuccess={handleCreatePlanSuccess} />
+              </DialogContent>
+            </Dialog>
           </div>
 
           <Tabs defaultValue="plans">
@@ -149,8 +174,6 @@ export default function SubscriptionsPage() {
           </Tabs>
         </div>
       </Layout.Body>
-
-      {isCreatePlanOpen && <CreatePlanForm onClose={() => setIsCreatePlanOpen(false)} onSuccess={handleCreatePlanSuccess} />}
     </Layout>
   )
 }

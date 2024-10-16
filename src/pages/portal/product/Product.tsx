@@ -15,6 +15,15 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateProductForm } from './dev_product/form_product'
 import { ProductFilters } from './dev_product/filters_product'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { PlusCircle } from 'lucide-react'
 
 export default function ProductsPage() {
     const { user } = useUser()
@@ -68,7 +77,23 @@ export default function ProductsPage() {
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-                        <Button onClick={() => setIsCreateProductOpen(true)}>Create Product</Button>
+                        <Dialog open={isCreateProductOpen} onOpenChange={setIsCreateProductOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Create Product
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create Product</DialogTitle>
+                                    <DialogDescription>
+                                        Fill in the details to create a new product.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
                     <ProductFilters
@@ -133,8 +158,6 @@ export default function ProductsPage() {
                     </div>
                 </div>
             </Layout.Body>
-
-            {isCreateProductOpen && <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />}
         </Layout>
     )
 }

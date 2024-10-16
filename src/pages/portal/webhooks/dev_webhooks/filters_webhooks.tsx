@@ -35,7 +35,7 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                         <SelectValue placeholder="All Events" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="">All Events</SelectItem>
+                        <SelectItem value="all">All Events</SelectItem>
                         <SelectItem value="new_payment">New Payment</SelectItem>
                         <SelectItem value="new_subscription">New Subscription</SelectItem>
                         <SelectItem value="payment_status_change">Payment Status Change</SelectItem>
