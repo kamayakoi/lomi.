@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card, CardContent } from "@/components/ui/card"
 import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon, PlusCircle } from 'lucide-react'
@@ -158,15 +158,8 @@ export default function PaymentLinksPage() {
       </DashboardLayout.Body>
 
       <Dialog open={isCreateLinkOpen} onOpenChange={setIsCreateLinkOpen}>
-        <DialogContent className="sm:max-w-full sm:h-full">
-          <DialogHeader>
-            <DialogTitle>Create Payment Link</DialogTitle>
-            <DialogDescription>
-              Fill in the details to create a new payment link.
-            </DialogDescription>
-          </DialogHeader>
-          {/* Render the PaymentCustomizerWithCheckout component */}
-          <div className="h-full">
+        <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] sm:w-full sm:h-full overflow-hidden">
+          <div className="h-[calc(90vh-100px)] overflow-auto">
             <PaymentCustomizerWithCheckout />
           </div>
         </DialogContent>

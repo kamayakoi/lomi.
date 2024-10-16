@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Plus, X, ExternalLink, CheckCircle, Search, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
+import { Plus, ExternalLink, CheckCircle, Search, Circle, Smartphone, Monitor, Lock } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import DateFieldInput from "@/components/ui/date-field-input"
 import { DateValue } from "react-aria-components"
+import { SegmentedControl } from "@/components/ui/segmented-control"
 
 interface PaymentMethod {
     id: string
@@ -57,7 +57,7 @@ const InstantLinkInput: React.FC<InstantLinkInputProps> = ({ name, label, value,
                 onBlur={handleBlur}
                 className="w-full rounded-none"
             />
-            {optional && <p className="text-sm text-muted-foreground mt-1">Optional</p>}
+            {optional && <p className="text-[0.625rem] text-muted-foreground mt-1">Optional</p>}
         </div>
     );
 };
@@ -91,7 +91,7 @@ interface PriceInputProps {
     onRemove?: (index: number) => void;
 }
 
-const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, onCurrencyChange, onRemove }) => {
+const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, onCurrencyChange }) => {
     const [localAmount, setLocalAmount] = useState(price.amount || '');
     const [localCurrency, setLocalCurrency] = useState(price.currency || 'XOF');
 
@@ -101,11 +101,17 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
     }, [price]);
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalAmount(e.target.value);
+        const value = e.target.value;
+        // Allow only numbers and one decimal point
+        if (/^\d*\.?\d*$/.test(value)) {
+            setLocalAmount(value);
+        }
     };
 
     const handleAmountBlur = () => {
-        onAmountChange(index, localAmount);
+        const formattedAmount = Number(localAmount).toFixed(2);
+        setLocalAmount(formattedAmount);
+        onAmountChange(index, formattedAmount);
     };
 
     const handleCurrencyChange = (value: string) => {
@@ -119,11 +125,13 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
                 <Label htmlFor={`price-${index}-amount`} className="mb-2 block">Price</Label>
                 <Input
                     id={`price-${index}-amount`}
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="^\d*\.?\d*$"
                     value={localAmount}
                     onChange={handleAmountChange}
                     onBlur={handleAmountBlur}
-                    className="w-full rounded-none"
+                    className="w-full rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
             </div>
             <div className="w-24">
@@ -142,16 +150,6 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
                     </SelectContent>
                 </Select>
             </div>
-            {onRemove && index > 0 && (
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="mt-8 rounded-none"
-                    onClick={() => onRemove(index)}
-                >
-                    <X className="h-4 w-4" />
-                </Button>
-            )}
         </div>
     );
 };
@@ -187,7 +185,7 @@ export default function PaymentCustomizerWithCheckout() {
     })
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
     const [expirationDate, setExpirationDate] = useState<DateValue | null>(null);
-    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'Orange', 'Wave', 'CARDS', 'APPLE_PAY'])
+    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'ORANGE', 'WAVE', 'CARDS', 'APPLE_PAY'])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
@@ -348,14 +346,7 @@ export default function PaymentCustomizerWithCheckout() {
                     <div className="space-y-4"> {/* Increased space between label and badges */}
                         <Label className="block">Payment methods</Label>
                         <div className="flex flex-wrap gap-2">
-                            <Badge
-                                key="CARDS"
-                                variant="default"
-                                className="cursor-default rounded-none bg-[#625BF6] hover:bg-[#625BF6] text-white"
-                            >
-                                Cards
-                            </Badge>
-                            {paymentMethods.slice(1).map((method) => (
+                            {paymentMethods.map((method) => (
                                 <Badge
                                     key={method.id}
                                     variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
@@ -385,7 +376,9 @@ export default function PaymentCustomizerWithCheckout() {
             case 'MTN':
                 return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
             case 'APPLE_PAY':
-                return 'bg-[#808080] text-white';
+                return 'bg-[#808080] hover:bg-[#808080] text-white';
+            case 'CARDS':
+                return 'bg-[#625BF6] hover:bg-[#625BF6] text-white';
             default:
                 return '';
         }
@@ -486,18 +479,116 @@ export default function PaymentCustomizerWithCheckout() {
         </div>
     );
 
+    const handleSubmit = () => {
+        // TODO: Implement the logic to submit the payment link creation
+        console.log("Submitting payment link creation...");
+        // You can add your submission logic here, such as API calls, state updates, etc.
+    };
+
     return (
-        <div className="flex flex-col h-screen">
-            <header className="flex items-center p-4 border-b">
-                <h1 className="text-xl font-semibold">New payment link</h1>
-            </header>
-            <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col">
+            <div className="flex overflow-hidden">
                 <div className="w-1/2 p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
-                    {activeTab === 'checkout' ? <CheckoutCustomizer /> : <SuccessCustomizer />}
+                    {/* Add the new title and description here */}
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold">Create a payment link</h2>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Fill in the details to get started.
+                        </p>
+                    </div>
+
+                    {/* Existing form content */}
+                    <div className="space-y-6">
+                        <div>
+                            <Label htmlFor="payment-type">Select the type of payment link</Label>
+                            <Select value={paymentType} onValueChange={setPaymentType}>
+                                <SelectTrigger id="payment-type" className="w-full mt-2 rounded-none">
+                                    <SelectValue placeholder="Select payment type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="product">Associated with a product</SelectItem>
+                                    <SelectItem value="plan">Associated with a plan</SelectItem>
+                                    <SelectItem value="instant">Instant link</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {paymentType === 'product' && (
+                            <div className="space-y-4">
+                                <Label htmlFor="product-search">Select a product</Label>
+                                <div className="relative">
+                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="product-search"
+                                        placeholder="Search product"
+                                        className="pl-8 rounded-none"
+                                    />
+                                </div>
+                                <Button className="w-full flex items-center justify-center rounded-none">
+                                    <Plus className="mr-2 h-4 w-4" /> Create a product
+                                </Button>
+                            </div>
+                        )}
+
+                        {paymentType === 'plan' && (
+                            <div className="space-y-4">
+                                <Label htmlFor="plan-search">Select a plan</Label>
+                                <div className="relative">
+                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="plan-search"
+                                        placeholder="Search plan"
+                                        className="pl-8 rounded-none"
+                                    />
+                                </div>
+                                <Button className="w-full flex items-center justify-center rounded-none">
+                                    <Plus className="mr-2 h-4 w-4" /> Create a plan
+                                </Button>
+                            </div>
+                        )}
+
+                        {paymentType === 'instant' && (
+                            <div className="space-y-4">
+                                <InstantLinkCustomizer />
+                                <ExpirationDateInput
+                                    value={expirationDate}
+                                    onChange={setExpirationDate}
+                                />
+                                <div className="space-y-4"> {/* Increased space between label and badges */}
+                                    <Label className="block">Payment methods</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {paymentMethods.map((method) => (
+                                            <Badge
+                                                key={method.id}
+                                                variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
+                                                className={`cursor-pointer rounded-none ${allowedPaymentMethods.includes(method.id)
+                                                    ? getBadgeColor(method.id)
+                                                    : 'bg-transparent hover:bg-transparent'
+                                                    }`}
+                                                onClick={() => togglePaymentMethod(method.id)}
+                                            >
+                                                {method.name}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Submit button */}
+                    <div className="mt-8">
+                        <Button
+                            onClick={handleSubmit}
+                            className="w-full bg-primary hover:bg-primary/90 text-white rounded-none h-10"
+                        >
+                            Create Payment Link
+                        </Button>
+                    </div>
                 </div>
                 <div className="w-1/2 p-6 bg-transparent dark:bg-[#121317] overflow-auto">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold">Checkout preview</h2>
+                        <h2 className="text-2xl font-bold">Preview</h2>
                         <div className="flex items-center space-x-2">
                             <Button
                                 variant={displayMode === 'desktop' ? 'default' : 'outline'}
@@ -517,26 +608,33 @@ export default function PaymentCustomizerWithCheckout() {
                             </Button>
                         </div>
                     </div>
-                    <Tabs defaultValue="checkout" className="w-full" onValueChange={setActiveTab}>
-                        <TabsList>
-                            <TabsTrigger value="checkout" className="rounded-none">Checkout page</TabsTrigger>
-                            <TabsTrigger value="success" className="rounded-none">Success page</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="checkout">
-                            <div className="relative">
-                                <BrowserMockup url="pay.lomi.africa" displayMode={displayMode}>
-                                    <CheckoutPage />
-                                </BrowserMockup>
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="success">
-                            <div className="relative">
-                                <BrowserMockup url="pay.lomi.africa" displayMode={displayMode}>
-                                    <SuccessPage />
-                                </BrowserMockup>
-                            </div>
-                        </TabsContent>
-                    </Tabs>
+                    <div className="mb-6">
+                        <SegmentedControl
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full"
+                        >
+                            <SegmentedControl.Item value="checkout" className="w-full">
+                                Checkout page
+                            </SegmentedControl.Item>
+                            <SegmentedControl.Item value="success" className="w-full">
+                                Success page
+                            </SegmentedControl.Item>
+                        </SegmentedControl>
+                    </div>
+                    {activeTab === 'checkout' ? (
+                        <div className="relative">
+                            <BrowserMockup url="pay.lomi.africa" displayMode={displayMode}>
+                                <CheckoutPage />
+                            </BrowserMockup>
+                        </div>
+                    ) : (
+                        <div className="relative">
+                            <BrowserMockup url="pay.lomi.africa" displayMode={displayMode}>
+                                <SuccessPage />
+                            </BrowserMockup>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
