@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { UserNav } from '@/components/dashboard/no-access-user-nav';
 
 export default function Component() {
-    const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
     return (
         <div className="flex items-center justify-center min-h-screen p-4">
             <div className="w-full max-w-4xl overflow-hidden rounded-3xl shadow-xl relative">
@@ -36,39 +34,12 @@ export default function Component() {
                         <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2">No Access</h1>
                         <p className="text-white text-sm sm:text-base max-w-md">
                             Your organization have not been given access yet.<br />
-                            To gain access, you can either:
-                            <ul className="list-disc list-inside mt-2">
-                                <li>Go through our Activation process</li>
-                                <li>
-                                    Reach out to <a href="mailto:hello@lomi.africa" className="underline hover:text-sky-200 transition-colors">hello@lomi.africa</a> | Submit <a href="#" onClick={(e) => { e.preventDefault(); setIsFormOpen(true); }} className="underline hover:text-sky-200 transition-colors">this form</a>
-                                </li>
-                            </ul>
+                            <span className="whitespace-nowrap">To gain access, you need to go through the Activation process [5 minutes].</span>
+
                         </p>
                     </div>
                 </div>
             </div>
-
-            {/* Airtable form modal */}
-            {isFormOpen && (
-                <div
-                    className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-                    onClick={() => setIsFormOpen(false)}
-                >
-                    <div
-                        className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <iframe
-                            className="airtable-embed"
-                            src="https://airtable.com/embed/appFQadFIGVMYNnHq/pagphA6Lt1pPzWMhX/form"
-                            frameBorder="0"
-                            width="100%"
-                            height="800"
-                            style={{ background: 'transparent', border: '1px solid #ccc' }}
-                        ></iframe>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
