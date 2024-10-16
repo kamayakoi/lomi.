@@ -1,23 +1,17 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, Trash2 } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
@@ -31,29 +25,35 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox } from "@/components/ui/checkbox"
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
-
-type Customer = {
-    customer_id: string
-    name: string
-    email: string
-    phone_number: string
-    country: string
-    city: string
-    address: string
-    postal_code: string
-    is_business: boolean
-}
+import { Customer } from './dev_customers/types'
+import CustomerActions from './dev_customers/actions_customers'
+import { cn } from '@/lib/actions/utils'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
+import { countryCodes } from '@/utils/data/onboarding'
 
 export default function CustomersPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(null)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+    const [isActionsOpen, setIsActionsOpen] = useState(false)
+    const [countryCodeSearch, setCountryCodeSearch] = useState('')
+    const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false)
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: customers = [], isLoading: isCustomersLoading } = useQuery(
+    const { data: customers = [], isLoading: isCustomersLoading, refetch: fetchCustomers } = useQuery(
         ['customers', user?.id],
         async () => {
             if (!user?.id) return []
@@ -107,6 +107,37 @@ export default function CustomersPage() {
         setIsDialogOpen(false)
     }
 
+    const handleDeleteClick = (customerId: string) => {
+        setDeletingCustomerId(customerId)
+        setDeleteDialogOpen(true)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (deletingCustomerId) {
+            const { error } = await supabase.rpc('delete_customer', { p_customer_id: deletingCustomerId })
+
+            if (error) {
+                console.error('Error deleting customer:', error)
+            } else {
+                fetchCustomers()
+            }
+            setDeletingCustomerId(null)
+        }
+        setDeleteDialogOpen(false)
+    }
+
+    const handleCustomerClick = (customer: Customer) => {
+        setSelectedCustomer(customer)
+        setIsActionsOpen(true)
+    }
+
+    const filteredCountryCodes = useMemo(() => {
+        const lowercaseSearch = countryCodeSearch.toLowerCase();
+        return Array.from(new Set(countryCodes.filter(code =>
+            code.toLowerCase().includes(lowercaseSearch)
+        ))).slice(0, 5); // Limit to 5 results
+    }, [countryCodeSearch]);
+
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -128,13 +159,13 @@ export default function CustomersPage() {
 
             <Separator className='my-0' />
 
-            <Layout.Body>
-                <div className='space-y-4'>
+            <Layout.Body className="flex flex-col overflow-auto">
+                <div className="space-y-4 pb-8">
                     <div className="flex justify-between items-center">
-                        <h1 className='text-2xl font-bold tracking-tight'>Customers</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     <PlusCircle className="mr-2 h-4 w-4" />
                                     Add a customer
                                 </Button>
@@ -153,25 +184,67 @@ export default function CustomersPage() {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="email">Email address</Label>
-                                        <Input id="email" name="email" type="email" placeholder="johndoe@example.com" required />
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            placeholder="johndoe@example.com"
+                                            required
+                                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                            title="Please enter a valid email address"
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="phone">Mobile number</Label>
                                         <div className="flex space-x-2">
-                                            <Select name="countryCode">
-                                                <SelectTrigger className="w-[80px]">
-                                                    <SelectValue placeholder="+221" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="+221">+221</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            <div className="relative">
+                                                <Input
+                                                    id="countryCode"
+                                                    type="text"
+                                                    placeholder="+225"
+                                                    value={countryCodeSearch}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setCountryCodeSearch(value);
+                                                        setIsCountryCodeDropdownOpen(true);
+                                                    }}
+                                                    onFocus={() => setIsCountryCodeDropdownOpen(true)}
+                                                    onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
+                                                    className={cn(
+                                                        "w-full mb-2",
+                                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                    )}
+                                                />
+                                                {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
+                                                    <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
+                                                        {filteredCountryCodes.map((code: string) => (
+                                                            <li
+                                                                key={code}
+                                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                onClick={() => {
+                                                                    setCountryCodeSearch(code);
+                                                                    setIsCountryCodeDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                {code}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </div>
                                             <Input id="phone" name="phone" type="tel" className="flex-1" required />
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <Checkbox id="isBusiness" name="isBusiness" />
-                                        <Label htmlFor="isBusiness">Business customer</Label>
+                                        <div className="flex items-center h-5">
+                                            <Checkbox id="isBusiness" name="isBusiness" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" />
+                                        </div>
+                                        <div className="ml-2 text-sm">
+                                            <Label htmlFor="isBusiness" className="font-medium text-gray-700">
+                                                Business customer
+                                            </Label>
+                                        </div>
                                     </div>
                                     <div className="flex justify-end space-x-2">
                                         <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -201,32 +274,58 @@ export default function CustomersPage() {
                         </div>
                     ) : (
                         <div className="rounded-md border">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b bg-muted/50">
-                                        <th className="p-2 text-left font-medium">Name</th>
-                                        <th className="p-2 text-left font-medium">Email</th>
-                                        <th className="p-2 text-left font-medium">Phone</th>
-                                        <th className="p-2 text-left font-medium">Country</th>
-                                        <th className="p-2 text-left font-medium">Type</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {customers.map((customer) => (
-                                        <tr key={customer.customer_id} className="border-b">
-                                            <td className="p-2">{customer.name}</td>
-                                            <td className="p-2">{customer.email}</td>
-                                            <td className="p-2">{customer.phone_number}</td>
-                                            <td className="p-2">{customer.country}</td>
-                                            <td className="p-2">{customer.is_business ? 'Business' : 'Individual'}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead>Phone</TableHead>
+                                            <TableHead>Country</TableHead>
+                                            <TableHead>Type</TableHead>
+                                            <TableHead></TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {customers.map((customer) => (
+                                            <TableRow key={customer.customer_id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleCustomerClick(customer)}>
+                                                <TableCell>{customer.name}</TableCell>
+                                                <TableCell>{customer.email}</TableCell>
+                                                <TableCell>{customer.phone_number}</TableCell>
+                                                <TableCell>{customer.country}</TableCell>
+                                                <TableCell>{customer.is_business ? 'Business' : 'Individual'}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteClick(customer.customer_id) }}>
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                         </div>
                     )}
                 </div>
             </Layout.Body>
+
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Delete Customer</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this customer? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="destructive" onClick={handleConfirmDelete}>
+                            Confirm
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <CustomerActions customer={selectedCustomer} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />
         </Layout>
     )
 }

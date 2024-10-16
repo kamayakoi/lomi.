@@ -63,9 +63,25 @@ BEGIN
         customers c
     WHERE 
         c.merchant_id = p_merchant_id
+        AND c.is_deleted = false
     ORDER BY
         c.created_at DESC
     LIMIT p_page_size
     OFFSET ((p_page - 1) * p_page_size);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to soft delete a customer
+CREATE OR REPLACE FUNCTION public.delete_customer(
+    p_customer_id UUID
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE customers
+    SET 
+        is_deleted = true,
+        deleted_at = NOW()
+    WHERE
+        customer_id = p_customer_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

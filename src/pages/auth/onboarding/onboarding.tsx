@@ -11,6 +11,7 @@ import OnboardingStep3 from './onboarding-step-3';
 import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
 import LoadingButton from '@/components/dashboard/loader';
+import WelcomeScreen from './welcome-screen';
 
 const steps = [
     { title: 'Let\'s get to know you', component: OnboardingStep1 },
@@ -200,14 +201,6 @@ const Onboarding: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setShowWelcome(false);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     if (loading) {
         return <LoadingButton />;
     }
@@ -239,13 +232,7 @@ const Onboarding: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
             {showWelcome ? (
-                <Card className="w-full max-w-3xl bg-white dark:bg-gray-800 shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="text-2xl font-bold text-center">
-                            Welcome to lomi. !
-                        </CardTitle>
-                    </CardHeader>
-                </Card>
+                <WelcomeScreen onGetStarted={() => setShowWelcome(false)} />
             ) : (
                 <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl">
                     <CardHeader>

@@ -7,7 +7,6 @@ CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE',
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly' , 'yearly', 'one-time');
--- CREATE TYPE entry_type AS ENUM ('debit', 'credit');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
@@ -220,11 +219,14 @@ CREATE TABLE customers (
     address VARCHAR,
     postal_code VARCHAR,
     is_business BOOLEAN NOT NULL DEFAULT false,
+    is_deleted BOOLEAN NOT NULL DEFAULT false,
+    deleted_at TIMESTAMPTZ,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX idx_customers_is_deleted ON customers(is_deleted);
 CREATE INDEX idx_customers_merchant_id ON customers(merchant_id);
 CREATE INDEX idx_customers_organization_id ON customers(organization_id);
 CREATE INDEX idx_customers_email ON customers(email);
@@ -313,14 +315,15 @@ CREATE TABLE merchant_subscriptions (
     next_billing_date DATE,
     billing_frequency frequency NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
-    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    currency_code currency_code NOT NULL DEFAULT 'XOF',
     retry_payment_every INT DEFAULT 0,
     total_retries INT DEFAULT 0,
     failed_payment_action VARCHAR,
     email_notifications JSONB,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (currency_code) REFERENCES currencies(code)
 );
 
 CREATE INDEX idx_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
