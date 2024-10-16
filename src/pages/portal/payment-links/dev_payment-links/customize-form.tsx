@@ -235,7 +235,23 @@ export default function PaymentCustomizerWithCheckout() {
                 <div className="space-y-6">
                     <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-xl' : 'text-lg'}`}>Select a payment method</h3>
                     <div className="grid gap-4">
-                        {allowedPaymentMethods.map((method) => {
+                        {/* Always render the "Cards" element first */}
+                        {allowedPaymentMethods.includes('CARDS') && (
+                            <button
+                                className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black`}
+                            >
+                                <div className="flex items-center">
+                                    <img src="/cards.png" alt="Cards" className="w-8 h-8 mr-3" />
+                                    <span className="text-lg font-medium">Cards</span>
+                                </div>
+                                <div className="flex space-x-2">
+                                    <img src="/checkout-visa.png" alt="Visa" className="h-6" />
+                                    <img src="/checkout-mastercard.png" alt="Mastercard" className="h-6" />
+                                </div>
+                            </button>
+                        )}
+                        {/* Render the remaining payment methods */}
+                        {allowedPaymentMethods.filter(method => method !== 'CARDS').map((method) => {
                             const paymentMethod = paymentMethods.find(m => m.id === method)
                             return paymentMethod ? (
                                 <button
@@ -246,12 +262,6 @@ export default function PaymentCustomizerWithCheckout() {
                                         <img src={paymentMethod.icon} alt={paymentMethod.name} className="w-8 h-8 mr-3" />
                                         <span className="text-lg font-medium">{paymentMethod.name}</span>
                                     </div>
-                                    {paymentMethod.id === 'CARDS' && (
-                                        <div className="flex space-x-2">
-                                            <img src="/checkout-visa.png" alt="Visa" className="h-6" />
-                                            <img src="/checkout-mastercard.png" alt="Mastercard" className="h-6" />
-                                        </div>
-                                    )}
                                 </button>
                             ) : null
                         })}
@@ -350,7 +360,7 @@ export default function PaymentCustomizerWithCheckout() {
                                 <Badge
                                     key={method.id}
                                     variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                    className={`cursor-pointer rounded-none ${allowedPaymentMethods.includes(method.id)
+                                    className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
                                         ? getBadgeColor(method.id)
                                         : 'bg-transparent hover:bg-transparent'
                                         }`}
@@ -376,7 +386,7 @@ export default function PaymentCustomizerWithCheckout() {
             case 'MTN':
                 return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
             case 'APPLE_PAY':
-                return 'bg-[#808080] hover:bg-[#808080] text-white';
+                return 'bg-[#000000] hover:bg-[#1a1a1a] text-white dark:bg-[#ffffff] dark:hover:bg-[#f0f0f0] dark:text-black';
             case 'CARDS':
                 return 'bg-[#625BF6] hover:bg-[#625BF6] text-white';
             default:
@@ -497,94 +507,24 @@ export default function PaymentCustomizerWithCheckout() {
                         </p>
                     </div>
 
-                    {/* Existing form content */}
-                    <div className="space-y-6">
-                        <div>
-                            <Label htmlFor="payment-type">Select the type of payment link</Label>
-                            <Select value={paymentType} onValueChange={setPaymentType}>
-                                <SelectTrigger id="payment-type" className="w-full mt-2 rounded-none">
-                                    <SelectValue placeholder="Select payment type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="product">Associated with a product</SelectItem>
-                                    <SelectItem value="plan">Associated with a plan</SelectItem>
-                                    <SelectItem value="instant">Instant link</SelectItem>
-                                </SelectContent>
-                            </Select>
+                    {/* Render the appropriate customizer based on the active tab */}
+                    {activeTab === 'checkout' ? (
+                        <CheckoutCustomizer />
+                    ) : (
+                        <SuccessCustomizer />
+                    )}
+
+                    {/* Submit button - only show on the checkout tab */}
+                    {activeTab === 'checkout' && (
+                        <div className="mt-8">
+                            <Button
+                                onClick={handleSubmit}
+                                className="w-full bg-primary hover:bg-primary/90 text-white dark:text-black rounded-none h-10"
+                            >
+                                Create Payment Link
+                            </Button>
                         </div>
-
-                        {paymentType === 'product' && (
-                            <div className="space-y-4">
-                                <Label htmlFor="product-search">Select a product</Label>
-                                <div className="relative">
-                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="product-search"
-                                        placeholder="Search product"
-                                        className="pl-8 rounded-none"
-                                    />
-                                </div>
-                                <Button className="w-full flex items-center justify-center rounded-none">
-                                    <Plus className="mr-2 h-4 w-4" /> Create a product
-                                </Button>
-                            </div>
-                        )}
-
-                        {paymentType === 'plan' && (
-                            <div className="space-y-4">
-                                <Label htmlFor="plan-search">Select a plan</Label>
-                                <div className="relative">
-                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="plan-search"
-                                        placeholder="Search plan"
-                                        className="pl-8 rounded-none"
-                                    />
-                                </div>
-                                <Button className="w-full flex items-center justify-center rounded-none">
-                                    <Plus className="mr-2 h-4 w-4" /> Create a plan
-                                </Button>
-                            </div>
-                        )}
-
-                        {paymentType === 'instant' && (
-                            <div className="space-y-4">
-                                <InstantLinkCustomizer />
-                                <ExpirationDateInput
-                                    value={expirationDate}
-                                    onChange={setExpirationDate}
-                                />
-                                <div className="space-y-4"> {/* Increased space between label and badges */}
-                                    <Label className="block">Payment methods</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {paymentMethods.map((method) => (
-                                            <Badge
-                                                key={method.id}
-                                                variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                                className={`cursor-pointer rounded-none ${allowedPaymentMethods.includes(method.id)
-                                                    ? getBadgeColor(method.id)
-                                                    : 'bg-transparent hover:bg-transparent'
-                                                    }`}
-                                                onClick={() => togglePaymentMethod(method.id)}
-                                            >
-                                                {method.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Submit button */}
-                    <div className="mt-8">
-                        <Button
-                            onClick={handleSubmit}
-                            className="w-full bg-primary hover:bg-primary/90 text-white rounded-none h-10"
-                        >
-                            Create Payment Link
-                        </Button>
-                    </div>
+                    )}
                 </div>
                 <div className="w-1/2 p-6 bg-transparent dark:bg-[#121317] overflow-auto">
                     <div className="flex justify-between items-center mb-6">

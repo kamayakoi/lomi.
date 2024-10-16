@@ -158,9 +158,11 @@ export default function PaymentLinksPage() {
       </DashboardLayout.Body>
 
       <Dialog open={isCreateLinkOpen} onOpenChange={setIsCreateLinkOpen}>
-        <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] sm:w-full sm:h-full overflow-hidden">
-          <div className="h-[calc(90vh-100px)] overflow-auto">
-            <PaymentCustomizerWithCheckout />
+        <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] sm:w-full sm:h-full overflow-hidden p-0">
+          <div className="h-full overflow-auto">
+            <div className="p-0">
+              <PaymentCustomizerWithCheckout />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
