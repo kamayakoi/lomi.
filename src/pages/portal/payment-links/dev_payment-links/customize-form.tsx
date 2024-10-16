@@ -219,21 +219,34 @@ export default function PaymentCustomizerWithCheckout() {
 
     const CheckoutPage = () => (
         <div className={`mx-auto bg-white rounded-lg shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'max-w-4xl' : 'max-w-sm'}`}>
-            <div className={`${displayMode === 'desktop' ? 'p-8' : 'p-4'}`}>
-                <div className="flex justify-between items-start mb-8">
+            <div className={`${displayMode === 'desktop' ? 'flex' : 'block'}`}>
+                <div className={`${displayMode === 'desktop' ? 'w-1/2 p-6 border-r flex flex-col justify-between' : 'p-4'}`}>
                     <div>
-                        <h2 className={`font-bold text-gray-900 ${displayMode === 'desktop' ? 'text-3xl' : 'text-xl'}`}>
-                            {prices[0]?.amount ? `${prices[0]?.amount} ${prices[0]?.currency}` : '0.00 XOF'}
-                        </h2>
-                        <p className="text-gray-600 text-sm">Amount to be paid</p>
+                        <div className="mb-8">
+                            <h2 className={`font-bold text-gray-900 ${displayMode === 'desktop' ? 'text-2xl' : 'text-xl'}`}>
+                                {prices[0]?.amount ? `${prices[0]?.amount} ${prices[0]?.currency}` : '0.00 XOF'}
+                            </h2>
+                            <p className="text-gray-600 text-sm">Amount to be paid</p>
+                        </div>
+                        <div>
+                            <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-base'} truncate max-w-[200px]`} title={instantLinkDetails.name || 'Payment'}>{instantLinkDetails.name || 'Payment'}</h3>
+                            <p className={`text-gray-600 text-sm truncate max-w-[200px]`} title={instantLinkDetails.description || 'Description'}>{instantLinkDetails.description || 'Description'}</p>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-base'} truncate max-w-[200px]`} title={instantLinkDetails.name || 'Payment'}>{instantLinkDetails.name || 'Payment'}</h3>
-                        <p className={`text-gray-600 text-sm truncate max-w-[200px]`} title={instantLinkDetails.description || 'Description'}>{instantLinkDetails.description || 'Description'}</p>
-                    </div>
+                    {displayMode === 'desktop' && (
+                        <div className="mt-8 text-left">
+                            <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
+                                Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
+                            </span>
+                            <div className="mt-2 text-xs text-blue-500 space-x-2">
+                                <a href="#" className="underline">Terms</a>
+                                <a href="#" className="underline">Conditions</a>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <div className="space-y-6">
-                    <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-xl' : 'text-lg'}`}>Select a payment method</h3>
+                <div className={`${displayMode === 'desktop' ? 'w-1/2 p-6' : 'p-4'}`}>
+                    <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-lg'} mb-4`}>Select a payment method</h3>
                     <div className="grid gap-4">
                         {/* Always render the "Cards" element first */}
                         {allowedPaymentMethods.includes('CARDS') && (
@@ -267,12 +280,18 @@ export default function PaymentCustomizerWithCheckout() {
                         })}
                     </div>
                 </div>
+            </div>
+            {displayMode === 'phone' && (
                 <div className="mt-8 text-center">
                     <span className="text-sm text-gray-500 font-semibold inline-flex items-center justify-center">
                         Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
                     </span>
+                    <div className="mt-4 mb-6 text-xs text-blue-500 space-x-2">
+                        <a href="#" className="underline">Terms</a>
+                        <a href="#" className="underline">Conditions</a>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     )
 
@@ -498,7 +517,7 @@ export default function PaymentCustomizerWithCheckout() {
     return (
         <div className="flex flex-col">
             <div className="flex overflow-hidden">
-                <div className="w-1/2 p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
+                <div className="w-[35%] p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
                     {/* Add the new title and description here */}
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold">Create a payment link</h2>
@@ -526,7 +545,7 @@ export default function PaymentCustomizerWithCheckout() {
                         </div>
                     )}
                 </div>
-                <div className="w-1/2 p-6 bg-transparent dark:bg-[#121317] overflow-auto">
+                <div className="w-[65%] p-6 bg-transparent dark:bg-[#121317] overflow-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Preview</h2>
                         <div className="flex items-center space-x-2">
