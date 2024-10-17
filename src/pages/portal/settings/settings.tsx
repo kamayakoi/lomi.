@@ -2,7 +2,6 @@ import { Outlet, Navigate } from 'react-router-dom'
 import {
   IconBuildingStore,
   IconCreditCard,
-  IconSend,
   IconReceipt,
   IconCode,
   IconWallet,
@@ -76,15 +75,15 @@ const sidebarNavItems = [
       { title: 'Checkout', href: '/portal/settings/receiving-money/checkout' },
     ],
   },
-  {
-    title: 'Sending Money',
-    icon: <IconSend size={18} />,
-    href: '/portal/settings/sending-money/disbursements',
-    subItems: [
-      { title: 'Disbursements', href: '/portal/settings/sending-money/disbursements' },
-      { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
-    ],
-  },
+  // {
+  //   title: 'Sending Money',
+  //   icon: <IconSend size={18} />,
+  //   href: '/portal/settings/sending-money/disbursements',
+  //   subItems: [
+  //     { title: 'Disbursements', href: '/portal/settings/sending-money/disbursements' },
+  //     { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
+  //   ],
+  // },
   // {
   //   title: 'Your Team',
   //   icon: <IconUsers size={18} />,

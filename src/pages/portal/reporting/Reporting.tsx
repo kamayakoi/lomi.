@@ -92,42 +92,44 @@ function ReportingPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto p-8 space-y-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <h1 className="text-3xl font-bold">Reporting</h1>
+                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-4 pb-8 pl-[-22] pr-8">
+                        <h1 className="text-2xl font-bold tracking-tight">Reporting</h1>
 
-                    <ReportingFilters
-                        selectedDateRange={selectedDateRange}
-                        setSelectedDateRange={setSelectedDateRange}
-                    />
-
-                    <RevenueTransactionsChart
-                        revenueData={revenueData}
-                        transactionVolumeData={transactionVolumeData}
-                        selectedDateRange={selectedDateRange}
-                        isLoading={isRevenueLoading || isTransactionVolumeLoading}
-                    />
-
-                    <div className={cn(
-                        "flex items-center my-8",
-                        "before:content-[''] before:flex-grow before:h-0.5 before:bg-gray-200 before:dark:bg-gray-700 before:mr-4",
-                        "after:content-[''] after:flex-grow after:h-0.5 after:bg-gray-200 after:dark:bg-gray-700 after:ml-4"
-                    )}>
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                            Global Analysis
-                        </span>
-                    </div>
-
-                    <div className="grid gap-6 md:grid-cols-2">
-                        <TopPerformingItemsCard
-                            topPerformingProducts={topPerformingProducts}
-                            topPerformingSubscriptions={topPerformingSubscriptions}
-                            isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionsLoading}
+                        <ReportingFilters
+                            selectedDateRange={selectedDateRange}
+                            setSelectedDateRange={setSelectedDateRange}
                         />
 
-                        <ProviderDistributionCard
-                            providerDistribution={providerDistribution}
-                            isLoading={isProviderDistributionLoading}
+                        <RevenueTransactionsChart
+                            revenueData={revenueData}
+                            transactionVolumeData={transactionVolumeData}
+                            selectedDateRange={selectedDateRange}
+                            isLoading={isRevenueLoading || isTransactionVolumeLoading}
                         />
+
+                        <div className={cn(
+                            "flex items-center my-8",
+                            "before:content-[''] before:flex-grow before:h-0.5 before:bg-gray-200 before:dark:bg-gray-700 before:mr-4",
+                            "after:content-[''] after:flex-grow after:h-0.5 after:bg-gray-200 after:dark:bg-gray-700 after:ml-4"
+                        )}>
+                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                Global Analysis
+                            </span>
+                        </div>
+
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <TopPerformingItemsCard
+                                topPerformingProducts={topPerformingProducts}
+                                topPerformingSubscriptions={topPerformingSubscriptions}
+                                isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionsLoading}
+                            />
+
+                            <ProviderDistributionCard
+                                providerDistribution={providerDistribution}
+                                isLoading={isProviderDistributionLoading}
+                            />
+                        </div>
                     </div>
                 </div>
             </Layout.Body>

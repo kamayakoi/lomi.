@@ -79,7 +79,7 @@ export function AnimatedBeamMultipleOutputDemo({
                 </div>
                 <div className="flex flex-col justify-center">
                     <Square ref={div6Ref} className="size-20">
-                        <img src="/whiteblack.png" alt="lomi." className="object-cover w-full h-full rounded-sm" />
+                        <img src="/lomi-icon.png" alt="lomi." className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
                 <div className="flex flex-col justify-center gap-1">

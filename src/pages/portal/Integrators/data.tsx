@@ -11,9 +11,9 @@ export const integrationOptions = [
   {
     title: "Shopify",
     description: "Integrate lomi.&apos;s checkout experience with your store for a smooth and localized payment flow.",
-    link: "https://developers.lomi.africa/docs/shopify-integration",
+    link: "#",
     logo: <img src="/shopify.png" alt="Shopify" className="w-12 h-12 object-contain" />,
-    installLink: "",
+    installLink: "#",
   },
   {
     title: "Next.js",
@@ -25,8 +25,8 @@ export const integrationOptions = [
   {
     title: "WordPress",
     description: "Accept payments on your website with our easy-to-use plugin.",
-    link: "https://developers.lomi.africa/docs/wordpress-integration",
+    link: "#",
     logo: <img src="/wordpress.png" alt="WordPress" className="w-12 h-12 object-contain" />,
-    installLink: "",
+    installLink: "#",
   },
 ];

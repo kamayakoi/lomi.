@@ -75,7 +75,7 @@ const BrowserMockup: React.FC<{ url: string; children: React.ReactNode; displayM
                 <span className="text-xs font-semibold text-gray-400">{url}</span>
             </div>
         </div>
-        <div className={`bg-white ${displayMode === 'desktop' ? 'h-[600px]' : 'h-[565px]'} overflow-y-auto`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className={`bg-white ${displayMode === 'desktop' ? 'h-[560px]' : 'h-[565px]'} overflow-y-auto`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="p-6">
                 {children}
             </div>
@@ -190,6 +190,7 @@ export default function PaymentCustomizerWithCheckout() {
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
     const [displayMode, setDisplayMode] = useState<DisplayMode>('desktop')
+    const [allowCouponCode, setAllowCouponCode] = useState(false)
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
@@ -232,20 +233,35 @@ export default function PaymentCustomizerWithCheckout() {
                             <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-base'} truncate max-w-[200px]`} title={instantLinkDetails.name || 'Payment'}>{instantLinkDetails.name || 'Payment'}</h3>
                             <p className={`text-gray-600 text-sm truncate max-w-[200px]`} title={instantLinkDetails.description || 'Description'}>{instantLinkDetails.description || 'Description'}</p>
                         </div>
+                        {allowCouponCode && displayMode === 'desktop' && (
+                            <div className="mt-4">
+                                <Label htmlFor="discount-code">Discount code</Label>
+                                <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1" readOnly />
+                            </div>
+                        )}
                     </div>
                     {displayMode === 'desktop' && (
                         <div className="mt-8 text-left">
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
                                 Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
                             </span>
-                            <div className="mt-2 text-xs text-blue-500 space-x-2">
-                                <a href="#" className="underline">Terms</a>
-                                <a href="#" className="underline">Conditions</a>
+                            <div className="mt-2 text-xs flex items-center justify-between">
+                                <div className="space-x-2">
+                                    <a href="#" className="underline text-blue-500">Terms</a>
+                                    <a href="#" className="underline text-blue-500">Conditions</a>
+                                </div>
+                                <a href="#" className="text-gray-500">Language</a>
                             </div>
                         </div>
                     )}
                 </div>
-                <div className={`${displayMode === 'desktop' ? 'w-1/2 p-6' : 'p-4'}`}>
+                <div className={`${displayMode === 'desktop' ? 'w-1/2 p-10' : 'p-4'}`}>
+                    {allowCouponCode && displayMode === 'phone' && (
+                        <div className="mt-[-6] mb-8">
+                            <Label htmlFor="discount-code">Discount code</Label>
+                            <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1" readOnly />
+                        </div>
+                    )}
                     <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-lg'} mb-4`}>Select a payment method</h3>
                     <div className="grid gap-4">
                         {/* Always render the "Cards" element first */}
@@ -286,9 +302,10 @@ export default function PaymentCustomizerWithCheckout() {
                     <span className="text-sm text-gray-500 font-semibold inline-flex items-center justify-center">
                         Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
                     </span>
-                    <div className="mt-4 mb-6 text-xs text-blue-500 space-x-2">
-                        <a href="#" className="underline">Terms</a>
-                        <a href="#" className="underline">Conditions</a>
+                    <div className="mt-4 mb-6 text-xs space-x-2">
+                        <a href="#" className="text-gray-500">Terms</a>
+                        <a href="#" className="text-gray-500">Conditions</a>
+                        <a href="#" className="text-gray-500">Language</a>
                     </div>
                 </div>
             )}
@@ -389,6 +406,16 @@ export default function PaymentCustomizerWithCheckout() {
                                 </Badge>
                             ))}
                         </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            checked={allowCouponCode}
+                            onCheckedChange={setAllowCouponCode}
+                            className="shrink-0"
+                        />
+                        <Label htmlFor="allow-coupon-code" className="mb-0">
+                            Allow coupon code
+                        </Label>
                     </div>
                 </div>
             )}
@@ -568,7 +595,7 @@ export default function PaymentCustomizerWithCheckout() {
                         </div>
                     </div>
                     <p className="text-sm text-muted-foreground mb-6 -mt-6">
-                        This preview approximates the actual checkout experience.
+                        This preview simplifies the actual checkout experience.
                     </p>
                     <div className="mb-6">
                         <SegmentedControl

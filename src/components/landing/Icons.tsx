@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import icon from "/icon.png";
+import icon from "/transparent2.png";
 import icon11 from "/lomi-icon.png"
 import shield from "/shield.png";
 import shieldwhite from "/shieldwhite.png";
