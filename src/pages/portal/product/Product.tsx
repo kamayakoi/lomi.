@@ -118,17 +118,17 @@ export default function ProductsPage() {
                                     ))
                                 ) : products.length === 0 ? (
                                     <div className="py-24 text-center">
-                                        <div className="flex flex-col items-center justify-center space-y-4">
-                                            <div className="rounded-full bg-transparent dark:bg-transparent p-4">
-                                                <ClipboardDocumentListIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                        <div className="flex justify-center mb-6">
+                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                             </div>
-                                            <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                No products found
-                                            </p>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                                Try changing your filter or create a new product.
-                                            </p>
                                         </div>
+                                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                            No products found
+                                        </h3>
+                                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                            Try changing your filter or create a new product.
+                                        </p>
                                     </div>
                                 ) : (
                                     products.map((product: Product) => (
@@ -157,7 +157,7 @@ export default function ProductsPage() {
                         </div>
                     </div>
                 </div>
-            </Layout.Body>
-        </Layout>
+            </Layout.Body >
+        </Layout >
     )
 }

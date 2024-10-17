@@ -578,7 +578,6 @@ CREATE TABLE webhooks (
 );
 
 CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);
-CREATE INDEX idx_webhooks_organization_id ON webhooks(organization_id);
 CREATE INDEX idx_webhooks_event ON webhooks(event);
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';

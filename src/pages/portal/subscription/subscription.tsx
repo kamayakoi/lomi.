@@ -126,17 +126,17 @@ export default function SubscriptionsPage() {
                       ))
                     ) : subscriptions.length === 0 ? (
                       <div className="py-24 text-center">
-                        <div className="flex flex-col items-center justify-center space-y-4">
-                          <div className="rounded-full bg-transparent dark:bg-transparent p-4">
-                            <ClipboardDocumentListIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                        <div className="flex justify-center mb-6">
+                          <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                           </div>
-                          <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                            No subscription plans found
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                            Try changing your filter or create a new plan.
-                          </p>
                         </div>
+                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                          No subscription plans found
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                          Try changing your filter or create a new plan.
+                        </p>
                       </div>
                     ) : (
                       subscriptions.map((subscription: Subscription) => (
@@ -172,6 +172,7 @@ export default function SubscriptionsPage() {
               {/* Add cycles content here */}
             </TabsContent>
           </Tabs>
+
         </div>
       </Layout.Body>
     </Layout>

@@ -168,16 +168,17 @@ export default function LogsPage() {
                                         ) : logs.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={6} className="text-center py-8">
-                                                    <div className="flex flex-col items-center justify-center space-y-4">
-                                                        <div className="rounded-full bg-transparent dark:bg-transparent p-4">
-                                                            <ClipboardDocumentListIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                                    <div className="py-24 text-center">
+                                                        <div className="flex justify-center mb-6">
+                                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                            </div>
                                                         </div>
-                                                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
                                                             No logs found
-                                                        </p>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                                            Start performing actions to see your activity logs here.
-                                                        </p>
+                                                        </h3>
+                                                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                            Start performing actions to see your activity logs here.                                                            </p>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>

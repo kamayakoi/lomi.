@@ -153,7 +153,7 @@ function RevenueTransactionsChart({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Revenue and Transactions</CardTitle>
+                <CardTitle>Revenue | Transactions</CardTitle>
             </CardHeader>
             <CardContent>
                 {isLoading ? (
@@ -232,7 +232,7 @@ function TopPerformingItemsCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Top Performing Items</CardTitle>
+                <CardTitle>Performing Items</CardTitle>
             </CardHeader>
             <CardContent>
                 <TopPerformingItems

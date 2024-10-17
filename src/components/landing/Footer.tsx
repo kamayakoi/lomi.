@@ -164,7 +164,7 @@ export const Footer = () => {
           <div className="flex items-center gap-4 md:gap-6">
             <p>&copy; 2024 <br className="md:hidden" /> lomi.africa, Inc. </p>
             <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
-              Abidjan,<br className="md:hidden" /> Côte d&apos;Ivoire
+              Les Perles, Abidjan,<br className="md:hidden" /> Côte d&apos;Ivoire
             </a>
             <div className="flex items-center gap-4 md:gap-6">
               <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
