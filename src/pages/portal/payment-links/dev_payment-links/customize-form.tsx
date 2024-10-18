@@ -6,12 +6,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import DateFieldInput from "@/components/ui/date-field-input"
-import { DateValue } from "react-aria-components"
 import { SegmentedControl } from "@/components/ui/segmented-control"
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { useNavigate } from 'react-router-dom'
+import { fetchProducts } from '@/pages/portal/product/dev_product/support_product'
+import { fetchSubscriptionPlans } from '@/pages/portal/subscription/dev_subscription/support_subscriptions'
+import { Product } from '@/pages/portal/product/dev_product/types'
+import { SubscriptionPlan } from '@/pages/portal/subscription/dev_subscription/types'
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css"
 
 interface PaymentMethod {
     id: string
@@ -158,22 +162,25 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
 };
 
 interface ExpirationDateInputProps {
-    value: DateValue | null;
-    onChange: (value: DateValue | null) => void;
+    value: Date | null;
+    onChange: (value: Date | null) => void;
 }
 
 const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChange }) => {
-    const handleChange = (value: DateValue | null) => {
-        onChange(value);
+    const handleChange = (date: Date | null) => {
+        onChange(date);
     };
 
     return (
         <div>
             <Label htmlFor="expirationDate" className="mb-2 block">Expiration date</Label>
-            <DateFieldInput
-                value={value}
+            <DatePicker
+                id="expirationDate"
+                selected={value}
                 onChange={handleChange}
-                className="w-full rounded-none bg-background text-foreground"
+                className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300"
+                minDate={new Date()}
+                dateFormat="dd/MM/yyyy"
             />
         </div>
     );
@@ -187,13 +194,17 @@ export default function PaymentCustomizerWithCheckout() {
         privateDescription: ''
     })
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
-    const [expirationDate, setExpirationDate] = useState<DateValue | null>(null);
+    const [expirationDate, setExpirationDate] = useState<Date | null>(null);
     const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'ORANGE', 'WAVE', 'CARDS', 'APPLE_PAY'])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
     const [displayMode, setDisplayMode] = useState<DisplayMode>('desktop')
     const [allowCouponCode, setAllowCouponCode] = useState(false)
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null)
+    const [products, setProducts] = useState<Product[]>([])
+    const [plans, setPlans] = useState<SubscriptionPlan[]>([])
     const { user } = useUser()
     const navigate = useNavigate()
 
@@ -204,6 +215,20 @@ export default function PaymentCustomizerWithCheckout() {
         { id: 'MTN', name: 'MTN', icon: '/mtn.png' },
         { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
     ]
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (user?.id) {
+                const fetchedProducts = await fetchProducts(user.id, null, 1, 50)
+                setProducts(fetchedProducts)
+
+                const fetchedPlans = await fetchSubscriptionPlans(user.id, 1, 50)
+                setPlans(fetchedPlans)
+            }
+        }
+
+        fetchData()
+    }, [user?.id])
 
     const handlePriceChange = (index: number, field: 'amount' | 'currency', value: string) => {
         const newPrices = [...prices]
@@ -356,15 +381,25 @@ export default function PaymentCustomizerWithCheckout() {
             {paymentType === 'product' && (
                 <div className="space-y-4">
                     <Label htmlFor="product-select">Select a product</Label>
-                    <Select>
+                    <Select value={selectedProduct?.product_id || ''} onValueChange={(value) => {
+                        if (value === 'create-product') {
+                            navigate('/portal/product')
+                        } else {
+                            setSelectedProduct(products.find(p => p.product_id === value) || null)
+                        }
+                    }}>
                         <SelectTrigger id="product-select" className="w-full">
                             <SelectValue placeholder="Select a product" />
                         </SelectTrigger>
                         <SelectContent>
+                            {products.map(product => (
+                                <SelectItem key={product.product_id} value={product.product_id}>
+                                    {product.name}
+                                </SelectItem>
+                            ))}
                             <SelectItem value="create-product">
                                 Create a product
                             </SelectItem>
-                            {/* Add more SelectItem components for existing products */}
                         </SelectContent>
                     </Select>
                 </div>
@@ -373,15 +408,25 @@ export default function PaymentCustomizerWithCheckout() {
             {paymentType === 'plan' && (
                 <div className="space-y-4">
                     <Label htmlFor="plan-select">Select a plan</Label>
-                    <Select>
+                    <Select value={selectedPlan?.plan_id || ''} onValueChange={(value) => {
+                        if (value === 'create-plan') {
+                            navigate('/portal/subscription')
+                        } else {
+                            setSelectedPlan(plans.find(p => p.plan_id === value) || null)
+                        }
+                    }}>
                         <SelectTrigger id="plan-select" className="w-full">
                             <SelectValue placeholder="Select a plan" />
                         </SelectTrigger>
                         <SelectContent>
+                            {plans.map(plan => (
+                                <SelectItem key={plan.plan_id} value={plan.plan_id}>
+                                    {plan.name}
+                                </SelectItem>
+                            ))}
                             <SelectItem value="create-plan">
                                 Create a plan
                             </SelectItem>
-                            {/* Add more SelectItem components for existing plans */}
                         </SelectContent>
                     </Select>
                 </div>
@@ -547,8 +592,17 @@ export default function PaymentCustomizerWithCheckout() {
         }
 
         try {
+            const { data: organizationData, error: organizationError } = await supabase
+                .rpc('fetch_organization_details', { p_merchant_id: user.id })
+
+            if (organizationError) {
+                console.error('Error fetching organization details:', organizationError)
+                return
+            }
+
             const { data, error } = await supabase.rpc('create_payment_link', {
                 p_merchant_id: user.id,
+                p_organization_id: organizationData[0].organization_id,
                 p_link_type: paymentType,
                 p_url: `https://pay.lomi.africa/${user.id}/${Date.now()}`,
                 p_title: instantLinkDetails.name,
@@ -558,7 +612,7 @@ export default function PaymentCustomizerWithCheckout() {
                 p_currency_code: prices[0]?.currency || 'XOF',
                 p_allowed_providers: allowedPaymentMethods,
                 p_allow_coupon_code: allowCouponCode,
-                p_expires_at: expirationDate ? new Date(expirationDate.toString()).toISOString() : null,
+                p_expires_at: expirationDate ? expirationDate.toString() : null,
                 p_success_url: redirectToCustomPage ? customSuccessUrl : null,
             })
 

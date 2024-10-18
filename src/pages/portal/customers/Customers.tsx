@@ -64,6 +64,8 @@ export default function CustomersPage() {
             const { data, error } = await supabase.rpc('fetch_customers', {
                 p_merchant_id: user.id,
                 p_search_term: searchTerm,
+                p_page: 1,
+                p_page_size: 50,
             })
 
             if (error) {

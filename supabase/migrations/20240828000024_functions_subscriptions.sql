@@ -44,18 +44,12 @@ CREATE OR REPLACE FUNCTION public.fetch_subscriptions(
 )
 RETURNS TABLE (
     subscription_id UUID,
-    name VARCHAR,
-    description TEXT,
+    plan_id UUID,
+    customer_id UUID,
     status subscription_status,
     start_date DATE,
     end_date DATE,
     next_billing_date DATE,
-    billing_frequency frequency,
-    amount NUMERIC,
-    currency_code currency_code,
-    retry_payment_every INT,
-    total_retries INT,
-    failed_payment_action VARCHAR,
     email_notifications JSONB,
     metadata JSONB,
     created_at TIMESTAMPTZ,
@@ -65,18 +59,12 @@ BEGIN
     RETURN QUERY
     SELECT
         s.subscription_id,
-        s.name,
-        s.description,
+        s.plan_id,
+        s.customer_id,
         s.status,
         s.start_date,
         s.end_date,
         s.next_billing_date,
-        s.billing_frequency,
-        s.amount,
-        s.currency_code,
-        s.retry_payment_every,
-        s.total_retries,
-        s.failed_payment_action,
         s.email_notifications,
         s.metadata,
         s.created_at,
@@ -84,7 +72,7 @@ BEGIN
     FROM
         merchant_subscriptions s
     WHERE
-        s.merchant_id = p_merchant_id
+        s.plan_id IN (SELECT sp.plan_id FROM subscription_plans sp WHERE sp.merchant_id = p_merchant_id)
         AND (p_status IS NULL OR s.status = p_status)
     ORDER BY
         s.created_at DESC

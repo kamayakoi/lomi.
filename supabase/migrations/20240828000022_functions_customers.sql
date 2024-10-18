@@ -27,6 +27,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Function to fetch customers for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_customers(
     p_merchant_id UUID,
+    p_search_term VARCHAR DEFAULT NULL,
     p_page INTEGER DEFAULT 1,
     p_page_size INTEGER DEFAULT 50
 )
@@ -64,6 +65,7 @@ BEGIN
     WHERE 
         c.merchant_id = p_merchant_id
         AND c.is_deleted = false
+        AND (p_search_term IS NULL OR c.name ILIKE '%' || p_search_term || '%' OR c.email ILIKE '%' || p_search_term || '%')
     ORDER BY
         c.created_at DESC
     LIMIT p_page_size

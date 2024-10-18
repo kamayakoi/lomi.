@@ -129,20 +129,22 @@ CREATE OR REPLACE FUNCTION public.fetch_top_performing_subscriptions(
     p_limit INTEGER DEFAULT 10
 )
 RETURNS TABLE (
-    subscription_name VARCHAR,
+    plan_name VARCHAR,
     sales_count BIGINT,
     total_revenue NUMERIC(15,2)
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
-        s.name AS subscription_name,
+        p.name AS plan_name,
         COUNT(t.transaction_id) AS sales_count,
         SUM(t.net_amount) AS total_revenue
     FROM 
         transactions t
     JOIN 
         merchant_subscriptions s ON t.subscription_id = s.subscription_id
+    JOIN
+        subscription_plans p ON s.plan_id = p.plan_id
     WHERE 
         t.merchant_id = p_merchant_id AND
         t.status = 'completed' AND
@@ -150,13 +152,12 @@ BEGIN
         (p_start_date IS NULL OR t.created_at >= p_start_date) AND
         (p_end_date IS NULL OR t.created_at <= p_end_date)
     GROUP BY 
-        s.name
+        p.name
     ORDER BY 
         total_revenue DESC
     LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
 -- Add the following function
 CREATE OR REPLACE FUNCTION public.fetch_provider_distribution(
     p_merchant_id UUID,

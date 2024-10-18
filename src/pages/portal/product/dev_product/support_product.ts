@@ -24,6 +24,7 @@ export const fetchProducts = async (
 
 interface CreateProductData {
   merchantId: string
+  organizationId: string
   name: string
   description: string
   price: number
@@ -34,6 +35,7 @@ interface CreateProductData {
 export const createProduct = async (data: CreateProductData) => {
   const { data: productId, error } = await supabase.rpc('create_product', {
     p_merchant_id: data.merchantId,
+    p_organization_id: data.organizationId,
     p_name: data.name,
     p_description: data.description,
     p_price: data.price,

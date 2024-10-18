@@ -27,9 +27,9 @@ export const fetchWebhooks = async (
 interface CreateWebhookData {
   merchantId: string
   url: string
-  event: string
-  isActive: boolean
-  metadata: Record<string, unknown>
+  event: webhook_event
+  isActive?: boolean
+  metadata?: Record<string, unknown>
 }
 
 export const createWebhook = async (data: CreateWebhookData) => {
@@ -37,8 +37,8 @@ export const createWebhook = async (data: CreateWebhookData) => {
     p_merchant_id: data.merchantId,
     p_url: data.url,
     p_event: data.event,
-    p_is_active: data.isActive,
-    p_metadata: data.metadata,
+    p_is_active: data.isActive ?? true,
+    p_metadata: data.metadata ?? {},
   })
 
   if (error) {

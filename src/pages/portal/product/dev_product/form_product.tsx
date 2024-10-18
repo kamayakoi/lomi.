@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { createProduct } from './support_product'
 import { useUser } from '@/lib/hooks/useUser'
+import { supabase } from '@/utils/supabase/client'
 
 interface CreateProductFormProps {
     onClose: () => void
@@ -27,8 +28,17 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
 
     const onSubmit = async (data: ProductFormData) => {
         try {
+            const { data: organizationData, error: organizationError } = await supabase
+                .rpc('fetch_organization_details', { p_merchant_id: user?.id })
+
+            if (organizationError) {
+                console.error('Error fetching organization details:', organizationError)
+                return
+            }
+
             await createProduct({
                 merchantId: user?.id || '',
+                organizationId: organizationData[0].organization_id,
                 name: data.name,
                 description: data.description,
                 price: data.price,

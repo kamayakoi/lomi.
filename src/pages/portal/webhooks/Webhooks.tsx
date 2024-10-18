@@ -51,8 +51,8 @@ export default function WebhooksPage() {
         ({ pageParam = 1 }) =>
             fetchWebhooks(
                 user?.id || '',
-                selectedEvent,
-                selectedStatus,
+                selectedEvent || null,
+                selectedStatus || null,
                 pageParam,
                 pageSize
             ),

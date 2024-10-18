@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION public.create_product(
     p_description TEXT,
     p_price NUMERIC(10,2),
     p_currency_code currency_code,
-    p_is_active BOOLEAN
+    p_is_active BOOLEAN DEFAULT true
 )
 RETURNS UUID AS $$
 DECLARE

@@ -38,7 +38,10 @@ RETURNS TABLE (
     subscription_end_date DATE,
     subscription_next_billing_date DATE,
     subscription_billing_frequency frequency,
-    subscription_amount NUMERIC(10,2)
+    subscription_amount NUMERIC(10,2),
+    plan_id UUID,
+    plan_name VARCHAR,
+    plan_description TEXT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -61,25 +64,28 @@ BEGIN
         t.provider_code,
         t.product_id,
         t.subscription_id,
-        p.name AS product_name,
-        p.description AS product_description,
-        p.price AS product_price,
-        s.name AS subscription_name,
-        s.description AS subscription_description,
+        mp.name AS product_name,
+        mp.description AS product_description,
+        mp.price AS product_price,
         s.status AS subscription_status,
         s.start_date AS subscription_start_date,
         s.end_date AS subscription_end_date,
         s.next_billing_date AS subscription_next_billing_date,
-        s.billing_frequency AS subscription_billing_frequency,
-        s.amount AS subscription_amount
+        p.billing_frequency AS subscription_billing_frequency,
+        p.amount AS subscription_amount,
+        s.plan_id,
+        p.name AS plan_name,
+        p.description AS plan_description
     FROM 
         transactions t
     JOIN
         customers c ON t.customer_id = c.customer_id
     LEFT JOIN
-        merchant_products p ON t.product_id = p.product_id
+        merchant_products mp ON t.product_id = mp.product_id
     LEFT JOIN
         merchant_subscriptions s ON t.subscription_id = s.subscription_id
+    LEFT JOIN
+        subscription_plans p ON s.plan_id = p.plan_id
     WHERE 
         t.merchant_id = p_merchant_id AND
         (p_provider_code IS NULL OR t.provider_code = p_provider_code) AND

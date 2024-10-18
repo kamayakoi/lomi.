@@ -114,7 +114,7 @@ export type FetchNewCustomerCountChangeParams = never
 export type FetchConversionRateChangeParams = never
 
 export type TopPerformingSubscription = {
-    subscription_name: string
+    plan_name: string
     sales_count: number
     total_revenue: number
 }

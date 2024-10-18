@@ -1,5 +1,5 @@
 import React from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,13 +22,16 @@ interface WebhookFormData {
 
 export const CreateWebhookForm: React.FC<CreateWebhookFormProps> = ({ onClose, onSuccess }) => {
     const { user } = useUser()
-    const { register, handleSubmit } = useForm<WebhookFormData>()
+    const { register, handleSubmit, control } = useForm<WebhookFormData>()
 
     const onSubmit = async (data: WebhookFormData) => {
         try {
             await createWebhook({
                 merchantId: user?.id || '',
-                ...data,
+                url: data.url,
+                event: data.event,
+                isActive: true,
+                metadata: {},
             })
             onSuccess()
             onClose()
@@ -49,17 +52,23 @@ export const CreateWebhookForm: React.FC<CreateWebhookFormProps> = ({ onClose, o
             </div>
             <div className="space-y-2">
                 <Label htmlFor="event">Event</Label>
-                <Select {...register('event')}>
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select an event" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="new_payment">New Payment</SelectItem>
-                        <SelectItem value="new_subscription">New Subscription</SelectItem>
-                        <SelectItem value="payment_status_change">Payment Status Change</SelectItem>
-                        <SelectItem value="subscription_status_change">Subscription Status Change</SelectItem>
-                    </SelectContent>
-                </Select>
+                <Controller
+                    name="event"
+                    control={control}
+                    render={({ field }) => (
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select an event" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="new_payment">New Payment</SelectItem>
+                                <SelectItem value="new_subscription">New Subscription</SelectItem>
+                                <SelectItem value="payment_status_change">Payment Status Change</SelectItem>
+                                <SelectItem value="subscription_status_change">Subscription Status Change</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    )}
+                />
             </div>
             <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={onClose}>Cancel</Button>

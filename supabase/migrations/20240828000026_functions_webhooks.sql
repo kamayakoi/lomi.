@@ -3,8 +3,8 @@ CREATE OR REPLACE FUNCTION public.create_webhook(
     p_merchant_id UUID,
     p_url VARCHAR,
     p_event webhook_event,
-    p_is_active BOOLEAN,
-    p_metadata JSONB
+    p_is_active BOOLEAN DEFAULT true,
+    p_metadata JSONB DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -31,12 +31,6 @@ RETURNS TABLE (
     url VARCHAR,
     event webhook_event,
     is_active BOOLEAN,
-    last_triggered_at TIMESTAMPTZ,
-    last_payload JSONB,
-    last_response_status INT,
-    last_response_body TEXT,
-    retry_count INT,
-    metadata JSONB,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ
 ) AS $$
@@ -47,12 +41,6 @@ BEGIN
         w.url,
         w.event,
         w.is_active,
-        w.last_triggered_at,
-        w.last_payload,
-        w.last_response_status,
-        w.last_response_body,
-        w.retry_count,
-        w.metadata,
         w.created_at,
         w.updated_at
     FROM 
