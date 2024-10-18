@@ -87,11 +87,13 @@ INSERT INTO fees (name, transaction_type, fee_type, percentage, fixed_amount, cu
   ('USD Payout Processing Fee', 'payment', 'processing', 2.0, 0.50, 'USD', NULL, NULL),
   ('XOF Payout Processing Fee', 'payment', 'processing', 2.2, 0.00, 'XOF', NULL, NULL);
 
+
 -- Seed data for merchants table
 INSERT INTO merchants (name, email, phone_number, country)
 VALUES 
   ('Merchant 1', 'merchant1@example.com', '+1234567890', 'Country 1'),
   ('Merchant 2', 'merchant2@example.com', '+2345678901', 'Country 2');
+
 
 -- Seed data for organizations table  
 INSERT INTO organizations (name, email, phone_number, website_url)
@@ -154,13 +156,15 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Plan 3', 'Description 3', 'monthly', 75.00, 'XOF', 2, 0, 'cancel', '{"enabled": true, "frequency": "monthly"}', '{}'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 4', 'Description 4', 'yearly', 200.00, 'XOF', 0, 0, 'retry', '{"enabled": true, "frequency": "daily"}', '{}');
 
+
 -- Update merchant_subscriptions seed data
-INSERT INTO merchant_subscriptions (plan_id, customer_id, status, start_date, email_notifications, metadata)
+INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, start_date, metadata)
 VALUES
-  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 1'), 'active', '2024-01-01', '{"enabled": true, "frequency": "weekly"}', '{}'),
-  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), 'active', '2024-01-01', '{"enabled": false}', '{}'),
-  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 3'), (SELECT customer_id FROM customers WHERE name = 'Customer 6'), 'active', '2024-07-01', '{"enabled": true, "frequency": "monthly"}', '{}'),
-  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 4'), (SELECT customer_id FROM customers WHERE name = 'Customer 3'), 'active', '2024-01-01', '{"enabled": true, "frequency": "daily"}', '{}');
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 1'), 'active', '2024-01-01', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), 'active', '2024-01-01', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 3'), (SELECT customer_id FROM customers WHERE name = 'Customer 6'), 'active', '2024-07-01', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 4'), (SELECT customer_id FROM customers WHERE name = 'Customer 3'), 'active', '2024-01-01', '{}');
+
 
 -- Seed data for payment_links table
 INSERT INTO payment_links (merchant_id, organization_id, link_type, url, product_id, plan_id, title, public_description, private_description, price, currency_code, allowed_providers, allow_coupon_code, expires_at, success_url, metadata)
@@ -168,6 +172,7 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'product', 'https://example.com/link1', (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'Payment Link 1', 'Public description 1', 'Private description 1', NULL, 'XOF', ARRAY['ORANGE', 'WAVE']::provider_code[], true, '2024-12-31 23:59:59', 'https://example.com/success1', '{}'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'plan', 'https://example.com/link2', NULL, (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 1'), 'Payment Link 2', 'Public description 2', 'Private description 2', NULL, 'XOF', ARRAY['MTN', 'ECOBANK']::provider_code[], false, NULL, 'https://example.com/success2', '{}'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'instant', 'https://example.com/link3', NULL, NULL, 'Payment Link 3', 'Public description 3', 'Private description 3', 100.00, 'XOF', ARRAY['STRIPE']::provider_code[], true, '2024-06-30 23:59:59', 'https://example.com/success3', '{}');
+
 
 -- Seed data for transactions table
 INSERT INTO transactions (merchant_id, organization_id, customer_id, product_id, subscription_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code, created_at)
@@ -188,6 +193,7 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 14'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Customer 14')), 'instalment', 'completed', 'Transaction 14', 'REF14', '{}', 200.00, 5.00, 195.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 19:50:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 15'), (SELECT product_id FROM merchant_products WHERE name = 'Product 4'), NULL, 'payment', 'failed', 'Transaction 15', 'REF15', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 22:35:00');
 
+
 -- Seed data for refunds table
 INSERT INTO refunds (transaction_id, amount, refunded_amount, fee_amount, reason, status)
 VALUES 
@@ -202,6 +208,7 @@ INSERT INTO merchant_accounts (merchant_id, balance, currency_code)
 VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 2000.00, 'XOF'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 1800.00, 'XOF');
+
 
 -- Seed data for merchant_bank_accounts table
 INSERT INTO merchant_bank_accounts (merchant_id, account_number, account_name, bank_name, bank_code, branch_code, country, is_default, is_valid)
@@ -233,41 +240,8 @@ VALUES
     'completed'
   );
 
--- Seed data for organization_kyc table
-
--- Seed data for api_keys table
-
--- Seed data for api_usage table
-
--- Seed data for webhooks table
 
 -- Seed data for logs table
-
--- Seed data for platform_invoices table
-
--- Seed data for customer_api_interactions table
-
--- Seed data for api_rate_limits table
-
--- Seed data for platform_metrics table
-
--- Seed data for error_logs table
-
--- Seed data for customer_invoices table
-
--- Seed data for disputes table
-
--- Seed data for organization_providers_settings table
-
--- Seed data for platform_main_account table
-
--- Seed data for platform_provider_balance table
-
--- Seed data for merchant_feedback table
-
--- Seed data for notifications table
-
--- Seed data for logs table (Merchant 1)
 INSERT INTO logs (merchant_id, event, ip_address, operating_system, browser, details, severity, request_url, request_method, response_status, created_at)
 VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'user_login', '192.168.0.1', 'Windows', 'Chrome', '{"user_id": "user1"}', 'NOTICE', '/login', 'POST', 200, '2024-10-01 09:00:00'),
@@ -290,3 +264,77 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_invoice', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/create-invoice', 'POST', 200, '2024-10-02 10:35:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'process_payment', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'WARNING', '/process-payment', 'POST', 400, '2024-10-02 10:40:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'create_refund', '192.168.0.2', 'MacOS', 'Safari', '{"user_id": "user2"}', 'NOTICE', '/create-refund', 'POST', 200, '2024-10-02 10:45:00');
+
+
+-- Seed data for webhooks table
+INSERT INTO webhooks (merchant_id, url, event, is_active, last_triggered_at, last_payload, last_response_status, last_response_body, retry_count, metadata)
+VALUES
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    'https://api.merchant1.com/webhooks/payments',
+    'new_payment',
+    true,
+    '2024-10-01 10:00:00',
+    '{"transaction_id": "123456", "amount": 100.00, "currency": "XOF"}',
+    200,
+    '{"status": "success", "message": "Webhook received"}',
+    0,
+    '{"description": "Payment notification webhook"}'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    'https://api.merchant1.com/webhooks/subscriptions',
+    'subscription_status_change',
+    true,
+    '2024-10-02 11:30:00',
+    '{"subscription_id": "789012", "new_status": "active", "customer_id": "CUS123"}',
+    200,
+    '{"status": "success", "message": "Subscription status updated"}',
+    0,
+    '{"description": "Subscription status change notification"}'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'),
+    'https://notify.merchant2.com/payment-hooks',
+    'payment_status_change',
+    true,
+    '2024-10-03 09:15:00',
+    '{"payment_id": "PAY456", "new_status": "completed", "amount": 250.00}',
+    200,
+    '{"status": "success", "message": "Payment status updated successfully"}',
+    1,
+    '{"description": "Payment status change notification", "importance": "high"}'
+  );
+
+
+-- Seed data for organization_kyc table
+
+
+-- Seed data for api_keys table
+
+
+-- Seed data for api_usage table
+
+
+-- Seed data for customer_api_interactions table
+
+
+-- Seed data for api_rate_limits table
+
+
+-- Seed data for error_logs table
+
+
+-- Seed data for customer_invoices table
+
+
+-- Seed data for disputes table
+
+
+-- Seed data for organization_providers_settings table
+
+
+-- Seed data for merchant_feedback table
+
+
+-- Seed data for notifications table

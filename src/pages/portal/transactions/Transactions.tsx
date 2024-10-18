@@ -442,7 +442,7 @@ function TransactionsPage() {
                                     <InfiniteScroll
                                         dataLength={transactions.length}
                                         next={() => fetchNextPage()}
-                                        hasMore={transactionsData?.pages[transactionsData.pages.length - 1].length === pageSize}
+                                        hasMore={transactionsData?.pages?.[transactionsData.pages.length - 1]?.length === pageSize}
                                         loader={<Skeleton className="w-full h-8" />}
                                     >
                                         <Table>

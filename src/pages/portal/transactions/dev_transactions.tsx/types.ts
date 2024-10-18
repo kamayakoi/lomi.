@@ -25,6 +25,13 @@ export type Transaction = {
     product_name?: string
     product_description?: string
     product_price?: number
+    subscription_id?: string
+    plan_name?: string
+    plan_description?: string
+    plan_billing_frequency?: string
+    subscription_end_date?: string
+    subscription_next_billing_date?: string
+    subscription_status?: string
 }
 
 export type FetchedTransaction = {

@@ -338,13 +338,13 @@ COMMENT ON COLUMN subscription_plans.failed_payment_action IS 'Action to take wh
 -- Subscriptions table
 CREATE TABLE merchant_subscriptions (
     subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     plan_id UUID NOT NULL REFERENCES subscription_plans(plan_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
     status subscription_status NOT NULL DEFAULT 'pending',
     start_date DATE NOT NULL,
     end_date DATE,
     next_billing_date DATE,
-    email_notifications JSONB,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -352,6 +352,7 @@ CREATE TABLE merchant_subscriptions (
 
 CREATE INDEX idx_merchant_subscriptions_plan_id ON merchant_subscriptions(plan_id);
 CREATE INDEX idx_merchant_subscriptions_customer_id ON merchant_subscriptions(customer_id);
+CREATE INDEX idx_merchant_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
 
 COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions, including status and visual representation';
 COMMENT ON COLUMN merchant_subscriptions.next_billing_date IS 'The next billing date of the subscription';

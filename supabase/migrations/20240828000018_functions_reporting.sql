@@ -420,3 +420,37 @@ BEGIN
         date;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch subscription data for a given transaction
+CREATE OR REPLACE FUNCTION public.fetch_subscription_data(
+    p_transaction_id UUID
+)
+RETURNS TABLE (
+    subscription_id UUID,
+    plan_name VARCHAR,
+    plan_description TEXT,
+    plan_billing_frequency frequency,
+    subscription_end_date DATE,
+    subscription_next_billing_date DATE,
+    subscription_status subscription_status
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        ms.subscription_id,
+        sp.name AS plan_name,
+        sp.description AS plan_description,
+        sp.billing_frequency AS plan_billing_frequency,
+        ms.end_date AS subscription_end_date,
+        ms.next_billing_date AS subscription_next_billing_date,
+        ms.status AS subscription_status
+    FROM
+        transactions t
+    LEFT JOIN
+        merchant_subscriptions ms ON t.subscription_id = ms.subscription_id
+    LEFT JOIN
+        subscription_plans sp ON ms.plan_id = sp.plan_id
+    WHERE
+        t.transaction_id = p_transaction_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

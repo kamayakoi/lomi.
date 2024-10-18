@@ -35,7 +35,7 @@ export const fetchTransactions = async (
         return []
     }
 
-    return data.map((transaction: FetchedTransaction) => ({
+    const transactions = data.map((transaction: FetchedTransaction) => ({
         transaction_id: transaction.transaction_id,
         customer_name: transaction.customer_name,
         customer_email: transaction.customer_email,
@@ -57,6 +57,33 @@ export const fetchTransactions = async (
         product_description: transaction.product_description,
         product_price: transaction.product_price,
     }))
+
+    const transactionsWithSubscriptions = await Promise.all(
+        transactions.map(async (transaction: Transaction) => {
+            if (transaction.type === 'instalment') {
+                const { data: subscriptionData, error: subscriptionError } = await supabase
+                    .rpc('fetch_subscription_data', { p_transaction_id: transaction.transaction_id });
+
+                if (subscriptionError) {
+                    console.error('Error fetching subscription data:', subscriptionError);
+                } else if (subscriptionData && subscriptionData.length > 0) {
+                    return {
+                        ...transaction,
+                        subscription_id: subscriptionData[0].subscription_id,
+                        plan_name: subscriptionData[0].plan_name,
+                        plan_description: subscriptionData[0].plan_description,
+                        plan_billing_frequency: subscriptionData[0].plan_billing_frequency,
+                        subscription_end_date: subscriptionData[0].subscription_end_date,
+                        subscription_next_billing_date: subscriptionData[0].subscription_next_billing_date,
+                        subscription_status: subscriptionData[0].subscription_status,
+                    };
+                }
+            }
+            return transaction;
+        })
+    );
+
+    return transactionsWithSubscriptions;
 }
 
 const getDateRange = (selectedDateRange: string | null, customDateRange?: DateRange) => {

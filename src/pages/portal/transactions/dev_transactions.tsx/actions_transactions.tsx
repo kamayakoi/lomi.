@@ -84,6 +84,28 @@ export default function TransactionActions({ transaction, isOpen, onClose }: Tra
                                     </section>
                                 </>
                             )}
+                            {transaction.subscription_id && (
+                                <>
+                                    <Separator />
+                                    <section>
+                                        <h3 className="text-lg font-semibold mb-2">Subscription Details</h3>
+                                        <div className="grid grid-cols-2 gap-2 text-sm">
+                                            <div className="font-medium">Plan Name:</div>
+                                            <div>{transaction.plan_name}</div>
+                                            <div className="font-medium">Description:</div>
+                                            <div>{transaction.plan_description}</div>
+                                            <div className="font-medium">Billing Frequency:</div>
+                                            <div>{formatBillingFrequency(transaction.plan_billing_frequency)}</div>
+                                            <div className="font-medium">End Date:</div>
+                                            <div>{formatDate(transaction.subscription_end_date)}</div>
+                                            <div className="font-medium">Next Billing Date:</div>
+                                            <div>{formatDate(transaction.subscription_next_billing_date)}</div>
+                                            <div className="font-medium">Status:</div>
+                                            <div>{formatSubscriptionStatus(transaction.subscription_status)}</div>
+                                        </div>
+                                    </section>
+                                </>
+                            )}
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
@@ -150,8 +172,18 @@ function formatProviderCode(providerCode: provider_code): string {
     }
 }
 
+function formatDate(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
 
-function formatDate(dateString: string): string {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+function formatBillingFrequency(frequency: string | undefined): string {
+    if (!frequency) return '';
+    return frequency.charAt(0).toUpperCase() + frequency.slice(1);
+}
+
+function formatSubscriptionStatus(status: string | undefined): string {
+    if (!status) return '';
+    return status.charAt(0).toUpperCase() + status.slice(1);
 }
