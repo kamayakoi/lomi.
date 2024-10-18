@@ -1,19 +1,19 @@
 -- Function to create a new product
 CREATE OR REPLACE FUNCTION public.create_product(
     p_merchant_id UUID,
+    p_organization_id UUID,
     p_name VARCHAR(255),
     p_description TEXT,
     p_price NUMERIC(10,2),
     p_currency_code currency_code,
-    p_image_url TEXT,
     p_is_active BOOLEAN
 )
 RETURNS UUID AS $$
 DECLARE
     v_product_id UUID;
 BEGIN
-    INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, image_url, is_active)
-    VALUES (p_merchant_id, p_name, p_description, p_price, p_currency_code, p_image_url, p_is_active)
+    INSERT INTO merchant_products (merchant_id, organization_id, name, description, price, currency_code, is_active)
+    VALUES (p_merchant_id, p_organization_id, p_name, p_description, p_price, p_currency_code, p_is_active)
     RETURNING product_id INTO v_product_id;
 
     RETURN v_product_id;
@@ -29,11 +29,12 @@ CREATE OR REPLACE FUNCTION public.fetch_products(
 )
 RETURNS TABLE (
     product_id UUID,
+    merchant_id UUID,
+    organization_id UUID,
     name VARCHAR(255),
     description TEXT,
     price NUMERIC(10,2),
     currency_code currency_code,
-    image_url TEXT,
     is_active BOOLEAN,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ
@@ -42,11 +43,12 @@ BEGIN
     RETURN QUERY
     SELECT 
         p.product_id,
+        p.merchant_id,
+        p.organization_id,
         p.name,
         p.description,
         p.price,
         p.currency_code,
-        p.image_url,
         p.is_active,
         p.created_at,
         p.updated_at

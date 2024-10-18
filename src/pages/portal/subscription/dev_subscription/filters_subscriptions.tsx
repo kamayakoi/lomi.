@@ -4,15 +4,17 @@ import { Input } from "@/components/ui/input"
 import { Search, RefreshCw } from 'lucide-react'
 
 interface SubscriptionFiltersProps {
-    selectedStatus: string | null
-    setSelectedStatus: (status: string | null) => void
+    selectedStatus?: string | null
+    setSelectedStatus?: (status: string | null) => void
     refetch: () => void
+    isRefreshing: boolean
 }
 
 export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
     selectedStatus,
     setSelectedStatus,
-    refetch
+    refetch,
+    isRefreshing,
 }) => {
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
@@ -25,19 +27,26 @@ export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
                     />
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>
-                <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="w-[140px] rounded-none">
-                        <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button variant="outline" size="icon" onClick={() => refetch()}>
-                    <RefreshCw className="h-4 w-4" />
+                {setSelectedStatus && (
+                    <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
+                        <SelectTrigger className="w-[140px] rounded-none">
+                            <SelectValue placeholder="All Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                    </Select>
+                )}
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => refetch()}
+                    disabled={isRefreshing}
+                >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                     <span className="sr-only">Refresh</span>
                 </Button>
             </div>

@@ -77,14 +77,14 @@ export default function FeedbackForm() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50"
+                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg z-50"
                     >
                         <div className="p-4">
                             <Textarea
                                 placeholder="Ideas on how to improve our products. Contact support for technical issues."
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
-                                className="min-h-[100px] mb-4 text-sm placeholder:text-sm"
+                                className="min-h-[100px] mb-4 text-sm placeholder:text-sm bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100"
                             />
                             <div className="flex items-center justify-between">
                                 <div className="flex space-x-2">
@@ -106,7 +106,7 @@ export default function FeedbackForm() {
                                 </div>
                             </div>
                         </div>
-                        <div className="text-xs text-gray-500 p-2 border-t border-gray-200 dark:border-gray-700">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 p-2 border-t border-gray-200 dark:border-gray-700">
                             Have a technical issue? Contact support or browse our docs.
                         </div>
                     </motion.div>

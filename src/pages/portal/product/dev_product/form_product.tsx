@@ -18,7 +18,6 @@ interface ProductFormData {
     description: string
     price: number
     currencyCode: string
-    imageUrl: string
     isActive: boolean
 }
 
@@ -30,7 +29,11 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
         try {
             await createProduct({
                 merchantId: user?.id || '',
-                ...data,
+                name: data.name,
+                description: data.description,
+                price: data.price,
+                currencyCode: 'XOF',
+                isActive: true,
             })
             onSuccess()
             onClose()
@@ -66,20 +69,12 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="XOF">XOF</SelectItem>
-                            <SelectItem value="USD">USD</SelectItem>
-                            <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="USD" disabled>USD</SelectItem>
+                            <SelectItem value="EUR" disabled>EUR</SelectItem>
                         </SelectContent>
                     </Select>
                     <Input id="price" type="number" placeholder="Enter price" className="flex-1" {...register('price')} />
                 </div>
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                    id="imageUrl"
-                    placeholder="Enter image URL"
-                    {...register('imageUrl')}
-                />
             </div>
             <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={onClose}>Cancel</Button>

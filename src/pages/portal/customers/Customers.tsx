@@ -37,6 +37,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { countryCodes } from '@/utils/data/onboarding'
+import { CustomerFilters } from './dev_customers/filters_customers'
 
 export default function CustomersPage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -47,6 +48,8 @@ export default function CustomersPage() {
     const [isActionsOpen, setIsActionsOpen] = useState(false)
     const [countryCodeSearch, setCountryCodeSearch] = useState('')
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
@@ -54,12 +57,13 @@ export default function CustomersPage() {
     ]
 
     const { data: customers = [], isLoading: isCustomersLoading, refetch: fetchCustomers } = useQuery(
-        ['customers', user?.id],
+        ['customers', user?.id, searchTerm],
         async () => {
             if (!user?.id) return []
 
             const { data, error } = await supabase.rpc('fetch_customers', {
                 p_merchant_id: user.id,
+                p_search_term: searchTerm,
             })
 
             if (error) {
@@ -91,7 +95,7 @@ export default function CustomersPage() {
             p_organization_id: organizationData[0].organization_id,
             p_name: formData.get('name') as string,
             p_email: formData.get('email') as string,
-            p_phone_number: `${formData.get('countryCode')}${formData.get('phone')}`,
+            p_phone_number: `${countryCodeSearch}${formData.get('phone')}`,
             p_country: 'Senegal',
             p_city: '',
             p_address: '',
@@ -105,6 +109,7 @@ export default function CustomersPage() {
         }
 
         setIsDialogOpen(false)
+        fetchCustomers()
     }
 
     const handleDeleteClick = (customerId: string) => {
@@ -137,6 +142,12 @@ export default function CustomersPage() {
             code.toLowerCase().includes(lowercaseSearch)
         ))).slice(0, 5); // Limit to 5 results
     }, [countryCodeSearch]);
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true)
+        await fetchCustomers()
+        setIsRefreshing(false)
+    }
 
     if (isUserLoading) {
         return <AnimatedLogoLoader />
@@ -257,38 +268,53 @@ export default function CustomersPage() {
                         </Dialog>
                     </div>
 
-                    {isCustomersLoading ? (
-                        <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
-                            <Skeleton className="h-8 w-64" />
-                            <Skeleton className="h-4 w-48" />
-                        </div>
-                    ) : customers.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
-                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                <UsersIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold mb-2">No customer data records exist yet</h2>
-                                <p className="text-gray-500 dark:text-gray-400">Start by adding your first customer.</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="rounded-md border">
-                            <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
-                                <Table>
-                                    <TableHeader>
+                    <CustomerFilters
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        refetch={handleRefresh}
+                        isRefreshing={isRefreshing}
+                    />
+
+                    <div className="rounded-md border">
+                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead>Phone</TableHead>
+                                        <TableHead>Country</TableHead>
+                                        <TableHead>Type</TableHead>
+                                        <TableHead></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {isCustomersLoading ? (
                                         <TableRow>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Email</TableHead>
-                                            <TableHead>Phone</TableHead>
-                                            <TableHead>Country</TableHead>
-                                            <TableHead>Type</TableHead>
-                                            <TableHead></TableHead>
+                                            <TableCell colSpan={6}>
+                                                <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
+                                                    <Skeleton className="h-8 w-64" />
+                                                    <Skeleton className="h-4 w-48" />
+                                                </div>
+                                            </TableCell>
                                         </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {customers.map((customer) => (
-                                            <TableRow key={customer.customer_id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleCustomerClick(customer)}>
+                                    ) : customers.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={6}>
+                                                <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
+                                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                        <UsersIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                    </div>
+                                                    <div>
+                                                        <h2 className="text-xl font-semibold mb-2">No customer data records exist yet</h2>
+                                                        <p className="text-gray-500 dark:text-gray-400">Start by adding your first customer.</p>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        customers.map((customer) => (
+                                            <TableRow key={customer.customer_id} className="cursor-pointer" onClick={() => handleCustomerClick(customer)}>
                                                 <TableCell>{customer.name}</TableCell>
                                                 <TableCell>{customer.email}</TableCell>
                                                 <TableCell>{customer.phone_number}</TableCell>
@@ -300,12 +326,12 @@ export default function CustomersPage() {
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
                         </div>
-                    )}
+                    </div>
                 </div>
             </Layout.Body>
 

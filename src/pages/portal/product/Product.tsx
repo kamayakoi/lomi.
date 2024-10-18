@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { fetchProducts } from './dev_product/support_product'
+import { fetchProducts, deleteProduct } from './dev_product/support_product'
 import { Product } from './dev_product/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -29,6 +29,7 @@ export default function ProductsPage() {
     const { user } = useUser()
     const [isCreateProductOpen, setIsCreateProductOpen] = useState(false)
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+    const [isRefreshing, setIsRefreshing] = useState(false)
     const pageSize = 50
 
     const topNav = [
@@ -41,7 +42,7 @@ export default function ProductsPage() {
         ({ pageParam = 1 }) =>
             fetchProducts(
                 user?.id || '',
-                selectedStatus,
+                selectedStatus === 'active',
                 pageParam,
                 pageSize
             ),
@@ -58,6 +59,21 @@ export default function ProductsPage() {
 
     const handleCreateProductSuccess = () => {
         refetch()
+    }
+
+    const handleDeleteProduct = async (productId: string) => {
+        try {
+            await deleteProduct(productId)
+            refetch()
+        } catch (error) {
+            console.error('Error deleting product:', error)
+        }
+    }
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true)
+        await refetch()
+        setIsRefreshing(false)
     }
 
     return (
@@ -99,7 +115,8 @@ export default function ProductsPage() {
                     <ProductFilters
                         selectedStatus={selectedStatus}
                         setSelectedStatus={setSelectedStatus}
-                        refetch={refetch}
+                        refetch={handleRefresh}
+                        isRefreshing={isRefreshing}
                     />
 
                     <div className="rounded-md border mt-4">
@@ -145,8 +162,8 @@ export default function ProductsPage() {
                           `}>
                                                         {product.is_active ? 'Active' : 'Inactive'}
                                                     </span>
-                                                    <Button variant="ghost" size="sm">
-                                                        View
+                                                    <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(product.product_id)}>
+                                                        Delete
                                                     </Button>
                                                 </div>
                                             </div>

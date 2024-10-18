@@ -16,6 +16,7 @@ CREATE TYPE kyc_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE entity_type AS ENUM ('merchant', 'organization', 'platform');
 CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed');
 CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
+CREATE TYPE link_type AS ENUM ('product', 'plan', 'instant');
 CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 'subscription', 'webhook', 'chargeback');
 CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
 CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
@@ -285,11 +286,11 @@ COMMENT ON TABLE platform_provider_balance IS 'Tracks the balance for each provi
 CREATE TABLE merchant_products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     price NUMERIC(10,2) NOT NULL CHECK (price >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    image_url TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -297,23 +298,18 @@ CREATE TABLE merchant_products (
 
 CREATE INDEX idx_merchant_products_merchant_id ON merchant_products(merchant_id);
 CREATE INDEX idx_merchant_products_currency_code ON merchant_products(currency_code);
+CREATE INDEX idx_merchant_products_organization_id ON merchant_products(organization_id);
+
 
 COMMENT ON TABLE merchant_products IS 'Stores products and services offered by merchants';
 
-
--- Merchant Subscriptions table
-CREATE TABLE merchant_subscriptions (
-    subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+-- Plans table
+CREATE TABLE subscription_plans (
+    plan_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    customer_id UUID NOT NULL REFERENCES customers(customer_id),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    status subscription_status NOT NULL DEFAULT 'pending',
-    image_url TEXT,
-    start_date DATE NOT NULL,
-    end_date DATE,
-    next_billing_date DATE,
     billing_frequency frequency NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL DEFAULT 'XOF',
@@ -327,16 +323,39 @@ CREATE TABLE merchant_subscriptions (
     FOREIGN KEY (currency_code) REFERENCES currencies(code)
 );
 
-CREATE INDEX idx_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
-CREATE INDEX idx_subscriptions_organization_id ON merchant_subscriptions(organization_id);
-CREATE INDEX idx_subscriptions_customer_id ON merchant_subscriptions(customer_id);
-CREATE INDEX idx_subscriptions_currency_code ON merchant_subscriptions(currency_code);
+CREATE INDEX idx_subscription_plans_merchant_id ON subscription_plans(merchant_id);
+CREATE INDEX idx_subscription_plans_organization_id ON subscription_plans(organization_id);
+CREATE INDEX idx_subscription_plans_currency_code ON subscription_plans(currency_code);
 
-COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions';
+COMMENT ON TABLE subscription_plans IS 'Stores information about available subscription plans';
+COMMENT ON COLUMN subscription_plans.billing_frequency IS 'Frequency of billing for the subscription plan';
+COMMENT ON COLUMN subscription_plans.amount IS 'Amount to be charged per billing cycle';
+COMMENT ON COLUMN subscription_plans.retry_payment_every IS 'Number of days between payment retry attempts';
+COMMENT ON COLUMN subscription_plans.total_retries IS 'Maximum number of payment retry attempts';
+COMMENT ON COLUMN subscription_plans.failed_payment_action IS 'Action to take when payment fails after all retry attempts';
+
+
+-- Subscriptions table
+CREATE TABLE merchant_subscriptions (
+    subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plan_id UUID NOT NULL REFERENCES subscription_plans(plan_id),
+    customer_id UUID NOT NULL REFERENCES customers(customer_id),
+    status subscription_status NOT NULL DEFAULT 'pending',
+    start_date DATE NOT NULL,
+    end_date DATE,
+    next_billing_date DATE,
+    email_notifications JSONB,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_merchant_subscriptions_plan_id ON merchant_subscriptions(plan_id);
+CREATE INDEX idx_merchant_subscriptions_customer_id ON merchant_subscriptions(customer_id);
+
+COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions, including status and visual representation';
 COMMENT ON COLUMN merchant_subscriptions.next_billing_date IS 'The next billing date of the subscription';
 COMMENT ON COLUMN merchant_subscriptions.status IS 'Current status of the subscription (active, paused, cancelled, expired)';
-
--- Add comments to explain the subscription statuses
 COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
 - active: Subscription is currently active and payments are up-to-date
 - paused: Subscription is temporarily paused (e.g., at customer''s request)
@@ -345,9 +364,6 @@ COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
 - past_due: Payment is overdue but the subscription is still active
 - pending: Subscription has been created but is not yet active (e.g., waiting for initial payment)
 - trial: Subscription is in a trial period';
-
--- Update the comment on the merchant_subscriptions table
-COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions, including status and visual representation';
 
 
 -- Fees table
@@ -449,7 +465,7 @@ COMMENT ON COLUMN refunds.refunded_amount IS 'Amount refunded to the customer';
 COMMENT ON COLUMN refunds.fee_amount IS 'Fee charged for processing the refund';
 
 
--- Create the merchant_bank_accounts table
+-- Merchant Bank Accounts table
 CREATE TABLE merchant_bank_accounts (
     bank_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
@@ -494,28 +510,6 @@ CREATE INDEX idx_payouts_currency_code ON payouts(currency_code);
 CREATE INDEX idx_payouts_created_at ON payouts(created_at);
 
 COMMENT ON TABLE payouts IS 'Tracks payouts from the system to merchant bank accounts';
-
--- -- Entries table
--- CREATE TABLE entries (
---     entry_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
---     account_id UUID NOT NULL REFERENCES merchant_accounts(account_id),
---     transaction_id UUID REFERENCES transactions(transaction_id),
---     payout_id UUID REFERENCES payouts(payout_id),
---     amount NUMERIC(10,2) NOT NULL CHECK (amount != 0),
---     entry_type entry_type NOT NULL,
---     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
---     CHECK (
---         (transaction_id IS NOT NULL AND payout_id IS NULL) OR
---         (transaction_id IS NULL AND payout_id IS NOT NULL)
---     )
--- );
-
--- CREATE INDEX idx_entries_account_id ON entries(account_id);
--- CREATE INDEX idx_entries_transaction_id ON entries(transaction_id);
--- CREATE INDEX idx_entries_created_at ON entries(created_at);
--- CREATE INDEX idx_entries_payout_id ON entries(payout_id);
-
--- COMMENT ON TABLE entries IS 'Ledger entries for tracking account balance changes';
 
 
 -- API Keys table
@@ -784,56 +778,40 @@ CREATE INDEX idx_error_logs_created_at ON api_error_logs(created_at);
 COMMENT ON TABLE api_error_logs IS 'Records system errors for debugging and monitoring purposes';
 
 
--- Pages table
-CREATE TABLE pages (
-    page_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    slug VARCHAR(255) NOT NULL,
-    content JSONB NOT NULL,
-    theme VARCHAR(50),
-    is_active BOOLEAN NOT NULL DEFAULT true,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (merchant_id, slug)
-);
-
-CREATE INDEX idx_pages_merchant_id ON pages(merchant_id);
-CREATE INDEX idx_pages_organization_id ON pages(organization_id);
-CREATE INDEX idx_pages_slug ON pages(slug);
-
-COMMENT ON TABLE pages IS 'Stores custom checkout pages created by merchants';
-
-
 -- Payment Links table
 CREATE TABLE payment_links (
     link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    page_id UUID REFERENCES pages(page_id),
+    link_type link_type NOT NULL,
+    url VARCHAR(2048) NOT NULL,
     product_id UUID REFERENCES merchant_products(product_id),
-    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
+    plan_id UUID REFERENCES subscription_plans(plan_id),
     title VARCHAR(255) NOT NULL,
     public_description TEXT,
     private_description TEXT,
     price NUMERIC(10,2),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
-    frequency frequency,
-    billing_cycles INT,
+    allowed_providers provider_code[] NOT NULL DEFAULT ARRAY[]::provider_code[],
+    allow_coupon_code BOOLEAN NOT NULL DEFAULT false,
     is_active BOOLEAN NOT NULL DEFAULT true,
     expires_at TIMESTAMPTZ,
+    success_url VARCHAR(2048),
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK (
+        (link_type = 'product' AND product_id IS NOT NULL AND plan_id IS NULL AND price IS NULL) OR
+        (link_type = 'plan' AND product_id IS NULL AND plan_id IS NOT NULL AND price IS NULL) OR
+        (link_type = 'instant' AND product_id IS NULL AND plan_id IS NULL AND price IS NOT NULL)
+    )
 );
 
 CREATE INDEX idx_payment_links_merchant_id ON payment_links(merchant_id);
 CREATE INDEX idx_payment_links_organization_id ON payment_links(organization_id);
-CREATE INDEX idx_payment_links_page_id ON payment_links(page_id);
 CREATE INDEX idx_payment_links_product_id ON payment_links(product_id);
-CREATE INDEX idx_payment_links_subscription_id ON payment_links(subscription_id);
+CREATE INDEX idx_payment_links_plan_id ON payment_links(plan_id);
 CREATE INDEX idx_payment_links_currency_code ON payment_links(currency_code);
+CREATE INDEX idx_payment_links_url ON payment_links(url);
 
 COMMENT ON TABLE payment_links IS 'Stores payment links for one-time payments, subscriptions, and instant links';

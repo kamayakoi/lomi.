@@ -3,13 +3,13 @@ import { Product } from './types'
 
 export const fetchProducts = async (
   merchantId: string,
-  isActive: string | null,
+  isActive: boolean | null,
   page: number,
   pageSize: number
 ) => {
   const { data, error } = await supabase.rpc('fetch_products', {
     p_merchant_id: merchantId,
-    p_is_active: isActive === 'all' ? null : (isActive === 'active'),
+    p_is_active: isActive,
     p_page: page,
     p_page_size: pageSize,
   })
@@ -28,7 +28,6 @@ interface CreateProductData {
   description: string
   price: number
   currencyCode: string
-  imageUrl: string
   isActive: boolean
 }
 
@@ -39,7 +38,6 @@ export const createProduct = async (data: CreateProductData) => {
     p_description: data.description,
     p_price: data.price,
     p_currency_code: data.currencyCode,
-    p_image_url: data.imageUrl,
     p_is_active: data.isActive,
   })
 
@@ -48,4 +46,14 @@ export const createProduct = async (data: CreateProductData) => {
   }
 
   return productId as string
+}
+
+export const deleteProduct = async (productId: string) => {
+  const { error } = await supabase.rpc('delete_product', {
+    p_product_id: productId,
+  })
+
+  if (error) {
+    throw error
+  }
 }

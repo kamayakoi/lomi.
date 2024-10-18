@@ -1,15 +1,8 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Card, CardContent } from "@/components/ui/card"
-import { CalendarIcon, Search, Link2Icon, DownloadIcon, Settings2Icon, PlusCircle } from 'lucide-react'
-import { format } from 'date-fns'
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { PlusCircle, Link2Icon } from 'lucide-react'
 import { Layout as DashboardLayout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { TopNav } from '@/components/dashboard/top-nav'
@@ -17,16 +10,58 @@ import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import PaymentCustomizerWithCheckout from './dev_payment-links/customize-form'
+import { useUser } from '@/lib/hooks/useUser'
+import { Skeleton } from '@/components/ui/skeleton'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useInfiniteQuery } from 'react-query'
+import AnimatedLogoLoader from '@/components/dashboard/loader'
+import PaymentLinkFilters from './dev_payment-links/filters_paymentLinks'
+import { fetchPaymentLinks } from './dev_payment-links/support_paymentLinks'
+import { PaymentLink } from './dev_payment-links/types'
 
 export default function PaymentLinksPage() {
+  const { user, isLoading: isUserLoading } = useUser()
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
-  const [startDate, setStartDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedLinkType, setSelectedLinkType] = useState<string | null>(null)
+  const [selectedCurrency, setSelectedCurrency] = useState<string | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const pageSize = 50
 
   const topNav = [
     { title: 'Payment Links', href: 'payment-links', isActive: true },
     { title: 'Settings', href: 'settings', isActive: false },
   ]
+
+  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage } = useInfiniteQuery(
+    ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus],
+    ({ pageParam = 1 }) =>
+      fetchPaymentLinks(
+        user?.id || '',
+        selectedLinkType,
+        selectedCurrency,
+        selectedStatus,
+        pageParam,
+        pageSize
+      ),
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        const nextPage = allPages.length + 1
+        return lastPage.length !== 0 ? nextPage : undefined
+      },
+      enabled: !!user?.id,
+    }
+  )
+
+  const paymentLinks = paymentLinksData?.pages?.flatMap((page) => page) || []
+
+  if (isUserLoading) {
+    return <AnimatedLogoLoader />
+  }
+
+  if (!user || !user.id) {
+    return <div><AnimatedLogoLoader /> User data not available.</div>
+  }
 
   return (
     <DashboardLayout>
@@ -45,119 +80,70 @@ export default function PaymentLinksPage() {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold tracking-tight">Payment Links</h1>
-            <div className="flex space-x-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Learn More</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem>See benefits</DropdownMenuItem>
-                  <DropdownMenuItem>See how it works</DropdownMenuItem>
-                  <DropdownMenuItem>Book a demo</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button
-                variant="outline"
-                onClick={() => setIsCreateLinkOpen(true)}
-                className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Create Payment Link
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateLinkOpen(true)}
+              className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create Payment Link
+            </Button>
           </div>
 
-          <Tabs defaultValue="single">
-            <TabsContent value="single">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
-                    <Select>
-                      <SelectTrigger className="w-full md:w-[180px]">
-                        <SelectValue placeholder="Filter" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Links</SelectItem>
-                        <SelectItem value="active">Active Links</SelectItem>
-                        <SelectItem value="expired">Expired Links</SelectItem>
-                      </SelectContent>
-                    </Select>
+          <PaymentLinkFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedLinkType={selectedLinkType}
+            setSelectedLinkType={setSelectedLinkType}
+            selectedCurrency={selectedCurrency}
+            setSelectedCurrency={setSelectedCurrency}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+          />
 
-                    <div className="flex space-x-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full md:w-auto justify-start text-left font-normal">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {startDate ? format(startDate, "PPP") : <span>Start date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={startDate}
-                            onSelect={setStartDate}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full md:w-auto justify-start text-left font-normal">
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {endDate ? format(endDate, "PPP") : <span>End date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={endDate}
-                            onSelect={setEndDate}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="flex flex-1 space-x-2">
-                      <Select>
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue placeholder="External ID" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="external-id">External ID</SelectItem>
-                          <SelectItem value="customer-id">Customer ID</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <div className="relative flex-1">
-                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Search External ID" className="pl-8" />
+          <Card>
+            <CardContent className="p-6">
+              <div className="rounded-md border">
+                <InfiniteScroll
+                  dataLength={paymentLinks.length}
+                  next={() => fetchNextPage()}
+                  hasMore={!!(paymentLinksData?.pages && paymentLinksData.pages[paymentLinksData.pages.length - 1]?.length === pageSize)}
+                  loader={<Skeleton className="w-full h-8" />}
+                >
+                  {isPaymentLinksLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <div key={index} className="p-4 border-b last:border-b-0">
+                        <Skeleton className="w-full h-4" />
+                        <Skeleton className="w-1/2 h-4 mt-2" />
                       </div>
-                      <Button variant="secondary">Search</Button>
+                    ))
+                  ) : paymentLinks.length === 0 ? (
+                    <div className="p-4 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-4">
+                        <div className="rounded-full bg-transparent dark:bg-transparent p-4">
+                          <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                          No payment links found
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                          Start creating payment links to see them here.
+                        </p>
+                      </div>
                     </div>
-
-                    <Button variant="outline">
-                      <DownloadIcon className="mr-2 h-4 w-4" />
-                      CSV
-                    </Button>
-                    <Button variant="outline">
-                      <Settings2Icon className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="mt-8 flex flex-col items-center justify-center space-y-4 py-12">
-                    <div className="rounded-full bg-primary/10 p-3">
-                      <Link2Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h2 className="text-xl font-semibold">No Payment Links Yet</h2>
-                    <p className="text-muted-foreground text-center">
-                      Your customers might be looking for a way to pay you.<br />
-                      To start accepting payments, create a Payment Link and share it with them.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  ) : (
+                    paymentLinks.map((link: PaymentLink) => (
+                      <div key={link.link_id} className="p-4 border-b last:border-b-0">
+                        <h3 className="text-lg font-semibold">{link.title}</h3>
+                        <p className="text-sm text-gray-500 mt-1">{link.public_description}</p>
+                        <p className="text-sm text-blue-500 mt-1">{link.url}</p>
+                      </div>
+                    ))
+                  )}
+                </InfiniteScroll>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </DashboardLayout.Body>
 

@@ -10,6 +10,7 @@ interface WebhookFiltersProps {
     selectedStatus: string | null
     setSelectedStatus: (status: string | null) => void
     refetch: () => void
+    isRefreshing: boolean
 }
 
 export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
@@ -17,7 +18,8 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
     setSelectedEvent,
     selectedStatus,
     setSelectedStatus,
-    refetch
+    refetch,
+    isRefreshing,
 }) => {
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
@@ -52,8 +54,13 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                         <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                 </Select>
-                <Button variant="outline" size="icon" onClick={() => refetch()}>
-                    <RefreshCw className="h-4 w-4" />
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => refetch()}
+                    disabled={isRefreshing}
+                >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                     <span className="sr-only">Refresh</span>
                 </Button>
             </div>

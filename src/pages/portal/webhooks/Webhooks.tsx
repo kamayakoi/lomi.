@@ -24,12 +24,21 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { PlusCircle } from 'lucide-react'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 export default function WebhooksPage() {
     const { user } = useUser()
     const [isCreateWebhookOpen, setIsCreateWebhookOpen] = useState(false)
     const [selectedEvent, setSelectedEvent] = useState<webhook_event | null>(null)
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+    const [isRefreshing, setIsRefreshing] = useState(false)
     const pageSize = 50
 
     const topNav = [
@@ -60,6 +69,12 @@ export default function WebhooksPage() {
 
     const handleCreateWebhookSuccess = () => {
         refetch()
+    }
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true)
+        await refetch()
+        setIsRefreshing(false)
     }
 
     return (
@@ -103,61 +118,78 @@ export default function WebhooksPage() {
                         setSelectedEvent={setSelectedEvent}
                         selectedStatus={selectedStatus}
                         setSelectedStatus={setSelectedStatus}
-                        refetch={refetch}
+                        refetch={handleRefresh}
+                        isRefreshing={isRefreshing}
                     />
 
                     <div className="rounded-md border mt-4">
                         <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
-                            <InfiniteScroll
-                                dataLength={webhooks.length}
-                                next={() => fetchNextPage()}
-                                hasMore={webhooksData?.pages[webhooksData.pages.length - 1]?.length === pageSize}
-                                loader={<Skeleton className="w-full h-8" />}
-                            >
-                                {isWebhooksLoading ? (
-                                    Array.from({ length: 5 }).map((_, index) => (
-                                        <div key={index} className="py-4 px-6 border-b">
-                                            <Skeleton className="w-full h-8" />
-                                        </div>
-                                    ))
-                                ) : webhooks.length === 0 ? (
-                                    <div className="py-24 text-center">
-                                        <div className="flex justify-center mb-6">
-                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                            </div>
-                                        </div>
-                                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                            No webhooks found
-                                        </h3>
-                                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                            Try changing your filter or create a new webhook.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    webhooks.map((webhook: Webhook) => (
-                                        <div key={webhook.webhook_id} className="py-4 px-6 border-b">
-                                            <div className="flex justify-between items-center">
-                                                <div>
-                                                    <p className="text-lg font-semibold">{webhook.url}</p>
-                                                    <p className="text-sm text-muted-foreground">{webhook.event}</p>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="text-center">URL</TableHead>
+                                        <TableHead className="text-center">Event</TableHead>
+                                        <TableHead className="text-center">Status</TableHead>
+                                        <TableHead></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {isWebhooksLoading ? (
+                                        Array.from({ length: 5 }).map((_, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell colSpan={4}>
+                                                    <Skeleton className="w-full h-8" />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : webhooks.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4}>
+                                                <div className="py-24 text-center">
+                                                    <div className="flex justify-center mb-6">
+                                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                        </div>
+                                                    </div>
+                                                    <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                        No webhooks found
+                                                    </h3>
+                                                    <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                        Try changing your filter or create a new webhook.
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <span className={`
-                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
-                                                        ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                                                    `}>
-                                                        {webhook.is_active ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                    <Button variant="ghost" size="sm">
-                                                        View
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </InfiniteScroll>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        <InfiniteScroll
+                                            dataLength={webhooks.length}
+                                            next={() => fetchNextPage()}
+                                            hasMore={webhooksData?.pages[webhooksData.pages.length - 1]?.length === pageSize}
+                                            loader={<Skeleton className="w-full h-8" />}
+                                        >
+                                            {webhooks.map((webhook: Webhook) => (
+                                                <TableRow key={webhook.webhook_id}>
+                                                    <TableCell className="text-center">{webhook.url}</TableCell>
+                                                    <TableCell className="text-center">{webhook.event}</TableCell>
+                                                    <TableCell className="text-center">
+                                                        <span className={`
+                                                            inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                            ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                        `}>
+                                                            {webhook.is_active ? 'Active' : 'Inactive'}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <Button variant="ghost" size="sm">
+                                                            View
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </InfiniteScroll>
+                                    )}
+                                </TableBody>
+                            </Table>
                         </div>
                     </div>
                 </div>

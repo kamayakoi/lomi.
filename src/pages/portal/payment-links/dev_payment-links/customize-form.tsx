@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import DateFieldInput from "@/components/ui/date-field-input"
 import { DateValue } from "react-aria-components"
 import { SegmentedControl } from "@/components/ui/segmented-control"
+import { supabase } from '@/utils/supabase/client'
+import { useUser } from '@/lib/hooks/useUser'
+import { useNavigate } from 'react-router-dom'
 
 interface PaymentMethod {
     id: string
@@ -191,6 +194,8 @@ export default function PaymentCustomizerWithCheckout() {
     const [activeTab, setActiveTab] = useState('checkout')
     const [displayMode, setDisplayMode] = useState<DisplayMode>('desktop')
     const [allowCouponCode, setAllowCouponCode] = useState(false)
+    const { user } = useUser()
+    const navigate = useNavigate()
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
@@ -535,11 +540,38 @@ export default function PaymentCustomizerWithCheckout() {
         </div>
     );
 
-    const handleSubmit = () => {
-        // TODO: Implement the logic to submit the payment link creation
-        console.log("Submitting payment link creation...");
-        // You can add your submission logic here, such as API calls, state updates, etc.
-    };
+    const handleSubmit = async () => {
+        if (!user || !user.id) {
+            console.error('User data not available.')
+            return
+        }
+
+        try {
+            const { data, error } = await supabase.rpc('create_payment_link', {
+                p_merchant_id: user.id,
+                p_link_type: paymentType,
+                p_url: `https://pay.lomi.africa/${user.id}/${Date.now()}`,
+                p_title: instantLinkDetails.name,
+                p_public_description: instantLinkDetails.description,
+                p_private_description: instantLinkDetails.privateDescription,
+                p_price: paymentType === 'instant' && prices[0]?.amount ? parseFloat(prices[0].amount) : null,
+                p_currency_code: prices[0]?.currency || 'XOF',
+                p_allowed_providers: allowedPaymentMethods,
+                p_allow_coupon_code: allowCouponCode,
+                p_expires_at: expirationDate ? new Date(expirationDate.toString()).toISOString() : null,
+                p_success_url: redirectToCustomPage ? customSuccessUrl : null,
+            })
+
+            if (error) {
+                console.error('Error creating payment link:', error)
+            } else {
+                console.log('Payment link created:', data)
+                navigate('/portal/payment-links')
+            }
+        } catch (error) {
+            console.error('Error creating payment link:', error)
+        }
+    }
 
     return (
         <div className="flex flex-col">

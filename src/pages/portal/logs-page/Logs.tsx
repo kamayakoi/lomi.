@@ -35,12 +35,14 @@ export default function LogsPage() {
     const { user } = useUser()
     const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
     const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null)
-    const pageSize = 50
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const topNav = [
         { title: 'Logs', href: '/portal/logs', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
+
+    const pageSize = 50
 
     const { data: logsData, isLoading: isLogsLoading, fetchNextPage, refetch } = useInfiniteQuery(
         ['logs', user?.id || '', selectedEvent, selectedSeverity],
@@ -62,6 +64,12 @@ export default function LogsPage() {
     )
 
     const logs = logsData?.pages?.flatMap((page) => page) || []
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true)
+        await refetch()
+        setIsRefreshing(false)
+    }
 
     return (
         <Layout fixed>
@@ -130,8 +138,13 @@ export default function LogsPage() {
                                     <SelectItem value="CRITICAL">Critical</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Button variant="outline" size="icon" onClick={() => refetch()}>
-                                <RefreshCw className="h-4 w-4" />
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleRefresh()}
+                                disabled={isRefreshing}
+                            >
+                                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                                 <span className="sr-only">Refresh</span>
                             </Button>
                         </div>

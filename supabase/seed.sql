@@ -135,43 +135,57 @@ VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Customer 16', 'customer16@example.com', '+6789012345', 'Country 1');
 
 
--- Seed data for merchant_products table
-INSERT INTO merchant_products (merchant_id, name, description, price, currency_code, image_url, is_active)
+-- Update merchant_products seed data
+INSERT INTO merchant_products (merchant_id, organization_id, name, description, price, currency_code, is_active)
 VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'Product 1', 'Description 1', 50.00, 'XOF', NULL, true),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'Product 2', 'Description 2', 25.00, 'XOF', NULL, true),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'Product 3', 'Description 3', 75.00, 'XOF', NULL, true),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 'Product 4', 'Description 4', 100.00, 'XOF', NULL, true),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 'Product 5', 'Description 5', 200.00, 'XOF', NULL, true),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 'Product 6', 'Description 6', 150.00, 'XOF', NULL, true);
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Product 1', 'Description 1', 50.00, 'XOF', true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Product 2', 'Description 2', 25.00, 'XOF', true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Product 3', 'Description 3', 75.00, 'XOF', true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Product 4', 'Description 4', 100.00, 'XOF', true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Product 5', 'Description 5', 200.00, 'XOF', true),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Product 6', 'Description 6', 150.00, 'XOF', true);
 
 
--- Seed data for merchant_subscriptions table
-INSERT INTO merchant_subscriptions (merchant_id, organization_id, customer_id, name, description, status, start_date, billing_frequency, amount, currency_code, retry_payment_every, total_retries, failed_payment_action, email_notifications, metadata)
+-- Seed data for subscription_plans table
+INSERT INTO subscription_plans (merchant_id, organization_id, name, description, billing_frequency, amount, currency_code, retry_payment_every, total_retries, failed_payment_action, email_notifications, metadata)
 VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 1'), 'Subscription 1', 'Description 1', 'active', '2024-01-01', 'monthly', 50.00, 'XOF', 3, 0, 'cancel', '{"enabled": true, "frequency": "weekly"}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), 'Subscription 2', 'Description 2', 'active', '2024-01-01', 'yearly', 100.00, 'XOF', 0, 0, 'retry', '{"enabled": false}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 6'), 'Subscription 3', 'Description 3', 'active', '2024-07-01', 'monthly', 75.00, 'XOF', 2, 0, 'cancel', '{"enabled": true, "frequency": "monthly"}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 3'), 'Subscription 4', 'Description 4', 'active', '2024-01-01', 'yearly', 200.00, 'XOF', 0, 0, 'retry', '{"enabled": true, "frequency": "daily"}', '{}');
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 1', 'Description 1', 'monthly', 50.00, 'XOF', 3, 0, 'cancel', '{"enabled": true, "frequency": "weekly"}', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 2', 'Description 2', 'yearly', 100.00, 'XOF', 0, 0, 'retry', '{"enabled": false}', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Plan 3', 'Description 3', 'monthly', 75.00, 'XOF', 2, 0, 'cancel', '{"enabled": true, "frequency": "monthly"}', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 4', 'Description 4', 'yearly', 200.00, 'XOF', 0, 0, 'retry', '{"enabled": true, "frequency": "daily"}', '{}');
 
+-- Update merchant_subscriptions seed data
+INSERT INTO merchant_subscriptions (plan_id, customer_id, status, start_date, email_notifications, metadata)
+VALUES
+  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 1'), 'active', '2024-01-01', '{"enabled": true, "frequency": "weekly"}', '{}'),
+  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), 'active', '2024-01-01', '{"enabled": false}', '{}'),
+  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 3'), (SELECT customer_id FROM customers WHERE name = 'Customer 6'), 'active', '2024-07-01', '{"enabled": true, "frequency": "monthly"}', '{}'),
+  ((SELECT plan_id FROM subscription_plans WHERE name = 'Plan 4'), (SELECT customer_id FROM customers WHERE name = 'Customer 3'), 'active', '2024-01-01', '{"enabled": true, "frequency": "daily"}', '{}');
+
+-- Seed data for payment_links table
+INSERT INTO payment_links (merchant_id, organization_id, link_type, url, product_id, plan_id, title, public_description, private_description, price, currency_code, allowed_providers, allow_coupon_code, expires_at, success_url, metadata)
+VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'product', 'https://example.com/link1', (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'Payment Link 1', 'Public description 1', 'Private description 1', NULL, 'XOF', ARRAY['ORANGE', 'WAVE']::provider_code[], true, '2024-12-31 23:59:59', 'https://example.com/success1', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'plan', 'https://example.com/link2', NULL, (SELECT plan_id FROM subscription_plans WHERE name = 'Plan 1'), 'Payment Link 2', 'Public description 2', 'Private description 2', NULL, 'XOF', ARRAY['MTN', 'ECOBANK']::provider_code[], false, NULL, 'https://example.com/success2', '{}'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'instant', 'https://example.com/link3', NULL, NULL, 'Payment Link 3', 'Public description 3', 'Private description 3', 100.00, 'XOF', ARRAY['STRIPE']::provider_code[], true, '2024-06-30 23:59:59', 'https://example.com/success3', '{}');
 
 -- Seed data for transactions table
 INSERT INTO transactions (merchant_id, organization_id, customer_id, product_id, subscription_id, transaction_type, status, description, reference_id, metadata, gross_amount, fee_amount, net_amount, fee_reference, currency_code, provider_code, payment_method_code, created_at)
 VALUES 
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 1'), (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'payment', 'refunded', 'Transaction 1', 'REF1', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY', '2024-07-15 09:30:00'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE name = 'Subscription 1'), 'instalment', 'refunded', 'Transaction 2', 'REF2', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY', '2024-08-01 14:45:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 2'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Customer 2')), 'instalment', 'refunded', 'Transaction 2', 'REF2', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY', '2024-08-01 14:45:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 3'), (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'payment', 'refunded', 'Transaction 3', 'REF3', '{}', 25.00, 5.00, 20.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-08-15 11:20:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 4'), (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'payment', 'refunded', 'Transaction 4', 'REF4', '{}', 75.00, 5.00, 70.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY', '2024-09-02 16:10:00'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 5'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE name = 'Subscription 2'), 'instalment', 'completed', 'Transaction 5', 'REF5', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY', '2024-09-10 08:55:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 5'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Customer 5')), 'instalment', 'completed', 'Transaction 5', 'REF5', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY', '2024-09-10 08:55:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 6'), (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'payment', 'completed', 'Transaction 6', 'REF6', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY', '2024-09-20 13:40:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 7'), (SELECT product_id FROM merchant_products WHERE name = 'Product 1'), NULL, 'payment', 'completed', 'Transaction 7', 'REF7', '{}', 200.00, 5.00, 195.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-09-25 10:15:00'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 8'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE name = 'Subscription 3'), 'instalment', 'completed', 'Transaction 8', 'REF8', '{}', 75.00, 5.00, 70.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY', '2024-10-01 17:30:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 8'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Customer 8')), 'instalment', 'completed', 'Transaction 8', 'REF8', '{}', 75.00, 5.00, 70.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'MTN', 'MOBILE_MONEY', '2024-10-01 17:30:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 9'), (SELECT product_id FROM merchant_products WHERE name = 'Product 4'), NULL, 'payment', 'completed', 'Transaction 9', 'REF9', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'STRIPE', 'CARDS', '2024-10-05 12:05:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 10'), (SELECT product_id FROM merchant_products WHERE name = 'Product 4'), NULL, 'payment', 'completed', 'Transaction 10', 'REF10', '{}', 200.00, 5.00, 195.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ECOBANK', 'BANK_TRANSFER', '2024-10-10 09:50:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 11'), (SELECT product_id FROM merchant_products WHERE name = 'Product 4'), NULL, 'payment', 'completed', 'Transaction 11', 'REF11', '{}', 50.00, 5.00, 45.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-12 14:35:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 12'), (SELECT product_id FROM merchant_products WHERE name = 'Product 2'), NULL, 'payment', 'pending', 'Transaction 12', 'REF12', '{}', 25.00, 5.00, 20.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 11:20:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 13'), (SELECT product_id FROM merchant_products WHERE name = 'Product 3'), NULL, 'payment', 'completed', 'Transaction 13', 'REF13', '{}', 75.00, 5.00, 70.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'WAVE', 'MOBILE_MONEY', '2024-10-13 16:05:00'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 14'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE name = 'Subscription 1'), 'instalment', 'completed', 'Transaction 14', 'REF14', '{}', 200.00, 5.00, 195.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 19:50:00'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), (SELECT customer_id FROM customers WHERE name = 'Customer 14'), NULL, (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Customer 14')), 'instalment', 'completed', 'Transaction 14', 'REF14', '{}', 200.00, 5.00, 195.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 19:50:00'),
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), (SELECT customer_id FROM customers WHERE name = 'Customer 15'), (SELECT product_id FROM merchant_products WHERE name = 'Product 4'), NULL, 'payment', 'failed', 'Transaction 15', 'REF15', '{}', 100.00, 5.00, 95.00, 'XOF/ORANGE Mobile Money Fee', 'XOF', 'ORANGE', 'MOBILE_MONEY', '2024-10-13 22:35:00');
 
 -- Seed data for refunds table
@@ -221,8 +235,6 @@ VALUES
 
 -- Seed data for organization_kyc table
 
--- Seed data for entries table
-
 -- Seed data for api_keys table
 
 -- Seed data for api_usage table
@@ -240,10 +252,6 @@ VALUES
 -- Seed data for platform_metrics table
 
 -- Seed data for error_logs table
-
--- Seed data for pages table
-
--- Seed data for payment_links table
 
 -- Seed data for customer_invoices table
 

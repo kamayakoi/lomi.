@@ -8,8 +8,8 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { fetchSubscriptions } from './dev_subscription/support_subscriptions'
-import { Subscription } from './dev_subscription/types'
+import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
+import { SubscriptionPlan, Subscription } from './dev_subscription/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
@@ -19,25 +19,43 @@ import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { PlusCircle } from 'lucide-react'
+import SubscriptionActions from './dev_subscription/actions_subscriptions'
 
 export default function SubscriptionsPage() {
   const { user } = useUser()
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const pageSize = 50
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
+  const [isActionsOpen, setIsActionsOpen] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const topNav = [
     { title: 'Subscriptions', href: '/portal/subscription', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
-  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, fetchNextPage, refetch } = useInfiniteQuery(
+  const { data: subscriptionPlansData, isLoading: isSubscriptionPlansLoading, fetchNextPage: fetchNextPagePlans, refetch: refetchPlans } = useInfiniteQuery(
+    ['subscriptionPlans', user?.id || ''],
+    ({ pageParam = 1 }) =>
+      fetchSubscriptionPlans(
+        user?.id || '',
+        pageParam,
+        pageSize
+      ),
+    {
+      getNextPageParam: (lastPage: SubscriptionPlan[], allPages: SubscriptionPlan[][]) => {
+        const nextPage = allPages.length + 1
+        return lastPage.length !== 0 ? nextPage : undefined
+      },
+      enabled: !!user?.id,
+    }
+  )
+
+  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, fetchNextPage: fetchNextPageSubscriptions, refetch: refetchSubscriptions } = useInfiniteQuery(
     ['subscriptions', user?.id || '', selectedStatus],
     ({ pageParam = 1 }) =>
       fetchSubscriptions(
@@ -55,10 +73,22 @@ export default function SubscriptionsPage() {
     }
   )
 
+  const subscriptionPlans = subscriptionPlansData?.pages?.flatMap((page) => page) || []
   const subscriptions = subscriptionsData?.pages?.flatMap((page) => page) || []
 
   const handleCreatePlanSuccess = () => {
-    refetch()
+    refetchPlans()
+  }
+
+  const handleSubscriptionClick = (subscription: Subscription) => {
+    setSelectedSubscription(subscription)
+    setIsActionsOpen(true)
+  }
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await Promise.all([refetchPlans(), refetchSubscriptions()])
+    setIsRefreshing(false)
   }
 
   return (
@@ -85,14 +115,12 @@ export default function SubscriptionsPage() {
                   Create Plan
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create Plan</DialogTitle>
-                  <DialogDescription>
-                    Fill in the details to create a new subscription plan.
-                  </DialogDescription>
-                </DialogHeader>
-                <CreatePlanForm onClose={() => setIsCreatePlanOpen(false)} onSuccess={handleCreatePlanSuccess} />
+              <DialogContent className="sm:max-w-[845px]">
+                <CreatePlanForm
+                  onClose={() => setIsCreatePlanOpen(false)}
+                  onSuccess={handleCreatePlanSuccess}
+                  merchantId={user?.id || ''}
+                />
               </DialogContent>
             </Dialog>
           </div>
@@ -100,21 +128,81 @@ export default function SubscriptionsPage() {
           <Tabs defaultValue="plans">
             <TabsList>
               <TabsTrigger value="plans">Plans</TabsTrigger>
-              <TabsTrigger value="cycles">Cycles</TabsTrigger>
+              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="plans">
               <SubscriptionFilters
-                selectedStatus={selectedStatus}
-                setSelectedStatus={setSelectedStatus}
-                refetch={refetch}
+                refetch={handleRefresh}
+                isRefreshing={isRefreshing}
               />
 
               <div className="rounded-md border mt-4">
-                <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
+                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
+                  <InfiniteScroll
+                    dataLength={subscriptionPlans.length}
+                    next={() => fetchNextPagePlans()}
+                    hasMore={subscriptionPlansData?.pages[subscriptionPlansData.pages.length - 1]?.length === pageSize}
+                    loader={<Skeleton className="w-full h-8" />}
+                  >
+                    {isSubscriptionPlansLoading ? (
+                      Array.from({ length: 5 }).map((_, index) => (
+                        <div key={index} className="py-4 px-6 border-b">
+                          <Skeleton className="w-full h-8" />
+                        </div>
+                      ))
+                    ) : subscriptionPlans.length === 0 ? (
+                      <div className="py-24 text-center">
+                        <div className="flex justify-center mb-6">
+                          <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                          No subscription plans found
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                          Try changing your filter or create a new plan.
+                        </p>
+                      </div>
+                    ) : (
+                      subscriptionPlans.map((plan: SubscriptionPlan) => (
+                        <div key={plan.plan_id} className="py-4 px-6 border-b">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-lg font-semibold">{plan.name}</p>
+                              <p className="text-sm text-muted-foreground">{plan.description}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="inline-block px-2 py-1 rounded-full text-xs font-normal bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                {plan.billing_frequency}
+                              </span>
+                              <Button variant="ghost" size="sm">
+                                View
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </InfiniteScroll>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="subscriptions">
+              <SubscriptionFilters
+                selectedStatus={selectedStatus}
+                setSelectedStatus={setSelectedStatus}
+                refetch={handleRefresh}
+                isRefreshing={isRefreshing}
+              />
+
+              <div className="rounded-md border mt-4">
+                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
                   <InfiniteScroll
                     dataLength={subscriptions.length}
-                    next={() => fetchNextPage()}
+                    next={() => fetchNextPageSubscriptions()}
                     hasMore={subscriptionsData?.pages[subscriptionsData.pages.length - 1]?.length === pageSize}
                     loader={<Skeleton className="w-full h-8" />}
                   >
@@ -132,19 +220,23 @@ export default function SubscriptionsPage() {
                           </div>
                         </div>
                         <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                          No subscription plans found
+                          No subscriptions found
                         </h3>
                         <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                          Try changing your filter or create a new plan.
+                          Try changing your filter or create a new subscription.
                         </p>
                       </div>
                     ) : (
                       subscriptions.map((subscription: Subscription) => (
-                        <div key={subscription.subscription_id} className="py-4 px-6 border-b">
+                        <div
+                          key={subscription.subscription_id}
+                          className="py-4 px-6 border-b cursor-pointer"
+                          onClick={() => handleSubscriptionClick(subscription)}
+                        >
                           <div className="flex justify-between items-center">
                             <div>
-                              <p className="text-lg font-semibold">{subscription.name}</p>
-                              <p className="text-sm text-muted-foreground">{subscription.description}</p>
+                              <p className="text-lg font-semibold">{subscription.plan_id}</p>
+                              <p className="text-sm text-muted-foreground">{subscription.customer_id}</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className={`
@@ -167,14 +259,15 @@ export default function SubscriptionsPage() {
                 </div>
               </div>
             </TabsContent>
-
-            <TabsContent value="cycles">
-              {/* Add cycles content here */}
-            </TabsContent>
           </Tabs>
-
         </div>
       </Layout.Body>
+
+      <SubscriptionActions
+        subscription={selectedSubscription}
+        isOpen={isActionsOpen}
+        onClose={() => setIsActionsOpen(false)}
+      />
     </Layout>
   )
 }
