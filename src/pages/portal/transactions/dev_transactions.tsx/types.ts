@@ -3,8 +3,6 @@ export type payment_method_code = 'CARDS' | 'MOBILE_MONEY' | 'E_WALLET' | 'BANK_
 export type transaction_status = 'pending' | 'completed' | 'failed'| 'refunded';
 export type transaction_type = 'payment' | 'instalment';
 export type provider_code = 'ORANGE' | 'WAVE' | 'ECOBANK' | 'MTN' | 'STRIPE' | 'OTHER';
-export type frequency = 'daily' | 'weekly' | 'bi-weekly' | 'monthly' | 'quaterly' | 'yearly' | 'one-time';
-export type subscription_status = 'pending' | 'active' | 'paused' | 'cancelled' | 'expired' | 'past_due' | 'trial';
 
 export type Transaction = {
     transaction_id: string
@@ -27,15 +25,6 @@ export type Transaction = {
     product_name?: string
     product_description?: string
     product_price?: number
-    subscription_id?: string
-    subscription_name?: string
-    subscription_description?: string
-    subscription_status?: subscription_status
-    subscription_start_date?: string
-    subscription_end_date?: string
-    subscription_next_billing_date?: string
-    subscription_billing_frequency?: frequency
-    subscription_amount?: number
 }
 
 export type FetchedTransaction = {
@@ -59,14 +48,4 @@ export type FetchedTransaction = {
     product_name: string
     product_description: string
     product_price: number
-    subscription_id: string
-    subscription_status: subscription_status
-    subscription_start_date: string
-    subscription_end_date: string
-    subscription_next_billing_date: string
-    subscription_billing_frequency: frequency
-    subscription_amount: number
-    plan_id: string
-    plan_name: string
-    plan_description: string
 }

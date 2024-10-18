@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Transaction, transaction_status, transaction_type, provider_code, subscription_status } from './types'
+import { Transaction, transaction_status, transaction_type, provider_code } from './types'
 import { ArrowDownToLine, RefreshCcw, LifeBuoy } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
@@ -68,42 +68,18 @@ export default function TransactionActions({ transaction, isOpen, onClose }: Tra
                                     )}
                                 </div>
                             </section>
-                            {(transaction.product_id || transaction.subscription_id) && (
+                            {transaction.product_id && (
                                 <>
                                     <Separator />
                                     <section>
-                                        <h3 className="text-lg font-semibold mb-2">Details</h3>
+                                        <h3 className="text-lg font-semibold mb-2">Product Details</h3>
                                         <div className="grid grid-cols-2 gap-2 text-sm">
-                                            {transaction.product_id && (
-                                                <>
-                                                    <div className="font-medium">Product Name:</div>
-                                                    <div>{transaction.product_name}</div>
-                                                    <div className="font-medium">Description:</div>
-                                                    <div>{transaction.product_description}</div>
-                                                    <div className="font-medium">Price:</div>
-                                                    <div>{formatCurrency(transaction.product_price || 0, transaction.currency)}</div>
-                                                </>
-                                            )}
-                                            {transaction.subscription_id && (
-                                                <>
-                                                    <div className="font-medium">Subscription Name:</div>
-                                                    <div>{transaction.subscription_name || 'N/A'}</div>
-                                                    <div className="font-medium">Description:</div>
-                                                    <div>{transaction.subscription_description || 'N/A'}</div>
-                                                    <div className="font-medium">Subscription Status:</div>
-                                                    <div>{formatSubscriptionStatus(transaction.subscription_status)}</div>
-                                                    <div className="font-medium">Start Date:</div>
-                                                    <div>{formatDate(transaction.subscription_start_date || '')}</div>
-                                                    <div className="font-medium">End Date:</div>
-                                                    <div>{formatDate(transaction.subscription_end_date || '')}</div>
-                                                    <div className="font-medium">Next Billing Date:</div>
-                                                    <div>{formatDate(transaction.subscription_next_billing_date || '')}</div>
-                                                    <div className="font-medium">Billing Frequency:</div>
-                                                    <div>{transaction.subscription_billing_frequency}</div>
-                                                    <div className="font-medium">Amount:</div>
-                                                    <div>{formatCurrency(transaction.subscription_amount || 0, transaction.currency)}</div>
-                                                </>
-                                            )}
+                                            <div className="font-medium">Product Name:</div>
+                                            <div>{transaction.product_name}</div>
+                                            <div className="font-medium">Description:</div>
+                                            <div>{transaction.product_description}</div>
+                                            <div className="font-medium">Price:</div>
+                                            <div>{formatCurrency(transaction.product_price || 0, transaction.currency)}</div>
                                         </div>
                                     </section>
                                 </>
@@ -174,9 +150,6 @@ function formatProviderCode(providerCode: provider_code): string {
     }
 }
 
-function formatSubscriptionStatus(status: subscription_status | undefined): string {
-    return status ? status.charAt(0).toUpperCase() + status.slice(1) : ''
-}
 
 function formatDate(dateString: string): string {
     const date = new Date(dateString)

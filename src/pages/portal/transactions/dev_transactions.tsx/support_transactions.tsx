@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
-import { Transaction, FetchedTransaction, subscription_status } from './types'
+import { Transaction, FetchedTransaction } from './types'
 import { DateRange } from 'react-day-picker'
 import { useQuery, UseQueryOptions } from 'react-query'
 
@@ -56,15 +56,6 @@ export const fetchTransactions = async (
         product_name: transaction.product_name,
         product_description: transaction.product_description,
         product_price: transaction.product_price,
-        subscription_id: transaction.subscription_id,
-        subscription_name: transaction.subscription_name,
-        subscription_description: transaction.subscription_description,
-        subscription_status: transaction.subscription_status as subscription_status,
-        subscription_start_date: transaction.subscription_start_date,
-        subscription_end_date: transaction.subscription_end_date,
-        subscription_next_billing_date: transaction.subscription_next_billing_date,
-        subscription_billing_frequency: transaction.subscription_billing_frequency,
-        subscription_amount: transaction.subscription_amount,
     }))
 }
 
