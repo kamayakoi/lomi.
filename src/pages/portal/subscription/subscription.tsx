@@ -9,7 +9,7 @@ import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
-import { SubscriptionPlan, Subscription } from './dev_subscription/types'
+import { SubscriptionPlan, Subscription, frequency } from './dev_subscription/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
@@ -23,6 +23,17 @@ import {
 } from "@/components/ui/dialog"
 import { PlusCircle } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
+
+const frequencyColors: Record<frequency, string> = {
+  'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  'bi-weekly': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  'monthly': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  'bi-monthly': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+  'quarterly': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
+  'semi-annual': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+  'yearly': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+  'one-time': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+};
 
 export default function SubscriptionsPage() {
   const { user } = useUser()
@@ -174,8 +185,8 @@ export default function SubscriptionsPage() {
                               <p className="text-sm text-muted-foreground">{plan.description}</p>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="inline-block px-2 py-1 rounded-full text-xs font-normal bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                {plan.billing_frequency}
+                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
+                                {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
                               </span>
                               <Button variant="ghost" size="sm">
                                 View

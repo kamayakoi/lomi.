@@ -97,7 +97,7 @@ CREATE OR REPLACE FUNCTION public.create_subscription_plan(
     p_amount NUMERIC,
     p_currency_code currency_code DEFAULT 'XOF',
     p_failed_payment_action failed_payment_action DEFAULT 'continue',
-    p_charge_day INT DEFAULT 1,
+    p_charge_day INT DEFAULT NULL,
     p_metadata JSONB DEFAULT '{}'::jsonb,
     p_first_payment_type first_payment_type DEFAULT 'initial'
 )
@@ -111,7 +111,7 @@ BEGIN
     )
     VALUES (
         p_merchant_id, p_organization_id, p_name, p_description, p_billing_frequency, p_amount, p_currency_code,
-        p_failed_payment_action, p_charge_day, p_metadata, p_first_payment_type
+        p_failed_payment_action, CASE WHEN p_metadata->>'subscription_length' = 'automatic' THEN NULL ELSE p_charge_day END, p_metadata, p_first_payment_type
     )
     RETURNING plan_id INTO v_plan_id;
 

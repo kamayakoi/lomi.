@@ -162,12 +162,9 @@ COMMENT ON TABLE merchant_organization_links IS 'Links merchants to organization
 
 -- Providers table
 CREATE TABLE providers (
-  provider_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR NOT NULL,
+  name PRIMARY KEY VARCHAR NOT NULL,
   code provider_code NOT NULL UNIQUE,
   description TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_providers_code ON providers(code);
@@ -179,8 +176,6 @@ COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, STRIPE, PAYPAL';
 CREATE TABLE payment_methods (
   payment_method_code payment_method_code,
   provider_code provider_code REFERENCES providers(code),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (payment_method_code, provider_code)
 );
 
@@ -322,7 +317,7 @@ CREATE TABLE subscription_plans (
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL DEFAULT 'XOF',
     failed_payment_action failed_payment_action,
-    charge_day INT CHECK (charge_day >= 1 AND charge_day <= 31),
+    charge_day INT CHECK (charge_day >= 1 AND charge_day <= 31 OR charge_day IS NULL),
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -374,7 +369,6 @@ COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
 
 -- Fees table
 CREATE TABLE fees (
-    fee_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR NOT NULL UNIQUE,
     transaction_type transaction_type NOT NULL,
     fee_type VARCHAR NOT NULL,

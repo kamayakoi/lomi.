@@ -12,6 +12,7 @@ import { frequency, failed_payment_action, FirstPaymentType } from './types'
 import React from 'react'
 import { SelectProps } from '@radix-ui/react-select'
 import { Switch } from "@/components/ui/switch"
+import InputRightAddon from "@/components/ui/input-right-addon"
 
 interface CreatePlanFormProps {
     onClose: () => void
@@ -72,6 +73,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
             first_payment_type: 'initial',
             collection_date_type: 'maintain',
             metadata: {},
+            amount: 0,
         },
     })
 
@@ -79,14 +81,15 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
     const subscriptionLength = watch('subscription_length')
     const collectionDateType = watch('collection_date_type')
+    const billingFrequency = watch('billing_frequency')
+
+    const isOneTimeFrequency = billingFrequency === 'one-time'
 
     const onSubmit = async (data: SubscriptionPlanFormData) => {
         try {
             const metadata: Record<string, unknown> = {
                 subscription_length: data.subscription_length,
                 fixed_charges: data.fixed_charges,
-                collection_date_type: data.collection_date_type,
-                collection_day: data.collection_day,
             };
 
             await createSubscriptionPlan({
@@ -107,6 +110,14 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
             console.error('Error creating subscription plan:', error);
         }
     }
+
+    const formatAmount = (amount: number | undefined) => {
+        return amount ? amount.toLocaleString("en-US") : "";
+    };
+
+    const parseAmount = (amount: string) => {
+        return parseFloat(amount.replace(/,/g, ""));
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -139,16 +150,13 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Plan price (XOF)</Label>
-                            <Input
+                            <Label htmlFor="amount">Plan price</Label>
+                            <InputRightAddon
                                 id="amount"
-                                type="number"
-                                placeholder="Enter amount in XOF"
-                                className="rounded-none"
-                                {...register('amount', {
-                                    required: 'Amount is required',
-                                    min: { value: 0.01, message: 'Amount must be greater than 0' }
-                                })}
+                                type="text"
+                                placeholder="Enter amount"
+                                value={formatAmount(watch("amount"))}
+                                onChange={(value) => setValue("amount", parseAmount(value))}
                             />
                             {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
                         </div>
@@ -179,48 +187,52 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                             {errors.billing_frequency && <p className="text-sm text-red-500">{errors.billing_frequency.message}</p>}
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>Subscription length</Label>
-                            <RadioGroup
-                                defaultValue="automatic"
-                                onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
-                                className="rounded-none"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="automatic" id="automatic" />
-                                    <Label htmlFor="automatic">Automatic renewal</Label>
+                        {!isOneTimeFrequency && (
+                            <>
+                                <div className="space-y-2">
+                                    <Label>Subscription length</Label>
+                                    <RadioGroup
+                                        defaultValue="automatic"
+                                        onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
+                                        className="rounded-none"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="automatic" id="automatic" />
+                                            <Label htmlFor="automatic">Automatic renewal</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="fixed" id="fixed" />
+                                            <Label htmlFor="fixed">End after specific charges</Label>
+                                        </div>
+                                    </RadioGroup>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="fixed" id="fixed" />
-                                    <Label htmlFor="fixed">End after specific charges</Label>
-                                </div>
-                            </RadioGroup>
-                        </div>
 
-                        {subscriptionLength === 'fixed' && (
-                            <div className="space-y-2">
-                                <Label htmlFor="fixed_charges">Number of charges</Label>
-                                <Controller
-                                    name="fixed_charges"
-                                    control={control}
-                                    rules={{ required: 'Number of charges is required' }}
-                                    render={({ field }) => (
-                                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select number of charges" />
-                                            </SelectTrigger>
-                                            <SelectContent className="max-h-60 overflow-y-auto">
-                                                {fixedChargesOptions.map((option) => (
-                                                    <SelectItem key={option} value={option.toString()}>
-                                                        End after {option} charges
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    )}
-                                />
-                                {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
-                            </div>
+                                {subscriptionLength === 'fixed' && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="fixed_charges">Number of charges</Label>
+                                        <Controller
+                                            name="fixed_charges"
+                                            control={control}
+                                            rules={{ required: 'Number of charges is required' }}
+                                            render={({ field }) => (
+                                                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select number of charges" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="max-h-60 overflow-y-auto">
+                                                        {fixedChargesOptions.map((option) => (
+                                                            <SelectItem key={option} value={option.toString()}>
+                                                                End after {option} charges
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                        {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         <div className="space-y-2">
@@ -233,7 +245,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                             </div>
                         </div>
 
-                        {showAdvancedSettings && (
+                        {showAdvancedSettings && !isOneTimeFrequency && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
                                     <Label>Collection Date</Label>
