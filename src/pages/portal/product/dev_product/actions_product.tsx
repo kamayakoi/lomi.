@@ -1,68 +1,56 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Subscription, Transaction } from './types'
+import { Product, Transaction } from './types'
 import { Separator } from "@/components/ui/separator"
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { fetchSubscriptionTransactions } from './support_subscriptions'
+import { fetchProductTransactions } from './support_product'
 
-type SubscriptionActionsProps = {
-    subscription: Subscription | null
+type ProductActionsProps = {
+    product: Product | null
     isOpen: boolean
     onClose: () => void
 }
 
-export default function SubscriptionActions({ subscription, isOpen, onClose }: SubscriptionActionsProps) {
+export default function ProductActions({ product, isOpen, onClose }: ProductActionsProps) {
     const [transactions, setTransactions] = useState<Transaction[]>([])
 
     useEffect(() => {
-        if (subscription?.subscription_id) {
-            fetchSubscriptionTransactions(subscription.subscription_id).then(setTransactions)
+        if (product?.product_id) {
+            fetchProductTransactions(product.product_id).then(setTransactions)
         }
-    }, [subscription?.subscription_id])
+    }, [product?.product_id])
 
-    if (!subscription) return null
+    if (!product) return null
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent className="sm:max-w-2xl overflow-y-auto">
                 <Card className="border-0 shadow-none">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-2xl font-bold">Subscription Details</CardTitle>
+                        <CardTitle className="text-2xl font-bold">Product Details</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4">
                             <section>
-                                <h3 className="text-lg font-semibold mb-2">Subscription Information</h3>
+                                <h3 className="text-lg font-semibold mb-2">Product Information</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div className="font-medium">Plan:</div>
-                                    <div>{subscription.plan_name}</div>
-                                    <div className="font-medium">Customer:</div>
-                                    <div>{subscription.customer_name}</div>
+                                    <div className="font-medium">Name:</div>
+                                    <div>{product.name}</div>
+                                    <div className="font-medium">Description:</div>
+                                    <div>{product.description}</div>
+                                    <div className="font-medium">Price:</div>
+                                    <div>{formatCurrency(product.price, product.currency_code)}</div>
                                     <div className="font-medium">Status:</div>
-                                    <div>{subscription.status}</div>
-                                    <div className="font-medium">Start Date:</div>
-                                    <div>{formatDate(subscription.start_date)}</div>
-                                    {subscription.end_date && (
-                                        <>
-                                            <div className="font-medium">End Date:</div>
-                                            <div>{formatDate(subscription.end_date)}</div>
-                                        </>
-                                    )}
-                                    {subscription.next_billing_date && (
-                                        <>
-                                            <div className="font-medium">Next Billing Date:</div>
-                                            <div>{formatDate(subscription.next_billing_date)}</div>
-                                        </>
-                                    )}
+                                    <div>{product.is_active ? 'Active' : 'Inactive'}</div>
                                 </div>
                             </section>
                             <Separator />
                             <section>
                                 <h3 className="text-lg font-semibold mb-2">Transactions</h3>
                                 {transactions.length === 0 ? (
-                                    <p className="text-sm text-gray-500">No transactions found for this subscription.</p>
+                                    <p className="text-sm text-gray-500">No transactions found for this product.</p>
                                 ) : (
                                     <ul className="space-y-2">
                                         {transactions.map((transaction) => (

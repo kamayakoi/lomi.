@@ -23,12 +23,13 @@ export interface SubscriptionPlan {
 export interface Subscription {
     subscription_id: string
     plan_id: string
+    plan_name: string
     customer_id: string
+    customer_name: string
     status: string
     start_date: string
     end_date: string | null
     next_billing_date: string | null
-    email_notifications: Record<string, unknown>
     metadata: Record<string, unknown>
     created_at: string
     updated_at: string

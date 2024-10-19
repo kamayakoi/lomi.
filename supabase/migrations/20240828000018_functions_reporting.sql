@@ -454,3 +454,41 @@ BEGIN
         t.transaction_id = p_transaction_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch top-performing subscription plans for a specific merchant
+CREATE OR REPLACE FUNCTION public.fetch_top_performing_subscription_plans(
+    p_merchant_id UUID,
+    p_start_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_end_date TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    p_limit INTEGER DEFAULT 10
+)
+RETURNS TABLE (
+    plan_name VARCHAR,
+    sales_count BIGINT,
+    total_revenue NUMERIC(15,2)
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        p.name AS plan_name,
+        COUNT(s.subscription_id) AS sales_count,
+        SUM(t.net_amount) AS total_revenue
+    FROM 
+        transactions t
+    JOIN 
+        merchant_subscriptions s ON t.subscription_id = s.subscription_id
+    JOIN
+        subscription_plans p ON s.plan_id = p.plan_id
+    WHERE 
+        p.merchant_id = p_merchant_id AND
+        t.status = 'completed' AND
+        t.transaction_type = 'instalment' AND
+        (p_start_date IS NULL OR t.created_at >= p_start_date) AND
+        (p_end_date IS NULL OR t.created_at <= p_end_date)
+    GROUP BY 
+        p.name
+    ORDER BY 
+        total_revenue DESC
+    LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

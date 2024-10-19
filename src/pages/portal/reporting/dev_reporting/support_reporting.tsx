@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { FetchRevenueByDateParams, FetchTopPerformingProductsParams, FetchTransactionVolumeByDateParams, FetchTopPerformingSubscriptionsParams, RevenueData, TopPerformingProduct, TransactionVolumeData, TopPerformingSubscription, FetchProviderDistributionParams, ProviderDistribution } from './types'
+import { FetchRevenueByDateParams, FetchTopPerformingProductsParams, FetchTransactionVolumeByDateParams, FetchTopPerformingSubscriptionPlansParams, RevenueData, TopPerformingProduct, TransactionVolumeData, TopPerformingSubscriptionPlan, FetchProviderDistributionParams, ProviderDistribution } from './types'
 
 export const fetchRevenueByDate = async ({ merchantId, startDate, endDate, granularity = 'day' }: FetchRevenueByDateParams) => {
     let query = supabase.rpc('fetch_revenue_by_date', {
@@ -99,8 +99,8 @@ export const fetchTopPerformingProducts = async ({ merchantId, startDate, endDat
     return data as TopPerformingProduct[]
 }
 
-export const fetchTopPerformingSubscriptions = async ({ merchantId, startDate, endDate, limit = 4 }: FetchTopPerformingSubscriptionsParams) => {
-    const { data, error } = await supabase.rpc('fetch_top_performing_subscriptions', {
+export const fetchTopPerformingSubscriptionPlans = async ({ merchantId, startDate, endDate, limit = 4 }: FetchTopPerformingSubscriptionPlansParams) => {
+    const { data, error } = await supabase.rpc('fetch_top_performing_subscription_plans', {
         p_merchant_id: merchantId,
         p_start_date: startDate,
         p_end_date: endDate,
@@ -108,11 +108,11 @@ export const fetchTopPerformingSubscriptions = async ({ merchantId, startDate, e
     })
 
     if (error) {
-        console.error('Error fetching top performing subscriptions:', error)
+        console.error('Error fetching top performing subscription plans:', error)
         return []
     }
 
-    return data as TopPerformingSubscription[]
+    return data as TopPerformingSubscriptionPlan[]
 }
 
 export const fetchProviderDistribution = async ({ merchantId, startDate, endDate }: FetchProviderDistributionParams) => {

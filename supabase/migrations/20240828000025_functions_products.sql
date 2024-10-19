@@ -23,9 +23,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Function to fetch products for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_products(
     p_merchant_id UUID,
-    p_is_active BOOLEAN DEFAULT NULL,
-    p_page INTEGER DEFAULT 1,
-    p_page_size INTEGER DEFAULT 50
+    p_is_active BOOLEAN DEFAULT NULL
 )
 RETURNS TABLE (
     product_id UUID,
@@ -55,12 +53,10 @@ BEGIN
     FROM 
         merchant_products p
     WHERE 
-        p.merchant_id = p_merchant_id AND
-        (p_is_active IS NULL OR p.is_active = p_is_active)
+        p.merchant_id = p_merchant_id
+        AND (p_is_active IS NULL OR p.is_active = p_is_active)
     ORDER BY
-        p.created_at DESC
-    LIMIT p_page_size
-    OFFSET ((p_page - 1) * p_page_size);
+        p.created_at DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -74,3 +70,34 @@ BEGIN
     WHERE product_id = p_product_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch transactions for a specific product
+CREATE OR REPLACE FUNCTION public.fetch_product_transactions(
+    p_product_id UUID
+)
+RETURNS TABLE (
+    transaction_id UUID,
+    description TEXT,
+    gross_amount NUMERIC,
+    currency_code currency_code,
+    created_at TIMESTAMPTZ
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.transaction_id,
+        t.description,
+        t.gross_amount,
+        t.currency_code,
+        t.created_at
+    FROM
+        transactions t
+    WHERE
+        t.product_id = p_product_id
+    ORDER BY
+        t.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;

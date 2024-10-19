@@ -4,16 +4,12 @@ import { Webhook, webhook_event } from './types'
 export const fetchWebhooks = async (
   merchantId: string,
   event: webhook_event | null,
-  isActive: string | null,
-  page: number,
-  pageSize: number
+  isActive: string | null
 ) => {
   const { data, error } = await supabase.rpc('fetch_webhooks', {
     p_merchant_id: merchantId,
-    p_event: event === null ? null : event,
-    p_is_active: isActive === 'all' ? null : (isActive === 'active'),
-    p_page: page,
-    p_page_size: pageSize,
+    p_event: event,
+    p_is_active: isActive === 'active' ? true : isActive === 'inactive' ? false : null,
   })
 
   if (error) {

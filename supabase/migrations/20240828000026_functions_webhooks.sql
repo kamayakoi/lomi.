@@ -22,9 +22,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE OR REPLACE FUNCTION public.fetch_webhooks(
     p_merchant_id UUID,
     p_event webhook_event DEFAULT NULL,
-    p_is_active BOOLEAN DEFAULT NULL,
-    p_page INTEGER DEFAULT 1,
-    p_page_size INTEGER DEFAULT 50
+    p_is_active BOOLEAN DEFAULT NULL
 )
 RETURNS TABLE (
     webhook_id UUID,
@@ -50,9 +48,7 @@ BEGIN
         (p_event IS NULL OR w.event = p_event) AND
         (p_is_active IS NULL OR w.is_active = p_is_active)
     ORDER BY
-        w.created_at DESC
-    LIMIT p_page_size
-    OFFSET ((p_page - 1) * p_page_size);
+        w.created_at DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

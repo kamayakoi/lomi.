@@ -1,23 +1,20 @@
 import { supabase } from '@/utils/supabase/client'
-import { Product } from './types'
+import { Product, Transaction } from './types'
 
-export const fetchProducts = async (
-  merchantId: string,
-  isActive: boolean | null,
-  page: number,
-  pageSize: number
-) => {
+export const fetchProducts = async (merchantId: string, isActive: boolean | null) => {
+  console.log('Fetching products with merchant ID:', merchantId, 'and isActive:', isActive)
+
   const { data, error } = await supabase.rpc('fetch_products', {
     p_merchant_id: merchantId,
     p_is_active: isActive,
-    p_page: page,
-    p_page_size: pageSize,
   })
 
   if (error) {
     console.error('Error fetching products:', error)
     return []
   }
+
+  console.log('Fetched products:', data)
 
   return data as Product[]
 }
@@ -58,4 +55,16 @@ export const deleteProduct = async (productId: string) => {
   if (error) {
     throw error
   }
+}
+
+export const fetchProductTransactions = async (productId: string) => {
+    const { data, error } = await supabase
+        .rpc('fetch_product_transactions', { p_product_id: productId })
+
+    if (error) {
+        console.error('Error fetching product transactions:', error)
+        return []
+    }
+
+    return data as Transaction[]
 }

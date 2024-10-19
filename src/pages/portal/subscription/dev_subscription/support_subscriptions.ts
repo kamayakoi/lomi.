@@ -41,6 +41,21 @@ export const fetchSubscriptions = async (
   return data as Subscription[]
 }
 
+export const fetchSubscriptionPlan = async (planId: string) => {
+  const { data, error } = await supabase
+    .from('subscription_plans')
+    .select('name')
+    .eq('plan_id', planId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching subscription plan:', error)
+    return null
+  }
+
+  return data as SubscriptionPlan
+}
+
 interface CreateSubscriptionPlanData {
   merchantId: string
   name: string
@@ -69,10 +84,7 @@ export const createSubscriptionPlan = async (data: CreateSubscriptionPlanData) =
 
 export const fetchSubscriptionTransactions = async (subscriptionId: string) => {
     const { data, error } = await supabase
-        .from('transactions')
-        .select('transaction_id, description, gross_amount, currency_code, created_at')
-        .eq('subscription_id', subscriptionId)
-        .order('created_at', { ascending: false })
+        .rpc('fetch_subscription_transactions', { p_subscription_id: subscriptionId })
 
     if (error) {
         console.error('Error fetching subscription transactions:', error)

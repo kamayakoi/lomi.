@@ -10,8 +10,6 @@ import { useUser } from '@/lib/hooks/useUser'
 import { fetchWebhooks } from './dev_webhooks/support_webhooks'
 import { Webhook, webhook_event } from './dev_webhooks/types'
 import { Skeleton } from '@/components/ui/skeleton'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateWebhookForm } from './dev_webhooks/form_webhooks'
 import { WebhookFilters } from './dev_webhooks/filters_webhooks'
@@ -32,6 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useQuery } from 'react-query'
 
 export default function WebhooksPage() {
     const { user } = useUser()
@@ -39,33 +38,21 @@ export default function WebhooksPage() {
     const [selectedEvent, setSelectedEvent] = useState<webhook_event | null>(null)
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
-    const pageSize = 50
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: webhooksData, isLoading: isWebhooksLoading, fetchNextPage, refetch } = useInfiniteQuery(
+    const { data: webhooksData, isLoading: isWebhooksLoading, refetch } = useQuery(
         ['webhooks', user?.id || '', selectedEvent, selectedStatus],
-        ({ pageParam = 1 }) =>
-            fetchWebhooks(
-                user?.id || '',
-                selectedEvent || null,
-                selectedStatus || null,
-                pageParam,
-                pageSize
-            ),
+        () => fetchWebhooks(user?.id || '', selectedEvent, selectedStatus),
         {
-            getNextPageParam: (lastPage: Webhook[], allPages: Webhook[][]) => {
-                const nextPage = allPages.length + 1
-                return lastPage.length !== 0 ? nextPage : undefined
-            },
             enabled: !!user?.id,
         }
     )
 
-    const webhooks = webhooksData?.pages?.flatMap((page) => page) || []
+    const webhooks = webhooksData || []
 
     const handleCreateWebhookSuccess = () => {
         refetch()
@@ -161,32 +148,25 @@ export default function WebhooksPage() {
                                             </TableCell>
                                         </TableRow>
                                     ) : (
-                                        <InfiniteScroll
-                                            dataLength={webhooks.length}
-                                            next={() => fetchNextPage()}
-                                            hasMore={webhooksData?.pages[webhooksData.pages.length - 1]?.length === pageSize}
-                                            loader={<Skeleton className="w-full h-8" />}
-                                        >
-                                            {webhooks.map((webhook: Webhook) => (
-                                                <TableRow key={webhook.webhook_id}>
-                                                    <TableCell className="text-center">{webhook.url}</TableCell>
-                                                    <TableCell className="text-center">{webhook.event}</TableCell>
-                                                    <TableCell className="text-center">
-                                                        <span className={`
-                                                            inline-block px-2 py-1 rounded-full text-xs font-normal
-                                                            ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                                                        `}>
-                                                            {webhook.is_active ? 'Active' : 'Inactive'}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <Button variant="ghost" size="sm">
-                                                            View
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </InfiniteScroll>
+                                        webhooks.map((webhook: Webhook) => (
+                                            <TableRow key={webhook.webhook_id}>
+                                                <TableCell className="text-center">{webhook.url}</TableCell>
+                                                <TableCell className="text-center">{webhook.event}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className={`
+                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                        ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                    `}>
+                                                        {webhook.is_active ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="sm">
+                                                        View
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
                                     )}
                                 </TableBody>
                             </Table>

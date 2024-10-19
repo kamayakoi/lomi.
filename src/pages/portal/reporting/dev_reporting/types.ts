@@ -113,13 +113,13 @@ export type CalculateConversionRateParams = never
 export type FetchNewCustomerCountChangeParams = never
 export type FetchConversionRateChangeParams = never
 
-export type TopPerformingSubscription = {
+export type TopPerformingSubscriptionPlan = {
     plan_name: string
     sales_count: number
     total_revenue: number
 }
 
-export type FetchTopPerformingSubscriptionsParams = {
+export type FetchTopPerformingSubscriptionPlansParams = {
     merchantId: MerchantId
     startDate?: string
     endDate?: string

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TopPerformingProduct, TopPerformingSubscription } from './types'
+import { TopPerformingProduct, TopPerformingSubscriptionPlan } from './types'
 import { CubeIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -8,13 +8,13 @@ import { Card, CardContent } from '@/components/ui/card'
 
 interface TopPerformingItemsProps {
     topPerformingProducts: TopPerformingProduct[]
-    topPerformingSubscriptions: TopPerformingSubscription[]
+    topPerformingSubscriptionPlans: TopPerformingSubscriptionPlan[]
     isLoading: boolean
 }
 
 export default function TopPerformingItems({
     topPerformingProducts,
-    topPerformingSubscriptions,
+    topPerformingSubscriptionPlans,
     isLoading,
 }: TopPerformingItemsProps) {
     const [showSubscriptions, setShowSubscriptions] = useState(false)
@@ -37,7 +37,7 @@ export default function TopPerformingItems({
         )
     }
 
-    if (topPerformingProducts.length === 0 && topPerformingSubscriptions.length === 0) {
+    if (topPerformingProducts.length === 0 && topPerformingSubscriptionPlans.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full pt-12">
                 <div className="text-center">
@@ -68,7 +68,7 @@ export default function TopPerformingItems({
                 {!showSubscriptions ? (
                     <ProductList products={topPerformingProducts} />
                 ) : (
-                    <SubscriptionList subscriptions={topPerformingSubscriptions} />
+                    <SubscriptionPlanList subscriptionPlans={topPerformingSubscriptionPlans} />
                 )}
             </AnimatePresence>
         </div>
@@ -109,7 +109,7 @@ function ProductList({ products }: { products: TopPerformingProduct[] }) {
     )
 }
 
-function SubscriptionList({ subscriptions }: { subscriptions: TopPerformingSubscription[] }) {
+function SubscriptionPlanList({ subscriptionPlans }: { subscriptionPlans: TopPerformingSubscriptionPlan[] }) {
     return (
         <motion.div
             key="subscriptions"
@@ -118,21 +118,21 @@ function SubscriptionList({ subscriptions }: { subscriptions: TopPerformingSubsc
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
         >
-            {subscriptions.length === 0 ? (
+            {subscriptionPlans.length === 0 ? (
                 <div className="text-center text-gray-500 dark:text-gray-400">
-                    No subscriptions sold yet.
+                    No subscription plans sold yet.
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {subscriptions.map((subscription, index) => (
+                    {subscriptionPlans.map((plan, index) => (
                         <Card key={index} className="hover:bg-gray-50 dark:hover:bg-[#0c0d10] transition-colors">
                             <CardContent className="flex justify-between items-center p-3">
                                 <div>
-                                    <p className="font-semibold dark:text-white">{subscription.subscription_name}</p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">{subscription.sales_count} sales</p>
+                                    <p className="font-semibold dark:text-white">{plan.plan_name}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{plan.sales_count} sales</p>
                                 </div>
                                 <div className="ml-2 flex min-w-[100px] max-w-[120px] items-center justify-center rounded-lg bg-green-100 px-2 py-1 text-sm font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    {formatAmount(subscription.total_revenue)} XOF
+                                    {formatAmount(plan.total_revenue)} XOF
                                 </div>
                             </CardContent>
                         </Card>

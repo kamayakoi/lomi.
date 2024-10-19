@@ -235,8 +235,8 @@ export default function SubscriptionsPage() {
                         >
                           <div className="flex justify-between items-center">
                             <div>
-                              <p className="text-lg font-semibold">{subscription.plan_id}</p>
-                              <p className="text-sm text-muted-foreground">{subscription.customer_id}</p>
+                              <p className="text-lg font-semibold">{subscription.customer_name}</p>
+                              <p className="text-sm text-muted-foreground">{subscription.plan_name}</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className={`

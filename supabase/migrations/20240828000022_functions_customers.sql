@@ -87,3 +87,34 @@ BEGIN
         customer_id = p_customer_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch transactions for a specific customer
+CREATE OR REPLACE FUNCTION public.fetch_customer_transactions(
+    p_customer_id UUID
+)
+RETURNS TABLE (
+    transaction_id UUID,
+    description TEXT,
+    gross_amount NUMERIC,
+    currency_code currency_code,
+    created_at TIMESTAMPTZ
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        t.transaction_id,
+        t.description,
+        t.gross_amount,
+        t.currency_code,
+        t.created_at
+    FROM
+        transactions t
+    WHERE
+        t.customer_id = p_customer_id
+    ORDER BY
+        t.created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION public.fetch_customer_transactions(UUID) TO authenticated;

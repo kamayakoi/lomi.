@@ -8,8 +8,8 @@ import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
 import { Separator } from '@/components/ui/separator'
-import { fetchRevenueByDate, fetchTransactionVolumeByDate, fetchTopPerformingProducts, fetchTopPerformingSubscriptions, fetchProviderDistribution } from './dev_reporting/support_reporting'
-import { RevenueData, TransactionVolumeData, TopPerformingProduct, TopPerformingSubscription, ProviderDistribution as ProviderDistributionType } from './dev_reporting/types'
+import { fetchRevenueByDate, fetchTransactionVolumeByDate, fetchTopPerformingProducts, fetchTopPerformingSubscriptionPlans, fetchProviderDistribution } from './dev_reporting/support_reporting'
+import { RevenueData, TransactionVolumeData, TopPerformingProduct, TopPerformingSubscriptionPlan, ProviderDistribution as ProviderDistributionType } from './dev_reporting/types'
 import { useQuery } from 'react-query'
 import { format, subDays, subMonths, startOfYear } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
@@ -58,9 +58,9 @@ function ReportingPage() {
         { enabled: !!user?.id }
     )
 
-    const { data: topPerformingSubscriptions = [], isLoading: isTopPerformingSubscriptionsLoading } = useQuery<TopPerformingSubscription[]>(
-        ['topPerformingSubscriptions', user?.id, selectedDateRange],
-        () => fetchTopPerformingSubscriptions({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
+    const { data: topPerformingSubscriptionPlans = [], isLoading: isTopPerformingSubscriptionPlansLoading } = useQuery<TopPerformingSubscriptionPlan[]>(
+        ['topPerformingSubscriptionPlans', user?.id, selectedDateRange],
+        () => fetchTopPerformingSubscriptionPlans({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
         { enabled: !!user?.id }
     )
 
@@ -121,8 +121,8 @@ function ReportingPage() {
                         <div className="grid gap-6 md:grid-cols-2">
                             <TopPerformingItemsCard
                                 topPerformingProducts={topPerformingProducts}
-                                topPerformingSubscriptions={topPerformingSubscriptions}
-                                isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionsLoading}
+                                topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
+                                isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionPlansLoading}
                             />
 
                             <ProviderDistributionCard
@@ -222,11 +222,11 @@ function formatAmount(amount: number): string {
 
 function TopPerformingItemsCard({
     topPerformingProducts,
-    topPerformingSubscriptions,
+    topPerformingSubscriptionPlans,
     isLoading
 }: {
     topPerformingProducts: TopPerformingProduct[];
-    topPerformingSubscriptions: TopPerformingSubscription[];
+    topPerformingSubscriptionPlans: TopPerformingSubscriptionPlan[];
     isLoading: boolean;
 }) {
     return (
@@ -237,7 +237,7 @@ function TopPerformingItemsCard({
             <CardContent>
                 <TopPerformingItems
                     topPerformingProducts={topPerformingProducts}
-                    topPerformingSubscriptions={topPerformingSubscriptions}
+                    topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
                     isLoading={isLoading}
                 />
             </CardContent>

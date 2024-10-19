@@ -10,3 +10,11 @@ export interface Product {
     created_at: string
     updated_at: string
 }
+
+export interface Transaction {
+    transaction_id: string
+    description: string
+    gross_amount: number
+    currency_code: string
+    created_at: string
+}
