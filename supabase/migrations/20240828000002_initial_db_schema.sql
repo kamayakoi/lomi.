@@ -6,7 +6,7 @@ CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
 CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'STRIPE', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
-CREATE TYPE frequency AS ENUM ('daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly' , 'yearly', 'one-time');
+CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quaterly' , 'semi-annual', 'yearly', 'one-time');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
@@ -23,6 +23,8 @@ CREATE TYPE support_status AS ENUM ('open', 'in_progress', 'resolved', 'closed')
 CREATE TYPE support_priority AS ENUM ('low', 'normal', 'high', 'urgent');
 CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
 CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
+CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
+CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
 
 --------------- TABLES ---------------
 
@@ -42,6 +44,9 @@ CREATE TABLE merchants (
   mrr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   arr NUMERIC(15,2) NOT NULL DEFAULT 0.00,
   merchant_lifetime_value NUMERIC(15,2) NOT NULL DEFAULT 0.00,
+  retry_payment_every INT DEFAULT 0,
+  total_retries INT DEFAULT 0,
+  subscription_notifications JSONB,
   metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -316,13 +321,12 @@ CREATE TABLE subscription_plans (
     billing_frequency frequency NOT NULL,
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL DEFAULT 'XOF',
-    retry_payment_every INT DEFAULT 0,
-    total_retries INT DEFAULT 0,
-    failed_payment_action VARCHAR,
-    email_notifications JSONB,
+    failed_payment_action failed_payment_action,
+    charge_day INT CHECK (charge_day >= 1 AND charge_day <= 31),
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    first_payment_type first_payment_type NOT NULL DEFAULT 'initial',
     FOREIGN KEY (currency_code) REFERENCES currencies(code)
 );
 

@@ -7,11 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Info } from 'lucide-react'
 import { createSubscriptionPlan } from './support_subscriptions'
+import { frequency, failed_payment_action, FirstPaymentType } from './types'
+import React from 'react'
+import { SelectProps } from '@radix-ui/react-select'
+import { Switch } from "@/components/ui/switch"
 
 interface CreatePlanFormProps {
     onClose: () => void
@@ -19,32 +19,49 @@ interface CreatePlanFormProps {
     merchantId: string
 }
 
-type Frequency = 'daily' | 'weekly' | 'bi-weekly' | 'monthly' | 'quaterly' | 'yearly' | 'one-time'
 type SubscriptionLength = 'automatic' | 'fixed'
-type FirstPaymentType = 'normal' | 'non_initial' | 'proportional'
 type CollectionDateType = 'maintain' | 'specific_day'
 
 interface SubscriptionPlanFormData {
     merchant_id: string
-    organization_id: string
     name: string
     description: string
-    billing_frequency: Frequency
+    billing_frequency: frequency
     amount: number
     currency_code: 'XOF'
     subscription_length: SubscriptionLength
     fixed_charges?: number
-    retry_payment_every: number
-    total_retries: number
-    failed_payment_action: string
+    failed_payment_action: failed_payment_action
     first_payment_type: FirstPaymentType
     collection_date_type: CollectionDateType
     collection_day?: number
     metadata: Record<string, unknown>
 }
 
-const frequencyOptions: Frequency[] = ['daily', 'weekly', 'bi-weekly', 'monthly', 'quaterly', 'yearly', 'one-time']
-const fixedChargesOptions = [3, 6, 9, 12, 18, 24, 36]
+const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time']
+
+const fixedChargesOptions: number[] = [3, 6, 9, 12, 18, 24, 36, 48, 60, 72, 84, 96];
+const collectionDayOptions: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
+
+interface ForwardedSelectProps extends SelectProps {
+    placeholder?: string;
+    value?: string;
+}
+
+const ForwardedSelect = React.forwardRef<HTMLButtonElement, ForwardedSelectProps>((props, ref) => (
+    <Select {...props}>
+        <SelectTrigger ref={ref} className="w-full">
+            <SelectValue placeholder={props.placeholder}>
+                {props.value}
+            </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+            {props.children}
+        </SelectContent>
+    </Select>
+));
+
+ForwardedSelect.displayName = 'ForwardedSelect';
 
 export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFormProps) {
     const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubscriptionPlanFormData>({
@@ -52,21 +69,26 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
             merchant_id: merchantId,
             currency_code: 'XOF',
             subscription_length: 'automatic',
-            retry_payment_every: 0,
-            total_retries: 0,
-            first_payment_type: 'normal',
+            first_payment_type: 'initial',
             collection_date_type: 'maintain',
-            metadata: {}
-        }
+            metadata: {},
+        },
     })
 
-    const [showCustomCharges, setShowCustomCharges] = useState(false)
+    const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
 
     const subscriptionLength = watch('subscription_length')
     const collectionDateType = watch('collection_date_type')
 
     const onSubmit = async (data: SubscriptionPlanFormData) => {
         try {
+            const metadata: Record<string, unknown> = {
+                subscription_length: data.subscription_length,
+                fixed_charges: data.fixed_charges,
+                collection_date_type: data.collection_date_type,
+                collection_day: data.collection_day,
+            };
+
             await createSubscriptionPlan({
                 merchantId: data.merchant_id,
                 name: data.name,
@@ -74,16 +96,15 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                 billingFrequency: data.billing_frequency,
                 amount: data.amount,
                 currencyCode: data.currency_code,
-                retryPaymentEvery: data.retry_payment_every,
-                totalRetries: data.total_retries,
                 failedPaymentAction: data.failed_payment_action,
-                emailNotifications: {}, // Add email notifications data if needed
-                metadata: data.metadata,
-            })
-            onSuccess()
-            onClose()
+                chargeDay: data.collection_date_type === 'specific_day' ? data.collection_day : undefined,
+                metadata,
+                firstPaymentType: data.first_payment_type,
+            });
+            onSuccess();
+            onClose();
         } catch (error) {
-            console.error('Error creating subscription plan:', error)
+            console.error('Error creating subscription plan:', error);
         }
     }
 
@@ -184,205 +205,124 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                     control={control}
                                     rules={{ required: 'Number of charges is required' }}
                                     render={({ field }) => (
-                                        <Select onValueChange={(value: string) => {
-                                            if (value === 'custom') {
-                                                setShowCustomCharges(true)
-                                            } else {
-                                                setShowCustomCharges(false)
-                                                field.onChange(parseInt(value))
-                                            }
-                                        }}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                                             <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select number of charges">
-                                                    {field.value ? `End after ${field.value} charges` : ''}
-                                                </SelectValue>
+                                                <SelectValue placeholder="Select number of charges" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="max-h-60 overflow-y-auto">
                                                 {fixedChargesOptions.map((option) => (
                                                     <SelectItem key={option} value={option.toString()}>
                                                         End after {option} charges
                                                     </SelectItem>
                                                 ))}
-                                                <SelectItem value="custom">Customized</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     )}
                                 />
-                                {showCustomCharges && (
-                                    <Input
-                                        type="number"
-                                        placeholder="Enter custom number of charges"
-                                        className="rounded-none"
-                                        {...register('fixed_charges', {
-                                            required: 'Number of charges is required',
-                                            min: { value: 1, message: 'Must be at least 1' }
-                                        })}
-                                    />
-                                )}
                                 {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
                             </div>
                         )}
 
-                        <Accordion type="single" collapsible>
-                            <AccordionItem value="advanced-settings">
-                                <AccordionTrigger>Advanced settings</AccordionTrigger>
-                                <AccordionContent className="mt-4 space-y-6">
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label>Collection Date</Label>
-                                            <RadioGroup
-                                                defaultValue="maintain"
-                                                onValueChange={(value: CollectionDateType) => setValue('collection_date_type', value)}
-                                                className="rounded-none"
-                                            >
-                                                <div className="flex items-center space-x-2">
-                                                    <RadioGroupItem value="maintain" id="maintain" />
-                                                    <Label htmlFor="maintain">Maintain the collection date according to the frequency of the subscription</Label>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <RadioGroupItem value="specific_day" id="specific_day" />
-                                                    <Label htmlFor="specific_day">Charge subscription on a specific day of the month</Label>
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    checked={showAdvancedSettings}
+                                    onCheckedChange={setShowAdvancedSettings}
+                                />
+                                <Label>Show Advanced Settings</Label>
+                            </div>
+                        </div>
+
+                        {showAdvancedSettings && (
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label>Collection Date</Label>
+                                    <RadioGroup
+                                        defaultValue="maintain"
+                                        onValueChange={(value: CollectionDateType) => setValue('collection_date_type', value)}
+                                        className="space-y-2"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="maintain" id="maintain" />
+                                            <Label htmlFor="maintain">Maintain the collection date according to the frequency of the subscription</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="specific_day" id="specific_day" />
+                                            <Label htmlFor="specific_day">Charge subscription on a specific day of the month</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+
+                                {collectionDateType === 'specific_day' && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="collection_day">Collection day of the month</Label>
+                                        <Controller
+                                            name="collection_day"
+                                            control={control}
+                                            rules={{ required: 'Collection day is required' }}
+                                            render={({ field }) => (
+                                                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue placeholder="Select collection day" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="max-h-60 overflow-y-auto">
+                                                        {collectionDayOptions.map((day) => (
+                                                            <SelectItem key={day} value={day.toString()}>
+                                                                {day}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        />
+                                        {errors.collection_day && <p className="text-sm text-red-500">{errors.collection_day.message}</p>}
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <Label>First payment of the subscription</Label>
+                                    <Controller
+                                        name="first_payment_type"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
+                                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                                                    <Card>
+                                                        <CardHeader>
+                                                            <CardTitle>
+                                                                <RadioGroupItem value="initial" id="initial" className="mr-2" />
+                                                                <Label htmlFor="initial">Initial charge</Label>
+                                                            </CardTitle>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            The subscription will be charged at the beginning and in each subsequent period.
+                                                        </CardContent>
+                                                    </Card>
+                                                    <Card>
+                                                        <CardHeader>
+                                                            <CardTitle>
+                                                                <RadioGroupItem value="non_initial" id="non_initial" className="mr-2" />
+                                                                <Label htmlFor="non_initial">Non-initial charge</Label>
+                                                            </CardTitle>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            Subscription will be initiated without charge. A charge will be applied on the nearest selected debit day.
+                                                        </CardContent>
+                                                    </Card>
                                                 </div>
                                             </RadioGroup>
-                                        </div>
-
-                                        {collectionDateType === 'specific_day' && (
-                                            <div className="space-y-2">
-                                                <Label htmlFor="collection_day">Collection day of the month</Label>
-                                                <Controller
-                                                    name="collection_day"
-                                                    control={control}
-                                                    rules={{ required: 'Collection day is required', min: 1, max: 31 }}
-                                                    render={({ field }) => (
-                                                        <Input
-                                                            type="number"
-                                                            min={1}
-                                                            max={31}
-                                                            className="rounded-none"
-                                                            {...field}
-                                                        />
-                                                    )}
-                                                />
-                                                {errors.collection_day && <p className="text-sm text-red-500">{errors.collection_day.message}</p>}
-                                            </div>
                                         )}
+                                    />
+                                </div>
 
-                                        <div className="space-y-2">
-                                            <Label>First payment of the subscription</Label>
-                                            <Controller
-                                                name="first_payment_type"
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="rounded-none">
-                                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                                            <Card>
-                                                                <CardHeader>
-                                                                    <CardTitle>
-                                                                        <RadioGroupItem value="normal" id="normal" className="mr-2" />
-                                                                        <Label htmlFor="normal">Normal charge</Label>
-                                                                    </CardTitle>
-                                                                </CardHeader>
-                                                                <CardContent>
-                                                                    The subscription will be charged at the beginning and in each subsequent period.
-                                                                </CardContent>
-                                                            </Card>
-                                                            <Card>
-                                                                <CardHeader>
-                                                                    <CardTitle>
-                                                                        <RadioGroupItem value="non_initial" id="non_initial" className="mr-2" />
-                                                                        <Label htmlFor="non_initial">Non initial charge</Label>
-                                                                    </CardTitle>
-                                                                </CardHeader>
-                                                                <CardContent>
-                                                                    Subscription will be initiated without charge. A charge will be applied on the nearest selected debit day.
-                                                                </CardContent>
-                                                            </Card>
-                                                            <Card>
-                                                                <CardHeader>
-                                                                    <CardTitle>
-                                                                        <RadioGroupItem value="proportional" id="proportional" className="mr-2" />
-                                                                        <Label htmlFor="proportional">Proportional charge</Label>
-                                                                    </CardTitle>
-                                                                </CardHeader>
-                                                                <CardContent>
-                                                                    The proportional will be calculated from the current date to the next nearest collection date. The following charges will be for the totality of the subscription.
-                                                                </CardContent>
-                                                            </Card>
-                                                        </div>
-                                                    </RadioGroup>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <Card className="w-full">
-                                            <CardHeader>
-                                                <CardTitle className="text-lg font-semibold flex items-center">
-                                                    Smart Retries
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="ml-2">
-                                                                <Info className="h-4 w-4" />
-                                                            </Button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-80">
-                                                            <p className="text-sm">
-                                                                Smart Retries allow you to set up a strategy for retrying failed payments.
-                                                                Specify the number of days between retries and the total number of retry attempts.
-                                                            </p>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-4">
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="retry_payment_every">Days between retries</Label>
-                                                        <Controller
-                                                            name="retry_payment_every"
-                                                            control={control}
-                                                            render={({ field }) => (
-                                                                <Slider
-                                                                    min={0}
-                                                                    max={30}
-                                                                    step={1}
-                                                                    value={[field.value]}
-                                                                    onValueChange={(value) => field.onChange(value[0])}
-                                                                    className="rounded-none"
-                                                                />
-                                                            )}
-                                                        />
-                                                        <div className="text-sm text-muted-foreground mt-1">
-                                                            Retry every {watch('retry_payment_every')} day(s)
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="total_retries">Total number of retries</Label>
-                                                        <Controller
-                                                            name="total_retries"
-                                                            control={control}
-                                                            render={({ field }) => (
-                                                                <Slider
-                                                                    min={0}
-                                                                    max={10}
-                                                                    step={1}
-                                                                    value={[field.value]}
-                                                                    onValueChange={(value) => field.onChange(value[0])}
-                                                                    className="rounded-none"
-                                                                />
-                                                            )}
-                                                        />
-                                                        <div className="text-sm text-muted-foreground mt-1">
-                                                            {watch('total_retries')} total retry attempts
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="failed_payment_action">Failed Payment Action</Label>
-                                            <Select {...register('failed_payment_action')}>
-                                                <SelectTrigger>
+                                <div className="space-y-2">
+                                    <Label htmlFor="failed_payment_action">Failed Payment Action</Label>
+                                    <Controller
+                                        name="failed_payment_action"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <SelectTrigger className="w-full">
                                                     <SelectValue placeholder="Select action" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -391,12 +331,11 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                                     <SelectItem value="continue">Continue subscription</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                        </div>
-
-                                    </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

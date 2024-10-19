@@ -1,6 +1,8 @@
 export type subscription_status = 'pending' | 'active' | 'paused' | 'cancelled' | 'expired' | 'past_due' | 'trial';
-export type frequency = 'daily' | 'weekly' | 'bi-weekly' | 'monthly' | 'quarterly' | 'yearly' | 'one-time';
+export type frequency = 'weekly' | 'bi-weekly' | 'monthly' | 'bi-monthly' | 'quarterly' | 'semi-annual' | 'yearly' | 'one-time';
 export type currency_code = 'XOF' | 'USD' | 'EUR';
+export type failed_payment_action = 'cancel' | 'pause' | 'continue';
+export type FirstPaymentType = 'initial' | 'non_initial';
 
 export interface SubscriptionPlan {
     plan_id: string;
@@ -11,13 +13,12 @@ export interface SubscriptionPlan {
     billing_frequency: frequency;
     amount: number;
     currency_code: currency_code;
-    retry_payment_every?: number;
-    total_retries?: number;
-    failed_payment_action?: string;
-    email_notifications?: Record<string, unknown>;
+    failed_payment_action?: failed_payment_action;
+    charge_day?: number;
     metadata?: Record<string, unknown>;
     created_at: string;
     updated_at: string;
+    first_payment_type: FirstPaymentType;
 }
 
 export interface Subscription {

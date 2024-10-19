@@ -2,8 +2,6 @@ import { supabase } from '@/utils/supabase/client'
 import { Product, Transaction } from './types'
 
 export const fetchProducts = async (merchantId: string, isActive: boolean | null) => {
-  console.log('Fetching products with merchant ID:', merchantId, 'and isActive:', isActive)
-
   const { data, error } = await supabase.rpc('fetch_products', {
     p_merchant_id: merchantId,
     p_is_active: isActive,
@@ -13,8 +11,6 @@ export const fetchProducts = async (merchantId: string, isActive: boolean | null
     console.error('Error fetching products:', error)
     return []
   }
-
-  console.log('Fetched products:', data)
 
   return data as Product[]
 }

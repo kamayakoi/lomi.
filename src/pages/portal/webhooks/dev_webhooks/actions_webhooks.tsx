@@ -18,9 +18,7 @@ export default function WebhookActions({ webhook, isOpen, onClose }: WebhookActi
 
     useEffect(() => {
         if (webhook?.webhook_id) {
-            console.log('Selected webhook:', webhook)
             fetchWebhookDetails(webhook.webhook_id).then((data) => {
-                console.log('Fetched webhook details:', data)
                 setWebhookDetails(data)
             })
         }

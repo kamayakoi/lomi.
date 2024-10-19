@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { SubscriptionPlan, Subscription, Transaction } from './types'
+import { SubscriptionPlan, Subscription, Transaction, frequency, currency_code, failed_payment_action, FirstPaymentType } from './types'
 
 export const fetchSubscriptionPlans = async (
   merchantId: string,
@@ -59,22 +59,37 @@ export const fetchSubscriptionPlan = async (planId: string) => {
 interface CreateSubscriptionPlanData {
   merchantId: string
   name: string
-  description: string
-  billingFrequency: string
+  description?: string
+  billingFrequency: frequency
   amount: number
-  currencyCode: string
-  retryPaymentEvery: number
-  totalRetries: number
-  failedPaymentAction: string
-  emailNotifications: Record<string, unknown>
+  currencyCode: currency_code
+  failedPaymentAction: failed_payment_action
+  chargeDay?: number
   metadata: Record<string, unknown>
+  firstPaymentType: FirstPaymentType
 }
 
 export const createSubscriptionPlan = async (data: CreateSubscriptionPlanData) => {
+  const { data: organizationData, error: organizationError } = await supabase
+    .rpc('fetch_organization_details', { p_merchant_id: data.merchantId })
+
+  if (organizationError) {
+    console.error('Error fetching organization details:', organizationError)
+    throw organizationError
+  }
+
   const { error } = await supabase.rpc('create_subscription_plan', {
     p_merchant_id: data.merchantId,
+    p_organization_id: organizationData[0].organization_id,
     p_name: data.name,
-    // ...
+    p_description: data.description,
+    p_billing_frequency: data.billingFrequency,
+    p_amount: data.amount,
+    p_currency_code: data.currencyCode,
+    p_failed_payment_action: data.failedPaymentAction,
+    p_charge_day: data.chargeDay,
+    p_metadata: data.metadata,
+    p_first_payment_type: data.firstPaymentType,
   })
 
   if (error) {

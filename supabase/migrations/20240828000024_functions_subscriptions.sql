@@ -90,28 +90,28 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Function to create a new subscription plan
 CREATE OR REPLACE FUNCTION public.create_subscription_plan(
     p_merchant_id UUID,
+    p_organization_id UUID,
     p_name VARCHAR,
     p_description TEXT,
     p_billing_frequency frequency,
     p_amount NUMERIC,
-    p_failed_payment_action VARCHAR,
-    p_email_notifications JSONB,
-    p_metadata JSONB,
     p_currency_code currency_code DEFAULT 'XOF',
-    p_retry_payment_every INT DEFAULT 0,
-    p_total_retries INT DEFAULT 0
+    p_failed_payment_action failed_payment_action,
+    p_charge_day INT,
+    p_metadata JSONB,
+    p_first_payment_type first_payment_type
 )
 RETURNS UUID AS $$
 DECLARE
     v_plan_id UUID;
 BEGIN
     INSERT INTO subscription_plans (
-        merchant_id, name, description, billing_frequency, amount, failed_payment_action, email_notifications, metadata,
-        currency_code, retry_payment_every, total_retries
+        merchant_id, organization_id, name, description, billing_frequency, amount, currency_code,
+        failed_payment_action, charge_day, metadata, first_payment_type
     )
     VALUES (
-        p_merchant_id, p_name, p_description, p_billing_frequency, p_amount, p_failed_payment_action, p_email_notifications, p_metadata,
-        p_currency_code, p_retry_payment_every, p_total_retries
+        p_merchant_id, p_organization_id, p_name, p_description, p_billing_frequency, p_amount, p_currency_code,
+        p_failed_payment_action, p_charge_day, p_metadata, p_first_payment_type
     )
     RETURNING plan_id INTO v_plan_id;
 
@@ -132,10 +132,8 @@ RETURNS TABLE (
     billing_frequency frequency,
     amount NUMERIC,
     currency_code currency_code,
-    retry_payment_every INT,
-    total_retries INT,
-    failed_payment_action VARCHAR,
-    email_notifications JSONB,
+    failed_payment_action failed_payment_action,
+    charge_day INT,
     metadata JSONB,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ
@@ -149,10 +147,8 @@ BEGIN
         sp.billing_frequency,
         sp.amount,
         sp.currency_code,
-        sp.retry_payment_every,
-        sp.total_retries,
         sp.failed_payment_action,
-        sp.email_notifications,
+        sp.charge_day,
         sp.metadata,
         sp.created_at,
         sp.updated_at

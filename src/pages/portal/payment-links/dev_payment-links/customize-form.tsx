@@ -219,7 +219,7 @@ export default function PaymentCustomizerWithCheckout() {
     useEffect(() => {
         const fetchData = async () => {
             if (user?.id) {
-                const fetchedProducts = await fetchProducts(user.id, null, 1, 50)
+                const fetchedProducts = await fetchProducts(user.id, null)
                 setProducts(fetchedProducts)
 
                 const fetchedPlans = await fetchSubscriptionPlans(user.id, 1, 50)

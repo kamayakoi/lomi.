@@ -46,11 +46,7 @@ export default function ProductsPage() {
         }
     )
 
-    console.log('productsData:', productsData)
-
     const products = productsData || []
-
-    console.log('products:', products)
 
     const handleCreateProductSuccess = () => {
         refetch()
