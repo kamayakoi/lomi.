@@ -10,6 +10,7 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Video } from 'lucide-react'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import SupportForm from '@/components/dashboard/support-form'
 
 
 export default function Dashboard() {
@@ -110,6 +111,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        <SupportForm />
 
       </Layout.Body>
     </Layout>

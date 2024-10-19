@@ -4,12 +4,12 @@ export interface Webhook {
     url: string
     event: webhook_event
     is_active: boolean
-    last_triggered_at: string
-    last_payload: Record<string, unknown>
-    last_response_status: number
-    last_response_body: string
-    retry_count: number
-    metadata: Record<string, unknown>
+    last_triggered_at: string | null
+    last_payload: Record<string, unknown> | null
+    last_response_status: number | null
+    last_response_body: string | null
+    retry_count: number | null
+    metadata: Record<string, unknown> | null
     created_at: string
     updated_at: string
 }

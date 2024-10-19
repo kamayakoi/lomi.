@@ -18,6 +18,9 @@ CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed'
 CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
 CREATE TYPE link_type AS ENUM ('product', 'plan', 'instant');
 CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payout', 'provider_status', 'alert', 'billing', 'compliance', 'update', 'security_alert', 'maintenance', 'dispute', 'refund', 'invoice', 'subscription', 'webhook', 'chargeback');
+CREATE TYPE support_category AS ENUM ('account', 'billing', 'technical', 'feature', 'other');
+CREATE TYPE support_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
+CREATE TYPE support_priority AS ENUM ('low', 'normal', 'high', 'urgent');
 CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
 CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
 
@@ -708,6 +711,25 @@ CREATE INDEX idx_merchant_feedback_merchant_id ON merchant_feedback(merchant_id)
 CREATE INDEX idx_merchant_feedback_status ON merchant_feedback(status);
 
 COMMENT ON TABLE merchant_feedback IS 'Stores merchant feedback, bug reports, or feature requests';
+
+
+-- Support Requests table
+CREATE TABLE support_requests (
+  support_requests_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  category support_category NOT NULL,
+  message TEXT NOT NULL,
+  image_url TEXT,
+  status support_status NOT NULL DEFAULT 'open',
+  priority support_priority NOT NULL DEFAULT 'normal',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_support_requests_merchant_id ON support_requests(merchant_id);
+CREATE INDEX idx_support_requests_status ON support_requests(status);
+
+COMMENT ON TABLE support_requests IS 'Stores support requests submitted by merchants';
 
 
 -- Notifications table

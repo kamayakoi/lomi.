@@ -53,12 +53,49 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to delete a webhook
-CREATE OR REPLACE FUNCTION public.delete_webhook(
-    p_webhook_id UUID
-)
+CREATE OR REPLACE FUNCTION public.delete_webhook(p_webhook_id UUID)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM webhooks
-    WHERE webhook_id = p_webhook_id;
+  DELETE FROM webhooks
+  WHERE webhook_id = p_webhook_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch webhook details
+CREATE OR REPLACE FUNCTION public.fetch_webhook_details(p_webhook_id UUID)
+RETURNS TABLE (
+  webhook_id UUID,
+  merchant_id UUID,
+  url VARCHAR,
+  event webhook_event,
+  is_active BOOLEAN,
+  last_triggered_at TIMESTAMPTZ,
+  last_payload JSONB,
+  last_response_status INT,
+  last_response_body TEXT,
+  retry_count INT,
+  metadata JSONB,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ
+)
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    w.webhook_id,
+    w.merchant_id,
+    w.url,
+    w.event,
+    w.is_active,
+    w.last_triggered_at,
+    w.last_payload,
+    w.last_response_status,
+    w.last_response_body,
+    w.retry_count,
+    w.metadata,
+    w.created_at,
+    w.updated_at
+  FROM webhooks w
+  WHERE w.webhook_id = p_webhook_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

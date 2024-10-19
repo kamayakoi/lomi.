@@ -3,12 +3,12 @@ import { Webhook, webhook_event } from './types'
 
 export const fetchWebhooks = async (
   merchantId: string,
-  event: webhook_event | null,
-  isActive: string | null
+  event: webhook_event | 'all',
+  isActive: 'active' | 'inactive' | 'all'
 ) => {
   const { data, error } = await supabase.rpc('fetch_webhooks', {
     p_merchant_id: merchantId,
-    p_event: event,
+    p_event: event === 'all' ? null : event,
     p_is_active: isActive === 'active' ? true : isActive === 'inactive' ? false : null,
   })
 
@@ -42,4 +42,28 @@ export const createWebhook = async (data: CreateWebhookData) => {
   }
 
   return webhookId as string
+}
+
+export const fetchWebhookDetails = async (webhookId: string) => {
+  const { data, error } = await supabase.rpc('fetch_webhook_details', {
+    p_webhook_id: webhookId,
+  })
+
+  if (error) {
+    console.error('Error fetching webhook details:', error)
+    return null
+  }
+
+  return data[0] as Webhook
+}
+
+export const deleteWebhook = async (webhookId: string) => {
+  const { error } = await supabase.rpc('delete_webhook', {
+    p_webhook_id: webhookId,
+  })
+
+  if (error) {
+    console.error('Error deleting webhook:', error)
+    throw error
+  }
 }

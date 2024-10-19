@@ -5,10 +5,10 @@ import { Search, RefreshCw } from 'lucide-react'
 import { webhook_event } from './types'
 
 interface WebhookFiltersProps {
-    selectedEvent: webhook_event | null
-    setSelectedEvent: (event: webhook_event | null) => void
-    selectedStatus: string | null
-    setSelectedStatus: (status: string | null) => void
+    selectedEvent: webhook_event | 'all'
+    setSelectedEvent: (event: webhook_event | 'all') => void
+    selectedStatus: 'active' | 'inactive' | 'all'
+    setSelectedStatus: (status: 'active' | 'inactive' | 'all') => void
     refetch: () => void
     isRefreshing: boolean
 }
@@ -32,7 +32,7 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                     />
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>
-                <Select value={selectedEvent || undefined} onValueChange={(value) => setSelectedEvent(value as webhook_event | null)}>
+                <Select value={selectedEvent} onValueChange={setSelectedEvent}>
                     <SelectTrigger className="w-[140px] rounded-none">
                         <SelectValue placeholder="All Events" />
                     </SelectTrigger>
@@ -44,7 +44,7 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                         <SelectItem value="subscription_status_change">Subscription Status Change</SelectItem>
                     </SelectContent>
                 </Select>
-                <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="w-[140px] rounded-none">
                         <SelectValue placeholder="All Status" />
                     </SelectTrigger>

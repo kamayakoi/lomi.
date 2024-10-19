@@ -31,13 +31,16 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useQuery } from 'react-query'
+import WebhookActions from './dev_webhooks/actions_webhooks'
 
 export default function WebhooksPage() {
     const { user } = useUser()
     const [isCreateWebhookOpen, setIsCreateWebhookOpen] = useState(false)
-    const [selectedEvent, setSelectedEvent] = useState<webhook_event | null>(null)
-    const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+    const [selectedEvent, setSelectedEvent] = useState<webhook_event | 'all'>('all')
+    const [selectedStatus, setSelectedStatus] = useState<'active' | 'inactive' | 'all'>('all')
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [selectedWebhook, setSelectedWebhook] = useState<Webhook | null>(null)
+    const [isActionsOpen, setIsActionsOpen] = useState(false)
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
@@ -62,6 +65,11 @@ export default function WebhooksPage() {
         setIsRefreshing(true)
         await refetch()
         setIsRefreshing(false)
+    }
+
+    const handleWebhookClick = (webhook: Webhook) => {
+        setSelectedWebhook(webhook)
+        setIsActionsOpen(true)
     }
 
     return (
@@ -114,10 +122,9 @@ export default function WebhooksPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="text-center">URL</TableHead>
-                                        <TableHead className="text-center">Event</TableHead>
-                                        <TableHead className="text-center">Status</TableHead>
-                                        <TableHead></TableHead>
+                                        <TableHead className="text-left">URL</TableHead>
+                                        <TableHead className="text-left">Event</TableHead>
+                                        <TableHead className="text-left">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -149,21 +156,16 @@ export default function WebhooksPage() {
                                         </TableRow>
                                     ) : (
                                         webhooks.map((webhook: Webhook) => (
-                                            <TableRow key={webhook.webhook_id}>
-                                                <TableCell className="text-center">{webhook.url}</TableCell>
-                                                <TableCell className="text-center">{webhook.event}</TableCell>
-                                                <TableCell className="text-center">
+                                            <TableRow key={webhook.webhook_id} onClick={() => handleWebhookClick(webhook)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                <TableCell className="text-left">{webhook.url}</TableCell>
+                                                <TableCell className="text-left">{webhook.event}</TableCell>
+                                                <TableCell className="text-left">
                                                     <span className={`
                                                         inline-block px-2 py-1 rounded-full text-xs font-normal
                                                         ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
                                                     `}>
                                                         {webhook.is_active ? 'Active' : 'Inactive'}
                                                     </span>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button variant="ghost" size="sm">
-                                                        View
-                                                    </Button>
                                                 </TableCell>
                                             </TableRow>
                                         ))
@@ -174,6 +176,7 @@ export default function WebhooksPage() {
                     </div>
                 </div>
             </Layout.Body>
+            <WebhookActions webhook={selectedWebhook} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />
         </Layout>
     )
 }
