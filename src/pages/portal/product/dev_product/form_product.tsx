@@ -86,9 +86,10 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                     <Input id="price" type="number" placeholder="Enter price" className="flex-1" {...register('price')} />
                 </div>
             </div>
-            <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button type="submit">Create Product</Button>
+            <div className="flex justify-end">
+                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
+                    Create Product
+                </Button>
             </div>
         </form>
     )

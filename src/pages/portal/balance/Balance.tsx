@@ -235,7 +235,7 @@ function BalancePage() {
                                                 </div>
                                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                                     <DialogTrigger asChild>
-                                                        <Button variant="default">
+                                                        <Button variant="default" className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white">
                                                             Withdraw
                                                         </Button>
                                                     </DialogTrigger>
@@ -281,14 +281,18 @@ function BalancePage() {
                                                             </div>
                                                         </div>
                                                         <DialogFooter>
-                                                            <Button onClick={handleWithdraw} disabled={isWithdrawing}>
+                                                            <Button
+                                                                onClick={handleWithdraw}
+                                                                disabled={isWithdrawing}
+                                                                className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
+                                                            >
                                                                 {isWithdrawing ? (
                                                                     <>
                                                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                                         Processing...
                                                                     </>
                                                                 ) : (
-                                                                    "Confirm Withdrawal"
+                                                                    "Confirm"
                                                                 )}
                                                             </Button>
                                                         </DialogFooter>

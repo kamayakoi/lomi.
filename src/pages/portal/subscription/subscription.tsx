@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog"
 import { PlusCircle } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
+import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 
 const frequencyColors: Record<frequency, string> = {
   'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -43,6 +44,8 @@ export default function SubscriptionsPage() {
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
   const [isActionsOpen, setIsActionsOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null)
+  const [isEditPlanOpen, setIsEditPlanOpen] = useState(false)
 
   const topNav = [
     { title: 'Subscriptions', href: '/portal/subscription', isActive: true },
@@ -100,6 +103,15 @@ export default function SubscriptionsPage() {
     setIsRefreshing(true)
     await Promise.all([refetchPlans(), refetchSubscriptions()])
     setIsRefreshing(false)
+  }
+
+  const handlePlanClick = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan)
+    setIsEditPlanOpen(true)
+  }
+
+  const handleEditPlanSuccess = () => {
+    refetchPlans()
   }
 
   return (
@@ -188,8 +200,8 @@ export default function SubscriptionsPage() {
                               <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
                                 {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
                               </span>
-                              <Button variant="ghost" size="sm">
-                                View
+                              <Button variant="ghost" size="sm" onClick={() => handlePlanClick(plan)}>
+                                Edit
                               </Button>
                             </div>
                           </div>
@@ -279,6 +291,18 @@ export default function SubscriptionsPage() {
         isOpen={isActionsOpen}
         onClose={() => setIsActionsOpen(false)}
       />
+
+      <Dialog open={isEditPlanOpen} onOpenChange={setIsEditPlanOpen}>
+        <DialogContent className="sm:max-w-[845px]">
+          {selectedPlan && (
+            <EditPlanForm
+              onClose={() => setIsEditPlanOpen(false)}
+              onSuccess={handleEditPlanSuccess}
+              plan={selectedPlan}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   )
 }

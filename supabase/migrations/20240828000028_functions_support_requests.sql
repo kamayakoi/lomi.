@@ -15,13 +15,26 @@ RETURNS UUID AS $$
 DECLARE
     v_support_request_id UUID;
     v_image_url TEXT := NULL;
+    v_content_type TEXT := 'application/octet-stream';
 BEGIN
     -- If an image is provided, upload it to the bucket
     IF p_image_data IS NOT NULL THEN
-        v_image_url := storage.upload_object(
+        -- Determine the content type based on the file extension
+        IF lower(right(p_image_name, 4)) = '.png' THEN
+            v_content_type := 'image/png';
+        ELSIF lower(right(p_image_name, 5)) = '.jpeg' THEN
+            v_content_type := 'image/jpeg';
+        ELSIF lower(right(p_image_name, 4)) = '.gif' THEN
+            v_content_type := 'image/gif';
+        ELSIF lower(right(p_image_name, 4)) = '.bmp' THEN
+            v_content_type := 'image/bmp';
+        END IF;
+
+        v_image_url := storage.objects.create(
             'support_request_images',
             p_image_name,
-            p_image_data
+            p_image_data,
+            v_content_type
         );
     END IF;
 

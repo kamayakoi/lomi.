@@ -108,3 +108,41 @@ export const fetchSubscriptionTransactions = async (subscriptionId: string) => {
 
     return data as Transaction[]
 }
+
+interface UpdateSubscriptionPlanData {
+  planId: string
+  name: string
+  description?: string
+  billingFrequency: frequency
+  amount: number
+  failedPaymentAction: failed_payment_action
+  chargeDay?: number
+  metadata: Record<string, unknown>
+}
+
+export const updateSubscriptionPlan = async (data: UpdateSubscriptionPlanData) => {
+  const { error } = await supabase.rpc('update_subscription_plan', {
+    p_plan_id: data.planId,
+    p_name: data.name,
+    p_description: data.description,
+    p_billing_frequency: data.billingFrequency,
+    p_amount: data.amount,
+    p_failed_payment_action: data.failedPaymentAction,
+    p_charge_day: data.chargeDay,
+    p_metadata: data.metadata,
+  })
+
+  if (error) {
+    throw error
+  }
+}
+
+export const deleteSubscriptionPlan = async (planId: string) => {
+  const { error } = await supabase.rpc('delete_subscription_plan', {
+    p_plan_id: planId,
+  })
+
+  if (error) {
+    throw error
+  }
+}

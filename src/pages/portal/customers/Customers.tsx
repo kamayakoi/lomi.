@@ -259,11 +259,10 @@ export default function CustomersPage() {
                                             </Label>
                                         </div>
                                     </div>
-                                    <div className="flex justify-end space-x-2">
-                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                                            Cancel
+                                    <div className="flex justify-end">
+                                        <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                                            Add Customer
                                         </Button>
-                                        <Button type="submit">Add Customer</Button>
                                     </div>
                                 </form>
                             </DialogContent>

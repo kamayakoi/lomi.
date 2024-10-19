@@ -7,20 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { createSubscriptionPlan } from './support_subscriptions'
-import { frequency, failed_payment_action, FirstPaymentType } from './types'
+import { updateSubscriptionPlan, deleteSubscriptionPlan } from './support_subscriptions'
+import { frequency, failed_payment_action, FirstPaymentType, SubscriptionPlan, SubscriptionLength } from './types'
 import React from 'react'
 import { SelectProps } from '@radix-ui/react-select'
 import { Switch } from "@/components/ui/switch"
 import InputRightAddon from "@/components/ui/input-right-addon"
 
-interface CreatePlanFormProps {
+interface EditPlanFormProps {
     onClose: () => void
     onSuccess: () => void
-    merchantId: string
+    plan: SubscriptionPlan
 }
 
-type SubscriptionLength = 'automatic' | 'fixed'
 type CollectionDateType = 'maintain' | 'specific_day'
 
 interface SubscriptionPlanFormData {
@@ -64,16 +63,22 @@ const ForwardedSelect = React.forwardRef<HTMLButtonElement, ForwardedSelectProps
 
 ForwardedSelect.displayName = 'ForwardedSelect';
 
-export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFormProps) {
+export function EditPlanForm({ onClose, onSuccess, plan }: EditPlanFormProps) {
     const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubscriptionPlanFormData>({
         defaultValues: {
-            merchant_id: merchantId,
-            currency_code: 'XOF',
-            subscription_length: 'automatic',
-            first_payment_type: 'initial',
-            collection_date_type: 'maintain',
-            metadata: {},
-            amount: 0,
+            merchant_id: plan.merchant_id,
+            name: plan.name,
+            description: plan.description,
+            billing_frequency: plan.billing_frequency,
+            amount: plan.amount,
+            currency_code: plan.currency_code as 'XOF',
+            subscription_length: plan.metadata?.['subscription_length'] as SubscriptionLength || 'automatic',
+            fixed_charges: plan.metadata?.['fixed_charges'] as number,
+            failed_payment_action: plan.failed_payment_action || 'continue',
+            first_payment_type: plan.first_payment_type,
+            collection_date_type: plan.charge_day ? 'specific_day' : 'maintain',
+            collection_day: plan.charge_day,
+            metadata: plan.metadata || {},
         },
     })
 
@@ -92,22 +97,20 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                 fixed_charges: data.fixed_charges,
             };
 
-            await createSubscriptionPlan({
-                merchantId: data.merchant_id,
+            await updateSubscriptionPlan({
+                planId: plan.plan_id,
                 name: data.name,
                 description: data.description,
                 billingFrequency: data.billing_frequency,
                 amount: data.amount,
-                currencyCode: data.currency_code,
                 failedPaymentAction: data.failed_payment_action,
                 chargeDay: data.collection_date_type === 'specific_day' ? data.collection_day : undefined,
                 metadata,
-                firstPaymentType: data.first_payment_type,
             });
             onSuccess();
             onClose();
         } catch (error) {
-            console.error('Error creating subscription plan:', error);
+            console.error('Error updating subscription plan:', error);
         }
     }
 
@@ -119,13 +122,23 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
         return parseFloat(amount.replace(/,/g, ""));
     };
 
+    const onDelete = async () => {
+        try {
+            await deleteSubscriptionPlan(plan.plan_id);
+            onSuccess();
+            onClose();
+        } catch (error) {
+            console.error('Error deleting subscription plan:', error);
+        }
+    }
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Create Subscription Plan</CardTitle>
-                        <CardDescription>Set up a new subscription plan for your customers</CardDescription>
+                        <CardTitle>Edit Subscription Plan</CardTitle>
+                        <CardDescription>Modify the details of the subscription plan</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
@@ -192,7 +205,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 <div className="space-y-2">
                                     <Label>Subscription length</Label>
                                     <RadioGroup
-                                        defaultValue="automatic"
+                                        defaultValue={subscriptionLength}
                                         onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
                                         className="rounded-none"
                                     >
@@ -250,7 +263,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 <div className="space-y-2">
                                     <Label>Collection Date</Label>
                                     <RadioGroup
-                                        defaultValue="maintain"
+                                        defaultValue={collectionDateType}
                                         onValueChange={(value: CollectionDateType) => setValue('collection_date_type', value)}
                                         className="space-y-2"
                                     >
@@ -292,42 +305,6 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 )}
 
                                 <div className="space-y-2">
-                                    <Label>First payment of the subscription</Label>
-                                    <Controller
-                                        name="first_payment_type"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                                                    <Card>
-                                                        <CardHeader>
-                                                            <CardTitle>
-                                                                <RadioGroupItem value="initial" id="initial" className="mr-2" />
-                                                                <Label htmlFor="initial">Initial charge</Label>
-                                                            </CardTitle>
-                                                        </CardHeader>
-                                                        <CardContent>
-                                                            The subscription will be charged at the beginning and in each subsequent period.
-                                                        </CardContent>
-                                                    </Card>
-                                                    <Card>
-                                                        <CardHeader>
-                                                            <CardTitle>
-                                                                <RadioGroupItem value="non_initial" id="non_initial" className="mr-2" />
-                                                                <Label htmlFor="non_initial">Non-initial charge</Label>
-                                                            </CardTitle>
-                                                        </CardHeader>
-                                                        <CardContent>
-                                                            Subscription will be initiated without charge. A charge will be applied on the nearest selected debit day.
-                                                        </CardContent>
-                                                    </Card>
-                                                </div>
-                                            </RadioGroup>
-                                        )}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
                                     <Label htmlFor="failed_payment_action">Failed Payment Action</Label>
                                     <Controller
                                         name="failed_payment_action"
@@ -354,10 +331,17 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
             <div className="flex justify-end space-x-2">
                 <Button
-                    type="submit"
-                    className="bg-green-500 text-white hover:bg-green-600 px-4 py-2 h-10"
+                    type="button"
+                    className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
+                    onClick={onDelete}
                 >
-                    Create
+                    Delete Plan
+                </Button>
+                <Button
+                    type="submit"
+                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
+                >
+                    Save Changes
                 </Button>
             </div>
         </form>

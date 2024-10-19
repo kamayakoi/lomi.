@@ -190,3 +190,41 @@ BEGIN
         t.created_at DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to update a subscription plan
+CREATE OR REPLACE FUNCTION public.update_subscription_plan(
+    p_plan_id UUID,
+    p_name VARCHAR,
+    p_description TEXT,
+    p_billing_frequency frequency,
+    p_amount NUMERIC,
+    p_failed_payment_action failed_payment_action,
+    p_charge_day INT,
+    p_metadata JSONB
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE subscription_plans
+    SET
+        name = p_name,
+        description = p_description,
+        billing_frequency = p_billing_frequency,
+        amount = p_amount,
+        failed_payment_action = p_failed_payment_action,
+        charge_day = p_charge_day,
+        metadata = p_metadata,
+        updated_at = NOW()
+    WHERE plan_id = p_plan_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to delete a subscription plan
+CREATE OR REPLACE FUNCTION public.delete_subscription_plan(
+    p_plan_id UUID
+)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM subscription_plans
+    WHERE plan_id = p_plan_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

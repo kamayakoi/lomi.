@@ -82,7 +82,7 @@ export default function WebhookActions({ webhook, isOpen, onClose }: WebhookActi
                             <ArrowDownToLine className="mr-2 h-4 w-4" />
                             Download Details
                         </Button>
-                        <Button variant="destructive" className="w-full sm:w-auto" onClick={handleDelete}>
+                        <Button variant="destructive" className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white" onClick={handleDelete}>
                             Delete Webhook
                         </Button>
                     </CardFooter>
