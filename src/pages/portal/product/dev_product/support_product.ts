@@ -64,3 +64,17 @@ export const fetchProductTransactions = async (productId: string) => {
 
     return data as Transaction[]
 }
+
+export const updateProduct = async (productId: string, data: Partial<Product>) => {
+    const { error } = await supabase.rpc('update_product', {
+        p_product_id: productId,
+        p_name: data.name,
+        p_description: data.description,
+        p_price: data.price,
+        p_is_active: data.is_active,
+    })
+
+    if (error) {
+        throw error
+    }
+}

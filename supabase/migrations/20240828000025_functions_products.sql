@@ -99,5 +99,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to update a product
+CREATE OR REPLACE FUNCTION public.update_product(
+    p_product_id UUID,
+    p_name VARCHAR(255),
+    p_description TEXT,
+    p_price NUMERIC(10,2),
+    p_is_active BOOLEAN
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE merchant_products
+    SET
+        name = p_name,
+        description = p_description,
+        price = p_price,
+        is_active = p_is_active,
+        updated_at = NOW()
+    WHERE product_id = p_product_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;

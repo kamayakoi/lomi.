@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { fetchProducts, deleteProduct } from './dev_product/support_product'
+import { fetchProducts } from './dev_product/support_product'
 import { Product } from './dev_product/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
@@ -24,6 +24,7 @@ import {
 import { PlusCircle } from 'lucide-react'
 import { useQuery } from 'react-query'
 import ProductActions from './dev_product/actions_product'
+import { EditProductForm } from './dev_product/edit_product'
 
 export default function ProductsPage() {
     const { user } = useUser()
@@ -32,6 +33,7 @@ export default function ProductsPage() {
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
+    const [isEditProductOpen, setIsEditProductOpen] = useState(false)
 
     const topNav = [
         { title: 'Products', href: '/portal/product', isActive: true },
@@ -52,15 +54,6 @@ export default function ProductsPage() {
         refetch()
     }
 
-    const handleDeleteProduct = async (productId: string) => {
-        try {
-            await deleteProduct(productId)
-            refetch()
-        } catch (error) {
-            console.error('Error deleting product:', error)
-        }
-    }
-
     const handleRefresh = async () => {
         setIsRefreshing(true)
         await refetch()
@@ -70,6 +63,11 @@ export default function ProductsPage() {
     const handleProductClick = (product: Product) => {
         setSelectedProduct(product)
         setIsActionsOpen(true)
+    }
+
+    const handleEditClick = (product: Product) => {
+        setSelectedProduct(product)
+        setIsEditProductOpen(true)
     }
 
     return (
@@ -156,8 +154,11 @@ export default function ProductsPage() {
                           `}>
                                                     {product.is_active ? 'Active' : 'Inactive'}
                                                 </span>
-                                                <Button variant="ghost" size="sm" onClick={() => handleDeleteProduct(product.product_id)}>
-                                                    Delete
+                                                <Button variant="ghost" size="sm" onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    handleEditClick(product)
+                                                }}>
+                                                    Edit
                                                 </Button>
                                             </div>
                                         </div>
@@ -174,6 +175,27 @@ export default function ProductsPage() {
                 isOpen={isActionsOpen}
                 onClose={() => setIsActionsOpen(false)}
             />
+
+            <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Product</DialogTitle>
+                        <DialogDescription>
+                            Modify the details of the selected product.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedProduct && (
+                        <EditProductForm
+                            product={selectedProduct}
+                            onClose={() => setIsEditProductOpen(false)}
+                            onSuccess={() => {
+                                refetch()
+                                setIsEditProductOpen(false)
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Layout>
     )
 }

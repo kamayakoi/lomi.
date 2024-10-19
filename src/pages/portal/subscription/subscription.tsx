@@ -114,6 +114,10 @@ export default function SubscriptionsPage() {
     refetchPlans()
   }
 
+  function formatCurrency(amount: number, currency: string): string {
+    return `${amount.toLocaleString('en-US', { minimumFractionDigits: 0 })} ${currency}`;
+  }
+
   return (
     <Layout fixed>
       <Layout.Header>
@@ -260,6 +264,7 @@ export default function SubscriptionsPage() {
                             <div>
                               <p className="text-lg font-semibold">{subscription.customer_name}</p>
                               <p className="text-sm text-muted-foreground">{subscription.plan_name}</p>
+                              <p className="text-sm text-muted-foreground">{formatCurrency(subscription.amount, subscription.currency_code)}</p>
                             </div>
                             <div className="flex items-center space-x-2">
                               <span className={`

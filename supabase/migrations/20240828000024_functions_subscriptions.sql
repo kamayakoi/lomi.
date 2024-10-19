@@ -54,7 +54,9 @@ RETURNS TABLE (
     next_billing_date DATE,
     metadata JSONB,
     created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ,
+    amount NUMERIC,
+    currency_code currency_code
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -70,7 +72,9 @@ BEGIN
         s.next_billing_date,
         s.metadata,
         s.created_at,
-        s.updated_at
+        s.updated_at,
+        sp.amount,
+        sp.currency_code
     FROM
         merchant_subscriptions s
     JOIN

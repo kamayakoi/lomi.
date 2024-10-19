@@ -35,6 +35,8 @@ export interface Subscription {
     metadata: Record<string, unknown>
     created_at: string
     updated_at: string
+    amount: number
+    currency_code: currency_code
 }
 
 export interface Transaction {
