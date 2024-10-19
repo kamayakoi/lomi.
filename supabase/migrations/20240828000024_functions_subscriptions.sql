@@ -96,10 +96,10 @@ CREATE OR REPLACE FUNCTION public.create_subscription_plan(
     p_billing_frequency frequency,
     p_amount NUMERIC,
     p_currency_code currency_code DEFAULT 'XOF',
-    p_failed_payment_action failed_payment_action,
-    p_charge_day INT,
-    p_metadata JSONB,
-    p_first_payment_type first_payment_type
+    p_failed_payment_action failed_payment_action DEFAULT 'continue',
+    p_charge_day INT DEFAULT 1,
+    p_metadata JSONB DEFAULT '{}'::jsonb,
+    p_first_payment_type first_payment_type DEFAULT 'initial'
 )
 RETURNS UUID AS $$
 DECLARE

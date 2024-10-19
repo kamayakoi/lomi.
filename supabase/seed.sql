@@ -149,12 +149,60 @@ VALUES
 
 
 -- Seed data for subscription_plans table
-INSERT INTO subscription_plans (merchant_id, organization_id, name, description, billing_frequency, amount, currency_code, retry_payment_every, total_retries, failed_payment_action, email_notifications, metadata)
+INSERT INTO subscription_plans (merchant_id, organization_id, name, description, billing_frequency, amount, currency_code, failed_payment_action, charge_day, metadata, first_payment_type)
 VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 1', 'Description 1', 'monthly', 50.00, 'XOF', 3, 0, 'cancel', '{"enabled": true, "frequency": "weekly"}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 2', 'Description 2', 'yearly', 100.00, 'XOF', 0, 0, 'retry', '{"enabled": false}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Plan 3', 'Description 3', 'monthly', 75.00, 'XOF', 2, 0, 'cancel', '{"enabled": true, "frequency": "monthly"}', '{}'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Plan 4', 'Description 4', 'yearly', 200.00, 'XOF', 0, 0, 'retry', '{"enabled": true, "frequency": "daily"}', '{}');
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 
+    'Plan 1', 
+    'Description 1', 
+    'monthly', 
+    50.00, 
+    'XOF', 
+    'continue',
+    1,
+    '{}',
+    'initial'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 
+    'Plan 2', 
+    'Description 2', 
+    'yearly', 
+    100.00, 
+    'XOF', 
+    'cancel',
+    1,
+    '{}',
+    'initial'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), 
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 
+    'Plan 3', 
+    'Description 3', 
+    'monthly', 
+    75.00, 
+    'XOF', 
+    'pause',
+    15,
+    '{}',
+    'non_initial'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 
+    'Plan 4', 
+    'Description 4', 
+    'yearly', 
+    200.00, 
+    'XOF', 
+    'continue',
+    1,
+    '{}',
+    'initial'
+  );
 
 
 -- Update merchant_subscriptions seed data

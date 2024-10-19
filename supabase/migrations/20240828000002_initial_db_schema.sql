@@ -337,8 +337,6 @@ CREATE INDEX idx_subscription_plans_currency_code ON subscription_plans(currency
 COMMENT ON TABLE subscription_plans IS 'Stores information about available subscription plans';
 COMMENT ON COLUMN subscription_plans.billing_frequency IS 'Frequency of billing for the subscription plan';
 COMMENT ON COLUMN subscription_plans.amount IS 'Amount to be charged per billing cycle';
-COMMENT ON COLUMN subscription_plans.retry_payment_every IS 'Number of days between payment retry attempts';
-COMMENT ON COLUMN subscription_plans.total_retries IS 'Maximum number of payment retry attempts';
 COMMENT ON COLUMN subscription_plans.failed_payment_action IS 'Action to take when payment fails after all retry attempts';
 
 
