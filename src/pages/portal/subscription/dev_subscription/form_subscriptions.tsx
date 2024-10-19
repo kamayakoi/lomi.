@@ -140,8 +140,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 rules={{ required: 'Billing frequency is required' }}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select billing frequency" />
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select billing frequency">
+                                                {frequencyOptions.find(f => f === field.value)?.charAt(0).toUpperCase() + (frequencyOptions.find(f => f === field.value)?.slice(1) ?? '')}
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             {frequencyOptions.map((frequency) => (
@@ -182,7 +184,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                     control={control}
                                     rules={{ required: 'Number of charges is required' }}
                                     render={({ field }) => (
-                                        <Select onValueChange={(value) => {
+                                        <Select onValueChange={(value: string) => {
                                             if (value === 'custom') {
                                                 setShowCustomCharges(true)
                                             } else {
@@ -190,8 +192,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                                 field.onChange(parseInt(value))
                                             }
                                         }}>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select number of charges" />
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select number of charges">
+                                                    {field.value ? `End after ${field.value} charges` : ''}
+                                                </SelectValue>
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {fixedChargesOptions.map((option) => (
