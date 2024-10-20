@@ -11,7 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { PlusCircle, Edit } from 'lucide-react'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { UserNav } from '@/components/dashboard/user-nav'
 import Notifications from '@/components/dashboard/notifications'
@@ -38,8 +38,10 @@ import {
 } from '@/components/ui/table'
 import { countryCodes } from '@/utils/data/onboarding'
 import { CustomerFilters } from './dev_customers/filters_customers'
+import { EditCustomerForm } from './dev_customers/edit_customer'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function CustomersPage() {
+function CustomersPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [deletingCustomerId, setDeletingCustomerId] = useState<string | null>(null)
@@ -50,6 +52,7 @@ export default function CustomersPage() {
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [isEditCustomerOpen, setIsEditCustomerOpen] = useState(false)
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
@@ -114,11 +117,6 @@ export default function CustomersPage() {
         fetchCustomers()
     }
 
-    const handleDeleteClick = (customerId: string) => {
-        setDeletingCustomerId(customerId)
-        setDeleteDialogOpen(true)
-    }
-
     const handleConfirmDelete = async () => {
         if (deletingCustomerId) {
             const { error } = await supabase.rpc('delete_customer', { p_customer_id: deletingCustomerId })
@@ -136,6 +134,11 @@ export default function CustomersPage() {
     const handleCustomerClick = (customer: Customer) => {
         setSelectedCustomer(customer)
         setIsActionsOpen(true)
+    }
+
+    const handleEditCustomer = (customer: Customer) => {
+        setSelectedCustomer(customer)
+        setIsEditCustomerOpen(true)
     }
 
     const filteredCountryCodes = useMemo(() => {
@@ -291,14 +294,16 @@ export default function CustomersPage() {
                                 </TableHeader>
                                 <TableBody>
                                     {isCustomersLoading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={6}>
-                                                <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
-                                                    <Skeleton className="h-8 w-64" />
-                                                    <Skeleton className="h-4 w-48" />
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
+                                        Array.from({ length: 5 }).map((_, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell colSpan={6}>
+                                                    <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center">
+                                                        <Skeleton className="h-8 w-64" />
+                                                        <Skeleton className="h-4 w-48" />
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
                                     ) : customers.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={6}>
@@ -322,8 +327,11 @@ export default function CustomersPage() {
                                                 <TableCell>{customer.country}</TableCell>
                                                 <TableCell>{customer.is_business ? 'Business' : 'Individual'}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteClick(customer.customer_id) }}>
-                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    <Button variant="ghost" size="sm" onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleEditCustomer(customer)
+                                                    }}>
+                                                        <Edit className="h-4 w-4 text-blue-500" />
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -353,6 +361,33 @@ export default function CustomersPage() {
             </Dialog>
 
             <CustomerActions customer={selectedCustomer} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />
+
+            <Dialog open={isEditCustomerOpen} onOpenChange={setIsEditCustomerOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Customer</DialogTitle>
+                        <DialogDescription>
+                            Modify the details of the selected customer.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedCustomer && (
+                        <EditCustomerForm
+                            customerId={selectedCustomer.customer_id}
+                            onClose={() => setIsEditCustomerOpen(false)}
+                            onSuccess={() => {
+                                fetchCustomers()
+                                setIsEditCustomerOpen(false)
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Layout>
     )
 }
+
+function CustomersWithActivationCheck() {
+    return withActivationCheck(CustomersPage)({});
+}
+
+export default CustomersWithActivationCheck;

@@ -18,8 +18,9 @@ import AnimatedLogoLoader from '@/components/dashboard/loader'
 import PaymentLinkFilters from './dev_payment-links/filters_paymentLinks'
 import { fetchPaymentLinks } from './dev_payment-links/support_paymentLinks'
 import { PaymentLink } from './dev_payment-links/types'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function PaymentLinksPage() {
+function PaymentLinksPage() {
   const { user, isLoading: isUserLoading } = useUser()
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -159,3 +160,9 @@ export default function PaymentLinksPage() {
     </DashboardLayout>
   )
 }
+
+function PaymentLinksWithActivationCheck() {
+  return withActivationCheck(PaymentLinksPage)({});
+}
+
+export default PaymentLinksWithActivationCheck;

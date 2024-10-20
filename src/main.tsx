@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Analytics } from "@vercel/analytics/react";
+// import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/landing/theme-provider.tsx";
 import { UserProvider } from '@/lib/contexts/UserContext';
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -16,7 +16,7 @@ export function App() {
         <ThemeProvider>
           <UserProvider>
             <AppRouter />
-            <Analytics />
+            {/* <Analytics /> */}
           </UserProvider>
         </ThemeProvider>
       </QueryClientProvider>

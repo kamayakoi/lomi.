@@ -5,7 +5,7 @@ import { Customer, Transaction } from './types'
 import { Separator } from "@/components/ui/separator"
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { fetchTransactions } from './support_customers'
+import { fetchTransactions } from './support_customers.tsx'
 
 type CustomerActionsProps = {
     customer: Customer | null

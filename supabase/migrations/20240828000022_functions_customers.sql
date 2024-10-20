@@ -9,15 +9,14 @@ CREATE OR REPLACE FUNCTION public.create_customer(
     p_city VARCHAR,
     p_address VARCHAR,
     p_postal_code VARCHAR,
-    p_is_business BOOLEAN,
-    p_metadata JSONB DEFAULT NULL
+    p_is_business BOOLEAN
 )
 RETURNS UUID AS $$
 DECLARE
     v_customer_id UUID;
 BEGIN
-    INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city, address, postal_code, is_business, metadata)
-    VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_country, p_city, p_address, p_postal_code, p_is_business, p_metadata)
+    INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city, address, postal_code, is_business)
+    VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_country, p_city, p_address, p_postal_code, p_is_business)
     RETURNING customer_id INTO v_customer_id;
 
     RETURN v_customer_id;
@@ -41,7 +40,6 @@ RETURNS TABLE (
     address VARCHAR,
     postal_code VARCHAR,
     is_business BOOLEAN,
-    metadata JSONB,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ
 ) AS $$
@@ -57,7 +55,6 @@ BEGIN
         c.address,
         c.postal_code,
         c.is_business,
-        c.metadata,
         c.created_at,
         c.updated_at
     FROM 
@@ -118,3 +115,32 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_customer_transactions(UUID) TO authenticated;
+
+-- Function to update a customer
+CREATE OR REPLACE FUNCTION public.update_customer(
+    p_customer_id UUID,
+    p_name VARCHAR,
+    p_email VARCHAR,
+    p_phone_number VARCHAR,
+    p_country VARCHAR,
+    p_city VARCHAR,
+    p_address VARCHAR,
+    p_postal_code VARCHAR,
+    p_is_business BOOLEAN
+)
+RETURNS VOID AS $$
+BEGIN
+    UPDATE customers
+    SET
+        name = p_name,
+        email = p_email,
+        phone_number = p_phone_number,
+        country = p_country,
+        city = p_city,
+        address = p_address,
+        postal_code = p_postal_code,
+        is_business = p_is_business,
+        updated_at = NOW()
+    WHERE customer_id = p_customer_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

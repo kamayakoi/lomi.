@@ -12,8 +12,9 @@ import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import SidebarNav from '../../../components/dashboard/sidebar-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function Settings() {
+function Settings() {
   const topNav = [
     { title: 'Settings', href: '/portal/settings', isActive: true },
     { title: 'Documentation', href: 'https://developers.lomi.africa', isActive: false },
@@ -125,7 +126,10 @@ const sidebarNavItems = [
   },
 ]
 
-// Add this at the end of the file
+const SettingsWithActivationCheck = withActivationCheck(Settings);
+
+export default SettingsWithActivationCheck;
+
 export function SettingsIndex() {
   return <Navigate to="/portal/settings/profile" replace />;
 }

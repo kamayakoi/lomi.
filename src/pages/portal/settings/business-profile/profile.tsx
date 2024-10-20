@@ -10,6 +10,7 @@ import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import ProfilePictureUploader from '@/components/auth/avatar-uploader'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 interface MerchantDetails {
     merchant_id: string;
@@ -21,7 +22,7 @@ interface MerchantDetails {
     preferred_language: string;
 }
 
-export default function Profile() {
+function Profile() {
     const [merchant, setMerchant] = useState<MerchantDetails | null>(null)
     const [loading, setLoading] = useState(true)
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -615,3 +616,9 @@ export default function Profile() {
         </div>
     )
 }
+
+function ProfileWithActivationCheck() {
+    return withActivationCheck(Profile)({});
+}
+
+export default ProfileWithActivationCheck;

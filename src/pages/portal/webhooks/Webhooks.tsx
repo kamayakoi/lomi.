@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/table"
 import { useQuery } from 'react-query'
 import WebhookActions from './dev_webhooks/actions_webhooks'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function WebhooksPage() {
+function WebhooksPage() {
     const { user } = useUser()
     const [isCreateWebhookOpen, setIsCreateWebhookOpen] = useState(false)
     const [selectedEvent, setSelectedEvent] = useState<webhook_event | 'all'>('all')
@@ -180,3 +181,9 @@ export default function WebhooksPage() {
         </Layout>
     )
 }
+
+function WebhooksWithActivationCheck() {
+    return withActivationCheck(WebhooksPage)({});
+}
+
+export default WebhooksWithActivationCheck;

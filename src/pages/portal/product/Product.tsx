@@ -25,8 +25,9 @@ import { PlusCircle } from 'lucide-react'
 import { useQuery } from 'react-query'
 import ProductActions from './dev_product/actions_product'
 import { EditProductForm } from './dev_product/edit_product'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function ProductsPage() {
+function ProductsPage() {
     const { user } = useUser()
     const [isCreateProductOpen, setIsCreateProductOpen] = useState(false)
     const [selectedStatus, setSelectedStatus] = useState<'active' | 'inactive' | 'all' | null>(null)
@@ -199,3 +200,9 @@ export default function ProductsPage() {
         </Layout>
     )
 }
+
+function ProductsWithActivationCheck() {
+    return withActivationCheck(ProductsPage)({});
+}
+
+export default ProductsWithActivationCheck;

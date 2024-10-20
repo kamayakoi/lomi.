@@ -24,6 +24,7 @@ import {
 import { PlusCircle } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
 import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 const frequencyColors: Record<frequency, string> = {
   'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -36,7 +37,7 @@ const frequencyColors: Record<frequency, string> = {
   'one-time': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
 };
 
-export default function SubscriptionsPage() {
+function SubscriptionsPage() {
   const { user } = useUser()
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
@@ -114,7 +115,10 @@ export default function SubscriptionsPage() {
     refetchPlans()
   }
 
-  function formatCurrency(amount: number, currency: string): string {
+  function formatCurrency(amount: number | undefined, currency: string | undefined): string {
+    if (amount === undefined || amount === null || currency === undefined) {
+      return '-';
+    }
     return `${amount.toLocaleString('en-US', { minimumFractionDigits: 0 })} ${currency}`;
   }
 
@@ -311,3 +315,9 @@ export default function SubscriptionsPage() {
     </Layout>
   )
 }
+
+function SubscriptionsWithActivationCheck() {
+  return withActivationCheck(SubscriptionsPage)({});
+}
+
+export default SubscriptionsWithActivationCheck;

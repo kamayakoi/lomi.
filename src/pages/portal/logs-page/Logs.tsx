@@ -30,8 +30,9 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
-export default function LogsPage() {
+function LogsPage() {
     const { user } = useUser()
     const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
     const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null)
@@ -284,3 +285,9 @@ function formatEventName(event: string): string {
             return event
     }
 }
+
+function LogsWithActivationCheck() {
+    return withActivationCheck(LogsPage)({});
+}
+
+export default LogsWithActivationCheck;

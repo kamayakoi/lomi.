@@ -42,7 +42,7 @@ export default function Component() {
                                 >
                                     email us
                                 </a>{' '}
-                                or go through the Activation process [5 minutes].
+                                or go through the Activation process.
                             </span>
                         </p>
                     </div>

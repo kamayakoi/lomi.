@@ -1,6 +1,7 @@
 -- Create a new bucket for storing support request images
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('support_request_images', 'support_request_images', false);
+VALUES ('support_request_images', 'support_request_images', false)
+ON CONFLICT (id) DO NOTHING;
 
 -- Function to create a new support request
 CREATE OR REPLACE FUNCTION public.create_support_request(

@@ -162,9 +162,9 @@ COMMENT ON TABLE merchant_organization_links IS 'Links merchants to organization
 
 -- Providers table
 CREATE TABLE providers (
-  name PRIMARY KEY VARCHAR NOT NULL,
+  name VARCHAR NOT NULL PRIMARY KEY,
   code provider_code NOT NULL UNIQUE,
-  description TEXT,
+  description TEXT
 );
 
 CREATE INDEX idx_providers_code ON providers(code);
