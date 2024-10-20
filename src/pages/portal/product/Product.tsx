@@ -21,11 +21,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, ArrowUpDown } from 'lucide-react'
 import { useQuery } from 'react-query'
 import ProductActions from './dev_product/actions_product'
 import { EditProductForm } from './dev_product/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
 
 function ProductsPage() {
     const { user } = useUser()
@@ -35,6 +37,8 @@ function ProductsPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
     const [isEditProductOpen, setIsEditProductOpen] = useState(false)
+    const [sortColumn, setSortColumn] = useState<keyof Product | null>(null)
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
     const topNav = [
         { title: 'Products', href: '/portal/product', isActive: true },
@@ -69,6 +73,32 @@ function ProductsPage() {
     const handleEditClick = (product: Product) => {
         setSelectedProduct(product)
         setIsEditProductOpen(true)
+    }
+
+    const handleSort = (column: keyof Product) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortColumn(column)
+            setSortDirection('asc')
+        }
+    }
+
+    const sortProducts = (products: Product[]) => {
+        if (!sortColumn) return products
+
+        return products.sort((a, b) => {
+            const aValue = a[sortColumn]
+            const bValue = b[sortColumn]
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+                return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
+            } else {
+                return 0
+            }
+        })
     }
 
     return (
@@ -114,60 +144,97 @@ function ProductsPage() {
                         isRefreshing={isRefreshing}
                     />
 
-                    <div className="rounded-md border mt-4">
-                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
-                            {isProductsLoading ? (
-                                Array.from({ length: 5 }).map((_, index) => (
-                                    <div key={index} className="py-4 px-6 border-b">
-                                        <Skeleton className="w-full h-8" />
-                                    </div>
-                                ))
-                            ) : products.length === 0 ? (
-                                <div className="py-24 text-center">
-                                    <div className="flex justify-center mb-6">
-                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                        No products found
-                                    </h3>
-                                    <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                        Try changing your filter or create a new product.
-                                    </p>
-                                </div>
-                            ) : (
-                                products.map((product: Product) => (
-                                    <div
-                                        key={product.product_id}
-                                        className="py-4 px-6 border-b cursor-pointer"
-                                        onClick={() => handleProductClick(product)}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <p className="text-lg font-semibold">{product.name}</p>
-                                                <p className="text-sm text-muted-foreground">{product.description}</p>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className={`
-                            inline-block px-2 py-1 rounded-full text-xs font-normal
-                            ${product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                          `}>
-                                                    {product.is_active ? 'Active' : 'Inactive'}
-                                                </span>
-                                                <Button variant="ghost" size="sm" onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleEditClick(product)
-                                                }}>
-                                                    Edit
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="text-center">
+                                                <Button variant="ghost" onClick={() => handleSort('name')}>
+                                                    Name
+                                                    {sortColumn === 'name' && (
+                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                    )}
                                                 </Button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                                            </TableHead>
+                                            <TableHead className="text-center">
+                                                <Button variant="ghost" onClick={() => handleSort('description')}>
+                                                    Description
+                                                    {sortColumn === 'description' && (
+                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                    )}
+                                                </Button>
+                                            </TableHead>
+                                            <TableHead className="text-center">
+                                                <Button variant="ghost" onClick={() => handleSort('is_active')}>
+                                                    Status
+                                                    {sortColumn === 'is_active' && (
+                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                    )}
+                                                </Button>
+                                            </TableHead>
+                                            <TableHead className="text-center">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {isProductsLoading ? (
+                                            Array.from({ length: 5 }).map((_, index) => (
+                                                <TableRow key={index}>
+                                                    <TableCell colSpan={4}>
+                                                        <Skeleton className="w-full h-8" />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : products.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="text-center py-8">
+                                                    <div className="flex flex-col items-center justify-center space-y-4">
+                                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                        </div>
+                                                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                            No products found
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                                            Try changing your filter or create a new product.
+                                                        </p>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            sortProducts(products).map((product: Product) => (
+                                                <TableRow
+                                                    key={product.product_id}
+                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                    onClick={() => handleProductClick(product)}
+                                                >
+                                                    <TableCell className="text-center">{product.name}</TableCell>
+                                                    <TableCell className="text-center">{product.description}</TableCell>
+                                                    <TableCell className="text-center">
+                                                        <span className={`
+                                                            inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                            ${product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                        `}>
+                                                            {product.is_active ? 'Active' : 'Inactive'}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="text-center">
+                                                        <Button variant="ghost" size="sm" onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleEditClick(product)
+                                                        }}>
+                                                            Edit
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </Layout.Body>
 

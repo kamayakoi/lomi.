@@ -11,7 +11,6 @@ import { useUser } from '@/lib/hooks/useUser'
 import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
 import { SubscriptionPlan, Subscription, frequency } from './dev_subscription/types'
 import { Skeleton } from '@/components/ui/skeleton'
-import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './dev_subscription/form_subscriptions'
@@ -25,6 +24,8 @@ import { PlusCircle } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
 import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
 
 const frequencyColors: Record<frequency, string> = {
   'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -53,7 +54,7 @@ function SubscriptionsPage() {
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
-  const { data: subscriptionPlansData, isLoading: isSubscriptionPlansLoading, fetchNextPage: fetchNextPagePlans, refetch: refetchPlans } = useInfiniteQuery(
+  const { data: subscriptionPlansData, isLoading: isSubscriptionPlansLoading, refetch: refetchPlans } = useInfiniteQuery(
     ['subscriptionPlans', user?.id || ''],
     ({ pageParam = 1 }) =>
       fetchSubscriptionPlans(
@@ -70,7 +71,7 @@ function SubscriptionsPage() {
     }
   )
 
-  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, fetchNextPage: fetchNextPageSubscriptions, refetch: refetchSubscriptions } = useInfiniteQuery(
+  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, refetch: refetchSubscriptions } = useInfiniteQuery(
     ['subscriptions', user?.id || '', selectedStatus],
     ({ pageParam = 1 }) =>
       fetchSubscriptions(
@@ -168,57 +169,66 @@ function SubscriptionsPage() {
                 isRefreshing={isRefreshing}
               />
 
-              <div className="rounded-md border mt-4">
-                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
-                  <InfiniteScroll
-                    dataLength={subscriptionPlans.length}
-                    next={() => fetchNextPagePlans()}
-                    hasMore={subscriptionPlansData?.pages[subscriptionPlansData.pages.length - 1]?.length === pageSize}
-                    loader={<Skeleton className="w-full h-8" />}
-                  >
-                    {isSubscriptionPlansLoading ? (
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="py-4 px-6 border-b">
-                          <Skeleton className="w-full h-8" />
-                        </div>
-                      ))
-                    ) : subscriptionPlans.length === 0 ? (
-                      <div className="py-24 text-center">
-                        <div className="flex justify-center mb-6">
-                          <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                          No subscription plans found
-                        </h3>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                          Try changing your filter or create a new plan.
-                        </p>
-                      </div>
-                    ) : (
-                      subscriptionPlans.map((plan: SubscriptionPlan) => (
-                        <div key={plan.plan_id} className="py-4 px-6 border-b">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="text-lg font-semibold">{plan.name}</p>
-                              <p className="text-sm text-muted-foreground">{plan.description}</p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
-                                {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
-                              </span>
-                              <Button variant="ghost" size="sm" onClick={() => handlePlanClick(plan)}>
-                                Edit
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </InfiniteScroll>
-                </div>
-              </div>
+              <Card className="mt-4">
+                <CardContent className="p-4">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-center">Name</TableHead>
+                          <TableHead className="text-center">Description</TableHead>
+                          <TableHead className="text-center">Frequency</TableHead>
+                          <TableHead className="text-center">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {isSubscriptionPlansLoading ? (
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <TableRow key={index}>
+                              <TableCell colSpan={4}>
+                                <Skeleton className="w-full h-8" />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : subscriptionPlans.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={4} className="text-center py-8">
+                              <div className="flex flex-col items-center justify-center space-y-4">
+                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                  <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                </div>
+                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                  No subscription plans found
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                  Try changing your filter or create a new plan.
+                                </p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          subscriptionPlans.map((plan: SubscriptionPlan) => (
+                            <TableRow key={plan.plan_id}>
+                              <TableCell className="text-center">{plan.name}</TableCell>
+                              <TableCell className="text-center">{plan.description}</TableCell>
+                              <TableCell className="text-center">
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
+                                  {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <Button variant="ghost" size="sm" onClick={() => handlePlanClick(plan)}>
+                                  Edit
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="subscriptions">
@@ -229,67 +239,77 @@ function SubscriptionsPage() {
                 isRefreshing={isRefreshing}
               />
 
-              <div className="rounded-md border mt-4">
-                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
-                  <InfiniteScroll
-                    dataLength={subscriptions.length}
-                    next={() => fetchNextPageSubscriptions()}
-                    hasMore={subscriptionsData?.pages[subscriptionsData.pages.length - 1]?.length === pageSize}
-                    loader={<Skeleton className="w-full h-8" />}
-                  >
-                    {isSubscriptionsLoading ? (
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="py-4 px-6 border-b">
-                          <Skeleton className="w-full h-8" />
-                        </div>
-                      ))
-                    ) : subscriptions.length === 0 ? (
-                      <div className="py-24 text-center">
-                        <div className="flex justify-center mb-6">
-                          <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                          No subscriptions found
-                        </h3>
-                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                          Try changing your filter or create a new subscription.
-                        </p>
-                      </div>
-                    ) : (
-                      subscriptions.map((subscription: Subscription) => (
-                        <div
-                          key={subscription.subscription_id}
-                          className="py-4 px-6 border-b cursor-pointer"
-                          onClick={() => handleSubscriptionClick(subscription)}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="text-lg font-semibold">{subscription.customer_name}</p>
-                              <p className="text-sm text-muted-foreground">{subscription.plan_name}</p>
-                              <p className="text-sm text-muted-foreground">{formatCurrency(subscription.amount, subscription.currency_code)}</p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className={`
-                                inline-block px-2 py-1 rounded-full text-xs font-normal
-                                ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                              `}>
-                                {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                              </span>
-                              <Button variant="ghost" size="sm">
-                                View
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </InfiniteScroll>
-                </div>
-              </div>
+              <Card className="mt-4">
+                <CardContent className="p-4">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-center">Customer</TableHead>
+                          <TableHead className="text-center">Plan</TableHead>
+                          <TableHead className="text-center">Amount</TableHead>
+                          <TableHead className="text-center">Status</TableHead>
+                          <TableHead className="text-center">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {isSubscriptionsLoading ? (
+                          Array.from({ length: 5 }).map((_, index) => (
+                            <TableRow key={index}>
+                              <TableCell colSpan={5}>
+                                <Skeleton className="w-full h-8" />
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : subscriptions.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-8">
+                              <div className="flex flex-col items-center justify-center space-y-4">
+                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                  <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                </div>
+                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                  No subscriptions found
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                  Try changing your filter or create a new subscription.
+                                </p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          subscriptions.map((subscription: Subscription) => (
+                            <TableRow
+                              key={subscription.subscription_id}
+                              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                              onClick={() => handleSubscriptionClick(subscription)}
+                            >
+                              <TableCell className="text-center">{subscription.customer_name}</TableCell>
+                              <TableCell className="text-center">{subscription.plan_name}</TableCell>
+                              <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
+                              <TableCell className="text-center">
+                                <span className={`
+                                  inline-block px-2 py-1 rounded-full text-xs font-normal
+                                  ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                  ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                  ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                `}>
+                                  {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <Button variant="ghost" size="sm">
+                                  View
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>

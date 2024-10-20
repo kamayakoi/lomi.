@@ -16,7 +16,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
-import { Search, RefreshCw } from 'lucide-react'
+import { Search, RefreshCw, ArrowUpDown } from 'lucide-react'
 import { Layout } from '@/components/custom/layout'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
@@ -31,12 +31,15 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Card, CardContent } from "@/components/ui/card"
 
 function LogsPage() {
     const { user } = useUser()
     const [selectedEvent, setSelectedEvent] = useState<string | null>(null)
     const [selectedSeverity, setSelectedSeverity] = useState<string | null>(null)
     const [isRefreshing, setIsRefreshing] = useState(false)
+    const [sortColumn, setSortColumn] = useState<keyof Log | null>(null)
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
     const topNav = [
         { title: 'Logs', href: '/portal/logs', isActive: true },
@@ -70,6 +73,32 @@ function LogsPage() {
         setIsRefreshing(true)
         await refetch()
         setIsRefreshing(false)
+    }
+
+    const handleSort = (column: keyof Log) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortColumn(column)
+            setSortDirection('asc')
+        }
+    }
+
+    const sortLogs = (logs: Log[]) => {
+        if (!sortColumn) return logs
+
+        return logs.sort((a, b) => {
+            const aValue = a[sortColumn]
+            const bValue = b[sortColumn]
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+            } else {
+                return 0
+            }
+        })
     }
 
     return (
@@ -151,78 +180,125 @@ function LogsPage() {
                         </div>
                     </div>
 
-                    <div className="rounded-md border">
-                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
-                            <InfiniteScroll
-                                dataLength={logs.length}
-                                next={() => fetchNextPage()}
-                                hasMore={logsData?.pages[logsData.pages.length - 1]?.length === pageSize}
-                                loader={<Skeleton className="w-full h-8" />}
-                            >
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Event</TableHead>
-                                            <TableHead>Severity</TableHead>
-                                            <TableHead>IP Address</TableHead>
-                                            <TableHead>Operating System</TableHead>
-                                            <TableHead>Browser</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {isLogsLoading ? (
-                                            Array.from({ length: 5 }).map((_, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell colSpan={6}>
-                                                        <Skeleton className="w-full h-8" />
-                                                    </TableCell>
+                    <Card>
+                        <CardContent className="p-4">
+                            <div className="rounded-md border">
+                                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
+                                    <InfiniteScroll
+                                        dataLength={logs.length}
+                                        next={() => fetchNextPage()}
+                                        hasMore={logsData?.pages[logsData.pages.length - 1]?.length === pageSize}
+                                        loader={<Skeleton className="w-full h-8" />}
+                                    >
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('created_at')}>
+                                                            Date
+                                                            {sortColumn === 'created_at' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('event')}>
+                                                            Event
+                                                            {sortColumn === 'event' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('severity')}>
+                                                            Severity
+                                                            {sortColumn === 'severity' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('ip_address')}>
+                                                            IP Address
+                                                            {sortColumn === 'ip_address' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('operating_system')}>
+                                                            Operating System
+                                                            {sortColumn === 'operating_system' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('browser')}>
+                                                            Browser
+                                                            {sortColumn === 'browser' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
                                                 </TableRow>
-                                            ))
-                                        ) : logs.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-8">
-                                                    <div className="py-24 text-center">
-                                                        <div className="flex justify-center mb-6">
-                                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                            </TableHeader>
+                                            <TableBody>
+                                                {isLogsLoading ? (
+                                                    Array.from({ length: 5 }).map((_, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell colSpan={6}>
+                                                                <Skeleton className="w-full h-8" />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : logs.length === 0 ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={6} className="text-center py-8">
+                                                            <div className="py-24 text-center">
+                                                                <div className="flex justify-center mb-6">
+                                                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                        <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                                    </div>
+                                                                </div>
+                                                                <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                    No logs found
+                                                                </h3>
+                                                                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                                    Start performing actions to see your activity logs here.
+                                                                </p>
                                                             </div>
-                                                        </div>
-                                                        <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                            No logs found
-                                                        </h3>
-                                                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                                            Start performing actions to see your activity logs here.                                                            </p>
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            logs.map((log: Log) => (
-                                                <TableRow key={log.log_id}>
-                                                    <TableCell>{formatDate(log.created_at)}</TableCell>
-                                                    <TableCell>{formatEventName(log.event)}</TableCell>
-                                                    <TableCell>
-                                                        <span className={`
-                                                            inline-block px-2 py-1 rounded-full text-xs font-normal
-                                                            ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                            ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                                            ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                            ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                        `}>
-                                                            {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
-                                                        </span>
-                                                    </TableCell>
-                                                    <TableCell>{log.ip_address}</TableCell>
-                                                    <TableCell>{log.operating_system}</TableCell>
-                                                    <TableCell>{log.browser}</TableCell>
-                                                </TableRow>
-                                            ))
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </InfiniteScroll>
-                        </div>
-                    </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ) : (
+                                                    sortLogs(logs).map((log: Log) => (
+                                                        <TableRow key={log.log_id}>
+                                                            <TableCell className="text-center">{formatDate(log.created_at)}</TableCell>
+                                                            <TableCell className="text-center">{formatEventName(log.event)}</TableCell>
+                                                            <TableCell className="text-center">
+                                                                <span className={`
+                                                                    inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                    ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                                                                    ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                                                    ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                    ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                `}>
+                                                                    {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
+                                                                </span>
+                                                            </TableCell>
+                                                            <TableCell className="text-center">{log.ip_address}</TableCell>
+                                                            <TableCell className="text-center">{log.operating_system}</TableCell>
+                                                            <TableCell className="text-center">{log.browser}</TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </InfiniteScroll>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </Layout.Body>
         </Layout>
@@ -237,7 +313,7 @@ function formatDate(dateString: string): string {
         day: 'numeric',
         hour: 'numeric',
         minute: 'numeric',
-        hour12: true
+        hour12: true,
     })
 }
 
@@ -262,15 +338,15 @@ function formatEventName(event: string): string {
         case 'edit_user_2fa':
             return 'User 2FA edited'
         case 'edit_user_phone':
-            return 'User Phone edited'
+            return 'User phone edited'
         case 'set_callback_url':
             return 'Callback URL set'
         case 'update_ip_whitelist':
-            return 'IP Whitelist updated'
+            return 'IP whitelist updated'
         case 'add_bank_account':
             return 'Bank account added'
         case 'remove_bank_account':
-            return 'Bank Account removed'
+            return 'Bank account removed'
         case 'create_payout':
             return 'Payout created'
         case 'create_invoice':
@@ -287,7 +363,7 @@ function formatEventName(event: string): string {
 }
 
 function LogsWithActivationCheck() {
-    return withActivationCheck(LogsPage)({});
+    return withActivationCheck(LogsPage)({})
 }
 
-export default LogsWithActivationCheck;
+export default LogsWithActivationCheck

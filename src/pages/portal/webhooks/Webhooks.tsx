@@ -21,7 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, ArrowUpDown } from 'lucide-react'
 import {
     Table,
     TableBody,
@@ -33,6 +33,7 @@ import {
 import { useQuery } from 'react-query'
 import WebhookActions from './dev_webhooks/actions_webhooks'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Card, CardContent } from '@/components/ui/card'
 
 function WebhooksPage() {
     const { user } = useUser()
@@ -42,6 +43,8 @@ function WebhooksPage() {
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [selectedWebhook, setSelectedWebhook] = useState<Webhook | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
+    const [sortColumn, setSortColumn] = useState<keyof Webhook | null>(null)
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
@@ -71,6 +74,32 @@ function WebhooksPage() {
     const handleWebhookClick = (webhook: Webhook) => {
         setSelectedWebhook(webhook)
         setIsActionsOpen(true)
+    }
+
+    const handleSort = (column: keyof Webhook) => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+        } else {
+            setSortColumn(column)
+            setSortDirection('asc')
+        }
+    }
+
+    const sortWebhooks = (webhooks: Webhook[]) => {
+        if (!sortColumn) return webhooks
+
+        return webhooks.sort((a, b) => {
+            const aValue = a[sortColumn]
+            const bValue = b[sortColumn]
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+                return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
+            } else {
+                return 0
+            }
+        })
     }
 
     return (
@@ -118,63 +147,88 @@ function WebhooksPage() {
                         isRefreshing={isRefreshing}
                     />
 
-                    <div className="rounded-md border mt-4">
-                        <div className="max-h-[calc(100vh-210px)] overflow-y-scroll pr-2 scrollbar-hide">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="text-left">URL</TableHead>
-                                        <TableHead className="text-left">Event</TableHead>
-                                        <TableHead className="text-left">Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {isWebhooksLoading ? (
-                                        Array.from({ length: 5 }).map((_, index) => (
-                                            <TableRow key={index}>
-                                                <TableCell colSpan={4}>
-                                                    <Skeleton className="w-full h-8" />
-                                                </TableCell>
+                    <Card className="mt-4">
+                        <CardContent className="p-4">
+                            <div className="rounded-md border">
+                                <div className="max-h-[calc(100vh-210px)] overflow-y-auto pr-2 scrollbar-hide">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="text-left w-1/2 pl-4">
+                                                    <Button variant="ghost" onClick={() => handleSort('url')}>
+                                                        URL
+                                                        {sortColumn === 'url' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="text-left w-1/3 pl-2">
+                                                    <Button variant="ghost" onClick={() => handleSort('event')}>
+                                                        Event
+                                                        {sortColumn === 'event' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="text-center w-1/6">
+                                                    <Button variant="ghost" onClick={() => handleSort('is_active')}>
+                                                        Status
+                                                        {sortColumn === 'is_active' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
                                             </TableRow>
-                                        ))
-                                    ) : webhooks.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4}>
-                                                <div className="py-24 text-center">
-                                                    <div className="flex justify-center mb-6">
-                                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                        </TableHeader>
+                                        <TableBody>
+                                            {isWebhooksLoading ? (
+                                                Array.from({ length: 5 }).map((_, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell colSpan={4}>
+                                                            <Skeleton className="w-full h-8" />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            ) : webhooks.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4}>
+                                                        <div className="py-24 text-center">
+                                                            <div className="flex justify-center mb-6">
+                                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                                </div>
+                                                            </div>
+                                                            <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                No webhooks found
+                                                            </h3>
+                                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                                Try changing your filter or create a new webhook.
+                                                            </p>
                                                         </div>
-                                                    </div>
-                                                    <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                        No webhooks found
-                                                    </h3>
-                                                    <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                                        Try changing your filter or create a new webhook.
-                                                    </p>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        webhooks.map((webhook: Webhook) => (
-                                            <TableRow key={webhook.webhook_id} onClick={() => handleWebhookClick(webhook)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
-                                                <TableCell className="text-left">{webhook.url}</TableCell>
-                                                <TableCell className="text-left">{webhook.event}</TableCell>
-                                                <TableCell className="text-left">
-                                                    <span className={`
-                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
-                                                        ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                                                    `}>
-                                                        {webhook.is_active ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                    </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                sortWebhooks(webhooks).map((webhook: Webhook) => (
+                                                    <TableRow key={webhook.webhook_id} onClick={() => handleWebhookClick(webhook)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                        <TableCell className="text-left pl-4">{webhook.url}</TableCell>
+                                                        <TableCell className="text-left pl-2">{webhook.event}</TableCell>
+                                                        <TableCell className="text-center">
+                                                            <span className={`
+                                                                inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                            `}>
+                                                                {webhook.is_active ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </Layout.Body>
             <WebhookActions webhook={selectedWebhook} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />

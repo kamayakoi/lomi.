@@ -437,7 +437,7 @@ function TransactionsPage() {
                         />
 
                         <Card>
-                            <CardContent className="p-6">
+                            <CardContent className="p-4">
                                 <div className="rounded-md border">
                                     <InfiniteScroll
                                         dataLength={transactions.length}
