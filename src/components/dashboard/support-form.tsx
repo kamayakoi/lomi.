@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { LifeBuoy, ImagePlus, CheckCircle } from "lucide-react"
+import { MessageCircle, ImagePlus, CheckCircle } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
@@ -10,11 +10,9 @@ const categories = [
     { value: 'account', label: 'Account Issues' },
     { value: 'billing', label: 'Billing Questions' },
     { value: 'technical', label: 'Technical Support' },
-    { value: 'feature', label: 'Feature Request' },
     { value: 'other', label: 'Other' },
 ]
 
-// New CustomSelect component
 interface SelectOption {
     value: string
     label: string
@@ -46,7 +44,7 @@ const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
     return (
         <div ref={selectRef} className="relative">
             <div
-                className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 rounded-md cursor-pointer border border-gray-300 dark:border-gray-700 text-sm text-center"
+                className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 rounded-md cursor-pointer border border-gray-300 dark:border-gray-700 text-sm"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {value ? options.find((opt: SelectOption) => opt.value === value)?.label : 'Select a category'}
@@ -147,23 +145,29 @@ export default function SupportForm() {
     }
 
     return (
-        <div className="fixed bottom-4 right-4" ref={formRef}>
-            <Button
-                variant="default"
-                size="icon"
-                onClick={() => setIsOpen(!isOpen)}
-                className="rounded-full h-12 w-12 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+        <div className="fixed bottom-4 right-4 z-50" ref={formRef}>
+            <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
             >
-                <LifeBuoy className="h-6 w-6" />
-            </Button>
+                <Button
+                    variant="default"
+                    size="icon"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                >
+                    <MessageCircle className="h-4 w-4" />
+                </Button>
+            </motion.div>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute bottom-16 right-0 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg z-50"
+                        initial={{ opacity: 0, y: 50, scale: 0.3 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.5 }}
+                        transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
+                        className="absolute bottom-12 right-0 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg overflow-hidden"
+                        style={{ zIndex: 9999 }}
                     >
                         <div className="p-4 space-y-4">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Contact Support</h3>
@@ -195,7 +199,7 @@ export default function SupportForm() {
                                             onChange={(e) => setMessage(e.target.value)}
                                             onDrop={handleDrop}
                                             onDragOver={(e) => e.preventDefault()}
-                                            className="min-h-[100px] text-sm placeholder:text-sm pr-8 bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100"
+                                            className="min-h-[100px] max-h-[200px] text-sm placeholder:text-sm pr-8 bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 resize-y"
                                         />
                                         <Button
                                             variant="ghost"

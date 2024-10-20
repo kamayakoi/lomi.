@@ -514,6 +514,7 @@ COMMENT ON TABLE payouts IS 'Tracks payouts from the system to merchant bank acc
 
 -- API Keys table
 CREATE TABLE api_keys (
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     api_key VARCHAR NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
@@ -525,6 +526,7 @@ CREATE TABLE api_keys (
 );
 
 CREATE INDEX idx_api_keys_organization_id ON api_keys(organization_id);
+CREATE INDEX idx_api_keys_merchant_id ON api_keys(merchant_id);
 CREATE INDEX idx_api_keys_api_key ON api_keys(api_key);
 CREATE INDEX idx_api_keys_is_active ON api_keys(is_active);
 

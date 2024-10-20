@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import { Video } from 'lucide-react'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import SupportForm from '@/components/dashboard/support-form'
-
+import ApiKeysSection from '@/components/dashboard/api-key-panel'
 
 export default function Dashboard() {
   const topNav = [
@@ -94,18 +94,20 @@ export default function Dashboard() {
           <h2 className="text-xl font-semibold mb-6">Developer Resources</h2>
           <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex space-x-6" style={{ minWidth: 'max-content' }}>
+              <ApiKeysSection />
               {developerResources.map((item, index) => (
                 <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block group">
-                  <Card className="w-64 flex-shrink-0 transition-all duration-200 group-hover:scale-105 transform group-hover:z-10 overflow-visible border border-gray-200 dark:border-gray-700">
-                    <CardContent className="pt-6 h-full flex flex-col relative">
-                      <div className="absolute inset-0 rounded-lg transition-colors duration-200 group-hover:bg-gray-100 dark:group-hover:bg-gray-800" />
-                      <div className="relative z-10">
-                        {item.icon}
-                        <h3 className="font-semibold mb-2">{item.title}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">{item.description}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div className="w-64 p-1">
+                    <Card className="h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200 group-hover:bg-gray-100 dark:group-hover:bg-gray-800">
+                      <CardContent className="pt-6 h-full flex flex-col relative">
+                        <div className="relative z-10">
+                          {item.icon}
+                          <h3 className="font-semibold mb-2">{item.title}</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 flex-grow">{item.description}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </a>
               ))}
             </div>
@@ -141,7 +143,7 @@ const developerResources = [
   {
     icon: <FileCode className="h-10 w-10 text-purple-600 dark:text-purple-400 mb-4" />,
     title: "Sample projects",
-    description: "Explore sample projects & apps to kickstart your integration.",
+    description: "Explore sample projects to kickstart your integration.",
     link: "https://github.com/lomiafrica"
   },
   {

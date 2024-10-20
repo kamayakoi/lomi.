@@ -21,6 +21,7 @@ import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import SupportForm from '@/components/dashboard/support-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 
@@ -643,6 +644,7 @@ function TransactionsPage() {
                         </Card>
                     </div>
                 </div>
+                <SupportForm />
             </Layout.Body>
             <TransactionActions
                 transaction={selectedTransaction}

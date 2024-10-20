@@ -99,10 +99,15 @@ export default function FeedbackForm() {
                                     ))}
                                 </div>
                                 <div className="flex space-x-2">
-                                    <Button variant="outline" size="icon" onClick={handleClear} title="Clear text">
+                                    <Button variant="outline" size="default" onClick={handleClear} title="Clear text" className="px-3">
                                         <Eraser className="h-4 w-4" />
                                     </Button>
-                                    <Button onClick={handleSubmit} size="sm">Submit</Button>
+                                    <Button
+                                        onClick={handleSubmit}
+                                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                        Submit
+                                    </Button>
                                 </div>
                             </div>
                         </div>

@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/actions/utils'
 import { ChartBarSquareIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import SupportForm from '@/components/dashboard/support-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 const topNav = [
@@ -132,6 +133,8 @@ function ReportingPage() {
                         </div>
                     </div>
                 </div>
+
+                <SupportForm />
             </Layout.Body>
         </Layout>
     )

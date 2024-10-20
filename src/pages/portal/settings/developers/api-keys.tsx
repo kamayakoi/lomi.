@@ -1,29 +1,122 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { CopyIcon, PlusCircleIcon } from 'lucide-react'
+import { CopyIcon, PlusCircleIcon, TrashIcon } from 'lucide-react'
 import ContentSection from '@/components/dashboard/content-section'
+import { supabase } from '@/utils/supabase/client'
+import { useUser } from '@/lib/hooks/useUser'
 
-type SecretKey = {
+type ApiKey = {
     name: string;
-    permissions: string;
-    created: string;
-    lastUsed: string;
+    api_key: string;
+    is_active: boolean;
+    created_at: string;
 }
 
 export default function ApiKeys() {
-    const [secretKeys, setSecretKeys] = useState<SecretKey[]>([])
-    const [publicKey] = useState("lomi_public_development_89G1GynFXftTY9")
+    const { user } = useUser()
+    const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
     const [isGeneratingKey, setIsGeneratingKey] = useState(false)
     const [newKeyName, setNewKeyName] = useState("")
+    const [organizationId, setOrganizationId] = useState<string | null>(null)
 
-    const handleGenerateKey = () => {
-        setIsGeneratingKey(false)
-        setSecretKeys([...secretKeys, { name: newKeyName, permissions: "All", created: new Date().toISOString(), lastUsed: "-" }])
-        setNewKeyName("")
+    const fetchOrganizationDetails = useCallback(async () => {
+        const { data, error } = await supabase
+            .rpc('fetch_organization_details', { p_merchant_id: user?.id })
+
+        if (error) {
+            console.error('Error fetching organization details:', error)
+        } else if (Array.isArray(data) && data[0]) {
+            setOrganizationId(data[0].organization_id)
+        }
+    }, [user?.id])
+
+    const fetchApiKeys = useCallback(async () => {
+        if (!organizationId) return
+
+        const { data, error } = await supabase.rpc('fetch_api_keys', {
+            p_organization_id: organizationId,
+        })
+
+        if (error) {
+            console.error('Error fetching API keys:', error)
+        } else if (Array.isArray(data)) {
+            setApiKeys(data)
+        }
+    }, [organizationId])
+
+    useEffect(() => {
+        if (user?.id) {
+            fetchOrganizationDetails()
+        }
+    }, [user?.id, fetchOrganizationDetails])
+
+    useEffect(() => {
+        if (organizationId) {
+            fetchApiKeys()
+        }
+    }, [organizationId, fetchApiKeys])
+
+    const handleGenerateKey = async () => {
+        if (apiKeys.length >= 3) {
+            alert('You can only have a maximum of 3 API keys.')
+            return
+        }
+
+        try {
+            const { data, error } = await supabase.rpc('generate_api_key', {
+                p_merchant_id: user?.id,
+                p_organization_id: organizationId,
+                p_name: newKeyName,
+                p_expiration_date: null,
+            })
+
+            if (error) {
+                console.error('Error generating API key:', error)
+            } else if (Array.isArray(data) && data[0] && data[0].api_key) {
+                setApiKeys([...apiKeys, {
+                    name: newKeyName,
+                    api_key: data[0].api_key,
+                    is_active: true,
+                    created_at: new Date().toISOString(),
+                }])
+                setNewKeyName('')
+            }
+        } catch (error) {
+            console.error('Error generating API key:', error)
+        }
+    }
+
+    const handleDeleteKey = async (apiKey: string) => {
+        const confirmed = window.confirm('Are you sure you want to delete this API key?')
+
+        if (confirmed) {
+            const { error } = await supabase.rpc('delete_api_key', {
+                p_api_key: apiKey,
+            })
+
+            if (error) {
+                console.error('Error deleting API key:', error)
+            } else {
+                setApiKeys(apiKeys.filter(key => key.api_key !== apiKey))
+            }
+        }
+    }
+
+    const handleToggleKeyStatus = async (apiKey: string, isActive: boolean) => {
+        const { error } = await supabase.rpc('update_api_key_status', {
+            p_api_key: apiKey,
+            p_is_active: !isActive,
+        })
+
+        if (error) {
+            console.error('Error updating API key status:', error)
+        } else {
+            setApiKeys(apiKeys.map(key => key.api_key === apiKey ? { ...key, is_active: !isActive } : key))
+        }
     }
 
     const copyToClipboard = (text: string) => {
@@ -51,28 +144,48 @@ export default function ApiKeys() {
                     <div>
                         <h2 className="text-2xl font-semibold mb-2">Secret Keys</h2>
                         <p className="text-muted-foreground mb-4">Secret keys are used to authenticate API requests coming from your servers.</p>
-                        {secretKeys.length > 0 ? (
+                        {apiKeys.length > 0 ? (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Key name</TableHead>
-                                        <TableHead>Permissions</TableHead>
+                                        <TableHead>Status</TableHead>
                                         <TableHead>Created</TableHead>
-                                        <TableHead>Last Used</TableHead>
                                         <TableHead>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {secretKeys.map((key, index) => (
+                                    {apiKeys.map((key, index) => (
                                         <TableRow key={index}>
                                             <TableCell>{key.name}</TableCell>
-                                            <TableCell>{key.permissions}</TableCell>
-                                            <TableCell>{new Date(key.created).toLocaleString()}</TableCell>
-                                            <TableCell>{key.lastUsed}</TableCell>
                                             <TableCell>
-                                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(key.name)}>
+                                                <Button
+                                                    variant={key.is_active ? 'secondary' : 'ghost'}
+                                                    size="sm"
+                                                    onClick={() => handleToggleKeyStatus(key.api_key, key.is_active)}
+                                                >
+                                                    {key.is_active ? 'Active' : 'Inactive'}
+                                                </Button>
+                                            </TableCell>
+                                            <TableCell>
+                                                {new Date(key.created_at).toLocaleString()}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => copyToClipboard(key.api_key)}
+                                                >
                                                     <CopyIcon className="h-4 w-4 mr-2" />
                                                     Copy
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteKey(key.api_key)}
+                                                >
+                                                    <TrashIcon className="h-4 w-4 mr-2" />
+                                                    Delete
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -84,7 +197,7 @@ export default function ApiKeys() {
                         )}
                         <Dialog open={isGeneratingKey} onOpenChange={setIsGeneratingKey}>
                             <DialogTrigger asChild>
-                                <Button className="mt-4">
+                                <Button className="mt-4" disabled={apiKeys.length >= 3}>
                                     <PlusCircleIcon className="h-4 w-4 mr-2" />
                                     Generate secret key
                                 </Button>
@@ -93,7 +206,7 @@ export default function ApiKeys() {
                                 <DialogHeader>
                                     <DialogTitle>Generate New Secret Key</DialogTitle>
                                     <DialogDescription>
-                                        Enter a name for your new secret key. This key will have full permissions.
+                                        Enter a name for your new secret key.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
@@ -114,18 +227,6 @@ export default function ApiKeys() {
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
-                    </div>
-
-                    <div>
-                        <h2 className="text-2xl font-semibold mb-2">Public Key</h2>
-                        <p className="text-muted-foreground mb-4">Public keys are only used to tokenize card information on the client side.</p>
-                        <div className="flex items-center space-x-2">
-                            <Input value={publicKey} readOnly />
-                            <Button variant="outline" onClick={() => copyToClipboard(publicKey)}>
-                                <CopyIcon className="h-4 w-4 mr-2" />
-                                Copy
-                            </Button>
-                        </div>
                     </div>
                 </div>
             </ContentSection>

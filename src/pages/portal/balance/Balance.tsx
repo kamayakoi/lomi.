@@ -28,6 +28,7 @@ import { Loader2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
+import SupportForm from '@/components/dashboard/support-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 function BalancePage() {
@@ -507,6 +508,7 @@ function BalancePage() {
                         </Card>
                     </div>
                 </div>
+                <SupportForm />
             </Layout.Body>
 
             <PayoutActions payout={selectedPayout} isOpen={!!selectedPayout} onClose={() => setSelectedPayout(null)} />
