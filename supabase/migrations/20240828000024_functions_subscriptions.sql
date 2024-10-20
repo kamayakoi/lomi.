@@ -215,7 +215,7 @@ BEGIN
         billing_frequency = p_billing_frequency,
         amount = p_amount,
         failed_payment_action = p_failed_payment_action,
-        charge_day = p_charge_day,
+        charge_day = COALESCE(p_charge_day, charge_day),
         metadata = p_metadata,
         updated_at = NOW()
     WHERE plan_id = p_plan_id;

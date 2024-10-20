@@ -15,9 +15,7 @@ export const fetchTransactions = async (customerId: string) => {
 
 export const fetchCustomer = async (customerId: string) => {
     const { data, error } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('customer_id', customerId)
+        .rpc('fetch_customer', { p_customer_id: customerId })
         .single()
 
     if (error) {

@@ -144,3 +144,38 @@ BEGIN
     WHERE customer_id = p_customer_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch a specific customer
+CREATE OR REPLACE FUNCTION public.fetch_customer(
+    p_customer_id UUID
+)
+RETURNS TABLE (
+    customer_id UUID,
+    name VARCHAR,
+    email VARCHAR,
+    phone_number VARCHAR,
+    country VARCHAR,
+    city VARCHAR,
+    address VARCHAR,
+    postal_code VARCHAR,
+    is_business BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.customer_id,
+        c.name,
+        c.email,
+        c.phone_number,
+        c.country,
+        c.city,
+        c.address,
+        c.postal_code,
+        c.is_business
+    FROM
+        customers c
+    WHERE
+        c.customer_id = p_customer_id
+        AND c.is_deleted = false;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

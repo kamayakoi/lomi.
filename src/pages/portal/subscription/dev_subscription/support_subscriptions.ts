@@ -126,10 +126,10 @@ export const updateSubscriptionPlan = async (data: UpdateSubscriptionPlanData) =
     p_name: data.name,
     p_description: data.description,
     p_billing_frequency: data.billingFrequency,
-    p_amount: data.amount,
+    p_amount: data.amount.toString(),
+    p_charge_day: data.chargeDay ?? null,
     p_failed_payment_action: data.failedPaymentAction,
-    p_charge_day: data.chargeDay,
-    p_metadata: data.metadata,
+    p_metadata: JSON.stringify(data.metadata),
   })
 
   if (error) {
