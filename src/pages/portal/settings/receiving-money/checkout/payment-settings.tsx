@@ -3,19 +3,11 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export function PaymentSettings() {
     const [defaultLanguage, setDefaultLanguage] = useState('en')
     const [displayCurrency, setDisplayCurrency] = useState('USD')
     const [paymentLinkDuration, setPaymentLinkDuration] = useState(1)
-    const [paymentMethods, setPaymentMethods] = useState({
-        creditCard: true,
-        debitCard: true,
-        paypal: false,
-        applePay: false,
-        googlePay: false,
-    })
 
     return (
         <div className="space-y-6">
@@ -30,7 +22,6 @@ export function PaymentSettings() {
                         <SelectContent>
                             <SelectItem value="en">English</SelectItem>
                             <SelectItem value="fr">French</SelectItem>
-                            <SelectItem value="es">Spanish</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -41,9 +32,9 @@ export function PaymentSettings() {
                             <SelectValue placeholder="Select currency" />
                         </SelectTrigger>
                         <SelectContent>
+                            <SelectItem value="XOF">XOF</SelectItem>
                             <SelectItem value="USD">USD</SelectItem>
                             <SelectItem value="EUR">EUR</SelectItem>
-                            <SelectItem value="GBP">GBP</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -56,23 +47,6 @@ export function PaymentSettings() {
                         onChange={(e) => setPaymentLinkDuration(Number(e.target.value))}
                         min={1}
                     />
-                </div>
-                <div>
-                    <Label>Payment Methods</Label>
-                    <div className="space-y-2">
-                        {Object.entries(paymentMethods).map(([method, enabled]) => (
-                            <div key={method} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={method}
-                                    checked={enabled}
-                                    onCheckedChange={(checked) =>
-                                        setPaymentMethods((prev) => ({ ...prev, [method]: checked }))
-                                    }
-                                />
-                                <Label htmlFor={method}>{method.replace(/([A-Z])/g, ' $1').trim()}</Label>
-                            </div>
-                        ))}
-                    </div>
                 </div>
             </div>
             <Button>Save Changes</Button>

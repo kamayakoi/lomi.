@@ -75,7 +75,6 @@ import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
 import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
-import PhoneNumbers from './pages/portal/settings/withdrawals/phone-numbers.tsx';
 import Activation from './pages/auth/activation/activation';
 import Status from './pages/Status.tsx';
 
@@ -146,7 +145,6 @@ const AppRouter = () => (
                         <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
                         <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
                         <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
-                        <Route path="withdrawals/phone-numbers" element={<PhoneNumbers />} />
                     </Route>
                     <Route path="activation" element={
                         <ActivationRoute>

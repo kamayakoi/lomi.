@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { PlusCircle, Trash2, X } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Textarea } from "@/components/ui/textarea"
+import ContentSection from '@/components/dashboard/content-section'
 
 type IpAddress = {
     address: string;
@@ -37,16 +37,24 @@ export default function IpAllowlist() {
     }
 
     return (
-        <div className="container mx-auto p-6 space-y-8">
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <CardTitle>IP Allowlist</CardTitle>
-                            <CardDescription>
-                                Secure API access against foreign or malicious IPs by allowing only specific IP addresses of your choice to access APIs via IP Allowlist.
-                            </CardDescription>
-                        </div>
+        <div style={{
+            overflowY: 'auto',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+            <ContentSection
+                title="IP Allowlist"
+                desc="Secure API access against foreign or malicious IPs by allowing only specific IP addresses of your choice to access APIs via IP Allowlist."
+            >
+                <div className="space-y-6">
+                    <div className="flex justify-end">
                         <Dialog open={isAddingIp} onOpenChange={setIsAddingIp}>
                             <DialogTrigger asChild>
                                 <Button>
@@ -90,9 +98,7 @@ export default function IpAllowlist() {
                             </DialogContent>
                         </Dialog>
                     </div>
-                </CardHeader>
-                <CardContent>
-                    <Alert variant="info" className="mb-6">
+                    <Alert variant="info">
                         <AlertTitle>Important</AlertTitle>
                         <AlertDescription>
                             The IP Allowlist only works for API users through direct integration and will not work for Plugin users (Shopify, Woocommerce, etc). Learn more about IP Allowlist <a href="#" className="underline">here</a>.
@@ -129,8 +135,8 @@ export default function IpAllowlist() {
                             <p className="text-muted-foreground">Click &apos;Add IP Address / CIDR&apos; to start adding your server IPs to allowlist</p>
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            </ContentSection>
         </div>
     )
 }

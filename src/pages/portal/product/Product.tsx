@@ -28,6 +28,7 @@ import { EditProductForm } from './dev_product/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
+import { Edit } from 'lucide-react'
 
 function ProductsPage() {
     const { user } = useUser()
@@ -174,7 +175,7 @@ function ProductsPage() {
                                                     )}
                                                 </Button>
                                             </TableHead>
-                                            <TableHead className="text-center">Actions</TableHead>
+                                            <TableHead className="text-center"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -220,11 +221,16 @@ function ProductsPage() {
                                                         </span>
                                                     </TableCell>
                                                     <TableCell className="text-center">
-                                                        <Button variant="ghost" size="sm" onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            handleEditClick(product)
-                                                        }}>
-                                                            Edit
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleEditClick(product)
+                                                            }}
+                                                            className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                        >
+                                                            <Edit className="h-4 w-4 text-blue-500" />
                                                         </Button>
                                                     </TableCell>
                                                 </TableRow>

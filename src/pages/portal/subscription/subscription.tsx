@@ -20,7 +20,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle } from 'lucide-react'
+import { PlusCircle, Edit } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
 import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
@@ -178,7 +178,7 @@ function SubscriptionsPage() {
                           <TableHead className="text-center">Name</TableHead>
                           <TableHead className="text-center">Description</TableHead>
                           <TableHead className="text-center">Frequency</TableHead>
-                          <TableHead className="text-center">Actions</TableHead>
+                          <TableHead className="text-center"></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -218,7 +218,7 @@ function SubscriptionsPage() {
                               </TableCell>
                               <TableCell className="text-center">
                                 <Button variant="ghost" size="sm" onClick={() => handlePlanClick(plan)}>
-                                  Edit
+                                  <Edit className="h-4 w-4 text-blue-500" />
                                 </Button>
                               </TableCell>
                             </TableRow>
@@ -249,21 +249,20 @@ function SubscriptionsPage() {
                           <TableHead className="text-center">Plan</TableHead>
                           <TableHead className="text-center">Amount</TableHead>
                           <TableHead className="text-center">Status</TableHead>
-                          <TableHead className="text-center">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {isSubscriptionsLoading ? (
                           Array.from({ length: 5 }).map((_, index) => (
                             <TableRow key={index}>
-                              <TableCell colSpan={5}>
+                              <TableCell colSpan={4}>
                                 <Skeleton className="w-full h-8" />
                               </TableCell>
                             </TableRow>
                           ))
                         ) : subscriptions.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={5} className="text-center py-8">
+                            <TableCell colSpan={4} className="text-center py-8">
                               <div className="flex flex-col items-center justify-center space-y-4">
                                 <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                                   <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
@@ -296,11 +295,6 @@ function SubscriptionsPage() {
                                 `}>
                                   {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                                 </span>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <Button variant="ghost" size="sm">
-                                  View
-                                </Button>
                               </TableCell>
                             </TableRow>
                           ))

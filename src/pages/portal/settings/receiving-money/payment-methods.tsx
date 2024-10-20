@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import ContentSection from '../../../../components/dashboard/content-section'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Mock data based on the SQL seed
 const paymentMethods = [
     { channel: 'Credit Card', type: 'Card', provider: 'Stripe' },
     { channel: 'Debit Card', type: 'Card', provider: 'Stripe' },
@@ -33,16 +32,10 @@ export default function PaymentMethods() {
             title="Payment Methods"
             desc="Activate and configure bank transfers, cards, e-wallets and other payment methods"
         >
-            <div className="space-y-6">
+            <div className="space-y-6 mt-4">
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Payment Methods</CardTitle>
-                        <CardDescription>
-                            Allow your customers to pay with more payment methods. Please reach out to hello@lomi.africa if you would like to enable additional channels.
-                        </CardDescription>
-                    </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex justify-between items-center mb-4 mt-4">
                             <Select value={filter} onValueChange={setFilter}>
                                 <SelectTrigger className="w-[180px]">
                                     <SelectValue placeholder="Filter" />
