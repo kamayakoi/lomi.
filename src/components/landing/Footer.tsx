@@ -4,17 +4,17 @@ import { faGithub, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-ic
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useTheme } from '@/lib/hooks/useTheme';
 
 export const Footer = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n, changeLanguage } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
   const { theme, setTheme } = useTheme();
 
   const toggleLanguage = () => {
     const newLanguage = currentLanguage === 'en' ? 'fr' : 'en';
-    i18n.changeLanguage(newLanguage);
+    changeLanguage(newLanguage);
     setCurrentLanguage(newLanguage);
   };
 

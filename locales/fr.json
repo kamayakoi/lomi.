@@ -90,7 +90,7 @@
     "atLaunch": "",
     "description": "Notre plateforme offre une expérience client sans friction pour collecter paiements et abonnements.",
     "hero": {
-      "title": "Des paiements sans friction pour les entreprises et entrepreneurs",
+      "title": "Des paiements sans friction pour les entreprises",
       "description": "Activez paiements en ligne et facturation en quelques minutes.\nAcceptez les paiements par mobile money, cartes bancaires et e-wallets avec des options d'intégration API, low-code ou no-code.",
       "start": "Get started",
       "inMinutes": "— in minutes"
@@ -98,7 +98,7 @@
     "integrations": {
       "title": "Nos partnaires",
       "description": "lomi. est intégrée avec une variété de moyens de paiement pour soutenir vos clients là où ils se trouvent.",
-      "comingSoon": "Plus d'intégrations à venir..."
+      "comingSoon": "Plus d'intégrations coming soon..."
     }
   },
 

@@ -3,6 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import en from '../locales/en.json';
 import fr from '../locales/fr.json';
 
+const defaultLanguage = 'en';
+
 i18n
   .use(initReactI18next)
   .init({
@@ -10,8 +12,8 @@ i18n
       en: { translation: en },
       fr: { translation: fr },
     },
-    lng: 'en',
-    fallbackLng: 'en',
+    lng: localStorage.getItem('language') || navigator.language.split('-')[0] || defaultLanguage,
+    fallbackLng: defaultLanguage,
     interpolation: {
       escapeValue: false,
     },
