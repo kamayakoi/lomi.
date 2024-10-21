@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import PulsatingButton from '@/components/ui/pulsating-button';
 import AvatarCircles from "@/components/ui/avatar-circles";
+import { useTranslation } from 'react-i18next';
 
 // Image import
 import africanledger from "/africanledger_round.png";
@@ -12,6 +13,7 @@ import testimony3 from "/testimony3.png";
 
 export const Hero = () => {
   const [isFormOpen, setIsFormOpen] = useState(false); // State to manage modal visibility
+  const { t } = useTranslation();
 
   return (
     <section className="container grid lg:grid-cols-2 place-items-center py-20 md:py-32 gap-10">
@@ -19,18 +21,17 @@ export const Hero = () => {
         <main className="text-5xl md:text-6xl font-bold text-center lg:text-left mb-6">
           <h1>
             <span className="bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
-              One integration
+              {t('hero.oneIntegration')}
             </span>{" "}
-            for all your{" "}
+            {t('hero.forAllYour')}{" "}
             <span className="bg-gradient-to-r from-[#61DAFB] to-[#2563EB] text-transparent bg-clip-text">
-              payment needs.
+              {t('hero.paymentNeeds')}
             </span>
           </h1>
         </main>
 
         <p className="text-xl md:text-2xl text-muted-foreground text-center lg:text-left mb-8">
-          We offer an easy-to-use API & financial gateway that connects with banks and networks across West
-          Africa — making it simple for your business to handle transactions and scale faster.
+          {t('hero.description')}
         </p>
 
         <div className="flex flex-col md:flex-row justify-center lg:justify-start space-y-4 md:space-y-0 md:space-x-4 mb-8">
@@ -38,7 +39,7 @@ export const Hero = () => {
             className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7"
             onClick={() => setIsFormOpen(true)}
           >
-            Learn more
+            {t('hero.learnMore')}
           </Button>
 
           <Link to="/sign-in" className="w-full md:w-1/2 lg:w-1/5 mt-4 md:mt-0">
@@ -46,7 +47,7 @@ export const Hero = () => {
               className="w-full text-2xl px-20 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
               pulseColor="#2563EB"
             >
-              <span className="font-bold text-white">Connect</span>
+              <span className="font-bold text-white">{t('hero.connect')}</span>
             </PulsatingButton>
           </Link>
         </div>
@@ -61,7 +62,7 @@ export const Hero = () => {
             numPeople={12}
           />
           <span className="text-sm md:text-base text-muted-foreground ml-4">
-            Loved by dozens of businesses and entrepreneurs.
+            {t('hero.lovedByBusinesses')}
           </span>
         </div>
         <div className="h-12 md:hidden"></div> {/* Add space only for mobile devices */}

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/actions/utils";
 import { AnimatedList } from "@/components/ui/animated-list";
+import { useTranslation } from 'react-i18next';
 
 interface Item {
     name: string;
@@ -9,51 +10,6 @@ interface Item {
     time: string;
     amount?: string;
 }
-
-let notifications = [
-    {
-        name: "Payment received",
-        description: "ashantishoes.com",
-        time: "12m ago",
-        icon: "💸",
-        color: "#00A0FF",
-        amount: "33,000 XOF",
-    },
-    {
-        name: "New monthly subscriber",
-        description: "The African Ledger",
-        time: "10m ago",
-        icon: "🎉",
-        color: "#FFB800",
-        amount: "7,500 XOF",
-    },
-    {
-        name: "Payout processed",
-        description: "ashantishoes.com",
-        time: "42m ago",
-        icon: "🏦",
-        color: "#A7F3D0",
-        amount: "88,745 XOF",
-    },
-    {
-        name: "Payment received",
-        description: "ashantishoes.com",
-        time: "5m ago",
-        icon: "💸",
-        color: "#00A0FF",
-        amount: "53,500 XOF",
-    },
-    {
-        name: "Payout processed",
-        description: "The African Ledger",
-        time: "42m ago",
-        icon: "🏦",
-        color: "#A7F3D0",
-        amount: "250,000 XOF",
-    },
-];
-
-notifications = Array.from({ length: 10 }, () => notifications).flat();
 
 const Notification = ({ name, description, icon, color, time, amount }: Item) => {
     return (
@@ -81,7 +37,7 @@ const Notification = ({ name, description, icon, color, time, amount }: Item) =>
                     <figcaption className="flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white">
                         <span className="truncate text-sm sm:text-lg">{name}</span>
                         <span className="mx-1">·</span>
-                        <span className="text-xs text-gray-500">{time}</span>
+                        <span className="text-xs text-gray-500 mt-1">{time}</span>
                     </figcaption>
                     <div className="flex items-center justify-between">
                         <p className="truncate text-sm font-normal dark:text-white/60">
@@ -100,6 +56,53 @@ const Notification = ({ name, description, icon, color, time, amount }: Item) =>
 };
 
 export function AnimatedListDemo({ className }: { className?: string }) {
+    const { t } = useTranslation();
+
+    let notifications = [
+        {
+            name: t('animatedList.paymentReceived'),
+            description: "ashantishoes.com",
+            time: t('animatedList.minutesAgo', { minutes: 12 }),
+            icon: "💸",
+            color: "#00A0FF",
+            amount: "33,000 XOF",
+        },
+        {
+            name: t('animatedList.newMonthlySubscriber'),
+            description: "The African Ledger",
+            time: t('animatedList.minutesAgo', { minutes: 10 }),
+            icon: "🎉",
+            color: "#FFB800",
+            amount: "7,500 XOF",
+        },
+        {
+            name: t('animatedList.payoutProcessed'),
+            description: "ashantishoes.com",
+            time: t('animatedList.minutesAgo', { minutes: 42 }),
+            icon: "🏦",
+            color: "#A7F3D0",
+            amount: "88,745 XOF",
+        },
+        {
+            name: t('animatedList.paymentReceived'),
+            description: "ashantishoes.com",
+            time: t('animatedList.minutesAgo', { minutes: 5 }),
+            icon: "💸",
+            color: "#00A0FF",
+            amount: "53,500 XOF",
+        },
+        {
+            name: t('animatedList.payoutProcessed'),
+            description: "The African Ledger",
+            time: t('animatedList.minutesAgo', { minutes: 42 }),
+            icon: "🏦",
+            color: "#A7F3D0",
+            amount: "250,000 XOF",
+        },
+    ];
+
+    notifications = Array.from({ length: 10 }, () => notifications).flat();
+
     return (
         <div
             className={cn(

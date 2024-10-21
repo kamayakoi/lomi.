@@ -16,6 +16,7 @@ import { buttonVariants } from '@/lib/actions/button-utils';
 import { Menu } from "lucide-react";
 import { LogoIcon } from "./Icons";
 import { Dock } from "@/components/ui/dock";
+import { useTranslation } from 'react-i18next';
 
 import "@/lib/styles/Navbar.css";
 
@@ -46,6 +47,7 @@ const routeList: RouteProps[] = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   return (
     <Dock>
@@ -93,7 +95,7 @@ export const Navbar = () => {
                         onClick={() => setIsOpen(false)}
                         className={`text-lg ${buttonVariants({ variant: "ghost" })}`}
                       >
-                        {label}
+                        {t(`navbar.${label}`)}
                       </a>
                     ))}
                     <button
@@ -104,7 +106,7 @@ export const Navbar = () => {
                       className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })}`}
                       style={{ padding: '0.75rem 1rem' }}
                     >
-                      Contact sales
+                      {t('navbar.contactSales')}
                     </button>
                   </nav>
                 </SheetContent>
@@ -123,7 +125,7 @@ export const Navbar = () => {
                   })}`}
                   style={{ fontSize: '1.06rem' }}
                 >
-                  {route.label}
+                  {t(`navbar.${route.label}`)}
                 </a>
               ))}
               <div className="navbar-contact-sales">
@@ -132,7 +134,7 @@ export const Navbar = () => {
                   className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })}`}
                   style={{ fontSize: '1.06rem', padding: '0.75rem 1rem' }}
                 >
-                  Contact sales
+                  {t('navbar.contactSales')}
                 </button>
               </div>
             </nav>

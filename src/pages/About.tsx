@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Footer } from '../components/landing/Footer';
 
 const About = () => {
     const { setTheme } = useTheme();
+    const { t } = useTranslation();
 
     useEffect(() => {
         setTheme('light');
@@ -13,7 +16,7 @@ const About = () => {
 
     return (
         <div className="relative w-full min-h-screen bg-background overflow-hidden">
-            <div className="bg-gray-900 min-h-screen pb-20"> {/* Added padding-bottom */}
+            <div className="bg-gray-900 min-h-screen pb-20">
                 <NavbarAbout />
                 <div className="h-(-10)"></div>
 
@@ -30,7 +33,7 @@ const About = () => {
                     {/* Hero Section */}
                     <section className="w-full h-[1100px] flex flex-col justify-center items-center px-4 md:px-6">
                         <p className="text-5xl tracking-tighter sm:text-6xl md:text-6xl lg:text-5xl text-center text-white mt-[-295px] mx-auto max-w-6xl font-bold">
-                            Our mission is to make online payments simple, secure, and accessible for businesses across West Africa.
+                            {t('about.mission')}
                         </p>
                     </section>
 
@@ -38,15 +41,15 @@ const About = () => {
                     <section className="w-full py-12 md:py-24 lg:py-32">
                         <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
                             <div className="space-y-4">
-                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">Our story</h2>
+                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">{t('about.ourStory')}</h2>
                                 <p className="text-white dark:text-white md:text-xl">
-                                    Founded in 2024, lomi. emerged to address the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.
+                                    {t('about.storyParagraph1')}
                                 </p>
                                 <p className="text-white dark:text-white md:text-xl">
-                                    Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. The payment providers are ever-increasing, and companies don&apos;t necessarly have the tools to orchestrate them effectively.
+                                    {t('about.storyParagraph2')}
                                 </p>
                                 <p className="text-white dark:text-white md:text-xl">
-                                    We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use the most.
+                                    {t('about.storyParagraph3')}
                                 </p>
                                 {/* Get Started Button */}
                                 <div className="flex justify-center lg:justify-start">
@@ -55,7 +58,7 @@ const About = () => {
                                             className="text-xl mt-4 px-6 py-3 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-800 transition-colors duration-300"
                                             pulseColor="#ff4d4d"
                                         >
-                                            Get started
+                                            {t('about.getStarted')}
                                         </PulsatingButton>
                                     </Link>
                                 </div>
@@ -63,43 +66,47 @@ const About = () => {
 
                             {/* Our Values Section */}
                             <div className="space-y-4 mt-12 lg:mt-0 lg:ml-28">
-                                <h2 className="text-4xl text-justify font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">Our values</h2>
+                                <h2 className="text-4xl text-justify font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">{t('about.ourValues')}</h2>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
-                                        Innovation
+                                        {t('about.innovation')}
                                     </h3>
                                     <p className="text-white mt-1">
-                                        Constantly evolving to exceed our clients and partners expectations.
+                                        {t('about.innovationDescription')}
                                     </p>
                                 </div>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
-                                        Customer obsession
+                                        {t('about.customerObsession')}
                                     </h3>
                                     <p className="text-white mt-1">
-                                        Delivering unparalleled service and great support.
+                                        {t('about.customerObsessionDescription')}
                                     </p>
                                 </div>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
-                                        Integrity
+                                        {t('about.integrity')}
                                     </h3>
                                     <p className="text-white mt-1">
-                                        Upholding trust and transparency in every interaction.
+                                        {t('about.integrityDescription')}
                                     </p>
                                 </div>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
-                                        Speed
+                                        {t('about.speed')}
                                     </h3>
                                     <p className="text-white mt-1">
-                                        Delivering fast results with a focus on merchant-centered metrics.
+                                        {t('about.speedDescription')}
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </section>
                 </div>
+            </div>
+            {/* Increase the z-index of the Footer */}
+            <div className="relative z-20">
+                <Footer />
             </div>
         </div>
     );

@@ -1,10 +1,10 @@
 import { MagicCard } from "../ui/magic-card";
 import { MedalIcon, MapIcon, PlaneIcon, ShieldIcon } from "./Icons";
+import { useTranslation } from 'react-i18next';
 
 interface ProductProps {
   icon: JSX.Element;
   title: string;
-  description: string;
 }
 
 const products: ProductProps[] = [
@@ -15,7 +15,6 @@ const products: ProductProps[] = [
       </div>
     ),
     title: "Accessibility",
-    description: "Easily integrate our API to start accepting payments from multiple channels.",
   },
   {
     icon: (
@@ -24,7 +23,6 @@ const products: ProductProps[] = [
       </div>
     ),
     title: "Support",
-    description: "Our resources and support can help make integration quick and straightforward.",
   },
   {
     icon: (
@@ -33,7 +31,6 @@ const products: ProductProps[] = [
       </div>
     ),
     title: "Scalability",
-    description: "Our platform is built to scale with your business, ensuring fast processing regardless of volume.",
   },
   {
     icon: (
@@ -42,29 +39,30 @@ const products: ProductProps[] = [
       </div>
     ),
     title: "Security",
-    description: "Advanced security features to protect your funds and customer data at all times.",
   },
 ];
 
 export const HowItWorks = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
       <h3 className="text-sm font-semibold tracking-wide uppercase mb-4" style={{ color: '#D247BF' }}>
-        Key Benefits
+        {t('howItWorks.keyBenefits')}
       </h3>
 
       <h2 className="text-3xl md:text-4xl font-bold">
-        Why choose {" "}
+        {t('howItWorks.whyChooseUs')}{" "}
         <span className="inline text-gray-900 dark:text-gray-100">
-          us ?{" "}
+          {t('howItWorks.us')}{" "}
         </span>
       </h2>
       <p className="md:w-3/4 mx-auto mt-4 mb-8 text-2xl text-muted-foreground">
-        Accept online payments and offer your clients flexibility through our seamless checkout experience and payment methods integrations
+        {t('howItWorks.description')}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {products.map(({ icon, title, description }: ProductProps) => (
+        {products.map(({ icon, title }: ProductProps) => (
           <MagicCard
             key={title}
             className="p-6"
@@ -73,9 +71,9 @@ export const HowItWorks = () => {
           >
             <div className="grid gap-4 place-items-center">
               {icon}
-              <h3 className="text-xl font-semibold">{title}</h3>
+              <h3 className="text-xl font-semibold">{t(`howItWorks.products.${title}.title`)}</h3>
             </div>
-            <p className="mt-4 text-lg">{description}</p>
+            <p className="mt-4 text-lg">{t(`howItWorks.products.${title}.description`)}</p>
           </MagicCard>
         ))}
       </div>
