@@ -1,22 +1,15 @@
 import { NavbarAbout } from '../components/landing/Navbar-About';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
-import { useTheme } from '@/lib/hooks/useTheme';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Footer } from '../components/landing/Footer';
+import { FooterAbout } from '../components/landing/Footer-About';
 
 const About = () => {
-    const { setTheme } = useTheme();
     const { t } = useTranslation();
 
-    useEffect(() => {
-        setTheme('light');
-    }, [setTheme]);
-
     return (
-        <div className="relative w-full min-h-screen bg-background overflow-hidden">
-            <div className="bg-gray-900 min-h-screen pb-20">
+        <div className="relative w-full min-h-screen bg-gray-900 overflow-hidden">
+            <div className="min-h-screen pb-20">
                 <NavbarAbout />
                 <div className="h-(-10)"></div>
 
@@ -41,21 +34,21 @@ const About = () => {
                     <section className="w-full py-12 md:py-24 lg:py-32">
                         <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
                             <div className="space-y-4">
-                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">{t('about.ourStory')}</h2>
-                                <p className="text-white dark:text-white md:text-xl">
+                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white">{t('about.ourStory')}</h2>
+                                <p className="text-gray-300 md:text-xl">
                                     {t('about.storyParagraph1')}
                                 </p>
-                                <p className="text-white dark:text-white md:text-xl">
+                                <p className="text-gray-300 md:text-xl">
                                     {t('about.storyParagraph2')}
                                 </p>
-                                <p className="text-white dark:text-white md:text-xl">
+                                <p className="text-gray-300 md:text-xl">
                                     {t('about.storyParagraph3')}
                                 </p>
                                 {/* Get Started Button */}
                                 <div className="flex justify-center lg:justify-start">
                                     <Link to="/integrations">
                                         <PulsatingButton
-                                            className="text-xl mt-4 px-6 py-3 bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-800 transition-colors duration-300"
+                                            className="text-xl mt-4 px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition-colors duration-300"
                                             pulseColor="#ff4d4d"
                                         >
                                             {t('about.getStarted')}
@@ -66,12 +59,12 @@ const About = () => {
 
                             {/* Our Values Section */}
                             <div className="space-y-4 mt-12 lg:mt-0 lg:ml-28">
-                                <h2 className="text-4xl text-justify font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white dark:text-white">{t('about.ourValues')}</h2>
+                                <h2 className="text-4xl text-justify font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white">{t('about.ourValues')}</h2>
                                 <div className="bg-transparent p-4 rounded-lg hover:bg-gray-800 transition-colors duration-300">
                                     <h3 className="text-lg font-semibold mt-0 text-white">
                                         {t('about.innovation')}
                                     </h3>
-                                    <p className="text-white mt-1">
+                                    <p className="text-gray-300 mt-1">
                                         {t('about.innovationDescription')}
                                     </p>
                                 </div>
@@ -79,7 +72,7 @@ const About = () => {
                                     <h3 className="text-lg font-semibold mt-0 text-white">
                                         {t('about.customerObsession')}
                                     </h3>
-                                    <p className="text-white mt-1">
+                                    <p className="text-gray-300 mt-1">
                                         {t('about.customerObsessionDescription')}
                                     </p>
                                 </div>
@@ -87,7 +80,7 @@ const About = () => {
                                     <h3 className="text-lg font-semibold mt-0 text-white">
                                         {t('about.integrity')}
                                     </h3>
-                                    <p className="text-white mt-1">
+                                    <p className="text-gray-300 mt-1">
                                         {t('about.integrityDescription')}
                                     </p>
                                 </div>
@@ -95,7 +88,7 @@ const About = () => {
                                     <h3 className="text-lg font-semibold mt-0 text-white">
                                         {t('about.speed')}
                                     </h3>
-                                    <p className="text-white mt-1">
+                                    <p className="text-gray-300 mt-1">
                                         {t('about.speedDescription')}
                                     </p>
                                 </div>
@@ -104,9 +97,8 @@ const About = () => {
                     </section>
                 </div>
             </div>
-            {/* Increase the z-index of the Footer */}
             <div className="relative z-20">
-                <Footer />
+                <FooterAbout />
             </div>
         </div>
     );

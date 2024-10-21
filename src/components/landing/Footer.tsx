@@ -1,44 +1,30 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
-import { useTheme } from '@/lib/hooks/useTheme';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 export const Footer = () => {
-  const [showLanguages, setShowLanguages] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme } = useTheme();
   const { t, i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const { theme, setTheme } = useTheme();
 
-  const toggleLanguages = () => {
-    setShowLanguages(!showLanguages);
+  const toggleLanguage = () => {
+    const newLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+    i18n.changeLanguage(newLanguage);
+    setCurrentLanguage(newLanguage);
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    setShowLanguages(false);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-      setShowLanguages(false);
-    }
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  };
+    setCurrentLanguage(i18n.language);
+  }, [i18n.language]);
 
   return (
     <footer id="footer" className="bg-gray-100 dark:bg-[#06060A] py-10 w-full">
@@ -160,7 +146,7 @@ export const Footer = () => {
       {/* Added vertical space */}
       <div className="h-10 md:h-20"></div>
 
-      <div className="container max-w-8xl mt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 dark:text-gray-300 px-4">
+      <div className="container max-w-8xl mt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 dark:text-gray-400 px-4">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 ml-2 md:ml-[55px]">
           <div className="flex items-center gap-2">
             <div className="cursor-pointer" onClick={toggleTheme}>
@@ -170,28 +156,16 @@ export const Footer = () => {
           </div>
           <div className="flex items-center gap-4 md:gap-6">
             <p>{t('footer.copyright')}</p>
-            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
+            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-400 whitespace-nowrap">
               {t('footer.address')}
             </a>
             <div className="flex items-center gap-4 md:gap-6">
-              <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
+              <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-400">
                 {t('footer.cookiePreferences')}
               </a>
-              <div className="relative" ref={dropdownRef}>
-                <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
-                  {t('footer.language')}
-                </button>
-                {showLanguages && (
-                  <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-[#06060A] border border-gray-300 dark:border-gray-700 rounded shadow-lg">
-                    <button onClick={() => changeLanguage('en')} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                      {t('footer.english')}
-                    </button>
-                    <button onClick={() => changeLanguage('fr')} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                      {t('footer.french')}
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button onClick={toggleLanguage} className="hover:underline text-gray-600 dark:text-gray-400">
+                {currentLanguage === 'en' ? 'English' : 'Français'}
+              </button>
             </div>
           </div>
         </div>

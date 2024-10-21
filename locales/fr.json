@@ -50,7 +50,7 @@
     "linkedIn": "LinkedIn",
     "twitter": "X | Twitter",
     "newsletters": "Newsletters",
-    "cookiePreferences": "Cookies",
+    "cookiePreferences": "Préférences de cookies",
     "language": "Langue",
     "english": "English",
     "french": "Français",
@@ -67,10 +67,10 @@
     "questions": [
       {
         "question": "À quelle vitesse puis-je me lancer avec lomi. ?",
-        "answer": "L'intégration est rapide et simple. Une fois que vous avez configuré votre compte et rempli nos exigences KYC décrites dans nos <a href='/terms' class='text-primary hover:underline'>Conditions d'utilisation</a>, vous pouvez commencer à accepter des paiements."
+        "answer": "L'intégration est rapide et simple. Une fois que vous avez créé votre compte et rempli nos exigences KYC décrites dans nos <a href='/terms' class='text-primary hover:underline'>Conditions d'utilisation</a>, vous pouvez commencer à accepter des paiements."
       },
       {
-        "question": "Comment créer un compte pour commencer vos solutions?",
+        "question": "Comment créer un compte et commencer à utiliser vos services ?",
         "answer": "Pour accéder à notre plateforme, cliquez simplement sur ce lien de <a href='/sign-in' class='text-primary hover:underline'>connexion</a> et suivez les étapes pour vous lancer."
       },
       {
@@ -78,8 +78,8 @@
         "answer": "Absolument ! Vous pouvez planifier une démo en contactant notre équipe via le contact sales. Nous vous répondrons rapidement et vous guiderons tout au long du processus de configuration et d'intégration."
       },
       {
-        "question": "Quelles sont les exigences pour enregistrer mon site Web/application ?",
-        "answer": "Votre application doit répondre à nos normes de sécurité et de conformité. Après l'inscription, complétez le processus d'activation et une fois vérifié, vous pouvez intégrer notre API et/ou generer des liens de paiements."
+        "question": "Quelles sont les exigences pour enregistrer mon site web/application ?",
+        "answer": "Votre application doit répondre à nos normes de sécurité. Après l'inscription, complétez le processus d'activation et une fois vérifié, vous pouvez intégrer notre API et/ou generer des liens de paiements."
       }
     ]
   },
@@ -183,16 +183,16 @@
   "animatedList": {
     "paymentReceived": "Paiement reçu",
     "minutesAgo": "il y a {{minutes}} minutes",
-    "newMonthlySubscriber": "Un nouvel abonné",
+    "newMonthlySubscriber": "Un nouvel abonné !",
     "payoutProcessed": "Versement traité"
   },
 
   "about": {
     "mission": "Notre mission est de rendre les paiements en ligne simples, sécurisés et accessibles pour les entreprises d'Afrique de l'Ouest.",
     "ourStory": "Notre histoire",
-    "storyParagraph1": "Fondée en 2024, lomi. est née pour relever les défis auxquels les entreprises sont confrontées dans la gestion des transactions et l'activation des paiements clients dans un écosystème fragmenté.",
-    "storyParagraph2": "Gérer efficacement de multiples méthodes de paiement dans un écosystème où les fournisseurs se multiplient est un problème complexe pour les entreprises, qui n'ont pas toujours les outils adéquats pour les orchestrer.",
-    "storyParagraph3": "Nous avons construit une plateforme qui peut vous aider à vendre vos produits, maximiser votre portée et vous connecter avec vos clients où qu'ils soient et sur les canaux qu'ils utilisent le plus.",
+    "storyParagraph1": "Fondée en 2024, lomi. est née pour relever les défis auxquels les entreprises d'Afrique de l'Ouest sont confrontées dans la gestion l'activation des paiements en ligne.",
+    "storyParagraph2": "Gérer efficacement de multiples méthodes de paiement dans un écosystème fragmenté où les fournisseurs se multiplient est un défi complexe pour les entreprises et les entrepreneurs.",
+    "storyParagraph3": "Nous avons construit une plateforme pour les aider à vendre leurs produits, maximiser leur portée et les connecter à leurs clients, où qu'ils soient et sur les canaux qu'ils utilisent le plus.",
     "getStarted": "Get started",
     "ourValues": "Nos valeurs",
     "innovation": "Innovation",
