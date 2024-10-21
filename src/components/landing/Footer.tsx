@@ -5,14 +5,21 @@ import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
 import { useTheme } from '@/lib/hooks/useTheme';
+import { useTranslation } from 'react-i18next';
 
 export const Footer = () => {
   const [showLanguages, setShowLanguages] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation();
 
   const toggleLanguages = () => {
     setShowLanguages(!showLanguages);
+  };
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setShowLanguages(false);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -44,20 +51,20 @@ export const Footer = () => {
         {/* Company Section */}
         <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Company
+            {t('footer.company')}
           </h4>
           <nav className="grid gap-2">
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Solutions
+              {t('footer.solutions')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Case Studies
+              {t('footer.caseStudies')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Customers
+              {t('footer.customers')}
             </a>
             <a href="/about" className="hover:underline text-gray-600 dark:text-gray-300">
-              About us
+              {t('footer.aboutUs')}
             </a>
           </nav>
         </div>
@@ -65,20 +72,20 @@ export const Footer = () => {
         {/* Products Section */}
         <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Products
+            {t('footer.products')}
           </h4>
           <nav className="grid gap-2">
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Payments
+              {t('footer.payments')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Subscriptions
+              {t('footer.subscriptions')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Checkout
+              {t('footer.checkout')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Payouts
+              {t('footer.payouts')}
             </a>
           </nav>
         </div>
@@ -86,20 +93,20 @@ export const Footer = () => {
         {/* Resources Section */}
         <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Resources
+            {t('footer.resources')}
           </h4>
           <nav className="grid gap-2">
             <a href="https://developers.lomi.africa/" className="hover:underline text-gray-600 dark:text-gray-300">
-              Developers
+              {t('footer.developers')}
             </a>
             <a href="https://developers.lomi.africa/api-documentation" className="hover:underline text-gray-600 dark:text-gray-300">
-              Recipes
+              {t('footer.recipes')}
             </a>
             <a href="mailto:hello@lomi.africa?subject=[Support] — Question" className="hover:underline text-gray-600 dark:text-gray-300">
-              Support
+              {t('footer.support')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Pricing
+              {t('footer.pricing')}
             </a>
           </nav>
         </div>
@@ -107,20 +114,20 @@ export const Footer = () => {
         {/* Links Section */}
         <div className="grid gap-2 col-span-1 sm:col-span-1 md:col-span-2 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Links
+            {t('footer.links')}
           </h4>
           <nav className="grid gap-2">
             <a href="/privacy" className="hover:underline text-gray-600 dark:text-gray-300">
-              Privacy Policy
+              {t('footer.privacyPolicy')}
             </a>
             <a href="/terms" className="hover:underline text-gray-600 dark:text-gray-300">
-              Terms of Service
+              {t('footer.termsOfService')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
-              Leave us a testimony
+              {t('footer.leaveTestimony')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-              Help center
+              {t('footer.helpCenter')}
             </a>
           </nav>
         </div>
@@ -131,20 +138,20 @@ export const Footer = () => {
         {/* Community Section */}
         <div className="grid gap-2 col-span-1 sm:col-span-2 md:col-span-3 ml-2 md:ml-14">
           <h4 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-3">
-            Community
+            {t('footer.community')}
           </h4>
           <nav className="grid gap-2">
             <a href="https://github.com/lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faGithub} /> Github
+              <FontAwesomeIcon icon={faGithub} /> {t('footer.github')}
             </a>
             <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faLinkedin} /> LinkedIn
+              <FontAwesomeIcon icon={faLinkedin} /> {t('footer.linkedIn')}
             </a>
             <a href="https://x.com/intent/follow?screen_name=lomiafrica" className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faTwitter} /> X | Twitter
+              <FontAwesomeIcon icon={faTwitter} /> {t('footer.twitter')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faEnvelope} /> Newsletters
+              <FontAwesomeIcon icon={faEnvelope} /> {t('footer.newsletters')}
             </a>
           </nav>
         </div>
@@ -162,26 +169,26 @@ export const Footer = () => {
             <SystemOperational />
           </div>
           <div className="flex items-center gap-4 md:gap-6">
-            <p>&copy; 2024 <br className="md:hidden" /> lomi.africa, Inc. </p>
+            <p>{t('footer.copyright')}</p>
             <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-300 whitespace-nowrap">
-              Les Perles, Abidjan,<br className="md:hidden" /> Côte d&apos;Ivoire
+              {t('footer.address')}
             </a>
             <div className="flex items-center gap-4 md:gap-6">
               <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300">
-                Cookie <br className="md:hidden" />  Preferences
+                {t('footer.cookiePreferences')}
               </a>
               <div className="relative" ref={dropdownRef}>
                 <button onClick={toggleLanguages} className="hover:underline text-gray-600 dark:text-gray-300">
-                  Language
+                  {t('footer.language')}
                 </button>
                 {showLanguages && (
                   <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-[#06060A] border border-gray-300 dark:border-gray-700 rounded shadow-lg">
-                    <a href="/" className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                      English
-                    </a>
-                    <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
-                      French
-                    </a>
+                    <button onClick={() => changeLanguage('en')} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      {t('footer.english')}
+                    </button>
+                    <button onClick={() => changeLanguage('fr')} className="block px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      {t('footer.french')}
+                    </button>
                   </div>
                 )}
               </div>

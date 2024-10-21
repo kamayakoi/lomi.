@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
@@ -17,7 +17,7 @@ export default function AutoWithdrawal() {
             <Card>
                 <CardContent className="p-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-semibold">Auto-Withdrawal</h2>
+                        <h2 className="text-lg font-medium">Auto-Withdrawal</h2>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="link" className="text-blue-600 hover:text-blue-600">

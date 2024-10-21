@@ -251,3 +251,7 @@ collapsibleDropdown[data-state='closed'] {
     text-align: center; /* Center text on mobile */
   }
 }
+
+*::-webkit-scrollbar {
+    display: none;
+}

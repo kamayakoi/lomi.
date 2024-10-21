@@ -4,10 +4,13 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { CopyIcon, PlusCircleIcon, TrashIcon } from 'lucide-react'
+import { Copy, PlusCircle, Trash2 } from 'lucide-react'
 import ContentSection from '@/components/dashboard/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 type ApiKey = {
     name: string;
@@ -16,7 +19,7 @@ type ApiKey = {
     created_at: string;
 }
 
-export default function ApiKeys() {
+export default function Component() {
     const { user } = useUser()
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
     const [isGeneratingKey, setIsGeneratingKey] = useState(false)
@@ -84,6 +87,7 @@ export default function ApiKeys() {
                     created_at: new Date().toISOString(),
                 }])
                 setNewKeyName('')
+                setIsGeneratingKey(false)
             }
         } catch (error) {
             console.error('Error generating API key:', error)
@@ -123,113 +127,131 @@ export default function ApiKeys() {
         navigator.clipboard.writeText(text)
     }
 
+    const maskApiKey = (key: string) => {
+        const visiblePart = key.slice(0, 4)
+        const hiddenPart = '•'.repeat(Math.max(20, key.length - 4))  // Ensure at least 20 dots
+        return `${visiblePart}${hiddenPart}`
+    }
+
     return (
-        <div style={{
-            overflowY: 'auto',
-            maxHeight: '100vh',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
-        }}>
-            <style>{`
-                div::-webkit-scrollbar {
-                    display: none;
-                }
-            `}</style>
-            <ContentSection
-                title="API Keys"
-                desc="Manage your API keys to authenticate requests and access Lomi's APIs."
-            >
-                <div className="space-y-8">
-                    <div>
-                        <h2 className="text-2xl font-semibold mb-2">Secret Keys</h2>
-                        <p className="text-muted-foreground mb-4">Secret keys are used to authenticate API requests coming from your servers.</p>
-                        {apiKeys.length > 0 ? (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Key name</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Created</TableHead>
-                                        <TableHead>Actions</TableHead>
+        <ContentSection
+            title="API Keys"
+            desc="Creat and manage your API keys to authenticate requests coming from your servers."
+        >
+            <Card className="w-full max-w-7xl mx-auto">
+                <CardHeader>
+                    <CardTitle className="text-2xl font-bold">Secret Keys</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {apiKeys.length > 0 ? (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-1/5">Name</TableHead>
+                                    <TableHead className="w-2/5">API Key</TableHead>
+                                    <TableHead className="w-1/5">Status</TableHead>
+                                    <TableHead className="w-1/5">Created</TableHead>
+                                    <TableHead className="w-1/5">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {apiKeys.map((key, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell className="font-medium">{key.name}</TableCell>
+                                        <TableCell>
+                                            <code className="bg-muted px-2 py-1 rounded text-xs">
+                                                {maskApiKey(key.api_key)}
+                                            </code>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={key.is_active ? "default" : "secondary"}
+                                                className="cursor-pointer"
+                                                onClick={() => handleToggleKeyStatus(key.api_key, key.is_active)}
+                                            >
+                                                {key.is_active ? 'Active' : 'Inactive'}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {new Date(key.created_at).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex space-x-2">
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => copyToClipboard(key.api_key)}
+                                                            >
+                                                                <Copy className="h-4 w-4" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Copy Key</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => handleDeleteKey(key.api_key)}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Delete Key</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
+                                        </TableCell>
                                     </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {apiKeys.map((key, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>{key.name}</TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    variant={key.is_active ? 'secondary' : 'ghost'}
-                                                    size="sm"
-                                                    onClick={() => handleToggleKeyStatus(key.api_key, key.is_active)}
-                                                >
-                                                    {key.is_active ? 'Active' : 'Inactive'}
-                                                </Button>
-                                            </TableCell>
-                                            <TableCell>
-                                                {new Date(key.created_at).toLocaleString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => copyToClipboard(key.api_key)}
-                                                >
-                                                    <CopyIcon className="h-4 w-4 mr-2" />
-                                                    Copy
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteKey(key.api_key)}
-                                                >
-                                                    <TrashIcon className="h-4 w-4 mr-2" />
-                                                    Delete
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        ) : (
-                            <p className="text-center py-4">You don&apos;t have any secret API keys yet.</p>
-                        )}
-                        <Dialog open={isGeneratingKey} onOpenChange={setIsGeneratingKey}>
-                            <DialogTrigger asChild>
-                                <Button className="mt-4" disabled={apiKeys.length >= 3}>
-                                    <PlusCircleIcon className="h-4 w-4 mr-2" />
-                                    Generate secret key
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Generate New Secret Key</DialogTitle>
-                                    <DialogDescription>
-                                        Enter a name for your new secret key.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="name" className="text-right">
-                                            Name
-                                        </Label>
-                                        <Input
-                                            id="name"
-                                            value={newKeyName}
-                                            onChange={(e) => setNewKeyName(e.target.value)}
-                                            className="col-span-3"
-                                        />
-                                    </div>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    ) : (
+                        <p className="text-center py-4">You don&apos;t have any secret API keys yet.</p>
+                    )}
+                    <Dialog open={isGeneratingKey} onOpenChange={setIsGeneratingKey}>
+                        <DialogTrigger asChild>
+                            <Button className="mt-6" onClick={() => setIsGeneratingKey(true)} disabled={apiKeys.length >= 3}>
+                                <PlusCircle className="h-4 w-4 mr-2" />
+                                Generate a secret key
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Generate a new secret key</DialogTitle>
+                                <DialogDescription>
+                                    Enter a name to identidy your new API key.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="name" className="text-right">
+                                        Name
+                                    </Label>
+                                    <Input
+                                        id="name"
+                                        value={newKeyName}
+                                        onChange={(e) => setNewKeyName(e.target.value)}
+                                        className="col-span-3"
+                                    />
                                 </div>
-                                <DialogFooter>
-                                    <Button onClick={handleGenerateKey}>Generate Key</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </div>
-            </ContentSection>
-        </div>
+                            </div>
+                            <DialogFooter>
+                                <Button onClick={handleGenerateKey}>Generate Key</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </CardContent>
+            </Card>
+        </ContentSection>
     )
 }

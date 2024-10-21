@@ -73,7 +73,7 @@ const sidebarNavItems = [
     href: '/portal/settings/receiving-money/payment-methods',
     subItems: [
       { title: 'Payment Methods', href: '/portal/settings/receiving-money/payment-methods' },
-      { title: 'Checkout', href: '/portal/settings/receiving-money/checkout' },
+      { title: 'Checkout Options', href: '/portal/settings/receiving-money/checkout' },
     ],
   },
   // {
@@ -99,7 +99,7 @@ const sidebarNavItems = [
     icon: <IconReceipt size={18} />,
     href: '/portal/settings/billing/statements',
     subItems: [
-      { title: 'Billing', href: '/portal/settings/billing/statements' },
+      { title: 'Billing Statements', href: '/portal/settings/billing/statements' },
       { title: 'Fee Structure', href: '/portal/settings/billing/fee-structure' },
     ],
   },
@@ -110,7 +110,7 @@ const sidebarNavItems = [
     subItems: [
       { title: 'API Keys', href: '/portal/settings/developers/api-keys' },
       { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
-      { title: 'IP Allowlist', href: '/portal/settings/developers/ip-allowlist' },
+      // { title: 'IP Allowlist', href: '/portal/settings/developers/ip-allowlist' },
     ],
   },
   {
@@ -119,7 +119,7 @@ const sidebarNavItems = [
     href: '/portal/settings/withdrawals/bank-accounts',
     subItems: [
       { title: 'Bank Accounts', href: '/portal/settings/withdrawals/bank-accounts' },
-      { title: 'Notifications', href: '/portal/settings/withdrawals/email-notifications' },
+      { title: 'Email Notifications', href: '/portal/settings/withdrawals/email-notifications' },
       { title: 'Automated Payouts', href: '/portal/settings/withdrawals/auto-withdrawal' },
     ],
   },

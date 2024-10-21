@@ -8,6 +8,7 @@ import { AlertCircle, Lock } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import ContentSection from '@/components/dashboard/content-section'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface WebhookCategory {
     name: string;
@@ -75,7 +76,6 @@ export default function Webhooks() {
         // Implement the actual test and save logic here
     }
 
-
     const handleVerificationTokenView = () => {
         // Implement the logic to verify the password and show the token
         console.log("Verifying password and showing token")
@@ -84,107 +84,117 @@ export default function Webhooks() {
     }
 
     return (
-        <div style={{
-            overflowY: 'auto',
-            maxHeight: '100vh',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
-        }}>
-            <style>{`
-                div::-webkit-scrollbar {
-                    display: none;
-                }
-            `}</style>
-            <ContentSection
-                title="Webhooks"
-                desc="Configure your webhook settings to receive real-time updates for various events."
-            >
+        <ContentSection
+            title="Webhooks"
+            desc="Configure your webhook settings to receive real-time updates for various events."
+        >
+            {/* Wrap everything in a single div */}
+            <div>
                 <div className="space-y-6">
                     <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Important</AlertTitle>
                         <AlertDescription>
-                            To learn how to add and manage your webhooks, visit our <a href="#" className="underline">documentation page</a>.
+                            To learn how to add and manage your webhooks, visit our <a href="#" className="underline font-medium hover:text-primary">documentation page</a>.
                         </AlertDescription>
                     </Alert>
 
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            id="auto-retry"
-                            checked={autoRetry}
-                            onCheckedChange={setAutoRetry}
-                        />
-                        <Label htmlFor="auto-retry">Enable auto-retry for failed webhooks</Label>
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>General Settings</CardTitle>
+                            <CardDescription>Configure global webhook settings</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    id="auto-retry"
+                                    checked={autoRetry}
+                                    onCheckedChange={setAutoRetry}
+                                />
+                                <Label htmlFor="auto-retry">Enable auto-retry for failed webhooks</Label>
+                            </div>
 
-                    <div className="space-y-2">
-                        <Label>Webhook verification token</Label>
-                        <Button onClick={() => setShowVerificationTokenModal(true)} className="w-full">
-                            <Lock className="h-4 w-4 mr-2" />
-                            View Webhook Verification Token
-                        </Button>
-                        <p className="text-sm text-muted-foreground">
-                            Sent with every webhook, use this token to validate that a webhook came from our servers
-                        </p>
-                    </div>
+                            <div className="space-y-2">
+                                <Label>Webhook verification token</Label>
+                                <Button onClick={() => setShowVerificationTokenModal(true)} variant="outline" className="w-full">
+                                    <Lock className="h-4 w-4 mr-2" />
+                                    View Webhook Verification Token
+                                </Button>
+                                <p className="text-sm text-muted-foreground">
+                                    Sent with every webhook, use this token to validate that a webhook came from our servers
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <Accordion type="single" collapsible className="w-full">
-                        {webhookCategories.map((category, index) => (
-                            <AccordionItem value={`item-${index}`} key={index}>
-                                <AccordionTrigger>{category.name}</AccordionTrigger>
-                                <AccordionContent>
-                                    {category.events.map((event, eventIndex) => (
-                                        <div key={eventIndex} className="mb-4 last:mb-0">
-                                            <Label htmlFor={`${category.name}-${event}`}>{event}</Label>
-                                            <div className="flex space-x-2 mt-1">
-                                                <Input
-                                                    id={`${category.name}-${event}`}
-                                                    placeholder="https://example.com"
-                                                    value={webhookUrls[category.name]?.[event] || ""}
-                                                    onChange={(e) => handleUrlChange(category.name, event, e.target.value)}
-                                                    className="flex-grow"
-                                                />
-                                                <Button onClick={() => handleTestAndSave(category.name, event)}>
-                                                    Test and save
-                                                </Button>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Webhook Endpoints</CardTitle>
+                            <CardDescription>Configure endpoints for different event categories</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Accordion type="single" collapsible className="w-full">
+                                {webhookCategories.map((category, index) => (
+                                    <AccordionItem value={`item-${index}`} key={index}>
+                                        <AccordionTrigger className="hover:no-underline">
+                                            {category.name}
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <div className="space-y-4">
+                                                {category.events.map((event, eventIndex) => (
+                                                    <div key={eventIndex} className="space-y-2">
+                                                        <Label htmlFor={`${category.name}-${event}`}>{event}</Label>
+                                                        <div className="flex space-x-2">
+                                                            <Input
+                                                                id={`${category.name}-${event}`}
+                                                                placeholder="https://example.com"
+                                                                value={webhookUrls[category.name]?.[event] || ""}
+                                                                onChange={(e) => handleUrlChange(category.name, event, e.target.value)}
+                                                                className="flex-grow"
+                                                            />
+                                                            <Button onClick={() => handleTestAndSave(category.name, event)} variant="secondary">
+                                                                Test and save
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        </div>
-                                    ))}
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
+                        </CardContent>
+                    </Card>
                 </div>
-            </ContentSection>
 
-            <Dialog open={showVerificationTokenModal} onOpenChange={setShowVerificationTokenModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>View Webhook Verification Token</DialogTitle>
-                        <DialogDescription>
-                            Enter your account password to view your webhook verification token
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="password" className="text-right">
-                                Password
-                            </Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={verificationTokenPassword}
-                                onChange={(e) => setVerificationTokenPassword(e.target.value)}
-                                className="col-span-3"
-                            />
+                <Dialog open={showVerificationTokenModal} onOpenChange={setShowVerificationTokenModal}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>View Webhook Verification Token</DialogTitle>
+                            <DialogDescription>
+                                Enter your account password to view your webhook verification token
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="password" className="text-right">
+                                    Password
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={verificationTokenPassword}
+                                    onChange={(e) => setVerificationTokenPassword(e.target.value)}
+                                    className="col-span-3"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <Button onClick={handleVerificationTokenView}>Confirm</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
+                        <DialogFooter>
+                            <Button onClick={handleVerificationTokenView}>Confirm</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </ContentSection>
     )
 }

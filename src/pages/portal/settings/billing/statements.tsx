@@ -1,17 +1,20 @@
 import { useState } from 'react'
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { InfoIcon } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 export default function BillingStatements() {
     const [totalOutstanding] = useState(0)
     const [billingBalance, setBillingBalance] = useState(0)
     const [isTopUpOpen, setIsTopUpOpen] = useState(false)
     const [topUpAmount, setTopUpAmount] = useState('')
+    const [topUpMethod, setTopUpMethod] = useState('lomi-balance')
 
     const handleTopUp = () => {
         const amount = parseFloat(topUpAmount)
@@ -38,33 +41,39 @@ export default function BillingStatements() {
                             <p className="text-sm text-muted-foreground">
                                 Billing Balance <span className="font-bold">XOF</span> {billingBalance.toLocaleString()}
                             </p>
-                            <div className="relative group">
-                                <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-2 bg-secondary text-secondary-foreground rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-64 text-xs pointer-events-none">
-                                    Billing Balance contains funds that you keep aside to automatically pay any unpaid bills.
-                                </div>
-                            </div>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Billing Balance contains funds that you keep aside to automatically pay any unpaid bills.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
                         <Dialog open={isTopUpOpen} onOpenChange={setIsTopUpOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="outline">Top Up Balance</Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="sm:max-w-[425px]">
                                 <DialogHeader>
                                     <DialogTitle>Top Up Billing Balance</DialogTitle>
                                 </DialogHeader>
-                                <div className="space-y-4 py-4">
-                                    <div className="space-y-2">
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
                                         <Label htmlFor="top-up-method">Select Top-Up Method</Label>
-                                        <div className="flex items-center space-x-2">
-                                            <input type="radio" id="lomi-balance" name="top-up-method" checked readOnly />
-                                            <Label htmlFor="lomi-balance">lomi Balance</Label>
-                                            <span className="text-sm text-muted-foreground">
-                                                Available: XOF {billingBalance.toLocaleString()}
-                                            </span>
-                                        </div>
+                                        <RadioGroup value={topUpMethod} onValueChange={setTopUpMethod}>
+                                            <div className="flex items-center space-x-2">
+                                                <RadioGroupItem value="lomi-balance" id="lomi-balance" />
+                                                <Label htmlFor="lomi-balance">lomi Balance</Label>
+                                            </div>
+                                        </RadioGroup>
+                                        <p className="text-sm text-muted-foreground">
+                                            Available: XOF {billingBalance.toLocaleString()}
+                                        </p>
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="grid gap-2">
                                         <Label htmlFor="top-up-amount">Top-Up Amount</Label>
                                         <Input
                                             id="top-up-amount"
@@ -78,10 +87,10 @@ export default function BillingStatements() {
                                         to pay any unpaid bills.
                                     </p>
                                 </div>
-                                <div className="flex justify-end space-x-2">
+                                <DialogFooter>
                                     <Button variant="outline" onClick={() => setIsTopUpOpen(false)}>Cancel</Button>
                                     <Button onClick={handleTopUp}>Top Up Now</Button>
-                                </div>
+                                </DialogFooter>
                             </DialogContent>
                         </Dialog>
                         <div className="mt-6 pt-6 border-t border-border">

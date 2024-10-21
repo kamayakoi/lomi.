@@ -70,7 +70,6 @@ import Profile from './pages/portal/settings/business-profile/profile';
 import BillingStatements from './pages/portal/settings/billing/statements.tsx';
 import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
 import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
-import IpAllowlist from './pages/portal/settings/developers/ip-allowlist.tsx';
 import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
 import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
@@ -140,7 +139,6 @@ const AppRouter = () => (
                         <Route path="billing/statements" element={<BillingStatements />} />
                         <Route path="billing/fee-structure" element={<FeeStructure />} />
                         <Route path="developers/api-keys" element={<ApiKeys />} />
-                        <Route path="developers/ip-allowlist" element={<IpAllowlist />} />
                         <Route path="developers/webhooks" element={<SettingsWebhooks />} />
                         <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
                         <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
