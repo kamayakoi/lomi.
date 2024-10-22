@@ -1,19 +1,23 @@
-import { Search } from 'lucide-react'
+import { Search, RefreshCw } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { link_type, currency_code } from './types'
 
 interface PaymentLinkFiltersProps {
     searchTerm: string
     setSearchTerm: (value: string) => void
-    selectedLinkType: string | null
-    setSelectedLinkType: (value: string | null) => void
-    selectedCurrency: string | null
-    setSelectedCurrency: (value: string | null) => void
-    selectedStatus: string | null
-    setSelectedStatus: (value: string | null) => void
+    selectedLinkType: link_type | 'all' | null
+    setSelectedLinkType: (value: link_type | 'all' | null) => void
+    selectedCurrency: currency_code | null
+    setSelectedCurrency: (value: currency_code | null) => void
+    selectedStatus: 'active' | 'inactive' | 'all' | null
+    setSelectedStatus: (value: 'active' | 'inactive' | 'all' | null) => void
+    refetch: () => void
+    isRefreshing: boolean
 }
 
-export default function PaymentLinkFilters({
+export function PaymentLinkFilters({
     searchTerm,
     setSearchTerm,
     selectedLinkType,
@@ -22,60 +26,63 @@ export default function PaymentLinkFilters({
     setSelectedCurrency,
     selectedStatus,
     setSelectedStatus,
+    refetch,
+    isRefreshing,
 }: PaymentLinkFiltersProps) {
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
-            <div className="relative w-full sm:w-64">
-                <Input
-                    type="text"
-                    placeholder="Search payment links"
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className='my-4 flex items-center justify-between sm:my-0'>
+            <div className='flex items-center space-x-4'>
+                <div className='relative w-64'>
+                    <Input
+                        placeholder='Search payment links...'
+                        className='w-full pl-10 pr-4 py-2 rounded-none'
+                        type="search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                </div>
+                <Select value={selectedLinkType || undefined} onValueChange={(value) => setSelectedLinkType(value as link_type | 'all' | null)}>
+                    <SelectTrigger className="w-[140px] rounded-none">
+                        <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="product">Product</SelectItem>
+                        <SelectItem value="plan">Plan</SelectItem>
+                        <SelectItem value="instant">Instant</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select value={selectedCurrency || 'XOF'} onValueChange={(value) => setSelectedCurrency(value as currency_code | null)}>
+                    <SelectTrigger className="w-[140px] rounded-none">
+                        <SelectValue placeholder="XOF" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="XOF">XOF</SelectItem>
+                        <SelectItem value="USD" disabled>USD</SelectItem>
+                        <SelectItem value="EUR" disabled>EUR</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select value={selectedStatus || undefined} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all' | null)}>
+                    <SelectTrigger className="w-[140px] rounded-none">
+                        <SelectValue placeholder="All Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => refetch()}
+                    disabled={isRefreshing}
+                >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <span className="sr-only">Refresh</span>
+                </Button>
             </div>
-            <Select
-                value={selectedLinkType || undefined}
-                onValueChange={(value) => setSelectedLinkType(value)}
-            >
-                <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Link Type" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="product">Product</SelectItem>
-                    <SelectItem value="plan">Plan</SelectItem>
-                    <SelectItem value="instant">Instant</SelectItem>
-                </SelectContent>
-            </Select>
-            <Select
-                value={selectedCurrency || undefined}
-                onValueChange={(value) => setSelectedCurrency(value)}
-            >
-                <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Currency" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Currencies</SelectItem>
-                    <SelectItem value="XOF">XOF</SelectItem>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                </SelectContent>
-            </Select>
-            <Select
-                value={selectedStatus || undefined}
-                onValueChange={(value) => setSelectedStatus(value)}
-            >
-                <SelectTrigger className="w-full sm:w-40">
-                    <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-            </Select>
         </div>
     )
 }

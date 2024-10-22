@@ -9,7 +9,12 @@ export type PaymentLink = {
   link_type: link_type
   url: string
   product_id?: string
+  product_name?: string
+  product_price?: number
   plan_id?: string
+  plan_name?: string
+  plan_price?: number
+  plan_amount?: number
   title: string
   public_description?: string
   private_description?: string

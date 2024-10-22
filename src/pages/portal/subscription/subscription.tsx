@@ -177,6 +177,7 @@ function SubscriptionsPage() {
                         <TableRow>
                           <TableHead className="text-center">Name</TableHead>
                           <TableHead className="text-center">Description</TableHead>
+                          <TableHead className="text-center">Price</TableHead>
                           <TableHead className="text-center">Frequency</TableHead>
                           <TableHead className="text-center"></TableHead>
                         </TableRow>
@@ -185,14 +186,14 @@ function SubscriptionsPage() {
                         {isSubscriptionPlansLoading ? (
                           Array.from({ length: 5 }).map((_, index) => (
                             <TableRow key={index}>
-                              <TableCell colSpan={4}>
+                              <TableCell colSpan={5}>
                                 <Skeleton className="w-full h-8" />
                               </TableCell>
                             </TableRow>
                           ))
                         ) : subscriptionPlans.length === 0 ? (
                           <TableRow>
-                            <TableCell colSpan={4} className="text-center py-8">
+                            <TableCell colSpan={5} className="text-center py-8">
                               <div className="flex flex-col items-center justify-center space-y-4">
                                 <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                                   <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
@@ -211,6 +212,7 @@ function SubscriptionsPage() {
                             <TableRow key={plan.plan_id}>
                               <TableCell className="text-center">{plan.name}</TableCell>
                               <TableCell className="text-center">{plan.description}</TableCell>
+                              <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
                               <TableCell className="text-center">
                                 <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
                                   {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}

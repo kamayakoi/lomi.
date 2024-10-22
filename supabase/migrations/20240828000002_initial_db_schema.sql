@@ -463,6 +463,11 @@ CREATE TABLE providers_transactions (
     UNIQUE (transaction_id, provider_code)
 );
 
+CREATE INDEX idx_providers_transactions_merchant_id ON providers_transactions(merchant_id);
+CREATE INDEX idx_providers_transactions_provider_code ON providers_transactions(provider_code);
+
+COMMENT ON TABLE providers_transactions IS 'Stores detailed transaction information specific to each payment provider';
+
 
 -- Refunds table
 CREATE TABLE refunds (
