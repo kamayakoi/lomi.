@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle } from 'lucide-react'
+import axios from 'axios'
 
 interface PaymentMethod {
     id: string
@@ -12,6 +13,27 @@ interface PaymentMethod {
 }
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure'
+
+interface CheckoutFormData {
+    amount: number;
+    currency: string;
+    aggregatedMerchantId: string;
+    errorUrl: string;
+    successUrl: string;
+    merchantId: string;
+    organizationId: string;
+    customerId: string;
+    productId: string | null;
+    subscriptionId: string | null;
+    transactionType: string;
+    description: string;
+    referenceId: string;
+    metadata: Record<string, unknown>;
+    feeAmount: number;
+    feeReference: string;
+    providerCode: string;
+    paymentMethodCode: string;
+}
 
 export default function StripeCheckoutPage() {
     const [selectedMethod, setSelectedMethod] = useState('')
@@ -60,6 +82,39 @@ export default function StripeCheckoutPage() {
                 setPaymentStatus('idle')
             }
         }, 2000)
+    }
+
+    const initiateWaveCheckout = async () => {
+        setPaymentStatus('processing')
+        try {
+            const checkoutFormData: CheckoutFormData = {
+                amount: 1250,
+                currency: 'XOF',
+                aggregatedMerchantId: 'your_aggregated_merchant_id',
+                errorUrl: 'https://example.com/error',
+                successUrl: 'https://example.com/success',
+                merchantId: 'merchant_id_here',
+                organizationId: 'organization_id_here',
+                customerId: 'customer_id_here',
+                productId: 'product_id_here',
+                subscriptionId: 'subscription_id_here',
+                transactionType: 'payment',
+                description: 'Payment for product XYZ',
+                referenceId: 'ref_123',
+                metadata: {},
+                feeAmount: 50,
+                feeReference: 'standard_fee',
+                providerCode: 'WAVE',
+                paymentMethodCode: 'MOBILE_MONEY',
+            };
+
+            const response = await axios.post('/api/checkout/wave', checkoutFormData);
+            const { waveLaunchUrl, transactionId } = response.data;
+            window.location.href = waveLaunchUrl;
+        } catch (error) {
+            console.error('Error initiating Wave checkout:', error);
+            setPaymentStatus('failure');
+        }
     }
 
     const renderPaymentStatus = () => {
@@ -236,7 +291,24 @@ export default function StripeCheckoutPage() {
                                     </Button>
                                 </motion.form>
                             )}
-                            {selectedMethod && selectedMethod !== 'CREDIT_CARD' && paymentStatus === 'idle' && (
+                            {selectedMethod === 'WAVE' && paymentStatus === 'idle' && (
+                                <motion.div
+                                    key="wave-method"
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="text-center"
+                                >
+                                    <Button
+                                        onClick={initiateWaveCheckout}
+                                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md"
+                                    >
+                                        Continue with Wave
+                                    </Button>
+                                </motion.div>
+                            )}
+                            {selectedMethod && selectedMethod !== 'CREDIT_CARD' && selectedMethod !== 'WAVE' && paymentStatus === 'idle' && (
                                 <motion.div
                                     key="other-method"
                                     initial={{ opacity: 0, y: 20 }}

@@ -1,0 +1,54 @@
+Here's how we can integrate the Wave API into our orchestration platform:
+
+Create a Wave Business Account:
+
+Sign up for a Wave business account to access their API and manage transactions.
+Obtain the necessary API credentials (API key) to authenticate your requests.
+
+2. Checkout Session Creation:
+
+When a customer initiates a payment on your platform, create a new checkout session using the POST /v1/checkout/sessions endpoint.
+
+Provide the required parameters such as amount, currency, success_url, and error_url.
+
+Optionally, include a client_reference to correlate the checkout session with your internal system.
+
+If you want to restrict the payment to a specific Wave account, you can provide the restrict_payer_mobile parameter with the customer's Wave account mobile number.
+
+3. Redirect to Wave:
+
+Upon successful creation of the checkout session, you will receive a wave_launch_url in the response.
+
+Redirect the customer to this URL, which will open the Wave app or provide instructions for completing the payment.
+
+It's important to open the wave_launch_url directly in the customer's browser, not within a webview in your app, to ensure a smooth redirection to the Wave app.
+
+Payment Processing:
+The customer will be guided through the payment process within the Wave app.
+Once the payment is completed, the customer will be redirected back to your specified success_url or error_url based on the payment status.
+
+Payment Verification:
+To verify the payment status and retrieve the transaction details, use the GET /v1/checkout/sessions/:id endpoint.
+
+Provide the id of the checkout session obtained during creation.
+
+The response will include the payment_status field, indicating whether the payment succeeded or not.
+
+You can also retrieve additional information such as the transaction_id, amount, and currency.
+
+Refunds (if needed):
+If a refund is required, you can initiate it using the POST /v1/transactions/:transaction_id/refund endpoint.
+
+Provide the transaction_id obtained from the checkout session or transaction retrieval.
+
+Webhook Integration (optional):
+Wave provides webhook functionality to receive real-time notifications about payment events.
+
+You can set up a webhook endpoint on your server to receive these notifications and update the payment status accordingly.
+
+Transaction Management:
+Use the GET /v1/transactions endpoint to retrieve a list of transactions for your account.
+
+You can filter transactions based on specific criteria like date range or transaction type.
+
+This allows you to manage and reconcile transactions within your system.
