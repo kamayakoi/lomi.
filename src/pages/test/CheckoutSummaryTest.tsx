@@ -1,4 +1,4 @@
-import { CheckoutSummary } from '@/components/checkout/CheckoutSummary'
+import { CheckoutSummary } from '@/api/checkout/CheckoutSummary'
 
 const products = [
     { id: '1', name: 'Product 1', price: 10, quantity: 2 },

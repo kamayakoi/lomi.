@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { updateTransactionStatus } from './transactionService';
+import { supabase } from '@/utils/supabase/client';
 
 const WAVE_API_URL = 'https://api.wave.com/v1';
-const WAVE_API_KEY = "import.meta.env.['VITE_WAVE_API_KEY']"
+const WAVE_API_KEY = import.meta.env['VITE_WAVE_API_KEY']
 
 // ... existing functions ...
 
 export async function createWaveCheckoutSession(
   amount: number,
   currency: string,
-  aggregatedMerchantId: string,
   errorUrl: string,
   successUrl: string
 ) {
@@ -17,7 +17,7 @@ export async function createWaveCheckoutSession(
     const response = await axios.post(`${WAVE_API_URL}/checkout/sessions`, {
       amount,
       currency,
-      aggregated_merchant_id: aggregatedMerchantId,
+      aggregated_merchant_id: import.meta.env['VITE_WAVE_MERCHANT_ID'],
       error_url: errorUrl,
       success_url: successUrl,
     }, {
@@ -43,10 +43,20 @@ export async function handleWaveCheckoutWebhook(body: WaveCheckoutWebhookPayload
   try {
     const { id, payment_status } = body;
     
-    // Update the transaction status based on the payment_status
+    // Update the transaction status and provider details based on the payment_status
     if (payment_status === 'succeeded') {
+      await supabase
+        .from('providers_transactions')
+        .update({ wave_payment_status: 'succeeded' })
+        .eq('wave_transaction_id', id);
+
       await updateTransactionStatus(id, 'success');
     } else if (payment_status === 'cancelled') {
+      await supabase
+        .from('providers_transactions')
+        .update({ wave_payment_status: 'cancelled' })
+        .eq('wave_transaction_id', id);
+
       await updateTransactionStatus(id, 'failed');
     }
   } catch (error) {

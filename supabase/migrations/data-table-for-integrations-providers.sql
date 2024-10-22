@@ -46,6 +46,7 @@ TABLE merchants (
 -- Transactions table
 TABLE transactions (
     transaction_id UUID PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
+    order_id VARCHAR(255) NOT NULL,
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
@@ -68,6 +69,24 @@ TABLE transactions (
     FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
 );
 
+-- Providers Transactions table
+CREATE TABLE providers_transactions (
+    transaction_id UUID PRIMARY KEY REFERENCES transactions(transaction_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
+    wave_checkout_id VARCHAR(255),
+    wave_payment_status VARCHAR(50),
+    wave_transaction_id VARCHAR(255),
+    orange_transaction_id VARCHAR(255),
+    orange_payment_status VARCHAR(50),
+    mtn_transaction_id VARCHAR(255),
+    mtn_payment_status VARCHAR(50),
+    stripe_transaction_id VARCHAR(255),
+    stripe_payment_status VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (transaction_id, provider_code)
+);
 
 -- Organizations table
 TABLE organizations (
@@ -91,6 +110,20 @@ TABLE organizations (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   is_deleted BOOLEAN NOT NULL DEFAULT false,
   deleted_at TIMESTAMPTZ
+);
+
+
+-- Merchant-Organization links table
+TABLE merchant_organization_links (
+  merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+  organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+  role VARCHAR NOT NULL CHECK (role IN ('Admin', 'Member')),
+  workspace_handle VARCHAR UNIQUE NOT NULL,
+  how_did_you_hear_about_us VARCHAR,
+  organization_position VARCHAR,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (merchant_id, organization_id)
 );
 
 
@@ -190,4 +223,54 @@ TABLE fees (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
+);
+
+
+-- Providers table
+TABLE providers (
+  name VARCHAR NOT NULL PRIMARY KEY,
+  code provider_code NOT NULL UNIQUE,
+  description TEXT
+);
+
+
+-- Organization-Providers Settings table
+TABLE organization_providers_settings (
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
+    is_connected BOOLEAN NOT NULL DEFAULT false,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (organization_id, provider_code),
+    UNIQUE (organization_id, provider_code)
+);
+
+-- Payment Links table
+CREATE TABLE payment_links (
+    link_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    link_type link_type NOT NULL,
+    url VARCHAR(2048) NOT NULL,
+    product_id UUID REFERENCES merchant_products(product_id),
+    plan_id UUID REFERENCES subscription_plans(plan_id),
+    title VARCHAR(255) NOT NULL,
+    public_description TEXT,
+    private_description TEXT,
+    price NUMERIC(10,2),
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    allowed_providers provider_code[] NOT NULL DEFAULT ARRAY[]::provider_code[],
+    allow_coupon_code BOOLEAN NOT NULL DEFAULT false,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    expires_at TIMESTAMPTZ,
+    success_url VARCHAR(2048),
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK (
+        (link_type = 'product' AND product_id IS NOT NULL AND plan_id IS NULL AND price IS NULL) OR
+        (link_type = 'plan' AND product_id IS NULL AND plan_id IS NOT NULL AND price IS NULL) OR
+        (link_type = 'instant' AND product_id IS NULL AND plan_id IS NULL AND price IS NOT NULL)
+    )
 );

@@ -1,5 +1,5 @@
-import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector'
-import { CheckoutProvider } from '@/components/checkout/CheckoutProvider'
+import PaymentMethodSelector from '@/api/checkout/PaymentMethodSelector'
+import { CheckoutProvider } from '@/api/checkout/CheckoutProvider'
 
 const PaymentMethodSelectorTest = () => {
     return (

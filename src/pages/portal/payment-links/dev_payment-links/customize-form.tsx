@@ -16,6 +16,7 @@ import { Product } from '@/pages/portal/product/dev_product/types'
 import { SubscriptionPlan } from '@/pages/portal/subscription/dev_subscription/types'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
+import { generatePaymentLink } from './support_paymentLinks'
 
 interface PaymentMethod {
     id: string
@@ -600,11 +601,20 @@ export default function PaymentCustomizerWithCheckout() {
                 return
             }
 
+            const orderId = `order_${Date.now()}`
+            const paymentLinkUrl = generatePaymentLink(
+                user.id,
+                orderId,
+                paymentType,
+                selectedProduct?.product_id,
+                selectedPlan?.plan_id
+            )
+
             const { data, error } = await supabase.rpc('create_payment_link', {
                 p_merchant_id: user.id,
                 p_organization_id: organizationData[0].organization_id,
                 p_link_type: paymentType,
-                p_url: `https://pay.lomi.africa/${user.id}/${Date.now()}`,
+                p_url: paymentLinkUrl,
                 p_title: instantLinkDetails.name,
                 p_public_description: instantLinkDetails.description,
                 p_private_description: instantLinkDetails.privateDescription,

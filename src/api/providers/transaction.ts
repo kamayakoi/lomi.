@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createTransaction, getTransactionById, updateTransactionStatus } from '@/api/services/transactionService';
+import { createTransactionWithProvider, getTransactionById, updateTransactionStatus } from '@/api/services/transactionService';
 
 const router = Router();
 
@@ -20,10 +20,12 @@ router.post('/', async (req, res) => {
     feeReference,
     currencyCode,
     providerCode,
-    paymentMethodCode
+    paymentMethodCode,
+    providerTransactionId,
+    providerPaymentStatus
   } = req.body;
 
-  const transaction = await createTransaction(
+  const transaction = await createTransactionWithProvider(
     merchantId,
     organizationId,
     customerId,
@@ -39,7 +41,9 @@ router.post('/', async (req, res) => {
     feeReference,
     currencyCode,
     providerCode,
-    paymentMethodCode
+    paymentMethodCode,
+    providerTransactionId,
+    providerPaymentStatus
   );
   res.status(201).json(transaction);
 });

@@ -1,44 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle } from 'lucide-react'
 import axios from 'axios'
+import { useUser } from '@/lib/hooks/useUser'
+import { useOrganization } from '@/lib/hooks/useOrganization'
+import {
+    PaymentMethod,
+    PaymentStatus,
+    CheckoutFormData,
+    WaveCheckoutResponse,
+    Product,
+    Provider,
+    Organization,
+    PaymentLink,
+    Props,
+} from './checkoutTypes'
+import { supabase } from '@/utils/supabase/client'
 
-interface PaymentMethod {
-    id: string
-    name: string
-    icon: string
-    color: string
-}
-
-type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure'
-
-interface CheckoutFormData {
-    amount: number;
-    currency: string;
-    aggregatedMerchantId: string;
-    errorUrl: string;
-    successUrl: string;
-    merchantId: string;
-    organizationId: string;
-    customerId: string;
-    productId: string | null;
-    subscriptionId: string | null;
-    transactionType: string;
-    description: string;
-    referenceId: string;
-    metadata: Record<string, unknown>;
-    feeAmount: number;
-    feeReference: string;
-    providerCode: string;
-    paymentMethodCode: string;
-}
-
-export default function StripeCheckoutPage() {
+export default function StripeCheckoutPage({ paymentLinkId }: Props) {
     const [selectedMethod, setSelectedMethod] = useState('')
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
+    const [organization, setOrganization] = useState<Organization | null>(null);
+    const [product, setProduct] = useState<Product | null>(null);
+    const [providers, setProviders] = useState<Provider[]>([]);
+    const [paymentLink, setPaymentLink] = useState<PaymentLink | null>(null);
+    const { user } = useUser();
+    const userOrganization = useOrganization();
     const paymentMethods: PaymentMethod[] = [
         { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards.png', color: 'bg-gray-100' },
         { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png', color: 'bg-gray-100' },
@@ -47,6 +37,65 @@ export default function StripeCheckoutPage() {
         { id: 'ORANGE', name: 'Orange', icon: '/orange.png', color: 'bg-gray-100' },
         { id: 'MTN_MOMO', name: 'Momo', icon: '/mtn.png', color: 'bg-gray-100' },
     ]
+
+    useEffect(() => {
+        // Fetch organization data
+        const fetchOrganization = async () => {
+            if (user && userOrganization) {
+                try {
+                    const response = await axios.get<Organization>(`/api/organizations/${userOrganization.organizationId}`);
+                    setOrganization(response.data);
+                } catch (error) {
+                    console.error('Error fetching organization data:', error);
+                }
+            }
+        };
+
+        // Fetch product data
+        const fetchProduct = async () => {
+            if (user && userOrganization) {
+                try {
+                    const response = await axios.get<Product>(`/api/products/${paymentLinkId}`);
+                    setProduct(response.data);
+                } catch (error) {
+                    console.error('Error fetching product data:', error);
+                }
+            }
+        };
+
+        // Fetch available providers
+        const fetchProviders = async () => {
+            if (user && userOrganization) {
+                try {
+                    const response = await axios.get<Provider[]>(`/api/organizations/${userOrganization.organizationId}/providers`);
+                    setProviders(response.data);
+                } catch (error) {
+                    console.error('Error fetching providers:', error);
+                }
+            }
+        };
+
+        // Fetch payment link data
+        const fetchPaymentLink = async () => {
+            if (user && userOrganization) {
+                try {
+                    const { data, error } = await supabase.rpc('get_payment_link_by_id', { link_id: paymentLinkId });
+                    if (error) {
+                        console.error('Error fetching payment link data:', error);
+                    } else {
+                        setPaymentLink(data as PaymentLink);
+                    }
+                } catch (error) {
+                    console.error('Error fetching payment link data:', error);
+                }
+            }
+        };
+
+        fetchOrganization();
+        fetchProduct();
+        fetchProviders();
+        fetchPaymentLink();
+    }, [user, userOrganization, paymentLinkId]);
 
     const handleMethodSelect = (methodId: string) => {
         setSelectedMethod(methodId)
@@ -85,37 +134,63 @@ export default function StripeCheckoutPage() {
     }
 
     const initiateWaveCheckout = async () => {
-        setPaymentStatus('processing')
+        setPaymentStatus('processing');
         try {
-            const checkoutFormData: CheckoutFormData = {
-                amount: 1250,
-                currency: 'XOF',
-                aggregatedMerchantId: 'your_aggregated_merchant_id',
-                errorUrl: 'https://example.com/error',
-                successUrl: 'https://example.com/success',
-                merchantId: 'merchant_id_here',
-                organizationId: 'organization_id_here',
-                customerId: 'customer_id_here',
-                productId: 'product_id_here',
-                subscriptionId: 'subscription_id_here',
-                transactionType: 'payment',
-                description: 'Payment for product XYZ',
-                referenceId: 'ref_123',
-                metadata: {},
-                feeAmount: 50,
-                feeReference: 'standard_fee',
-                providerCode: 'WAVE',
-                paymentMethodCode: 'MOBILE_MONEY',
-            };
+            if (user && userOrganization && product && paymentLink) {
+                // Create a new customer or fetch existing customer
+                const { data: customerData, error: customerError } = await supabase.rpc('create_customer', {
+                    p_merchant_id: user.id,
+                    p_organization_id: userOrganization.organizationId,
+                    p_name: 'Customer Name', // Replace with actual customer name
+                    p_email: 'customer@example.com', // Replace with actual customer email
+                    p_phone_number: '+1234567890', // Replace with actual customer phone number
+                    p_country: 'Country', // Replace with actual customer country
+                    p_city: 'City', // Replace with actual customer city
+                    p_address: 'Address', // Replace with actual customer address
+                    p_postal_code: '12345', // Replace with actual customer postal code
+                    p_is_business: false, // Replace with actual customer type
+                });
 
-            const response = await axios.post('/api/checkout/wave', checkoutFormData);
-            const { waveLaunchUrl, transactionId } = response.data;
-            window.location.href = waveLaunchUrl;
+                if (customerError) {
+                    console.error('Error creating or fetching customer:', customerError);
+                    setPaymentStatus('failure');
+                    return;
+                }
+
+                const customerId = customerData.customer_id;
+
+                const checkoutFormData: CheckoutFormData = {
+                    amount: paymentLink.price || product.price,
+                    currency: paymentLink.currencyCode || product.currencyCode,
+                    aggregatedMerchantId: 'your_aggregated_merchant_id', // Determine based on merchant and organization
+                    errorUrl: 'https://pay.lomi.africa/error',
+                    successUrl: paymentLink.successUrl || 'https://pay.lomi.africa/success',
+                    merchantId: product.merchantId,
+                    organizationId: product.organizationId,
+                    customerId: customerId,
+                    productId: product.id,
+                    subscriptionId: null,
+                    transactionType: 'payment',
+                    description: `Payment for ${product.name}`,
+                    referenceId: 'ref_123',
+                    metadata: paymentLink.metadata,
+                    feeAmount: 0,
+                    feeReference: 'standard_fee',
+                    providerCode: 'WAVE',
+                    paymentMethodCode: 'MOBILE_MONEY',
+                    providerTransactionId: 'wave_transaction_id_here', // Replace with actual Wave transaction ID
+                    providerPaymentStatus: 'pending', // Set initial payment status
+                };
+
+                const response = await axios.post<WaveCheckoutResponse>('/api/checkout/wave', checkoutFormData);
+                const { waveLaunchUrl } = response.data;
+                window.location.href = waveLaunchUrl;
+            }
         } catch (error) {
             console.error('Error initiating Wave checkout:', error);
             setPaymentStatus('failure');
         }
-    }
+    };
 
     const renderPaymentStatus = () => {
         switch (paymentStatus) {
@@ -170,18 +245,24 @@ export default function StripeCheckoutPage() {
                 {/* Left side - Product details */}
                 <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold mb-4 text-gray-900">Your Order</h1>
+                        <h1 className="text-2xl font-bold mb-4 text-gray-900">{paymentLink?.title || 'Your Order'}</h1>
                         <div className="flex items-center mb-4">
-                            <img
-                                src="/al.png"
-                                alt="Product"
-                                width={80}
-                                height={80}
-                                className="rounded-md mr-4"
-                            />
+                            {organization && (
+                                <img
+                                    src={organization.logoUrl}
+                                    alt="Organization Logo"
+                                    width={80}
+                                    height={80}
+                                    className="rounded-md mr-4"
+                                />
+                            )}
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900">The African Ledger — Monthly Premium Subscription</h2>
-                                <p className="text-gray-600">1-month access to all articles</p>
+                                {product && (
+                                    <>
+                                        <h2 className="text-lg font-semibold text-gray-900">{product.name}</h2>
+                                        <p className="text-gray-600">{paymentLink?.publicDescription || product.description}</p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -189,11 +270,11 @@ export default function StripeCheckoutPage() {
                         <div className="border-t border-gray-200 pt-4 mb-4">
                             <div className="flex justify-between mb-2">
                                 <span className="text-gray-700">Subtotal</span>
-                                <span className="text-gray-900">XOF 1250</span>
+                                <span className="text-gray-900">{paymentLink?.price || product?.price} {paymentLink?.currencyCode || product?.currencyCode}</span>
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span className="text-gray-900">Total</span>
-                                <span className="text-gray-900">XOF 1250</span>
+                                <span className="text-gray-900">{paymentLink?.price || product?.price} {paymentLink?.currencyCode || product?.currencyCode}</span>
                             </div>
                         </div>
                         <p className="text-xs text-gray-500 text-center">
@@ -214,19 +295,15 @@ export default function StripeCheckoutPage() {
                                 className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
                                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                             >
-                                {paymentMethods.map((method) => (
+                                {providers.map((provider) => (
                                     <motion.div
-                                        key={method.id}
-                                        onClick={() => handleMethodSelect(method.id)}
-                                        className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedMethod === method.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'
+                                        key={provider.code}
+                                        onClick={() => handleMethodSelect(provider.code)}
+                                        className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedMethod === provider.code ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'
                                             }`}
                                         style={{ width: '100px', height: '100px', padding: '0rem' }}
                                     >
-                                        <img
-                                            src={method.icon}
-                                            alt={method.name}
-                                            className="w-full h-full object-contain rounded-lg"
-                                        />
+                                        <span>{provider.name}</span>
                                     </motion.div>
                                 ))}
                             </div>

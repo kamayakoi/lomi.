@@ -395,6 +395,7 @@ COMMENT ON TABLE fees IS 'Defines fee structures for different transaction types
 -- Transactions table
 CREATE TABLE transactions (
     transaction_id UUID PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
+    order_id VARCHAR(255) NOT NULL,
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
@@ -441,6 +442,26 @@ COMMENT ON COLUMN transactions.metadata IS 'Additional transaction-specific data
 COMMENT ON COLUMN transactions.gross_amount IS 'Total transaction amount including fees';
 COMMENT ON COLUMN transactions.fee_amount IS 'Total fees charged for the transaction';
 COMMENT ON COLUMN transactions.net_amount IS 'Amount received by the merchant after deducting fees';
+
+
+-- Providers Transactions table
+CREATE TABLE providers_transactions (
+    transaction_id UUID PRIMARY KEY REFERENCES transactions(transaction_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    provider_code provider_code NOT NULL REFERENCES providers(code),
+    wave_checkout_id VARCHAR(255),
+    wave_payment_status VARCHAR(50),
+    wave_transaction_id VARCHAR(255),
+    orange_transaction_id VARCHAR(255),
+    orange_payment_status VARCHAR(50),
+    mtn_transaction_id VARCHAR(255),
+    mtn_payment_status VARCHAR(50),
+    stripe_transaction_id VARCHAR(255),
+    stripe_payment_status VARCHAR(50),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (transaction_id, provider_code)
+);
 
 
 -- Refunds table

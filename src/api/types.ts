@@ -19,6 +19,8 @@ export interface Transaction {
   payment_method_code: string;
   created_at: string;
   updated_at: string;
+  provider_transaction_id: string;
+  provider_payment_status: string;
 }
 
 export interface Merchant {

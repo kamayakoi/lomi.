@@ -72,3 +72,52 @@ export async function updateTransactionStatus(id: string, status: string): Promi
 
   return data ? (data as Transaction) : null;
 }
+
+export async function createTransactionWithProvider(
+  merchantId: string,
+  organizationId: string,
+  customerId: string,
+  productId: string | null,
+  subscriptionId: string | null,
+  transactionType: string,
+  description: string,
+  referenceId: string,
+  metadata: Record<string, unknown>,
+  grossAmount: number,
+  feeAmount: number,
+  netAmount: number,
+  feeReference: string,
+  currencyCode: string,
+  providerCode: string,
+  paymentMethodCode: string,
+  providerTransactionId: string,
+  providerPaymentStatus: string
+): Promise<Transaction> {
+  const { data, error } = await supabase.rpc('create_transaction_with_provider', {
+    merchant_id: merchantId,
+    organization_id: organizationId,
+    customer_id: customerId,
+    product_id: productId,
+    subscription_id: subscriptionId,
+    transaction_type: transactionType,
+    description,
+    reference_id: referenceId,
+    metadata,
+    gross_amount: grossAmount,
+    fee_amount: feeAmount,
+    net_amount: netAmount,
+    fee_reference: feeReference,
+    currency_code: currencyCode,
+    provider_code: providerCode,
+    payment_method_code: paymentMethodCode,
+    provider_transaction_id: providerTransactionId,
+    provider_payment_status: providerPaymentStatus,
+  });
+
+  if (error) {
+    console.error('Error creating transaction with provider:', error);
+    throw error;
+  }
+
+  return data as Transaction;
+}

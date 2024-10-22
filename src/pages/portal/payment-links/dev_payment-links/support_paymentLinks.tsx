@@ -25,3 +25,25 @@ export const fetchPaymentLinks = async (
 
     return data as PaymentLink[]
 }
+
+export const generatePaymentLink = (
+    merchantId: string,
+    orderId: string,
+    linkType: string,
+    productId?: string,
+    planId?: string
+) => {
+    const baseUrl = import.meta.env.MODE === 'production' ? import.meta.env['VITE_PAYMENT_LINK_BASE_URL'] : import.meta.env['VITE_PAYMENT_LINK_BASE_URL_DEV'];
+    const encodedMerchantId = encodeURIComponent(merchantId);
+    const encodedOrderId = encodeURIComponent(orderId);
+
+    let linkPath = `/${encodedMerchantId}/${encodedOrderId}`;
+
+    if (linkType === 'product' && productId) {
+        linkPath += `/product/${encodeURIComponent(productId)}`;
+    } else if (linkType === 'plan' && planId) {
+        linkPath += `/plan/${encodeURIComponent(planId)}`;
+    }
+
+    return `${baseUrl}${linkPath}`;
+};

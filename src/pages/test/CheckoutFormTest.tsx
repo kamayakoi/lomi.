@@ -1,4 +1,4 @@
-import { CheckoutForm } from '@/components/checkout/CheckoutForm'
+import { CheckoutForm } from '@/api/checkout/CheckoutForm'
 
 const CheckoutFormTest = () => {
     return (

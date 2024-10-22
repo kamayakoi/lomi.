@@ -79,8 +79,8 @@ import Status from './pages/Status.tsx';
 
 
 // API pages
-import StripeCallback from '../providers/stripe/callback/stripe-callback-index.tsx';
-import StripeConnectLanding from "../providers/stripe/StripeConnectLanding";
+import StripeCallback from '@/api/providers/stripe/callback/stripe-callback-index.tsx';
+import StripeConnectLanding from "@/api/providers/stripe/StripeConnectLanding";
 
 
 // // Test pages
