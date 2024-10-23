@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { PaymentLink, provider_code } from './types'
-import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
+import { LifeBuoy } from 'lucide-react'
 
 const providerColors: Record<provider_code, string> = {
     'ORANGE': 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white',
@@ -22,6 +22,12 @@ type PaymentLinkActionsProps = {
 export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: PaymentLinkActionsProps) {
     if (!paymentLink) return null
 
+    const handleContactSupport = () => {
+        const subject = encodeURIComponent(`[Support] — Payment link Issue: ${paymentLink.link_id} (id)`)
+        const mailtoLink = `mailto:hello@lomi.africa?subject=${subject}`
+        window.location.href = mailtoLink
+    }
+
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent className="sm:max-w-2xl overflow-y-auto">
@@ -34,6 +40,8 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                             <section>
                                 <h3 className="text-lg font-semibold mb-2">Payment Link Information</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm">
+                                    <div className="font-medium">ID:</div>
+                                    <div>{paymentLink.link_id}</div>
                                     <div className="font-medium">Title:</div>
                                     <div>{paymentLink.title}</div>
                                     <div className="font-medium">Public Description:</div>
@@ -91,12 +99,8 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                             </section>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <ArrowDownToLine className="mr-2 h-4 w-4" />
-                            Download Details
-                        </Button>
-                        <Button variant="outline" className="w-full sm:w-auto">
+                    <CardFooter className="flex justify-end">
+                        <Button variant="outline" onClick={handleContactSupport}>
                             <LifeBuoy className="mr-2 h-4 w-4" />
                             Contact Support
                         </Button>

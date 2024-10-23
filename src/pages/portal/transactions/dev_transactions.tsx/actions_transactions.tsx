@@ -4,17 +4,160 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Transaction, transaction_status, transaction_type, provider_code } from './types'
 import { ArrowDownToLine, RefreshCcw, LifeBuoy } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { jsPDF } from 'jspdf';
 
 type TransactionActionsProps = {
     transaction: Transaction | null
     isOpen: boolean
     onClose: () => void
+    isGenerating: boolean
 }
 
-export default function TransactionActions({ transaction, isOpen, onClose }: TransactionActionsProps) {
+export default function TransactionActions({ transaction, isOpen, onClose, isGenerating }: TransactionActionsProps) {
     if (!transaction) return null
 
     const canRefund = transaction.status !== 'failed' && transaction.status !== 'refunded' && transaction.status !== 'pending'
+
+    const handleContactSupport = () => {
+        const subject = encodeURIComponent(`[Support] — Transaction Issue: ${transaction.transaction_id}`)
+        const mailtoLink = `mailto:hello@lomi.africa?subject=${subject}`
+        window.location.href = mailtoLink
+    }
+
+    const handleDownloadReceipt = () => {
+        if (!transaction) return;
+
+        const doc = new jsPDF();
+
+        // Set background color
+        doc.setFillColor(248, 250, 252);
+        doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
+
+        // Add company logo
+        const logoUrl = '/lomi-icon.png';
+        doc.addImage(logoUrl, 'PNG', 15, 15, 20, 20);
+
+        // Add company name and receipt title
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Lomi Africa', 40, 25);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.text('Transaction Receipt', 40, 35);
+
+        // Add horizontal line separator
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(15, 45, 195, 45);
+
+        // Add transaction details
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Transaction Summary', 15, 55);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(75, 85, 99);
+        const details = [
+            `Transaction ID: ${transaction.transaction_id}`,
+            `Amount: ${formatCurrency(transaction.gross_amount, transaction.currency)}`,
+            `Status: ${formatTransactionStatus(transaction.status)}`,
+            `Type: ${formatTransactionType(transaction.type)}`,
+            `Date: ${formatDate(transaction.date)}`,
+            `Provider: ${formatProviderCode(transaction.provider_code)}`,
+        ];
+        details.forEach((detail, index) => {
+            doc.text(detail, 15, 65 + index * 7);
+        });
+
+        // Add horizontal line separator
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.5);
+        doc.line(15, 110, 195, 110);
+
+        // Add customer information
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Customer Information', 15, 120);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(75, 85, 99);
+        const customerInfo = [
+            `Name: ${transaction.customer_name}`,
+            `Email: ${transaction.customer_email || 'N/A'}`,
+            `Phone: ${transaction.customer_phone || 'N/A'}`,
+            `Country: ${transaction.customer_country || 'N/A'}`,
+        ];
+        customerInfo.forEach((info, index) => {
+            doc.text(info, 15, 130 + index * 7);
+        });
+
+        let lastY = 160;
+
+        // Add product details
+        if (transaction.product_id) {
+            // Add horizontal line separator
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.5);
+            doc.line(15, lastY, 195, lastY);
+            lastY += 10;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(31, 41, 55);
+            doc.text('Product Details', 15, lastY);
+            lastY += 10;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            const productDetails = [
+                `Product Name: ${transaction.product_name}`,
+                `Description: ${transaction.product_description}`,
+                `Price: ${formatCurrency(transaction.product_price || 0, transaction.currency)}`,
+            ];
+            productDetails.forEach((detail, index) => {
+                doc.text(detail, 15, lastY + index * 7);
+            });
+            lastY += productDetails.length * 7 + 10;
+        }
+
+        // Add subscription details
+        if (transaction.subscription_id) {
+            // Add horizontal line separator
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.5);
+            doc.line(15, lastY, 195, lastY);
+            lastY += 10;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(31, 41, 55);
+            doc.text('Subscription Details', 15, lastY);
+            lastY += 10;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(75, 85, 99);
+            const subscriptionDetails = [
+                `Plan Name: ${transaction.plan_name}`,
+                `Description: ${transaction.plan_description}`,
+                `Billing Frequency: ${formatBillingFrequency(transaction.plan_billing_frequency)}`,
+                `End Date: ${formatDate(transaction.subscription_end_date)}`,
+                `Next Billing Date: ${formatDate(transaction.subscription_next_billing_date)}`,
+                `Status: ${formatSubscriptionStatus(transaction.subscription_status)}`,
+            ];
+            subscriptionDetails.forEach((detail, index) => {
+                doc.text(detail, 15, lastY + index * 7);
+            });
+            lastY += subscriptionDetails.length * 7 + 10;
+        }
+
+        // Add footer
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(31, 41, 55);
+        doc.text('Thank you for your business!', 105, lastY + 15, { align: 'center' });
+
+        // Save the PDF
+        doc.save(`transaction_receipt_${transaction.transaction_id}.pdf`);
+    };
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
@@ -109,17 +252,31 @@ export default function TransactionActions({ transaction, isOpen, onClose }: Tra
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <ArrowDownToLine className="mr-2 h-4 w-4" />
-                            Download Receipt
+                        <Button
+                            variant="outline"
+                            className="w-full sm:w-auto flex items-center space-x-2"
+                            onClick={handleDownloadReceipt}
+                            disabled={isGenerating}
+                        >
+                            {isGenerating ? (
+                                <>
+                                    <span className="animate-spin">⏳</span>
+                                    <span>Generating...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <ArrowDownToLine className="mr-2 h-4 w-4" />
+                                    <span>Download Receipt</span>
+                                </>
+                            )}
                         </Button>
                         {canRefund && (
-                            <Button variant="outline" className="w-full sm:w-auto">
+                            <Button variant="outline" className="w-full sm:w-auto" disabled>
                                 <RefreshCcw className="mr-2 h-4 w-4" />
                                 Refund Transaction
                             </Button>
                         )}
-                        <Button variant="outline" className="w-full sm:w-auto">
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={handleContactSupport}>
                             <LifeBuoy className="mr-2 h-4 w-4" />
                             Contact Support
                         </Button>

@@ -67,6 +67,7 @@ function TransactionsPage() {
     const [showTotalBreakdown, setShowTotalBreakdown] = useState(false)
     const [showAverageValue, setShowAverageValue] = useState(false)
     const [showAverageRetentionRate, setShowAverageRetentionRate] = useState(false)
+    const [isDownloadOpen, setIsDownloadOpen] = useState(false)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -183,6 +184,61 @@ function TransactionsPage() {
         if (customDateRange && customDateRange.from && customDateRange.to) {
             setSelectedDateRange('custom')
         }
+    }
+
+    const handleDownload = () => {
+        const filteredTransactions = applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm)
+        const csvData = convertToCSV(filteredTransactions)
+        downloadCSV(csvData)
+        setIsDownloadOpen(false)
+    }
+
+    function convertToCSV(data: (Transaction | undefined)[]): string {
+        const filteredData = data.filter((item): item is Transaction => item !== undefined);
+
+        if (filteredData.length === 0) {
+            return '';
+        }
+
+        const headers = Object.keys(filteredData[0] || {}).join(',');
+        const rows = filteredData.map(transaction => {
+            if (!transaction) return '';
+            return Object.values(transaction)
+                .map(value => {
+                    if (typeof value === 'string') {
+                        return `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
+                })
+                .join(',');
+        }).join('\n');
+
+        return `${headers}\n${rows}`;
+    }
+
+    function downloadCSV(csvData: string) {
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        const link = document.createElement('a')
+        const url = URL.createObjectURL(blob)
+        link.setAttribute('href', url)
+        link.setAttribute('download', 'transactions.csv')
+        link.style.visibility = 'hidden'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+
+    function copyAsJSON() {
+        const filteredTransactions = applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm)
+        const jsonData = JSON.stringify(filteredTransactions, null, 2)
+        navigator.clipboard.writeText(jsonData)
+            .then(() => {
+                console.log('JSON data copied to clipboard')
+                setIsDownloadOpen(false)
+            })
+            .catch((error) => {
+                console.error('Error copying JSON data:', error)
+            })
     }
 
     if (isUserLoading) {
@@ -435,6 +491,10 @@ function TransactionsPage() {
                             setSelectedPaymentMethods={setSelectedPaymentMethods}
                             columns={columns}
                             setColumns={setColumns}
+                            isDownloadOpen={isDownloadOpen}
+                            setIsDownloadOpen={setIsDownloadOpen}
+                            handleDownload={handleDownload}
+                            copyAsJSON={copyAsJSON}
                         />
 
                         <Card>

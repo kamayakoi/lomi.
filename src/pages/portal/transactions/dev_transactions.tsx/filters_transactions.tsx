@@ -30,6 +30,10 @@ interface TransactionFiltersProps {
     setSelectedPaymentMethods: (value: string[]) => void
     columns: string[]
     setColumns: (value: string[]) => void
+    isDownloadOpen: boolean
+    setIsDownloadOpen: (isOpen: boolean) => void
+    handleDownload: () => void
+    copyAsJSON: () => void
 }
 
 export default function TransactionFilters({
@@ -51,6 +55,10 @@ export default function TransactionFilters({
     setSelectedPaymentMethods,
     columns,
     setColumns,
+    isDownloadOpen,
+    setIsDownloadOpen,
+    handleDownload,
+    copyAsJSON
 }: TransactionFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
 
@@ -178,12 +186,12 @@ export default function TransactionFilters({
                 <div className="flex space-x-2 ml-auto">
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button variant="outline" className="border-border text-card-foreground h-10 rounded-none">
+                            <Button variant="outline" className="bg-card text-card-foreground px-2 h-10 rounded-none">
                                 <Filter className="h-5 w-5" />
-                                <span className="ml-2">Filters</span>
+                                <span className="sr-only">Filters</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[400px] sm:w-[540px] bg-card text-card-foreground">
+                        <SheetContent className="w-[450px] p-4 bg-card text-card-foreground">
                             <div className="flex flex-col space-y-4 p-4">
                                 <h3 className="text-lg font-semibold">Filters</h3>
                                 <div>
@@ -292,7 +300,7 @@ export default function TransactionFilters({
                     </Sheet>
                     <Popover open={isColumnsPopoverOpen} onOpenChange={setIsColumnsPopoverOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
+                            <Button variant="outline" className="bg-card text-card-foreground px-2 h-10 rounded-none">
                                 <Settings className="h-5 w-5" />
                                 <span className="sr-only">Columns</span>
                             </Button>
@@ -313,10 +321,22 @@ export default function TransactionFilters({
                             ))}
                         </PopoverContent>
                     </Popover>
-                    <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
-                        <Download className="h-5 w-5" />
-                        <span className="sr-only">Export</span>
-                    </Button>
+                    <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" className="bg-card text-card-foreground px-2 h-10 rounded-none">
+                                <Download className="h-5 w-5" />
+                                <span className="sr-only">Export</span>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40 p-2" side="bottom" align="end" sideOffset={5}>
+                            <Button variant="ghost" size="sm" className="w-full" onClick={handleDownload}>
+                                Download CSV
+                            </Button>
+                            <Button variant="ghost" size="sm" className="w-full mt-2" onClick={copyAsJSON}>
+                                Copy as JSON
+                            </Button>
+                        </PopoverContent>
+                    </Popover>
                 </div>
             </div>
         </div>

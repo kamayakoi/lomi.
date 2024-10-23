@@ -862,3 +862,4 @@ CREATE INDEX idx_payment_links_currency_code ON payment_links(currency_code);
 CREATE INDEX idx_payment_links_url ON payment_links(url);
 
 COMMENT ON TABLE payment_links IS 'Stores payment links for one-time payments, subscriptions, and instant links';
+

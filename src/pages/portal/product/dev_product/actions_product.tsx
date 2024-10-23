@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Product, Transaction } from './types'
 import { Separator } from "@/components/ui/separator"
-import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
+import { LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { fetchProductTransactions } from './support_product'
 
@@ -15,6 +15,13 @@ type ProductActionsProps = {
 
 export default function ProductActions({ product, isOpen, onClose }: ProductActionsProps) {
     const [transactions, setTransactions] = useState<Transaction[]>([])
+
+
+    const handleContactSupport = () => {
+        const subject = encodeURIComponent(`[Support] — Product Issue: ${product?.product_id} (id)`)
+        const mailtoLink = `mailto:hello@lomi.africa?subject=${subject}`
+        window.location.href = mailtoLink
+    }
 
     useEffect(() => {
         if (product?.product_id) {
@@ -65,12 +72,8 @@ export default function ProductActions({ product, isOpen, onClose }: ProductActi
                             </section>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <ArrowDownToLine className="mr-2 h-4 w-4" />
-                            Download Details
-                        </Button>
-                        <Button variant="outline" className="w-full sm:w-auto">
+                    <CardFooter className="flex justify-end">
+                        <Button variant="outline" className="w-full sm:w-auto" onClick={handleContactSupport}>
                             <LifeBuoy className="mr-2 h-4 w-4" />
                             Contact Support
                         </Button>

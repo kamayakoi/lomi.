@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Subscription, Transaction } from './types'
 import { Separator } from "@/components/ui/separator"
-import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
+import { LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { fetchSubscriptionTransactions } from './support_subscriptions'
 
@@ -77,11 +77,7 @@ export default function SubscriptionActions({ subscription, isOpen, onClose }: S
                             </section>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <ArrowDownToLine className="mr-2 h-4 w-4" />
-                            Download Details
-                        </Button>
+                    <CardFooter className="flex justify-end">
                         <Button variant="outline" className="w-full sm:w-auto">
                             <LifeBuoy className="mr-2 h-4 w-4" />
                             Contact Support

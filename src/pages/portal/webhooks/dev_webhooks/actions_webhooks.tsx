@@ -3,7 +3,6 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Webhook } from './types'
 import { Separator } from "@/components/ui/separator"
-import { ArrowDownToLine } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { fetchWebhookDetails, deleteWebhook } from './support_webhooks'
 
@@ -77,11 +76,7 @@ export default function WebhookActions({ webhook, isOpen, onClose }: WebhookActi
                             </section>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <ArrowDownToLine className="mr-2 h-4 w-4" />
-                            Download Details
-                        </Button>
+                    <CardFooter className="flex justify-end">
                         <Button variant="destructive" className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white" onClick={handleDelete}>
                             Delete Webhook
                         </Button>
