@@ -48,7 +48,7 @@ function PaymentLinksPage() {
     { title: 'Settings', href: 'settings', isActive: false },
   ]
 
-  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage } = useInfiniteQuery(
+  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage, refetch } = useInfiniteQuery(
     ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus],
     ({ pageParam = 1 }) =>
       fetchPaymentLinks(
@@ -308,7 +308,7 @@ function PaymentLinksPage() {
         <DialogContent className="sm:max-w-[90vw] sm:max-h-[90vh] sm:w-full sm:h-full overflow-hidden p-0">
           <div className="h-full overflow-auto">
             <div className="p-0">
-              <PaymentCustomizerWithCheckout />
+              <PaymentCustomizerWithCheckout setIsCreateLinkOpen={setIsCreateLinkOpen} refetch={refetch} />
             </div>
           </div>
         </DialogContent>

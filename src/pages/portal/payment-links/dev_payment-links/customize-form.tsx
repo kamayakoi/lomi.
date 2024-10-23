@@ -187,7 +187,12 @@ const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChan
     );
 };
 
-export default function PaymentCustomizerWithCheckout() {
+interface PaymentCustomizerWithCheckoutProps {
+    setIsCreateLinkOpen: (isOpen: boolean) => void
+    refetch: () => void
+}
+
+export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, refetch }: PaymentCustomizerWithCheckoutProps) {
     const [paymentType, setPaymentType] = useState('instant')
     const [instantLinkDetails, setInstantLinkDetails] = useState({
         name: '',
@@ -610,6 +615,18 @@ export default function PaymentCustomizerWithCheckout() {
                 selectedPlan?.plan_id
             )
 
+            // Map the selected payment methods to their corresponding provider codes
+            const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
+                if (method === 'CARDS' || method === 'APPLE_PAY') {
+                    if (!acc.includes('STRIPE')) {
+                        acc.push('STRIPE')
+                    }
+                } else {
+                    acc.push(method)
+                }
+                return acc
+            }, [] as string[])
+
             const { data, error } = await supabase.rpc('create_payment_link', {
                 p_merchant_id: user.id,
                 p_organization_id: organizationData[0].organization_id,
@@ -620,20 +637,29 @@ export default function PaymentCustomizerWithCheckout() {
                 p_private_description: instantLinkDetails.privateDescription,
                 p_price: paymentType === 'instant' && prices[0]?.amount ? parseFloat(prices[0].amount) : null,
                 p_currency_code: prices[0]?.currency || 'XOF',
-                p_allowed_providers: allowedPaymentMethods,
+                p_allowed_providers: mappedProviders,
                 p_allow_coupon_code: allowCouponCode,
-                p_expires_at: expirationDate ? expirationDate.toString() : null,
+                p_expires_at: expirationDate ? expirationDate.toISOString() : null, // Convert to ISO 8601 string
                 p_success_url: redirectToCustomPage ? customSuccessUrl : null,
             })
 
             if (error) {
                 console.error('Error creating payment link:', error)
+                // Display an error message to the user
+                alert('An error occurred while creating the payment link. Please contact support for assistance.')
             } else {
                 console.log('Payment link created:', data)
-                navigate('/portal/payment-links')
+                // Close the form dialog
+                setIsCreateLinkOpen(false)
+                // Refresh the payment links data
+                refetch()
+                // Remove the success message alert
+                // alert('Payment link created successfully!')
             }
         } catch (error) {
             console.error('Error creating payment link:', error)
+            // Display a generic error message to the user
+            alert('An unexpected error occurred. Please contact support for assistance.')
         }
     }
 
