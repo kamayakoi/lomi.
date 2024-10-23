@@ -215,12 +215,12 @@ function CustomersPage() {
                             <DialogTrigger asChild>
                                 <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     <PlusCircle className="mr-2 h-4 w-4" />
-                                    Add a customer
+                                    Add a Customer
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Add a Customer</DialogTitle>
+                                    <DialogTitle>Add a customer</DialogTitle>
                                     <DialogDescription>
                                         Fill in the details to add a new customer for billing.
                                     </DialogDescription>
@@ -329,7 +329,7 @@ function CustomersPage() {
                                     </div>
                                     <div className="flex justify-end">
                                         <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                                            Add Customer
+                                            Add
                                         </Button>
                                     </div>
                                 </form>
