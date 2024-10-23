@@ -219,3 +219,26 @@ BEGIN
     RETURN v_updated_link;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to get available providers for a payment link based on the merchant's organization
+CREATE OR REPLACE FUNCTION public.get_payment_link_available_providers(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    code provider_code,
+    name VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.code,
+        p.name
+    FROM providers p
+    JOIN organization_providers_settings ops ON p.code = ops.provider_code
+    WHERE ops.organization_id = (
+        SELECT organization_id
+        FROM merchants
+        WHERE merchant_id = p_merchant_id
+    ) AND ops.is_connected = true;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

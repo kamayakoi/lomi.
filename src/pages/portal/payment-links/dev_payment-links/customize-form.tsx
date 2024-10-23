@@ -201,7 +201,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     })
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
     const [expirationDate, setExpirationDate] = useState<Date | null>(null);
-    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['MTN', 'ORANGE', 'WAVE', 'CARDS', 'APPLE_PAY'])
+    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['CARDS'])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
@@ -213,6 +213,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     const [plans, setPlans] = useState<SubscriptionPlan[]>([])
     const { user } = useUser()
     const navigate = useNavigate()
+    const [connectedProviders, setConnectedProviders] = useState<string[]>([])
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
@@ -230,6 +231,15 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
                 const fetchedPlans = await fetchSubscriptionPlans(user.id, 1, 50)
                 setPlans(fetchedPlans)
+
+                const { data: connectedProvidersData, error: connectedProvidersError } = await supabase
+                    .rpc('get_payment_link_available_providers', { p_merchant_id: user.id })
+
+                if (connectedProvidersError) {
+                    console.error('Error fetching connected providers:', connectedProvidersError)
+                } else {
+                    setConnectedProviders(connectedProvidersData.map((provider: { code: string }) => provider.code))
+                }
             }
         }
 
@@ -259,11 +269,9 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     }
 
     const togglePaymentMethod = useCallback((methodId: string) => {
-        if (methodId !== 'CARDS') {
-            setAllowedPaymentMethods(prev =>
-                prev.includes(methodId) ? prev.filter(m => m !== methodId) : [...prev, methodId]
-            )
-        }
+        setAllowedPaymentMethods(prev =>
+            prev.includes(methodId) ? prev.filter(m => m !== methodId) : [...prev, methodId]
+        )
     }, []);
 
     const handleInstantLinkChange = useCallback((name: string, value: string) => {
@@ -466,7 +474,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 </div>
             )}
 
-            {(paymentType === 'product' || paymentType === 'plan') && (
+            {(paymentType === 'product' || paymentType === 'plan' || paymentType === 'instant') && (
                 <>
                     <InstantLinkInput
                         name="privateDescription"
@@ -482,19 +490,22 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     <div className="space-y-4">
                         <Label className="block">Payment methods</Label>
                         <div className="flex flex-wrap gap-2">
-                            {paymentMethods.map((method) => (
-                                <Badge
-                                    key={method.id}
-                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                    className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
-                                        ? getBadgeColor(method.id)
-                                        : 'bg-transparent hover:bg-transparent'
-                                        }`}
-                                    onClick={() => togglePaymentMethod(method.id)}
-                                >
-                                    {method.name}
-                                </Badge>
-                            ))}
+                            {paymentMethods
+                                .filter((method) => connectedProviders.includes(method.id))
+                                .map((method) => (
+                                    <Badge
+                                        key={method.id}
+                                        variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
+                                        className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
+                                            ? getBadgeColor(method.id)
+                                            : 'bg-transparent hover:bg-transparent'
+                                            }`}
+                                        onClick={() => togglePaymentMethod(method.id)}
+                                    >
+                                        {method.name}
+                                    </Badge>
+                                ))
+                            }
                         </div>
                     </div>
                 </>
@@ -517,19 +528,22 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     <div className="space-y-4">
                         <Label className="block">Payment methods</Label>
                         <div className="flex flex-wrap gap-2">
-                            {paymentMethods.map((method) => (
-                                <Badge
-                                    key={method.id}
-                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                    className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
-                                        ? getBadgeColor(method.id)
-                                        : 'bg-transparent hover:bg-transparent'
-                                        }`}
-                                    onClick={() => togglePaymentMethod(method.id)}
-                                >
-                                    {method.name}
-                                </Badge>
-                            ))}
+                            {paymentMethods
+                                .filter((method) => connectedProviders.includes(method.id))
+                                .map((method) => (
+                                    <Badge
+                                        key={method.id}
+                                        variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
+                                        className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
+                                            ? getBadgeColor(method.id)
+                                            : 'bg-transparent hover:bg-transparent'
+                                            }`}
+                                        onClick={() => togglePaymentMethod(method.id)}
+                                    >
+                                        {method.name}
+                                    </Badge>
+                                ))
+                            }
                         </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -724,8 +738,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 setIsCreateLinkOpen(false)
                 // Refresh the payment links data
                 refetch()
-                // Remove the success message alert
-                // alert('Payment link created successfully!')
             }
         } catch (error) {
             console.error('Error creating payment link:', error)
