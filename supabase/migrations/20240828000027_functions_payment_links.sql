@@ -176,7 +176,8 @@ CREATE OR REPLACE FUNCTION public.update_payment_link(
     p_price NUMERIC(10,2) DEFAULT NULL,
     p_is_active BOOLEAN DEFAULT NULL,
     p_expires_at TIMESTAMPTZ DEFAULT NULL,
-    p_success_url VARCHAR(2048) DEFAULT NULL
+    p_success_url VARCHAR(2048) DEFAULT NULL,
+    p_allowed_providers provider_code[] DEFAULT NULL
 )
 RETURNS payment_links AS $$
 DECLARE
@@ -198,6 +199,7 @@ BEGIN
             is_active = COALESCE(p_is_active, is_active),
             expires_at = COALESCE(p_expires_at, expires_at),
             success_url = COALESCE(p_success_url, success_url),
+            allowed_providers = COALESCE(p_allowed_providers, allowed_providers),
             updated_at = NOW()
         WHERE link_id = p_link_id
         RETURNING * INTO v_updated_link;
@@ -211,6 +213,7 @@ BEGIN
             is_active = COALESCE(p_is_active, is_active),
             expires_at = COALESCE(p_expires_at, expires_at),
             success_url = COALESCE(p_success_url, success_url),
+            allowed_providers = COALESCE(p_allowed_providers, allowed_providers),
             updated_at = NOW()
         WHERE link_id = p_link_id
         RETURNING * INTO v_updated_link;
@@ -240,5 +243,16 @@ BEGIN
         FROM merchants
         WHERE merchant_id = p_merchant_id
     ) AND ops.is_connected = true;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to delete a payment link
+CREATE OR REPLACE FUNCTION public.delete_payment_link(
+    p_link_id UUID
+)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM payment_links
+    WHERE link_id = p_link_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

@@ -29,6 +29,19 @@ const linkTypeColors: Record<link_type, string> = {
   'plan': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
 };
 
+function formatPrice(price: number | undefined): string {
+  if (price === undefined) {
+    return '-';
+  }
+
+  const formattedPrice = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(price);
+
+  return formattedPrice;
+}
+
 function PaymentLinksPage() {
   const { user, isLoading: isUserLoading } = useUser()
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
@@ -106,6 +119,10 @@ function PaymentLinksPage() {
     setIsEditLinkOpen(true)
   }
 
+  const handleRefresh = async () => {
+    await fetchNextPage()
+  }
+
   if (isUserLoading) {
     return <AnimatedLogoLoader />
   }
@@ -150,16 +167,8 @@ function PaymentLinksPage() {
             setSelectedCurrency={setSelectedCurrency}
             selectedStatus={selectedStatus}
             setSelectedStatus={setSelectedStatus}
-            refetch={() => {
-              fetchNextPage()
-                .then(() => {
-                  // Handle success if needed
-                })
-                .catch((error) => {
-                  console.error('Error fetching next page:', error)
-                })
-            }}
             isRefreshing={isPaymentLinksLoading}
+            onRefresh={handleRefresh}
           />
 
           <Card>
@@ -263,11 +272,11 @@ function PaymentLinksPage() {
                           </TableCell>
                           <TableCell className="text-center">
                             {link.link_type === 'instant' && link.price ? (
-                              `${link.price} ${link.currency_code}`
+                              `${formatPrice(link.price)} ${link.currency_code}`
                             ) : link.link_type === 'product' && link.product_price ? (
-                              `${link.product_price} ${link.currency_code}`
+                              `${formatPrice(link.product_price)} ${link.currency_code}`
                             ) : link.link_type === 'plan' && link.plan_amount ? (
-                              `${link.plan_amount} ${link.currency_code}`
+                              `${formatPrice(link.plan_amount)} ${link.currency_code}`
                             ) : (
                               '-'
                             )}
@@ -325,11 +334,10 @@ function PaymentLinksPage() {
           {selectedPaymentLink && (
             <EditPaymentLinkForm
               paymentLink={selectedPaymentLink}
-              onClose={() => setIsEditLinkOpen(false)}
               onSuccess={() => {
-                fetchNextPage()
                 setIsEditLinkOpen(false)
               }}
+              onRefresh={handleRefresh}
             />
           )}
         </DialogContent>

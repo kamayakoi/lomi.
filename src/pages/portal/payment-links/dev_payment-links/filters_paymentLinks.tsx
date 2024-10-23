@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { link_type, currency_code } from './types'
+import { useState } from 'react'
 
 interface PaymentLinkFiltersProps {
     searchTerm: string
@@ -13,8 +14,8 @@ interface PaymentLinkFiltersProps {
     setSelectedCurrency: (value: currency_code | null) => void
     selectedStatus: 'active' | 'inactive' | 'all' | null
     setSelectedStatus: (value: 'active' | 'inactive' | 'all' | null) => void
-    refetch: () => void
     isRefreshing: boolean
+    onRefresh: () => Promise<void>
 }
 
 export function PaymentLinkFilters({
@@ -26,9 +27,17 @@ export function PaymentLinkFilters({
     setSelectedCurrency,
     selectedStatus,
     setSelectedStatus,
-    refetch,
     isRefreshing,
+    onRefresh,
 }: PaymentLinkFiltersProps) {
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleRefresh = async () => {
+        setIsLoading(true)
+        await onRefresh()
+        setIsLoading(false)
+    }
+
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
             <div className='flex items-center space-x-4'>
@@ -53,16 +62,6 @@ export function PaymentLinkFilters({
                         <SelectItem value="instant">Instant</SelectItem>
                     </SelectContent>
                 </Select>
-                <Select value={selectedCurrency || 'XOF'} onValueChange={(value) => setSelectedCurrency(value as currency_code | null)}>
-                    <SelectTrigger className="w-[140px] rounded-none">
-                        <SelectValue placeholder="XOF" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="XOF">XOF</SelectItem>
-                        <SelectItem value="USD" disabled>USD</SelectItem>
-                        <SelectItem value="EUR" disabled>EUR</SelectItem>
-                    </SelectContent>
-                </Select>
                 <Select value={selectedStatus || undefined} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all' | null)}>
                     <SelectTrigger className="w-[140px] rounded-none">
                         <SelectValue placeholder="Status" />
@@ -73,13 +72,23 @@ export function PaymentLinkFilters({
                         <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                 </Select>
+                <Select value={selectedCurrency || 'XOF'} onValueChange={(value) => setSelectedCurrency(value as currency_code | null)}>
+                    <SelectTrigger className="w-[140px] rounded-none">
+                        <SelectValue placeholder="XOF" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="XOF">XOF</SelectItem>
+                        <SelectItem value="USD" disabled>USD</SelectItem>
+                        <SelectItem value="EUR" disabled>EUR</SelectItem>
+                    </SelectContent>
+                </Select>
                 <Button
                     variant="outline"
-                    onClick={() => refetch()}
+                    onClick={handleRefresh}
                     className="border-border text-card-foreground px-2 h-10 rounded-none"
-                    disabled={isRefreshing}
+                    disabled={isRefreshing || isLoading}
                 >
-                    <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-5 w-5 ${isRefreshing || isLoading ? 'animate-spin' : ''}`} />
                     <span className="sr-only">Refresh</span>
                 </Button>
             </div>

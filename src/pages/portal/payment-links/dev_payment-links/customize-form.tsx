@@ -17,6 +17,7 @@ import { SubscriptionPlan } from '@/pages/portal/subscription/dev_subscription/t
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import { generatePaymentLink } from './support_paymentLinks'
+import { provider_code } from './types'
 
 interface PaymentMethod {
     id: string
@@ -238,7 +239,15 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 if (connectedProvidersError) {
                     console.error('Error fetching connected providers:', connectedProvidersError)
                 } else {
-                    setConnectedProviders(connectedProvidersData.map((provider: { code: string }) => provider.code))
+                    const mappedProviders = connectedProvidersData.reduce((acc: string[], provider: { code: string }) => {
+                        if (provider.code === 'STRIPE') {
+                            acc.push('CARDS', 'APPLE_PAY')
+                        } else {
+                            acc.push(provider.code)
+                        }
+                        return acc
+                    }, [])
+                    setConnectedProviders(mappedProviders)
                 }
             }
         }
@@ -474,7 +483,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 </div>
             )}
 
-            {(paymentType === 'product' || paymentType === 'plan' || paymentType === 'instant') && (
+            {(paymentType === 'product' || paymentType === 'plan') && (
                 <>
                     <InstantLinkInput
                         name="privateDescription"
@@ -514,13 +523,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
             {paymentType === 'instant' && (
                 <>
                     <InstantLinkCustomizer />
-                    <InstantLinkInput
-                        name="privateDescription"
-                        label="Private description"
-                        value={instantLinkDetails.privateDescription}
-                        onChange={handleInstantLinkChange}
-                        optional
-                    />
                     <ExpirationDateInput
                         value={expirationDate}
                         onChange={setExpirationDate}
@@ -705,10 +707,10 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         acc.push('STRIPE')
                     }
                 } else {
-                    acc.push(method)
+                    acc.push(method as provider_code)
                 }
                 return acc
-            }, [] as string[])
+            }, [] as provider_code[])
 
             const { data, error } = await supabase.rpc('create_payment_link', {
                 p_merchant_id: user.id,

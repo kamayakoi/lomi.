@@ -3,10 +3,11 @@ import { useForm } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { updateProduct, deleteProduct } from './support_product'
 import { Product } from './types'
+import InputRightAddon from "@/components/ui/input-right-addon"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface EditProductFormProps {
     product: Product
@@ -22,7 +23,7 @@ interface ProductFormData {
 }
 
 export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClose, onSuccess }) => {
-    const { register, handleSubmit } = useForm<ProductFormData>({
+    const { register, handleSubmit, setValue, watch } = useForm<ProductFormData>({
         defaultValues: {
             name: product.name,
             description: product.description,
@@ -55,6 +56,14 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
         }
     }
 
+    const formatAmount = (amount: number | undefined) => {
+        return amount ? amount.toLocaleString("en-US") : "";
+    };
+
+    const parseAmount = (amount: string) => {
+        return parseFloat(amount.replace(/,/g, ""));
+    };
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -75,19 +84,23 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
             </div>
             <div className="space-y-2">
                 <Label htmlFor="price">Price</Label>
-                <div className="flex space-x-2">
-                    <Select>
-                        <SelectTrigger className="w-[80px]">
-                            <SelectValue placeholder="XOF" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="XOF">XOF</SelectItem>
-                            <SelectItem value="USD" disabled>USD</SelectItem>
-                            <SelectItem value="EUR" disabled>EUR</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Input id="price" type="number" placeholder="Enter price" className="flex-1" {...register('price')} />
-                </div>
+                <InputRightAddon
+                    id="price"
+                    type="text"
+                    placeholder="Enter amount"
+                    value={formatAmount(watch("price"))}
+                    onChange={(value) => setValue("price", parseAmount(value))}
+                />
+            </div>
+            <div className="flex items-center space-x-2">
+                <Checkbox
+                    id="isActive"
+                    checked={watch("is_active")}
+                    onCheckedChange={(checked: boolean) => setValue("is_active", checked)}
+                />
+                <Label htmlFor="isActive" className="cursor-pointer">
+                    Active
+                </Label>
             </div>
             <div className="flex justify-end space-x-2">
                 <Button
@@ -95,13 +108,13 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                     className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
                     onClick={handleDelete}
                 >
-                    Delete Product
+                    Delete
                 </Button>
                 <Button
                     type="submit"
                     className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
                 >
-                    Save Changes
+                    Save
                 </Button>
             </div>
         </form>
