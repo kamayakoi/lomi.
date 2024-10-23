@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,7 +24,7 @@ interface CustomerFormData {
 }
 
 export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, onClose, onSuccess }) => {
-    const { register, handleSubmit, setValue } = useForm<CustomerFormData>()
+    const { register, handleSubmit, setValue, control } = useForm<CustomerFormData>()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,7 +94,17 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
                 <Input id="postal_code" {...register('postal_code')} />
             </div>
             <div className="flex items-center space-x-2">
-                <Checkbox id="is_business" {...register('is_business')} />
+                <Controller
+                    name="is_business"
+                    control={control}
+                    render={({ field }) => (
+                        <Checkbox
+                            id="is_business"
+                            checked={field.value}
+                            onCheckedChange={(checked) => field.onChange(checked)}
+                        />
+                    )}
+                />
                 <Label htmlFor="is_business" className="font-normal">Business Customer</Label>
             </div>
             <div className="flex justify-end space-x-2">

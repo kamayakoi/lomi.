@@ -30,7 +30,7 @@ export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
                 {setSelectedStatus && (
                     <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
                         <SelectTrigger className="w-[140px] rounded-none">
-                            <SelectValue placeholder="All Status" />
+                            <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Status</SelectItem>

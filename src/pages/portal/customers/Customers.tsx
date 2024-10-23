@@ -36,7 +36,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { countryCodes } from '@/utils/data/onboarding'
+import { countries, countryCodes } from '@/utils/data/onboarding'
 import { CustomerFilters } from './dev_customers/filters_customers'
 import { EditCustomerForm } from './dev_customers/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
@@ -56,6 +56,8 @@ function CustomersPage() {
     const [isEditCustomerOpen, setIsEditCustomerOpen] = useState(false)
     const [sortColumn, setSortColumn] = useState<keyof Customer | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+    const [customerType, setCustomerType] = useState<'all' | 'business' | 'individual'>('all')
+    const [selectedCountry, setSelectedCountry] = useState('')
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
@@ -63,13 +65,14 @@ function CustomersPage() {
     ]
 
     const { data: customers = [], isLoading: isCustomersLoading, refetch: fetchCustomers } = useQuery(
-        ['customers', user?.id, searchTerm],
+        ['customers', user?.id, searchTerm, customerType],
         async () => {
             if (!user?.id) return []
 
             const { data, error } = await supabase.rpc('fetch_customers', {
                 p_merchant_id: user.id,
                 p_search_term: searchTerm,
+                p_customer_type: customerType === 'all' ? null : customerType,
                 p_page: 1,
                 p_page_size: 50,
             })
@@ -104,10 +107,10 @@ function CustomersPage() {
             p_name: formData.get('name') as string,
             p_email: formData.get('email') as string,
             p_phone_number: `${countryCodeSearch}${formData.get('phone')}`,
-            p_country: 'Senegal',
-            p_city: '',
-            p_address: '',
-            p_postal_code: '',
+            p_country: selectedCountry,
+            p_city: formData.get('city') as string,
+            p_address: formData.get('address') as string,
+            p_postal_code: formData.get('postalCode') as string,
             p_is_business: formData.get('isBusiness') === 'on',
         })
 
@@ -217,9 +220,9 @@ function CustomersPage() {
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Add A Customer</DialogTitle>
+                                    <DialogTitle>Add a Customer</DialogTitle>
                                     <DialogDescription>
-                                        Fill in the details to add a new customer.
+                                        Fill in the details to add a new customer for billing.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <form onSubmit={handleAddCustomer} className="space-y-4">
@@ -242,7 +245,7 @@ function CustomersPage() {
                                     <div className="space-y-2">
                                         <Label htmlFor="phone">Mobile number</Label>
                                         <div className="flex space-x-2">
-                                            <div className="relative">
+                                            <div className="relative w-24">
                                                 <Input
                                                     id="countryCode"
                                                     type="text"
@@ -281,6 +284,39 @@ function CustomersPage() {
                                             <Input id="phone" name="phone" type="tel" className="flex-1" required />
                                         </div>
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="country">Country</Label>
+                                        <select
+                                            id="country"
+                                            value={selectedCountry}
+                                            onChange={(e) => setSelectedCountry(e.target.value)}
+                                            className={cn(
+                                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
+                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                                "appearance-none"
+                                            )}
+                                        >
+                                            <option value="">Select a country</option>
+                                            {countries.map((country) => (
+                                                <option key={country} value={country}>
+                                                    {country}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="city">City</Label>
+                                        <Input id="city" name="city" placeholder="City" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="address">Address</Label>
+                                        <Input id="address" name="address" placeholder="Address" required />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="postalCode">Postal Code</Label>
+                                        <Input id="postalCode" name="postalCode" placeholder="Postal Code" required />
+                                    </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="flex items-center h-5">
                                             <Checkbox id="isBusiness" name="isBusiness" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" />
@@ -304,6 +340,8 @@ function CustomersPage() {
                     <CustomerFilters
                         searchTerm={searchTerm}
                         setSearchTerm={setSearchTerm}
+                        customerType={customerType}
+                        setCustomerType={setCustomerType}
                         refetch={handleRefresh}
                         isRefreshing={isRefreshing}
                     />

@@ -29,7 +29,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 </div>
                 <Select value={selectedStatus || undefined} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all' | null)}>
                     <SelectTrigger className="w-[140px] rounded-none">
-                        <SelectValue placeholder="All Status" />
+                        <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All Status</SelectItem>

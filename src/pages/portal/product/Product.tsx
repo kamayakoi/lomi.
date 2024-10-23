@@ -94,6 +94,8 @@ function ProductsPage() {
 
             if (typeof aValue === 'string' && typeof bValue === 'string') {
                 return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
             } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
                 return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
             } else {
@@ -168,6 +170,14 @@ function ProductsPage() {
                                                 </Button>
                                             </TableHead>
                                             <TableHead className="text-center">
+                                                <Button variant="ghost" onClick={() => handleSort('price')}>
+                                                    Price
+                                                    {sortColumn === 'price' && (
+                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                    )}
+                                                </Button>
+                                            </TableHead>
+                                            <TableHead className="text-center">
                                                 <Button variant="ghost" onClick={() => handleSort('is_active')}>
                                                     Status
                                                     {sortColumn === 'is_active' && (
@@ -189,7 +199,7 @@ function ProductsPage() {
                                             ))
                                         ) : products.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={4} className="text-center py-8">
+                                                <TableCell colSpan={5} className="text-center py-8">
                                                     <div className="flex flex-col items-center justify-center space-y-4">
                                                         <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                                                             <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
@@ -212,6 +222,7 @@ function ProductsPage() {
                                                 >
                                                     <TableCell className="text-center">{product.name}</TableCell>
                                                     <TableCell className="text-center">{product.description}</TableCell>
+                                                    <TableCell className="text-center">{product.price}</TableCell>
                                                     <TableCell className="text-center">
                                                         <span className={`
                                                             inline-block px-2 py-1 rounded-full text-xs font-normal

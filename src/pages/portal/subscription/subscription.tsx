@@ -249,7 +249,7 @@ function SubscriptionsPage() {
                         <TableRow>
                           <TableHead className="text-center">Customer</TableHead>
                           <TableHead className="text-center">Plan</TableHead>
-                          <TableHead className="text-center">Amount</TableHead>
+                          <TableHead className="text-center">Price</TableHead>
                           <TableHead className="text-center">Status</TableHead>
                         </TableRow>
                       </TableHeader>

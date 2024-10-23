@@ -27,6 +27,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE OR REPLACE FUNCTION public.fetch_customers(
     p_merchant_id UUID,
     p_search_term VARCHAR DEFAULT NULL,
+    p_customer_type VARCHAR DEFAULT NULL,
     p_page INTEGER DEFAULT 1,
     p_page_size INTEGER DEFAULT 50
 )
@@ -63,6 +64,7 @@ BEGIN
         c.merchant_id = p_merchant_id
         AND c.is_deleted = false
         AND (p_search_term IS NULL OR c.name ILIKE '%' || p_search_term || '%' OR c.email ILIKE '%' || p_search_term || '%')
+        AND (p_customer_type IS NULL OR (p_customer_type = 'business' AND c.is_business) OR (p_customer_type = 'individual' AND NOT c.is_business))
     ORDER BY
         c.created_at DESC
     LIMIT p_page_size
