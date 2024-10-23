@@ -26,7 +26,7 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({
                 <div className='relative w-64'>
                     <Input
                         placeholder='Search customers...'
-                        className='w-full pl-10 pr-4 py-2 rounded-md'
+                        className='w-full pl-10 pr-4 py-2 rounded-none'
                         type="search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -34,11 +34,11 @@ export const CustomerFilters: React.FC<CustomerFiltersProps> = ({
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>
                 <Select value={customerType} onValueChange={setCustomerType}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-48 rounded-none">
                         <SelectValue placeholder="Customer Type" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="all">Type</SelectItem>
                         <SelectItem value="business">Business</SelectItem>
                         <SelectItem value="individual">Individual</SelectItem>
                     </SelectContent>

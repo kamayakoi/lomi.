@@ -120,7 +120,10 @@ function SubscriptionsPage() {
     if (amount === undefined || amount === null || currency === undefined) {
       return '-';
     }
-    return `${amount.toLocaleString('en-US', { minimumFractionDigits: 0 })} ${currency}`;
+    return `${amount.toLocaleString('en-US', {
+      minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+      maximumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+    })} ${currency}`;
   }
 
   return (

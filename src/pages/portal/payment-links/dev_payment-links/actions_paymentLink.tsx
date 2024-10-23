@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { PaymentLink } from './types'
+import { PaymentLink, provider_code } from './types'
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
+
+const providerColors: Record<provider_code, string> = {
+    'ORANGE': 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white',
+    'WAVE': 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white',
+    'ECOBANK': 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white',
+    'MTN': 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black',
+    'STRIPE': 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white',
+    'OTHER': 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+}
 
 type PaymentLinkActionsProps = {
     paymentLink: PaymentLink | null
@@ -50,7 +59,22 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                                     <div className="font-medium">Success URL:</div>
                                     <div>{paymentLink.success_url || '-'}</div>
                                     <div className="font-medium">Allowed Providers:</div>
-                                    <div>{paymentLink.allowed_providers.join(', ') || '-'}</div>
+                                    <div>
+                                        {paymentLink.allowed_providers.length > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {paymentLink.allowed_providers.map((provider) => (
+                                                    <span
+                                                        key={provider}
+                                                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${providerColors[provider]}`}
+                                                    >
+                                                        {formatProviderCode(provider)}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            '-'
+                                        )}
+                                    </div>
                                     {paymentLink.link_type === 'product' && (
                                         <>
                                             <div className="font-medium">Associated Product:</div>
@@ -81,6 +105,25 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
             </SheetContent>
         </Sheet>
     )
+}
+
+function formatProviderCode(providerCode: provider_code): string {
+    switch (providerCode) {
+        case 'ORANGE':
+            return 'Orange'
+        case 'WAVE':
+            return 'Wave'
+        case 'ECOBANK':
+            return 'Ecobank'
+        case 'MTN':
+            return 'MTN'
+        case 'STRIPE':
+            return 'Stripe'
+        case 'OTHER':
+            return 'Other'
+        default:
+            return providerCode
+    }
 }
 
 function formatDate(dateString: string): string {

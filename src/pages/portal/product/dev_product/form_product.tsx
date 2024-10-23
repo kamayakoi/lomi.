@@ -88,7 +88,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
             </div>
             <div className="flex justify-end">
                 <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
-                    Create Product
+                    Create
                 </Button>
             </div>
         </form>

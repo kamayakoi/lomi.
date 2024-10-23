@@ -130,7 +130,7 @@ function ProductsPage() {
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
-                                    <DialogTitle>Create Product</DialogTitle>
+                                    <DialogTitle>Create a product</DialogTitle>
                                     <DialogDescription>
                                         Fill in the details to create a new product.
                                     </DialogDescription>
@@ -222,7 +222,13 @@ function ProductsPage() {
                                                 >
                                                     <TableCell className="text-center">{product.name}</TableCell>
                                                     <TableCell className="text-center">{product.description}</TableCell>
-                                                    <TableCell className="text-center">{product.price}</TableCell>
+                                                    <TableCell className="text-center">
+                                                        {product.price.toLocaleString('en-US', {
+                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                        })}{' '}
+                                                        {product.currency_code}
+                                                    </TableCell>
                                                     <TableCell className="text-center">
                                                         <span className={`
                                                             inline-block px-2 py-1 rounded-full text-xs font-normal

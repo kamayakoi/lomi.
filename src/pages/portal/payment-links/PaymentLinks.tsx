@@ -23,6 +23,12 @@ import { Link2Icon } from 'lucide-react'
 import PaymentLinkActions from './dev_payment-links/actions_paymentLink'
 import { EditPaymentLinkForm } from './dev_payment-links/edit_paymentlink.tsx'
 
+const linkTypeColors: Record<link_type, string> = {
+  'instant': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  'product': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  'plan': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+};
+
 function PaymentLinksPage() {
   const { user, isLoading: isUserLoading } = useUser()
   const [isCreateLinkOpen, setIsCreateLinkOpen] = useState(false)
@@ -247,7 +253,14 @@ function PaymentLinksPage() {
                               {link.url}
                             </a>
                           </TableCell>
-                          <TableCell className="text-center">{link.link_type}</TableCell>
+                          <TableCell className="text-center">
+                            <span className={`
+                              inline-block px-2 py-1 rounded-full text-xs font-normal
+                              ${linkTypeColors[link.link_type]}
+                            `}>
+                              {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
+                            </span>
+                          </TableCell>
                           <TableCell className="text-center">
                             {link.link_type === 'instant' && link.price ? (
                               `${link.price} ${link.currency_code}`
