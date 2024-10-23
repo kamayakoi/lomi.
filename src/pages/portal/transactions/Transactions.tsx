@@ -68,6 +68,7 @@ function TransactionsPage() {
     const [showAverageValue, setShowAverageValue] = useState(false)
     const [showAverageRetentionRate, setShowAverageRetentionRate] = useState(false)
     const [isDownloadOpen, setIsDownloadOpen] = useState(false)
+    const [isGenerating] = useState(false);
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -710,6 +711,7 @@ function TransactionsPage() {
                 transaction={selectedTransaction}
                 isOpen={!!selectedTransaction}
                 onClose={() => setSelectedTransaction(null)}
+                isGenerating={isGenerating}
             />
         </Layout>
     )

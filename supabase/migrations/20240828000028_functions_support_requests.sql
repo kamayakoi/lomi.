@@ -94,7 +94,7 @@ BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Trigger to call the update_support_request_timestamp function
 CREATE TRIGGER update_support_request_timestamp

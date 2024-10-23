@@ -5,6 +5,7 @@ import { Transaction, transaction_status, transaction_type, provider_code } from
 import { ArrowDownToLine, RefreshCcw, LifeBuoy } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { jsPDF } from 'jspdf';
+import { useSidebar } from '@/lib/hooks/useSidebar';
 
 type TransactionActionsProps = {
     transaction: Transaction | null
@@ -14,6 +15,8 @@ type TransactionActionsProps = {
 }
 
 export default function TransactionActions({ transaction, isOpen, onClose, isGenerating }: TransactionActionsProps) {
+    const { sidebarData } = useSidebar();
+
     if (!transaction) return null
 
     const canRefund = transaction.status !== 'failed' && transaction.status !== 'refunded' && transaction.status !== 'pending'
@@ -24,7 +27,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
         window.location.href = mailtoLink
     }
 
-    const handleDownloadReceipt = () => {
+    const handleDownloadReceipt = async () => {
         if (!transaction) return;
 
         const doc = new jsPDF();
@@ -33,18 +36,26 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
         doc.setFillColor(248, 250, 252);
         doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F');
 
-        // Add company logo
-        const logoUrl = '/lomi-icon.png';
-        doc.addImage(logoUrl, 'PNG', 15, 15, 20, 20);
-
         // Add company name and receipt title
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
         doc.setTextColor(31, 41, 55);
-        doc.text('Lomi Africa', 40, 25);
+        doc.text(sidebarData.organizationName || '', 15, 25);
+
+        // Add company logo
+        const logoUrl = sidebarData.organizationLogo;
+        if (logoUrl) {
+            const logoImage = await getImageFromUrl(logoUrl);
+            const logoWidth = 20;
+            const logoHeight = 20;
+            const logoX = doc.internal.pageSize.width - 15 - logoWidth;
+            const logoY = 15;
+            doc.addImage(logoImage, 'PNG', logoX, logoY, logoWidth, logoHeight);
+        }
+
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(14);
-        doc.text('Transaction Receipt', 40, 35);
+        doc.text('Receipt', 15, 35);
 
         // Add horizontal line separator
         doc.setDrawColor(226, 232, 240);
@@ -55,7 +66,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(12);
         doc.setTextColor(31, 41, 55);
-        doc.text('Transaction Summary', 15, 55);
+        doc.text('Summary', 15, 55);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(75, 85, 99);
         const details = [
@@ -110,7 +121,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(75, 85, 99);
             const productDetails = [
-                `Product Name: ${transaction.product_name}`,
+                `Name: ${transaction.product_name}`,
                 `Description: ${transaction.product_description}`,
                 `Price: ${formatCurrency(transaction.product_price || 0, transaction.currency)}`,
             ];
@@ -150,10 +161,11 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
         }
 
         // Add footer
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(31, 41, 55);
-        doc.text('Thank you for your business!', 105, lastY + 15, { align: 'center' });
+        const footerY = doc.internal.pageSize.height - 10;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text('Powered by lomi. | © 2024 lomi.africa, Inc — All rights reserved', 15, footerY);
 
         // Save the PDF
         doc.save(`transaction_receipt_${transaction.transaction_id}.pdf`);
@@ -169,7 +181,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
                     <CardContent>
                         <div className="grid gap-4">
                             <section>
-                                <h3 className="text-lg font-semibold mb-2">Transaction Summary</h3>
+                                <h3 className="text-lg font-semibold mb-2">Summary</h3>
                                 <div className="grid grid-cols-2 gap-2 text-sm">
                                     <div className="font-medium">Transaction ID:</div>
                                     <div>{transaction.transaction_id}</div>
@@ -217,7 +229,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
                                     <section>
                                         <h3 className="text-lg font-semibold mb-2">Product Details</h3>
                                         <div className="grid grid-cols-2 gap-2 text-sm">
-                                            <div className="font-medium">Product Name:</div>
+                                            <div className="font-medium">Name:</div>
                                             <div>{transaction.product_name}</div>
                                             <div className="font-medium">Description:</div>
                                             <div>{transaction.product_description}</div>
@@ -343,4 +355,15 @@ function formatBillingFrequency(frequency: string | undefined): string {
 function formatSubscriptionStatus(status: string | undefined): string {
     if (!status) return '';
     return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+async function getImageFromUrl(url: string): Promise<string> {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }

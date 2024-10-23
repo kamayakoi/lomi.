@@ -57,7 +57,7 @@ BEGIN
     WHERE ak.organization_id = p_organization_id
     ORDER BY ak.created_at DESC;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to delete an API key
 CREATE OR REPLACE FUNCTION public.delete_api_key(p_api_key VARCHAR)
@@ -65,7 +65,7 @@ RETURNS VOID AS $$
 BEGIN
     DELETE FROM api_keys WHERE api_key = p_api_key;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update the status of an API key
 CREATE OR REPLACE FUNCTION public.update_api_key_status(p_api_key VARCHAR, p_is_active BOOLEAN)
@@ -73,4 +73,4 @@ RETURNS VOID AS $$
 BEGIN
     UPDATE api_keys SET is_active = p_is_active WHERE api_key = p_api_key;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
