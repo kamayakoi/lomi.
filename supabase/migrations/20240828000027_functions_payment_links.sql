@@ -98,7 +98,25 @@ CREATE OR REPLACE FUNCTION public.create_payment_link(
 RETURNS UUID AS $$
 DECLARE
     v_link_id UUID;
+    v_plan_amount NUMERIC(10,2);
+    v_product_price NUMERIC(10,2);
+    v_plan_currency_code currency_code;
+    v_product_currency_code currency_code;
 BEGIN
+    -- Get the plan amount and currency code if a plan ID is provided
+    IF p_plan_id IS NOT NULL THEN
+        SELECT amount, currency_code INTO v_plan_amount, v_plan_currency_code
+        FROM subscription_plans
+        WHERE plan_id = p_plan_id;
+    END IF;
+
+    -- Get the product price and currency code if a product ID is provided
+    IF p_product_id IS NOT NULL THEN
+        SELECT price, currency_code INTO v_product_price, v_product_currency_code
+        FROM merchant_products
+        WHERE product_id = p_product_id;
+    END IF;
+
     INSERT INTO payment_links (
         merchant_id,
         organization_id,
@@ -122,13 +140,21 @@ BEGIN
         p_organization_id,
         p_link_type,
         p_url,
-        p_currency_code,
+        CASE
+            WHEN p_link_type = 'instant' THEN p_currency_code
+            WHEN p_link_type = 'plan' THEN v_plan_currency_code
+            WHEN p_link_type = 'product' THEN v_product_currency_code
+            ELSE p_currency_code
+        END,
         p_title,
         p_product_id,
         p_plan_id,
         p_public_description,
         p_private_description,
-        p_price,
+        CASE
+            WHEN p_link_type = 'instant' THEN p_price
+            ELSE NULL
+        END,
         p_allowed_providers,
         p_allow_coupon_code,
         p_expires_at,

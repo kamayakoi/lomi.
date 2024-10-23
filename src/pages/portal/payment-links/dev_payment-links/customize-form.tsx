@@ -65,7 +65,7 @@ const InstantLinkInput: React.FC<InstantLinkInputProps> = ({ name, label, value,
                 onBlur={handleBlur}
                 className="w-full rounded-none"
             />
-            {optional && <p className="text-[0.625rem] text-muted-foreground mt-1">Optional</p>}
+            {optional && <p className="text-xs text-muted-foreground mt-1">Optional</p>}
         </div>
     );
 };
@@ -236,6 +236,22 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
         fetchData()
     }, [user?.id])
 
+    useEffect(() => {
+        if (paymentType === 'product' && selectedProduct) {
+            setInstantLinkDetails({
+                name: selectedProduct.name,
+                description: selectedProduct.description || '',
+                privateDescription: '',
+            })
+        } else if (paymentType === 'plan' && selectedPlan) {
+            setInstantLinkDetails({
+                name: selectedPlan.name,
+                description: selectedPlan.description || '',
+                privateDescription: '',
+            })
+        }
+    }, [paymentType, selectedProduct, selectedPlan])
+
     const handlePriceChange = (index: number, field: 'amount' | 'currency', value: string) => {
         const newPrices = [...prices]
         newPrices[index] = { ...newPrices[index], [field]: value }
@@ -261,13 +277,25 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     <div>
                         <div className="mb-8">
                             <h2 className={`font-bold text-gray-900 ${displayMode === 'desktop' ? 'text-2xl' : 'text-xl'}`}>
-                                {prices[0]?.amount ? `${prices[0]?.amount} ${prices[0]?.currency}` : '0.00 XOF'}
+                                {paymentType === 'instant' && prices[0]?.amount ? (
+                                    `${prices[0]?.amount} ${prices[0]?.currency}`
+                                ) : paymentType === 'plan' && selectedPlan?.amount ? (
+                                    `${selectedPlan.amount} ${selectedPlan.currency_code}`
+                                ) : paymentType === 'product' && selectedProduct?.price ? (
+                                    `${selectedProduct.price} ${selectedProduct.currency_code}`
+                                ) : (
+                                    '0.00 XOF'
+                                )}
                             </h2>
                             <p className="text-gray-600 text-sm">Amount to be paid</p>
                         </div>
                         <div>
-                            <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-base'} truncate max-w-[200px]`} title={instantLinkDetails.name || 'Payment'}>{instantLinkDetails.name || 'Payment'}</h3>
-                            <p className={`text-gray-600 text-sm truncate max-w-[200px]`} title={instantLinkDetails.description || 'Description'}>{instantLinkDetails.description || 'Description'}</p>
+                            <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-base'} truncate max-w-[200px]`} title={instantLinkDetails.name || selectedPlan?.name || selectedProduct?.name || 'Payment'}>
+                                {instantLinkDetails.name || selectedPlan?.name || selectedProduct?.name || 'Payment'}
+                            </h3>
+                            <p className={`text-gray-600 text-sm truncate max-w-[200px]`} title={instantLinkDetails.description || selectedPlan?.description || selectedProduct?.description || 'Description'}>
+                                {instantLinkDetails.description || selectedPlan?.description || selectedProduct?.description || 'Description'}
+                            </p>
                         </div>
                         {allowCouponCode && displayMode === 'desktop' && (
                             <div className="mt-4">
@@ -438,14 +466,55 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 </div>
             )}
 
-            {paymentType === 'instant' && (
-                <div className="space-y-4">
-                    <InstantLinkCustomizer />
+            {(paymentType === 'product' || paymentType === 'plan') && (
+                <>
+                    <InstantLinkInput
+                        name="privateDescription"
+                        label="Private description"
+                        value={instantLinkDetails.privateDescription}
+                        onChange={handleInstantLinkChange}
+                        optional
+                    />
                     <ExpirationDateInput
                         value={expirationDate}
                         onChange={setExpirationDate}
                     />
-                    <div className="space-y-4"> {/* Increased space between label and badges */}
+                    <div className="space-y-4">
+                        <Label className="block">Payment methods</Label>
+                        <div className="flex flex-wrap gap-2">
+                            {paymentMethods.map((method) => (
+                                <Badge
+                                    key={method.id}
+                                    variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
+                                    className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
+                                        ? getBadgeColor(method.id)
+                                        : 'bg-transparent hover:bg-transparent'
+                                        }`}
+                                    onClick={() => togglePaymentMethod(method.id)}
+                                >
+                                    {method.name}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {paymentType === 'instant' && (
+                <>
+                    <InstantLinkCustomizer />
+                    <InstantLinkInput
+                        name="privateDescription"
+                        label="Private description"
+                        value={instantLinkDetails.privateDescription}
+                        onChange={handleInstantLinkChange}
+                        optional
+                    />
+                    <ExpirationDateInput
+                        value={expirationDate}
+                        onChange={setExpirationDate}
+                    />
+                    <div className="space-y-4">
                         <Label className="block">Payment methods</Label>
                         <div className="flex flex-wrap gap-2">
                             {paymentMethods.map((method) => (
@@ -473,7 +542,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             Allow coupon code
                         </Label>
                     </div>
-                </div>
+                </>
             )}
         </div>
     )
@@ -632,15 +701,17 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 p_organization_id: organizationData[0].organization_id,
                 p_link_type: paymentType,
                 p_url: paymentLinkUrl,
-                p_title: instantLinkDetails.name,
-                p_public_description: instantLinkDetails.description,
+                p_title: paymentType === 'instant' ? instantLinkDetails.name : selectedPlan?.name || selectedProduct?.name || '',
+                p_public_description: paymentType === 'instant' ? instantLinkDetails.description : selectedPlan?.description || selectedProduct?.description || '',
                 p_private_description: instantLinkDetails.privateDescription,
                 p_price: paymentType === 'instant' && prices[0]?.amount ? parseFloat(prices[0].amount) : null,
-                p_currency_code: prices[0]?.currency || 'XOF',
+                p_currency_code: paymentType === 'instant' ? prices[0]?.currency || 'XOF' : selectedPlan?.currency_code || selectedProduct?.currency_code || 'XOF',
                 p_allowed_providers: mappedProviders,
-                p_allow_coupon_code: allowCouponCode,
-                p_expires_at: expirationDate ? expirationDate.toISOString() : null, // Convert to ISO 8601 string
+                p_allow_coupon_code: paymentType === 'instant' ? allowCouponCode : false,
+                p_expires_at: expirationDate ? expirationDate.toISOString() : null,
                 p_success_url: redirectToCustomPage ? customSuccessUrl : null,
+                p_plan_id: paymentType === 'plan' && selectedPlan?.plan_id ? selectedPlan.plan_id : null,
+                p_product_id: paymentType === 'product' && selectedProduct?.product_id ? selectedProduct.product_id : null,
             })
 
             if (error) {
