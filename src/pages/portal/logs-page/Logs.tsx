@@ -170,11 +170,11 @@ function LogsPage() {
                             </Select>
                             <Button
                                 variant="outline"
-                                size="icon"
                                 onClick={() => handleRefresh()}
+                                className="border-border text-card-foreground px-2 h-10 rounded-none"
                                 disabled={isRefreshing}
                             >
-                                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
                                 <span className="sr-only">Refresh</span>
                             </Button>
                         </div>

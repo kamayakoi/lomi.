@@ -14,7 +14,7 @@ import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySe
 import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useInfiniteQuery } from 'react-query'
+import { useInfiniteQuery, useQueryClient } from 'react-query'
 import AnimatedLogoLoader from '@/components/dashboard/loader'
 import TransactionActions from './dev_transactions.tsx/actions_transactions'
 import TransactionFilters from './dev_transactions.tsx/filters_transactions'
@@ -69,6 +69,8 @@ function TransactionsPage() {
     const [showAverageRetentionRate, setShowAverageRetentionRate] = useState(false)
     const [isDownloadOpen, setIsDownloadOpen] = useState(false)
     const [isGenerating] = useState(false);
+    const queryClient = useQueryClient()
+    const [isRefreshing, setIsRefreshing] = useState(false)
 
     const topNav = [
         { title: 'Transactions', href: '/portal/transactions', isActive: true },
@@ -240,6 +242,12 @@ function TransactionsPage() {
             .catch((error) => {
                 console.error('Error copying JSON data:', error)
             })
+    }
+
+    const refetch = async () => {
+        setIsRefreshing(true)
+        await queryClient.refetchQueries(['transactions'])
+        setIsRefreshing(false)
     }
 
     if (isUserLoading) {
@@ -496,6 +504,8 @@ function TransactionsPage() {
                             setIsDownloadOpen={setIsDownloadOpen}
                             handleDownload={handleDownload}
                             copyAsJSON={copyAsJSON}
+                            refetch={refetch}
+                            isRefreshing={isRefreshing}
                         />
 
                         <Card>
