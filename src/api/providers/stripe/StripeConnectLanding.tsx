@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useStripeConnect } from "@/../src/lib/hooks/useStripeConnect";
+import { useStripeConnect } from "@/lib/hooks/useStripeConnect";
 import {
   ConnectAccountOnboarding,
   ConnectComponentsProvider,

@@ -16,33 +16,29 @@ export const fetchPaymentLinks = async (
         p_is_active: status === 'all' ? null : status === 'active',
         p_page: page,
         p_page_size: pageSize,
-    })
+    });
 
     if (error) {
-        console.error('Error fetching payment links:', error)
-        return []
+        console.error('Error fetching payment links:', error);
+        return [];
     }
 
-    return data as PaymentLink[]
-}
+    return data as PaymentLink[];
+};
 
 export const generatePaymentLink = (
-    merchantId: string,
-    orderId: string,
     linkType: string,
     productId?: string,
     planId?: string
 ) => {
     const baseUrl = import.meta.env.MODE === 'production' ? import.meta.env['VITE_PAYMENT_LINK_BASE_URL'] : import.meta.env['VITE_PAYMENT_LINK_BASE_URL_DEV'];
-    const encodedMerchantId = encodeURIComponent(merchantId);
-    const encodedOrderId = encodeURIComponent(orderId);
 
-    let linkPath = `/${encodedMerchantId}/${encodedOrderId}`;
+    let linkPath = '';
 
     if (linkType === 'product' && productId) {
-        linkPath += `/product/${encodeURIComponent(productId)}`;
+        linkPath = `/product/${encodeURIComponent(productId)}`;
     } else if (linkType === 'plan' && planId) {
-        linkPath += `/plan/${encodeURIComponent(planId)}`;
+        linkPath = `/plan/${encodeURIComponent(planId)}`;
     }
 
     return `${baseUrl}${linkPath}`;

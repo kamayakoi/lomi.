@@ -15,11 +15,12 @@ import {
     Provider,
     Organization,
     PaymentLink,
-    Props,
 } from './checkoutTypes'
 import { supabase } from '@/utils/supabase/client'
+import { useParams } from 'react-router-dom'
 
-export default function StripeCheckoutPage({ paymentLinkId }: Props) {
+export default function CheckoutPage() {
+    const { productId, planId } = useParams<{ productId?: string; planId?: string }>();
     const [selectedMethod, setSelectedMethod] = useState('')
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
@@ -51,14 +52,23 @@ export default function StripeCheckoutPage({ paymentLinkId }: Props) {
             }
         };
 
-        // Fetch product data
-        const fetchProduct = async () => {
-            if (user && userOrganization) {
+        // Fetch product or plan data based on the URL parameters
+        const fetchData = async () => {
+            if (productId) {
+                // Fetch product data using productId
                 try {
-                    const response = await axios.get<Product>(`/api/products/${paymentLinkId}`);
+                    const response = await axios.get<Product>(`/api/products/${productId}`);
                     setProduct(response.data);
                 } catch (error) {
                     console.error('Error fetching product data:', error);
+                }
+            } else if (planId) {
+                // Fetch plan data using planId
+                try {
+                    const response = await axios.get<Product>(`/api/plans/${planId}`);
+                    setProduct(response.data);
+                } catch (error) {
+                    console.error('Error fetching plan data:', error);
                 }
             }
         };
@@ -79,7 +89,7 @@ export default function StripeCheckoutPage({ paymentLinkId }: Props) {
         const fetchPaymentLink = async () => {
             if (user && userOrganization) {
                 try {
-                    const { data, error } = await supabase.rpc('get_payment_link_by_id', { link_id: paymentLinkId });
+                    const { data, error } = await supabase.rpc('get_payment_link_by_id', { link_id: productId });
                     if (error) {
                         console.error('Error fetching payment link data:', error);
                     } else {
@@ -92,10 +102,10 @@ export default function StripeCheckoutPage({ paymentLinkId }: Props) {
         };
 
         fetchOrganization();
-        fetchProduct();
+        fetchData();
         fetchProviders();
         fetchPaymentLink();
-    }, [user, userOrganization, paymentLinkId]);
+    }, [user, userOrganization, productId, planId]);
 
     const handleMethodSelect = (methodId: string) => {
         setSelectedMethod(methodId)

@@ -18,10 +18,11 @@ import Products from './pages/Products.tsx';
 import Integrations from './pages/Integrations.tsx';
 import Terms from './pages/Terms.tsx';
 import Privacy from './pages/Privacy.tsx';
+import Status from './pages/Status.tsx';
 // import Careers from './pages/Careers.tsx';
 
 
-// Connect pages
+// Auth pages
 import Signin from './pages/auth/sign-in';
 import Login from './pages/auth/log-in';
 import Signup from './pages/auth/sign-up';
@@ -54,7 +55,7 @@ import Reporting from './pages/portal/reporting/Reporting.tsx'
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx'
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx'
 import Customers from './pages/portal/customers/Customers.tsx';
-import Subscription from "./pages/portal/subscription/Subscription.tsx"
+import Subscription from "./pages/portal/subscription/subscription.tsx"
 import Product from "./pages/portal/product/Product.tsx"
 
 
@@ -65,8 +66,6 @@ import Disbursements from './pages/portal/settings/sending-money/disbursements.t
 import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
 import Business from './pages/portal/settings/business-profile/business';
 import Profile from './pages/portal/settings/business-profile/profile';
-// import TeamMembers from './pages/portal/settings/team/members.tsx';
-// import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
 import BillingStatements from './pages/portal/settings/billing/statements.tsx';
 import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
 import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
@@ -74,21 +73,17 @@ import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
 import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
+// import TeamMembers from './pages/portal/settings/team/members.tsx';
+// import EmailRecipients from './pages/portal/settings/team/email-recipients.tsx';
 import Activation from './pages/auth/activation/activation';
-import Status from './pages/Status.tsx';
 
 
 // API pages
 import StripeCallback from '@/api/providers/stripe/callback/stripe-callback-index.tsx';
 import StripeConnectLanding from "@/api/providers/stripe/StripeConnectLanding";
 
-
-// // Test pages
-// import Test from './pages/test/test.tsx'
-// import CheckoutTest from './pages/test/CheckoutTest.tsx'
-// import CheckoutFormTest from './pages/test/CheckoutFormTest.tsx'
-// import CheckoutSummaryTest from './pages/test/CheckoutSummaryTest.tsx'
-// import PaymentMethodSelectorTest from './pages/test/PaymentMethodSelectorTest.tsx'
+// Checkout pages
+import CheckoutPage from '@/api/checkout/Checkout';
 
 const AppRouter = () => (
     <Router>
@@ -151,6 +146,9 @@ const AppRouter = () => (
                     } />
                 </Route>
 
+                <Route path="/product/:productId" element={<CheckoutPage />} />
+                <Route path="/plan/:planId" element={<CheckoutPage />} />
+
                 {/* Login/Signup routes */}
                 <Route path="/sign-in" element={<Signin />} />
                 <Route path="/log-in" element={<Login />} />
@@ -167,14 +165,6 @@ const AppRouter = () => (
 
                 {/* API routes */}
                 <Route path="api/stripe/callback" element={<StripeCallback />} />
-
-                {/* Test routes
-                <Route path="test" element={<Test />}>
-                    <Route path="checkout" element={<CheckoutTest />} />
-                    <Route path="checkout-form" element={<CheckoutFormTest />} />
-                    <Route path="checkout-summary" element={<CheckoutSummaryTest />} />
-                    <Route path="payment-method-selector" element={<PaymentMethodSelectorTest />} />
-                </Route> */}
 
                 {/* Error routes */}
                 <Route path="/500" element={<GeneralError />} />

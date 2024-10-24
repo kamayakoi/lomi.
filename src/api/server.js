@@ -1,36 +1,172 @@
-import express from 'express';
-import organizationsRouter from './routes/organizations';
-import organizationProvidersRouter from './routes/organizationProviders';
-import userOrganizationLinksRouter from './routes/userOrganizationLinks';
-import transactionsRouter from './routes/transactions';
-import endCustomersRouter from './routes/endCustomers';
-import providersRouter from './routes/providers';
-import stripeRouter from '../providers/stripe/route';
+import express from "express";
+import Stripe from "stripe";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Middleware
+const stripe = new Stripe(
+  // This is your test secret API key.
+  'sk_test_51Ig94GGwgS0qnVOVRggeHRD8GnsDXDz4IuXzI8DHbezmT4CJSSItElsEN9SGXJr35eW4hJLA8ve7FWCatMO0ZRHR00lXyh0MQF',
+  {
+    apiVersion: "2023-10-16",
+  }
+);
+
+// Serve static files from the 'dist' directory
+app.use(express.static(path.join(__dirname, "..", "..", "..", "dist")));
+
 app.use(express.json());
 
-// Routes
-app.use('/organizations', organizationsRouter);
-app.use('/organization-providers', organizationProvidersRouter);
-app.use('/user-organization-links', userOrganizationLinksRouter);
-app.use('/transactions', transactionsRouter);
-app.use('/end-customers', endCustomersRouter);
-app.use('/providers', providersRouter);
-app.use('/stripe', stripeRouter);
+app.post("/account_session", async (req, res) => {
+  try {
+    const { account } = req.body;
 
-// Error handling middleware
-app.use((err, res) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal server error' });
+    const accountSession = await stripe.accountSessions.create({
+      account: account,
+      components: {
+        account_onboarding: { enabled: true },
+        account_management: { enabled: true },
+        notification_banner: { enabled: true },
+      },
+    });
+
+    res.json({
+      client_secret: accountSession.client_secret,
+    });
+  } catch (error) {
+    console.error(
+      "An error occurred when calling the Stripe API to create an account session",
+      error
+    );
+    res.status(500);
+    res.send({ error: error.message });
+  }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.post("/account", async (req, res) => {
+  try {
+    const account = await stripe.accounts.create({
+      controller: {
+        stripe_dashboard: {
+          type: "none",
+        },
+      },
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true }
+      },
+      country: "FR",
+    });
+
+    res.json({
+      account: account.id,
+    });
+  } catch (error) {
+    console.error(
+      "An error occurred when calling the Stripe API to create an account",
+      error
+    );
+    res.status(500);
+    res.send({ error: error.message });
+  }
 });
 
-export default app;
+// Add these functions to fetch product and plan data from your database or API
+const fetchProductData = async (productId) => {
+  // Implement the logic to fetch product data based on the productId
+  // For example, you can query your database or make an API call to retrieve the product data
+  // Return the product data
+  return {
+    id: productId,
+    name: 'Sample Product',
+    description: 'This is a sample product',
+    price: 10.99,
+    currency: 'USD',
+  };
+};
+
+const fetchPlanData = async (planId) => {
+  // Implement the logic to fetch plan data based on the planId
+  // For example, you can query your database or make an API call to retrieve the plan data
+  // Return the plan data
+  return {
+    id: planId,
+    name: 'Sample Plan',
+    description: 'This is a sample plan',
+    amount: 19.99,
+    currency: 'USD',
+    interval: 'month',
+  };
+};
+
+// Add routes for handling product and plan data
+app.get("/api/products/:productId", async (req, res) => {
+  const { productId } = req.params;
+  try {
+    // Fetch product data from your database or API based on the productId
+    const product = await fetchProductData(productId);
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get("/api/plans/:planId", async (req, res) => {
+  const { planId } = req.params;
+  try {
+    // Fetch plan data from your database or API based on the planId
+    const plan = await fetchPlanData(planId);
+    res.json(plan);
+  } catch (error) {
+    console.error('Error fetching plan data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Handle all other routes by serving the index.html file
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(__dirname, "..", "..", "..", "dist", "index.html"));
+});
+
+app.listen(4242, () => console.log("Node server listening on port 4242! Visit http://localhost:4242 in your browser."));
+
+// This is your Stripe CLI webhook secret for testing your endpoint locally.
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (request, response) => {
+  const sig = request.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  // Handle the event
+  switch (event.type) {
+    case 'connect.account.updated':
+      handleConnectAccountUpdated(event.data.object);
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
+});
+
+// Define the function to handle the connect.account.updated event
+const handleConnectAccountUpdated = (account) => {
+  console.log('Connect account updated:', account.id);
+  // Implement your logic here to handle the account update event
+  // For example, you can update your database with the new account information
+};

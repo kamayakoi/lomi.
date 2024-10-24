@@ -691,14 +691,11 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 return
             }
 
-            const orderId = `order_${Date.now()}`
             const paymentLinkUrl = generatePaymentLink(
-                user.id,
-                orderId,
                 paymentType,
                 selectedProduct?.product_id,
                 selectedPlan?.plan_id
-            )
+            );
 
             // Map the selected payment methods to their corresponding provider codes
             const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
