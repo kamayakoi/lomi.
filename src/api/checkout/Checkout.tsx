@@ -73,28 +73,12 @@ export default function CheckoutPage() {
             }
         };
 
-        // Fetch available providers
-        const fetchProviders = async () => {
-            if (user && userOrganization) {
-                try {
-                    const response = await axios.get<Provider[]>(`/api/organizations/${userOrganization.organizationId}/providers`);
-                    setProviders(response.data);
-                } catch (error) {
-                    console.error('Error fetching providers:', error);
-                }
-            }
-        };
-
         // Fetch payment link data
         const fetchPaymentLink = async () => {
             if (user && userOrganization) {
                 try {
-                    const { data, error } = await supabase.rpc('get_payment_link_by_id', { link_id: productId });
-                    if (error) {
-                        console.error('Error fetching payment link data:', error);
-                    } else {
-                        setPaymentLink(data as PaymentLink);
-                    }
+                    const response = await axios.get<PaymentLink>(`/api/payment-links/${productId || planId}`);
+                    setPaymentLink(response.data);
                 } catch (error) {
                     console.error('Error fetching payment link data:', error);
                 }
@@ -103,9 +87,26 @@ export default function CheckoutPage() {
 
         fetchOrganization();
         fetchData();
-        fetchProviders();
         fetchPaymentLink();
     }, [user, userOrganization, productId, planId]);
+
+    useEffect(() => {
+        // Fetch available providers
+        const fetchProviders = async () => {
+            if (paymentLink) {
+                try {
+                    const allowedProviders = paymentLink.allowedProviders;
+                    setProviders(allowedProviders.map((code) => ({ code, name: code, description: '' })));
+                } catch (error) {
+                    console.error('Error fetching providers:', error);
+                }
+            }
+        };
+
+        if (paymentLink) {
+            fetchProviders();
+        }
+    }, [paymentLink]);
 
     const handleMethodSelect = (methodId: string) => {
         setSelectedMethod(methodId)
