@@ -99,7 +99,13 @@ function PaymentLinksPage() {
       const aValue = a[sortColumn]
       const bValue = b[sortColumn]
 
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
+      if (sortColumn === 'price') {
+        const aPrice = a.link_type === 'instant' ? a.price : a.link_type === 'product' ? a.product_price : a.plan_amount
+        const bPrice = b.link_type === 'instant' ? b.price : b.link_type === 'product' ? b.product_price : b.plan_amount
+        return sortDirection === 'asc' ? (aPrice || 0) - (bPrice || 0) : (bPrice || 0) - (aPrice || 0)
+      } else if (sortColumn === 'is_active') {
+        return sortDirection === 'asc' ? Number(a.is_active) - Number(b.is_active) : Number(b.is_active) - Number(a.is_active)
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
       } else if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
@@ -177,22 +183,18 @@ function PaymentLinksPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-left">
-                        Title
-                        {sortColumn === 'title' && (
-                          <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                        )}
-                      </TableHead>
-                      <TableHead className="text-left">
-                        Description
-                      </TableHead>
-                      <TableHead className="text-left">
-                        URL
+                      <TableHead className="text-center">
+                        <Button variant="ghost" onClick={() => handleSort('title')}>
+                          Title
+                          {sortColumn === 'title' && (
+                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                          )}
+                        </Button>
                       </TableHead>
                       <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('link_type')}>
-                          Type
-                          {sortColumn === 'link_type' && (
+                        <Button variant="ghost" onClick={() => handleSort('public_description')}>
+                          Description
+                          {sortColumn === 'public_description' && (
                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                           )}
                         </Button>
@@ -201,6 +203,17 @@ function PaymentLinksPage() {
                         <Button variant="ghost" onClick={() => handleSort('price')}>
                           Price
                           {sortColumn === 'price' && (
+                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                          )}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-center">
+                        URL
+                      </TableHead>
+                      <TableHead className="text-center">
+                        <Button variant="ghost" onClick={() => handleSort('link_type')}>
+                          Type
+                          {sortColumn === 'link_type' && (
                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                           )}
                         </Button>
@@ -247,9 +260,20 @@ function PaymentLinksPage() {
                           className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                           onClick={() => handlePaymentLinkClick(link)}
                         >
-                          <TableCell className="text-left">{link.title}</TableCell>
-                          <TableCell className="text-left">{link.public_description}</TableCell>
-                          <TableCell className="text-left">
+                          <TableCell className="text-center">{link.title}</TableCell>
+                          <TableCell className="text-center">{link.public_description}</TableCell>
+                          <TableCell className="text-center">
+                            {link.link_type === 'instant' && link.price ? (
+                              `${formatPrice(link.price)} ${link.currency_code}`
+                            ) : link.link_type === 'product' && link.product_price ? (
+                              `${formatPrice(link.product_price)} ${link.currency_code}`
+                            ) : link.link_type === 'plan' && link.plan_amount ? (
+                              `${formatPrice(link.plan_amount)} ${link.currency_code}`
+                            ) : (
+                              '-'
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
                             <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                               {link.url}
                             </a>
@@ -261,17 +285,6 @@ function PaymentLinksPage() {
                             `}>
                               {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
                             </span>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {link.link_type === 'instant' && link.price ? (
-                              `${formatPrice(link.price)} ${link.currency_code}`
-                            ) : link.link_type === 'product' && link.product_price ? (
-                              `${formatPrice(link.product_price)} ${link.currency_code}`
-                            ) : link.link_type === 'plan' && link.plan_amount ? (
-                              `${formatPrice(link.plan_amount)} ${link.currency_code}`
-                            ) : (
-                              '-'
-                            )}
                           </TableCell>
                           <TableCell className="text-center">
                             <span className={`

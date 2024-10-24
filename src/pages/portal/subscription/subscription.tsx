@@ -20,7 +20,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle, Edit, ArrowUpDown, Eye } from 'lucide-react'
+import { PlusCircle, Edit, ArrowUpDown } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
 import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
@@ -294,6 +294,11 @@ function SubscriptionsPage() {
                             <TableRow
                               key={plan.plan_id}
                               className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                if (!(e.target instanceof HTMLButtonElement)) {
+                                  handlePlanClick(plan);
+                                }
+                              }}
                             >
                               <TableCell className="text-center">{plan.name}</TableCell>
                               <TableCell className="text-center">{plan.description}</TableCell>
@@ -309,18 +314,8 @@ function SubscriptionsPage() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={(e) => {
-                                      e.stopPropagation()
-                                      handlePlanClick(plan)
-                                    }}
-                                  >
-                                    <Eye className="h-4 w-4 text-blue-500" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleEditPlanClick(plan)
+                                      e.stopPropagation();
+                                      handleEditPlanClick(plan);
                                     }}
                                   >
                                     <Edit className="h-4 w-4 text-blue-500" />
