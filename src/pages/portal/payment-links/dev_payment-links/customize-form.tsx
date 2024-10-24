@@ -772,9 +772,9 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         <div className="mt-8">
                             <Button
                                 onClick={handleSubmit}
-                                className="w-full bg-primary hover:bg-primary/90 text-white dark:text-black rounded-none h-10"
+                                className="w-full bg-green-500 text-white hover:bg-green-600 dark:text-black rounded-none h-10"
                             >
-                                Create Payment Link
+                                Create
                             </Button>
                         </div>
                     )}

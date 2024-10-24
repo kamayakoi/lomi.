@@ -54,8 +54,8 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                                             `${paymentLink.price} ${paymentLink.currency_code}`
                                         ) : paymentLink.link_type === 'product' && paymentLink.product_price ? (
                                             `${paymentLink.product_price} ${paymentLink.currency_code}`
-                                        ) : paymentLink.link_type === 'plan' && paymentLink.plan_price ? (
-                                            `${paymentLink.plan_price} ${paymentLink.currency_code}`
+                                        ) : paymentLink.link_type === 'plan' && paymentLink.plan_amount ? (
+                                            `${paymentLink.plan_amount} ${paymentLink.currency_code}`
                                         ) : (
                                             '-'
                                         )}

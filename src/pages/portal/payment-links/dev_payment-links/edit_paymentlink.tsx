@@ -33,7 +33,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     const [successUrl, setSuccessUrl] = useState(paymentLink.success_url || '')
     const [allowedPaymentMethods, setAllowedPaymentMethods] = useState<(provider_code | 'CARDS' | 'APPLE_PAY')[]>(
         paymentLink.allowed_providers.includes('STRIPE')
-            ? [...paymentLink.allowed_providers, 'CARDS', 'APPLE_PAY']
+            ? [...paymentLink.allowed_providers.filter(p => p !== 'STRIPE'), 'CARDS', 'APPLE_PAY']
             : paymentLink.allowed_providers
     );
     const [connectedProviders, setConnectedProviders] = useState<string[]>([])
@@ -76,13 +76,12 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
         e.preventDefault()
 
         try {
-            // Map the selected payment methods to their corresponding provider codes
             const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
                 if (method === 'CARDS' || method === 'APPLE_PAY') {
                     if (!acc.includes('STRIPE')) {
                         acc.push('STRIPE')
                     }
-                } else if (method !== 'STRIPE') {
+                } else {
                     acc.push(method as provider_code)
                 }
                 return acc
@@ -135,14 +134,10 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     const togglePaymentMethod = (methodId: string | provider_code) => {
         setAllowedPaymentMethods(prev => {
             if (methodId === 'CARDS' || methodId === 'APPLE_PAY') {
-                const hasStripe = prev.includes('STRIPE')
-                const hasBoth = prev.includes('CARDS') && prev.includes('APPLE_PAY')
-                if (hasStripe && hasBoth) {
-                    return prev.filter(m => m !== 'STRIPE' && m !== 'CARDS' && m !== 'APPLE_PAY')
-                } else if (hasStripe) {
-                    return [...prev, methodId as 'CARDS' | 'APPLE_PAY']
+                if (prev.includes(methodId)) {
+                    return prev.filter(m => m !== methodId)
                 } else {
-                    return [...prev, 'STRIPE', methodId as 'CARDS' | 'APPLE_PAY']
+                    return [...prev, methodId]
                 }
             } else {
                 return prev.includes(methodId as provider_code)
@@ -209,9 +204,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                     {paymentMethods
                         .filter((method) => connectedProviders.includes(method.id))
                         .map((method) => {
-                            const isSelected = method.id === 'CARDS' || method.id === 'APPLE_PAY'
-                                ? allowedPaymentMethods.includes('STRIPE')
-                                : allowedPaymentMethods.includes(method.id as provider_code)
+                            const isSelected = allowedPaymentMethods.includes(method.id as provider_code | 'CARDS' | 'APPLE_PAY')
 
                             return (
                                 <Badge

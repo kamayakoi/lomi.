@@ -20,7 +20,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle, Edit } from 'lucide-react'
+import { PlusCircle, Edit, ArrowUpDown, Eye } from 'lucide-react'
 import SubscriptionActions from './dev_subscription/actions_subscriptions'
 import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
@@ -44,10 +44,13 @@ function SubscriptionsPage() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const pageSize = 50
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
-  const [isActionsOpen, setIsActionsOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null)
   const [isEditPlanOpen, setIsEditPlanOpen] = useState(false)
+  const [isPlanActionsOpen, setIsPlanActionsOpen] = useState(false)
+  const [isSubscriptionActionsOpen, setIsSubscriptionActionsOpen] = useState(false)
+  const [sortColumn, setSortColumn] = useState<keyof SubscriptionPlan | keyof Subscription | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   const topNav = [
     { title: 'Subscriptions', href: '/portal/subscription', isActive: true },
@@ -98,7 +101,7 @@ function SubscriptionsPage() {
 
   const handleSubscriptionClick = (subscription: Subscription) => {
     setSelectedSubscription(subscription)
-    setIsActionsOpen(true)
+    setIsSubscriptionActionsOpen(true)
   }
 
   const handleRefresh = async () => {
@@ -109,11 +112,59 @@ function SubscriptionsPage() {
 
   const handlePlanClick = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan)
+    setIsPlanActionsOpen(true)
+  }
+
+  const handleEditPlanClick = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan)
     setIsEditPlanOpen(true)
   }
 
   const handleEditPlanSuccess = () => {
     refetchPlans()
+  }
+
+  const handleSort = (column: keyof SubscriptionPlan | keyof Subscription) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortColumn(column)
+      setSortDirection('asc')
+    }
+  }
+
+  const sortSubscriptionPlans = (plans: SubscriptionPlan[]) => {
+    if (!sortColumn) return plans
+
+    return plans.sort((a, b) => {
+      const aValue = a[sortColumn as keyof SubscriptionPlan]
+      const bValue = b[sortColumn as keyof SubscriptionPlan]
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+      } else {
+        return 0
+      }
+    })
+  }
+
+  const sortSubscriptions = (subscriptions: Subscription[]) => {
+    if (!sortColumn) return subscriptions
+
+    return subscriptions.sort((a, b) => {
+      const aValue = a[sortColumn as keyof Subscription]
+      const bValue = b[sortColumn as keyof Subscription]
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+      } else {
+        return 0
+      }
+    })
   }
 
   function formatCurrency(amount: number | undefined, currency: string | undefined): string {
@@ -178,10 +229,38 @@ function SubscriptionsPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-center">Name</TableHead>
-                          <TableHead className="text-center">Description</TableHead>
-                          <TableHead className="text-center">Price</TableHead>
-                          <TableHead className="text-center">Frequency</TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('name')}>
+                              Name
+                              {sortColumn === 'name' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('description')}>
+                              Description
+                              {sortColumn === 'description' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('amount')}>
+                              Price
+                              {sortColumn === 'amount' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('billing_frequency')}>
+                              Frequency
+                              {sortColumn === 'billing_frequency' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
                           <TableHead className="text-center"></TableHead>
                         </TableRow>
                       </TableHeader>
@@ -211,8 +290,11 @@ function SubscriptionsPage() {
                             </TableCell>
                           </TableRow>
                         ) : (
-                          subscriptionPlans.map((plan: SubscriptionPlan) => (
-                            <TableRow key={plan.plan_id}>
+                          sortSubscriptionPlans(subscriptionPlans).map((plan: SubscriptionPlan) => (
+                            <TableRow
+                              key={plan.plan_id}
+                              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                            >
                               <TableCell className="text-center">{plan.name}</TableCell>
                               <TableCell className="text-center">{plan.description}</TableCell>
                               <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
@@ -222,9 +304,28 @@ function SubscriptionsPage() {
                                 </span>
                               </TableCell>
                               <TableCell className="text-center">
-                                <Button variant="ghost" size="sm" onClick={() => handlePlanClick(plan)}>
-                                  <Edit className="h-4 w-4 text-blue-500" />
-                                </Button>
+                                <div className="flex justify-center space-x-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handlePlanClick(plan)
+                                    }}
+                                  >
+                                    <Eye className="h-4 w-4 text-blue-500" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleEditPlanClick(plan)
+                                    }}
+                                  >
+                                    <Edit className="h-4 w-4 text-blue-500" />
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))
@@ -250,10 +351,38 @@ function SubscriptionsPage() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-center">Customer</TableHead>
-                          <TableHead className="text-center">Plan</TableHead>
-                          <TableHead className="text-center">Price</TableHead>
-                          <TableHead className="text-center">Status</TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('customer_name')}>
+                              Customer
+                              {sortColumn === 'customer_name' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('plan_name')}>
+                              Plan
+                              {sortColumn === 'plan_name' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('amount')}>
+                              Price
+                              {sortColumn === 'amount' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-center">
+                            <Button variant="ghost" onClick={() => handleSort('status')}>
+                              Status
+                              {sortColumn === 'status' && (
+                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                              )}
+                            </Button>
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -282,7 +411,7 @@ function SubscriptionsPage() {
                             </TableCell>
                           </TableRow>
                         ) : (
-                          subscriptions.map((subscription: Subscription) => (
+                          sortSubscriptions(subscriptions).map((subscription: Subscription) => (
                             <TableRow
                               key={subscription.subscription_id}
                               className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -315,9 +444,15 @@ function SubscriptionsPage() {
       </Layout.Body>
 
       <SubscriptionActions
+        plan={selectedPlan}
+        isOpen={isPlanActionsOpen}
+        onClose={() => setIsPlanActionsOpen(false)}
+      />
+
+      <SubscriptionActions
         subscription={selectedSubscription}
-        isOpen={isActionsOpen}
-        onClose={() => setIsActionsOpen(false)}
+        isOpen={isSubscriptionActionsOpen}
+        onClose={() => setIsSubscriptionActionsOpen(false)}
       />
 
       <Dialog open={isEditPlanOpen} onOpenChange={setIsEditPlanOpen}>
