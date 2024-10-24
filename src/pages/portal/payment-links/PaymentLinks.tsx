@@ -213,14 +213,6 @@ function PaymentLinksPage() {
                           )}
                         </Button>
                       </TableHead>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('is_active')}>
-                          Edit
-                          {sortColumn === 'is_active' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

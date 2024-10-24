@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar } from '../components/landing/Navbar';
+import { Navbar } from '../components/landing/Navbar-Signin';
 import { Footer } from '../components/landing/Footer';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { OrbitingCirclesDemo } from '../components/landing/OrbitingCircles';
