@@ -16,6 +16,7 @@ type ApiKey = {
     name: string;
     api_key: string;
     is_active: boolean;
+    is_primary: boolean;
     created_at: string;
 }
 
@@ -84,6 +85,7 @@ export default function Component() {
                     name: newKeyName,
                     api_key: data[0].api_key,
                     is_active: true,
+                    is_primary: false,
                     created_at: new Date().toISOString(),
                 }])
                 setNewKeyName('')
@@ -129,14 +131,13 @@ export default function Component() {
 
     const maskApiKey = (key: string) => {
         const visiblePart = key.slice(0, 4)
-        const hiddenPart = '•'.repeat(Math.max(20, key.length - 4))  // Ensure at least 20 dots
-        return `${visiblePart}${hiddenPart}`
+        return `${visiblePart}**************`
     }
 
     return (
         <ContentSection
             title="API Keys"
-            desc="Creat and manage your API keys to authenticate requests coming from your servers."
+            desc="Create and manage your API keys to authenticate requests coming from your servers."
         >
             <Card className="w-full max-w-7xl mx-auto">
                 <CardHeader>

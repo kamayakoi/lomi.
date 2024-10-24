@@ -1,3 +1,6 @@
+-- Enable the pgcrypto extension
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Function to generate a new API key
 CREATE OR REPLACE FUNCTION public.generate_api_key(
     p_merchant_id UUID,
@@ -9,13 +12,11 @@ RETURNS TABLE (api_key VARCHAR) AS $$
 DECLARE
     v_api_key VARCHAR;
 BEGIN
-    v_api_key := 'lomi_sk_' || encode(gen_random_bytes(48), 'base64');
-    v_api_key := regexp_replace(v_api_key, '[+/=]', '', 'g');
-    v_api_key := regexp_replace(v_api_key, '\s', '_', 'g');
-    v_api_key := left(v_api_key, 88);
+    v_api_key := 'lomi_sk_' || md5(random()::text || clock_timestamp()::text);
+    v_api_key := v_api_key || substring(md5(random()::text), 1, 88 - length(v_api_key));
 
-    INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date)
-    VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date);
+    INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date, is_primary)
+    VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date, false);
 
     RETURN QUERY SELECT v_api_key AS api_key;
 END;
