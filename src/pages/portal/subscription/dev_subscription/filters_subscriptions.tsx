@@ -19,7 +19,7 @@ export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
             <div className='flex items-center space-x-4'>
-                <div className='relative w-64'>
+                <div className='relative w-60'>
                     <Input
                         placeholder='Search subscriptions...'
                         className='w-full pl-10 pr-4 py-2 rounded-none'
@@ -29,7 +29,7 @@ export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
                 </div>
                 {setSelectedStatus && (
                     <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
-                        <SelectTrigger className="w-[140px] rounded-none">
+                        <SelectTrigger className="w-[120px] rounded-none">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>

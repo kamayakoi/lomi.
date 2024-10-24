@@ -41,7 +41,7 @@ export function PaymentLinkFilters({
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
             <div className='flex items-center space-x-4'>
-                <div className='relative w-64'>
+                <div className='relative w-60'>
                     <Input
                         placeholder='Search payment links...'
                         className='w-full pl-10 pr-4 py-2 rounded-none'
@@ -52,7 +52,7 @@ export function PaymentLinkFilters({
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>
                 <Select value={selectedLinkType || undefined} onValueChange={(value) => setSelectedLinkType(value as link_type | 'all' | null)}>
-                    <SelectTrigger className="w-[140px] rounded-none">
+                    <SelectTrigger className="w-[120px] rounded-none">
                         <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -63,7 +63,7 @@ export function PaymentLinkFilters({
                     </SelectContent>
                 </Select>
                 <Select value={selectedStatus || undefined} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all' | null)}>
-                    <SelectTrigger className="w-[140px] rounded-none">
+                    <SelectTrigger className="w-[120px] rounded-none">
                         <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -73,7 +73,7 @@ export function PaymentLinkFilters({
                     </SelectContent>
                 </Select>
                 <Select value={selectedCurrency || 'XOF'} onValueChange={(value) => setSelectedCurrency(value as currency_code | null)}>
-                    <SelectTrigger className="w-[140px] rounded-none">
+                    <SelectTrigger className="w-[90px] rounded-none">
                         <SelectValue placeholder="XOF" />
                     </SelectTrigger>
                     <SelectContent>

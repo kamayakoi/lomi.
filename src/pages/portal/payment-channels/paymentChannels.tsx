@@ -180,7 +180,7 @@ export default function PaymentChannels() {
         </div>
         <div className='my-4 flex items-center justify-between sm:my-0'>
           <div className='flex items-center space-x-4'>
-            <div className='relative w-64'>
+            <div className='relative w-60'>
               <Input
                 placeholder='Filter integrations...'
                 className='w-full pl-10 pr-4 py-2 rounded-none'
@@ -190,7 +190,7 @@ export default function PaymentChannels() {
               <IconSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             </div>
             <Select value={integrationType} onValueChange={setIntegrationType}>
-              <SelectTrigger className='w-[180px] rounded-none'>
+              <SelectTrigger className='w-[150px] rounded-none'>
                 <SelectValue>{integrationText.get(integrationType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>

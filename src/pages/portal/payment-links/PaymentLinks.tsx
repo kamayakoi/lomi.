@@ -180,138 +180,140 @@ function PaymentLinksPage() {
           <Card>
             <CardContent className="p-4">
               <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('title')}>
-                          Title
-                          {sortColumn === 'title' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('public_description')}>
-                          Description
-                          {sortColumn === 'public_description' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('price')}>
-                          Price
-                          {sortColumn === 'price' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-center">
-                        URL
-                      </TableHead>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('link_type')}>
-                          Type
-                          {sortColumn === 'link_type' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-center">
-                        <Button variant="ghost" onClick={() => handleSort('is_active')}>
-                          Status
-                          {sortColumn === 'is_active' && (
-                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                          )}
-                        </Button>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {isPaymentLinksLoading ? (
-                      Array.from({ length: 5 }).map((_, index) => (
-                        <TableRow key={index}>
-                          <TableCell colSpan={6}>
-                            <Skeleton className="w-full h-8" />
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : paymentLinks.length === 0 ? (
+                <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8">
-                          <div className="flex flex-col items-center justify-center space-y-4">
-                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                              <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                              No payment links found
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                              Try changing your filter or create a new payment link.
-                            </p>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      sortPaymentLinks(paymentLinks).map((link: PaymentLink) => (
-                        <TableRow
-                          key={link.link_id}
-                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                          onClick={() => handlePaymentLinkClick(link)}
-                        >
-                          <TableCell className="text-center">{link.title}</TableCell>
-                          <TableCell className="text-center">{link.public_description}</TableCell>
-                          <TableCell className="text-center">
-                            {link.link_type === 'instant' && link.price ? (
-                              `${formatPrice(link.price)} ${link.currency_code}`
-                            ) : link.link_type === 'product' && link.product_price ? (
-                              `${formatPrice(link.product_price)} ${link.currency_code}`
-                            ) : link.link_type === 'plan' && link.plan_amount ? (
-                              `${formatPrice(link.plan_amount)} ${link.currency_code}`
-                            ) : (
-                              '-'
+                        <TableHead className="text-center">
+                          <Button variant="ghost" onClick={() => handleSort('title')}>
+                            Title
+                            {sortColumn === 'title' && (
+                              <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                             )}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                              {link.url}
-                            </a>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <span className={`
-                              inline-block px-2 py-1 rounded-full text-xs font-normal
-                              ${linkTypeColors[link.link_type]}
-                            `}>
-                              {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <span className={`
-                              inline-block px-2 py-1 rounded-full text-xs font-normal
-                              ${link.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                            `}>
-                              {link.is_active ? 'Active' : 'Inactive'}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleEditClick(link)
-                              }}
-                              className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                              <Edit className="h-4 w-4 text-blue-500" />
-                            </Button>
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <Button variant="ghost" onClick={() => handleSort('public_description')}>
+                            Description
+                            {sortColumn === 'public_description' && (
+                              <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <Button variant="ghost" onClick={() => handleSort('price')}>
+                            Price
+                            {sortColumn === 'price' && (
+                              <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          URL
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <Button variant="ghost" onClick={() => handleSort('link_type')}>
+                            Type
+                            {sortColumn === 'link_type' && (
+                              <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            )}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-center">
+                          <Button variant="ghost" onClick={() => handleSort('is_active')}>
+                            Status
+                            {sortColumn === 'is_active' && (
+                              <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                            )}
+                          </Button>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {isPaymentLinksLoading ? (
+                        Array.from({ length: 5 }).map((_, index) => (
+                          <TableRow key={index}>
+                            <TableCell colSpan={6}>
+                              <Skeleton className="w-full h-8" />
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : paymentLinks.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="text-center py-8">
+                            <div className="flex flex-col items-center justify-center space-y-4">
+                              <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                              </div>
+                              <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                No payment links found
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                Try changing your filter or create a new payment link.
+                              </p>
+                            </div>
                           </TableCell>
                         </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
+                      ) : (
+                        sortPaymentLinks(paymentLinks).map((link: PaymentLink) => (
+                          <TableRow
+                            key={link.link_id}
+                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                            onClick={() => handlePaymentLinkClick(link)}
+                          >
+                            <TableCell className="text-center">{link.title}</TableCell>
+                            <TableCell className="text-center">{link.public_description}</TableCell>
+                            <TableCell className="text-center">
+                              {link.link_type === 'instant' && link.price ? (
+                                `${formatPrice(link.price)} ${link.currency_code}`
+                              ) : link.link_type === 'product' && link.product_price ? (
+                                `${formatPrice(link.product_price)} ${link.currency_code}`
+                              ) : link.link_type === 'plan' && link.plan_amount ? (
+                                `${formatPrice(link.plan_amount)} ${link.currency_code}`
+                              ) : (
+                                '-'
+                              )}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                {link.url}
+                              </a>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span className={`
+                                inline-block px-2 py-1 rounded-full text-xs font-normal
+                                ${linkTypeColors[link.link_type]}
+                              `}>
+                                {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span className={`
+                                inline-block px-2 py-1 rounded-full text-xs font-normal
+                                ${link.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                              `}>
+                                {link.is_active ? 'Active' : 'Inactive'}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleEditClick(link)
+                                }}
+                                className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              >
+                                <Edit className="h-4 w-4 text-blue-500" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             </CardContent>
           </Card>

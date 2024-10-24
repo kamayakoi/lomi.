@@ -48,7 +48,7 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                                             <div className="font-medium">Customer:</div>
                                             <div>{subscription.customer_name}</div>
                                             <div className="font-medium">Status:</div>
-                                            <div>{subscription.status}</div>
+                                            <div>{formatSubscriptionStatus(subscription.status)}</div>
                                             <div className="font-medium">Start Date:</div>
                                             <div>{formatDate(subscription.start_date)}</div>
                                             {subscription.end_date && (
@@ -72,11 +72,11 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                                             <div className="font-medium">Description:</div>
                                             <div>{plan.description}</div>
                                             <div className="font-medium">Billing Frequency:</div>
-                                            <div>{plan.billing_frequency}</div>
+                                            <div>{formatBillingFrequency(plan.billing_frequency)}</div>
                                             <div className="font-medium">Amount:</div>
                                             <div>{formatCurrency(plan.amount, plan.currency_code)}</div>
                                             <div className="font-medium">Failed Payment Action:</div>
-                                            <div>{plan.failed_payment_action}</div>
+                                            <div>{formatFailedPaymentAction(plan.failed_payment_action)}</div>
                                             <div className="font-medium">Charge Day:</div>
                                             <div>{plan.charge_day || '-'}</div>
                                             <div className="font-medium">Created At:</div>
@@ -129,4 +129,56 @@ function formatCurrency(amount: number, currency: string): string {
 function formatDate(dateString: string): string {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function formatBillingFrequency(frequency: string | undefined): string {
+    if (!frequency) return '';
+    switch (frequency) {
+        case 'weekly':
+            return 'Weekly';
+        case 'bi-weekly':
+            return 'Bi-weekly';
+        case 'monthly':
+            return 'Monthly';
+        case 'bi-monthly':
+            return 'Bi-monthly';
+        case 'quarterly':
+            return 'Quarterly';
+        case 'semi-annual':
+            return 'Semi-annual';
+        case 'yearly':
+            return 'Yearly';
+        case 'one-time':
+            return 'One-time';
+        default:
+            return frequency;
+    }
+}
+
+function formatFailedPaymentAction(action: string | undefined): string {
+    if (!action) return '';
+    switch (action) {
+        case 'pause':
+            return 'Pause';
+        case 'continue':
+            return 'Continue';
+        case 'cancel':
+            return 'Cancel';
+        default:
+            return action;
+    }
+}
+
+function formatSubscriptionStatus(status: string | undefined): string {
+    if (!status) return '';
+    switch (status) {
+        case 'active':
+            return 'Active';
+        case 'pending':
+            return 'Pending';
+        case 'cancelled':
+            return 'Cancelled';
+        default:
+            return status;
+    }
 }

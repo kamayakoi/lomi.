@@ -33,7 +33,7 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>
                 <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                    <SelectTrigger className="w-[140px] rounded-none">
+                    <SelectTrigger className="w-[230px] rounded-none">
                         <SelectValue placeholder="All Events" />
                     </SelectTrigger>
                     <SelectContent>
@@ -45,7 +45,7 @@ export const WebhookFilters: React.FC<WebhookFiltersProps> = ({
                     </SelectContent>
                 </Select>
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                    <SelectTrigger className="w-[140px] rounded-none">
+                    <SelectTrigger className="w-[120px] rounded-none">
                         <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>

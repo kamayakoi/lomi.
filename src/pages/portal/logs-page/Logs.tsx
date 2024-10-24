@@ -121,7 +121,7 @@ function LogsPage() {
                     </div>
                     <div className='my-4 flex items-center justify-between sm:my-0'>
                         <div className='flex items-center space-x-4'>
-                            <div className='relative w-64'>
+                            <div className='relative w-60'>
                                 <Input
                                     placeholder='Search logs...'
                                     className='w-full pl-10 pr-4 py-2 rounded-none'
@@ -130,7 +130,7 @@ function LogsPage() {
                                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                             </div>
                             <Select value={selectedEvent || undefined} onValueChange={setSelectedEvent}>
-                                <SelectTrigger className="w-[140px] rounded-none">
+                                <SelectTrigger className="w-[200px] rounded-none">
                                     <SelectValue placeholder="All Events" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -157,7 +157,7 @@ function LogsPage() {
                                 </SelectContent>
                             </Select>
                             <Select value={selectedSeverity || undefined} onValueChange={setSelectedSeverity}>
-                                <SelectTrigger className="w-[140px] rounded-none">
+                                <SelectTrigger className="w-[120px] rounded-none">
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
