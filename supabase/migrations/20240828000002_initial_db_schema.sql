@@ -545,7 +545,6 @@ CREATE TABLE api_keys (
     api_key VARCHAR NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT true,
-    is_primary BOOLEAN NOT NULL DEFAULT false,
     expiration_date TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
