@@ -94,38 +94,52 @@ export default function SupportForm() {
 
     const handleSubmit = async () => {
         if (!user) {
-            console.error('User not found')
-            return
+            console.error('User not found');
+            return;
         }
 
-        let imageData: Uint8Array | null = null
-        let imageName: string | null = null
+        let imageUrl: string | null = null;
 
         if (image) {
-            imageData = new Uint8Array(await image.arrayBuffer())
-            imageName = image.name
+            // Sanitize the filename
+            const sanitizedFileName = image.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const fileName = `${user.id}/${Date.now()}_${sanitizedFileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('support_request_images')
+                .upload(fileName, image);
+
+            if (uploadError) {
+                console.error('Error uploading image:', uploadError);
+                return;
+            }
+
+            const { data: urlData } = await supabase.storage
+                .from('support_request_images')
+                .getPublicUrl(fileName);
+
+            imageUrl = urlData.publicUrl;
         }
 
-        const { data, error } = await supabase.rpc('create_support_request', {
+        const { data: supportRequestData, error: supportRequestError } = await supabase.rpc('create_support_request', {
             p_merchant_id: user.id,
             p_category: category,
             p_message: message,
-            p_image_data: imageData,
-            p_image_name: imageName,
-        })
+            p_image_url: imageUrl,
+        });
 
-        if (error) {
-            console.error('Error submitting support request:', error)
+        if (supportRequestError) {
+            console.error('Error submitting support request:', supportRequestError);
         } else {
-            console.log('Support request submitted:', data)
-            setIsSubmitted(true)
+            console.log('Support request submitted:', supportRequestData);
+            setIsSubmitted(true);
             setTimeout(() => {
-                setCategory('')
-                setMessage('')
-                setImage(null)
-                setIsSubmitted(false)
-                setIsOpen(false)
-            }, 3000)
+                setCategory('');
+                setMessage('');
+                setImage(null);
+                setIsSubmitted(false);
+                setIsOpen(false);
+            }, 3000);
         }
     }
 

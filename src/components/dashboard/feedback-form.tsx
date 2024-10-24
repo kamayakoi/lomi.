@@ -62,21 +62,26 @@ export default function FeedbackForm() {
 
     return (
         <div className="relative" ref={formRef}>
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsOpen(!isOpen)}
-                className="border-gray-300 dark:border-gray-700"
+            <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
             >
-                Feedback
-            </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="border-gray-300 dark:border-gray-700"
+                >
+                    Feedback
+                </Button>
+            </motion.div>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
+                        initial={{ opacity: 0, y: -10, scale: 0.3 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.5 }}
+                        transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
                         className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg z-50"
                     >
                         <div className="p-4">
@@ -112,7 +117,7 @@ export default function FeedbackForm() {
                             </div>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 p-2 border-t border-gray-200 dark:border-gray-700">
-                            Have a technical issue? Contact support or browse our docs.
+                            Have a technical issue? Contact support via the form below or browse our docs.
                         </div>
                     </motion.div>
                 )}

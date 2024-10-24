@@ -3,44 +3,37 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('support_request_images', 'support_request_images', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- Grant access to authenticated users to use the bucket
+CREATE POLICY "Allow authenticated users to upload images to their own folder"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+    bucket_id = 'support_request_images' 
+    AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+CREATE OR REPLACE POLICY "Allow authenticated users to read their own images"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+    bucket_id = 'support_request_images' 
+    AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
 -- Function to create a new support request
 CREATE OR REPLACE FUNCTION public.create_support_request(
     p_merchant_id UUID,
     p_category support_category,
     p_message TEXT,
-    p_image_data BYTEA DEFAULT NULL,
-    p_image_name TEXT DEFAULT NULL,
+    p_image_url TEXT DEFAULT NULL,
     p_priority support_priority DEFAULT 'normal'
 )
 RETURNS UUID AS $$
 DECLARE
     v_support_request_id UUID;
-    v_image_url TEXT := NULL;
-    v_content_type TEXT := 'application/octet-stream';
 BEGIN
-    -- If an image is provided, upload it to the bucket
-    IF p_image_data IS NOT NULL THEN
-        -- Determine the content type based on the file extension
-        IF lower(right(p_image_name, 4)) = '.png' THEN
-            v_content_type := 'image/png';
-        ELSIF lower(right(p_image_name, 5)) = '.jpeg' THEN
-            v_content_type := 'image/jpeg';
-        ELSIF lower(right(p_image_name, 4)) = '.gif' THEN
-            v_content_type := 'image/gif';
-        ELSIF lower(right(p_image_name, 4)) = '.bmp' THEN
-            v_content_type := 'image/bmp';
-        END IF;
-
-        v_image_url := storage.objects.create(
-            'support_request_images',
-            p_image_name,
-            p_image_data,
-            v_content_type
-        );
-    END IF;
-
     INSERT INTO support_requests (merchant_id, category, message, image_url, priority)
-    VALUES (p_merchant_id, p_category, p_message, v_image_url, p_priority)
+    VALUES (p_merchant_id, p_category, p_message, p_image_url, p_priority)
     RETURNING support_requests_id INTO v_support_request_id;
 
     RETURN v_support_request_id;
