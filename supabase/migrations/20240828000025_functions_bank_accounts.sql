@@ -8,21 +8,24 @@ CREATE OR REPLACE FUNCTION public.create_bank_account(
     p_country VARCHAR,
     p_is_default BOOLEAN
 )
-RETURNS TABLE (bank_account_id UUID) AS $$
+RETURNS UUID AS $$
 DECLARE
     v_merchant_id UUID;
+    v_bank_account_id UUID;
 BEGIN
     SELECT merchant_id INTO v_merchant_id
     FROM merchants
     WHERE merchant_id = auth.uid();
 
     INSERT INTO merchant_bank_accounts (
-        merchant_id, account_number, account_name, bank_name, bank_code, branch_code, country, is_default
+        merchant_id, account_number, account_name, bank_name, bank_code, branch_code, country, is_default, is_valid
     )
     VALUES (
-        v_merchant_id, p_account_number, p_account_name, p_bank_name, p_bank_code, p_branch_code, p_country, p_is_default
+        v_merchant_id, p_account_number, p_account_name, p_bank_name, p_bank_code, p_branch_code, p_country, p_is_default, false
     )
-    RETURNING bank_account_id;
+    RETURNING bank_account_id INTO v_bank_account_id;
+
+    RETURN v_bank_account_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

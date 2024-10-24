@@ -45,7 +45,7 @@ export default function BankAccountActions({ bankAccount, isOpen, onClose }: Ban
                                     <div>{bankAccount.country}</div>
                                     <div className="font-medium">Default Account:</div>
                                     <div>{bankAccount.is_default ? 'Yes' : 'No'}</div>
-                                    <div className="font-medium">Valid Account:</div>
+                                    <div className="font-medium">Account Verified:</div>
                                     <div>{bankAccount.is_valid ? 'Yes' : 'No'}</div>
                                 </div>
                             </section>

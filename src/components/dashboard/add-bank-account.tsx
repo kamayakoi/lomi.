@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,9 +14,11 @@ import { cn } from '@/lib/actions/utils'
 
 interface AddBankButtonProps {
     onAddAccount: (account: BankAccount) => Promise<void>
+    disabled?: boolean
+    hasDefaultAccount: boolean
 }
 
-export function AddBankButton({ onAddAccount }: AddBankButtonProps) {
+export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: AddBankButtonProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [newAccount, setNewAccount] = useState<Partial<BankAccount>>({
         is_default: false
@@ -27,12 +29,18 @@ export function AddBankButton({ onAddAccount }: AddBankButtonProps) {
     const { user } = useUser()
     const [selectedCountry, setSelectedCountry] = useState('')
 
+    useEffect(() => {
+        if (hasDefaultAccount) {
+            setNewAccount(prevAccount => ({ ...prevAccount, is_default: false }))
+        }
+    }, [hasDefaultAccount])
+
     const validateForm = () => {
         const newErrors: Partial<Record<keyof BankAccount, string>> = {}
         if (!newAccount.country) newErrors.country = "Country is required"
         if (!newAccount.bank_name) newErrors.bank_name = "Bank name is required"
         if (!newAccount.account_number) newErrors.account_number = "Account number is required"
-        else if (!/^\d{10,12}$/.test(newAccount.account_number)) newErrors.account_number = "Account number must be 10-12 digits"
+        else if (!/^\d{8,30}$/.test(newAccount.account_number)) newErrors.account_number = "Account number must be 8-30 digits"
         if (!newAccount.account_name) newErrors.account_name = "Account name is required"
         if (!newAccount.bank_code) newErrors.bank_code = "Bank code is required"
         if (!newAccount.branch_code) newErrors.branch_code = "Branch code is required"
@@ -61,7 +69,7 @@ export function AddBankButton({ onAddAccount }: AddBankButtonProps) {
 
                 const createdAccount: BankAccount = {
                     ...newAccount as BankAccount,
-                    id: data.bank_account_id,
+                    id: data,
                     is_valid: true,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
@@ -89,7 +97,7 @@ export function AddBankButton({ onAddAccount }: AddBankButtonProps) {
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" disabled={disabled}>
                     <PlusIcon className="mr-2 h-4 w-4" /> Add bank account
                 </Button>
             </DialogTrigger>
@@ -171,17 +179,19 @@ export function AddBankButton({ onAddAccount }: AddBankButtonProps) {
                         />
                         {errors.account_name && <p className="text-sm text-red-500">{errors.account_name}</p>}
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Checkbox
-                            id="isDefault"
-                            checked={newAccount.is_default}
-                            onCheckedChange={(checked) => setNewAccount({ ...newAccount, is_default: checked as boolean })}
-                        />
-                        <Label htmlFor="isDefault">Set as default account</Label>
-                    </div>
+                    {!hasDefaultAccount && (
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="isDefault"
+                                checked={newAccount.is_default}
+                                onCheckedChange={(checked) => setNewAccount({ ...newAccount, is_default: checked as boolean })}
+                            />
+                            <Label htmlFor="isDefault">Set as default account</Label>
+                        </div>
+                    )}
                     <div className="flex justify-end">
                         <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600" disabled={isLoading}>
-                            {isLoading ? "Adding..." : "Add Account"}
+                            {isLoading ? "Adding..." : "Add"}
                         </Button>
                     </div>
                 </form>

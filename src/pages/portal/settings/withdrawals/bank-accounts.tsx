@@ -8,6 +8,7 @@ import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { BankAccount } from './types'
 import BankAccountActions from './actions_bank_accounts'
+import { Badge } from '@/components/ui/badge'
 
 export default function BankAccounts() {
     const [accounts, setAccounts] = useState<BankAccount[]>([])
@@ -50,6 +51,8 @@ export default function BankAccounts() {
         setIsActionsOpen(true)
     }
 
+    const hasDefaultAccount = accounts.some(account => account.is_default)
+
     return (
         <ContentSection
             title="Bank Accounts"
@@ -59,7 +62,7 @@ export default function BankAccounts() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-lg font-medium">Your bank accounts</CardTitle>
-                        <AddBankButton onAddAccount={handleAddAccount} />
+                        <AddBankButton onAddAccount={handleAddAccount} disabled={accounts.length >= 3} hasDefaultAccount={hasDefaultAccount} />
                     </CardHeader>
                     <CardContent>
                         {accounts.length === 0 ? (
@@ -70,7 +73,19 @@ export default function BankAccounts() {
                                     <Card key={account.id} className="p-4 cursor-pointer hover:bg-muted" onClick={() => handleOpenActions(account)}>
                                         <div className="flex items-center justify-between space-x-4">
                                             <div>
-                                                <p className="text-base font-medium">{account.bank_name}</p>
+                                                <div className="flex items-center space-x-2">
+                                                    <p className="text-base font-medium">{account.bank_name}</p>
+                                                    {account.is_default && (
+                                                        <Badge variant="outline" className="bg-green-100 text-green-800">
+                                                            Default
+                                                        </Badge>
+                                                    )}
+                                                    {!account.is_valid && (
+                                                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                                                            Pending verification
+                                                        </Badge>
+                                                    )}
+                                                </div>
                                                 <p className="text-sm text-muted-foreground">{account.account_number}</p>
                                             </div>
                                             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteAccount(account.id); }}>
