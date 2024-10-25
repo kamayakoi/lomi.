@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 
 export default function Disbursements() {
     const [defaultDescription, setDefaultDescription] = useState("")

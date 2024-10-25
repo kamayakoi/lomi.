@@ -1,42 +1,29 @@
-export interface PaymentMethod {
-    id: string
-    name: string
-    icon: string
-    color: string
-}
-
-export type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure'
-
-export interface CheckoutFormData {
-    amount: number;
-    currency: string;
-    aggregatedMerchantId: string;
-    errorUrl: string;
-    successUrl: string;
+export interface PaymentLink {
+    linkId: string;
     merchantId: string;
     organizationId: string;
-    customerId: string;
+    linkType: 'product' | 'plan' | 'instant';
+    url: string;
     productId: string | null;
-    subscriptionId: string | null;
-    transactionType: string;
-    description: string;
-    referenceId: string;
-    metadata: Record<string, unknown>;
-    feeAmount: number;
-    feeReference: string;
-    providerCode: string;
-    paymentMethodCode: string;
-    providerTransactionId: string;
-    providerPaymentStatus: string;
+    planId: string | null;
+    title: string;
+    publicDescription: string | null;
+    privateDescription: string | null;
+    price: number | null;
+    currencyCode: string;
+    allowedProviders: string[];
+    allowCouponCode: boolean;
+    isActive: boolean;
+    expiresAt: string | null;
+    successUrl: string | null;
+    metadata: Record<string, unknown> | null;
+    createdAt: string;
+    updatedAt: string;
+    organizationLogoUrl: string | null;
 }
 
-export interface WaveCheckoutResponse {
-    waveLaunchUrl: string;
-    // Add other properties if needed
-}
-
-export interface Product {
-    id: string;
+export interface MerchantProduct {
+    productId: string;
     merchantId: string;
     organizationId: string;
     name: string;
@@ -48,80 +35,25 @@ export interface Product {
     updatedAt: string;
 }
 
-export interface Provider {
-    name: string;
-    code: string;
-    description: string;
-}
-
-export interface Organization {
-    id: string;
-    name: string;
-    email: string;
-    phoneNumber: string;
-    verified: boolean;
-    websiteUrl: string;
-    logoUrl: string;
-    status: string;
-    defaultCurrency: string;
-    totalRevenue: number;
-    totalTransactions: number;
-    totalMerchants: number;
-    totalCustomers: number;
-    employeeNumber: string;
-    industry: string;
-    metadata: Record<string, unknown>;
-    createdAt: string;
-    updatedAt: string;
-    isDeleted: boolean;
-    deletedAt: string | null;
-}
-
-export interface PaymentLink {
-    id: string;
+export interface SubscriptionPlan {
+    planId: string;
     merchantId: string;
     organizationId: string;
-    linkType: string;
-    url: string;
-    productId: string | null;
-    planId: string | null;
-    title: string;
-    publicDescription: string;
-    privateDescription: string;
-    price: number | null;
-    currencyCode: string;
-    allowedProviders: string[];
-    allowCouponCode: boolean;
-    isActive: boolean;
-    expiresAt: string | null;
-    successUrl: string | null;
-    metadata: Record<string, unknown>;
-    createdAt: string;
-    updatedAt: string;
-}
-
-export interface Props {
-    paymentLinkId: string;
-}
-
-export interface Checkout {
-    id: string;
-    merchantId: string;
-    organizationId: string;
-    customerId: string;
-    productId: string | null;
-    subscriptionId: string | null;
-    transactionType: string;
+    name: string;
     description: string;
-    referenceId: string;
-    metadata: Record<string, unknown>;
+    billingFrequency: string;
     amount: number;
-    feeAmount: number;
-    feeReference: string;
-    currency: string;
-    providerCode: string;
-    paymentMethodCode: string;
-    providerTransactionId: string;
-    providerPaymentStatus: string;
-    // Add other checkout properties here
+    currencyCode: string;
+    failedPaymentAction: string;
+    chargeDay: number | null;
+    metadata: Record<string, unknown>;
+    createdAt: string;
+    updatedAt: string;
+    firstPaymentType: string;
+}
+
+export interface CheckoutData {
+    paymentLink: PaymentLink;
+    merchantProduct: MerchantProduct | null;
+    subscriptionPlan: SubscriptionPlan | null;
 }

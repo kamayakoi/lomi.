@@ -1,6 +1,6 @@
-import { Navbar } from '../components/landing/Navbar';
-import { Footer } from '../components/landing/Footer';
-import SideNav from '../components/landing/Sidenav';
+import { Navbar } from '@/components/landing/Navbar';
+import { Footer } from '@/components/landing/Footer';
+import SideNav from '@/components/landing/Sidenav';
 import { ScrollToTop } from "../components/landing/ScrollToTop";
 
 const Terms = () => {

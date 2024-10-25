@@ -5,31 +5,27 @@ import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle } from 'lucide-react'
 import axios from 'axios'
 import { useUser } from '@/lib/hooks/useUser'
-import { useOrganization } from '@/lib/hooks/useOrganization'
 import {
     PaymentMethod,
     PaymentStatus,
     CheckoutFormData,
     WaveCheckoutResponse,
-    Product,
     Provider,
-    Organization,
     PaymentLink,
 } from './checkoutTypes'
 import { supabase } from '@/utils/supabase/client'
 import { useParams } from 'react-router-dom'
+import { fetchDataForCheckout } from './support_checkout'
 
 export default function CheckoutPage() {
-    const { productId, planId } = useParams<{ productId?: string; planId?: string }>();
+    const { linkId } = useParams<{ linkId?: string }>();
     const [selectedMethod, setSelectedMethod] = useState('')
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
-    const [organization, setOrganization] = useState<Organization | null>(null);
-    const [product, setProduct] = useState<Product | null>(null);
+    const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null });
     const [providers, setProviders] = useState<Provider[]>([]);
     const [paymentLink, setPaymentLink] = useState<PaymentLink | null>(null);
     const { user } = useUser();
-    const userOrganization = useOrganization();
     const paymentMethods: PaymentMethod[] = [
         { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards.png', color: 'bg-gray-100' },
         { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png', color: 'bg-gray-100' },
@@ -40,60 +36,44 @@ export default function CheckoutPage() {
     ]
 
     useEffect(() => {
-        // Fetch organization data
-        const fetchOrganization = async () => {
-            if (user && userOrganization) {
-                try {
-                    const response = await axios.get<Organization>(`/api/organizations/${userOrganization.organizationId}`);
-                    setOrganization(response.data);
-                } catch (error) {
-                    console.error('Error fetching organization data:', error);
+        // Fetch organization details
+        const fetchOrganizationDetails = async () => {
+            if (user?.id) {
+                const { data, error } = await supabase.rpc('fetch_organization_details', { p_merchant_id: user.id });
+
+                if (error) {
+                    console.error('Error fetching organization details:', error);
+                } else if (Array.isArray(data) && data[0]) {
+                    setOrganization({
+                        organizationId: data[0].organization_id,
+                        logoUrl: data[0].logo_url,
+                    });
                 }
             }
         };
 
-        // Fetch product or plan data based on the URL parameters
+        // Fetch checkout data based on the URL parameter
         const fetchData = async () => {
-            if (productId) {
-                // Fetch product data using productId
-                try {
-                    const response = await axios.get<Product>(`/api/products/${productId}`);
-                    setProduct(response.data);
-                } catch (error) {
-                    console.error('Error fetching product data:', error);
-                }
-            } else if (planId) {
-                // Fetch plan data using planId
-                try {
-                    const response = await axios.get<Product>(`/api/plans/${planId}`);
-                    setProduct(response.data);
-                } catch (error) {
-                    console.error('Error fetching plan data:', error);
-                }
+            if (linkId && organization.organizationId) {
+                const checkoutData = await fetchDataForCheckout(linkId, organization.organizationId);
+                setPaymentLink(checkoutData);
             }
         };
 
-        // Fetch payment link data
-        const fetchPaymentLink = async () => {
-            if (user && userOrganization) {
-                try {
-                    const response = await axios.get<PaymentLink>(`/api/payment-links/${productId || planId}`);
-                    setPaymentLink(response.data);
-                } catch (error) {
-                    console.error('Error fetching payment link data:', error);
-                }
-            }
-        };
-
-        fetchOrganization();
+        fetchOrganizationDetails();
         fetchData();
-        fetchPaymentLink();
-    }, [user, userOrganization, productId, planId]);
+    }, [user?.id, linkId, organization.organizationId]);
+
+    useEffect(() => {
+        // Log the organization and payment link data
+        console.log('Organization:', organization);
+        console.log('Payment Link:', paymentLink);
+    }, [organization, paymentLink]);
 
     useEffect(() => {
         // Fetch available providers
         const fetchProviders = async () => {
-            if (paymentLink) {
+            if (paymentLink && paymentLink.allowedProviders) {
                 try {
                     const allowedProviders = paymentLink.allowedProviders;
                     setProviders(allowedProviders.map((code) => ({ code, name: code, description: '' })));
@@ -147,11 +127,11 @@ export default function CheckoutPage() {
     const initiateWaveCheckout = async () => {
         setPaymentStatus('processing');
         try {
-            if (user && userOrganization && product && paymentLink) {
+            if (user && organization && paymentLink) {
                 // Create a new customer or fetch existing customer
                 const { data: customerData, error: customerError } = await supabase.rpc('create_customer', {
                     p_merchant_id: user.id,
-                    p_organization_id: userOrganization.organizationId,
+                    p_organization_id: organization.organizationId,
                     p_name: 'Customer Name', // Replace with actual customer name
                     p_email: 'customer@example.com', // Replace with actual customer email
                     p_phone_number: '+1234567890', // Replace with actual customer phone number
@@ -171,20 +151,20 @@ export default function CheckoutPage() {
                 const customerId = customerData.customer_id;
 
                 const checkoutFormData: CheckoutFormData = {
-                    amount: paymentLink.price || product.price,
-                    currency: paymentLink.currencyCode || product.currencyCode,
+                    amount: paymentLink.productPrice || paymentLink.planAmount || paymentLink.price || 0,
+                    currency: paymentLink.currencyCode,
                     aggregatedMerchantId: 'your_aggregated_merchant_id', // Determine based on merchant and organization
                     errorUrl: 'https://pay.lomi.africa/error',
                     successUrl: paymentLink.successUrl || 'https://pay.lomi.africa/success',
-                    merchantId: product.merchantId,
-                    organizationId: product.organizationId,
+                    merchantId: paymentLink.merchantId,
+                    organizationId: paymentLink.organizationId,
                     customerId: customerId,
-                    productId: product.id,
+                    productId: paymentLink.productId,
                     subscriptionId: null,
                     transactionType: 'payment',
-                    description: `Payment for ${product.name}`,
+                    description: paymentLink.productDescription || paymentLink.planDescription || paymentLink.publicDescription || '',
                     referenceId: 'ref_123',
-                    metadata: paymentLink.metadata,
+                    metadata: paymentLink.metadata || {},
                     feeAmount: 0,
                     feeReference: 'standard_fee',
                     providerCode: 'WAVE',
@@ -258,7 +238,7 @@ export default function CheckoutPage() {
                     <div>
                         <h1 className="text-2xl font-bold mb-4 text-gray-900">{paymentLink?.title || 'Your Order'}</h1>
                         <div className="flex items-center mb-4">
-                            {organization && (
+                            {organization.logoUrl && (
                                 <img
                                     src={organization.logoUrl}
                                     alt="Organization Logo"
@@ -268,10 +248,19 @@ export default function CheckoutPage() {
                                 />
                             )}
                             <div>
-                                {product && (
+                                {paymentLink?.productId && (
                                     <>
-                                        <h2 className="text-lg font-semibold text-gray-900">{product.name}</h2>
-                                        <p className="text-gray-600">{paymentLink?.publicDescription || product.description}</p>
+                                        <h2 className="text-lg font-semibold text-gray-900">{paymentLink.productName}</h2>
+                                        <p className="text-gray-600">{paymentLink.productDescription}</p>
+                                        <p className="text-gray-800 font-semibold mt-2">{paymentLink.productPrice} {paymentLink.currencyCode}</p>
+                                    </>
+                                )}
+                                {paymentLink?.planId && (
+                                    <>
+                                        <h2 className="text-lg font-semibold text-gray-900">{paymentLink.planName}</h2>
+                                        <p className="text-gray-600">{paymentLink.planDescription}</p>
+                                        <p className="text-gray-800 font-semibold mt-2">{paymentLink.planAmount} {paymentLink.currencyCode}</p>
+                                        <p className="text-gray-600 mt-1">Billed {paymentLink.planBillingFrequency}</p>
                                     </>
                                 )}
                             </div>
@@ -281,11 +270,15 @@ export default function CheckoutPage() {
                         <div className="border-t border-gray-200 pt-4 mb-4">
                             <div className="flex justify-between mb-2">
                                 <span className="text-gray-700">Subtotal</span>
-                                <span className="text-gray-900">{paymentLink?.price || product?.price} {paymentLink?.currencyCode || product?.currencyCode}</span>
+                                <span className="text-gray-900">
+                                    {paymentLink?.productPrice || paymentLink?.planAmount || paymentLink?.price} {paymentLink?.currencyCode}
+                                </span>
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span className="text-gray-900">Total</span>
-                                <span className="text-gray-900">{paymentLink?.price || product?.price} {paymentLink?.currencyCode || product?.currencyCode}</span>
+                                <span className="text-gray-900">
+                                    {paymentLink?.productPrice || paymentLink?.planAmount || paymentLink?.price} {paymentLink?.currencyCode}
+                                </span>
                             </div>
                         </div>
                         <p className="text-xs text-gray-500 text-center">

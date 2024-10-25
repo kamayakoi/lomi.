@@ -10,7 +10,7 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
-import SidebarNav from '../../../components/dashboard/sidebar-nav'
+import SidebarNav from '@/components/dashboard/sidebar-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 

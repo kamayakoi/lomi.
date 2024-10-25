@@ -1,77 +1,30 @@
--- Function to fetch product data for checkout
-CREATE OR REPLACE FUNCTION public.fetch_product_data_for_checkout(
-    p_product_id UUID
-)
-RETURNS TABLE (
-    product_id UUID,
-    name VARCHAR,
-    description TEXT,
-    price NUMERIC,
-    currency_code currency_code,
-    merchant_id UUID,
-    organization_id UUID
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        p.product_id,
-        p.name,
-        p.description,
-        p.price,
-        p.currency_code,
-        p.merchant_id,
-        p.organization_id
-    FROM
-        merchant_products p
-    WHERE
-        p.product_id = p_product_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
--- Function to fetch plan data for checkout
-CREATE OR REPLACE FUNCTION public.fetch_plan_data_for_checkout(
-    p_plan_id UUID
-)
-RETURNS TABLE (
-    plan_id UUID,
-    name VARCHAR,
-    description TEXT,
-    amount NUMERIC,
-    currency_code currency_code,
-    merchant_id UUID,
-    organization_id UUID
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        p.plan_id,
-        p.name,
-        p.description,
-        p.amount,
-        p.currency_code,
-        p.merchant_id,
-        p.organization_id
-    FROM
-        subscription_plans p
-    WHERE
-        p.plan_id = p_plan_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
--- Function to fetch payment link data for checkout
-CREATE OR REPLACE FUNCTION public.fetch_payment_link_data_for_checkout(
-    p_link_id UUID
+-- Function to fetch data for checkout
+CREATE OR REPLACE FUNCTION public.fetch_data_for_checkout(
+    p_link_id UUID,
+    p_organization_id UUID
 )
 RETURNS TABLE (
     link_id UUID,
     url VARCHAR,
     title VARCHAR,
     public_description TEXT,
+    private_description TEXT,
     price NUMERIC,
     currency_code currency_code,
     allowed_providers provider_code[],
+    allow_coupon_code BOOLEAN,
     success_url VARCHAR,
-    metadata JSONB
+    metadata JSONB,
+    product_id UUID,
+    product_name VARCHAR,
+    product_description TEXT,
+    product_price NUMERIC,
+    plan_id UUID,
+    plan_name VARCHAR,
+    plan_description TEXT,
+    plan_amount NUMERIC,
+    plan_billing_frequency frequency,
+    organization_logo_url VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -80,14 +33,30 @@ BEGIN
         pl.url,
         pl.title,
         pl.public_description,
+        pl.private_description,
         pl.price,
         pl.currency_code,
         pl.allowed_providers,
+        pl.allow_coupon_code,
         pl.success_url,
-        pl.metadata
+        pl.metadata,
+        pl.product_id,
+        mp.name AS product_name,
+        mp.description AS product_description,
+        mp.price AS product_price,
+        pl.plan_id,
+        sp.name AS plan_name,
+        sp.description AS plan_description,
+        sp.amount AS plan_amount,
+        sp.billing_frequency AS plan_billing_frequency,
+        o.logo_url AS organization_logo_url
     FROM
         payment_links pl
+        LEFT JOIN merchant_products mp ON pl.product_id = mp.product_id
+        LEFT JOIN subscription_plans sp ON pl.plan_id = sp.plan_id
+        JOIN organizations o ON pl.organization_id = o.organization_id
     WHERE
-        pl.link_id = p_link_id;
+        pl.link_id = p_link_id AND
+        pl.organization_id = p_organization_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

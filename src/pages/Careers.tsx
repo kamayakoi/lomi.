@@ -1,6 +1,6 @@
 import { useState } from 'react'; // Import useState hook
-import { Navbar } from '../components/landing/Navbar';
-import { Footer } from '../components/landing/Footer'; // Import Footer component
+import { Navbar } from '@/components/landing/Navbar';
+import { Footer } from '@/components/landing/Footer'; // Import Footer component
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 const Careers = () => {

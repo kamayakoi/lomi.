@@ -1,8 +1,8 @@
-import { NavbarAbout } from '../components/landing/Navbar-About';
+import { NavbarAbout } from '@/components/landing/Navbar-About';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTranslation } from 'react-i18next';
-import { FooterAbout } from '../components/landing/Footer-About';
+import { FooterAbout } from '@/components/landing/Footer-About';
 
 const About = () => {
     const { t } = useTranslation();

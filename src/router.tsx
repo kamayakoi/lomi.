@@ -83,7 +83,7 @@ import StripeCallback from '@/api/providers/stripe/callback/stripe-callback-inde
 import StripeConnectLanding from "@/api/providers/stripe/StripeConnectLanding";
 
 // Checkout pages
-import CheckoutPage from '@/api/checkout/Checkout';
+import CheckoutPage from '@/api/checkout/new.Checkout';
 
 const AppRouter = () => (
     <Router>

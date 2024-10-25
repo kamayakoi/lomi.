@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 
 export default function DisbursementNotifications() {
     const [emailSender, setEmailSender] = useState("")

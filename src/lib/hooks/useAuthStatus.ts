@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabase/client';
+import { supabase } from '@/utils/supabase/client';
 
 export function useAuthStatus() {
     const [isLoading, setIsLoading] = useState(true);

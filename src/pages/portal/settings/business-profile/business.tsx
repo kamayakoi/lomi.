@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import ContentSection from '../../../../components/dashboard/content-section'
+import ContentSection from '@/components/dashboard/content-section'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,7 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
-import LogoUploader from '../../../../components/auth/logo-uploader'
+import LogoUploader from '@/components/auth/logo-uploader'
 
 interface OrganizationDetails {
     organization_id: string;

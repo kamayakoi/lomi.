@@ -46,5 +46,4 @@ const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         </OrganizationContext.Provider>
     );
 };
-
 export { OrganizationContext, OrganizationProvider };
