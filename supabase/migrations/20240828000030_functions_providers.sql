@@ -76,29 +76,37 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION get_merchant_details(merchant_id UUID)
 RETURNS TABLE (
   id UUID,
-  name VARCHAR,
+  name VARCHAR
 ) AS $$
   SELECT
     m.merchant_id AS id,
-    m.name,
+    m.name
   FROM merchants m
   WHERE m.merchant_id = $1;
 $$ LANGUAGE sql;
 
--- Get product details
-CREATE OR REPLACE FUNCTION get_product_details(product_id UUID)
+-- Get product details by ID
+CREATE OR REPLACE FUNCTION get_product_by_id(prod_id UUID)
 RETURNS TABLE (
   id UUID,
   name VARCHAR,
   description TEXT,
-  price NUMERIC(10,2)
+  price NUMERIC(10,2),
+  currency_code currency_code,
+  merchant_id UUID,
+  organization_id UUID
 ) AS $$
   SELECT
     p.product_id AS id,
     p.name,
     p.description,
-    p.price
+    p.price,
+    p.currency_code,
+    p.merchant_id,
+    p.organization_id
   FROM merchant_products p
+  JOIN merchants m ON p.merchant_id = m.merchant_id
+  JOIN organizations o ON p.organization_id = o.organization_id
   WHERE p.product_id = $1;
 $$ LANGUAGE sql;
 
@@ -306,20 +314,20 @@ BEGIN
   )
   RETURNING * INTO v_transaction;
 
-  INSERT INTO providers_transactions (
-    transaction_id,
-    merchant_id,
-    provider_code,
-    wave_transaction_id,
-    wave_payment_status
-  )
-  VALUES (
-    v_transaction.transaction_id,
-    merchant_id,
-    provider_code,
-    provider_transaction_id,
-    provider_payment_status
-  );
+INSERT INTO providers_transactions (
+  transaction_id,
+  merchant_id,
+  provider_code,
+  provider_transaction_id,
+  provider_payment_status
+)
+VALUES (
+  v_transaction.transaction_id,
+  merchant_id,
+  provider_code,
+  provider_transaction_id,
+  provider_payment_status
+);
 
   RETURN v_transaction;
 END;

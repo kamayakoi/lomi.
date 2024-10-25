@@ -15,8 +15,8 @@ BEGIN
     v_api_key := 'lomi_sk_' || md5(random()::text || clock_timestamp()::text);
     v_api_key := v_api_key || substring(md5(random()::text), 1, 88 - length(v_api_key));
 
-    INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date, is_primary)
-    VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date, false);
+    INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date)
+    VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date);
 
     RETURN QUERY SELECT v_api_key AS api_key;
 END;

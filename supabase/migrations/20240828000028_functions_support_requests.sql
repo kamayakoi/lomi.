@@ -12,7 +12,7 @@ WITH CHECK (
     AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
-CREATE OR REPLACE POLICY "Allow authenticated users to read their own images"
+CREATE POLICY "Allow authenticated users to read their own images"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
