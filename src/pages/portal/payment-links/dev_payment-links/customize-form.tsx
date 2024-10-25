@@ -16,7 +16,6 @@ import { Product } from '@/pages/portal/product/dev_product/types'
 import { SubscriptionPlan } from '@/pages/portal/subscription/dev_subscription/types'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
-import { generatePaymentLink } from './support_paymentLinks'
 import { provider_code } from './types'
 
 interface PaymentMethod {
@@ -691,12 +690,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 return
             }
 
-            const paymentLinkUrl = generatePaymentLink(
-                paymentType,
-                selectedProduct?.product_id,
-                selectedPlan?.plan_id
-            );
-
             // Map the selected payment methods to their corresponding provider codes
             const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
                 if (method === 'CARDS' || method === 'APPLE_PAY') {
@@ -713,7 +706,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 p_merchant_id: user.id,
                 p_organization_id: organizationData[0].organization_id,
                 p_link_type: paymentType,
-                p_url: paymentLinkUrl,
                 p_title: paymentType === 'instant' ? instantLinkDetails.name : selectedPlan?.name || selectedProduct?.name || '',
                 p_public_description: paymentType === 'instant' ? instantLinkDetails.description : selectedPlan?.description || selectedProduct?.description || '',
                 p_private_description: instantLinkDetails.privateDescription,

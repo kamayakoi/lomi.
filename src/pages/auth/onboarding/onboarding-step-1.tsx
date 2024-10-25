@@ -102,7 +102,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                 <div className="flex space-x-2">
                     <div className="w-1/3">
                         <Label htmlFor="countryCode" className="block mb-2">Country code</Label>
-                        <div className="relative w-16">
+                        <div className="relative w-full">
                             <Input
                                 id="countryCode"
                                 type="text"

@@ -81,11 +81,8 @@ CREATE OR REPLACE FUNCTION public.create_payment_link(
     p_merchant_id UUID,
     p_organization_id UUID,
     p_link_type link_type,
-    p_url VARCHAR(2048),
-    p_currency_code currency_code,
     p_title VARCHAR(255),
-    p_product_id UUID DEFAULT NULL,
-    p_plan_id UUID DEFAULT NULL,
+    p_currency_code currency_code,
     p_public_description TEXT DEFAULT NULL,
     p_private_description TEXT DEFAULT NULL,
     p_price NUMERIC(10,2) DEFAULT NULL,
@@ -93,7 +90,8 @@ CREATE OR REPLACE FUNCTION public.create_payment_link(
     p_allow_coupon_code BOOLEAN DEFAULT false,
     p_expires_at TIMESTAMPTZ DEFAULT NULL,
     p_success_url VARCHAR(2048) DEFAULT NULL,
-    p_metadata JSONB DEFAULT NULL
+    p_plan_id UUID DEFAULT NULL,
+    p_product_id UUID DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -121,7 +119,6 @@ BEGIN
         merchant_id,
         organization_id,
         link_type,
-        url,
         currency_code,
         title,
         product_id,
@@ -139,7 +136,6 @@ BEGIN
         p_merchant_id,
         p_organization_id,
         p_link_type,
-        p_url,
         CASE
             WHEN p_link_type = 'instant' THEN p_currency_code
             WHEN p_link_type = 'plan' THEN v_plan_currency_code
@@ -159,7 +155,7 @@ BEGIN
         p_allow_coupon_code,
         p_expires_at,
         p_success_url,
-        p_metadata
+        NULL
     )
     RETURNING link_id INTO v_link_id;
 
@@ -256,3 +252,37 @@ BEGIN
     WHERE link_id = p_link_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to get the base URL based on the environment
+CREATE OR REPLACE FUNCTION public.get_base_url()
+RETURNS VARCHAR(2048) AS $$
+BEGIN
+    IF inet_client_addr() << '127.0.0.0/8'::inet THEN
+        RETURN 'https://pay.lomi.africa/';
+    ELSE
+        RETURN 'http://localhost:5173/';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger function to generate the URL after the payment link is created
+CREATE OR REPLACE FUNCTION public.generate_payment_link_url()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Generate the payment link URL based on the link_id and link_type
+    NEW.url := CASE
+        WHEN NEW.link_type = 'product' THEN get_base_url() || 'product/' || NEW.link_id::text
+        WHEN NEW.link_type = 'plan' THEN get_base_url() || 'plan/' || NEW.link_id::text
+        WHEN NEW.link_type = 'instant' THEN get_base_url() || 'instant/' || NEW.link_id::text
+        ELSE NULL
+    END;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to generate the URL after the payment link is created
+CREATE TRIGGER generate_payment_link_url
+BEFORE INSERT ON payment_links
+FOR EACH ROW
+EXECUTE FUNCTION public.generate_payment_link_url();
