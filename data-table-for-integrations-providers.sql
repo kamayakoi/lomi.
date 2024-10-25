@@ -46,7 +46,6 @@ TABLE merchants (
 -- Transactions table
 TABLE transactions (
     transaction_id UUID PRIMARY KEY UNIQUE DEFAULT uuid_generate_v4(),
-    order_id VARCHAR(255) NOT NULL,
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),

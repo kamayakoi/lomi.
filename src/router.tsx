@@ -148,6 +148,7 @@ const AppRouter = () => (
 
                 <Route path="/product/:productId" element={<CheckoutPage />} />
                 <Route path="/plan/:planId" element={<CheckoutPage />} />
+                <Route path="/instant" element={<CheckoutPage />} />
 
                 {/* Login/Signup routes */}
                 <Route path="/sign-in" element={<Signin />} />
