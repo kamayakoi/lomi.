@@ -25,7 +25,6 @@ export default function CheckoutPage() {
         const fetchData = async () => {
             if (linkId && organization.organizationId) {
                 const data = await fetchDataForCheckout(linkId, organization.organizationId);
-                console.log('Checkout Data:', data);
                 setCheckoutData(data);
 
                 // Download the organization logo using the relative path
@@ -85,7 +84,7 @@ export default function CheckoutPage() {
                                 {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
                                     <>
                                         <h2 className="text-lg font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
-                                        <p className="text-gray-600">{checkoutData?.paymentLink?.publicDescription}</p>
+                                        <p className="text-gray-600">{checkoutData?.paymentLink?.public_description}</p>
                                     </>
                                 )}
                             </div>
@@ -96,13 +95,13 @@ export default function CheckoutPage() {
                             <div className="flex justify-between mb-2">
                                 <span className="text-gray-700">Subtotal</span>
                                 <span className="text-gray-900">
-                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currencyCode}
+                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
                                 </span>
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span className="text-gray-900">Total</span>
                                 <span className="text-gray-900">
-                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currencyCode}
+                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
                                 </span>
                             </div>
                         </div>
