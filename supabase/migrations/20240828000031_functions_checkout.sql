@@ -60,3 +60,19 @@ BEGIN
         pl.organization_id = p_organization_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch organization ID for checkout
+CREATE OR REPLACE FUNCTION public.fetch_organization_id(p_merchant_id UUID)
+RETURNS TABLE (
+    organization_id UUID
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        mol.organization_id
+    FROM 
+        merchant_organization_links mol
+    WHERE 
+        mol.merchant_id = p_merchant_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

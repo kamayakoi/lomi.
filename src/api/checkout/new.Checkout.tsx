@@ -17,7 +17,7 @@ export default function CheckoutPage() {
         const fetchOrganization = async () => {
             if (user?.id) {
                 const orgDetails = await fetchOrganizationDetails(user.id);
-                setOrganization(orgDetails);
+                setOrganization({ ...orgDetails, logoUrl: null });
             }
         };
 
@@ -30,10 +30,11 @@ export default function CheckoutPage() {
 
                 // Download the organization logo using the relative path
                 if (data?.paymentLink?.organizationLogoUrl) {
+                    const logoPath = data.paymentLink.organizationLogoUrl;
                     const { data: logoData, error: logoError } = await supabase
                         .storage
                         .from('logos')
-                        .download(data.paymentLink.organizationLogoUrl);
+                        .download(logoPath);
 
                     if (logoError) {
                         console.error('Error downloading logo:', logoError);
@@ -79,6 +80,12 @@ export default function CheckoutPage() {
                                         <p className="text-gray-600">{checkoutData.subscriptionPlan.description}</p>
                                         <p className="text-gray-800 font-semibold mt-2">{checkoutData.subscriptionPlan.amount} {checkoutData.subscriptionPlan.currencyCode}</p>
                                         <p className="text-gray-600 mt-1">Billed {checkoutData.subscriptionPlan.billingFrequency}</p>
+                                    </>
+                                )}
+                                {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
+                                    <>
+                                        <h2 className="text-lg font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
+                                        <p className="text-gray-600">{checkoutData?.paymentLink?.publicDescription}</p>
                                     </>
                                 )}
                             </div>

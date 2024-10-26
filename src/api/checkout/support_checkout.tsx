@@ -47,13 +47,12 @@ export const fetchDataForCheckout = async (linkId: string, organizationId: strin
 };
 
 export const fetchOrganizationDetails = async (userId: string) => {
-    const { data, error } = await supabase.rpc('fetch_organization_details', { p_merchant_id: userId });
+    const { data, error } = await supabase.rpc('fetch_organization_id', { p_merchant_id: userId });
     if (error) {
-        console.error('Error fetching organization details:', error);
-        return { organizationId: null, logoUrl: null };
+        console.error('Error fetching organization ID:', error);
+        return { organizationId: null };
     }
     return {
         organizationId: data[0].organization_id,
-        logoUrl: data[0].logo_url,
     };
 };

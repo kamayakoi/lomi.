@@ -7,7 +7,7 @@ export interface PaymentLink {
     productId: string | null;
     planId: string | null;
     title: string;
-    publicDescription: string | null;
+    publicDescription: string;
     privateDescription: string | null;
     price: number | null;
     currencyCode: string;
