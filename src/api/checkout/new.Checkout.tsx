@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { fetchDataForCheckout, fetchOrganizationDetails } from './support_checkout';
 import { CheckoutData } from './CheckoutTypes';
 import { useUser } from '@/lib/hooks/useUser';
+import { supabase } from '@/utils/supabase/client';
 
 export default function CheckoutPage() {
     const { linkId } = useParams<{ linkId?: string }>();
@@ -26,6 +27,21 @@ export default function CheckoutPage() {
                 const data = await fetchDataForCheckout(linkId, organization.organizationId);
                 console.log('Checkout Data:', data);
                 setCheckoutData(data);
+
+                // Download the organization logo using the relative path
+                if (data?.paymentLink?.organizationLogoUrl) {
+                    const { data: logoData, error: logoError } = await supabase
+                        .storage
+                        .from('logos')
+                        .download(data.paymentLink.organizationLogoUrl);
+
+                    if (logoError) {
+                        console.error('Error downloading logo:', logoError);
+                    } else {
+                        const logoUrl = URL.createObjectURL(logoData);
+                        setOrganization(prevOrg => ({ ...prevOrg, logoUrl }));
+                    }
+                }
             }
         };
 
@@ -40,9 +56,9 @@ export default function CheckoutPage() {
                 <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between">
                     <div>
                         <div className="flex items-center mb-4">
-                            {checkoutData?.paymentLink.organizationLogoUrl && (
+                            {organization.logoUrl && (
                                 <img
-                                    src={checkoutData.paymentLink.organizationLogoUrl}
+                                    src={organization.logoUrl}
                                     alt="Organization Logo"
                                     width={80}
                                     height={80}
@@ -73,13 +89,13 @@ export default function CheckoutPage() {
                             <div className="flex justify-between mb-2">
                                 <span className="text-gray-700">Subtotal</span>
                                 <span className="text-gray-900">
-                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink.price} {checkoutData?.paymentLink.currencyCode}
+                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currencyCode}
                                 </span>
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span className="text-gray-900">Total</span>
                                 <span className="text-gray-900">
-                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink.price} {checkoutData?.paymentLink.currencyCode}
+                                    {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currencyCode}
                                 </span>
                             </div>
                         </div>

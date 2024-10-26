@@ -49,7 +49,7 @@ BEGIN
         sp.description AS plan_description,
         sp.amount AS plan_amount,
         sp.billing_frequency AS plan_billing_frequency,
-        o.logo_url AS organization_logo_url
+        CAST(REGEXP_REPLACE(o.logo_url, '^.*\/logos\/', '') AS VARCHAR) AS organization_logo_url
     FROM
         payment_links pl
         LEFT JOIN merchant_products mp ON pl.product_id = mp.product_id
