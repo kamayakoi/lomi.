@@ -258,9 +258,9 @@ CREATE OR REPLACE FUNCTION public.get_base_url()
 RETURNS VARCHAR(2048) AS $$
 BEGIN
     IF inet_client_addr() << '127.0.0.0/8'::inet THEN
-        RETURN 'https://pay.lomi.africa/';
+        RETURN 'http://localhost:5173/';    
     ELSE
-        RETURN 'http://localhost:5173/';
+        RETURN 'https://pay.lomi.africa/';
     END IF;
 END;
 $$ LANGUAGE plpgsql;
