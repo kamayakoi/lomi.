@@ -55,13 +55,13 @@ RETURNS transactions AS $$
     payment_method_code
   )
   RETURNING *;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get a transaction by ID
 CREATE OR REPLACE FUNCTION get_transaction_by_id(transaction_id UUID)
 RETURNS transactions AS $$
   SELECT * FROM transactions WHERE transaction_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Update transaction status
 CREATE OR REPLACE FUNCTION update_transaction_status(transaction_id UUID, new_status transaction_status)
@@ -70,7 +70,7 @@ RETURNS transactions AS $$
   SET status = new_status
   WHERE transaction_id = $1
   RETURNING *;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get merchant details
 CREATE OR REPLACE FUNCTION get_merchant_details(merchant_id UUID)
@@ -83,7 +83,7 @@ RETURNS TABLE (
     m.name
   FROM merchants m
   WHERE m.merchant_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get product details by ID
 CREATE OR REPLACE FUNCTION get_product_by_id(prod_id UUID)
@@ -108,7 +108,7 @@ RETURNS TABLE (
   JOIN merchants m ON p.merchant_id = m.merchant_id
   JOIN organizations o ON p.organization_id = o.organization_id
   WHERE p.product_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get available providers for an organization
 CREATE OR REPLACE FUNCTION get_available_providers(organization_id UUID)
@@ -122,7 +122,7 @@ RETURNS TABLE (
   FROM providers p
   JOIN organization_providers_settings ops ON p.code = ops.provider_code
   WHERE ops.organization_id = $1 AND ops.is_connected = true;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get organization details
 CREATE OR REPLACE FUNCTION get_organization_details(org_id UUID)
@@ -137,7 +137,7 @@ RETURNS TABLE (
     o.logo_url
   FROM organizations o
   WHERE o.organization_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get product details by ID
 CREATE OR REPLACE FUNCTION get_product_by_id(prod_id UUID)
@@ -162,7 +162,7 @@ RETURNS TABLE (
   JOIN merchants m ON p.merchant_id = m.merchant_id
   JOIN organizations o ON p.organization_id = o.organization_id
   WHERE p.product_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 
 -- Get payment link details by ID
@@ -212,7 +212,7 @@ RETURNS TABLE (
     pl.updated_at
   FROM payment_links pl
   WHERE pl.link_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Get plan details by ID
 CREATE OR REPLACE FUNCTION get_plan_by_id(plan_id UUID)
@@ -249,7 +249,7 @@ RETURNS TABLE (
     sp.first_payment_type
   FROM subscription_plans sp
   WHERE sp.plan_id = $1;
-$$ LANGUAGE sql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create a transaction with provider details
 CREATE OR REPLACE FUNCTION create_transaction_with_provider(
@@ -331,4 +331,4 @@ VALUES (
 
   RETURN v_transaction;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

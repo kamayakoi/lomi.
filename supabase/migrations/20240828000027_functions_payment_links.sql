@@ -263,7 +263,7 @@ BEGIN
         RETURN 'https://pay.lomi.africa/';
     END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger function to generate the URL after the payment link is created
 CREATE OR REPLACE FUNCTION public.generate_payment_link_url()
@@ -279,7 +279,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger to generate the URL after the payment link is created
 CREATE TRIGGER generate_payment_link_url
