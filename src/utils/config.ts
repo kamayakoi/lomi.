@@ -7,4 +7,5 @@ export const config = {
   baseUrl: import.meta.env.PROD ? 'https://lomi.africa' : 'http://localhost:5173',
   portalBaseUrl: 'https://portal.lomi.africa',
   mainSiteBaseUrl: 'https://lomi.africa',
+  paymentBaseUrl: import.meta.env.PROD ? 'https://pay.lomi.africa' : 'http://localhost:5173',
 };

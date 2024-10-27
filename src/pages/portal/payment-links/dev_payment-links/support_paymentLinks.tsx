@@ -1,5 +1,6 @@
 import { supabase } from '@/utils/supabase/client'
 import { PaymentLink } from './types'
+// import { config } from '@/utils/config'
 
 export const fetchPaymentLinks = async (
     merchantId: string,
@@ -32,6 +33,7 @@ export const generatePaymentLink = (
     planId?: string
 ) => {
     const baseUrl = import.meta.env.MODE === 'production' ? import.meta.env['VITE_PAYMENT_LINK_BASE_URL'] : import.meta.env['VITE_PAYMENT_LINK_BASE_URL_DEV'];
+    // const baseUrl = config.paymentBaseUrl;
 
     let linkPath = '';
 

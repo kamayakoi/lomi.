@@ -1,15 +1,20 @@
 {
   "rewrites": [
     {
+      "source": "/plan/:linkId",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/product/:linkId",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/instant/:linkId",
+      "destination": "/index.html"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/",
-      "has": [
-        {
-          "type": "header",
-          "key": "x-forwarded-proto",
-          "value": "http"
-        }
-      ]
+      "destination": "/index.html"
     }
   ],
   "headers": [
