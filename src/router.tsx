@@ -25,7 +25,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Integrators from './pages/portal/integrators/Integrators.tsx';
+import Integrators from './pages/portal/integrate/Integrate.tsx';
 import PaymentChannels from './pages/portal/payment-channels/paymentChannels';
 import Logs from './pages/portal/logs-page/Logs.tsx';
 import Balance from './pages/portal/balance/Balance.tsx';
@@ -39,7 +39,7 @@ import Product from "./pages/portal/product/Product.tsx";
 import Activation from './pages/auth/activation/activation';
 
 // Checkout pages
-import CheckoutPage from '@/api/checkout/checkout';
+import CheckoutPage from '@/api/checkout/Checkout.tsx';
 
 // Lazy loaded components
 const Home = lazy(() => import('./pages/Home.tsx'));
@@ -65,6 +65,9 @@ const BankAccounts = lazy(() => import('./pages/portal/settings/withdrawals/bank
 const WithdrawalNotifications = lazy(() => import('./pages/portal/settings/withdrawals/email-notifications.tsx'));
 const AutoWithdrawal = lazy(() => import('./pages/portal/settings/withdrawals/auto-withdrawal.tsx'));
 
+// Import the custom Loader component
+import Loader from '@/components/dashboard/loader';
+
 const AppRouter = () => (
     <Router>
         <Routes>
@@ -78,42 +81,42 @@ const AppRouter = () => (
                     <Routes>
                         {/* Website routes */}
                         <Route path="/" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Home />
                             </Suspense>
                         } />
                         <Route path="/home" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Home />
                             </Suspense>
                         } />
                         <Route path="/about" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <About />
                             </Suspense>
                         } />
                         <Route path="/products" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Products />
                             </Suspense>
                         } />
                         <Route path="/integrations" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Integrations />
                             </Suspense>
                         } />
                         <Route path="/terms" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Terms />
                             </Suspense>
                         } />
                         <Route path="/privacy" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Privacy />
                             </Suspense>
                         } />
                         <Route path="/status" element={
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loader />}>
                                 <Status />
                             </Suspense>
                         } />
@@ -137,72 +140,72 @@ const AppRouter = () => (
                             <Route path="payment-links" element={<PaymentLinks />} />
                             <Route path="customers" element={<Customers />} />
                             <Route path="settings" element={
-                                <Suspense fallback={<div>Loading...</div>}>
+                                <Suspense fallback={<Loader />}>
                                     <Settings />
                                 </Suspense>
                             }>
                                 <Route path="receiving-money/payment-methods" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <PaymentMethods />
                                     </Suspense>
                                 } />
                                 <Route path="receiving-money/checkout" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <CheckoutSettings />
                                     </Suspense>
                                 } />
                                 <Route path="sending-money/disbursements" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <Disbursements />
                                     </Suspense>
                                 } />
                                 <Route path="sending-money/notifications" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <DisbursementNotifications />
                                     </Suspense>
                                 } />
                                 <Route path="business" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <Business />
                                     </Suspense>
                                 } />
                                 <Route path="profile" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <Profile />
                                     </Suspense>
                                 } />
                                 <Route path="billing/statements" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <BillingStatements />
                                     </Suspense>
                                 } />
                                 <Route path="billing/fee-structure" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <FeeStructure />
                                     </Suspense>
                                 } />
                                 <Route path="developers/api-keys" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <ApiKeys />
                                     </Suspense>
                                 } />
                                 <Route path="developers/webhooks" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <SettingsWebhooks />
                                     </Suspense>
                                 } />
                                 <Route path="withdrawals/bank-accounts" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <BankAccounts />
                                     </Suspense>
                                 } />
                                 <Route path="withdrawals/email-notifications" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <WithdrawalNotifications />
                                     </Suspense>
                                 } />
                                 <Route path="withdrawals/auto-withdrawal" element={
-                                    <Suspense fallback={<div>Loading...</div>}>
+                                    <Suspense fallback={<Loader />}>
                                         <AutoWithdrawal />
                                     </Suspense>
                                 } />

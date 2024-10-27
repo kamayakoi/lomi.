@@ -51,7 +51,7 @@ export default defineConfig({
         seed: 0,
         selfDefending: true,
         simplify: true,
-        sourceMap: false,
+        sourceMap: true,
         sourceMapBaseUrl: '',
         sourceMapFileName: '',
         sourceMapMode: 'separate',
