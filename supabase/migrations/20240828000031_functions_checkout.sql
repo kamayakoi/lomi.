@@ -1,7 +1,6 @@
 -- Function to fetch data for checkout
 CREATE OR REPLACE FUNCTION public.fetch_data_for_checkout(
-    p_link_id UUID,
-    p_organization_id UUID
+    p_link_id UUID
 )
 RETURNS TABLE (
     link_id UUID,
@@ -56,8 +55,7 @@ BEGIN
         LEFT JOIN subscription_plans sp ON pl.plan_id = sp.plan_id
         JOIN organizations o ON pl.organization_id = o.organization_id
     WHERE
-        pl.link_id = p_link_id AND
-        pl.organization_id = p_organization_id;
+        pl.link_id = p_link_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

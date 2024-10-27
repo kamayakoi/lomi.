@@ -1,8 +1,8 @@
 import { supabase } from '@/utils/supabase/client';
 import { CheckoutData, CustomerDetails } from './checkoutTypes.ts';
 
-export const fetchDataForCheckout = async (linkId: string, organizationId: string): Promise<CheckoutData | null> => {
-    const { data, error } = await supabase.rpc('fetch_data_for_checkout', { p_link_id: linkId, p_organization_id: organizationId });
+export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData | null> => {
+    const { data, error } = await supabase.rpc('fetch_data_for_checkout', { p_link_id: linkId });
     if (error) {
         console.error('Error fetching checkout data:', error);
         return null;
@@ -46,14 +46,21 @@ export const fetchDataForCheckout = async (linkId: string, organizationId: strin
     };
 };
 
-export const fetchOrganizationDetails = async (userId: string) => {
-    const { data, error } = await supabase.rpc('fetch_organization_id', { p_merchant_id: userId });
+export const fetchOrganizationDetails = async (organizationId: string) => {
+    const { data, error } = await supabase
+        .from('organizations')
+        .select('id, logo_url')
+        .eq('id', organizationId)
+        .single();
+
     if (error) {
-        console.error('Error fetching organization ID:', error);
-        return { organizationId: null };
+        console.error('Error fetching organization details:', error);
+        return { organizationId: null, logoUrl: null };
     }
+
     return {
-        organizationId: data[0].organization_id,
+        organizationId: data.id,
+        logoUrl: data.logo_url,
     };
 };
 
