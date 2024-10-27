@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@/components/landing/theme-provider.tsx";
 import { UserProvider } from '@/lib/contexts/UserContext';
 import { QueryClient, QueryClientProvider } from 'react-query'
-// import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react";
 import AppRouter from "./router";
 import "./index.css";
 import './i18n';
@@ -17,7 +17,7 @@ export function App() {
         <ThemeProvider>
           <UserProvider>
             <AppRouter />
-            {/* <Analytics /> */}
+            <Analytics />
           </UserProvider>
         </ThemeProvider>
       </QueryClientProvider>
