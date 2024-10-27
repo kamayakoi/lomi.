@@ -1,22 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/plan/:linkId",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/product/:linkId",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/instant/:linkId",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
