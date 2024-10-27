@@ -7,6 +7,7 @@ import { fetchDataForCheckout, fetchOrganizationDetails, createOrUpdateCustomer 
 import { CheckoutData } from './checkoutTypes.ts'
 import { useUser } from '@/lib/hooks/useUser'
 import { supabase } from '@/utils/supabase/client'
+// import axios from 'axios'
 
 export default function CheckoutPage() {
     const { linkId } = useParams<{ linkId?: string }>()
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
         address: '',
     });
     const { user } = useUser()
+    // const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failure'>('idle')
 
     useEffect(() => {
         const fetchOrganization = async () => {
@@ -145,6 +147,53 @@ export default function CheckoutPage() {
             }
         }
     };
+
+    /*
+    const initiateWaveCheckout = async () => {
+        setPaymentStatus('processing');
+        try {
+            if (user && checkoutData) {
+                const customerId = await createOrUpdateCustomer(
+                    checkoutData.paymentLink.merchantId,
+                    checkoutData.paymentLink.organizationId,
+                    customerDetails
+                );
+
+                if (customerId) {
+                    const checkoutFormData = {
+                        amount: checkoutData.paymentLink.price || checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || 0,
+                        currency: checkoutData.paymentLink.currency_code,
+                        aggregatedMerchantId: 'your_aggregated_merchant_id', // Determine based on merchant and organization
+                        errorUrl: 'https://pay.lomi.africa/error',
+                        successUrl: checkoutData.paymentLink.success_url || 'https://pay.lomi.africa/success',
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        customerId: customerId,
+                        productId: checkoutData.paymentLink.productId,
+                        subscriptionId: null,
+                        transactionType: 'payment',
+                        description: checkoutData.paymentLink.public_description || checkoutData.merchantProduct?.description || checkoutData.subscriptionPlan?.description || '',
+                        referenceId: 'ref_123',
+                        metadata: checkoutData.paymentLink.metadata || {},
+                        feeAmount: 0,
+                        feeReference: 'standard_fee',
+                        providerCode: 'WAVE',
+                        paymentMethodCode: 'MOBILE_MONEY',
+                        providerTransactionId: 'wave_transaction_id_here', // Replace with actual Wave transaction ID
+                        providerPaymentStatus: 'pending', // Set initial payment status
+                    };
+
+                    const response = await axios.post<WaveCheckoutResponse>('/api/checkout/wave', checkoutFormData);
+                    const { waveLaunchUrl } = response.data;
+                    window.location.href = waveLaunchUrl;
+                }
+            }
+        } catch (error) {
+            console.error('Error initiating Wave checkout:', error);
+            setPaymentStatus('failure');
+        }
+    };
+    */
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
@@ -400,6 +449,25 @@ export default function CheckoutPage() {
                                         </Button>
                                     </motion.div>
                                 )}
+                                {/*
+                                {selectedProvider === 'WAVE' && paymentStatus === 'idle' && (
+                                    <motion.div
+                                        key="wave-method"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="text-center"
+                                    >
+                                        <Button
+                                            onClick={initiateWaveCheckout}
+                                            className="w-full bg-[#25BBF9] text-black font-semibold py-7 px-4 rounded-md hover:bg-[#60B8D8] transition duration-300 shadow-md text-xl"
+                                        >
+                                            Continue with Wave
+                                        </Button>
+                                    </motion.div>
+                                )}
+                                */}
                             </AnimatePresence>
                         </div>
                         <div className="mt-8 text-center">

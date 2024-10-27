@@ -1,419 +1,484 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CheckCircle, XCircle } from 'lucide-react'
-import axios from 'axios'
-import { useUser } from '@/lib/hooks/useUser'
-import {
-    PaymentMethod,
-    PaymentStatus,
-    CheckoutFormData,
-    WaveCheckoutResponse,
-    Provider,
-    PaymentLink,
-} from './checkoutTypes'
-import { supabase } from '@/utils/supabase/client'
 import { useParams } from 'react-router-dom'
-import { fetchDataForCheckout } from './support_checkout'
+import { fetchDataForCheckout, fetchOrganizationDetails, createOrUpdateCustomer } from './support_checkout'
+import { CheckoutData } from './checkoutTypes.ts'
+import { useUser } from '@/lib/hooks/useUser'
+import { supabase } from '@/utils/supabase/client'
+// import axios from 'axios'
 
 export default function CheckoutPage() {
-    const { linkId } = useParams<{ linkId?: string }>();
-    const [selectedMethod, setSelectedMethod] = useState('')
+    const { linkId } = useParams<{ linkId?: string }>()
+    const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null })
+    const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
+    const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
-    const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle')
-    const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null });
-    const [providers, setProviders] = useState<Provider[]>([]);
-    const [paymentLink, setPaymentLink] = useState<PaymentLink | null>(null);
-    const { user } = useUser();
-    const paymentMethods: PaymentMethod[] = [
-        { id: 'CREDIT_CARD', name: 'Credit Card', icon: '/cards.png', color: 'bg-gray-100' },
-        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png', color: 'bg-gray-100' },
-        { id: 'GOOGLE_PAY', name: 'Google Pay', icon: '/google-pay.png', color: 'bg-gray-100' },
-        { id: 'WAVE', name: 'Wave', icon: '/wave.png', color: 'bg-blue-500' },
-        { id: 'ORANGE', name: 'Orange', icon: '/orange.png', color: 'bg-gray-100' },
-        { id: 'MTN_MOMO', name: 'Momo', icon: '/mtn.png', color: 'bg-gray-100' },
-    ]
+    const [customerDetails, setCustomerDetails] = useState({
+        email: '',
+        name: '',
+        countryCode: '',
+        phoneNumber: '',
+        country: '',
+        city: '',
+        postalCode: '',
+        address: '',
+    });
+    const { user } = useUser()
+    // const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success' | 'failure'>('idle')
 
     useEffect(() => {
-        // Fetch organization details
-        const fetchOrganizationDetails = async () => {
+        const fetchOrganization = async () => {
             if (user?.id) {
-                const { data, error } = await supabase.rpc('fetch_organization_details', { p_merchant_id: user.id });
-
-                if (error) {
-                    console.error('Error fetching organization details:', error);
-                } else if (Array.isArray(data) && data[0]) {
-                    setOrganization({
-                        organizationId: data[0].organization_id,
-                        logoUrl: data[0].logo_url,
-                    });
-                }
+                const orgDetails = await fetchOrganizationDetails(user.id)
+                setOrganization({ ...orgDetails, logoUrl: null })
             }
-        };
+        }
 
-        // Fetch checkout data based on the URL parameter
         const fetchData = async () => {
             if (linkId && organization.organizationId) {
-                const checkoutData = await fetchDataForCheckout(linkId, organization.organizationId);
-                setPaymentLink(checkoutData);
-            }
-        };
+                const data = await fetchDataForCheckout(linkId, organization.organizationId)
+                setCheckoutData(data)
 
-        fetchOrganizationDetails();
-        fetchData();
-    }, [user?.id, linkId, organization.organizationId]);
+                if (data?.paymentLink?.organizationLogoUrl) {
+                    const logoPath = data.paymentLink.organizationLogoUrl
+                    const { data: logoData, error: logoError } = await supabase
+                        .storage
+                        .from('logos')
+                        .download(logoPath)
 
-    useEffect(() => {
-        // Log the organization and payment link data
-        console.log('Organization:', organization);
-        console.log('Payment Link:', paymentLink);
-    }, [organization, paymentLink]);
-
-    useEffect(() => {
-        // Fetch available providers
-        const fetchProviders = async () => {
-            if (paymentLink && paymentLink.allowedProviders) {
-                try {
-                    const allowedProviders = paymentLink.allowedProviders;
-                    setProviders(allowedProviders.map((code) => ({ code, name: code, description: '' })));
-                } catch (error) {
-                    console.error('Error fetching providers:', error);
+                    if (logoError) {
+                        console.error('Error downloading logo:', logoError)
+                    } else {
+                        const logoUrl = URL.createObjectURL(logoData)
+                        setOrganization(prevOrg => ({ ...prevOrg, logoUrl }))
+                    }
                 }
             }
-        };
-
-        if (paymentLink) {
-            fetchProviders();
         }
-    }, [paymentLink]);
 
-    const handleMethodSelect = (methodId: string) => {
-        setSelectedMethod(methodId)
-        setPaymentStatus('idle')
+        fetchOrganization()
+        fetchData()
+    }, [linkId, organization.organizationId, user?.id])
+
+    const handleProviderClick = (provider: string) => {
+        setSelectedProvider(provider)
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        if (name === 'expiry') {
-            // Automatically format expiry date
-            const formatted = value.replace(/\D/g, '').slice(0, 4)
+        const { name, value } = e.target;
+        if (name === 'number') {
+            // Automatically add spacing after every 4 numbers and limit to 12 numbers
+            const formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim().slice(0, 19);
+            setCardDetails((prev) => ({ ...prev, [name]: formattedValue }));
+        } else if (name === 'expiry') {
+            // Limit to 4 numbers (considering the automatic "/")
+            const formatted = value.replace(/\D/g, '').slice(0, 4);
             if (formatted.length > 2) {
-                setCardDetails(prev => ({ ...prev, [name]: `${formatted.slice(0, 2)}/${formatted.slice(2)}` }))
+                setCardDetails((prev) => ({ ...prev, [name]: `${formatted.slice(0, 2)}/${formatted.slice(2)}` }));
             } else {
-                setCardDetails(prev => ({ ...prev, [name]: formatted }))
+                setCardDetails((prev) => ({ ...prev, [name]: formatted }));
             }
+        } else if (name === 'cvc') {
+            // Limit to 4 numbers
+            const formatted = value.replace(/\D/g, '').slice(0, 4);
+            setCardDetails((prev) => ({ ...prev, [name]: formatted }));
         } else {
-            setCardDetails(prev => ({ ...prev, [name]: value }))
+            setCardDetails((prev) => ({ ...prev, [name]: value }));
         }
-    }
+    };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        setPaymentStatus('processing')
+    const handleCustomerInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setCustomerDetails((prev) => ({ ...prev, [name]: value }));
+    };
 
-        // Simulate API call
-        setTimeout(() => {
-            if (cardDetails.number === '4444 4444 4444 4444') {
-                setPaymentStatus('success')
-            } else if (cardDetails.number === '0000 0000 0000 0000') {
-                setPaymentStatus('failure')
-            } else {
-                setPaymentStatus('idle')
+    const renderProviderImages = () => {
+        if (checkoutData?.paymentLink?.allowed_providers) {
+            // Always place the "STRIPE" provider first if it exists
+            const stripeIndex = checkoutData.paymentLink.allowed_providers.indexOf('STRIPE');
+            if (stripeIndex !== -1) {
+                checkoutData.paymentLink.allowed_providers.splice(stripeIndex, 1);
+                checkoutData.paymentLink.allowed_providers.unshift('STRIPE');
             }
-        }, 2000)
+
+            return checkoutData.paymentLink.allowed_providers.map((provider) => (
+                <motion.div
+                    key={provider}
+                    onClick={() => handleProviderClick(provider)}
+                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'}`}
+                    style={{ width: '100px', height: '100px', padding: '0' }}
+                >
+                    {provider === 'STRIPE' ? (
+                        <img src="/cards.png" alt="Credit Cards" className="w-full h-full object-contain rounded-lg" />
+                    ) : provider === 'ORANGE' ? (
+                        <img src="/orange.png" alt="Orange" className="w-full h-full object-contain rounded-lg" />
+                    ) : provider === 'WAVE' ? (
+                        <img src="/wave.png" alt="Wave" className="w-full h-full object-contain rounded-lg" />
+                    ) : provider === 'MTN' ? (
+                        <img src="/mtn.png" alt="Momo" className="w-full h-full object-contain rounded-lg" />
+                    ) : (
+                        <span>{provider}</span>
+                    )}
+                </motion.div>
+            ));
+        }
+        return null;
+    };
+
+    const isPaymentFormValid = () => {
+        return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
     }
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (user && checkoutData) {
+            const customerId = await createOrUpdateCustomer(
+                checkoutData.paymentLink.merchantId,
+                checkoutData.paymentLink.organizationId,
+                customerDetails
+            );
+
+            if (customerId) {
+                // Process the payment with the customerId
+                // ...
+            }
+        }
+    };
+
+    /*
     const initiateWaveCheckout = async () => {
         setPaymentStatus('processing');
         try {
-            if (user && organization && paymentLink) {
-                // Create a new customer or fetch existing customer
-                const { data: customerData, error: customerError } = await supabase.rpc('create_customer', {
-                    p_merchant_id: user.id,
-                    p_organization_id: organization.organizationId,
-                    p_name: 'Customer Name', // Replace with actual customer name
-                    p_email: 'customer@example.com', // Replace with actual customer email
-                    p_phone_number: '+1234567890', // Replace with actual customer phone number
-                    p_country: 'Country', // Replace with actual customer country
-                    p_city: 'City', // Replace with actual customer city
-                    p_address: 'Address', // Replace with actual customer address
-                    p_postal_code: '12345', // Replace with actual customer postal code
-                    p_is_business: false, // Replace with actual customer type
-                });
+            if (user && checkoutData) {
+                const customerId = await createOrUpdateCustomer(
+                    checkoutData.paymentLink.merchantId,
+                    checkoutData.paymentLink.organizationId,
+                    customerDetails
+                );
 
-                if (customerError) {
-                    console.error('Error creating or fetching customer:', customerError);
-                    setPaymentStatus('failure');
-                    return;
+                if (customerId) {
+                    const checkoutFormData = {
+                        amount: checkoutData.paymentLink.price || checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || 0,
+                        currency: checkoutData.paymentLink.currency_code,
+                        aggregatedMerchantId: 'your_aggregated_merchant_id', // Determine based on merchant and organization
+                        errorUrl: 'https://pay.lomi.africa/error',
+                        successUrl: checkoutData.paymentLink.success_url || 'https://pay.lomi.africa/success',
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        customerId: customerId,
+                        productId: checkoutData.paymentLink.productId,
+                        subscriptionId: null,
+                        transactionType: 'payment',
+                        description: checkoutData.paymentLink.public_description || checkoutData.merchantProduct?.description || checkoutData.subscriptionPlan?.description || '',
+                        referenceId: 'ref_123',
+                        metadata: checkoutData.paymentLink.metadata || {},
+                        feeAmount: 0,
+                        feeReference: 'standard_fee',
+                        providerCode: 'WAVE',
+                        paymentMethodCode: 'MOBILE_MONEY',
+                        providerTransactionId: 'wave_transaction_id_here', // Replace with actual Wave transaction ID
+                        providerPaymentStatus: 'pending', // Set initial payment status
+                    };
+
+                    const response = await axios.post<WaveCheckoutResponse>('/api/checkout/wave', checkoutFormData);
+                    const { waveLaunchUrl } = response.data;
+                    window.location.href = waveLaunchUrl;
                 }
-
-                const customerId = customerData.customer_id;
-
-                const checkoutFormData: CheckoutFormData = {
-                    amount: paymentLink.productPrice || paymentLink.planAmount || paymentLink.price || 0,
-                    currency: paymentLink.currencyCode,
-                    aggregatedMerchantId: 'your_aggregated_merchant_id', // Determine based on merchant and organization
-                    errorUrl: 'https://pay.lomi.africa/error',
-                    successUrl: paymentLink.successUrl || 'https://pay.lomi.africa/success',
-                    merchantId: paymentLink.merchantId,
-                    organizationId: paymentLink.organizationId,
-                    customerId: customerId,
-                    productId: paymentLink.productId,
-                    subscriptionId: null,
-                    transactionType: 'payment',
-                    description: paymentLink.productDescription || paymentLink.planDescription || paymentLink.publicDescription || '',
-                    referenceId: 'ref_123',
-                    metadata: paymentLink.metadata || {},
-                    feeAmount: 0,
-                    feeReference: 'standard_fee',
-                    providerCode: 'WAVE',
-                    paymentMethodCode: 'MOBILE_MONEY',
-                    providerTransactionId: 'wave_transaction_id_here', // Replace with actual Wave transaction ID
-                    providerPaymentStatus: 'pending', // Set initial payment status
-                };
-
-                const response = await axios.post<WaveCheckoutResponse>('/api/checkout/wave', checkoutFormData);
-                const { waveLaunchUrl } = response.data;
-                window.location.href = waveLaunchUrl;
             }
         } catch (error) {
             console.error('Error initiating Wave checkout:', error);
             setPaymentStatus('failure');
         }
     };
-
-    const renderPaymentStatus = () => {
-        switch (paymentStatus) {
-            case 'processing':
-                return (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-center py-4"
-                    >
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto mb-4"></div>
-                        <p className="text-gray-800 font-semibold">Processing payment...</p>
-                    </motion.div>
-                )
-            case 'success':
-                return (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="text-center py-4"
-                    >
-                        <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                        <p className="text-green-600 font-semibold">Payment successful!</p>
-                    </motion.div>
-                )
-            case 'failure':
-                return (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="text-center py-4"
-                    >
-                        <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                        <p className="text-red-600 font-semibold">Payment failed. Please try again.</p>
-                    </motion.div>
-                )
-            default:
-                return null
-        }
-    }
-
-    const isPaymentFormValid = () => {
-        return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
-    }
+    */
 
     return (
-        <div className="max-w-6xl mx-auto my-4 md:my-8 border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-            <div className="bg-white flex flex-col md:flex-row">
-                {/* Left side - Product details */}
-                <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold mb-4 text-gray-900">{paymentLink?.title || 'Your Order'}</h1>
-                        <div className="flex items-center mb-4">
-                            {organization.logoUrl && (
-                                <img
-                                    src={organization.logoUrl}
-                                    alt="Organization Logo"
-                                    width={80}
-                                    height={80}
-                                    className="rounded-md mr-4"
-                                />
-                            )}
-                            <div>
-                                {paymentLink?.productId && (
-                                    <>
-                                        <h2 className="text-lg font-semibold text-gray-900">{paymentLink.productName}</h2>
-                                        <p className="text-gray-600">{paymentLink.productDescription}</p>
-                                        <p className="text-gray-800 font-semibold mt-2">{paymentLink.productPrice} {paymentLink.currencyCode}</p>
-                                    </>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div className="w-full max-w-6xl bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                <div className="flex flex-col lg:flex-row">
+                    {/* Left side - Product details */}
+                    <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center mb-4">
+                                {organization.logoUrl && (
+                                    <img
+                                        src={organization.logoUrl}
+                                        alt="Organization Logo"
+                                        width={100}
+                                        height={100}
+                                        className="rounded-md mr-4"
+                                    />
                                 )}
-                                {paymentLink?.planId && (
-                                    <>
-                                        <h2 className="text-lg font-semibold text-gray-900">{paymentLink.planName}</h2>
-                                        <p className="text-gray-600">{paymentLink.planDescription}</p>
-                                        <p className="text-gray-800 font-semibold mt-2">{paymentLink.planAmount} {paymentLink.currencyCode}</p>
-                                        <p className="text-gray-600 mt-1">Billed {paymentLink.planBillingFrequency}</p>
-                                    </>
-                                )}
+                                <div className="flex-1">
+                                    {checkoutData?.merchantProduct && (
+                                        <>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.merchantProduct.name}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData.merchantProduct.description}</p>
+                                            <p className="text-xl text-gray-800 font-semibold mt-2">{checkoutData.merchantProduct.price} {checkoutData.merchantProduct.currencyCode}</p>
+                                        </>
+                                    )}
+                                    {checkoutData?.subscriptionPlan && (
+                                        <>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.subscriptionPlan.name}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData.subscriptionPlan.description}</p>
+                                            <div className="flex items-center space-x-2 mt-2">
+                                                <p className="text-xl text-gray-800 font-semibold">{checkoutData.subscriptionPlan.amount} {checkoutData.subscriptionPlan.currencyCode}</p>
+                                                <span className="text-gray-400">|</span>
+                                                <p className="text-lg text-gray-600">Billed {checkoutData.subscriptionPlan.billingFrequency}</p>
+                                            </div>
+                                        </>
+                                    )}
+                                    {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
+                                        <div>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData?.paymentLink?.public_description}</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="border-t border-gray-200 pt-4 mb-4">
-                            <div className="flex justify-between mb-2">
-                                <span className="text-gray-700">Subtotal</span>
-                                <span className="text-gray-900">
-                                    {paymentLink?.productPrice || paymentLink?.planAmount || paymentLink?.price} {paymentLink?.currencyCode}
-                                </span>
+                        <div>
+                            <div className="border-t border-gray-200 pt-4 mb-4">
+                                <div className="flex justify-between mb-2">
+                                    <span className="text-gray-700">Subtotal</span>
+                                    <span className="text-gray-900">
+                                        {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between font-semibold">
+                                    <span className="text-gray-900">Total</span>
+                                    <span className="text-gray-900">
+                                        {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="flex justify-between font-semibold">
-                                <span className="text-gray-900">Total</span>
-                                <span className="text-gray-900">
-                                    {paymentLink?.productPrice || paymentLink?.planAmount || paymentLink?.price} {paymentLink?.currencyCode}
-                                </span>
-                            </div>
+                            <p className="text-xs text-gray-500 text-center">
+                                By completing this purchase, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                            </p>
                         </div>
-                        <p className="text-xs text-gray-500 text-center">
-                            By completing this purchase, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
-                        </p>
                     </div>
-                </div>
 
-                {/* Middle separation (visible only on larger screens) */}
-                <div className="hidden md:block w-px bg-gray-200"></div>
-
-                {/* Right side - Checkout component */}
-                <div className="w-full md:w-1/2 p-4 md:p-8">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-900">Checkout</h2>
-                    <div className="space-y-6">
-                        <div className="relative">
-                            <div
-                                className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
-                                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    {/* Right side - Checkout component */}
+                    <div className="w-full lg:w-1/2 p-4 lg:p-8">
+                        <div className="space-y-6">
+                            {/* Render the "Pay" button with Apple icon */}
+                            <Button
+                                onClick={() => handleProviderClick('APPLE_PAY')}
+                                className="w-full bg-black text-white font-semibold py-7 px-6 rounded-md hover:bg-gray-900 transition duration-300 shadow-md flex items-center justify-center"
                             >
-                                {providers.map((provider) => (
-                                    <motion.div
-                                        key={provider.code}
-                                        onClick={() => handleMethodSelect(provider.code)}
-                                        className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedMethod === provider.code ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'
-                                            }`}
-                                        style={{ width: '100px', height: '100px', padding: '0rem' }}
-                                    >
-                                        <span>{provider.name}</span>
-                                    </motion.div>
-                                ))}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    x="0px"
+                                    y="0px"
+                                    width="28"
+                                    height="28"
+                                    viewBox="0 0 50 50"
+                                    style={{ fill: '#FFFFFF' }}
+                                    className="mr-1"
+                                >
+                                    <path d="M 44.527344 34.75 C 43.449219 37.144531 42.929688 38.214844 41.542969 40.328125 C 39.601563 43.28125 36.863281 46.96875 33.480469 46.992188 C 30.46875 47.019531 29.691406 45.027344 25.601563 45.0625 C 21.515625 45.082031 20.664063 47.03125 17.648438 47 C 14.261719 46.96875 11.671875 43.648438 9.730469 40.699219 C 4.300781 32.429688 3.726563 22.734375 7.082031 17.578125 C 9.457031 13.921875 13.210938 11.773438 16.738281 11.773438 C 20.332031 11.773438 22.589844 13.746094 25.558594 13.746094 C 28.441406 13.746094 30.195313 11.769531 34.351563 11.769531 C 37.492188 11.769531 40.8125 13.480469 43.1875 16.433594 C 35.421875 20.691406 36.683594 31.78125 44.527344 34.75 Z M 31.195313 8.46875 C 32.707031 6.527344 33.855469 3.789063 33.4375 1 C 30.972656 1.167969 28.089844 2.742188 26.40625 4.78125 C 24.878906 6.640625 23.613281 9.398438 24.105469 12.066406 C 26.796875 12.152344 29.582031 10.546875 31.195313 8.46875 Z"></path>
+                                </svg>
+                                <span className="text-2xl">Pay</span>
+                            </Button>
+
+                            <div className="relative flex items-center">
+                                <div className="flex-grow border-t border-gray-300"></div>
+                                <span className="flex-shrink mx-4 text-gray-400">Or pay another way</span>
+                                <div className="flex-grow border-t border-gray-300"></div>
                             </div>
+
+                            {/* Customer Details Form */}
+                            <div className="space-y-4">
+                                <Input
+                                    type="email"
+                                    name="email"
+                                    value={customerDetails.email}
+                                    onChange={handleCustomerInputChange}
+                                    placeholder="Email address*"
+                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    value={customerDetails.name}
+                                    onChange={handleCustomerInputChange}
+                                    placeholder="Full name*"
+                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                                <div className="flex space-x-3">
+                                    <Input
+                                        type="text"
+                                        name="country"
+                                        value={customerDetails.country}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="Country*"
+                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                    <Input
+                                        type="text"
+                                        name="city"
+                                        value={customerDetails.city}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="City*"
+                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex space-x-3">
+                                    <Input
+                                        type="text"
+                                        name="countryCode"
+                                        value={customerDetails.countryCode}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="+225"
+                                        className="w-24 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    <Input
+                                        type="tel"
+                                        value={customerDetails.phoneNumber}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="Phone Number*"
+                                        className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <p className="text-gray-500 text-sm">
+                                    <span className="text-red-500">*</span> Required fields
+                                </p>
+                            </div>
+
+                            <div className="relative">
+                                <div
+                                    className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                >
+                                    {renderProviderImages()}
+                                </div>
+                            </div>
+                            <AnimatePresence mode="wait">
+                                {selectedProvider === 'STRIPE' && (
+                                    <motion.form
+                                        key="card-form"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="space-y-4 bg-white rounded-md"
+                                        onSubmit={handleSubmit}
+                                    >
+                                        <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                            <div className="relative focus-within:z-10">
+                                                <Input
+                                                    id="number"
+                                                    name="number"
+                                                    value={cardDetails.number}
+                                                    onChange={handleInputChange}
+                                                    placeholder="1234 1234 1234 1234"
+                                                    className="peer rounded-b-none pe-12 shadow-none [direction:inherit] mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                    required
+                                                    maxLength={19}
+                                                />
+                                                <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-4 text-muted-foreground/80 peer-disabled:opacity-50">
+                                                    <div className="flex space-x-1">
+                                                        <img src="/checkout-visa.png" alt="Visa" className="h-4 w-auto" />
+                                                        <img src="/checkout-mastercard.png" alt="Mastercard" className="h-4 w-auto" />
+                                                        <img src="/checkout-amer.png" alt="American Express" className="h-4 w-auto" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="-mt-px flex">
+                                                <div className="w-1/2 min-w-0 flex-1 focus-within:z-10">
+                                                    <Input
+                                                        id="expiry"
+                                                        name="expiry"
+                                                        value={cardDetails.expiry}
+                                                        onChange={handleInputChange}
+                                                        placeholder="MM/YY"
+                                                        className="rounded-e-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                        required
+                                                        maxLength={5}
+                                                    />
+                                                </div>
+                                                <div className="-ms-px w-1/2 min-w-0 flex-1 focus-within:z-10">
+                                                    <Input
+                                                        id="cvc"
+                                                        name="cvc"
+                                                        value={cardDetails.cvc}
+                                                        onChange={handleInputChange}
+                                                        placeholder="CVC"
+                                                        className="rounded-s-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                        required
+                                                        maxLength={4}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-gray-800 text-white font-semibold py-7 px-4 rounded-md hover:bg-gray-900 transition duration-300 shadow-md text-xl"
+                                            disabled={!isPaymentFormValid()}
+                                        >
+                                            Pay
+                                        </Button>
+                                    </motion.form>
+                                )}
+                                {selectedProvider && selectedProvider !== 'STRIPE' && selectedProvider !== 'APPLE_PAY' && (
+                                    <motion.div
+                                        key="other-method"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="text-center"
+                                    >
+                                        <Button
+                                            className={`
+                                                w-full text-white font-semibold py-7 px-4 rounded-md transition duration-300 shadow-md text-xl
+                                                ${selectedProvider === 'ORANGE' ? 'bg-[#FC6307] hover:bg-[#E35A06]' : ''}
+                                                ${selectedProvider === 'WAVE' ? 'bg-[#25BBF9] text-black hover:bg-[#60B8D8]' : ''}
+                                                ${selectedProvider === 'MTN' ? 'bg-[#F7CE46] text-black hover:bg-[#E0B83D]' : ''}
+                                            `}
+                                        >
+                                            Continue with {selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}
+                                        </Button>
+                                    </motion.div>
+                                )}
+                                {/*
+                                {selectedProvider === 'WAVE' && paymentStatus === 'idle' && (
+                                    <motion.div
+                                        key="wave-method"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="text-center"
+                                    >
+                                        <Button
+                                            onClick={initiateWaveCheckout}
+                                            className="w-full bg-[#25BBF9] text-black font-semibold py-7 px-4 rounded-md hover:bg-[#60B8D8] transition duration-300 shadow-md text-xl"
+                                        >
+                                            Continue with Wave
+                                        </Button>
+                                    </motion.div>
+                                )}
+                                */}
+                            </AnimatePresence>
                         </div>
-                        <AnimatePresence mode="wait">
-                            {selectedMethod === 'CREDIT_CARD' && paymentStatus === 'idle' && (
-                                <motion.form
-                                    key="card-form"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.3 }}
-                                    onSubmit={handleSubmit}
-                                    className="space-y-4 bg-white rounded-md p-4"
-                                >
-                                    <div className="relative">
-                                        <Input
-                                            id="number"
-                                            name="number"
-                                            value={cardDetails.number}
-                                            onChange={handleInputChange}
-                                            placeholder="1234 1234 1234 1234"
-                                            className="mt-1 block w-full pr-20 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                            required
-                                        />
-                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 space-x-1">
-                                            <img src="/checkout-visa.png" alt="Visa" className="h-4 w-auto" />
-                                            <img src="/checkout-mastercard.png" alt="Mastercard" className="h-4 w-auto" />
-                                            <img src="/checkout-amer.png" alt="American Express" className="h-4 w-auto" />
-                                        </div>
-                                    </div>
-                                    <div className="flex space-x-4">
-                                        <div className="flex-1">
-                                            <Input
-                                                id="expiry"
-                                                name="expiry"
-                                                value={cardDetails.expiry}
-                                                onChange={handleInputChange}
-                                                placeholder="MM/YY"
-                                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <Input
-                                                id="cvc"
-                                                name="cvc"
-                                                value={cardDetails.cvc}
-                                                onChange={handleInputChange}
-                                                placeholder="CVC"
-                                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        type="submit"
-                                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md"
-                                        disabled={!isPaymentFormValid()}
-                                    >
-                                        Pay
-                                    </Button>
-                                </motion.form>
-                            )}
-                            {selectedMethod === 'WAVE' && paymentStatus === 'idle' && (
-                                <motion.div
-                                    key="wave-method"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="text-center"
-                                >
-                                    <Button
-                                        onClick={initiateWaveCheckout}
-                                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md"
-                                    >
-                                        Continue with Wave
-                                    </Button>
-                                </motion.div>
-                            )}
-                            {selectedMethod && selectedMethod !== 'CREDIT_CARD' && selectedMethod !== 'WAVE' && paymentStatus === 'idle' && (
-                                <motion.div
-                                    key="other-method"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="text-center"
-                                >
-                                    <Button
-                                        onClick={() => console.log(`Proceeding with ${selectedMethod} payment`)}
-                                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 shadow-md"
-                                    >
-                                        Continue with {paymentMethods.find(m => m.id === selectedMethod)?.name}
-                                    </Button>
-                                </motion.div>
-                            )}
-                            {renderPaymentStatus()}
-                        </AnimatePresence>
-                    </div>
-                    <div className="mt-8 text-center">
-                        <div className="border-t border-gray-200 pt-4 mb-4"></div>
-                        <span className="text-sm text-gray-500 font-semibold inline-block">
-                            Powered by <span className="text-gray-800">lomi.</span>
-                        </span>
+                        <div className="mt-8 text-center">
+                            <div className="border-t border-gray-200 pt-4 mb-4"></div>
+                            <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
+                                Powered by{' '}
+                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer">
+                                    <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
+                                </a>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

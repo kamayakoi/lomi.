@@ -68,3 +68,9 @@ export interface CheckoutData {
     merchantProduct: MerchantProduct | null;
     subscriptionPlan: SubscriptionPlan | null;
 }
+
+// export interface WaveCheckoutResponse {
+//     waveLaunchUrl: string;
+// }
+
+export type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure';
