@@ -241,11 +241,6 @@ export default function PaymentChannels() {
               )
             })}
           </ul>
-          <Separator className='my-8' />
-          <h2 className='text-xl font-semibold mb-4'>Advanced</h2>
-          <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
-            {/* Remove the Stripe-specific code */}
-          </ul>
 
           {/* Updated "Coming Soon" panel */}
           <div className="mt-4 mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 rounded-lg p-8 shadow-lg relative overflow-hidden border border-blue-100 dark:border-indigo-700 transition-all duration-300 hover:shadow-xl hover:border-blue-200 dark:hover:border-indigo-600">
