@@ -81,7 +81,7 @@ export default defineConfig({
   ],
   base: '/',
   build: {
-    sourcemap: false,
+    sourcemap: true,
     minify: 'terser',
     terserOptions: {
       mangle: true,
