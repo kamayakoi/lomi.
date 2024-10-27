@@ -76,3 +76,46 @@ BEGIN
         mol.merchant_id = p_merchant_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to create or update customer
+CREATE OR REPLACE FUNCTION public.create_or_update_customer(
+    p_merchant_id UUID,
+    p_organization_id UUID,
+    p_name VARCHAR,
+    p_email VARCHAR,
+    p_phone_number VARCHAR,
+    p_country VARCHAR,
+    p_city VARCHAR,
+    p_address VARCHAR,
+    p_postal_code VARCHAR
+)
+RETURNS UUID AS $$
+DECLARE
+    v_customer_id UUID;
+BEGIN
+    -- Check if the customer already exists
+    SELECT customer_id INTO v_customer_id
+    FROM customers
+    WHERE email = p_email AND merchant_id = p_merchant_id AND organization_id = p_organization_id;
+
+    IF v_customer_id IS NULL THEN
+        -- Customer doesn't exist, create a new one
+        INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city, address, postal_code)
+        VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_country, p_city, p_address, p_postal_code)
+        RETURNING customer_id INTO v_customer_id;
+    ELSE
+        -- Customer exists, update their details
+        UPDATE customers
+        SET name = p_name,
+            phone_number = p_phone_number,
+            country = p_country,
+            city = p_city,
+            address = p_address,
+            postal_code = p_postal_code,
+            updated_at = NOW()
+        WHERE customer_id = v_customer_id;
+    END IF;
+
+    RETURN v_customer_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

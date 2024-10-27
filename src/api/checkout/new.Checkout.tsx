@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useParams } from 'react-router-dom'
-import { fetchDataForCheckout, fetchOrganizationDetails } from './support_checkout'
+import { fetchDataForCheckout, fetchOrganizationDetails, createOrUpdateCustomer } from './support_checkout'
 import { CheckoutData } from './checkoutTypes.ts'
 import { useUser } from '@/lib/hooks/useUser'
 import { supabase } from '@/utils/supabase/client'
@@ -14,6 +14,16 @@ export default function CheckoutPage() {
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
+    const [customerDetails, setCustomerDetails] = useState({
+        email: '',
+        name: '',
+        countryCode: '',
+        phoneNumber: '',
+        country: '',
+        city: '',
+        postalCode: '',
+        address: '',
+    });
     const { user } = useUser()
 
     useEffect(() => {
@@ -55,18 +65,32 @@ export default function CheckoutPage() {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target
-        if (name === 'expiry') {
-            const formatted = value.replace(/\D/g, '').slice(0, 4)
+        const { name, value } = e.target;
+        if (name === 'number') {
+            // Automatically add spacing after every 4 numbers and limit to 12 numbers
+            const formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim().slice(0, 19);
+            setCardDetails((prev) => ({ ...prev, [name]: formattedValue }));
+        } else if (name === 'expiry') {
+            // Limit to 4 numbers (considering the automatic "/")
+            const formatted = value.replace(/\D/g, '').slice(0, 4);
             if (formatted.length > 2) {
-                setCardDetails(prev => ({ ...prev, [name]: `${formatted.slice(0, 2)}/${formatted.slice(2)}` }))
+                setCardDetails((prev) => ({ ...prev, [name]: `${formatted.slice(0, 2)}/${formatted.slice(2)}` }));
             } else {
-                setCardDetails(prev => ({ ...prev, [name]: formatted }))
+                setCardDetails((prev) => ({ ...prev, [name]: formatted }));
             }
+        } else if (name === 'cvc') {
+            // Limit to 4 numbers
+            const formatted = value.replace(/\D/g, '').slice(0, 4);
+            setCardDetails((prev) => ({ ...prev, [name]: formatted }));
         } else {
-            setCardDetails(prev => ({ ...prev, [name]: value }))
+            setCardDetails((prev) => ({ ...prev, [name]: value }));
         }
-    }
+    };
+
+    const handleCustomerInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setCustomerDetails((prev) => ({ ...prev, [name]: value }));
+    };
 
     const renderProviderImages = () => {
         if (checkoutData?.paymentLink?.allowed_providers) {
@@ -91,7 +115,7 @@ export default function CheckoutPage() {
                     ) : provider === 'WAVE' ? (
                         <img src="/wave.png" alt="Wave" className="w-full h-full object-contain rounded-lg" />
                     ) : provider === 'MTN' ? (
-                        <img src="/mtn.png" alt="MTN" className="w-full h-full object-contain rounded-lg" />
+                        <img src="/mtn.png" alt="Momo" className="w-full h-full object-contain rounded-lg" />
                     ) : (
                         <span>{provider}</span>
                     )}
@@ -105,6 +129,23 @@ export default function CheckoutPage() {
         return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
     }
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (user && checkoutData) {
+            const customerId = await createOrUpdateCustomer(
+                checkoutData.paymentLink.merchantId,
+                checkoutData.paymentLink.organizationId,
+                customerDetails
+            );
+
+            if (customerId) {
+                // Process the payment with the customerId
+                // ...
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
             <div className="w-full max-w-6xl bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
@@ -117,34 +158,34 @@ export default function CheckoutPage() {
                                     <img
                                         src={organization.logoUrl}
                                         alt="Organization Logo"
-                                        width={80}
-                                        height={80}
+                                        width={100}
+                                        height={100}
                                         className="rounded-md mr-4"
                                     />
                                 )}
                                 <div className="flex-1">
                                     {checkoutData?.merchantProduct && (
                                         <>
-                                            <h2 className="text-lg font-semibold text-gray-900">{checkoutData.merchantProduct.name}</h2>
-                                            <p className="text-gray-600">{checkoutData.merchantProduct.description}</p>
-                                            <p className="text-gray-800 font-semibold mt-2">{checkoutData.merchantProduct.price} {checkoutData.merchantProduct.currencyCode}</p>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.merchantProduct.name}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData.merchantProduct.description}</p>
+                                            <p className="text-xl text-gray-800 font-semibold mt-2">{checkoutData.merchantProduct.price} {checkoutData.merchantProduct.currencyCode}</p>
                                         </>
                                     )}
                                     {checkoutData?.subscriptionPlan && (
                                         <>
-                                            <h2 className="text-lg font-semibold text-gray-900">{checkoutData.subscriptionPlan.name}</h2>
-                                            <p className="text-gray-600">{checkoutData.subscriptionPlan.description}</p>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.subscriptionPlan.name}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData.subscriptionPlan.description}</p>
                                             <div className="flex items-center space-x-2 mt-2">
-                                                <p className="text-gray-800 font-semibold">{checkoutData.subscriptionPlan.amount} {checkoutData.subscriptionPlan.currencyCode}</p>
+                                                <p className="text-xl text-gray-800 font-semibold">{checkoutData.subscriptionPlan.amount} {checkoutData.subscriptionPlan.currencyCode}</p>
                                                 <span className="text-gray-400">|</span>
-                                                <p className="text-gray-600">Billed {checkoutData.subscriptionPlan.billingFrequency}</p>
+                                                <p className="text-lg text-gray-600">Billed {checkoutData.subscriptionPlan.billingFrequency}</p>
                                             </div>
                                         </>
                                     )}
                                     {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
-                                        <div className="mt-[-30px]">
-                                            <h2 className="text-lg font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
-                                            <p className="text-gray-600">{checkoutData?.paymentLink?.public_description}</p>
+                                        <div>
+                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
+                                            <p className="text-lg text-gray-600">{checkoutData?.paymentLink?.public_description}</p>
                                         </div>
                                     )}
                                 </div>
@@ -173,7 +214,6 @@ export default function CheckoutPage() {
 
                     {/* Right side - Checkout component */}
                     <div className="w-full lg:w-1/2 p-4 lg:p-8">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-900">Checkout</h2>
                         <div className="space-y-6">
                             {/* Render the "Pay" button with Apple icon */}
                             <Button
@@ -201,6 +241,69 @@ export default function CheckoutPage() {
                                 <div className="flex-grow border-t border-gray-300"></div>
                             </div>
 
+                            {/* Customer Details Form */}
+                            <div className="space-y-4">
+                                <Input
+                                    type="email"
+                                    name="email"
+                                    value={customerDetails.email}
+                                    onChange={handleCustomerInputChange}
+                                    placeholder="Email address*"
+                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    value={customerDetails.name}
+                                    onChange={handleCustomerInputChange}
+                                    placeholder="Full name*"
+                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                />
+                                <div className="flex space-x-3">
+                                    <Input
+                                        type="text"
+                                        name="country"
+                                        value={customerDetails.country}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="Country*"
+                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                    <Input
+                                        type="text"
+                                        name="city"
+                                        value={customerDetails.city}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="City*"
+                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div className="flex space-x-3">
+                                    <Input
+                                        type="text"
+                                        name="countryCode"
+                                        value={customerDetails.countryCode}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="+225"
+                                        className="w-24 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    <Input
+                                        type="tel"
+                                        value={customerDetails.phoneNumber}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="Phone Number*"
+                                        className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <p className="text-gray-500 text-sm">
+                                    <span className="text-red-500">*</span> Required fields
+                                </p>
+                            </div>
+
                             <div className="relative">
                                 <div
                                     className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
@@ -218,6 +321,7 @@ export default function CheckoutPage() {
                                         exit={{ opacity: 0, y: -20 }}
                                         transition={{ duration: 0.3 }}
                                         className="space-y-4 bg-white rounded-md"
+                                        onSubmit={handleSubmit}
                                     >
                                         <div className="rounded-lg shadow-sm shadow-black/[.04]">
                                             <div className="relative focus-within:z-10">
@@ -227,8 +331,9 @@ export default function CheckoutPage() {
                                                     value={cardDetails.number}
                                                     onChange={handleInputChange}
                                                     placeholder="1234 1234 1234 1234"
-                                                    className="peer rounded-b-none pe-12 shadow-none [direction:inherit] text-lg py-3 mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                    className="peer rounded-b-none pe-12 shadow-none [direction:inherit] mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                                                     required
+                                                    maxLength={19}
                                                 />
                                                 <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-4 text-muted-foreground/80 peer-disabled:opacity-50">
                                                     <div className="flex space-x-1">
@@ -246,8 +351,9 @@ export default function CheckoutPage() {
                                                         value={cardDetails.expiry}
                                                         onChange={handleInputChange}
                                                         placeholder="MM/YY"
-                                                        className="rounded-e-none rounded-t-none shadow-none [direction:inherit] text-lg py-3 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                        className="rounded-e-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                                                         required
+                                                        maxLength={5}
                                                     />
                                                 </div>
                                                 <div className="-ms-px w-1/2 min-w-0 flex-1 focus-within:z-10">
@@ -257,15 +363,16 @@ export default function CheckoutPage() {
                                                         value={cardDetails.cvc}
                                                         onChange={handleInputChange}
                                                         placeholder="CVC"
-                                                        className="rounded-s-none rounded-t-none shadow-none [direction:inherit] text-lg py-3 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                                                        className="rounded-s-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                                                         required
+                                                        maxLength={4}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
                                         <Button
                                             type="submit"
-                                            className="w-full bg-blue-600 text-white font-semibold py-7 px-4 rounded-md hover:bg-gray-700 transition duration-300 shadow-md text-xl"
+                                            className="w-full bg-gray-800 text-white font-semibold py-7 px-4 rounded-md hover:bg-gray-900 transition duration-300 shadow-md text-xl"
                                             disabled={!isPaymentFormValid()}
                                         >
                                             Pay
@@ -281,8 +388,15 @@ export default function CheckoutPage() {
                                         transition={{ duration: 0.3 }}
                                         className="text-center"
                                     >
-                                        <Button className="w-full bg-blue-600 text-white font-semibold py-7 px-4 rounded-md hover:bg-gray-700 transition duration-300 shadow-md text-xl">
-                                            Continue with {selectedProvider}
+                                        <Button
+                                            className={`
+                                                w-full text-white font-semibold py-7 px-4 rounded-md transition duration-300 shadow-md text-xl
+                                                ${selectedProvider === 'ORANGE' ? 'bg-[#FC6307] hover:bg-[#E35A06]' : ''}
+                                                ${selectedProvider === 'WAVE' ? 'bg-[#25BBF9] text-black hover:bg-[#60B8D8]' : ''}
+                                                ${selectedProvider === 'MTN' ? 'bg-[#F7CE46] text-black hover:bg-[#E0B83D]' : ''}
+                                            `}
+                                        >
+                                            Continue with {selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}
                                         </Button>
                                     </motion.div>
                                 )}

@@ -52,6 +52,17 @@ export interface SubscriptionPlan {
     firstPaymentType: string;
 }
 
+export interface CustomerDetails {
+    email: string;
+    name: string;
+    countryCode: string;
+    phoneNumber: string;
+    country: string;
+    city: string;
+    postalCode: string;
+    address: string;
+}
+
 export interface CheckoutData {
     paymentLink: PaymentLink;
     merchantProduct: MerchantProduct | null;

@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client';
-import { CheckoutData } from './checkoutTypes.ts';
+import { CheckoutData, CustomerDetails } from './checkoutTypes.ts';
 
 export const fetchDataForCheckout = async (linkId: string, organizationId: string): Promise<CheckoutData | null> => {
     const { data, error } = await supabase.rpc('fetch_data_for_checkout', { p_link_id: linkId, p_organization_id: organizationId });
@@ -55,4 +55,29 @@ export const fetchOrganizationDetails = async (userId: string) => {
     return {
         organizationId: data[0].organization_id,
     };
+};
+
+export const createOrUpdateCustomer = async (
+    merchantId: string,
+    organizationId: string,
+    customerDetails: CustomerDetails
+): Promise<string | null> => {
+    const { data, error } = await supabase.rpc('create_or_update_customer', {
+        p_merchant_id: merchantId,
+        p_organization_id: organizationId,
+        p_name: customerDetails.name,
+        p_email: customerDetails.email,
+        p_phone_number: customerDetails.countryCode + customerDetails.phoneNumber,
+        p_country: customerDetails.country,
+        p_city: customerDetails.city,
+        p_address: customerDetails.address,
+        p_postal_code: customerDetails.postalCode,
+    });
+
+    if (error) {
+        console.error('Error creating or updating customer:', error);
+        return null;
+    }
+
+    return data;
 };
