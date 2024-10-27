@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
 
 // Routes pages
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
@@ -24,8 +23,8 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
-import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Integrators from './pages/portal/Integrate/Integrate.tsx';
+import Dashboard from '@/pages/portal/dashboard/Dashboard';
+import Integrators from '@/pages/portal/Integrate/Integrate.tsx';
 import PaymentChannels from './pages/portal/payment-channels/paymentChannels';
 import Logs from './pages/portal/logs-page/Logs.tsx';
 import Balance from './pages/portal/balance/Balance.tsx';
@@ -41,32 +40,30 @@ import Activation from './pages/auth/activation/activation';
 // Checkout pages
 import CheckoutPage from '@/api/checkout/Checkout.tsx';
 
-// Lazy loaded components
-const Home = lazy(() => import('./pages/Home.tsx'));
-const About = lazy(() => import('./pages/About.tsx'));
-const Products = lazy(() => import('./pages/Products.tsx'));
-const Integrations = lazy(() => import('./pages/Integrations.tsx'));
-const Terms = lazy(() => import('./pages/Terms.tsx'));
-const Privacy = lazy(() => import('./pages/Privacy.tsx'));
-const Status = lazy(() => import('./pages/Status.tsx'));
+// Website routes
+import Home from './pages/Home.tsx';
+import About from './pages/About.tsx';
+import Products from './pages/Products.tsx';
+import Integrations from './pages/Integrations.tsx';
+import Terms from './pages/Terms.tsx';
+import Privacy from './pages/Privacy.tsx';
+import Status from './pages/Status.tsx';
 
-const Settings = lazy(() => import('./pages/portal/settings/settings.tsx'));
-const PaymentMethods = lazy(() => import('./pages/portal/settings/receiving-money/payment-methods.tsx'));
-const CheckoutSettings = lazy(() => import('./pages/portal/settings/receiving-money/checkout/checkout-settings.tsx'));
-const Disbursements = lazy(() => import('./pages/portal/settings/sending-money/disbursements.tsx'));
-const DisbursementNotifications = lazy(() => import('./pages/portal/settings/sending-money/notifications.tsx'));
-const Business = lazy(() => import('./pages/portal/settings/business-profile/business'));
-const Profile = lazy(() => import('./pages/portal/settings/business-profile/profile'));
-const BillingStatements = lazy(() => import('./pages/portal/settings/billing/statements.tsx'));
-const FeeStructure = lazy(() => import('./pages/portal/settings/billing/fee-structure.tsx'));
-const ApiKeys = lazy(() => import('./pages/portal/settings/developers/api-keys.tsx'));
-const SettingsWebhooks = lazy(() => import('./pages/portal/settings/developers/webhooks.tsx'));
-const BankAccounts = lazy(() => import('./pages/portal/settings/withdrawals/bank-accounts.tsx'));
-const WithdrawalNotifications = lazy(() => import('./pages/portal/settings/withdrawals/email-notifications.tsx'));
-const AutoWithdrawal = lazy(() => import('./pages/portal/settings/withdrawals/auto-withdrawal.tsx'));
-
-// Import the custom Loader component
-import Loader from '@/components/dashboard/loader';
+// Settings routes
+import Settings from './pages/portal/settings/settings.tsx';
+import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods.tsx';
+import CheckoutSettings from './pages/portal/settings/receiving-money/checkout/checkout-settings.tsx';
+import Disbursements from './pages/portal/settings/sending-money/disbursements.tsx';
+import DisbursementNotifications from './pages/portal/settings/sending-money/notifications.tsx';
+import Business from './pages/portal/settings/business-profile/business';
+import Profile from './pages/portal/settings/business-profile/profile';
+import BillingStatements from './pages/portal/settings/billing/statements.tsx';
+import FeeStructure from './pages/portal/settings/billing/fee-structure.tsx';
+import ApiKeys from './pages/portal/settings/developers/api-keys.tsx';
+import SettingsWebhooks from './pages/portal/settings/developers/webhooks.tsx';
+import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts.tsx';
+import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications.tsx';
+import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
 
 const AppRouter = () => (
     <Router>
@@ -80,46 +77,14 @@ const AppRouter = () => (
                 <SessionCheck>
                     <Routes>
                         {/* Website routes */}
-                        <Route path="/" element={
-                            <Suspense fallback={<Loader />}>
-                                <Home />
-                            </Suspense>
-                        } />
-                        <Route path="/home" element={
-                            <Suspense fallback={<Loader />}>
-                                <Home />
-                            </Suspense>
-                        } />
-                        <Route path="/about" element={
-                            <Suspense fallback={<Loader />}>
-                                <About />
-                            </Suspense>
-                        } />
-                        <Route path="/products" element={
-                            <Suspense fallback={<Loader />}>
-                                <Products />
-                            </Suspense>
-                        } />
-                        <Route path="/integrations" element={
-                            <Suspense fallback={<Loader />}>
-                                <Integrations />
-                            </Suspense>
-                        } />
-                        <Route path="/terms" element={
-                            <Suspense fallback={<Loader />}>
-                                <Terms />
-                            </Suspense>
-                        } />
-                        <Route path="/privacy" element={
-                            <Suspense fallback={<Loader />}>
-                                <Privacy />
-                            </Suspense>
-                        } />
-                        <Route path="/status" element={
-                            <Suspense fallback={<Loader />}>
-                                <Status />
-                            </Suspense>
-                        } />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/integrations" element={<Integrations />} />
+                        <Route path="/terms" element={<Terms />} />
+                        <Route path="/privacy" element={<Privacy />} />
+                        <Route path="/status" element={<Status />} />
 
                         {/* Dashboard routes */}
                         <Route path="/portal" element={
@@ -139,76 +104,20 @@ const AppRouter = () => (
                             <Route path="webhooks" element={<Webhooks />} />
                             <Route path="payment-links" element={<PaymentLinks />} />
                             <Route path="customers" element={<Customers />} />
-                            <Route path="settings" element={
-                                <Suspense fallback={<Loader />}>
-                                    <Settings />
-                                </Suspense>
-                            }>
-                                <Route path="receiving-money/payment-methods" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <PaymentMethods />
-                                    </Suspense>
-                                } />
-                                <Route path="receiving-money/checkout" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <CheckoutSettings />
-                                    </Suspense>
-                                } />
-                                <Route path="sending-money/disbursements" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <Disbursements />
-                                    </Suspense>
-                                } />
-                                <Route path="sending-money/notifications" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <DisbursementNotifications />
-                                    </Suspense>
-                                } />
-                                <Route path="business" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <Business />
-                                    </Suspense>
-                                } />
-                                <Route path="profile" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <Profile />
-                                    </Suspense>
-                                } />
-                                <Route path="billing/statements" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <BillingStatements />
-                                    </Suspense>
-                                } />
-                                <Route path="billing/fee-structure" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <FeeStructure />
-                                    </Suspense>
-                                } />
-                                <Route path="developers/api-keys" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <ApiKeys />
-                                    </Suspense>
-                                } />
-                                <Route path="developers/webhooks" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <SettingsWebhooks />
-                                    </Suspense>
-                                } />
-                                <Route path="withdrawals/bank-accounts" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <BankAccounts />
-                                    </Suspense>
-                                } />
-                                <Route path="withdrawals/email-notifications" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <WithdrawalNotifications />
-                                    </Suspense>
-                                } />
-                                <Route path="withdrawals/auto-withdrawal" element={
-                                    <Suspense fallback={<Loader />}>
-                                        <AutoWithdrawal />
-                                    </Suspense>
-                                } />
+                            <Route path="settings" element={<Settings />}>
+                                <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
+                                <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
+                                <Route path="sending-money/disbursements" element={<Disbursements />} />
+                                <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
+                                <Route path="business" element={<Business />} />
+                                <Route path="profile" element={<Profile />} />
+                                <Route path="billing/statements" element={<BillingStatements />} />
+                                <Route path="billing/fee-structure" element={<FeeStructure />} />
+                                <Route path="developers/api-keys" element={<ApiKeys />} />
+                                <Route path="developers/webhooks" element={<SettingsWebhooks />} />
+                                <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
+                                <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
+                                <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
                             </Route>
                             <Route path="activation" element={
                                 <ActivationRoute>
