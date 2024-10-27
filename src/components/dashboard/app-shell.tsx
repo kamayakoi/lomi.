@@ -17,7 +17,7 @@ export default function AppShell() {
   useMetaTags({
     title: `${userOrgName} | Business | lomi.`,
     description: `${userOrgName}'s payment portal powered by lomi.`,
-    favicon: '/portal-favicon.ico',
+    favicon: '/favicon.ico',
   });
 
   const MemoizedSidebar = React.memo(Sidebar);

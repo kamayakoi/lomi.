@@ -25,7 +25,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 // Dashboard
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from './pages/portal/dashboard/Dashboard.tsx';
-import Integrators from './pages/portal/integrate/Integrate.tsx';
+import Integrators from './pages/portal/Integrate/Integrate.tsx';
 import PaymentChannels from './pages/portal/payment-channels/paymentChannels';
 import Logs from './pages/portal/logs-page/Logs.tsx';
 import Balance from './pages/portal/balance/Balance.tsx';
