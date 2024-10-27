@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client';
-import { CheckoutData } from './CheckoutTypes';
+import { CheckoutData } from './checkoutTypes.ts';
 
 export const fetchDataForCheckout = async (linkId: string, organizationId: string): Promise<CheckoutData | null> => {
     const { data, error } = await supabase.rpc('fetch_data_for_checkout', { p_link_id: linkId, p_organization_id: organizationId });
