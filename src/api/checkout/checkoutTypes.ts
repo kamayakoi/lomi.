@@ -74,3 +74,24 @@ export interface CheckoutData {
 // }
 
 export type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure';
+
+export interface Checkout {
+  id: string;
+  merchantId: string;
+  organizationId: string;
+  customerId: string;
+  productId: string | null;
+  subscriptionId: string | null;
+  transactionType: string;
+  description: string;
+  referenceId: string;
+  metadata: Record<string, unknown>;
+  amount: number;
+  feeAmount: number;
+  feeReference: string;
+  currency: string;
+  providerCode: string;
+  paymentMethodCode: string;
+  providerTransactionId: string;
+  providerPaymentStatus: string;
+}

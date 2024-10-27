@@ -51,7 +51,6 @@ export function AnimatedBeamMultipleOutputDemo({
     const div2Ref = useRef<HTMLDivElement>(null);
     const div3Ref = useRef<HTMLDivElement>(null);
     const div4Ref = useRef<HTMLDivElement>(null);
-    const div5Ref = useRef<HTMLDivElement>(null);
     const div6Ref = useRef<HTMLDivElement>(null);
     const div7Ref = useRef<HTMLDivElement>(null);
     const div8Ref = useRef<HTMLDivElement>(null);
@@ -93,10 +92,7 @@ export function AnimatedBeamMultipleOutputDemo({
                         <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div4Ref} className="size-14">
-                        <img src="/apple-pay-2.png" alt="Apple Pay" className="object-cover w-full h-full rounded-sm" />
-                    </Square>
-                    <Square ref={div5Ref} className="size-14">
-                        <img src="/ecobank-2.png" alt="Ecobank" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/cards.png" alt="Cards" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
             </div>
@@ -123,12 +119,6 @@ export function AnimatedBeamMultipleOutputDemo({
             <AnimatedBeam
                 containerRef={containerRef}
                 fromRef={div4Ref}
-                toRef={div6Ref}
-                duration={3}
-            />
-            <AnimatedBeam
-                containerRef={containerRef}
-                fromRef={div5Ref}
                 toRef={div6Ref}
                 duration={3}
             />

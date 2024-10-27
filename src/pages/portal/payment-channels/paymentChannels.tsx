@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
-  IconExternalLink,
   IconSearch,
   IconPlus,
 } from '@tabler/icons-react'
@@ -18,7 +16,7 @@ import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
-import { providers, Provider } from './data'
+import { providers } from './data'
 import { supabase } from '@/utils/supabase/client'
 import { Database } from '@/../database.types'
 import { TopNav } from '@/components/dashboard/top-nav'
@@ -120,12 +118,6 @@ export default function PaymentChannels() {
     return () => clearTimeout(timer)
   }, [showMessage])
 
-  const navigate = useNavigate()
-
-  const handleStripeConnect = () => {
-    navigate('/portal/stripe-connect-landing')
-  }
-
   const filteredProviders = providers
     .filter((provider) => {
       const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
@@ -134,12 +126,7 @@ export default function PaymentChannels() {
       return provider.name.toLowerCase().includes(searchTerm.toLowerCase())
     })
 
-  const directProviders = filteredProviders.filter(provider => provider.provider_code !== 'STRIPE')
-  const stripeProvider = filteredProviders.find(provider => provider.provider_code === 'STRIPE')
-
-  const isStripeProvider = (provider: Provider): provider is Provider & { includedPayments: Array<{ name: string; icon: JSX.Element }> } => {
-    return provider.provider_code === 'STRIPE' && 'includedPayments' in provider;
-  };
+  const directProviders = filteredProviders
 
   const handleDisconnectClick = (providerCode: string) => {
     setDisconnectingProvider(providerCode)
@@ -213,11 +200,11 @@ export default function PaymentChannels() {
                   className='rounded-lg border p-6 hover:shadow-md'
                 >
                   <div className='mb-8 flex items-center justify-between'>
-                    <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
+                    <div className='flex size-14 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
                       {provider.logo}
                     </div>
                     <motion.button
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out ${isConnected
+                      className={`px-5 py-2 rounded-md text-lg font-medium transition-colors duration-200 ease-in-out ${isConnected
                         ? 'bg-[#00A0FF] text-white'
                         : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'
                         }`}
@@ -255,50 +242,9 @@ export default function PaymentChannels() {
             })}
           </ul>
           <Separator className='my-8' />
-          <h2 className='text-xl font-semibold mb-4'>Other</h2>
+          <h2 className='text-xl font-semibold mb-4'>Advanced</h2>
           <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
-            {stripeProvider && (
-              <li
-                key={stripeProvider.provider_code}
-                className='rounded-lg border p-6 hover:shadow-md'
-              >
-                <div className='mb-8 flex items-center justify-between'>
-                  <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-gray-100'>
-                    {stripeProvider.logo}
-                  </div>
-                  <Button
-                    variant='default'
-                    size='sm'
-                    onClick={handleStripeConnect}
-                    className='flex items-center px-4 py-2 text-sm font-medium bg-gray-800 text-white hover:bg-[#635BFF]'
-                  >
-                    <IconExternalLink size={14} className="mr-2" />
-                    Setup
-                  </Button>
-                </div>
-                <div>
-                  <h2 className='mb-2 text-lg font-semibold'>{stripeProvider.name}</h2>
-                  <p className='text-gray-500'>{stripeProvider.description}</p>
-                  <p className='text-xs text-blue-600 mt-2 flex items-center'>
-                    <IconExternalLink size={12} className="mr-1" />
-                    External sign-up required
-                  </p>
-                  {isStripeProvider(stripeProvider) && (
-                    <div className='mt-4'>
-                      <p className='text-sm font-medium mb-2'>Includes:</p>
-                      <div className='flex flex-wrap gap-2'>
-                        {stripeProvider.includedPayments.map((payment) => (
-                          <div key={payment.name} className='flex items-center bg-gray-100 dark:bg-gray-700 dark:text-gray-200 rounded-full px-2 py-1'>
-                            <span className='mr-1'>{payment.icon}</span>
-                            <span className='text-xs'>{payment.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </li>
-            )}
+            {/* Remove the Stripe-specific code */}
           </ul>
 
           {/* Updated "Coming Soon" panel */}

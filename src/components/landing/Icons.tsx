@@ -7,7 +7,7 @@ import kwameadjei from "/kwameadjei.png";
 import iconDark from "/whiteblack.png";
 import mtnLogo from '/mtn.png';
 import waveLogo from '/wave.png';
-import applePayLogo from '/apple-pay.png';
+import cardsLogo from '/mastercard.png';
 import ecobankLogo from '/ecobank-2.png';
 
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -78,8 +78,8 @@ export const WaveLogo = () => {
 export const ApplePayLogo = () => {
   return (
     <img
-      src={applePayLogo}
-      alt="apple pay"
+      src={cardsLogo}
+      alt="cards"
       className="lucide lucide-panels-top-left mr-2"
       style={{ width: '100px', height: '100px', borderRadius: '50%' }}
     />
