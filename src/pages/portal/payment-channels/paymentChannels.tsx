@@ -25,6 +25,7 @@ import { useSidebarData } from '@/lib/hooks/useSidebarData'
 import { motion, AnimatePresence } from 'framer-motion'
 import Loader from '@/components/dashboard/loader'
 import FeedbackForm from '@/components/dashboard/feedback-form'
+import SupportForm from '@/components/dashboard/support-form'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 const integrationText = new Map<string, string>([
@@ -155,6 +156,7 @@ export default function PaymentChannels() {
       </Layout.Header>
 
       <Separator className='my-0' />
+      <SupportForm />
 
       <Layout.Body className='flex flex-col'>
         <div style={{ marginBottom: '0.5rem' }}>

@@ -15,6 +15,7 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './dev_subscription/form_subscriptions'
 import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
+import SupportForm from '@/components/dashboard/support-form'
 import {
   Dialog,
   DialogContent,
@@ -189,7 +190,7 @@ function SubscriptionsPage() {
       </Layout.Header>
 
       <Separator className='my-0' />
-
+      <SupportForm />
       <Layout.Body>
         <div className="space-y-4">
           <div className="flex justify-between items-center">

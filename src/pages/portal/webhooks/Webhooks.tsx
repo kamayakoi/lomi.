@@ -33,6 +33,7 @@ import {
 import { useQuery } from 'react-query'
 import WebhookActions from './dev_webhooks/actions_webhooks'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from '@/components/ui/card'
 
 function WebhooksPage() {
@@ -114,7 +115,7 @@ function WebhooksPage() {
             </Layout.Header>
 
             <Separator className='my-0' />
-
+            <SupportForm />
             <Layout.Body>
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">

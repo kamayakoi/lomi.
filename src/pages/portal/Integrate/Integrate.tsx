@@ -7,6 +7,7 @@ import { TopNav } from '@/components/dashboard/top-nav'
 import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
+import SupportForm from '@/components/dashboard/support-form'
 
 export default function Providers() {
   const topNav = [
@@ -34,6 +35,7 @@ export default function Providers() {
       </Layout.Header>
 
       <Separator className='my-0' />
+      <SupportForm />
 
       {/* ===== Content ===== */}
       <Layout.Body className='flex flex-col'>

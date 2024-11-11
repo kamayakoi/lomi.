@@ -31,6 +31,7 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 
 function LogsPage() {
@@ -113,6 +114,7 @@ function LogsPage() {
             </Layout.Header>
 
             <Separator className='my-0' />
+            <SupportForm />
 
             <Layout.Body className='flex flex-col'>
                 <div className="space-y-4 pb-8">

@@ -10,6 +10,8 @@ import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
+import SupportForm from '@/components/dashboard/support-form'
+import FeedbackForm from '@/components/dashboard/feedback-form'
 import SidebarNav from '@/components/dashboard/sidebar-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
@@ -26,6 +28,7 @@ function Settings() {
       <Layout.Header>
         <TopNav links={topNav} />
         <div className='ml-auto flex items-center space-x-4'>
+          <FeedbackForm />
           <Notifications />
           <UserNav />
         </div>
@@ -51,6 +54,7 @@ function Settings() {
             <Outlet />
           </div>
         </div>
+        <SupportForm />
       </Layout.Body>
     </Layout>
   )

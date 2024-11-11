@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateProductForm } from './dev_product/form_product'
 import { ProductFilters } from './dev_product/filters_product'
+import SupportForm from '@/components/dashboard/support-form'
 import {
     Dialog,
     DialogContent,
@@ -259,6 +260,7 @@ function ProductsPage() {
                         </CardContent>
                     </Card>
                 </div>
+                <SupportForm />
             </Layout.Body>
 
             <ProductActions

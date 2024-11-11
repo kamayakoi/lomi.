@@ -20,6 +20,7 @@ import { PaymentLink, link_type, currency_code } from './dev_payment-links/types
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Link2Icon } from 'lucide-react'
+import SupportForm from '@/components/dashboard/support-form'
 import PaymentLinkActions from './dev_payment-links/actions_paymentLink'
 import { EditPaymentLinkForm } from './dev_payment-links/edit_paymentlink.tsx'
 
@@ -149,7 +150,7 @@ function PaymentLinksPage() {
       </DashboardLayout.Header>
 
       <Separator className='my-0' />
-
+      <SupportForm />
       <DashboardLayout.Body>
         <div className="space-y-4">
           <div className="flex justify-between items-center">

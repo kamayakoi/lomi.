@@ -40,6 +40,7 @@ import { countries, countryCodes } from '@/utils/data/onboarding'
 import { CustomerFilters } from './dev_customers/filters_customers'
 import { EditCustomerForm } from './dev_customers/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 
 function CustomersPage() {
@@ -206,7 +207,7 @@ function CustomersPage() {
             </Layout.Header>
 
             <Separator className='my-0' />
-
+            <SupportForm />
             <Layout.Body className="flex flex-col overflow-auto">
                 <div className="space-y-4 pb-8">
                     <div className="flex justify-between items-center">
