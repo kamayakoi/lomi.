@@ -11,6 +11,7 @@ import iconDark from "/icon_dark.png"
 import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
 import { useSidebar } from '@/lib/hooks/useSidebar'
+import { CommandPalette } from '@/components/dashboard/command-palette'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -91,6 +92,11 @@ export default function Sidebar({ className }: SidebarProps) {
           closeNav={() => setNavOpened(false)}
           links={filteredLinks}
         />
+
+        {/* Command Palette */}
+        <div className="px-4 py-2">
+          <CommandPalette />
+        </div>
 
         {/* Organization info */}
         {sidebarData.merchantName && (
