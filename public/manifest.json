@@ -1,21 +1,41 @@
 {
-  "name": "lomi.africa",
+  "name": "lomi. | West Africa's Payment Orchestration Platform",
   "short_name": "lomi.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "description": "Your gateway to seamless online payments in West Africa. Accept payments via bank, mobile money, e-Wallets, and cards all through a single platform.",
+  "description": "Your all-in-one payment orchestration platform. Seamlessly accept and process payments via mobile money, e-Wallets, and credit cards all through a single API.",
   "icons": [
     {
       "src": "/icon-L.webp",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/webp",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-lomi.webp",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "productivity", "software", "Payment API", "West Africa"],
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Portal",
+      "url": "/portal",
+      "description": "Get started in mùinutes"
+    },
+    {
+      "name": "Integrations",
+      "url": "/products",
+      "description": "Learn more about our payment partners"
     }
   ]
 }

@@ -23,9 +23,11 @@ export const LogoIcon = () => {
   return (
     <img
       src={currentIcon}
-      alt="lomi.africa"
+      alt="lomi.africa logo"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '38px', height: '38px', borderRadius: '5%' }}
+      width="38"
+      height="38"
+      style={{ borderRadius: '5px' }}
     />
   );
 };
@@ -34,9 +36,11 @@ export const AnotherIcon = () => {
   return (
     <img
       src={icon11}
-      alt="lomi.africa"
+      alt="lomi.africa icon"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '38px', height: '38px', borderRadius: '5%' }}
+      width="38"
+      height="38"
+      style={{ borderRadius: '5px' }}
     />
   );
 };
@@ -45,9 +49,11 @@ export const AboutIcon = () => {
   return (
     <img
       src={iconDark}
-      alt="lomi.africa"
+      alt="lomi.africa about icon"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '38px', height: '38px', borderRadius: '5%' }}
+      width="38"
+      height="38"
+      style={{ borderRadius: '5px' }}
     />
   );
 };
@@ -57,9 +63,11 @@ export const MtnLogo = () => {
   return (
     <img
       src={mtnLogo}
-      alt="mtn"
+      alt="MTN logo"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+      width="100"
+      height="100"
+      style={{ borderRadius: '50%' }}
     />
   );
 };
@@ -68,9 +76,11 @@ export const WaveLogo = () => {
   return (
     <img
       src={waveLogo}
-      alt="wave"
+      alt="Wave logo"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '180px', height: '100px', borderRadius: '50%' }}
+      width="180"
+      height="100"
+      style={{ borderRadius: '50%' }}
     />
   );
 };
@@ -79,9 +89,11 @@ export const ApplePayLogo = () => {
   return (
     <img
       src={cardsLogo}
-      alt="cards"
+      alt="Mastercard logo"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+      width="100"
+      height="100"
+      style={{ borderRadius: '50%' }}
     />
   );
 };
@@ -90,9 +102,11 @@ export const EcobankLogo = () => {
   return (
     <img
       src={ecobankLogo}
-      alt="ecobank"
+      alt="Ecobank logo"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '100px', height: '100px', borderRadius: '50%' }}
+      width="100"
+      height="100"
+      style={{ borderRadius: '50%' }}
     />
   );
 };
@@ -103,7 +117,8 @@ export const VisitIcon = () => {
       src={kwameadjei}
       alt="Testimonial icon"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '45px', height: '45px' }}
+      width="45"
+      height="45"
     />
   );
 };
@@ -119,9 +134,10 @@ export const ShieldIcon = () => {
   return (
     <img
       src={currentShield}
-      alt="orchestrate"
+      alt="Trust and safety shield icon"
       className="lucide lucide-panels-top-left mr-2"
-      style={{ width: '45px', height: '45px' }}
+      width="45"
+      height="45"
     />
   );
 };
@@ -848,7 +864,7 @@ export const MagnifierIcon = () => {
         />
         <path
           className="cls-1"
-          d="M61.61,26.1q4.2.22,8.4.27c1,0,2-.05,3.06,0,3.61,0,7.21-.08,10.81-.25,1.6-.09,3.2-.25,4.77-.46,1-.07,2-.25,3-.36.5-.06,1-.12,1.51-.2s1-.07,1.53-.11.58,0,.09.31l-1,.61a6.6,6.6,0,0,1-1.54.57c-1,.22-2.06.49-3.1.67s-2.09.3-3.14.4c-2.1.2-4.21.35-6.33.36-2.53,0-5.15.2-7.74.23-2.84,0-5.69,0-8.53-.08l-5.24-.22c-2.65-.13-5.3-.33-7.93-.54-2-.15-4.06-.24-6.09-.47-.45-.06-.89-.09-1.34-.16l-.58-.1-.47-.16a5.7,5.7,0,0,1-.68-.31,2.09,2.09,0,0,1-.41-.32,2,2,0,0,1-.22-.4c-.05-.13-.13-.24-.15-.32-.09-.24.71-.6,1.88-.48,3.5.33,7.22.72,11,1,1.4.11,2.8.21,4.21.29s2.82.15,4.23.21Z"
+          d="M61.61,26.1q4.2.22,8.4.27c1,0,2-.05,3.06,0,3.61,0,7.21-.08,10.81-.25,1.6-.09,3.2-.25,4.77-.46,1-.07,2-.25,3-.36.5-.06,1-.12,1.51-.2s1-.07,1.53-.11.58,0,.09.31l-1,.61a6.6,6.6,0,0,1-1.54.57c-1,.22-2.06.49-3.1.67s-2.09.3-3.14.4c-2.1.2-4.21.35-6.33.36-2.53,0-5.15.2-7.74.23-2.84,0-5.69,0-8.53-.08l-5.24-.22c-2.65-.13-5.3-.33-7.93-.54-2-.15-4-.24-6-.47-.45-.06-.89-.09-1.34-.16l-.58-.1-.47-.16a5.7,5.7,0,0,1-.68-.31,2.09,2.09,0,0,1-.41-.32,2,2,0,0,1-.22-.4c-.05-.13-.13-.24-.15-.32-.09-.24.71-.6,1.88-.48,3.5.33,7.22.72,11,1,1.4.11,2.8.21,4.21.29s2.82.15,4.23.21Z"
         />
         <path
           className="cls-1"

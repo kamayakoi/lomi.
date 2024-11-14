@@ -10,13 +10,21 @@ function Homepage() {
   return (
     <>
       <Navbar />
-      <div className="h-16"></div>
-      <div className="hero-section">
-        <Hero />
-      </div>
-      <HowItWorks />
-      <Products />
-      <FAQ />
+      <main>
+        <div className="h-16"></div>
+        <section className="hero-section">
+          <Hero />
+        </section>
+        <section>
+          <HowItWorks />
+        </section>
+        <section>
+          <Products />
+        </section>
+        <section>
+          <FAQ />
+        </section>
+      </main>
       <div className="border-b border-gray-300 dark:border-gray-700"></div>
       <Footer />
       {/* <ScrollToTop /> */}

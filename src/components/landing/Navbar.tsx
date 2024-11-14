@@ -54,29 +54,27 @@ export const Navbar = () => {
       <header className="navbar-dock">
         <NavigationMenu className="mx-auto">
           <NavigationMenuList className="container flex items-center justify-between">
-            <div className="navbar-logo-container flex items-center ml-8">
-              <NavigationMenuItem className="font-bold flex items-center">
-                <a
-                  rel="lomi.africa"
-                  href="/"
-                  className="font-bold text-xl flex items-center"
-                  style={{ fontSize: '1.65rem' }}
-                >
-                  <LogoIcon />
-                  <span className="ml-1">lomi.africa</span>
-                </a>
-              </NavigationMenuItem>
-            </div>
+            <NavigationMenuItem className="navbar-logo-container font-bold flex items-center ml-8">
+              <a
+                rel="lomi.africa"
+                href="/"
+                className="font-bold text-xl flex items-center"
+                style={{ fontSize: '1.65rem' }}
+              >
+                <LogoIcon />
+                <span className="ml-1">lomi.africa</span>
+              </a>
+            </NavigationMenuItem>
 
             {/* mobile */}
-            <span className="md:hidden flex items-center">
+            <div className="md:hidden flex items-center">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger className="px-2">
                   <Menu
                     className="h-6 w-6"
                     onClick={() => setIsOpen(true)}
                   >
-                    <span className="sr-only"></span>
+                    <span className="sr-only">Open navigation menu</span>
                   </Menu>
                 </SheetTrigger>
 
@@ -111,10 +109,10 @@ export const Navbar = () => {
                   </nav>
                 </SheetContent>
               </Sheet>
-            </span>
+            </div>
 
             {/* desktop */}
-            <nav className="navbar-desktop-menu" style={{ marginLeft: '-10rem' }}>
+            <nav className="navbar-desktop-menu hidden md:flex" style={{ marginLeft: '-10rem' }}>
               {routeList.map((route: RouteProps, i) => (
                 <a
                   rel="noreferrer noopener"
@@ -159,6 +157,7 @@ export const Navbar = () => {
               width="100%"
               height="800"
               style={{ background: 'transparent', border: '1px solid #ccc' }}
+              title="Contact sales form"
             ></iframe>
           </div>
         </div>

@@ -9,15 +9,15 @@
   <meta name="keywords" content="payment orchestration, online payments, West Africa, bank transfers, mobile money, credit card payments, API, unified checkout, transaction management" />
   <meta name="author" content="lomi.africa" />
   <meta name="theme-color" content="#ffffff" />
-  <link rel="canonical" href="https://lomi.africa/" />
+  <link rel="canonical" href="https://lomi.africa/" title="lomi. Payment Orchestration Platform" />
   
   <!-- Primary Meta Tags -->
   <title>lomi. | West Africa's Payment Orchestration Platform</title>
   
   <!-- Favicon -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" title="lomi. favicon">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" title="lomi. shortcut icon">
+  <link rel="manifest" href="/manifest.json" title="lomi. Progressive Web App configuration">
   <meta name="msapplication-TileColor" content="#da532c">
   <meta name="theme-color" content="#ffffff">
   
@@ -60,6 +60,25 @@
   }
   </script>
 
+  <!-- Add preconnect for performance -->
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin="anonymous" title="CDN for lomi. assets">
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous" title="Analytics for lomi.">
+
+  <!-- Add preload for critical resources -->
+  <link rel="preload" href="/src/main.tsx" as="script" type="module" title="lomi. application main script">
+
+  <!-- Add preload for LCP image -->
+  <link rel="preload" href="/cube.webp" as="image">
+
+  <meta 
+    http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' https://res.cloudinary.com data:; connect-src 'self' https://www.google-analytics.com; font-src 'self'; object-src 'none'; frame-src 'none';"
+  >
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GE3CRWDL1X"></script>
   <script>
@@ -68,9 +87,5 @@
     gtag('js', new Date());
     gtag('config', 'G-GE3CRWDL1X');
   </script>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
