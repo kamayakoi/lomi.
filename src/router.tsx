@@ -80,12 +80,8 @@ const AppRouter = () => (
                         <Route path="/" element={<Home />} />
                         <Route path="/home" element={<Home />} />
                         <Route path="/about" element={<About />} />
-                        <Route path="/products" element={
-                            <Products aria-label="Products | lomi." />
-                        } />
-                        <Route path="/integrations" element={
-                            <Integrations aria-label="Integration | lomi." />
-                        } />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/integrations" element={<Integrations />} />
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/status" element={<Status />} />
