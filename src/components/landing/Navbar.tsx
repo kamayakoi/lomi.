@@ -67,7 +67,7 @@ export const Navbar = () => {
             </NavigationMenuItem>
 
             {/* mobile */}
-            <div className="md:hidden flex items-center">
+            <div className="flex items-center xl:hidden">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger className="px-2">
                   <Menu
@@ -112,7 +112,7 @@ export const Navbar = () => {
             </div>
 
             {/* desktop */}
-            <nav className="navbar-desktop-menu hidden md:flex" style={{ marginLeft: '-10rem' }}>
+            <nav className="navbar-desktop-menu hidden xl:flex" style={{ marginLeft: '-10rem' }}>
               {routeList.map((route: RouteProps, i) => (
                 <a
                   rel="noreferrer noopener"

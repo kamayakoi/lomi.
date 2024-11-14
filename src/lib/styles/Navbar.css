@@ -21,27 +21,24 @@
 }
 
 .navbar-logo-container {
-  margin-right: 45rem;
+  margin-right: 1rem;
+  padding-left: 0.5rem;
+  display: flex;
 }
 
 .navbar-desktop-menu {
   display: none;
-  margin-left: -20rem; /* Add negative margin-left to move menu items closer to the logo */
 }
 
 @media (min-width: 768px) {
   .navbar-desktop-menu {
-    display: flex;
-    gap: var(--navbar-menu-gap);
-    align-items: center;
+    display: none;
   }
 }
 
 @media (min-width: 1024px) {
   .navbar-desktop-menu {
-    display: flex;
-    gap: var(--navbar-menu-gap);
-    align-items: center;
+    display: none;
   }
 }
 
@@ -66,11 +63,7 @@
 
 @media (min-width: 770px) and (max-width: 1200px) {
   .navbar-logo-container {
-    display: none; /* Hide the entire logo container */
-  }
-
-  .navbar-desktop-menu {
-    margin-left: 1rem; /* Adjust the margin to prevent overlap */
+    display: flex;
   }
 }
 
@@ -81,13 +74,13 @@
   }
 
   .navbar-logo-container a {
-    flex-direction: row; /* Change flex-direction to row */
-    align-items: center; /* Align items vertically */
+    flex-direction: row;
+    align-items: center;
   }
 
   .navbar-logo-container a span {
-    margin-left: 0.5rem; /* Add margin to the left of the logo text */
-    margin-top: 0; /* Remove top margin */
+    margin-left: 0.5rem;
+    margin-top: 0;
   }
 }
 
@@ -122,55 +115,16 @@
   }
 }
 
-@media (min-width: 760px) and (max-width: 1360px) {
-  .navbar-logo-container {
-    margin-right: 0;
-    padding-left: 0;
-    display: flex; /* Ensure the logo container is displayed */
-  }
-
+@media (min-width: 1361px) {
   .navbar-desktop-menu {
+    display: flex;
+    gap: var(--navbar-menu-gap);
+    align-items: center;
+    margin-left: -10rem;
+  }
+
+  .navbar-mobile-menu {
     display: none;
-  }
-
-  .navbar-mobile-menu {
-    display: flex;
-  }
-
-  .navbar-logo-container a {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .navbar-logo-container a span {
-    display: inline;
-    margin-left: 0.5rem;
-  }
-
-  /* Adjust the layout for the about navbar */
-  .navbar-dock {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-  }
-
-  .navbar-logo-container {
-    flex: 1;
-  }
-
-  /* Style for the mobile menu button */
-  .navbar-mobile-menu {
-    display: flex;
-    align-items: center;
-  }
-
-  .navbar-mobile-menu button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
   }
 }
 
@@ -189,5 +143,80 @@
 
   .navbar-desktop-menu {
     display: flex;
+  }
+}
+
+/* Ensure desktop menu is hidden below 1360px */
+.navbar-desktop-menu {
+  display: none; /* Hide by default */
+}
+
+/* Remove all intermediate breakpoints that might show the desktop menu */
+@media (min-width: 768px), 
+       (min-width: 1024px), 
+       (min-width: 760px) {
+  .navbar-desktop-menu {
+    display: none !important; /* Force hide with !important */
+  }
+}
+
+/* Only show desktop menu above 1360px */
+@media (min-width: 1361px) {
+  .navbar-desktop-menu {
+    display: flex !important;
+    gap: var(--navbar-menu-gap);
+    align-items: center;
+    margin-left: -10rem;
+  }
+}
+
+/* Clean up redundant media queries and ensure mobile menu visibility */
+@media (max-width: 1360px) {
+  .navbar-dock {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+  }
+
+  .navbar-mobile-menu {
+    display: flex;
+  }
+
+  /* Force hide desktop menu */
+  .navbar-desktop-menu {
+    display: none !important;
+  }
+}
+
+/* Ensure logo text is visible by default */
+.navbar-logo-container a span {
+  display: inline;
+  margin-left: 0.5rem;
+}
+
+/* Only hide logo text on very small screens */
+@media (max-width: 380px) {
+  .navbar-logo-container a span {
+    display: none;
+  }
+}
+
+/* Ensure logo container and text are visible between 767px and 1360px */
+@media (min-width: 767px) and (max-width: 1360px) {
+  .navbar-logo-container {
+    margin-right: 0;
+    padding-left: 0;
+    display: flex;
+  }
+
+  .navbar-logo-container a {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-logo-container a span {
+    display: inline !important; /* Force display */
+    margin-left: 0.5rem;
   }
 }
