@@ -81,7 +81,7 @@ const Products = () => {
                             {t('products.hero.description')}
                         </p>
                         <div className="flex justify-center md:justify-start">
-                            <Link to="/sign-in" aria-label="Get started with lomi in minutes">
+                            <Link to="/sign-in">
                                 <PulsatingButton className="mt-8 bg-blue-600 text-white font-semibold text-2xl px-10 py-4 rounded-lg shadow-lg hover:bg-blue-700">
                                     <span className="font-bold text-white">{t('products.hero.start')}</span>
                                     <span className="text-lg ml-2 text-white">{t('products.hero.inMinutes')}</span>
