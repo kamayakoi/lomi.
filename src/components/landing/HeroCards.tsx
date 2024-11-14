@@ -23,7 +23,6 @@ function HeroCards() {
               className="w-full h-auto object-cover transition-opacity duration-300"
               width="1200"
               height="800"
-              fetchpriority="high"
               decoding="async"
               loading="eager"
               sizes="(max-width: 768px) 100vw, 1200px"
