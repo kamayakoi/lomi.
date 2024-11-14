@@ -21,13 +21,12 @@
 }
 
 .navbar-logo-container {
-  margin-right: 1rem;
-  padding-left: 0.5rem;
-  display: flex;
+  margin-right: 45rem;
 }
 
 .navbar-desktop-menu {
   display: none;
+  margin-left: -20rem;
 }
 
 @media (min-width: 768px) {
