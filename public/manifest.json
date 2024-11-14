@@ -8,14 +8,14 @@
   "description": "Your all-in-one payment orchestration platform. Seamlessly accept and process payments via mobile money, e-Wallets, and credit cards all through a single API.",
   "icons": [
     {
-      "src": "/icon-L.webp",
+      "src": "/icon-L.png",
       "sizes": "695x695",
-      "type": "image/webp"
+      "type": "image/png"
     },
     {
-      "src": "/icon-lomi.webp",
+      "src": "/icon-L.png",
       "sizes": "512x512",
-      "type": "image/webp"
+      "type": "image/png"
     }
   ],
   "categories": ["finance", "business", "productivity", "software"],

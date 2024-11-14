@@ -47,11 +47,7 @@ export const HowItWorks = () => {
 
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
-      <h3 className="text-sm font-semibold tracking-wide uppercase mb-4" style={{ color: '#D247BF' }}>
-        {t('howItWorks.keyBenefits')}
-      </h3>
-
-      <h2 className="text-3xl md:text-4xl font-bold">
+      <h2 className="text-3xl md:text-4xl font-bold mb-4">
         {t('howItWorks.whyChooseUs')}{" "}
         <span className="inline text-gray-900 dark:text-gray-100">
           {t('howItWorks.us')}{" "}
@@ -60,6 +56,10 @@ export const HowItWorks = () => {
       <p className="md:w-3/4 mx-auto mt-4 mb-8 text-2xl text-muted-foreground">
         {t('howItWorks.description')}
       </p>
+
+      <h3 className="text-xl font-semibold tracking-wide uppercase mb-8" style={{ color: '#D247BF' }}>
+        {t('howItWorks.keyBenefits')}
+      </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map(({ icon, title }: ProductProps) => (
@@ -71,7 +71,7 @@ export const HowItWorks = () => {
           >
             <div className="grid gap-4 place-items-center">
               {icon}
-              <h3 className="text-xl font-semibold">{t(`howItWorks.products.${title}.title`)}</h3>
+              <h4 className="text-xl font-semibold">{t(`howItWorks.products.${title}.title`)}</h4>
             </div>
             <p className="mt-4 text-lg">{t(`howItWorks.products.${title}.description`)}</p>
           </MagicCard>

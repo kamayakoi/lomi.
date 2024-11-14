@@ -14,7 +14,7 @@ function HeroCards() {
               className="w-full h-auto object-cover"
               width="1200"
               height="800"
-              loading="lazy"
+              loading="eager"
             />
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 // Routes pages
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
@@ -66,94 +66,88 @@ import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-n
 import AutoWithdrawal from './pages/portal/settings/withdrawals/auto-withdrawal.tsx';
 
 const AppRouter = () => (
-    <Router>
-        <Routes>
-            {/* Checkout routes */}
-            <Route path="/product/:linkId" element={<CheckoutPage />} />
-            <Route path="/plan/:linkId" element={<CheckoutPage />} />
-            <Route path="/instant/:linkId" element={<CheckoutPage />} />
+    <Routes>
+        {/* Checkout routes */}
+        <Route path="/product/:linkId" element={<CheckoutPage />} />
+        <Route path="/plan/:linkId" element={<CheckoutPage />} />
+        <Route path="/instant/:linkId" element={<CheckoutPage />} />
 
-            <Route path="*" element={
-                <SessionCheck>
-                    <Routes>
-                        {/* Website routes */}
-                        <Route path="/" element={<Home />} />
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/products" element={
-                            <Products aria-label="Products | lomi." />
-                        } />
-                        <Route path="/integrations" element={
-                            <Integrations aria-label="Integration | lomi." />
-                        } />
-                        <Route path="/terms" element={<Terms />} />
-                        <Route path="/privacy" element={<Privacy />} />
-                        <Route path="/status" element={<Status />} />
+        <Route path="*" element={
+            <SessionCheck>
+                <Routes>
+                    {/* Website routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/integrations" element={<Integrations />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/status" element={<Status />} />
 
-                        {/* Dashboard routes */}
-                        <Route path="/portal" element={
-                            <ProtectedRoute>
-                                <AppShell />
-                            </ProtectedRoute>
-                        }>
-                            <Route index element={<Dashboard />} />
-                            <Route path="integrations" element={<Integrators />} />
-                            <Route path="subscription" element={<Subscription />} />
-                            <Route path="product" element={<Product />} />
-                            <Route path="payment-channels" element={<PaymentChannels />} />
-                            <Route path="logs" element={<Logs />} />
-                            <Route path="balance" element={<Balance />} />
-                            <Route path="transactions" element={<Transactions />} />
-                            <Route path="reporting" element={<Reporting />} />
-                            <Route path="webhooks" element={<Webhooks />} />
-                            <Route path="payment-links" element={<PaymentLinks />} />
-                            <Route path="customers" element={<Customers />} />
-                            <Route path="settings" element={<Settings />}>
-                                <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
-                                <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
-                                <Route path="sending-money/disbursements" element={<Disbursements />} />
-                                <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
-                                <Route path="business" element={<Business />} />
-                                <Route path="profile" element={<Profile />} />
-                                <Route path="billing/statements" element={<BillingStatements />} />
-                                <Route path="billing/fee-structure" element={<FeeStructure />} />
-                                <Route path="developers/api-keys" element={<ApiKeys />} />
-                                <Route path="developers/webhooks" element={<SettingsWebhooks />} />
-                                <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
-                                <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
-                                <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
-                            </Route>
-                            <Route path="activation" element={
-                                <ActivationRoute>
-                                    <Activation />
-                                </ActivationRoute>
-                            } />
+                    {/* Dashboard routes */}
+                    <Route path="/portal" element={
+                        <ProtectedRoute>
+                            <AppShell />
+                        </ProtectedRoute>
+                    }>
+                        <Route index element={<Dashboard />} />
+                        <Route path="integrations" element={<Integrators />} />
+                        <Route path="subscription" element={<Subscription />} />
+                        <Route path="product" element={<Product />} />
+                        <Route path="payment-channels" element={<PaymentChannels />} />
+                        <Route path="logs" element={<Logs />} />
+                        <Route path="balance" element={<Balance />} />
+                        <Route path="transactions" element={<Transactions />} />
+                        <Route path="reporting" element={<Reporting />} />
+                        <Route path="webhooks" element={<Webhooks />} />
+                        <Route path="payment-links" element={<PaymentLinks />} />
+                        <Route path="customers" element={<Customers />} />
+                        <Route path="settings" element={<Settings />}>
+                            <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
+                            <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
+                            <Route path="sending-money/disbursements" element={<Disbursements />} />
+                            <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
+                            <Route path="business" element={<Business />} />
+                            <Route path="profile" element={<Profile />} />
+                            <Route path="billing/statements" element={<BillingStatements />} />
+                            <Route path="billing/fee-structure" element={<FeeStructure />} />
+                            <Route path="developers/api-keys" element={<ApiKeys />} />
+                            <Route path="developers/webhooks" element={<SettingsWebhooks />} />
+                            <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
+                            <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
+                            <Route path="withdrawals/auto-withdrawal" element={<AutoWithdrawal />} />
                         </Route>
-
-                        {/* Login/Signup routes */}
-                        <Route path="/sign-in" element={<Signin />} />
-                        <Route path="/log-in" element={<Login />} />
-                        <Route path="/sign-up" element={<Signup />} />
-                        <Route path="/forgot-password" element={<Forgot />} />
-                        <Route path="/otp" element={<OTP />} />
-                        <Route path="/auth/reset-password" element={<ResetPassword />} />
-                        <Route path="/onboarding" element={
-                            <OnboardingRoute>
-                                <Onboarding />
-                            </OnboardingRoute>
+                        <Route path="activation" element={
+                            <ActivationRoute>
+                                <Activation />
+                            </ActivationRoute>
                         } />
-                        <Route path="/auth/callback" element={<AuthCallback />} />
+                    </Route>
 
-                        {/* Error routes */}
-                        <Route path="/500" element={<GeneralError />} />
-                        <Route path="/404" element={<NotFoundError />} />
-                        <Route path="/503" element={<MaintenanceError />} />
-                        <Route path="*" element={<NotFoundError />} />
-                    </Routes>
-                </SessionCheck>
-            } />
-        </Routes>
-    </Router>
+                    {/* Login/Signup routes */}
+                    <Route path="/sign-in" element={<Signin />} />
+                    <Route path="/log-in" element={<Login />} />
+                    <Route path="/sign-up" element={<Signup />} />
+                    <Route path="/forgot-password" element={<Forgot />} />
+                    <Route path="/otp" element={<OTP />} />
+                    <Route path="/auth/reset-password" element={<ResetPassword />} />
+                    <Route path="/onboarding" element={
+                        <OnboardingRoute>
+                            <Onboarding />
+                        </OnboardingRoute>
+                    } />
+                    <Route path="/auth/callback" element={<AuthCallback />} />
+
+                    {/* Error routes */}
+                    <Route path="/500" element={<GeneralError />} />
+                    <Route path="/404" element={<NotFoundError />} />
+                    <Route path="/503" element={<MaintenanceError />} />
+                    <Route path="*" element={<NotFoundError />} />
+                </Routes>
+            </SessionCheck>
+        } />
+    </Routes>
 );
 
 export default AppRouter;

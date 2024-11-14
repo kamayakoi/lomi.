@@ -96,6 +96,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             placeholder='Full Name**'
             value={fullName}
             onChange={handleFullNameChange}
+            autoComplete="name"
             className={cn(
               'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
@@ -111,6 +112,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             placeholder='Email address**'
             value={email}
             onChange={handleEmailChange}
+            autoComplete="username"
             className={cn(
               'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
@@ -125,6 +127,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             placeholder='Password**'
             value={password}
             onChange={handlePasswordChange}
+            autoComplete="new-password"
             className={cn(
               'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {

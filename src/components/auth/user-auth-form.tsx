@@ -115,6 +115,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 'border-green-500 dark:border-green-500': isValidEmail,
               }
             )}
+            autoComplete="username"
           />
           <div className='flex justify-end mb-1'>
             <Link
@@ -137,6 +138,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 'border-green-500 dark:border-green-500': isValidPassword,
               }
             )}
+            autoComplete="current-password"
           />
           {errorMessage && (
             <div className="flex items-center gap-2 bg-red-50 text-red-900 px-4 py-3 rounded-lg">
