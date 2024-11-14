@@ -11,25 +11,11 @@ export default defineConfig({
     terser({
       compress: {
         drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
-        passes: 2,
-        unsafe: true,
-      },
-      mangle: {
-        properties: false,
-        toplevel: true,
-      },
-      format: {
-        comments: false,
-        ecma: 2020,
       },
     }),
     visualizer({
       filename: 'bundle-analysis.html',
       open: true,
-      gzipSize: true,
-      brotliSize: true,
     }),
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
@@ -95,46 +81,20 @@ export default defineConfig({
   ],
   base: '/',
   build: {
-    target: 'es2020',
-    cssCodeSplit: true,
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
       mangle: true,
       compress: {
         drop_console: true,
-        drop_debugger: true,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-components': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-toast',
-          ],
-          'utils': ['lodash', 'date-fns', 'clsx', 'tailwind-merge'],
-          'i18n': ['i18next', 'react-i18next'],
-          ...id => {
-            if (id.includes('node_modules')) {
-              return id.toString().split('node_modules/')[1].split('/')[0].toString();
-            }
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
           }
-        },
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: ({name}) => {
-          if (/\.(gif|jpe?g|png|svg|webp)$/.test(name ?? '')) {
-            return 'assets/images/[name]-[hash][extname]';
-          }
-          if (/\.css$/.test(name ?? '')) {
-            return 'assets/css/[name]-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
         },
       },
     },
