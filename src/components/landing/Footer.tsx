@@ -6,6 +6,7 @@ import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
 import { useTranslation } from '@/lib/hooks/useTranslation';
 import { useTheme } from '@/lib/hooks/useTheme';
+import GithubStarButton from "@/components/custom/github-star-button";
 
 export const Footer = () => {
   const { t, i18n, changeLanguage } = useTranslation();
@@ -148,11 +149,12 @@ export const Footer = () => {
 
       <div className="container max-w-8xl mt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-600 dark:text-gray-400 px-4">
         <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 ml-2 md:ml-[55px]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <div className="cursor-pointer" onClick={toggleTheme}>
               <AnotherIcon />
             </div>
             <SystemOperational />
+            <GithubStarButton />
           </div>
           <div className="flex items-center gap-4 md:gap-6">
             <p>{t('footer.copyright')}</p>
