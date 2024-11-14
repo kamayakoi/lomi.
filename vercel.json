@@ -20,6 +20,10 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com"
         }
       ]
     }

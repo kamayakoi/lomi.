@@ -9,28 +9,25 @@
   "icons": [
     {
       "src": "/icon-L.webp",
-      "sizes": "192x192",
-      "type": "image/webp",
-      "purpose": "any maskable"
+      "sizes": "695x695",
+      "type": "image/webp"
     },
     {
       "src": "/icon-lomi.webp",
       "sizes": "512x512",
-      "type": "image/webp",
-      "purpose": "any maskable"
+      "type": "image/webp"
     }
   ],
-  "categories": ["finance", "business", "productivity", "software", "Payment API", "West Africa"],
+  "categories": ["finance", "business", "productivity", "software"],
   "orientation": "any",
   "scope": "/",
   "lang": "en",
-  "prefer_related_applications": false,
-  "related_applications": [],
+  "id": "/",
   "shortcuts": [
     {
       "name": "Portal",
       "url": "/portal",
-      "description": "Get started in mùinutes"
+      "description": "Get started in minutes"
     },
     {
       "name": "Integrations",
