@@ -72,19 +72,11 @@
 
   <meta 
     http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' https://res.cloudinary.com data:; connect-src 'self' https://www.google-analytics.com; font-src 'self'; object-src 'none'; frame-src 'none';"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://va.vercel-scripts.com https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' https://res.cloudinary.com data:; connect-src 'self' https://www.google-analytics.com; font-src 'self'; object-src 'none'; frame-src https://vercel.live;"
   >
 </head>
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  
-  <!-- Google Tag Manager -->
-  <script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js';f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-XXXXXX');</script>
-  <!-- End Google Tag Manager -->
 </body>
 </html>
