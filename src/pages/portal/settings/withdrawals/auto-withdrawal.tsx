@@ -30,7 +30,7 @@ export default function AutoWithdrawal() {
                                 </DialogHeader>
                                 <div className="space-y-4">
                                     <img
-                                        src="/autopayout.png"
+                                        src="/autopayout.webp"
                                         alt="Auto-withdrawal illustration"
                                         className="w-full"
                                     />

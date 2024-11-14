@@ -16,7 +16,7 @@ const About = () => {
                 <div
                     className="absolute inset-0 bg-cover bg-center z-0"
                     style={{
-                        backgroundImage: 'url("/transition-star.png")',
+                        backgroundImage: 'url("/transition-star.webp")',
                         backgroundPosition: '55% 12%',
                         backgroundSize: 'cover',
                         backgroundRepeat: 'no-repeat',

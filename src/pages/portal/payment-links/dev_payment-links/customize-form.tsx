@@ -216,11 +216,11 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     const [connectedProviders, setConnectedProviders] = useState<string[]>([])
 
     const paymentMethods: PaymentMethod[] = [
-        { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
-        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png' },
-        { id: 'WAVE', name: 'Wave', icon: '/wave.png' },
-        { id: 'MTN', name: 'MTN', icon: '/mtn.png' },
-        { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
+        { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
+        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.webp' },
+        { id: 'WAVE', name: 'Wave', icon: '/wave.webp' },
+        { id: 'MTN', name: 'MTN', icon: '/mtn.webp' },
+        { id: 'ORANGE', name: 'Orange', icon: '/orange.webp' },
     ]
 
     useEffect(() => {
@@ -323,7 +323,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     {displayMode === 'desktop' && (
                         <div className="mt-8 text-left">
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
-                                Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
+                                Powered by <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
                             </span>
                             <div className="mt-2 text-xs flex items-center justify-between">
                                 <div className="space-x-2">
@@ -350,12 +350,12 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                                 className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black`}
                             >
                                 <div className="flex items-center">
-                                    <img src="/cards.png" alt="Cards" className="w-8 h-8 mr-3" />
+                                    <img src="/cards.webp" alt="Cards" className="w-8 h-8 mr-3" />
                                     <span className="text-lg font-medium">Cards</span>
                                 </div>
                                 <div className="flex space-x-2">
-                                    <img src="/checkout-visa.png" alt="Visa" className="h-6" />
-                                    <img src="/checkout-mastercard.png" alt="Mastercard" className="h-6" />
+                                    <img src="/checkout-visa.webp" alt="Visa" className="h-6" />
+                                    <img src="/checkout-mastercard.webp" alt="Mastercard" className="h-6" />
                                 </div>
                             </button>
                         )}
@@ -380,7 +380,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
             {displayMode === 'phone' && (
                 <div className="mt-8 text-center">
                     <span className="text-sm text-gray-500 font-semibold inline-flex items-center justify-center">
-                        Powered by <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
+                        Powered by <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
                     </span>
                     <div className="mt-4 mb-6 text-xs space-x-2">
                         <a href="#" className="text-gray-500">Terms</a>

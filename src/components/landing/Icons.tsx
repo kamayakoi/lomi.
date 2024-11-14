@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import icon from "/transparent2.png";
-import icon11 from "/lomi-icon.png"
-import shield from "/shield.png";
-import shieldwhite from "/shieldwhite.png";
-import kwameadjei from "/kwameadjei.png";
-import iconDark from "/whiteblack.png";
-import mtnLogo from '/mtn.png';
-import waveLogo from '/wave.png';
-import cardsLogo from '/mastercard.png';
-import ecobankLogo from '/ecobank-2.png';
+import icon from "/transparent2.webp";
+import icon11 from "/lomi-icon.webp"
+import shield from "/shield.webp";
+import shieldwhite from "/shieldwhite.webp";
+import kwameadjei from "/kwameadjei.webp";
+import iconDark from "/whiteblack.webp";
+import mtnLogo from '/mtn.webp';
+import waveLogo from '/wave.webp';
+import cardsLogo from '/mastercard.webp';
+import ecobankLogo from '/ecobank-2.webp';
 
 import { useTheme } from '@/lib/hooks/useTheme';
 

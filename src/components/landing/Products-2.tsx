@@ -71,12 +71,12 @@ export const Products = () => {
         <div className="hidden lg:block relative overflow-hidden z-[-100]">
           <div className="right-0 w-screen">
             <img
-              src="/portal2.png"
+              src="/portal2.webp"
               alt="Portal"
               className="w-[3000px] h-[800px] -ml-[-500px] -padding-top-[-60px] border-6 border-gray-300 dark:border-gray-600 rounded-md shadow-md transition duration-300 ease-in-out hover:shadow-lg hover:scale-102 block dark:hidden"
             />
             <img
-              src="/portal.png"
+              src="/portal.webp"
               alt="Portal"
               className="w-[3000px] h-[800px] -ml-[-500px] -padding-top-[-60px] border-6 border-gray-300 dark:border-gray-600 rounded-md shadow-md transition duration-300 ease-in-out hover:shadow-lg hover:scale-102 hidden dark:block"
             />

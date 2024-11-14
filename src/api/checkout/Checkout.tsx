@@ -107,13 +107,13 @@ export default function CheckoutPage() {
                     style={{ width: '100px', height: '100px', padding: '0' }}
                 >
                     {provider === 'STRIPE' ? (
-                        <img src="/cards.png" alt="Credit Cards" className="w-full h-full object-contain rounded-lg" />
+                        <img src="/cards.webp" alt="Credit Cards" className="w-full h-full object-contain rounded-lg" />
                     ) : provider === 'ORANGE' ? (
-                        <img src="/orange.png" alt="Orange" className="w-full h-full object-contain rounded-lg" />
+                        <img src="/orange.webp" alt="Orange" className="w-full h-full object-contain rounded-lg" />
                     ) : provider === 'WAVE' ? (
-                        <img src="/wave.png" alt="Wave" className="w-full h-full object-contain rounded-lg" />
+                        <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain rounded-lg" />
                     ) : provider === 'MTN' ? (
-                        <img src="/mtn.png" alt="Momo" className="w-full h-full object-contain rounded-lg" />
+                        <img src="/mtn.webp" alt="Momo" className="w-full h-full object-contain rounded-lg" />
                     ) : (
                         <span>{provider}</span>
                     )}
@@ -352,9 +352,9 @@ export default function CheckoutPage() {
                                                 />
                                                 <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-4 text-muted-foreground/80 peer-disabled:opacity-50">
                                                     <div className="flex space-x-1">
-                                                        <img src="/checkout-visa.png" alt="Visa" className="h-4 w-auto" />
-                                                        <img src="/checkout-mastercard.png" alt="Mastercard" className="h-4 w-auto" />
-                                                        <img src="/checkout-amer.png" alt="American Express" className="h-4 w-auto" />
+                                                        <img src="/checkout-visa.webp" alt="Visa" className="h-4 w-auto" />
+                                                        <img src="/checkout-mastercard.webp" alt="Mastercard" className="h-4 w-auto" />
+                                                        <img src="/checkout-amer.webp" alt="American Express" className="h-4 w-auto" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
                                 Powered by{' '}
                                 <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer">
-                                    <img src="/transparent2.png" alt="Lomi" className="h-8 w-8 ml-1" />
+                                    <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
                                 </a>
                             </span>
                         </div>

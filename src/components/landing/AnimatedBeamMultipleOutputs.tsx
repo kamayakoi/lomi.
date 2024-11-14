@@ -78,21 +78,21 @@ export function AnimatedBeamMultipleOutputDemo({
                 </div>
                 <div className="flex flex-col justify-center">
                     <Square ref={div6Ref} className="size-20">
-                        <img src="/lomi-icon.png" alt="lomi." className="object-cover w-full h-full rounded-sm" />
+                        <img src="/lomi-icon.webp" alt="lomi." className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
                 <div className="flex flex-col justify-center gap-1">
                     <Square ref={div1Ref} className="size-14">
-                        <img src="/wave.png" alt="Wave" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/wave.webp" alt="Wave" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div2Ref} className="size-14">
-                        <img src="/orange.png" alt="Orange" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/orange.webp" alt="Orange" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div3Ref} className="size-14">
-                        <img src="/mtn.png" alt="MTN" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/mtn.webp" alt="MTN" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div4Ref} className="size-14">
-                        <img src="/cards.png" alt="Cards" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/cards.webp" alt="Cards" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
             </div>

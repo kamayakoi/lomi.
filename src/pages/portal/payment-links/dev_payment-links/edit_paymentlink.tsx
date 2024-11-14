@@ -40,11 +40,11 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     const { user } = useUser()
 
     const paymentMethods: PaymentMethod[] = [
-        { id: 'CARDS', name: 'Cards', icon: '/cards.png' },
-        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.png' },
-        { id: 'WAVE', name: 'Wave', icon: '/wave.png' },
-        { id: 'MTN', name: 'MTN', icon: '/mtn.png' },
-        { id: 'ORANGE', name: 'Orange', icon: '/orange.png' },
+        { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
+        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.webp' },
+        { id: 'WAVE', name: 'Wave', icon: '/wave.webp' },
+        { id: 'MTN', name: 'MTN', icon: '/mtn.webp' },
+        { id: 'ORANGE', name: 'Orange', icon: '/orange.webp' },
     ]
 
     useEffect(() => {

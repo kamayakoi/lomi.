@@ -7,9 +7,9 @@ import AvatarCircles from "@/components/ui/avatar-circles";
 import { useTranslation } from 'react-i18next';
 
 // Image import
-import africanledger from "/africanledger_round.png";
-import testimony2 from "/testimony2.png";
-import testimony3 from "/testimony3.png";
+import africanledger from "/africanledger_round.webp";
+import testimony2 from "/testimony2.webp";
+import testimony3 from "/testimony3.webp";
 
 export const Hero = () => {
   const [isFormOpen, setIsFormOpen] = useState(false); // State to manage modal visibility

@@ -1,4 +1,4 @@
-import cube from "/cube.png";
+import cube from "/cube.webp";
 
 function HeroCards() {
   return (

@@ -7,14 +7,14 @@ import { OrbitingCirclesDemo } from '@/components/landing/OrbitingCircles';
 import { useTranslation } from 'react-i18next';
 
 // Import the logo images
-import orangeLogo from '/orange.png';
-import mtnLogo from '/mtn.png';
-import waveLogo from '/wave.png';
-import ecobankLogo from '/ecobank.png';
-import sepaLogo from '/sepa.png';
-import visaLogo from '/visa.png';
-import mastercardLogo from '/mastercard.png';
-import applePayLogo from '/apple-pay.png';
+import orangeLogo from '/orange.webp';
+import mtnLogo from '/mtn.webp';
+import waveLogo from '/wave.webp';
+import ecobankLogo from '/ecobank.webp';
+import sepaLogo from '/sepa.webp';
+import visaLogo from '/visa.webp';
+import mastercardLogo from '/mastercard.webp';
+import applePayLogo from '/apple-pay.webp';
 
 interface IntegrationAccordionProps {
     title: string;
