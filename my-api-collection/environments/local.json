@@ -1,0 +1,6 @@
+{
+  "username": "octocat",
+  "github_token": "your-github-token",
+  "api_key": "your-api-key",
+  "base_url": "https://api.github.com"
+} 
