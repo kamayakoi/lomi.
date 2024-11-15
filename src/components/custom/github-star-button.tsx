@@ -41,12 +41,16 @@ export default function Component() {
     return (
         <button
             onClick={handleClick}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors rounded-md"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium 
+                text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 
+                transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label={`Star Lomi Docs on GitHub (${starCount} stars)`}
         >
-            <Star className="w-4 h-4" />
+            <Star className="w-4 h-4 dark:stroke-gray-400 dark:group-hover:stroke-gray-200" />
             <span className="sr-only">Star</span>
-            <span>{isLoading ? '...' : new Intl.NumberFormat('en-US').format(starCount)}</span>
+            <span className="tabular-nums">
+                {isLoading ? '...' : new Intl.NumberFormat('en-US').format(starCount)}
+            </span>
         </button>
     )
 }
