@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faGithub, faLinkedin, faTwitter, faDiscord } from '@fortawesome/free-brands-svg-icons';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export const FooterAbout = () => {
     const { t, i18n } = useTranslation();
@@ -128,16 +128,16 @@ export const FooterAbout = () => {
                     </h4>
                     <nav className="grid gap-2">
                         <a href="https://github.com/lomiafrica" className="hover:underline text-gray-400 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faGithub} /> {t('footer.github')}
+                            <FontAwesomeIcon icon={faGithub as IconProp} /> {t('footer.github')}
                         </a>
                         <a href="https://www.linkedin.com/company/lomiafri/" className="hover:underline text-gray-400 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faLinkedin} /> {t('footer.linkedIn')}
+                            <FontAwesomeIcon icon={faLinkedin as IconProp} /> {t('footer.linkedIn')}
                         </a>
                         <a href="https://x.com/intent/follow?screen_name=lomiafrica" className="hover:underline text-gray-400 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faTwitter} /> {t('footer.twitter')}
+                            <FontAwesomeIcon icon={faTwitter as IconProp} /> {t('footer.twitter')}
                         </a>
                         <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-400 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faEnvelope} /> {t('footer.newsletters')}
+                            <FontAwesomeIcon icon={faDiscord as IconProp} /> {t('footer.discord')}
                         </a>
                     </nav>
                 </div>

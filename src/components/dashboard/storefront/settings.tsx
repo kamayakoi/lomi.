@@ -57,18 +57,18 @@ export function OrganizationSettings({ onSettingsChange }: OrganizationSettingsP
     }
 
     return (
-        <div className="p-6 space-y-8 overflow-y-auto h-full">
+        <div className="p-6 space-y-8 overflow-y-auto h-full bg-background text-foreground">
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-foreground">Storefront</h2>
-                    <Button variant="default" className="bg-primary text-primary-foreground hover:bg-primary/80">
+                    <h2 className="text-xl font-semibold">Storefront</h2>
+                    <Button variant="default">
                         Open Storefront
                     </Button>
                 </div>
 
                 <div className="space-y-4">
                     <div>
-                        <Label htmlFor="logo-url" className="text-muted-foreground">Logo URL</Label>
+                        <Label htmlFor="logo-url">Logo URL</Label>
                         <Input
                             id="logo-url"
                             placeholder="Enter logo URL"
@@ -79,7 +79,7 @@ export function OrganizationSettings({ onSettingsChange }: OrganizationSettingsP
                     </div>
 
                     <div>
-                        <Label htmlFor="org-name" className="text-muted-foreground">Organization Name</Label>
+                        <Label htmlFor="org-name">Organization Name</Label>
                         <Input
                             id="org-name"
                             value={orgName}
@@ -89,7 +89,7 @@ export function OrganizationSettings({ onSettingsChange }: OrganizationSettingsP
                     </div>
 
                     <div>
-                        <Label htmlFor="description" className="text-muted-foreground">Description</Label>
+                        <Label htmlFor="description">Description</Label>
                         <div className="relative mt-1">
                             <Textarea
                                 id="description"
@@ -105,7 +105,7 @@ export function OrganizationSettings({ onSettingsChange }: OrganizationSettingsP
                     </div>
 
                     <div>
-                        <Label className="text-muted-foreground block mb-2">Theme</Label>
+                        <Label className="block mb-2">Theme</Label>
                         <div className="flex flex-wrap gap-2">
                             {THEME_COLORS.map((color) => (
                                 <button
@@ -154,3 +154,4 @@ export function OrganizationSettings({ onSettingsChange }: OrganizationSettingsP
         </div>
     )
 }
+

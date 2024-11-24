@@ -164,7 +164,6 @@ export default function TransactionFilters({
                             <SelectItem value="WAVE">Wave</SelectItem>
                             <SelectItem value="ECOBANK">Ecobank</SelectItem>
                             <SelectItem value="MTN">MTN</SelectItem>
-                            <SelectItem value="STRIPE">Stripe</SelectItem>
                             <SelectItem value="OTHER">Other</SelectItem>
                         </SelectContent>
                     </Select>

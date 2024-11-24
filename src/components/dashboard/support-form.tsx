@@ -168,9 +168,9 @@ export default function SupportForm() {
                     variant="default"
                     size="icon"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="rounded-full h-10 w-10 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                    className="rounded-full h-14 w-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
                 >
-                    <MessageCircle className="h-4 w-4" />
+                    <MessageCircle className="h-6 w-6" />
                 </Button>
             </motion.div>
             <AnimatePresence>
@@ -180,7 +180,7 @@ export default function SupportForm() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 50, scale: 0.5 }}
                         transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
-                        className="absolute bottom-12 right-0 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg overflow-hidden"
+                        className="absolute bottom-20 right-0 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg overflow-hidden"
                         style={{ zIndex: 9999 }}
                     >
                         <div className="p-4 space-y-4">

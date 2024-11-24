@@ -34,9 +34,10 @@
     "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts"
   },
   "dependencies": {
-    "@fortawesome/free-brands-svg-icons": "6.5.1",
-    "@fortawesome/free-solid-svg-icons": "6.5.1",
-    "@fortawesome/react-fontawesome": "0.2.0",
+    "@fortawesome/fontawesome-svg-core": "^6.7.1",
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@heroicons/react": "^2.1.5",
     "@hookform/resolvers": "3.3.4",
     "@huggingface/inference": "^2.8.1",

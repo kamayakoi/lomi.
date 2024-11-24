@@ -1,25 +1,24 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { CuboidIcon as CubeIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
+import { Check } from 'lucide-react'
 
-interface StorefrontPreviewProps {
+interface ConfirmationPreviewProps {
     logoUrl?: string
     orgName: string
-    description: string
     themeColor: string
 }
 
-export function StorefrontPreview({
+export function ConfirmationPreview({
     logoUrl,
     orgName,
-    description,
     themeColor
-}: StorefrontPreviewProps) {
+}: ConfirmationPreviewProps) {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-4xl mx-auto p-8">
+                {/* Banner Section */}
                 <div className="rounded-2xl bg-muted overflow-hidden mb-8 relative border shadow-sm">
-                    {/* Animated gradient background */}
                     <motion.div
                         className="w-full h-96 relative"
                         animate={{
@@ -41,7 +40,6 @@ export function StorefrontPreview({
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/50 to-muted" />
                     </motion.div>
 
-                    {/* Centered logo overlapping the banner */}
                     <div className="relative -mt-48 flex flex-col items-center pb-12">
                         <Avatar className="h-24 w-24 border-4 border-muted rounded-full bg-muted ring-4 ring-background/10">
                             {logoUrl ? (
@@ -56,24 +54,34 @@ export function StorefrontPreview({
                             {orgName}
                         </h1>
                         <p className="text-muted-foreground mt-1">@{orgName.toLowerCase().replace(/\./g, '')}</p>
-                        {description && (
-                            <p className="text-muted-foreground mt-4 max-w-md text-center">{description}</p>
-                        )}
                     </div>
                 </div>
 
+                {/* Confirmation Section */}
                 <div className="rounded-2xl bg-muted p-12 border shadow-sm">
-                    <div className="text-center space-y-4">
-                        <div className="flex justify-center mb-6">
-                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                <CubeIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                    <div className="max-w-md mx-auto text-center space-y-6">
+                        <h2 className="text-2xl font-bold">Your order was successful!</h2>
+                        <p className="text-muted-foreground">You&apos;re now eligible for the benefits of Pro Tier.</p>
+
+                        <div className="bg-background rounded-lg p-6 text-left space-y-4">
+                            <div className="text-3xl font-bold">$100</div>
+                            <div className="text-sm text-muted-foreground">Before VAT and taxes</div>
+
+                            <div>
+                                <h3 className="font-medium mb-2">Included</h3>
+                                <div className="flex items-center gap-2 text-sm">
+                                    <Check className="w-4 h-4" />
+                                    Weekly Newsletter
+                                </div>
                             </div>
                         </div>
-                        <h3 className="text-xl font-semibold text-muted-foreground">
-                            No products and subscriptions found
-                        </h3>
-                        <p className="text-muted-foreground/70">
-                            {orgName} is not offering any products or subscriptions yet
+
+                        <Button className="w-full bg-primary hover:bg-primary/90">
+                            Access your benefits
+                        </Button>
+
+                        <p className="text-xs text-muted-foreground">
+                            This order is processed by our online reseller & Merchant of Record, Polar, who also handles order-related inquiries and returns.
                         </p>
                     </div>
                 </div>
