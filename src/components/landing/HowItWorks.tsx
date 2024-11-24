@@ -47,6 +47,9 @@ export const HowItWorks = () => {
 
   return (
     <section id="howItWorks" className="container text-center py-24 sm:py-32">
+      <h3 className="text-sm font-semibold tracking-wider uppercase mb-4" style={{ color: '#D247BF' }}>
+        {t('howItWorks.keyBenefits')}
+      </h3>
       <h2 className="text-3xl md:text-4xl font-bold mb-4">
         {t('howItWorks.whyChooseUs')}{" "}
         <span className="inline text-gray-900 dark:text-gray-100">
@@ -57,17 +60,13 @@ export const HowItWorks = () => {
         {t('howItWorks.description')}
       </p>
 
-      <h3 className="text-xl font-semibold tracking-wide uppercase mb-8" style={{ color: '#D247BF' }}>
-        {t('howItWorks.keyBenefits')}
-      </h3>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map(({ icon, title }: ProductProps) => (
           <MagicCard
             key={title}
             className="p-6"
-            gradientColor="#e5e7eb" // Light gray color for the gradient
-            gradientOpacity={0.4} // Very low opacity for an almost invisible effect
+            gradientColor="#e5e7eb"
+            gradientOpacity={0.4}
           >
             <div className="grid gap-4 place-items-center">
               {icon}

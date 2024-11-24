@@ -1,0 +1,24 @@
+meta {
+  name: Retrieve Balance
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/v1/balance
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+docs {
+  Retrieves the current balance of the account associated with the API key used to make the request.
+
+  Parameters:
+  No parameters.
+
+  Returns:
+  Returns a balance object for the account associated with the API key used to make the request.
+}

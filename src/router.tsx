@@ -35,6 +35,8 @@ import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx';
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/subscription.tsx";
 import Product from "./pages/portal/product/Product.tsx";
+import Storefront from "./pages/portal/storefront/Storefront.tsx";
+
 import Activation from './pages/auth/activation/activation';
 
 // Checkout pages
@@ -102,6 +104,7 @@ const AppRouter = () => (
                         <Route path="reporting" element={<Reporting />} />
                         <Route path="webhooks" element={<Webhooks />} />
                         <Route path="payment-links" element={<PaymentLinks />} />
+                        <Route path="storefront" element={<Storefront />} />
                         <Route path="customers" element={<Customers />} />
                         <Route path="settings" element={<Settings />}>
                             <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />

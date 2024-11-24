@@ -1,0 +1,31 @@
+meta {
+  name: Rate
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/ecobankafrica/rates
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: developer.ecobank.com
+}
+
+body:json {
+  {
+      "requestId": "23100191000000003",
+      "secureHash":"0afbea4466be51759ce32c81c87c5c5230f70717385b4a9011c6c3950d9509773834f4726acda7b5828d6ea4e09bb7c0e85739c0bbc60152dce5ade5f755a3e4"
+  }
+}
+
+docs {
+  This API service fetches Ecobank commercial rates.
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | requestId | string | 15 | M | A unique reference that is used to query pass a request to get list of institution list | 2323V |
+  | secureHash | string | 129 | M | SHA 512 hashing algorithm = (RequestId +labkey | Sample provided in request payload |
+}

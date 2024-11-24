@@ -1,0 +1,33 @@
+meta {
+  name: Transaction Enquiry
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/ecobankafrica/transaction/enquiry
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: developer.ecobank.com
+}
+
+body:json {
+  {
+      "requestId": "23100191000000004",
+      "transactionReference": "Mondayda300920222#3",
+      "secureHash":"f6f7e3d907432d284431b10278c6ee1f2dfc1d8fee520a7d0933067cc5b0d5cb4da1de669dd3a34c39a11e0e4cd97d4452436eb989607d0de14e12cc59136a41"
+  }
+}
+
+docs {
+  API service to query status of an earlier initiated REST transaction.
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | requestId | string | 15 | M | A unique reference that is used to query pass a request to get list of institution list | 2323V |
+  | transactionReference | string | 20 | M | Transaction reference passed in the earlier payment request. | Mondayda300920222#3 |
+  | secureHash | string | 129 | M | SHA 512 hashing algorithm = (RequestId +labkey | Sample provided in request payload |
+}

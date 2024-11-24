@@ -1,0 +1,24 @@
+meta {
+  name: Refund Checkout
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/v1/checkout/sessions/:id/refund
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+docs {
+  Refunds the user payment associated with a Checkout Session.
+
+  Parameters:
+  No parameters.
+
+  Returns:
+  Returns an empty body and an HTTP 200 Success code when the payment is refunded, and an error otherwise.
+}

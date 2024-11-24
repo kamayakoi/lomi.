@@ -1,0 +1,43 @@
+meta {
+  name: Name Enquiry
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/ecobankafrica/account/enquiry
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: developer.ecobank.com
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+      "requestId": "23100191000000002",
+      "clientId": "EGHTelc000043",
+      "affiliateCode": "EGH",
+      "deliveryMethod": "ACCOUNT",
+      "destinationEntityCode": "ECOBANK",
+      "accountNo": "3441002127474",
+      "destinationCountry": "GH",
+      "secureHash":"05013a1f94d8849c7475c3498e3d2cb1c3004228a9b7562e9dee628e97dc7ea3a07bd0d8f3ed742ad851f9543f594203fa4461567f8a78ccc9e7892ad6882983"
+  }
+}
+
+docs {
+  The name enquiry API is used fetch the name and other details of a supplied account.
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | deliveryMethod | string | 10 | M | This is static value as “ACCOUNT” since the request is to enquire into an account | ACCOUNT |
+  | destinationEntityCode | string | 6 | M | Static account as ECOBANK | ECOBANK |
+  | accountNo | Number | 20 | M | The account number to enquire | 3441002127474 |
+  | destinationCountry | string | 2 | M | Destination country | GH |
+  | requestId | string |  | M | A unique reference pass to each name enquiry request. | 23100191000000002 |
+  | secureHash | string | 129 | M | SHA 512 hashing algorithm = (RequestId +labkey | Sample provided in request payload |
+}

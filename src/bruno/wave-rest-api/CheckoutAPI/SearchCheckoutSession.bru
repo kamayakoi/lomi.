@@ -1,0 +1,24 @@
+meta {
+  name: Search Checkout Session
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/v1/checkout/sessions/search
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+}
+
+docs {
+  Retrieves a list of Checkout Session objects that match the search criteria.
+
+  Parameters:
+  - client_reference: A unique string that you provide which can be used to correlate the checkout in your system.
+
+  Returns:
+  Returns a list of Checkout Session objects that match the search criteria.
+}

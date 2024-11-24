@@ -1,0 +1,99 @@
+meta {
+  name: PostBillPayment
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/payment
+  body: json
+  auth: bearer
+}
+
+headers {
+  Origin: developer.ecobank.com
+}
+
+auth:bearer {
+  token: eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJpYW1hdW5pZmllZGRldjEwMyIsImV4cCI6MTczMTc2Njc1OSwiaWF0IjoxNzMxNzU5NTU5LCJpc3MiOiJjb20uZWNvYmFuay5jb3Jwb3JhdGVhcGkiLCJqdGkiOiIwMTQxYzJjZC1hNDE1LTExZWYtYmU5Mi0wMzEyNzA5MTg0YzAifQ.Z-ERd_Q841zwgZAL6D-tKjogwVUGtRpHQwOMtPlnAIQ0PhI6YqpzdqVTPdrgoldj5Ynktd0qUKWoE3A_gIp49s93Y78nT4jQluWdvRlKFCm92hRvvIA2d7hMUew4qV3PBTtTUtdNQ7cwgSLIf4uvLnsLJ3OC4v56xzJ6FWpq-AlItsRjIKtr9j7NNXZ8lWK_vFPJPada0W0v_sE5rlJ4qD_Rqjf7HX_dTqp-0labAh3ggO_mWfR81847SJbtnnoKqJTfF8EuyZX4qfv45VxDr7le8mw5nuMQGEVa5X-AeF9D7tE8NzowHHuo9mkqvzHGRHXC9Gu0SJdyP-OwNK7iHA
+}
+
+body:json {
+  {"paymentHeader": {
+      "clientid": "EGHTelc000043",
+      "batchsequence": "1",
+      "batchamount": 300,
+      "transactionamount": 300,
+      "batchid": "EG1593490",
+      "transactioncount": 1,
+      "batchcount": 1,
+      "transactionid": "E12T443308",
+      "debittype": "Multiple",
+      "affiliateCode": "EGH",
+      "totalbatches": "1",
+      "execution_date": "2020-06-01 00:00:00"
+  },
+  "extension": [
+       {
+              "request_id": "ECI55096987905",
+              "request_type": "BILLPAYMENT",
+              "param_list": "[{\"key\":\"billerCode\", \"value\":\"Pass_Bio_ECI\"},{\"key\":\"billRefNo\", \"value\":\"239729\"},{\"key\":\"cbaRefNo\", \"value\":\"\"},{\"key\":\"customerName\", \"value\":\"Freeman Kay\"},{\"key\":\"customerRefNo\", \"value\":\"239729\"},{\"key\":\"productCode\", \"value\":\"PassBio\"},{\"key\":\"formDataValue\", \"value\":\"[{\\\"fieldName\\\":\\\"LastName\\\",\\\"fieldValue\\\":\\\"Kojo\\\"},{\\\"fieldName\\\":\\\"FirstName\\\",\\\"fieldValue\\\":\\\"Kwame\\\"},{\\\"fieldName\\\":\\\"Amount\\\",\\\"fieldValue\\\":\\\"300\\\"},{\\\"fieldName\\\":\\\"Phone\\\",\\\"fieldValue\\\":\\\"225543756765\\\"},{\\\"fieldName\\\":\\\"Email\\\",\\\"fieldValue\\\":\\\"enyaledzigbor@ecobank.com\\\"},{\\\"fieldName\\\":\\\"reference\\\",\\\"fieldValue\\\":\\\"210120400582\\\"}]\"}]",
+              "amount": 300,
+              "currency": "GHS",
+              "status": "",
+              "rate_type": "spot"
+          }],
+         
+   "secureHash":"398d4f285cc33e12f035da19fa9d954be35afaf66816531c4f1a1aedd3c6f132a85c62b23ca12d7b9a99bf5a84fc69b66738289a70e8f8115e90ffaa060f4026"
+  }
+}
+
+docs {
+  ## **BILL PAYMENT SERVICE**
+  
+  Allows customer to make bill payment, by enabling customer to validate references pertaining to a bill and further allow payment.
+  
+  ## TRANSACTION DESCRIPTION (HEADER)
+  
+  This is a standard header for all payment request types. For test purposes, each of the parameter values in the header remains the same. This is to aid users get familiarize with request and response payloads.
+  
+  The payment payload accommodates single and batch posting. The extension in the request payload determines the request type (domestic, token, interbank, billpayment, airtime top-up) being call for transaction posting. For test purposes, each of the parameter values remains the same. This is to aid users get familiarize with request and response payload.
+  
+  Each transaction contains number of batches, and each batch will have a header and a body, below are the header details:
+  
+  Also, the body contain a list of requests. Each request contains a request type and another array of key-value pair objects that are specific for each request type.  
+  Each of the key-value pair objects required for each request type is explain below on a tabular form.
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | clientid | string | 15 | M | Client ID is used to identify each customer. Testing value is EGHTelc000043 and its static value for testing. | EGHTelc000043 |
+  | batchsequence | string | 1 | M | Batch Sequence is used to identified batches per transaction e.g. (1 of 1, 2 of 1, 3 of 1). | 1,2,3 |
+  | batchamount | BigDecimal | NUMBER (22,2) | M | Batch Amount is the total amount of all individual request in a batch. | NUMBER (22,2) |
+  | transactionamount | BigDecimal | NUMBER (22,2) | M | Transaction Amount this is to total amount of all the batches amount in a transaction. | NUMBER (22,2) |
+  | batchid | string | 15 | M | Multiple transaction batches can be created but each batch will be identified by its BatchID. Customer to define the BatchID which is alphanumeric | EG15934CV |
+  | transactioncount | BigDecimal | Dependent on the total number of transactions sent | M | Transaction Count, this is the total number of all the individual transactions in the request | 4,5,6 |
+  | batchcount | string | 200 | M | Batch Count is the total of all individual request in this batch and will contain maximum of two hundred (200) per a batch. | 4,5,6 |
+  | transactionid | string | 15 | M | Transaction ID, this is a unique id that identifies the transaction. | E12T4433X4 |
+  | debittype | Alphanumeric | 8 - (Multiple) | M | This determines how customer’s account will be debited. Single debit for all transaction or debit for each transaction. For now, default value is Multiple. | Multiple |
+  | affiliateCode | Alphanumeric | 3 | M | Ecobank country where customer account is held. Sandbox value is EGH. In live Ecobank will provide the value for each country | Ghana (EGH), Nigeria (ENG), Togo (ETG), Senegal (ESN), etc. |
+  | totalbatches | Numeric | 1 or 2 | M | We have a concept of creating multiple batches of transactions but linking them together as same set of transaction using the same batchID hence if the batches of transaction were sent with the same batchID then totalbaches will be 2 else keep it always 1. | 1,2 |
+  
+  **SERVICE: BILL PAYMENT**
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | request_id | string | 15 | M | A unique reference that identifies instrument in a batch. This is unique to each transaction. | ECI55096987905 |
+  | request_type | string | 12 | M | This identifies the payment type that is been sent  <br> | BILLPAYMENT |
+  | billerCode | string | 15 | M | This code identifies the biller being called for payment. Additional endpoint exist that helps customers to call list of billers present in an affiliate. | Pass_Bio_ECI |
+  | billRefNo | string | 15 | M | This is bill reference number passed by customers | 239729 |
+  | cbaRefNo | string | 15 | O | This is reference passed by customers | 239729AB |
+  | customerName | string | 50 | M | Customer name | Freeman Kay |
+  | customerRefNo | string | 15 | M | Customer reference number | 239729BB |
+  | productCode | string | 15 | M | Product code of the exact biller being paid to. Additional endpoint exist to help customers spool details of a biller details that comprises of the product code and other vital details required for transaction posting. | PassBio |
+  | formDataValue | list |  | M | The list of form data values varies based on the biller mandatory values required for validation. | "billFormData": \[ { "serialNo": 1, "fieldName": "INVOICE NUMBER", "fieldTitle": "INVOICE NUMBER", "dataType": "String", "validateField": "N", "defaultValue": "", "maxFieldLength": 100, "listofValues": "", "lookupValue": \[\] } \], |
+  | amount | amount | NUMBER (22,2) | M | Transaction amount | NUMBER (22,2) |
+  | currency | string | 3 | M | Debit account currency | USD, GHS, etc. |
+  | status | string | 3 | O | This field should be null or NEW | NEW |
+  | rate_type | string | 4 | M | This is a static value as sport | Spot (static value) |
+  | secureHash | string | 129 | M | SHA 512 hashing algorithm = (clientid+batchsequence+batchamount+transactionamount+ batched+ transactioncount+ batchcount+ transactionid+ debittype+ affiliateCode+ totalbatches+ execution_date+labkey) | Sample provided in request payload |
+}

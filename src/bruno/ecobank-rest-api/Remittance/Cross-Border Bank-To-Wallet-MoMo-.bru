@@ -1,0 +1,115 @@
+meta {
+  name: Cross-Border Bank-To-Wallet-MoMo-
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/payment
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: developer.ecobank.com
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+      "paymentHeader": {
+          "clientid": "EGHTelc000043",
+          "batchsequence": "1",
+          "batchamount": 520,
+          "transactionamount": 520,
+          "batchid": "EG1593490",
+          "transactioncount": 6,
+          "batchcount": 6,
+          "transactionid": "E12T443308",
+          "debittype": "Multiple",
+          "affiliateCode": "EGH",
+          "totalbatches": "1",
+          "execution_date": "2020-06-01 00:00:00"
+      },
+      "extension": [
+          {
+              "request_id": "ByA1lUeHSS",
+              "request_type": "MOMOIA",
+              "param_list": "[{\"key\":\"destAffiliate\", \"value\":\"EKE\"},{\"key\":\"destCrncy\", \"value\":\"KES\"}, {\"key\":\"destinationAccount\",\"value\":\"01108738185300\"},{\"key\":\"destinationAccountName\", \"value\":\"Owen\"},{\"key\":\"receiveFirstName\", \"value\":\"Eugene\"},{\"key\":\"receiveLastName\", \"value\":\"Eugene\"},{\"key\":\"receiverPhoneNumber\", \"value\":\"233543837123\"},{\"key\":\"receiveEmailAddress\", \"value\":\"test@gmail.com\"},{\"key\":\"receiveIdType\", \"value\":\"23421221\"},{\"key\":\"receiveIdNumber\", \"value\":\"23421221\"},{\"key\":\"sourceAmount\", \"value\":\"100\"},{\"key\":\"testQuestion\", \"value\":\"GHS\"},{\"key\":\"testAnswer\", \"value\":\"vacation\"},{\"key\":\"narration\", \"value\":\"narration\"},{\"key\":\"purposeOfTransfer\", \"value\":\"purposeOfTransfer\"},{\"key\":\"sendExternalRef\", \"value\":\"ByA1lUeHSS\"}]",
+              "amount": 100,
+              "currency": "GHS",
+              "status": "",
+              "rate_type": "spot"
+          }
+      ],
+      "secureHash": "398d4f285cc33e12f035da19fa9d954be35afaf66816531c4f1a1aedd3c6f132a85c62b23ca12d7b9a99bf5a84fc69b66738289a70e8f8115e90ffaa060f4026"
+  }
+}
+
+docs {
+  The API helps customers to initiate cross-border transactions.
+  
+  **Payment Header**
+  
+  This is a standard header for all payment request types. For test purposes, each of the parameter values in the header remains the same. This is to aid users get familiarize with request and response payloads.
+  
+  The payment payload accommodates single and batch posting. The extension in the request payload determines the request type inter-bank being call for transaction posting. For test purposes, each of the parameter values remains the same. This is to aid users get familiarize with request and response payload
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | clientid | string | 15 | M | Client ID is used to identify each customer. Testing value is EGHTelc000043 and its static value for testing. | EGHTelc000043 |
+  | batchsequence | string | 1 | M | Batch Sequence is used to identified batches per transaction e.g. (1 of 1, 2 of 1, 3 of 1). | 1,2,3 |
+  | batchamount | BigDecimal | NUMBER (22,2) | M | Batch Amount is the total amount of all individual request in a batch. | NUMBER (22,2) |
+  | transactionamount | BigDecimal | NUMBER (22,2) | M | Transaction Amount this is to total amount of all the batches amount in a transaction. | NUMBER (22,2) |
+  | batchid | string | 15 | M | Multiple transaction batches can be created but each batch will be identified by its BatchID. Customer to define the BatchID which is alphanumeric | EG15934CV |
+  | transactioncount | BigDecimal | Dependent on the total number of transactions sent | M | Transaction Count, this is the total number of all the individual transactions in the request | 4,5,6 |
+  | batchcount | string | 200 | M | Batch Count is the total of all individual request in this batch and will contain maximum of two hundred (200) per a batch. | 4,5,6 |
+  | transactionid | string | 15 | M | Transaction ID, this is a unique id that identifies the transaction. | E12T4433X4 |
+  | debittype | Alphanumeric | 8 - (Multiple) | M | This determines how customer’s account will be debited. Single debit for all transaction or debit for each transaction. For now, default value is Multiple. | Multiple |
+  | affiliateCode | Alphanumeric | 3 | M | Ecobank country where customer account is held. Sandbox value is EGH. In live Ecobank will provide the value for each country | Ghana (EGH), Nigeria (ENG), Togo (ETG), Senegal (ESN), etc. |
+  | totalbatches | Numeric | 1 or 2 | M | We have a concept of creating multiple batches of transactions but linking them together as same set of transaction using the same batchID hence if the batches of transaction were sent with the same batchID then totalbaches will be 2 else keep it always 1. | 1,2 |
+  | execution_date | Datetime | 23 | M | This is date of transactions. It cannot be back date. Only current or future date | YYYYMMDDHHmmss e.g., 2023-02-27T18:48:51.113 |
+  
+  **Extension parameter list**
+  
+  | **FIELD** | **TYPE** | **LENGTH(MAX)** | **M/O** | **DESCRIPTION** | **SAMPLE VALUE** |
+  | --- | --- | --- | --- | --- | --- |
+  | request_id | string | 15 | M | A unique reference assign to transaction. This is unique to each transaction. | 2323V |
+  | request_type | string | 15 | M | This identifies the payment type that is been sent for posting | ECOBANKAFRICA |
+  | receiverLastName | string | 50 | M |  | Kasumu |
+  | sourceCountry | string | 2 | M | Source country | NG |
+  | senderNationality | string | 2 | M | Nationality of the sender | Fr, Gh, etc |
+  | senderPhoneNumber | Number | 20 | M | Phone number of the sender | 07066690519 |
+  | destinationBank | string | 20 | M | Destination bank | NG |
+  | purpose | string | 50 | M | Purpose of the transaction | Travel |
+  | receiverCcy | string | 3 | M | Currency of the receiving country | USD |
+  | receiverIdNumber | Number | 20 | M | Phone number of the receiver | jdhdh54123 |
+  | senderIdNumber | Number | 20 | M | Phone number of the sender | jacobh54123 |
+  | senderCcy | string | 3 | M | Currency of the sender country | GHS |
+  | senderGender | string | 1 | M | Gender of the sender (Male - M or Female- F) | M or F |
+  | sourceBank | string | 2 | M | Source bank code | GH |
+  | exchangeRate | string |  | M | Ecobank commercial rates | 9.5 |
+  | receiverFirstName | string | 20 | M | Receiver first name | Gaffar |
+  | senderLastName | string | 20 | M | Sender first name | Oladimeji |
+  | receiverResidentialAddress | string | 50 | M | Receiver residential address | 8, Accra Level |
+  | receiverIdType | string | 20 | M | Receiver Identification type | passport |
+  | receiverIdExpiryDate | string | 10 | M | Receiver Identification Expiry date | 09/20/2022 |
+  | product | string | 10 | M | This is a static value as “ACCOUNT” | ACCOUNT |
+  | senderIdType | string | 20 | M | Receiver Identification type of the sender | passport |
+  | receiverDOB | string | 10 | M | Receiver date of birth | 9/20/1999 |
+  | receiverPhoneNumber | string | 20 | M | Receiver phone number | 08066689079 |
+  | senderDOB | string | 20 | M | Sender phone number | 09/20/2080 |
+  | senderFirstName | string | 20 | M | Sender’s first name | James |
+  | receiverNationality | string | 2 | M | Receiver nationality code | NG |
+  | destinationAccountNumber | string | 20 | M | Destination account number | 0012057660 |
+  | destinationCountry | string | 2 | M | Destination country | NG |
+  | narration | string | 50 | M | Transaction narration | Test Transaction |
+  | senderResidentialAddress | string | 50 | M | Sender’s residential address | 4, Iganmu Road |
+  | senderIdExpiryDate | string | 10 | M | Sender’s Identification expiry date | 09/20/2022 |
+  | amount | amount | NUMBER(22,2) | M | Amount | NUMBER (22,2) |
+  | currency | string | 3 | M | Debit account currency | USD, GHS, etc. |
+  | status | string | 3 | O | This field should be null or NEW | NEW |
+  | rate_type | string | 4 | M | This is a static value as sport | Spot (static value) |
+  | secureHash | string | 129 | M | SHA 512 hashing algorithm = (clientid+batchsequence+batchamount+transactionamount+ batchid+ transactioncount+ batchcount+ transactionid+ debittype+ affiliateCode+ totalbatches+ execution_date+labkey) | Sample provided in request payload |
+}

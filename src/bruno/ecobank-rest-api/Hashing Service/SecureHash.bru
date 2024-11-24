@@ -1,0 +1,100 @@
+meta {
+  name: SecureHash
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://developer.ecobank.com/corporateapi/merchant/securehash
+  body: json
+  auth: bearer
+}
+
+headers {
+  Origin: developer.ecobank.com
+}
+
+auth:bearer {
+  token: eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJpYW1hdW5pZmllZGRldjEwMyIsImV4cCI6MTczMTc2Njc1OSwiaWF0IjoxNzMxNzU5NTU5LCJpc3MiOiJjb20uZWNvYmFuay5jb3Jwb3JhdGVhcGkiLCJqdGkiOiIwMTQxYzJjZC1hNDE1LTExZWYtYmU5Mi0wMzEyNzA5MTg0YzAifQ.Z-ERd_Q841zwgZAL6D-tKjogwVUGtRpHQwOMtPlnAIQ0PhI6YqpzdqVTPdrgoldj5Ynktd0qUKWoE3A_gIp49s93Y78nT4jQluWdvRlKFCm92hRvvIA2d7hMUew4qV3PBTtTUtdNQ7cwgSLIf4uvLnsLJ3OC4v56xzJ6FWpq-AlItsRjIKtr9j7NNXZ8lWK_vFPJPada0W0v_sE5rlJ4qD_Rqjf7HX_dTqp-0labAh3ggO_mWfR81847SJbtnnoKqJTfF8EuyZX4qfv45VxDr7le8mw5nuMQGEVa5X-AeF9D7tE8NzowHHuo9mkqvzHGRHXC9Gu0SJdyP-OwNK7iHA
+}
+
+body:json {
+  {
+   "param1":"Aymard",
+   "param2":"Gildas",
+   "param3":"MILANDOU",
+   "param4":"Ecobank",
+   "param5":"Group",
+   "secureHash": "95803de67ceca952bb6469901b32de511e6be8ab6763ae882f82b9b29063298919c1806a3307b2edd3d51620062ee43b663d45375c36c60b08dff7dd648cba10"
+  }
+}
+
+docs {
+  ## Procedure
+  
+  This method allows you test the hashing algorithm in isolation with different values dynamically generated from your platform.
+  
+  param1,2,3 ...5 stand for values of your payload that will be concatenated from top down in a single string, that is what makes your payload.
+  
+  ## Setup
+  
+  Ensure you have the aqcuired the [appropriate credential](https://developer.ecobank.com/app/register.xhtml) to make requests to Unified Developer LAB API. 
+  
+  To generate a secure Hash for your request payload a `lab_key` is required. 
+  `lab_key` sample:
+  ```console
+  	XT7zuounWNKXmbwdAR+qYhyQymRdsEUylXFZ/frwBBjDKZsPCDlUjAMH4OQT+uvU
+  ```
+  
+  Requirement to successfully generate a secure hash:
+  - `lab_key` this is automatically sent to you after successful registration on the sandbox and same will be sent to you for production during the Go live onboarding process. This is same as the "API Key".
+  
+  - `payload` is the concatenation of field values in your JSON request from top down as a single string.
+  PS: For the Payment section the payload should only be made up of field values in the header section of your JSON request.
+  
+  - `SHAR-512` is your algorithm for one-way hashing.
+  
+  Hashing can be done with any language of preference, below is a sample `JAVA` code for hashing:
+  ```console
+  	private static final String LAB_KEY ="XT7zuounWNKXmbwdAR+qYhyQymRdsEUylXFZ/frwBBjDKZsPCDlUjAMH4OQT+uvU";
+  
+      public static String Hash512Msg(String payload) {
+        String result;
+          try {
+  			String data = payload + lab_key;
+              MessageDigest digest = MessageDigest.getInstance("SHA-512");
+              // ** NOTE all bytes that are retrieved from the data string must be done so using UTF-8 Character Set.
+              byte[] hashBytes = (data).getBytes("UTF-8");
+              //Create the hash bytes from the data
+              byte[] messageDigest = digest.digest(hashBytes);
+              //Create a HEX string from the hashed data
+              StringBuilder sb = new StringBuilder();
+              for (int i = 0; i < messageDigest.length; i++) {
+                  String h = Integer.toHexString(0xFF & messageDigest[i]);
+                  while (h.length() < 2) {
+                      h = "0" + h;
+                  }
+                  sb.append(h);
+              }
+              result = sb.toString();
+          } catch (Exception ex) {
+              //Log your errors;
+          }
+  		//sample result :2611e1ad3a8077020c55a227408329f0b2bb4f00c0e409a93abd69dba133c5d5a7d7575fef87cb13a9d5319c2f78199d8e674ce6f7d63acea95ae5a214ad9f5a
+  		
+          return result;
+      }
+  ```
+  
+  Fire up request payload with secure hash value for integrity check:
+  ```console
+   {	....,
+  	"secureHash":"2611e1ad3a8077020c55a227408329f0b2bb4f00c0e409a93abd69dba133c5d5a7d7575fef87cb13a9d5319c2f78199d8e674ce6f7d63acea95ae5a214ad9f5a"
+  }
+  ```
+  
+  
+  Ensure your user has the correct permissions to access the payment/collection service requested.
+  
+  Now you're ready to run this collection in Postman!
+}

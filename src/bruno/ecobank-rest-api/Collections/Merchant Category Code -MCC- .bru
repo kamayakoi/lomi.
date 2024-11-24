@@ -1,0 +1,33 @@
+meta {
+  name: Merchant Category Code -MCC-
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/getmcc
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{access_token}}
+  Content-Type: application/json
+  Accept: application/json
+  Origin: developer.ecobank.com
+}
+
+body:json {
+  {
+      "requestId": "123344",
+      "affiliateCode": "EGH",
+      "requestToken": "/4mZF42iofzo7BDu0YtbwY6swLwk46Z91xItybhYwQGFpaZNOpsznL/9fca5LkeV",
+      "sourceCode": "ECOBANK_QR_API",
+      "sourceChannelId": "KANZAN",
+      "requestType": "CREATE_MERCHANT"
+  }
+}
+
+docs {
+  The endpoint allows the merchant to identify itself to the industry it belongs to. The Mcc code would be needed during merchant terminal creation.
+}

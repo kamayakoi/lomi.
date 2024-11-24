@@ -132,24 +132,6 @@ console.log(data);`}
                                         </pre>
                                     </ScrollArea>
                                 </TabsContent>
-                                <TabsContent value="python" className="mt-4">
-                                    <ScrollArea className="h-[400px]">
-                                        <pre className="p-4 rounded-lg bg-muted font-mono text-sm whitespace-pre-wrap">
-                                            {`import requests
-
-response = requests.get(
-    'https://api.polar.sh/v1/products/',
-    headers={
-        'Accept': 'application/json',
-        'Authorization': 'Bearer <token>'
-    }
-)
-
-data = response.json()
-print(data)`}
-                                        </pre>
-                                    </ScrollArea>
-                                </TabsContent>
                             </Tabs>
                         </div>
                     </div>

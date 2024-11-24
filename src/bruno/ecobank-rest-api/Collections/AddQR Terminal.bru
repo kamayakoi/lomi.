@@ -1,0 +1,47 @@
+meta {
+  name: AddQR Terminal
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/corporateapi/merchant/createaddQr
+  body: json
+  auth: inherit
+}
+
+headers {
+  Origin: developer.ecobank.com
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+      "requestId": "12142WER312",
+      "affiliateCode": "EGH",
+      "merchantCode": "834781258",
+      "terminalMobileNo": "0237321956",
+      "terminalName": "EGH Ghana PLC",
+      "terminalEmail": "afuam@gamil.com",
+      "productCode": "100321",
+      "secureHash": "7eba5d132a171ceced6989b7da216deed09d6a74937db0d9ba56df206641311ee551e2373898f675f8924bcd81b941d74b652049bcc25babfdb6ce5cb0f584b1"
+  
+  }
+  
+}
+
+docs {
+  This endpoint allows merchants to add additional QR terminal to the same merchant account to receive payments.
+  
+  |   <br>**FIELD** | **TYPE** | **LENGTH** | **M/O** | **DESCRIPTION** | **Sample Value** |
+  | --- | --- | --- | --- | --- | --- |
+  | requestId | Alphanumeric | 15 | M | This field identifies the request ID provisioned for the merchant | e.g ECO21341245 |
+  | affiliateCode | String | 3 | M | Affiliate code of which the account and client has been maintained | (3 letters) e.g., EGH |
+  | merchantCode | Alphanumeric | 15 | M | Terminal code assigned to the merchant prior going live | e.g., 834781258 |
+  | terminalMobileNo | Numeric | 15 | M | Terminal mobile number assigned to client’s profile | e.g., 0237321956 |
+  | terminalName | String | 50 | M | This parameter depicts the name that has been created for merchant | e.g. EGH Ghana PLC) |
+  | terminalEmail | Alphanumeric | M | 15 | Email address created for client | [afuam@gamil.com](mailto:afuam@gamil.com) |
+  | productCode | Alphanumeric | M | 10 | Terminal code assigned to the merchant prior going live Max 10 characters | (e.g. 100321) |
+  | secureHash | Alphanumeric | M | 128 | Click on link to get details on how to generate secureHash. Link | 128 length characters |
+}
