@@ -3,9 +3,19 @@ import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTranslation } from 'react-i18next';
 import { FooterAbout } from '@/components/landing/Footer-About';
+import { useEffect } from 'react';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 const About = () => {
     const { t } = useTranslation();
+    const { setTheme } = useTheme();
+
+    useEffect(() => {
+        setTheme('light');
+        return () => {
+            setTheme('dark');
+        };
+    }, [setTheme]);
 
     return (
         <div className="relative w-full min-h-screen bg-gray-900 overflow-hidden">

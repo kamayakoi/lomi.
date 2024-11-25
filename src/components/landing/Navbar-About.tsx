@@ -16,6 +16,7 @@ import { buttonVariants } from '@/lib/actions/button-utils';
 import { Menu } from "lucide-react";
 import { AboutIcon } from "./Icons";
 import { Dock } from "@/components/ui/dock";
+import { useTranslation } from 'react-i18next';
 
 interface RouteProps {
     href: string;
@@ -44,6 +45,7 @@ const routeList: RouteProps[] = [
 export const NavbarAbout = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+    const { t } = useTranslation();
 
     return (
         <Dock>
@@ -91,7 +93,7 @@ export const NavbarAbout = () => {
                                                 onClick={() => setIsOpen(false)}
                                                 className={`text-lg ${buttonVariants({ variant: "ghost" })} text-white`}
                                             >
-                                                {label}
+                                                {t(`navbar.${label}`)}
                                             </a>
                                         ))}
                                         <button
@@ -102,7 +104,7 @@ export const NavbarAbout = () => {
                                             className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })} text-white`}
                                             style={{ padding: '0.75rem 1rem' }}
                                         >
-                                            Contact sales
+                                            {t('navbar.contactSales')}
                                         </button>
                                     </nav>
                                 </SheetContent>
@@ -121,7 +123,7 @@ export const NavbarAbout = () => {
                                     })} text-white`}
                                     style={{ fontSize: '1.06rem' }}
                                 >
-                                    {route.label}
+                                    {t(`navbar.${route.label}`)}
                                 </a>
                             ))}
                             <div className="navbar-contact-sales">
@@ -130,7 +132,7 @@ export const NavbarAbout = () => {
                                     className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })} text-white`}
                                     style={{ fontSize: '1.06rem', padding: '0.75rem 1rem' }}
                                 >
-                                    Contact sales
+                                    {t('navbar.contactSales')}
                                 </button>
                             </div>
                         </nav>
