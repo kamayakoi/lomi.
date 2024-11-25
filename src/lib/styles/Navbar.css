@@ -175,7 +175,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 1rem;
+  }
+
+  .navbar-logo-container {
+    margin-right: 0;
+    padding-left: 0;
   }
 
   .navbar-mobile-menu {
@@ -185,6 +190,21 @@
   /* Force hide desktop menu */
   .navbar-desktop-menu {
     display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .navbar-logo-container {
+    margin-right: auto;
+  }
+
+  .navbar-logo-container a {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-logo-container a span {
+    margin-left: 0.5rem;
   }
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faLinkedin, faTwitter, faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { faGithub, faLinkedin, faTwitter, faSlack } from '@fortawesome/free-brands-svg-icons';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
 import { useTranslation } from 'react-i18next';
@@ -137,7 +137,7 @@ export const FooterAbout = () => {
                             <FontAwesomeIcon icon={faTwitter as IconProp} /> {t('footer.twitter')}
                         </a>
                         <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-400 flex items-center gap-2">
-                            <FontAwesomeIcon icon={faDiscord as IconProp} /> {t('footer.discord')}
+                            <FontAwesomeIcon icon={faSlack as IconProp} /> {t('footer.slack')}
                         </a>
                     </nav>
                 </div>

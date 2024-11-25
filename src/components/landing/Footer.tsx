@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faLinkedin, faTwitter, faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { faGithub, faLinkedin, faTwitter, faSlack } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import SystemOperational from "@/components/custom/system-operational";
 import { AnotherIcon } from "./Icons";
@@ -138,7 +138,7 @@ export const Footer = () => {
               <FontAwesomeIcon icon={faTwitter as IconProp} /> {t('footer.twitter')}
             </a>
             <a onClick={(e) => e.preventDefault()} href="#" style={{ cursor: 'default' }} className="hover:underline text-gray-600 dark:text-gray-300 flex items-center gap-2">
-              <FontAwesomeIcon icon={faDiscord as IconProp} /> {t('footer.discord')}
+              <FontAwesomeIcon icon={faSlack as IconProp} /> {t('footer.slack')}
             </a>
           </nav>
         </div>
@@ -158,7 +158,7 @@ export const Footer = () => {
           </div>
           <div className="flex items-center gap-4 md:gap-6">
             <p>{t('footer.copyright')}</p>
-            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-400 whitespace-nowrap">
+            <a href="https://maps.app.goo.gl/maQA72wpgb3nVGQ46" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-600 dark:text-gray-400">
               {t('footer.address')}
             </a>
             <div className="flex items-center gap-4 md:gap-6">

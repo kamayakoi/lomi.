@@ -18,7 +18,7 @@ export function BentoDemo() {
             background: (
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
-                    <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_8%,#000_54%)] group-hover:scale-105" />
+                    <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none opacity-75 transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_8%,#000_54%)] group-hover:scale-105" />
                 </div>
             ),
         },
@@ -31,7 +31,7 @@ export function BentoDemo() {
             background: (
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
-                    <AnimatedListDemo className="opacity-90" />
+                    <AnimatedListDemo className="opacity-75" />
                 </div>
             ),
             className: "lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2",

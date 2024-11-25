@@ -54,24 +54,26 @@ export const Navbar = () => {
       <header className="navbar-dock">
         <NavigationMenu className="mx-auto">
           <NavigationMenuList className="container flex items-center justify-between">
-            <NavigationMenuItem className="navbar-logo-container font-bold flex items-center ml-8">
-              <a
-                rel="lomi.africa"
-                href="/"
-                className="font-bold text-xl flex items-center"
-                style={{ fontSize: '1.65rem' }}
-              >
-                <LogoIcon />
-                <span className="ml-1">lomi.africa</span>
-              </a>
-            </NavigationMenuItem>
+            <div className="flex items-center">
+              <NavigationMenuItem className="navbar-logo-container font-bold flex items-center">
+                <a
+                  rel="lomi.africa"
+                  href="/"
+                  className="font-bold text-xl flex items-center"
+                  style={{ fontSize: '1.65rem' }}
+                >
+                  <LogoIcon />
+                  <span className="ml-1">lomi.africa</span>
+                </a>
+              </NavigationMenuItem>
+            </div>
 
             {/* mobile */}
             <div className="flex items-center xl:hidden">
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger className="px-2">
                   <Menu
-                    className="h-6 w-6"
+                    className="h-6 w-6 mt-1"
                     onClick={() => setIsOpen(true)}
                     aria-label="Open navigation menu"
                   >
