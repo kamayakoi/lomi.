@@ -13,7 +13,7 @@ import {
   IconLinkPlus,
   IconPackage,
   IconFlag,
-  // IconBuildingStore
+  IconBuildingStore
 } from '@tabler/icons-react'
 
 
@@ -91,11 +91,11 @@ export const sidelinks: SidebarItem[] = [
     href: '/portal/payment-links',
     icon: <IconLinkPlus className="text-indigo-500" size={18} />,
   },
-  // {
-  //   title: 'Storefront',
-  //   href: '/portal/storefront',
-  //   icon: <IconBuildingStore className="text-orange-500" size={18} />,
-  // },
+  {
+    title: 'Storefront',
+    href: '/portal/storefront',
+    icon: <IconBuildingStore className="text-orange-500" size={18} />,
+  },
   // {
   //   title: 'Payout Links',
   //   href: '/portal/payout-links',

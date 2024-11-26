@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -9,6 +8,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { motion } from 'framer-motion'
+import { useSidebar } from '@/lib/hooks/useSidebar'
 
 interface CheckoutPreviewProps {
     orgName: string
@@ -19,6 +19,8 @@ export function CheckoutPreview({
     orgName,
     themeColor = '#3B82F6'
 }: CheckoutPreviewProps) {
+    const { sidebarData } = useSidebar()
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-6xl mx-auto p-8">
@@ -26,11 +28,19 @@ export function CheckoutPreview({
                     {/* Left Column - Product Details */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <Avatar className="h-12 w-12 rounded-full bg-muted border border-border">
-                                <AvatarFallback className="text-xl font-medium">
-                                    {orgName[0]?.toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
+                            <div className="h-12 w-12 rounded-lg border-6 border-transparent">
+                                {sidebarData.organizationLogo ? (
+                                    <img
+                                        src={sidebarData.organizationLogo}
+                                        alt={orgName}
+                                        className="object-contain h-full w-full rounded-lg"
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full w-full bg-muted rounded-lg text-xl font-medium">
+                                        {orgName && orgName[0]?.toUpperCase()}
+                                    </div>
+                                )}
+                            </div>
                             <h1 className="text-2xl font-semibold">Pro Tier</h1>
                         </div>
 

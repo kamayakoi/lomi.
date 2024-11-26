@@ -16,10 +16,10 @@ import { PreviewSwitcher } from '@/components/dashboard/storefront/preview-switc
 import SupportForm from '@/components/dashboard/support-form'
 
 interface StorefrontSettings {
-    logoUrl: string
     orgName: string
     description: string
     themeColor: string
+    slug: string
 }
 
 function StorefrontPage() {
@@ -29,10 +29,10 @@ function StorefrontPage() {
     ];
 
     const [settings, setSettings] = useState<StorefrontSettings>({
-        logoUrl: '',
         orgName: 'lomi.',
         description: '',
-        themeColor: '#000000'
+        themeColor: '#000000',
+        slug: 'lomi',
     })
 
     const [activeView, setActiveView] = useState('storefront')
@@ -73,7 +73,7 @@ function StorefrontPage() {
                     </div>
                 </div>
                 <div className="w-[400px] border-l border-border">
-                    <OrganizationSettings onSettingsChange={setSettings} />
+                    <OrganizationSettings settings={settings} onSettingsChange={setSettings} />
                 </div>
             </Layout.Body>
             <SupportForm />

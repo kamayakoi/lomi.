@@ -295,6 +295,7 @@ CREATE TABLE merchant_products (
     price NUMERIC(10,2) NOT NULL CHECK (price >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     is_active BOOLEAN NOT NULL DEFAULT true,
+    display_on_storefront BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -319,6 +320,7 @@ CREATE TABLE subscription_plans (
     failed_payment_action failed_payment_action,
     charge_day INT CHECK (charge_day >= 1 AND charge_day <= 31 OR charge_day IS NULL),
     metadata JSONB,
+    display_on_storefront BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     first_payment_type first_payment_type NOT NULL DEFAULT 'initial',
@@ -861,3 +863,25 @@ CREATE INDEX idx_payment_links_currency_code ON payment_links(currency_code);
 CREATE INDEX idx_payment_links_url ON payment_links(url);
 
 COMMENT ON TABLE payment_links IS 'Stores payment links for one-time payments, subscriptions, and instant links';
+
+-- Storefronts table
+CREATE TABLE storefronts (
+    storefront_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    theme_color VARCHAR(7) NOT NULL DEFAULT '#3B82F6',
+    slug VARCHAR(255) NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (merchant_id, organization_id),
+    UNIQUE (slug)
+);
+
+CREATE INDEX idx_storefronts_merchant_id ON storefronts(merchant_id);
+CREATE INDEX idx_storefronts_organization_id ON storefronts(organization_id);
+CREATE INDEX idx_storefronts_slug ON storefronts(slug);
+
+COMMENT ON TABLE storefronts IS 'Stores storefront settings and configurations for each merchant';

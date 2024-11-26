@@ -1,19 +1,26 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { useSidebar } from '@/lib/hooks/useSidebar'
 
 interface ConfirmationPreviewProps {
-    logoUrl?: string
     orgName: string
     themeColor: string
 }
 
 export function ConfirmationPreview({
-    logoUrl,
     orgName,
     themeColor
 }: ConfirmationPreviewProps) {
+    const { sidebarData } = useSidebar()
+
+    const getSlug = (name: string | null) => {
+        if (!name) return '';
+        const lowercaseName = name.toLowerCase();
+        const withoutPronouns = lowercaseName.replace(/^(the|le|la)\s+/, '');
+        return withoutPronouns.replace(/[^a-z0-9]/g, '');
+    }
+
     return (
         <div className="min-h-screen bg-background text-foreground">
             <div className="max-w-4xl mx-auto p-8">
@@ -41,19 +48,23 @@ export function ConfirmationPreview({
                     </motion.div>
 
                     <div className="relative -mt-48 flex flex-col items-center pb-12">
-                        <Avatar className="h-24 w-24 border-4 border-muted rounded-full bg-muted ring-4 ring-background/10">
-                            {logoUrl ? (
-                                <AvatarImage src={logoUrl} alt={orgName} />
+                        <div className="h-24 w-24 rounded-lg border-6 border-transparent">
+                            {sidebarData.organizationLogo ? (
+                                <img
+                                    src={sidebarData.organizationLogo}
+                                    alt={orgName}
+                                    className="object-contain h-full w-full rounded-lg"
+                                />
                             ) : (
-                                <AvatarFallback className="text-3xl font-medium">
+                                <div className="flex items-center justify-center h-full w-full bg-muted rounded-lg text-3xl font-medium">
                                     {orgName && orgName[0]?.toUpperCase()}
-                                </AvatarFallback>
+                                </div>
                             )}
-                        </Avatar>
+                        </div>
                         <h1 className="text-3xl font-bold mt-6">
                             {orgName}
                         </h1>
-                        <p className="text-muted-foreground mt-1">@{orgName.toLowerCase().replace(/\./g, '')}</p>
+                        <p className="text-muted-foreground mt-1">@{getSlug(sidebarData.organizationName)}</p>
                     </div>
                 </div>
 
