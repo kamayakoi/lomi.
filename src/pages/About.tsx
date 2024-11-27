@@ -44,21 +44,21 @@ const About = () => {
                     <section className="w-full py-12 md:py-24 lg:py-32">
                         <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
                             <div className="space-y-4">
-                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-white">{t('about.ourStory')}</h2>
-                                <p className="text-gray-300 md:text-xl">
+                                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 text-black lg:text-white">{t('about.ourStory')}</h2>
+                                <p className="text-black lg:text-gray-300 md:text-xl">
                                     {t('about.storyParagraph1')}
                                 </p>
-                                <p className="text-gray-300 md:text-xl">
+                                <p className="text-black lg:text-gray-300 md:text-xl">
                                     {t('about.storyParagraph2')}
                                 </p>
-                                <p className="text-gray-300 md:text-xl">
+                                <p className="text-black lg:text-gray-300 md:text-xl">
                                     {t('about.storyParagraph3')}
                                 </p>
                                 {/* Get Started Button */}
-                                <div className="flex justify-center lg:justify-start">
+                                <div className="flex justify-start">
                                     <Link to="/integrations">
                                         <PulsatingButton
-                                            className="text-xl mt-4 px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition-colors duration-300"
+                                            className="text-xl mt-4 px-6 py-3 bg-red-600 text-black font-semibold rounded-lg shadow-lg hover:bg-red-700 transition-colors duration-300"
                                             pulseColor="#ff4d4d"
                                         >
                                             {t('about.getStarted')}

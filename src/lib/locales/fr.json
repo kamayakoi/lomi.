@@ -168,17 +168,17 @@
     "fullAPI": {
       "title": "Full API",
       "description": "<strong>Vous recherchez une intégration complète pour une expérience utilisateur fluide et transparente ?</strong>",
-      "details": "Il ne faut pas plus que quelques lignes de code pour intégrer notre module dans votre plateforme B2B.<br><br>Personnalisez notre produit pour l'adapter à votre site web et à votre marque, et offrez une expérience entièrement customizée à vos acheteurs."
+      "details": "Il ne faut pas plus que quelques lignes de code pour intégrer notre module dans votre plateforme B2B.<br><br>Personnalisez notre produit pour l'adapter à votre site web et à votre marque, et offrez une expérience entièrement customizée à vos clients."
     },
     "lowCode": {
       "title": "Low Code",
       "description": "<strong>Pas prêt pour une intégration complète ? Découvrez notre option low-code.</strong>",
-      "details": "Aucun developpeur web n'est nécessaire. Notre solution low-code vous permet de démarrer rapidement avec un minimum de code. Parfait pour les petites entreprises ou celles disposant de ressources techniques limitées. Vous pouvez diriger les acheteurs vers notre page de paiement hébergée.<br><br>Personnalisez l'interface pour l'adapter à votre marque et commencez à accepter des paiements rapidement. Cette option est idéale pour un démarrage rapide avec tout ce que nous avons à vous offrir."
+      "details": "Aucun developpeur web n'est nécessaire. Notre solution low-code vous permet de démarrer rapidement avec un minimum de code. Parfait pour les petites entreprises ou celles disposant de ressources techniques limitées. Vous pouvez diriger les clients vers notre page de paiement hébergée.<br><br>Personnalisez l'interface pour l'adapter à votre marque et commencez à accepter des paiements rapidement. Cette option est idéale pour un démarrage rapide avec tout ce que nous avons à vous offrir."
     },
     "noCode": {
       "title": "No Code",
-      "description": "<strong>Pas de développeurs ? Pas de problème. Utilisez nos options no-code pour commencer dès aujourd'hui.</strong>",
-      "details": "Créez facilement un lien de paiement unique depuis votre tableau de bord et envoyez-le à votre client pour paiement. L'acheteur sélectionne son moyen de paiement et effectue son paiement rapidement et en toute simplicitée.<br><br>Aucune intégration nécessaire !",
+      "description": "<strong>Pas de développeurs et pas prêt pour une intégration plus poussée ? Pas de problème. Utilisez nos options no-code pour commencer dès aujourd'hui.</strong>",
+      "details": "Créez facilement un lien de paiement unique depuis votre tableau de bord et envoyez-le à votre client pour paiement. L'acheteur sélectionne son moyen de paiement et effectue son paiement rapidement et en toute simplicitée.<br><br>Aucune code nécessaire !",
       "linkText": "Commencez maintenant →"
     },
     "contactUs": "Contactez-nous pour en savoir plus →",

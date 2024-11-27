@@ -17,8 +17,8 @@ export const Hero = () => {
 
   return (
     <section className="container grid lg:grid-cols-2 place-items-center py-20 md:py-32 gap-10">
-      <div className="text-center lg:text-start space-y-6">
-        <main className="text-5xl md:text-6xl font-bold text-center lg:text-left mb-6">
+      <div className="text-left lg:text-start space-y-6">
+        <main className="text-4xl md:text-5xl lg:text-6xl font-bold text-left lg:text-start mb-6">
           <h1>
             <span className="bg-gradient-to-r from-[#F596D3] to-[#D247BF] text-transparent bg-clip-text">
               {t('hero.oneIntegration')}
@@ -30,21 +30,21 @@ export const Hero = () => {
           </h1>
         </main>
 
-        <p className="text-xl md:text-2xl text-muted-foreground text-center lg:text-left mb-8">
+        <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground text-left lg:text-start mb-8">
           {t('hero.description')}
         </p>
 
-        <div className="flex flex-col md:flex-row justify-center lg:justify-start space-y-4 md:space-y-0 md:space-x-4 mb-8">
+        <div className="flex flex-col md:flex-row justify-start lg:justify-start space-y-4 md:space-y-0 md:space-x-4 mb-8">
           <Button
-            className="w-full md:w-1/2 lg:w-1/5 text-2xl px-20 py-7"
+            className="w-full md:w-auto lg:w-1/5 text-lg md:text-xl lg:text-2xl px-8 md:px-12 lg:px-20 py-3 md:py-5 lg:py-7"
             onClick={() => setIsFormOpen(true)}
           >
             {t('hero.learnMore')}
           </Button>
 
-          <Link to="/sign-in" className="w-full md:w-1/2 lg:w-1/5 mt-4 md:mt-0">
+          <Link to="/sign-in" className="w-full md:w-auto lg:w-1/5 mt-4 md:mt-0">
             <PulsatingButton
-              className="w-full text-2xl px-20 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
+              className="w-full text-lg md:text-xl lg:text-2xl px-8 md:px-12 lg:px-20 py-2 md:py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
               pulseColor="#2563EB"
             >
               <span className="font-bold text-white">{t('hero.connect')}</span>

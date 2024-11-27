@@ -6,7 +6,6 @@ import { cn } from '@/lib/actions/utils'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/custom/password-input'
 import { supabase } from '@/utils/supabase/client'
-import { Link } from 'react-router-dom'
 
 interface SignUpFormProps {
   className?: string
@@ -222,15 +221,6 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           </div>
         </Button>
       </div>
-      <p className='px-8 text-center text-sm text-muted-foreground'>
-        Already have an account?{' '}
-        <Link
-          to='/log-in'
-          className='underline underline-offset-4 text-blue-600 hover:text-blue-600'
-        >
-          Log in
-        </Link>
-      </p>
     </div>
   )
 }

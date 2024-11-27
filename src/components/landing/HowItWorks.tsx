@@ -64,7 +64,7 @@ export const HowItWorks = () => {
         {products.map(({ icon, title }: ProductProps) => (
           <MagicCard
             key={title}
-            className="p-6"
+            className="p-8 bg-white dark:bg-[#121317]"
             gradientColor="#e5e7eb"
             gradientOpacity={0.4}
           >

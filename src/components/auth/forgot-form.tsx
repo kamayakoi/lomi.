@@ -70,7 +70,7 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder='Email address*'
+                      placeholder='Email address**'
                       {...field}
                       className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />

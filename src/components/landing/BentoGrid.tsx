@@ -17,7 +17,7 @@ export function BentoDemo() {
             className: "col-span-3 lg:col-span-2",
             background: (
                 <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
+                    <div className="absolute inset-0 bg-white dark:bg-[#121317]"></div>
                     <AnimatedBeamMultipleOutputDemo className="absolute right-2 top-4 h-[300px] border-none transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_8%,#000_54%)] group-hover:scale-105 opacity-50 md:opacity-85" />
                 </div>
             ),
@@ -30,8 +30,8 @@ export function BentoDemo() {
             cta: t('bentoGrid.setUpYourCheckout'),
             background: (
                 <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
-                    <AnimatedListDemo className="opacity-45 md:opacity-85" />
+                    <div className="absolute inset-0 bg-white dark:bg-[#121317]"></div>
+                    <AnimatedListDemo className="opacity-25 md:opacity-85" />
                 </div>
             ),
             className: "lg:row-start-1 lg:row-end-3 lg:col-start-1 lg:col-end-2",
@@ -48,7 +48,7 @@ export function BentoDemo() {
                     <img
                         src="/portal.webp"
                         alt="Portal background"
-                        className="object-cover w-full h-5% -ml-1 opacity-35"
+                        className="object-cover w-full h-5%  opacity-35"
                         width="1280"
                         height="720"
                     />

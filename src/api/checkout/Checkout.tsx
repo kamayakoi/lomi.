@@ -263,7 +263,7 @@ export default function CheckoutPage() {
                                     name="email"
                                     value={customerDetails.email}
                                     onChange={handleCustomerInputChange}
-                                    placeholder="Email address*"
+                                    placeholder="Email address**"
                                     className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                                     required
                                 />
