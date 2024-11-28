@@ -10,7 +10,7 @@ export function PreviewSwitcher({ activeView, onChange }: PreviewSwitcherProps) 
         { id: 'storefront', label: 'Storefront' },
         { id: 'checkout', label: 'Checkout' },
         { id: 'confirmation', label: 'Confirmation' },
-        { id: 'portal', label: 'Portal' },
+        // { id: 'portal', label: 'Portal' },
     ]
 
     return (
