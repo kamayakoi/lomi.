@@ -107,15 +107,16 @@ export default function Sidebar({ className }: SidebarProps) {
                 <img
                   src={sidebarData.organizationLogo}
                   alt="Organization logo"
-                  className="h-[40px] w-[40px] rounded border-6 border-transparent cursor-pointer"
+                  className="h-[40px] w-[40px] rounded-[5px] border-6 border-transparent cursor-pointer"
                   onClick={toggleTheme}
                 />
               ) : (
-                <div className="h-[38px] w-[38px] rounded-full bg-muted flex items-center justify-center cursor-pointer" onClick={toggleTheme}>
-                  <span className="text-xl font-semibold uppercase text-muted-foreground">
-                    {sidebarData.merchantName[0]}
-                  </span>
-                </div>
+                <img
+                  src={`https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName.toLowerCase())}?rounded=5`}
+                  alt="Generated avatar"
+                  className="h-[38px] w-[38px] rounded-[5px] border-6 border-transparent cursor-pointer"
+                  onClick={toggleTheme}
+                />
               )}
               <div>
                 <div className="text-sm font-semibold text-foreground">

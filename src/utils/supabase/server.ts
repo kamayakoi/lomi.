@@ -42,6 +42,16 @@ export const signInWithGithub = async () => {
   return { data, error }
 }
 
+export const signInWithAzure = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'azure',
+    options: {
+      scopes: 'email',
+    },
+  })
+  return { data, error }
+}
+
 export const checkSession = async () => {
   const { data, error } = await supabase.auth.getSession()
   if (error) {

@@ -1,6 +1,6 @@
 import { useUser } from '@/lib/hooks/useUserContext';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/custom/button';
 import {
   DropdownMenu,
@@ -47,10 +47,6 @@ export function UserNav() {
     navigate('/');
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map((n) => n[0]).join('').toUpperCase();
-  };
-
   if (!user) {
     return null;
   }
@@ -58,8 +54,8 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-[40px] w-[40px] rounded-full">
-          <Avatar className="h-[50px] w-[50px]">
+        <Button variant="ghost" className="relative h-[45px] w-[45px] rounded-full">
+          <Avatar className="h-[45px] w-[45px]">
             {avatarUrl ? (
               <AvatarImage
                 src={avatarUrl}
@@ -68,9 +64,11 @@ export function UserNav() {
                 loading="lazy"
               />
             ) : (
-              <AvatarFallback className="h-full w-full rounded-full flex items-center justify-center text-lg font-semibold uppercase">
-                {user.email ? getInitials(user.email) : ''}
-              </AvatarFallback>
+              <AvatarImage
+                src={`https://avatar.vercel.sh/${encodeURIComponent(user.email?.toLowerCase() || '')}?rounded=60`}
+                alt="Generated avatar"
+                className="h-full w-full rounded-full"
+              />
             )}
           </Avatar>
         </Button>
