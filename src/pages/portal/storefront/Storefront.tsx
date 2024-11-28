@@ -11,7 +11,7 @@ import { StorefrontPreview } from '@/components/dashboard/storefront/storefront-
 import { OrganizationSettings } from '@/components/dashboard/storefront/settings'
 import { CheckoutPreview } from '@/components/dashboard/storefront/checkout-preview'
 import { ConfirmationPreview } from '@/components/dashboard/storefront/confirmation-preview'
-// import { PortalPreview } from '@/components/dashboard/storefront/portal-preview'
+import { PortalPreview } from '@/components/dashboard/storefront/portal-preview'
 import { PreviewSwitcher } from '@/components/dashboard/storefront/preview-switcher'
 import SupportForm from '@/components/dashboard/support-form'
 
@@ -45,8 +45,8 @@ function StorefrontPage() {
                 return <CheckoutPreview {...settings} />
             case 'confirmation':
                 return <ConfirmationPreview {...settings} />
-            // case 'portal':
-            //     return <PortalPreview {...settings} />
+            case 'portal':
+                return <PortalPreview {...settings} />
             default:
                 return null
         }
