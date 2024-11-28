@@ -1,11 +1,16 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
+import AnimatedLogoLoader from '@/components/dashboard/loader';
 
 export function OnboardingRoute({ children }: { children: React.ReactNode }) {
-    const { isLoading, isOnboarded } = useAuthStatus();
+    const { isLoading, isAuthenticated, isOnboarded } = useAuthStatus();
 
     if (isLoading) {
-        return null;
+        return <AnimatedLogoLoader />;
+    }
+
+    if (!isAuthenticated) {
+        return <Navigate to="/sign-in" replace />;
     }
 
     if (isOnboarded) {

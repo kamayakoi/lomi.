@@ -87,6 +87,15 @@ const AppRouter = () => (
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/status" element={<Status />} />
 
+                    {/* Login/Signup routes */}
+                    <Route path="/sign-in" element={<Signin />} />
+                    <Route path="/log-in" element={<Login />} />
+                    <Route path="/sign-up" element={<Signup />} />
+                    <Route path="/forgot-password" element={<Forgot />} />
+                    <Route path="/otp" element={<OTP />} />
+                    <Route path="/auth/reset-password" element={<ResetPassword />} />
+                    <Route path="/auth/callback" element={<AuthCallback />} />
+
                     {/* Dashboard routes */}
                     <Route path="/portal" element={
                         <ProtectedRoute>
@@ -128,19 +137,11 @@ const AppRouter = () => (
                         } />
                     </Route>
 
-                    {/* Login/Signup routes */}
-                    <Route path="/sign-in" element={<Signin />} />
-                    <Route path="/log-in" element={<Login />} />
-                    <Route path="/sign-up" element={<Signup />} />
-                    <Route path="/forgot-password" element={<Forgot />} />
-                    <Route path="/otp" element={<OTP />} />
-                    <Route path="/auth/reset-password" element={<ResetPassword />} />
                     <Route path="/onboarding" element={
                         <OnboardingRoute>
                             <Onboarding />
                         </OnboardingRoute>
                     } />
-                    <Route path="/auth/callback" element={<AuthCallback />} />
 
                     {/* Error routes */}
                     <Route path="/500" element={<GeneralError />} />

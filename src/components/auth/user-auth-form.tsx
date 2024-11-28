@@ -1,5 +1,5 @@
 import { HTMLAttributes, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { z } from 'zod'
 import { IconBrandGithub } from '@tabler/icons-react'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isGithubLoading, setIsGithubLoading] = useState(false)
   const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -65,7 +64,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             title: "Success",
             description: "You have successfully signed in.",
           })
-          navigate('/portal')
+
+          // Refresh the page to update the authentication state
+          window.location.reload();
         }
       } catch (error) {
         console.error('Error during sign in:', error)
