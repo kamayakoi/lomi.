@@ -43,8 +43,14 @@ export function UserNav() {
   }, [user, fetchUserAvatar]);
 
   const handleLogout = async () => {
+    // Redirect to the home page immediately
+    window.location.href = '/';
+
+    // Clear the local storage
+    localStorage.clear();
+
+    // Sign out the user in the background
     await supabase.auth.signOut();
-    navigate('/');
   };
 
   if (!user) {
