@@ -6,8 +6,8 @@
     { "source": "/instant/:linkId", "destination": "/instant/:linkId" },
     { "source": "/product/:linkId", "destination": "/product/:linkId" },
     { "source": "/plan/:linkId", "destination": "/plan/:linkId" },
-    { "source": "/portal/(.*)", "destination": "/portal/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/portal(.*)", "destination": "/portal" },
+    { "source": "/(.*)", "destination": "/" }
   ],
   "headers": [
     {

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { config } from '@/utils/config';
 
 // Routes pages
@@ -77,6 +77,7 @@ const AppRouter = () => {
                     <Route path="/product/:linkId" element={<CheckoutPage />} />
                     <Route path="/plan/:linkId" element={<CheckoutPage />} />
                     <Route path="/instant/:linkId" element={<CheckoutPage />} />
+                    <Route path="*" element={<Navigate to={config.mainSiteBaseUrl} />} />
                 </>
             )}
 
