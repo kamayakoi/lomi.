@@ -22,7 +22,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
-  const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   const [email, setEmail] = useState('')
@@ -77,11 +76,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     }
   }
 
-  const handleOAuthSignIn = async (provider: 'github' | 'google' | 'azure') => {
+  const handleOAuthSignIn = async (provider: 'github' | 'google') => {
     try {
       if (provider === 'google') setIsGoogleLoading(true)
       if (provider === 'github') setIsGithubLoading(true)
-      if (provider === 'azure') setIsMicrosoftLoading(true)
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -98,7 +96,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       setErrorMessage(`There was a problem signing in with ${provider}. Please try again.`)
       if (provider === 'google') setIsGoogleLoading(false)
       if (provider === 'github') setIsGithubLoading(false)
-      if (provider === 'azure') setIsMicrosoftLoading(false)
     }
   }
 
@@ -179,7 +176,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           className="w-full h-12"
           variant="outline"
           onClick={() => handleOAuthSignIn('google')}
-          disabled={isGoogleLoading || isGithubLoading || isMicrosoftLoading}
+          disabled={isGoogleLoading || isGithubLoading}
         >
           <div className="flex items-center justify-center">
             {isGoogleLoading ? (
@@ -217,7 +214,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           variant='outline'
           className='w-full h-12'
           type='button'
-          disabled={isGoogleLoading || isGithubLoading || isMicrosoftLoading}
+          disabled={isGoogleLoading || isGithubLoading}
           onClick={() => handleOAuthSignIn('github')}
         >
           <div className="flex items-center justify-center">
@@ -227,28 +224,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               <IconBrandGithub className='h-6 w-6 mr-2' />
             )}
             <span>&nbsp;{isGithubLoading ? 'Github' : 'GitHub'}</span>
-          </div>
-        </Button>
-
-        <Button
-          variant='outline'
-          className='w-full h-12'
-          type='button'
-          disabled={isGoogleLoading || isGithubLoading || isMicrosoftLoading}
-          onClick={() => handleOAuthSignIn('azure')}
-        >
-          <div className="flex items-center justify-center">
-            {isMicrosoftLoading ? (
-              <Spinner size={20} color="#00a2ed" />
-            ) : (
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M44.522 44.5217H489.739V489.739H44.522V44.5217Z" fill="#F35325" />
-                <path d="M534.261 44.5217H979.478V489.739H534.261V44.5217Z" fill="#81BC06" />
-                <path d="M44.522 534.261H489.739V979.478H44.522V534.261Z" fill="#05A6F0" />
-                <path d="M534.261 534.261H979.478V979.478H534.261V534.261Z" fill="#FFBA08" />
-              </svg>
-            )}
-            <span>&nbsp;{isMicrosoftLoading ? 'Microsoft' : 'Microsoft'}</span>
           </div>
         </Button>
       </div>

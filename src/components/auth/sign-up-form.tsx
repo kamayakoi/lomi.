@@ -52,7 +52,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
     }
   }
 
-  const handleOAuthSignUp = async (provider: 'github' | 'google' | 'azure') => {
+  const handleOAuthSignUp = async (provider: 'github' | 'google') => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -201,23 +201,6 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           <div className="flex items-center justify-center">
             <IconBrandGithub className='h-6 w-6 mr-2' />
             <span>&nbsp;GitHub</span>
-          </div>
-        </Button>
-        <Button
-          variant='outline'
-          className='w-full h-12'
-          type='button'
-          disabled={isLoading}
-          onClick={() => handleOAuthSignUp('azure')}
-        >
-          <div className="flex items-center justify-center">
-            <svg className="w-5 h-5 mr-2" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M44.522 44.5217H489.739V489.739H44.522V44.5217Z" fill="#F35325" />
-              <path d="M534.261 44.5217H979.478V489.739H534.261V44.5217Z" fill="#81BC06" />
-              <path d="M44.522 534.261H489.739V979.478H44.522V534.261Z" fill="#05A6F0" />
-              <path d="M534.261 534.261H979.478V979.478H534.261V534.261Z" fill="#FFBA08" />
-            </svg>
-            <span>&nbsp;Microsoft</span>
           </div>
         </Button>
       </div>
