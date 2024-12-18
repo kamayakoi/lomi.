@@ -30,7 +30,7 @@
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
     "supabase:db:reset": "supabase db reset --linked",
-    "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts",
+    "update-types": "npx supabase gen types typescript --project-id injlwsgidvxehdmwdoov > database.types.ts",
     "generate:sitemap": "python src/utils/scripts/generate_sitemap.py"
   },
   "dependencies": {
