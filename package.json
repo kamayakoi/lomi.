@@ -21,7 +21,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && npm run generate:sitemap",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview",
     "server": "node src/api/server.js",
@@ -29,9 +29,9 @@
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
-    "supabase:db:reset": "npx supabase db reset",
-    "supabase:db:reset:linked": "supabase db reset --linked",
-    "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts"
+    "supabase:db:reset": "supabase db reset --linked",
+    "update-types": "npx supabase gen types typescript --project-id $PROJECT_ID > database.types.ts",
+    "generate:sitemap": "python src/utils/scripts/generate_sitemap.py"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.1",
