@@ -32,7 +32,7 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
       text: options.text,
       cc: options.cc,
       bcc: options.bcc,
-      reply_to: options.replyTo,
+      replyTo: options.replyTo,
       attachments: options.attachments,
       tags: options.tags,
     });

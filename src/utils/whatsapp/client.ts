@@ -30,10 +30,15 @@ export async function sendWhatsAppMessage(message: WhatsAppMessage): Promise<Wha
     }
   );
 
-  const data = await response.json();
+  const data = await response.json() as WhatsAppResponse | WhatsAppError;
 
   if (!response.ok) {
-    throw new WhatsAppApiError(data as WhatsAppError['error']);
+    throw new WhatsAppApiError('error' in data ? data.error : {
+      message: 'Unknown WhatsApp API error',
+      type: 'unknown_error',
+      code: response.status,
+      fbtrace_id: '',
+    });
   }
 
   return data as WhatsAppResponse;
