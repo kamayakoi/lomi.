@@ -28,17 +28,46 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
 RETURNS VOID AS $$
 DECLARE
     v_organization_id UUID;
+    v_merchant_exists BOOLEAN;
 BEGIN
-    -- Update merchant information
-    UPDATE merchants
-    SET 
-        phone_number = p_phone_number,
-        country = p_country,
-        onboarded = true,
-        preferred_language = p_preferred_language,
-        avatar_url = REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', ''),
-        updated_at = NOW()
-    WHERE merchant_id = p_merchant_id;
+    -- Check if merchant exists
+    SELECT EXISTS (
+        SELECT 1 FROM merchants WHERE merchant_id = p_merchant_id
+    ) INTO v_merchant_exists;
+
+    IF NOT v_merchant_exists THEN
+        -- Create merchant record if it doesn't exist
+        INSERT INTO merchants (
+            merchant_id,
+            name,
+            email,
+            phone_number,
+            country,
+            onboarded,
+            preferred_language,
+            avatar_url
+        ) VALUES (
+            p_merchant_id,
+            p_org_name, -- Use organization name as merchant name initially
+            p_org_email, -- Use organization email as merchant email initially
+            p_phone_number,
+            p_country,
+            true,
+            p_preferred_language,
+            REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', '')
+        );
+    ELSE
+        -- Update merchant information if it exists
+        UPDATE merchants
+        SET 
+            phone_number = p_phone_number,
+            country = p_country,
+            onboarded = true,
+            preferred_language = p_preferred_language,
+            avatar_url = REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', ''),
+            updated_at = NOW()
+        WHERE merchant_id = p_merchant_id;
+    END IF;
 
     -- Create organization
     INSERT INTO organizations (

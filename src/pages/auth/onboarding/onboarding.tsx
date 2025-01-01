@@ -137,6 +137,27 @@ const Onboarding: React.FC = () => {
             // Prepend "portal.lomi.africa/" to the workspace handle
             const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
 
+            // Check if workspace handle is available
+            const { data: isAvailable, error: checkError } = await supabase
+                .from('merchant_organization_links')
+                .select('workspace_handle')
+                .eq('workspace_handle', completeWorkspaceHandle)
+                .maybeSingle();
+
+            if (checkError) {
+                throw checkError;
+            }
+
+            if (isAvailable) {
+                toast({
+                    title: "Workspace Handle Unavailable",
+                    description: "This workspace handle is already taken. Please choose a different one.",
+                    variant: "destructive",
+                });
+                setLoading(false);
+                return;
+            }
+
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
                 p_merchant_id: user.id,
@@ -163,6 +184,16 @@ const Onboarding: React.FC = () => {
             });
 
             if (error) {
+                // Handle specific error cases
+                if (error.code === '23505') { // Unique violation
+                    toast({
+                        title: "Workspace Handle Unavailable",
+                        description: "This workspace handle is already taken. Please choose a different one.",
+                        variant: "destructive",
+                    });
+                    setLoading(false);
+                    return;
+                }
                 throw error;
             }
 
