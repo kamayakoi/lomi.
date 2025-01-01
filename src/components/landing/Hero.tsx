@@ -34,17 +34,17 @@ export const Hero = () => {
           {t('hero.description')}
         </p>
 
-        <div className="flex flex-col md:flex-row justify-start lg:justify-start space-y-4 md:space-y-0 md:space-x-4 mb-8">
+        <div className="w-[80%] md:w-[80%] lg:w-[45px] flex flex-row justify-between space-x-2 mb-8">
           <Button
-            className="w-full md:w-auto lg:w-1/5 text-lg md:text-xl lg:text-2xl px-8 md:px-12 lg:px-20 py-3 md:py-5 lg:py-7"
+            className="flex-1 lg:w-[200px] text-lg md:text-xl lg:text-2xl px-4 md:px-12 lg:px-12 py-2 h-[55px]"
             onClick={() => setIsFormOpen(true)}
           >
             {t('hero.learnMore')}
           </Button>
 
-          <Link to="/sign-in" className="w-full md:w-auto lg:w-1/5 mt-4 md:mt-0">
+          <Link to="/sign-in" className="flex-1 lg:w-[200px]">
             <PulsatingButton
-              className="w-full text-lg md:text-xl lg:text-2xl px-8 md:px-12 lg:px-20 py-2 md:py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
+              className="w-full text-lg md:text-xl lg:text-2xl px-4 md:px-6 lg:px-10 py-2 h-[55px] bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700"
               pulseColor="#2563EB"
             >
               <span className="font-bold text-white">{t('hero.connect')}</span>

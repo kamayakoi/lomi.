@@ -6,14 +6,33 @@ CREATE OR REPLACE FUNCTION public.create_product(
     p_description TEXT,
     p_price NUMERIC(10,2),
     p_currency_code currency_code,
-    p_is_active BOOLEAN DEFAULT true
+    p_is_active BOOLEAN DEFAULT true,
+    p_display_on_storefront BOOLEAN DEFAULT true
 )
 RETURNS UUID AS $$
 DECLARE
     v_product_id UUID;
 BEGIN
-    INSERT INTO merchant_products (merchant_id, organization_id, name, description, price, currency_code, is_active)
-    VALUES (p_merchant_id, p_organization_id, p_name, p_description, p_price, p_currency_code, p_is_active)
+    INSERT INTO merchant_products (
+        merchant_id, 
+        organization_id, 
+        name, 
+        description, 
+        price, 
+        currency_code, 
+        is_active,
+        display_on_storefront
+    )
+    VALUES (
+        p_merchant_id, 
+        p_organization_id, 
+        p_name, 
+        p_description, 
+        p_price, 
+        p_currency_code, 
+        p_is_active,
+        p_display_on_storefront
+    )
     RETURNING product_id INTO v_product_id;
 
     RETURN v_product_id;
@@ -34,6 +53,7 @@ RETURNS TABLE (
     price NUMERIC(10,2),
     currency_code currency_code,
     is_active BOOLEAN,
+    display_on_storefront BOOLEAN,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ
 ) AS $$
@@ -48,6 +68,7 @@ BEGIN
         p.price,
         p.currency_code,
         p.is_active,
+        p.display_on_storefront,
         p.created_at,
         p.updated_at
     FROM 
@@ -105,7 +126,8 @@ CREATE OR REPLACE FUNCTION public.update_product(
     p_name VARCHAR(255),
     p_description TEXT,
     p_price NUMERIC(10,2),
-    p_is_active BOOLEAN
+    p_is_active BOOLEAN,
+    p_display_on_storefront BOOLEAN
 )
 RETURNS VOID AS $$
 BEGIN
@@ -115,6 +137,7 @@ BEGIN
         description = p_description,
         price = p_price,
         is_active = p_is_active,
+        display_on_storefront = p_display_on_storefront,
         updated_at = NOW()
     WHERE product_id = p_product_id;
 END;
@@ -122,3 +145,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_products(UUID, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.delete_product(UUID) TO authenticated;

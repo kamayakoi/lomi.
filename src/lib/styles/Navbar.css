@@ -20,27 +20,70 @@
   background-color: #1214187d;
 }
 
-.navbar-logo-container {
-  margin-right: 45rem;
+/* Container for the navigation menu list */
+.navbar-dock .container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between !important;
+  align-items: center;
 }
 
+/* Logo container styles */
+.navbar-logo-container {
+  margin-right: 0;
+  padding-left: 0;
+}
+
+.navbar-logo-container a {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo-container a span {
+  margin-left: 0.5rem;
+}
+
+/* Desktop menu styles */
 .navbar-desktop-menu {
   display: none;
-  margin-left: -20rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1361px) {
   .navbar-desktop-menu {
+    display: flex !important;
+    gap: var(--navbar-menu-gap);
+    align-items: center;
+    margin-left: -10rem;
+  }
+  
+  .navbar-logo-container {
+    margin-right: 45rem;
+  }
+}
+
+/* Mobile-specific styles */
+@media (max-width: 1360px) {
+  .navbar-dock {
+    padding: 0.75rem 1rem;
+  }
+  
+  .navbar-logo-container {
+    margin-right: 0;
+  }
+  
+  .navbar-mobile-menu {
+    display: flex;
+  }
+}
+
+/* Very small screen adjustments */
+@media (max-width: 380px) {
+  .navbar-logo-container a span {
     display: none;
   }
 }
 
-@media (min-width: 1024px) {
-  .navbar-desktop-menu {
-    display: none;
-  }
-}
-
+/* Contact sales button styles */
 .navbar-contact-sales {
   margin-right: 1rem;
 }
@@ -80,12 +123,6 @@
   .navbar-logo-container a span {
     margin-left: 0.5rem;
     margin-top: 0;
-  }
-}
-
-@media (max-width: 380px) {
-  .navbar-logo-container a span {
-    display: none;
   }
 }
 

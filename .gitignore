@@ -49,3 +49,7 @@ src/utils/prompts/
 
 # Cursor rules
 .cursorrules
+
+# data 
+data/
+docs/

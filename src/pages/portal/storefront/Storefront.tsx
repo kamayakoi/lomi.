@@ -7,12 +7,12 @@ import { Separator } from '@/components/ui/separator';
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
-import { StorefrontPreview } from '@/components/dashboard/storefront/storefront-preview'
-import { OrganizationSettings } from '@/components/dashboard/storefront/settings'
-import { CheckoutPreview } from '@/components/dashboard/storefront/checkout-preview'
-import { ConfirmationPreview } from '@/components/dashboard/storefront/confirmation-preview'
-import { PortalPreview } from '@/components/dashboard/storefront/portal-preview'
-import { PreviewSwitcher } from '@/components/dashboard/storefront/preview-switcher'
+import { StorefrontPreview } from './storefront/storefront-preview'
+import { OrganizationSettings } from './storefront/settings'
+import { CheckoutPreview } from './storefront/checkout-preview'
+import { ConfirmationPreview } from './storefront/confirmation-preview'
+import { PortalPreview } from './storefront/portal-preview'
+import { PreviewSwitcher } from './storefront/preview-switcher'
 import SupportForm from '@/components/dashboard/support-form'
 
 interface StorefrontSettings {
@@ -29,10 +29,10 @@ function StorefrontPage() {
     ];
 
     const [settings, setSettings] = useState<StorefrontSettings>({
-        orgName: 'lomi.',
+        orgName: '',
         description: '',
         themeColor: '#000000',
-        slug: 'lomi',
+        slug: '',
     })
 
     const [activeView, setActiveView] = useState('storefront')
