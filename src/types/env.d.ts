@@ -4,6 +4,5 @@ declare namespace NodeJS {
     WHATSAPP_ACCESS_TOKEN: string;
     WHATSAPP_PHONE_NUMBER_ID: string;
     NODE_ENV: 'development' | 'production' | 'test';
-    VITE_API_URL: string;
   }
 } 
