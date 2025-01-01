@@ -10,92 +10,185 @@ RETURNS UUID AS $$
 DECLARE
     v_webhook_id UUID;
 BEGIN
-    INSERT INTO webhooks (merchant_id, url, event, is_active, metadata)
-    VALUES (p_merchant_id, p_url, p_event, p_is_active, p_metadata)
+    -- Validate URL format
+    IF NOT p_url ~ '^https?://' THEN
+        RAISE EXCEPTION 'Invalid URL format. URL must start with http:// or https://';
+    END IF;
+
+    INSERT INTO webhooks (
+        merchant_id,
+        url,
+        event,
+        is_active,
+        metadata
+    )
+    VALUES (
+        p_merchant_id,
+        p_url,
+        p_event,
+        p_is_active,
+        p_metadata
+    )
     RETURNING webhook_id INTO v_webhook_id;
+
+    -- Log webhook creation
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'update_webhook'::event_type,
+        p_details := jsonb_build_object(
+            'webhook_id', v_webhook_id,
+            'url', p_url,
+            'event', p_event,
+            'is_active', p_is_active,
+            'action', 'create'
+        ),
+        p_severity := 'NOTICE'
+    );
 
     RETURN v_webhook_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to fetch webhooks for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_webhooks(
-    p_merchant_id UUID,
-    p_event webhook_event DEFAULT NULL,
-    p_is_active BOOLEAN DEFAULT NULL
+-- Function to update webhook status and response
+CREATE OR REPLACE FUNCTION public.update_webhook_status(
+    p_webhook_id UUID,
+    p_last_response_status INT,
+    p_last_response_body TEXT,
+    p_last_payload JSONB
 )
-RETURNS TABLE (
-    webhook_id UUID,
-    url VARCHAR,
-    event webhook_event,
-    is_active BOOLEAN,
-    created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ
-) AS $$
+RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_event webhook_event;
+    v_retry_count INT;
 BEGIN
-    RETURN QUERY
+    -- Get current webhook details
     SELECT 
-        w.webhook_id,
-        w.url,
-        w.event,
-        w.is_active,
-        w.created_at,
-        w.updated_at
-    FROM 
-        webhooks w
-    WHERE 
-        w.merchant_id = p_merchant_id AND
-        (p_event IS NULL OR w.event = p_event) AND
-        (p_is_active IS NULL OR w.is_active = p_is_active)
-    ORDER BY
-        w.created_at DESC;
+        merchant_id,
+        event,
+        COALESCE(retry_count, 0)
+    INTO 
+        v_merchant_id,
+        v_event,
+        v_retry_count
+    FROM webhooks
+    WHERE webhook_id = p_webhook_id;
+
+    -- Update webhook status
+    UPDATE webhooks
+    SET
+        last_triggered_at = NOW(),
+        last_response_status = p_last_response_status,
+        last_response_body = p_last_response_body,
+        last_payload = p_last_payload,
+        retry_count = CASE 
+            WHEN p_last_response_status >= 200 AND p_last_response_status < 300 THEN 0
+            ELSE v_retry_count + 1
+        END
+    WHERE webhook_id = p_webhook_id;
+
+    -- Log webhook failure if status is not successful
+    IF p_last_response_status < 200 OR p_last_response_status >= 300 THEN
+        PERFORM public.log_event(
+            p_merchant_id := v_merchant_id,
+            p_event := 'update_webhook'::event_type,
+            p_details := jsonb_build_object(
+                'webhook_id', p_webhook_id,
+                'event', v_event,
+                'status', p_last_response_status,
+                'retry_count', v_retry_count + 1,
+                'action', 'delivery_failed'
+            ),
+            p_severity := 'ERROR',
+            p_response_status := p_last_response_status
+        );
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to update a webhook
+CREATE OR REPLACE FUNCTION public.update_webhook(
+    p_webhook_id UUID,
+    p_url VARCHAR,
+    p_is_active BOOLEAN,
+    p_metadata JSONB DEFAULT NULL
+)
+RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_event webhook_event;
+BEGIN
+    -- Validate URL format
+    IF NOT p_url ~ '^https?://' THEN
+        RAISE EXCEPTION 'Invalid URL format. URL must start with http:// or https://';
+    END IF;
+
+    -- Get webhook details before update
+    SELECT merchant_id, event
+    INTO v_merchant_id, v_event
+    FROM webhooks
+    WHERE webhook_id = p_webhook_id;
+
+    UPDATE webhooks
+    SET
+        url = p_url,
+        is_active = p_is_active,
+        metadata = p_metadata,
+        updated_at = NOW()
+    WHERE webhook_id = p_webhook_id;
+
+    -- Log webhook update
+    PERFORM public.log_event(
+        p_merchant_id := v_merchant_id,
+        p_event := 'update_webhook'::event_type,
+        p_details := jsonb_build_object(
+            'webhook_id', p_webhook_id,
+            'url', p_url,
+            'event', v_event,
+            'is_active', p_is_active,
+            'action', 'update'
+        ),
+        p_severity := 'NOTICE'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to delete a webhook
-CREATE OR REPLACE FUNCTION public.delete_webhook(p_webhook_id UUID)
+CREATE OR REPLACE FUNCTION public.delete_webhook(
+    p_webhook_id UUID
+)
 RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_url VARCHAR;
+    v_event webhook_event;
 BEGIN
-  DELETE FROM webhooks
-  WHERE webhook_id = p_webhook_id;
+    -- Get webhook details before deletion
+    SELECT merchant_id, url, event
+    INTO v_merchant_id, v_url, v_event
+    FROM webhooks
+    WHERE webhook_id = p_webhook_id;
+
+    DELETE FROM webhooks
+    WHERE webhook_id = p_webhook_id;
+
+    -- Log webhook deletion
+    PERFORM public.log_event(
+        p_merchant_id := v_merchant_id,
+        p_event := 'update_webhook'::event_type,
+        p_details := jsonb_build_object(
+            'webhook_id', p_webhook_id,
+            'url', v_url,
+            'event', v_event,
+            'action', 'delete'
+        ),
+        p_severity := 'NOTICE'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to fetch webhook details
-CREATE OR REPLACE FUNCTION public.fetch_webhook_details(p_webhook_id UUID)
-RETURNS TABLE (
-  webhook_id UUID,
-  merchant_id UUID,
-  url VARCHAR,
-  event webhook_event,
-  is_active BOOLEAN,
-  last_triggered_at TIMESTAMPTZ,
-  last_payload JSONB,
-  last_response_status INT,
-  last_response_body TEXT,
-  retry_count INT,
-  metadata JSONB,
-  created_at TIMESTAMPTZ,
-  updated_at TIMESTAMPTZ
-)
-AS $$
-BEGIN
-  RETURN QUERY
-  SELECT 
-    w.webhook_id,
-    w.merchant_id,
-    w.url,
-    w.event,
-    w.is_active,
-    w.last_triggered_at,
-    w.last_payload,
-    w.last_response_status,
-    w.last_response_body,
-    w.retry_count,
-    w.metadata,
-    w.created_at,
-    w.updated_at
-  FROM webhooks w
-  WHERE w.webhook_id = p_webhook_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+-- Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION public.create_webhook(UUID, VARCHAR, webhook_event, BOOLEAN, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_webhook(UUID, VARCHAR, BOOLEAN, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.delete_webhook(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_webhook_status(UUID, INT, TEXT, JSONB) TO authenticated;

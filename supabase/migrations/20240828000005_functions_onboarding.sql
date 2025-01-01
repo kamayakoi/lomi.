@@ -81,6 +81,19 @@ BEGIN
             p_preferred_language,
             REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', '')
         );
+
+        -- Log merchant creation
+        PERFORM public.log_event(
+            p_merchant_id := p_merchant_id,
+            p_event := 'user_login'::event_type,
+            p_details := jsonb_build_object(
+                'name', p_org_name,
+                'email', p_org_email,
+                'country', p_country,
+                'phone_number', p_phone_number
+            ),
+            p_severity := 'NOTICE'
+        );
     ELSE
         RAISE NOTICE 'Updating existing merchant record';
         -- Update merchant information if it exists
@@ -93,6 +106,18 @@ BEGIN
             avatar_url = REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', ''),
             updated_at = NOW()
         WHERE merchant_id = p_merchant_id;
+
+        -- Log merchant update
+        PERFORM public.log_event(
+            p_merchant_id := p_merchant_id,
+            p_event := 'edit_user_details'::event_type,
+            p_details := jsonb_build_object(
+                'phone_number', p_phone_number,
+                'country', p_country,
+                'preferred_language', p_preferred_language
+            ),
+            p_severity := 'NOTICE'
+        );
     END IF;
 
     -- Get the merchant name and email

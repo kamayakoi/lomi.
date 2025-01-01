@@ -8,7 +8,7 @@ CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
-CREATE TYPE kyc_status AS ENUM ('pending', 'not_authorized', 'approved', 'rejected');
+CREATE TYPE kyc_status AS ENUM ('not_submitted', 'pending', 'not_authorized', 'approved', 'rejected');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
@@ -21,7 +21,71 @@ CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payo
 CREATE TYPE support_category AS ENUM ('account', 'billing', 'technical', 'feature', 'other');
 CREATE TYPE support_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
 CREATE TYPE support_priority AS ENUM ('low', 'normal', 'high', 'urgent');
-CREATE TYPE event_type AS ENUM ('create_api_key', 'edit_api_key', 'remove_api_key', 'user_login', 'edit_user_password', 'create_pin', 'edit_pin', 'edit_user_details', 'authorize_user_2fa', 'create_user_2fa', 'remove_user_2fa', 'edit_user_2fa', 'edit_user_phone', 'set_callback_url', 'update_ip_whitelist', 'add_bank_account', 'remove_bank_account', 'create_payout', 'create_invoice', 'process_payment', 'update_webhook', 'create_refund');
+CREATE TYPE event_type AS ENUM (
+    -- Authentication & Security
+    'create_api_key',
+    'edit_api_key',
+    'remove_api_key',
+    'user_login',
+    'edit_user_password',
+    'create_pin',
+    'edit_pin',
+    'edit_user_details',
+    'authorize_user_2fa',
+    'create_user_2fa',
+    'remove_user_2fa',
+    'edit_user_2fa',
+    'edit_user_phone',
+    
+    -- Settings & Configuration
+    'set_callback_url',
+    'update_ip_whitelist',
+    'update_webhook',
+    
+    -- Banking & Payouts
+    'add_bank_account',
+    'remove_bank_account',
+    'create_payout',
+    'payout_status_change',
+    
+    -- Payments & Transactions
+    'create_invoice',
+    'process_payment',
+    'payment_status_change',
+    'create_refund',
+    'refund_status_change',
+    'create_dispute',
+    'dispute_status_change',
+    'create_chargeback',
+    'chargeback_status_change',
+    
+    -- Subscriptions
+    'create_subscription',
+    'cancel_subscription',
+    'subscription_status_change',
+    'subscription_payment_failed',
+    
+    -- Products & Services
+    'create_product',
+    'update_product',
+    'delete_product',
+    
+    -- Provider Integration
+    'provider_status_change',
+    'provider_connection_error',
+    'provider_integration_success',
+    
+    -- System & Maintenance
+    'system_maintenance',
+    'system_update',
+    'compliance_update',
+    'api_status_change',
+    
+    -- Customer Management
+    'customer_verification_required',
+    'customer_verification_success',
+    'customer_verification_failed'
+);
 CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
 CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');

@@ -73,6 +73,7 @@ const steps = [
 ]
 
 enum KycStatus {
+    NotSubmitted = 'not_submitted',
     Pending = 'pending',
     NotAuthorized = 'not_authorized',
     Approved = 'approved',
@@ -96,16 +97,14 @@ const Activation: React.FC = () => {
                     });
                     if (error) throw error;
 
-                    if (!status) {
-                        // Handle not submitted case
-                        if (Object.keys(activationData).length === 0) {
-                            setCurrentStep(0);
-                            setActivationData(initialActivationData);
-                        }
-                        return;
-                    }
-
                     switch (status as KycStatus) {
+                        case KycStatus.NotSubmitted:
+                            // Handle not submitted case
+                            if (Object.keys(activationData).length === 0) {
+                                setCurrentStep(0);
+                                setActivationData(initialActivationData);
+                            }
+                            break;
                         case KycStatus.Approved:
                             setCurrentStep(5); // Move to final step
                             break;

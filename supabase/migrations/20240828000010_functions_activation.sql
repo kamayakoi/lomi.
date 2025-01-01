@@ -144,7 +144,7 @@ CREATE OR REPLACE FUNCTION public.send_activation_submitted_email(signatory_emai
 RETURNS void AS $$
 DECLARE
   resend_api_key TEXT;
-  email_subject TEXT := 'lomi. Activation Submitted';
+  email_subject TEXT := 'lomi. — Activation submitted';
   email_content TEXT;
   response_status INTEGER;
   response_body TEXT;
@@ -164,7 +164,7 @@ BEGIN
 
 Thank you for submitting your account activation information. Our team is currently reviewing your application.
 
-We will notify you as soon as the review is complete, usually within 24 hours. In the meantime, please feel free to explore the **lomi.** portal and documentation to familiarize yourself with our platform.
+We will notify you as soon as the review is complete, usually within 24 hours. In the meantime, please feel free to explore the lomi.''s portal and documentation to familiarize yourself with our platform.
 
 If we need any additional information to process your application, we will reach out to you directly. 
 
@@ -193,7 +193,7 @@ If you have any questions, please reply to this email or contact our support tea
       ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
       'application/json',
       jsonb_build_object(
-        'from', 'Babacar <activation@updates.lomi.africa>',
+        'from', 'Babacar Diop <welcome@updates.lomi.africa>',
         'reply_to', 'Support from lomi. <hello@lomi.africa>',
         'to', signatory_email,
         'subject', email_subject, 
@@ -255,7 +255,7 @@ BEGIN
     email_content := format(
       'Hello %s,
 
-Congratulations! Your **lomi.** account has been approved. 
+Congratulations! Your lomi. account has been approved. 
 
 You now have full access to all the features of our platform. Feel free to explore the portal, connect your payment providers, and start accepting payments.
 
@@ -280,7 +280,7 @@ Babacar',
         ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],  
         'application/json',
         jsonb_build_object(
-          'from', 'Babacar <activation@updates.lomi.africa>',
+          'from', 'Babacar Diop <welcome@updates.lomi.africa>',
           'reply_to', 'Support from lomi. <hello@lomi.africa>',
           'to', signatory_email,
           'subject', email_subject,

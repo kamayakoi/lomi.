@@ -18,6 +18,18 @@ BEGIN
     INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date)
     VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date);
 
+    -- Log the API key creation
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'create_api_key'::event_type,
+        p_details := jsonb_build_object(
+            'api_key_name', p_name,
+            'expiration_date', p_expiration_date,
+            'organization_id', p_organization_id
+        ),
+        p_severity := 'CRITICAL'
+    );
+
     RETURN QUERY SELECT v_api_key AS api_key;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
@@ -69,9 +81,27 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update the status of an API key
-CREATE OR REPLACE FUNCTION public.update_api_key_status(p_api_key VARCHAR, p_is_active BOOLEAN)
+CREATE OR REPLACE FUNCTION public.update_api_key_status(
+    p_merchant_id UUID,
+    p_api_key VARCHAR, 
+    p_is_active BOOLEAN
+)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE api_keys SET is_active = p_is_active WHERE api_key = p_api_key;
+    UPDATE api_keys 
+    SET is_active = p_is_active 
+    WHERE api_key = p_api_key 
+    AND merchant_id = p_merchant_id;
+
+    -- Log the API key status update
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'edit_api_key'::event_type,
+        p_details := jsonb_build_object(
+            'api_key', p_api_key,
+            'is_active', p_is_active
+        ),
+        p_severity := 'CRITICAL'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

@@ -309,3 +309,104 @@ BEGIN
     RETURN ROUND(v_average_retention_rate, 2);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to process a payment
+CREATE OR REPLACE FUNCTION public.process_payment(
+    p_merchant_id UUID,
+    p_amount NUMERIC,
+    p_currency_code currency_code,
+    p_provider_code provider_code,
+    p_metadata JSONB DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+    v_transaction_id UUID;
+BEGIN
+    -- Create transaction record
+    INSERT INTO transactions (
+        merchant_id,
+        amount,
+        currency_code,
+        provider_code,
+        status,
+        metadata
+    ) VALUES (
+        p_merchant_id,
+        p_amount,
+        p_currency_code,
+        p_provider_code,
+        'pending',
+        p_metadata
+    ) RETURNING transaction_id INTO v_transaction_id;
+
+    -- Log payment processing
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'process_payment'::event_type,
+        p_details := jsonb_build_object(
+            'transaction_id', v_transaction_id,
+            'amount', p_amount,
+            'currency', p_currency_code,
+            'provider', p_provider_code,
+            'status', 'pending'
+        ),
+        p_severity := 'NOTICE'
+    );
+
+    RETURN v_transaction_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to create a refund
+CREATE OR REPLACE FUNCTION public.create_refund(
+    p_merchant_id UUID,
+    p_transaction_id UUID,
+    p_amount NUMERIC,
+    p_reason TEXT DEFAULT NULL,
+    p_metadata JSONB DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+    v_refund_id UUID;
+    v_transaction_amount NUMERIC;
+    v_fee_amount NUMERIC;
+BEGIN
+    -- Get original transaction amount
+    SELECT amount, fee_amount 
+    INTO v_transaction_amount, v_fee_amount
+    FROM transactions 
+    WHERE transaction_id = p_transaction_id;
+
+    -- Create refund record
+    INSERT INTO refunds (
+        transaction_id,
+        amount,
+        refunded_amount,
+        fee_amount,
+        reason,
+        metadata
+    ) VALUES (
+        p_transaction_id,
+        v_transaction_amount,
+        p_amount,
+        v_fee_amount,
+        p_reason,
+        p_metadata
+    ) RETURNING refund_id INTO v_refund_id;
+
+    -- Log refund creation
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'create_refund'::event_type,
+        p_details := jsonb_build_object(
+            'refund_id', v_refund_id,
+            'transaction_id', p_transaction_id,
+            'amount', p_amount,
+            'reason', p_reason
+        ),
+        p_severity := 'CRITICAL'
+    );
+
+    RETURN v_refund_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

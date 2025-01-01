@@ -35,6 +35,19 @@ BEGIN
     )
     RETURNING product_id INTO v_product_id;
 
+    -- Log product creation
+    PERFORM public.log_event(
+        p_merchant_id := p_merchant_id,
+        p_event := 'create_product'::event_type,
+        p_details := jsonb_build_object(
+            'product_id', v_product_id,
+            'name', p_name,
+            'price', p_price,
+            'currency', p_currency_code
+        ),
+        p_severity := 'NOTICE'
+    );
+
     RETURN v_product_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
@@ -86,9 +99,33 @@ CREATE OR REPLACE FUNCTION public.delete_product(
     p_product_id UUID
 )
 RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_product_name VARCHAR;
+    v_price NUMERIC;
+    v_currency currency_code;
 BEGIN
+    -- Get product details before deletion
+    SELECT merchant_id, name, price, currency_code
+    INTO v_merchant_id, v_product_name, v_price, v_currency
+    FROM merchant_products
+    WHERE product_id = p_product_id;
+
     DELETE FROM merchant_products
     WHERE product_id = p_product_id;
+
+    -- Log product deletion
+    PERFORM public.log_event(
+        p_merchant_id := v_merchant_id,
+        p_event := 'delete_product'::event_type,
+        p_details := jsonb_build_object(
+            'product_id', p_product_id,
+            'name', v_product_name,
+            'price', v_price,
+            'currency', v_currency
+        ),
+        p_severity := 'NOTICE'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -130,7 +167,17 @@ CREATE OR REPLACE FUNCTION public.update_product(
     p_display_on_storefront BOOLEAN
 )
 RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_old_price NUMERIC;
+    v_currency currency_code;
 BEGIN
+    -- Get current product details
+    SELECT merchant_id, price, currency_code
+    INTO v_merchant_id, v_old_price, v_currency
+    FROM merchant_products
+    WHERE product_id = p_product_id;
+
     UPDATE merchant_products
     SET
         name = p_name,
@@ -140,6 +187,21 @@ BEGIN
         display_on_storefront = p_display_on_storefront,
         updated_at = NOW()
     WHERE product_id = p_product_id;
+
+    -- Log product update
+    PERFORM public.log_event(
+        p_merchant_id := v_merchant_id,
+        p_event := 'update_product'::event_type,
+        p_details := jsonb_build_object(
+            'product_id', p_product_id,
+            'name', p_name,
+            'old_price', v_old_price,
+            'new_price', p_price,
+            'currency', v_currency,
+            'is_active', p_is_active
+        ),
+        p_severity := 'NOTICE'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

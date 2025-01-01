@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION public.send_onboarding_welcome_email(user_email TEXT,
 RETURNS void AS $$
 DECLARE
   resend_api_key TEXT;
-  email_subject TEXT := 'Welcome to lomi!';
+  email_subject TEXT := 'Let''s get you started !';
   email_content TEXT;
   response_status INTEGER;
   response_body TEXT;
@@ -48,24 +48,21 @@ BEGIN
   -- Compose the email content  
   email_content := format(E'Hello %s,
 
-I''m Babacar, the founder of lomi.. We''re thrilled to have you on board! Our mission is to build francophone West Africa''s most reliable payment orchestration platform.
-
-To achieve this, we’ve built top-tier programmatic tools from the ground up, designed to empower businesses like yours to start accepting payments effortlessly.
+Babacar here, the founder of lomi. thank you so much for joigning us — we''re very happy to have you on board. What began as a simple side project has grown into a mission: building francophone West Africa''s most reliable payment orchestration platform. To achieve this, we’ve crafted tools to empower businesses like yours to start accepting payments effortlessly.
 
 Here''s how you can get started:
 
-1. Activate your account by going through our activation process
+1. Activate your account by going through our business onboarding process
 2. Connect your preferred payment providers
-3. Create your first product or subscription plan
-4. Create your first payment link or generate a payment page
-5. Set up our API in your application
+3. Create your first product
+4. Create your first payment link; or set up our API in your application
 
-We’ve designed Lomi. to be exceptionally developer-friendly, offering comprehensive documentation and powerful APIs that give you the freedom to build exactly what you need.
+We’ve designed lomi. to be exceptionally developer-friendly, offering comprehensive documentation and powerful APIs that give you the freedom to build exactly what you need.
 
 Access your portal: https://lomi.africa/portal
-Access the docs: https://developers.lomi.africa
+Access your docs: https://developers.lomi.africa
 
-If you need any help or there''s anything we could do to improve lomi. for you, our team is at your entire disposal — anytime. Making lomi. phenomenal for our users is our number one priority.
+If you need any help or there''s anything we could do to improve lomi. for you, our team is at your entire disposal — anytime. Making this platform phenomenal for our users is our number one priority.
 
 Best regards,
 Babacar
