@@ -72,6 +72,13 @@ const steps = [
     { title: "Account activated" },
 ]
 
+enum KycStatus {
+    Pending = 'pending',
+    NotAuthorized = 'not_authorized',
+    Approved = 'approved',
+    Rejected = 'rejected'
+}
+
 const Activation: React.FC = () => {
     const [currentStep, setCurrentStep] = useLocalStorage('kycCurrentStep', 0);
     const [activationData, setActivationData] = useLocalStorage<ActivationData>('kycActivationData', initialActivationData);
@@ -89,29 +96,31 @@ const Activation: React.FC = () => {
                     });
                     if (error) throw error;
 
-                    switch (status) {
-                        case 'approved':
+                    if (!status) {
+                        // Handle not submitted case
+                        if (Object.keys(activationData).length === 0) {
+                            setCurrentStep(0);
+                            setActivationData(initialActivationData);
+                        }
+                        return;
+                    }
+
+                    switch (status as KycStatus) {
+                        case KycStatus.Approved:
                             setCurrentStep(5); // Move to final step
                             break;
-                        case 'pending':
+                        case KycStatus.Pending:
                             // If activation is pending, stay on step 5
                             setCurrentStep(4);
                             break;
-                        case 'rejected':
+                        case KycStatus.Rejected:
                             // If rejected, reset activation data but allow proceeding through steps
                             setActivationData(initialActivationData);
                             break;
-                        case 'not_authorized':
+                        case KycStatus.NotAuthorized:
                             // If not authorized, stay on step 1 and reset activation data
                             setCurrentStep(0);
                             setActivationData(initialActivationData);
-                            break;
-                        default:
-                            // If not submitted and no activation data stored, reset to initial state
-                            if (Object.keys(activationData).length === 0) {
-                                setCurrentStep(0);
-                                setActivationData(initialActivationData);
-                            }
                             break;
                     }
                 } catch (error) {

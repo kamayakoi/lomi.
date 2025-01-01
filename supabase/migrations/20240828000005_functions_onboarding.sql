@@ -6,19 +6,19 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_merchant_id UUID,
     p_phone_number VARCHAR,
     p_country VARCHAR,
-    p_preferred_language VARCHAR,
     p_org_name VARCHAR,
     p_org_email VARCHAR,
     p_org_phone_number VARCHAR,
     p_org_country VARCHAR,
     p_org_region VARCHAR,
     p_org_city VARCHAR,
-    p_org_district VARCHAR,
     p_org_street VARCHAR,
+    p_org_district VARCHAR,
     p_org_postal_code VARCHAR,
     p_org_industry VARCHAR,
     p_org_website_url VARCHAR,
     p_org_employee_number VARCHAR,
+    p_preferred_language VARCHAR,
     p_workspace_handle VARCHAR,
     p_how_did_you_hear_about_us VARCHAR,
     p_avatar_url VARCHAR,
@@ -29,13 +29,38 @@ RETURNS VOID AS $$
 DECLARE
     v_organization_id UUID;
     v_merchant_exists BOOLEAN;
+    v_merchant_name TEXT;
+    v_merchant_email TEXT;
+    v_resend_api_key TEXT;
 BEGIN
+    -- Debug logging
+    RAISE NOTICE 'Starting complete_onboarding for merchant_id: %', p_merchant_id;
+
+    -- Check if Resend API key is configured
+    SELECT value INTO v_resend_api_key FROM secrets.resend_config WHERE key = 'resend_api_key';
+    IF v_resend_api_key IS NULL THEN
+        RAISE WARNING 'Resend API key not found in secrets.resend_config';
+    ELSE
+        RAISE NOTICE 'Resend API key found successfully';
+    END IF;
+
     -- Check if merchant exists
     SELECT EXISTS (
         SELECT 1 FROM merchants WHERE merchant_id = p_merchant_id
     ) INTO v_merchant_exists;
+    
+    RAISE NOTICE 'Merchant exists check: %', v_merchant_exists;
+
+    -- Check if workspace handle is available
+    IF EXISTS (
+        SELECT 1 FROM public.merchant_organization_links 
+        WHERE workspace_handle = p_workspace_handle
+    ) THEN
+        RAISE EXCEPTION 'Workspace handle "%" is already taken', p_workspace_handle;
+    END IF;
 
     IF NOT v_merchant_exists THEN
+        RAISE NOTICE 'Creating new merchant record';
         -- Create merchant record if it doesn't exist
         INSERT INTO merchants (
             merchant_id,
@@ -48,8 +73,8 @@ BEGIN
             avatar_url
         ) VALUES (
             p_merchant_id,
-            p_org_name, -- Use organization name as merchant name initially
-            p_org_email, -- Use organization email as merchant email initially
+            p_org_name,
+            p_org_email,
             p_phone_number,
             p_country,
             true,
@@ -57,6 +82,7 @@ BEGIN
             REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', '')
         );
     ELSE
+        RAISE NOTICE 'Updating existing merchant record';
         -- Update merchant information if it exists
         UPDATE merchants
         SET 
@@ -69,6 +95,22 @@ BEGIN
         WHERE merchant_id = p_merchant_id;
     END IF;
 
+    -- Get the merchant name and email
+    SELECT name, email INTO v_merchant_name, v_merchant_email
+    FROM merchants
+    WHERE merchant_id = p_merchant_id;
+
+    RAISE NOTICE 'Preparing to send welcome email to % (%)', v_merchant_name, v_merchant_email;
+
+    -- Send welcome email with error handling
+    BEGIN
+        PERFORM public.send_onboarding_welcome_email(v_merchant_email, v_merchant_name);
+        RAISE NOTICE 'Welcome email sent successfully to %', v_merchant_email;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE WARNING 'Failed to send welcome email: % - %', SQLERRM, SQLSTATE;
+    END;
+
+    RAISE NOTICE 'Creating organization';
     -- Create organization
     INSERT INTO organizations (
         name,
@@ -91,6 +133,8 @@ BEGIN
     )
     RETURNING organization_id INTO v_organization_id;
 
+    RAISE NOTICE 'Organization created with ID: %', v_organization_id;
+
     -- Create organization address
     INSERT INTO organization_addresses (
         organization_id,
@@ -110,6 +154,8 @@ BEGIN
         p_org_postal_code
     );
 
+    RAISE NOTICE 'Organization address created';
+
     -- Create merchant-organization link
     INSERT INTO merchant_organization_links (
         merchant_id,
@@ -126,6 +172,9 @@ BEGIN
         p_workspace_handle,
         p_how_did_you_hear_about_us
     );
+
+    RAISE NOTICE 'Merchant-organization link created';
+    RAISE NOTICE 'Complete onboarding process finished successfully';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

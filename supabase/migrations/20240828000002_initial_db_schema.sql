@@ -8,11 +8,11 @@ CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
+CREATE TYPE kyc_status AS ENUM ('pending', 'not_authorized', 'approved', 'rejected');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'BANK_TRANSFER', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 CREATE TYPE dispute_status AS ENUM ('pending', 'resolved', 'closed');
-CREATE TYPE kyc_status AS ENUM ('pending', 'approved', 'rejected');
 CREATE TYPE entity_type AS ENUM ('merchant', 'organization', 'platform');
 CREATE TYPE feedback_status AS ENUM ('open', 'reviewed', 'implemented', 'closed');
 CREATE TYPE ticket_status AS ENUM ('open', 'resolved', 'closed');
@@ -130,7 +130,7 @@ CREATE TABLE organization_kyc (
   legal_representative_ID_url VARCHAR,
   address_proof_url VARCHAR,
   business_registration_url VARCHAR,
-  status VARCHAR NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'not_authorized', 'approved', 'rejected')),
+  status kyc_status NOT NULL DEFAULT 'pending',
   kyc_submitted_at TIMESTAMPTZ,
   kyc_approved_at TIMESTAMPTZ,
   PRIMARY KEY (organization_id, merchant_id)
@@ -371,6 +371,7 @@ COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
 
 -- Fees table
 CREATE TABLE fees (
+    fee_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR NOT NULL UNIQUE,
     transaction_type transaction_type NOT NULL,
     fee_type VARCHAR NOT NULL,

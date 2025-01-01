@@ -18,21 +18,27 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE OR REPLACE FUNCTION public.update_organization_verification_status()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.status = 'approved' THEN
+    IF NEW.status = 'approved'::kyc_status THEN
+        -- Update organization verification status using the organization_id directly from NEW record
         UPDATE organizations
-        SET verified = true
-        WHERE organization_id = (
-            SELECT organization_id
-            FROM merchant_organization_links
-            WHERE merchant_id = NEW.merchant_id
-        );
+        SET 
+            verified = true,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE organization_id = NEW.organization_id;
+
+        -- Update kyc_approved_at timestamp
+        UPDATE organization_kyc
+        SET kyc_approved_at = CURRENT_TIMESTAMP
+        WHERE organization_id = NEW.organization_id 
+        AND merchant_id = NEW.merchant_id;
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger to call the update_organization_verification_status function
+DROP TRIGGER IF EXISTS update_organization_verification_status_trigger ON organization_kyc;
 CREATE TRIGGER update_organization_verification_status_trigger
-AFTER INSERT OR UPDATE ON organization_kyc
+AFTER UPDATE OF status ON organization_kyc
 FOR EACH ROW
 EXECUTE FUNCTION update_organization_verification_status();
