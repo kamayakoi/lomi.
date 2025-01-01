@@ -1,5 +1,7 @@
-import { Resend } from 'resend';
-import axios from 'axios';
+import { sendEmail } from '@/utils/resend/client';
+import { sendWhatsAppMessage, createTextMessage, createTemplateMessage } from '@/utils/whatsapp/client';
+import type { EmailOptions } from '@/utils/resend/types';
+import type { WhatsAppMessage } from '@/utils/whatsapp/types';
 
 interface NotificationPayload {
   to: string;
@@ -7,31 +9,13 @@ interface NotificationPayload {
   message: string;
   type: 'whatsapp' | 'email';
   templateId?: string;
-  metadata?: Record<string, unknown>;
-}
-
-interface WhatsAppConfig {
-  accessToken: string;
-  phoneNumberId: string;
-  version: string;
+  metadata?: {
+    components?: NonNullable<WhatsAppMessage['template']>['components'];
+  };
 }
 
 class NotificationService {
-  private resendClient: Resend;
-  private whatsappConfig: WhatsAppConfig;
   private static instance: NotificationService;
-
-  private constructor() {
-    // Initialize Resend client
-    this.resendClient = new Resend(process.env['RESEND_API_KEY']);
-
-    // Initialize WhatsApp Cloud API config
-    this.whatsappConfig = {
-      accessToken: process.env['WHATSAPP_ACCESS_TOKEN'] || '',
-      phoneNumberId: process.env['WHATSAPP_PHONE_NUMBER_ID'] || '',
-      version: 'v17.0'
-    };
-  }
 
   public static getInstance(): NotificationService {
     if (!NotificationService.instance) {
@@ -60,23 +44,19 @@ class NotificationService {
     try {
       const formattedNumber = this.formatPhoneNumber(payload.to);
       
-      await axios({
-        method: 'POST',
-        url: `https://graph.facebook.com/${this.whatsappConfig.version}/${this.whatsappConfig.phoneNumberId}/messages`,
-        headers: {
-          'Authorization': `Bearer ${this.whatsappConfig.accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        data: {
-          messaging_product: 'whatsapp',
-          to: formattedNumber,
-          type: 'text',
-          text: {
-            body: payload.message
-          }
-        }
-      });
+      let message: WhatsAppMessage;
+      if (payload.templateId) {
+        message = createTemplateMessage(
+          formattedNumber,
+          payload.templateId,
+          'en', // Default to English
+          payload.metadata?.components
+        );
+      } else {
+        message = createTextMessage(formattedNumber, payload.message);
+      }
 
+      await sendWhatsAppMessage(message);
       return true;
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
@@ -86,17 +66,15 @@ class NotificationService {
 
   private async sendEmail(payload: NotificationPayload): Promise<boolean> {
     try {
-      const { error } = await this.resendClient.emails.send({
+      const emailOptions: EmailOptions = {
         from: 'notifications@lomi.africa',
         to: payload.to,
         subject: payload.subject || 'Notification from Lomi',
+        text: payload.message,
         html: payload.message,
-      });
+      };
 
-      if (error) {
-        throw error;
-      }
-
+      await sendEmail(emailOptions);
       return true;
     } catch (error) {
       console.error('Error sending email:', error);
@@ -111,50 +89,96 @@ class NotificationService {
 
   // Template-based notification methods
   public async sendPaymentConfirmation(to: string, amount: number, reference: string): Promise<boolean> {
-    const message = `Payment Confirmation
-Amount: ${amount}
-Reference: ${reference}
-Status: Successful
-
-Thank you for using Lomi!`;
-
     return this.sendNotification({
       to,
-      message,
       type: 'whatsapp',
-      templateId: 'payment_confirmation'
+      templateId: 'payment_confirmation',
+      message: '', // Not used when template is provided
+      metadata: {
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'currency',
+                currency: {
+                  fallback_value: `${amount}`,
+                  code: 'USD',
+                  amount_1000: amount * 1000
+                }
+              },
+              {
+                type: 'text',
+                text: reference
+              }
+            ]
+          }
+        ]
+      }
     });
   }
 
   public async sendPaymentFailure(to: string, amount: number, reference: string, reason: string): Promise<boolean> {
-    const message = `Payment Failed
-Amount: ${amount}
-Reference: ${reference}
-Reason: ${reason}
-
-Need help? Contact our support team.`;
-
     return this.sendNotification({
       to,
-      message,
       type: 'whatsapp',
-      templateId: 'payment_failure'
+      templateId: 'payment_failure',
+      message: '', // Not used when template is provided
+      metadata: {
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'currency',
+                currency: {
+                  fallback_value: `${amount}`,
+                  code: 'USD',
+                  amount_1000: amount * 1000
+                }
+              },
+              {
+                type: 'text',
+                text: reference
+              },
+              {
+                type: 'text',
+                text: reason
+              }
+            ]
+          }
+        ]
+      }
     });
   }
 
   public async sendRefundNotification(to: string, amount: number, reference: string): Promise<boolean> {
-    const message = `Refund Processed
-Amount: ${amount}
-Reference: ${reference}
-Status: Completed
-
-The refund has been initiated and will be processed within 3-5 business days.`;
-
     return this.sendNotification({
       to,
-      message,
       type: 'whatsapp',
-      templateId: 'refund_notification'
+      templateId: 'refund_notification',
+      message: '', // Not used when template is provided
+      metadata: {
+        components: [
+          {
+            type: 'body',
+            parameters: [
+              {
+                type: 'currency',
+                currency: {
+                  fallback_value: `${amount}`,
+                  code: 'USD',
+                  amount_1000: amount * 1000
+                }
+              },
+              {
+                type: 'text',
+                text: reference
+              }
+            ]
+          }
+        ]
+      }
     });
   }
 }
