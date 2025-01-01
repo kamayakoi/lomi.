@@ -42,3 +42,16 @@ coverage/
 .pnp.js
 __pycache__/
 *.py[cod]
+
+# Sitemap
+data/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+
+# Scripts and prompts
+src/utils/scripts/
+src/utils/prompts
+
+# Cursor rules
+.cursorrules

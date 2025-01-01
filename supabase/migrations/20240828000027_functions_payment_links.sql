@@ -255,7 +255,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to get the base URL based on the environment
 CREATE OR REPLACE FUNCTION public.get_base_url()
-RETURNS VARCHAR(2048) AS $$
+RETURNS VARCHAR(2048)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 BEGIN
     IF inet_client_addr() << '127.0.0.0/8'::inet THEN
         RETURN 'http://localhost:5173/';    
@@ -263,11 +267,15 @@ BEGIN
         RETURN 'https://pay.lomi.africa/';
     END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+$$;
 
 -- Trigger function to generate the URL after the payment link is created
 CREATE OR REPLACE FUNCTION public.generate_payment_link_url()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 BEGIN
     -- Generate the payment link URL based on the link_id and link_type
     NEW.url := CASE
@@ -279,7 +287,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+$$;
 
 -- Trigger to generate the URL after the payment link is created
 CREATE TRIGGER generate_payment_link_url

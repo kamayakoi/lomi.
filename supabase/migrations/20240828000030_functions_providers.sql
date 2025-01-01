@@ -17,7 +17,12 @@ CREATE OR REPLACE FUNCTION create_transaction(
   provider_code provider_code,
   payment_method_code payment_method_code
 )
-RETURNS transactions AS $$
+RETURNS transactions
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
   INSERT INTO transactions (
     merchant_id,
     organization_id,
@@ -55,35 +60,55 @@ RETURNS transactions AS $$
     payment_method_code
   )
   RETURNING *;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get a transaction by ID
 CREATE OR REPLACE FUNCTION get_transaction_by_id(transaction_id UUID)
-RETURNS transactions AS $$
+RETURNS transactions
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
   SELECT * FROM transactions WHERE transaction_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Update transaction status
 CREATE OR REPLACE FUNCTION update_transaction_status(transaction_id UUID, new_status transaction_status)
-RETURNS transactions AS $$
+RETURNS transactions
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
   UPDATE transactions
   SET status = new_status
   WHERE transaction_id = $1
   RETURNING *;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get merchant details
 CREATE OR REPLACE FUNCTION get_merchant_details(merchant_id UUID)
 RETURNS TABLE (
   id UUID,
   name VARCHAR
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     m.merchant_id AS id,
     m.name
   FROM merchants m
   WHERE m.merchant_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get product details by ID
 CREATE OR REPLACE FUNCTION get_product_by_id(prod_id UUID)
@@ -95,7 +120,13 @@ RETURNS TABLE (
   currency_code currency_code,
   merchant_id UUID,
   organization_id UUID
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     p.product_id AS id,
     p.name,
@@ -108,21 +139,29 @@ RETURNS TABLE (
   JOIN merchants m ON p.merchant_id = m.merchant_id
   JOIN organizations o ON p.organization_id = o.organization_id
   WHERE p.product_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get available providers for an organization
 CREATE OR REPLACE FUNCTION get_available_providers(organization_id UUID)
 RETURNS TABLE (
   code provider_code,
   name VARCHAR
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     p.code,
     p.name
   FROM providers p
   JOIN organization_providers_settings ops ON p.code = ops.provider_code
   WHERE ops.organization_id = $1 AND ops.is_connected = true;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get organization details
 CREATE OR REPLACE FUNCTION get_organization_details(org_id UUID)
@@ -130,40 +169,21 @@ RETURNS TABLE (
   id UUID,
   name VARCHAR,
   logo_url VARCHAR
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     o.organization_id AS id,
     o.name,
     o.logo_url
   FROM organizations o
   WHERE o.organization_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
--- Get product details by ID
-CREATE OR REPLACE FUNCTION get_product_by_id(prod_id UUID)
-RETURNS TABLE (
-  id UUID,
-  name VARCHAR,
-  description TEXT,
-  price NUMERIC(10,2),
-  currency_code currency_code,
-  merchant_id UUID,
-  organization_id UUID
-) AS $$
-  SELECT
-    p.product_id AS id,
-    p.name,
-    p.description,
-    p.price,
-    p.currency_code,
-    p.merchant_id,
-    p.organization_id
-  FROM merchant_products p
-  JOIN merchants m ON p.merchant_id = m.merchant_id
-  JOIN organizations o ON p.organization_id = o.organization_id
-  WHERE p.product_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
+END;
+$$;
 
 -- Get payment link details by ID
 CREATE OR REPLACE FUNCTION get_payment_link_by_id(link_id UUID)
@@ -188,7 +208,13 @@ RETURNS TABLE (
   metadata JSONB,
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     pl.link_id AS id,
     pl.merchant_id,
@@ -212,7 +238,8 @@ RETURNS TABLE (
     pl.updated_at
   FROM payment_links pl
   WHERE pl.link_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Get plan details by ID
 CREATE OR REPLACE FUNCTION get_plan_by_id(plan_id UUID)
@@ -231,7 +258,13 @@ RETURNS TABLE (
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ,
   first_payment_type first_payment_type
-) AS $$
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN QUERY
   SELECT
     sp.plan_id AS id,
     sp.merchant_id,
@@ -249,7 +282,8 @@ RETURNS TABLE (
     sp.first_payment_type
   FROM subscription_plans sp
   WHERE sp.plan_id = $1;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+END;
+$$;
 
 -- Create a transaction with provider details
 CREATE OR REPLACE FUNCTION create_transaction_with_provider(
@@ -272,7 +306,11 @@ CREATE OR REPLACE FUNCTION create_transaction_with_provider(
   provider_transaction_id VARCHAR(255),
   provider_payment_status VARCHAR(50)
 )
-RETURNS transactions AS $$
+RETURNS transactions
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 DECLARE
   v_transaction transactions;
 BEGIN
@@ -314,21 +352,21 @@ BEGIN
   )
   RETURNING * INTO v_transaction;
 
-INSERT INTO providers_transactions (
-  transaction_id,
-  merchant_id,
-  provider_code,
-  provider_transaction_id,
-  provider_payment_status
-)
-VALUES (
-  v_transaction.transaction_id,
-  merchant_id,
-  provider_code,
-  provider_transaction_id,
-  provider_payment_status
-);
+  INSERT INTO providers_transactions (
+    transaction_id,
+    merchant_id,
+    provider_code,
+    provider_transaction_id,
+    provider_payment_status
+  )
+  VALUES (
+    v_transaction.transaction_id,
+    merchant_id,
+    provider_code,
+    provider_transaction_id,
+    provider_payment_status
+  );
 
   RETURN v_transaction;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+$$;
