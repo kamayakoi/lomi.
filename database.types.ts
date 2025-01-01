@@ -752,6 +752,7 @@ export type Database = {
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           description: string | null
+          display_on_storefront: boolean
           is_active: boolean
           merchant_id: string
           name: string
@@ -764,6 +765,7 @@ export type Database = {
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          display_on_storefront?: boolean
           is_active?: boolean
           merchant_id: string
           name: string
@@ -776,6 +778,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          display_on_storefront?: boolean
           is_active?: boolean
           merchant_id?: string
           name?: string
@@ -1713,6 +1716,60 @@ export type Database = {
           },
         ]
       }
+      storefronts: {
+        Row: {
+          created_at: string
+          description: string | null
+          is_active: boolean
+          merchant_id: string
+          name: string
+          organization_id: string
+          slug: string
+          storefront_id: string
+          theme_color: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          merchant_id: string
+          name: string
+          organization_id: string
+          slug: string
+          storefront_id?: string
+          theme_color?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          is_active?: boolean
+          merchant_id?: string
+          name?: string
+          organization_id?: string
+          slug?: string
+          storefront_id?: string
+          theme_color?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storefronts_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "storefronts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           amount: number
@@ -1721,6 +1778,7 @@ export type Database = {
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           description: string | null
+          display_on_storefront: boolean
           failed_payment_action:
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
@@ -1739,6 +1797,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          display_on_storefront?: boolean
           failed_payment_action?:
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
@@ -1757,6 +1816,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           description?: string | null
+          display_on_storefront?: boolean
           failed_payment_action?:
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
@@ -2170,29 +2230,32 @@ export type Database = {
         }
         Returns: string
       }
-      create_product: {
-        Args: {
-          p_merchant_id: string
-          p_organization_id: string
-          p_name: string
-          p_description: string
-          p_price: number
-          p_currency_code: Database["public"]["Enums"]["currency_code"]
-          p_is_active?: boolean
-        }
-        Returns: string
-      }
-      create_storefront: {
-        Args: {
-          p_merchant_id: string
-          p_organization_id: string
-          p_name: string
-          p_description: string
-          p_theme_color: string
-          p_slug: string
-        }
-        Returns: string
-      }
+      create_product:
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_price: number
+              p_currency_code: Database["public"]["Enums"]["currency_code"]
+              p_is_active?: boolean
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_price: number
+              p_currency_code: Database["public"]["Enums"]["currency_code"]
+              p_is_active?: boolean
+              p_display_on_storefront?: boolean
+            }
+            Returns: string
+          }
       create_subscription: {
         Args: {
           p_merchant_id: string
@@ -2212,22 +2275,40 @@ export type Database = {
         }
         Returns: string
       }
-      create_subscription_plan: {
-        Args: {
-          p_merchant_id: string
-          p_organization_id: string
-          p_name: string
-          p_description: string
-          p_billing_frequency: Database["public"]["Enums"]["frequency"]
-          p_amount: number
-          p_currency_code?: Database["public"]["Enums"]["currency_code"]
-          p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
-          p_charge_day?: number
-          p_metadata?: Json
-          p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
-        }
-        Returns: string
-      }
+      create_subscription_plan:
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_currency_code?: Database["public"]["Enums"]["currency_code"]
+              p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day?: number
+              p_metadata?: Json
+              p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_currency_code?: Database["public"]["Enums"]["currency_code"]
+              p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day?: number
+              p_metadata?: Json
+              p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+              p_display_on_storefront?: boolean
+            }
+            Returns: string
+          }
       create_support_request: {
         Args: {
           p_merchant_id: string
@@ -2777,6 +2858,7 @@ export type Database = {
           price: number
           currency_code: Database["public"]["Enums"]["currency_code"]
           is_active: boolean
+          display_on_storefront: boolean
           created_at: string
           updated_at: string
         }[]
@@ -2893,6 +2975,7 @@ export type Database = {
           metadata: Json
           created_at: string
           updated_at: string
+          display_on_storefront: boolean
         }[]
       }
       fetch_subscription_transactions: {
@@ -3299,6 +3382,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      toggle_storefront_status: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+        }
+        Returns: boolean
+      }
       update_api_key_status: {
         Args: {
           p_api_key: string
@@ -3406,29 +3496,66 @@ export type Database = {
           url: string
         }
       }
-      update_product: {
+      update_product:
+        | {
+            Args: {
+              p_product_id: string
+              p_name: string
+              p_description: string
+              p_price: number
+              p_is_active: boolean
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_product_id: string
+              p_name: string
+              p_description: string
+              p_price: number
+              p_is_active: boolean
+              p_display_on_storefront: boolean
+            }
+            Returns: undefined
+          }
+      update_storefront_settings: {
         Args: {
-          p_product_id: string
+          p_merchant_id: string
+          p_organization_id: string
           p_name: string
           p_description: string
-          p_price: number
-          p_is_active: boolean
+          p_theme_color: string
         }
-        Returns: undefined
+        Returns: Json
       }
-      update_subscription_plan: {
-        Args: {
-          p_plan_id: string
-          p_name: string
-          p_description: string
-          p_billing_frequency: Database["public"]["Enums"]["frequency"]
-          p_amount: number
-          p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
-          p_charge_day: number
-          p_metadata: Json
-        }
-        Returns: undefined
-      }
+      update_subscription_plan:
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+              p_display_on_storefront?: boolean
+            }
+            Returns: undefined
+          }
       update_transaction_status: {
         Args: {
           transaction_id: string

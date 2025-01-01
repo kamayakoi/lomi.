@@ -1,5 +1,3 @@
-import type { Resend } from 'resend';
-
 export interface EmailOptions {
   from: string;
   to: string | string[];

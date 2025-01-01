@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { EmailOptions, EmailResponse, ResendError } from './types';
+import type { EmailOptions, EmailResponse } from './types';
 
 export class ResendApiError extends Error {
   constructor(message: string) {
@@ -12,7 +12,7 @@ let resendClient: Resend | null = null;
 
 function getResendClient(): Resend {
   if (!resendClient) {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = process.env['RESEND_API_KEY'];
     if (!apiKey) {
       throw new Error('Resend API key not configured');
     }
@@ -57,19 +57,4 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
     }
     throw new ResendApiError('Unknown error occurred');
   }
-}
-
-export function createEmailOptions(options: EmailOptions): EmailOptions {
-  return {
-    from: options.from,
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
-    text: options.text,
-    cc: options.cc,
-    bcc: options.bcc,
-    replyTo: options.replyTo,
-    attachments: options.attachments,
-    tags: options.tags,
-  };
 } 

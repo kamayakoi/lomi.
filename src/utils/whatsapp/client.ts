@@ -1,18 +1,18 @@
-import { WhatsAppMessage, WhatsAppResponse, WhatsAppError as IWhatsAppError } from './types';
+import { WhatsAppMessage, WhatsAppResponse, WhatsAppError } from './types';
 
 const WHATSAPP_API_VERSION = 'v17.0';
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`;
 
 export class WhatsAppApiError extends Error {
-  constructor(public readonly error: IWhatsAppError['error']) {
+  constructor(public readonly error: WhatsAppError['error']) {
     super(error.message);
     this.name = 'WhatsAppApiError';
   }
 }
 
 export async function sendWhatsAppMessage(message: WhatsAppMessage): Promise<WhatsAppResponse> {
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+  const phoneNumberId = process.env['WHATSAPP_PHONE_NUMBER_ID'];
+  const accessToken = process.env['WHATSAPP_ACCESS_TOKEN'];
 
   if (!phoneNumberId || !accessToken) {
     throw new Error('WhatsApp credentials not configured');
@@ -33,7 +33,7 @@ export async function sendWhatsAppMessage(message: WhatsAppMessage): Promise<Wha
   const data = await response.json();
 
   if (!response.ok) {
-    throw new WhatsAppApiError(data as IWhatsAppError['error']);
+    throw new WhatsAppApiError(data as WhatsAppError['error']);
   }
 
   return data as WhatsAppResponse;
@@ -55,7 +55,7 @@ export function createTemplateMessage(
   to: string,
   templateName: string,
   languageCode: string,
-  components?: WhatsAppMessage['template']['components']
+  components?: NonNullable<WhatsAppMessage['template']>['components']
 ): WhatsAppMessage {
   return {
     messaging_product: 'whatsapp',
