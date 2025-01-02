@@ -3,10 +3,12 @@ export interface Product {
     merchant_id: string
     organization_id: string
     name: string
-    description: string
+    description: string | null
     price: number
     currency_code: string
+    image_url: string | null
     is_active: boolean
+    display_on_storefront: boolean
     created_at: string
     updated_at: string
 }

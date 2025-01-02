@@ -358,6 +358,7 @@ CREATE TABLE merchant_products (
     description TEXT,
     price NUMERIC(10,2) NOT NULL CHECK (price >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
+    image_url TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     display_on_storefront BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

@@ -6,6 +6,7 @@ CREATE OR REPLACE FUNCTION public.create_product(
     p_description TEXT,
     p_price NUMERIC(10,2),
     p_currency_code currency_code,
+    p_image_url TEXT DEFAULT NULL,
     p_is_active BOOLEAN DEFAULT true,
     p_display_on_storefront BOOLEAN DEFAULT true
 )
@@ -19,7 +20,8 @@ BEGIN
         name, 
         description, 
         price, 
-        currency_code, 
+        currency_code,
+        image_url,
         is_active,
         display_on_storefront
     )
@@ -29,7 +31,8 @@ BEGIN
         p_name, 
         p_description, 
         p_price, 
-        p_currency_code, 
+        p_currency_code,
+        p_image_url,
         p_is_active,
         p_display_on_storefront
     )
@@ -43,7 +46,9 @@ BEGIN
             'product_id', v_product_id,
             'name', p_name,
             'price', p_price,
-            'currency', p_currency_code
+            'currency', p_currency_code,
+            'has_image', p_image_url IS NOT NULL,
+            'display_on_storefront', p_display_on_storefront
         ),
         p_severity := 'NOTICE'
     );
@@ -65,6 +70,7 @@ RETURNS TABLE (
     description TEXT,
     price NUMERIC(10,2),
     currency_code currency_code,
+    image_url TEXT,
     is_active BOOLEAN,
     display_on_storefront BOOLEAN,
     created_at TIMESTAMPTZ,
@@ -80,6 +86,7 @@ BEGIN
         p.description,
         p.price,
         p.currency_code,
+        p.image_url,
         p.is_active,
         p.display_on_storefront,
         p.created_at,
@@ -163,6 +170,7 @@ CREATE OR REPLACE FUNCTION public.update_product(
     p_name VARCHAR(255),
     p_description TEXT,
     p_price NUMERIC(10,2),
+    p_image_url TEXT,
     p_is_active BOOLEAN,
     p_display_on_storefront BOOLEAN
 )
@@ -183,6 +191,7 @@ BEGIN
         name = p_name,
         description = p_description,
         price = p_price,
+        image_url = p_image_url,
         is_active = p_is_active,
         display_on_storefront = p_display_on_storefront,
         updated_at = NOW()
@@ -198,7 +207,9 @@ BEGIN
             'old_price', v_old_price,
             'new_price', p_price,
             'currency', v_currency,
-            'is_active', p_is_active
+            'is_active', p_is_active,
+            'has_image', p_image_url IS NOT NULL,
+            'display_on_storefront', p_display_on_storefront
         ),
         p_severity := 'NOTICE'
     );
@@ -208,6 +219,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fetch_products(UUID, BOOLEAN) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, BOOLEAN, BOOLEAN) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_product(UUID) TO authenticated;

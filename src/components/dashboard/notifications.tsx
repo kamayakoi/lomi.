@@ -56,7 +56,7 @@ export default function Notifications() {
     return (
         <Popover>
             <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative hover:bg-accent transition-colors duration-200">
+                <Button variant="ghost" size="icon" className="relative hover:bg-accent transition-colors duration-200 rounded-none h-[38px] w-[38px]">
                     <Bell className="h-5 w-5 text-foreground" />
                     {notifications.some(notif => !notif.is_read) && (
                         <span className="absolute top-0 right-0 h-2 w-2 bg-green-500 rounded-full animate-pulse" />

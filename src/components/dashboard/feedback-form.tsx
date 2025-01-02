@@ -62,34 +62,29 @@ export default function FeedbackForm() {
 
     return (
         <div className="relative" ref={formRef}>
-            <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsOpen(!isOpen)}
+                className="border-gray-300 dark:border-gray-700 rounded-none"
             >
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="border-gray-300 dark:border-gray-700"
-                >
-                    Feedback
-                </Button>
-            </motion.div>
+                Feedback
+            </Button>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.3 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.5 }}
-                        transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
-                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg z-50"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#121317] shadow-lg z-50"
                     >
                         <div className="p-4">
                             <Textarea
                                 placeholder="Ideas on how to improve our products. Contact support for technical issues."
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
-                                className="min-h-[100px] mb-4 text-sm placeholder:text-sm bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100"
+                                className="min-h-[100px] mb-4 text-sm placeholder:text-sm bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 rounded-none"
                             />
                             <div className="flex items-center justify-between">
                                 <div className="flex space-x-2">
@@ -97,19 +92,19 @@ export default function FeedbackForm() {
                                         <button
                                             key={key}
                                             onClick={() => setSentiment(key)}
-                                            className={`text-lg p-1 rounded ${sentiment === key ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+                                            className={`text-lg p-1 ${sentiment === key ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
                                         >
                                             {emojis[key]}
                                         </button>
                                     ))}
                                 </div>
                                 <div className="flex space-x-2">
-                                    <Button variant="outline" size="default" onClick={handleClear} title="Clear text" className="px-3">
+                                    <Button variant="outline" size="default" onClick={handleClear} title="Clear text" className="px-3 rounded-none">
                                         <Eraser className="h-4 w-4" />
                                     </Button>
                                     <Button
                                         onClick={handleSubmit}
-                                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 rounded-none"
                                     >
                                         Submit
                                     </Button>

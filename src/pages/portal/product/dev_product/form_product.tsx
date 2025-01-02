@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { createProduct } from './support_product'
+import { createProduct, uploadProductImage } from './support_product'
+import InputRightAddon from "@/components/ui/input-right-addon"
 import { useUser } from '@/lib/hooks/useUser'
-import { supabase } from '@/utils/supabase/client'
+import { Loader2, X, Upload } from 'lucide-react'
 
 interface CreateProductFormProps {
     onClose: () => void
@@ -16,41 +16,68 @@ interface CreateProductFormProps {
 
 interface ProductFormData {
     name: string
-    description: string
+    description: string | null
     price: number
-    currencyCode: string
-    isActive: boolean
+    image: FileList
 }
 
 export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, onSuccess }) => {
     const { user } = useUser()
-    const { register, handleSubmit } = useForm<ProductFormData>()
+    const [isUploading, setIsUploading] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const { register, handleSubmit, setValue, watch } = useForm<ProductFormData>()
 
     const onSubmit = async (data: ProductFormData) => {
-        try {
-            const { data: organizationData, error: organizationError } = await supabase
-                .rpc('fetch_organization_details', { p_merchant_id: user?.id })
+        if (!user?.id) return
 
-            if (organizationError) {
-                console.error('Error fetching organization details:', organizationError)
-                return
+        try {
+            setIsUploading(true)
+            let imageUrl: string | null = null
+
+            // Upload image if selected
+            if (data.image?.[0]) {
+                imageUrl = await uploadProductImage(data.image[0], user.id)
             }
 
             await createProduct({
-                merchantId: user?.id || '',
-                organizationId: organizationData[0].organization_id,
                 name: data.name,
                 description: data.description,
                 price: data.price,
-                currencyCode: 'XOF',
-                isActive: true,
+                image_url: imageUrl,
             })
+
             onSuccess()
             onClose()
         } catch (error) {
             console.error('Error creating product:', error)
+        } finally {
+            setIsUploading(false)
         }
     }
+
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            const url = URL.createObjectURL(file)
+            setPreviewUrl(url)
+        }
+    }
+
+    const handleRemoveImage = (e: React.MouseEvent) => {
+        e.preventDefault()
+        setPreviewUrl(null)
+        // Create an empty DataTransfer to get an empty FileList
+        const dt = new DataTransfer()
+        setValue('image', dt.files)
+    }
+
+    const formatAmount = (amount: number | undefined) => {
+        return amount ? amount.toLocaleString("en-US") : "";
+    };
+
+    const parseAmount = (amount: string) => {
+        return parseFloat(amount.replace(/,/g, ""));
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -59,7 +86,8 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                 <Input
                     id="name"
                     placeholder="Enter product name"
-                    {...register('name')}
+                    {...register('name', { required: true })}
+                    className="rounded-none"
                 />
             </div>
             <div className="space-y-2">
@@ -68,27 +96,86 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                     id="description"
                     placeholder="Enter product description"
                     {...register('description')}
+                    className="rounded-none"
                 />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="price">Price</Label>
-                <div className="flex space-x-2">
-                    <Select>
-                        <SelectTrigger className="w-[80px]">
-                            <SelectValue placeholder="XOF" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="XOF">XOF</SelectItem>
-                            <SelectItem value="USD" disabled>USD</SelectItem>
-                            <SelectItem value="EUR" disabled>EUR</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Input id="price" type="number" placeholder="Enter price" className="flex-1" {...register('price')} />
+                <InputRightAddon
+                    id="price"
+                    type="text"
+                    placeholder="Enter amount"
+                    value={formatAmount(watch("price"))}
+                    onChange={(value) => setValue("price", parseAmount(value))}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="image">Product Image</Label>
+                <div className="mt-1.5">
+                    <div className="flex items-center gap-4">
+                        {previewUrl && (
+                            <div className="relative w-56 h-36 overflow-hidden border border-border">
+                                <img
+                                    src={previewUrl}
+                                    alt="Product preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <button
+                                    onClick={handleRemoveImage}
+                                    className="absolute top-1 right-1 p-1 bg-red-500/90 hover:bg-red-500 text-white transition-colors"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        )}
+                        <label
+                            htmlFor="image"
+                            className="flex flex-col items-center justify-center w-full h-36 cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50"
+                        >
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <Upload className="h-8 w-8 text-gray-400 mb-3" />
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="font-medium">Click to upload</span> or drag and drop
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    PNG, JPG up to 3MB
+                                </p>
+                            </div>
+                            <Input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                {...register('image')}
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
                 </div>
             </div>
-            <div className="flex justify-end">
-                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
-                    Create
+            <div className="flex justify-end space-x-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    disabled={isUploading}
+                    className="px-4 py-2 h-10 rounded-none"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={isUploading}
+                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10 rounded-none"
+                >
+                    {isUploading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating...
+                        </>
+                    ) : (
+                        'Create'
+                    )}
                 </Button>
             </div>
         </form>

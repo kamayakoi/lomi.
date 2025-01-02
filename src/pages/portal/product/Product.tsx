@@ -7,10 +7,8 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { fetchProducts } from './dev_product/support_product'
 import { Product } from './dev_product/types'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateProductForm } from './dev_product/form_product'
 import { ProductFilters } from './dev_product/filters_product'
 import SupportForm from '@/components/dashboard/support-form'
@@ -22,14 +20,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle, ArrowUpDown } from 'lucide-react'
+import { PlusCircle, Edit, ImageIcon, ClipboardList } from 'lucide-react'
 import { useQuery } from 'react-query'
 import ProductActions from './dev_product/actions_product'
 import { EditProductForm } from './dev_product/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
-import { Edit } from 'lucide-react'
+import { fetchProducts } from './dev_product/support_product'
 
 function ProductsPage() {
     const { user } = useUser()
@@ -39,8 +36,8 @@ function ProductsPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
     const [isEditProductOpen, setIsEditProductOpen] = useState(false)
-    const [sortColumn, setSortColumn] = useState<keyof Product | null>(null)
-    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+    const [sortColumn] = useState<keyof Product | null>(null)
+    const [sortDirection] = useState<'asc' | 'desc'>('asc')
 
     const topNav = [
         { title: 'Products', href: '/portal/product', isActive: true },
@@ -75,15 +72,6 @@ function ProductsPage() {
     const handleEditClick = (product: Product) => {
         setSelectedProduct(product)
         setIsEditProductOpen(true)
-    }
-
-    const handleSort = (column: keyof Product) => {
-        if (sortColumn === column) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
-        } else {
-            setSortColumn(column)
-            setSortDirection('asc')
-        }
     }
 
     const sortProducts = (products: Product[]) => {
@@ -124,19 +112,21 @@ function ProductsPage() {
                         <h1 className="text-2xl font-bold tracking-tight">Products</h1>
                         <Dialog open={isCreateProductOpen} onOpenChange={setIsCreateProductOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-none">
                                     <PlusCircle className="mr-2 h-4 w-4" />
-                                    Create Product
+                                    Create
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
+                            <DialogContent className="rounded-none [&::backdrop]:bg-black/30 p-0 border border-border">
+                                <DialogHeader className="p-6 pb-0">
                                     <DialogTitle>Create a product</DialogTitle>
                                     <DialogDescription>
                                         Fill in the details to create a new product.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />
+                                <div className="p-6 pt-4">
+                                    <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />
+                                </div>
                             </DialogContent>
                         </Dialog>
                     </div>
@@ -148,115 +138,119 @@ function ProductsPage() {
                         isRefreshing={isRefreshing}
                     />
 
-                    <Card>
-                        <CardContent className="p-4">
-                            <div className="rounded-md border">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="text-center">
-                                                <Button variant="ghost" onClick={() => handleSort('name')}>
-                                                    Name
-                                                    {sortColumn === 'name' && (
-                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                    )}
-                                                </Button>
-                                            </TableHead>
-                                            <TableHead className="text-center">
-                                                <Button variant="ghost" onClick={() => handleSort('description')}>
-                                                    Description
-                                                    {sortColumn === 'description' && (
-                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                    )}
-                                                </Button>
-                                            </TableHead>
-                                            <TableHead className="text-center">
-                                                <Button variant="ghost" onClick={() => handleSort('price')}>
-                                                    Price
-                                                    {sortColumn === 'price' && (
-                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                    )}
-                                                </Button>
-                                            </TableHead>
-                                            <TableHead className="text-center">
-                                                <Button variant="ghost" onClick={() => handleSort('is_active')}>
-                                                    Status
-                                                    {sortColumn === 'is_active' && (
-                                                        <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                    )}
-                                                </Button>
-                                            </TableHead>
-                                            <TableHead className="text-center"></TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {isProductsLoading ? (
-                                            Array.from({ length: 5 }).map((_, index) => (
-                                                <TableRow key={index}>
-                                                    <TableCell colSpan={4}>
-                                                        <Skeleton className="w-full h-8" />
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        ) : products.length === 0 ? (
-                                            <TableRow>
-                                                <TableCell colSpan={5} className="text-center py-8">
-                                                    <div className="flex flex-col items-center justify-center space-y-4">
-                                                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                            <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                    <Card className="rounded-none">
+                        <CardContent className="p-4 rounded-none">
+                            {isProductsLoading ? (
+                                <div className="space-y-4">
+                                    {Array.from({ length: 6 }).map((_, index) => (
+                                        <div key={index} className="p-4 border border-border">
+                                            <div className="flex gap-4">
+                                                <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
+                                                <div className="flex-grow space-y-2">
+                                                    <Skeleton className="w-1/3 h-6" />
+                                                    <Skeleton className="w-2/3 h-4" />
+                                                    <Skeleton className="w-24 h-4" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : products.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <div className="bg-gray-100 dark:bg-gray-800 p-4">
+                                        <ClipboardList className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                    </div>
+                                    <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                                        No products found
+                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
+                                        Try changing your filter or create a new product.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {sortProducts(products).slice(0, 25).map((product: Product) => (
+                                        <div
+                                            key={product.product_id}
+                                            className="p-4 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer"
+                                            onClick={() => handleProductClick(product)}
+                                        >
+                                            <div className="flex gap-4">
+                                                <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                                    {product.image_url ? (
+                                                        <img
+                                                            src={product.image_url}
+                                                            alt={product.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center">
+                                                            <ImageIcon className="h-12 w-12 text-gray-400" />
                                                         </div>
-                                                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                            No products found
-                                                        </p>
-                                                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                                            Try changing your filter or create a new product.
-                                                        </p>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex-grow h-32 flex flex-col">
+                                                    <div className="flex-1 min-h-0">
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="w-full pr-0">
+                                                                <div className="flex items-center justify-between">
+                                                                    <h3 className="font-medium text-foreground text-lg">{product.name}</h3>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation()
+                                                                            handleEditClick(product)
+                                                                        }}
+                                                                        className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                                    >
+                                                                        <Edit className="h-4.5 w-4.5" />
+                                                                    </button>
+                                                                </div>
+                                                                {product.description && (
+                                                                    <p className="text-sm text-muted-foreground overflow-y-auto max-h-[40px] w-[850px] whitespace-pre-wrap break-words scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800 scrollbar-track-transparent mt-1.5">
+                                                                        {product.description}
+                                                                    </p>
+                                                                )}
+                                                                <div className="mt-1">
+                                                                    <span className="text-lg font-medium">
+                                                                        {product.price.toLocaleString('en-US', {
+                                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                        })}
+                                                                        <span className="text-sm text-muted-foreground ml-1">
+                                                                            {product.currency_code}
+                                                                        </span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        ) : (
-                                            sortProducts(products).map((product: Product) => (
-                                                <TableRow
-                                                    key={product.product_id}
-                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                    onClick={() => handleProductClick(product)}
-                                                >
-                                                    <TableCell className="text-center">{product.name}</TableCell>
-                                                    <TableCell className="text-center">{product.description}</TableCell>
-                                                    <TableCell className="text-center">
-                                                        {product.price.toLocaleString('en-US', {
-                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                        })}{' '}
-                                                        {product.currency_code}
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
+                                                    <div className="flex items-center gap-2">
                                                         <span className={`
-                                                            inline-block px-2 py-1 rounded-full text-xs font-normal
-                                                            ${product.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                            px-3 py-1 text-xs font-medium
+                                                            ${product.is_active
+                                                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
+                                                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                            }
                                                         `}>
                                                             {product.is_active ? 'Active' : 'Inactive'}
                                                         </span>
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                handleEditClick(product)
-                                                            }}
-                                                            className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                                        >
-                                                            <Edit className="h-4 w-4 text-blue-500" />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                                        <span className={`
+                                                            px-3 py-1 text-xs font-medium
+                                                            ${product.display_on_storefront
+                                                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+                                                            }
+                                                        `}>
+                                                            Storefront
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -267,6 +261,7 @@ function ProductsPage() {
                 product={selectedProduct}
                 isOpen={isActionsOpen}
                 onClose={() => setIsActionsOpen(false)}
+                onUpdate={refetch}
             />
 
             <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>

@@ -44,13 +44,13 @@ const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
     return (
         <div ref={selectRef} className="relative">
             <div
-                className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 rounded-md cursor-pointer border border-gray-300 dark:border-gray-700 text-sm"
+                className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 cursor-pointer border border-gray-300 dark:border-gray-700 text-sm"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {value ? options.find((opt: SelectOption) => opt.value === value)?.label : 'Select a category'}
             </div>
             {isOpen && (
-                <div className="absolute top-full left-0 w-full bg-white dark:bg-[#121317] border border-gray-300 dark:border-gray-700 rounded-md mt-1 z-10 text-sm">
+                <div className="absolute top-full left-0 w-full bg-white dark:bg-[#121317] border border-gray-300 dark:border-gray-700 mt-1 z-10 text-sm">
                     {options.map((option: SelectOption) => (
                         <div
                             key={option.value}
@@ -159,7 +159,7 @@ export default function SupportForm() {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 z-50" ref={formRef}>
+        <div className="fixed bottom-4 right-[calc(1rem+18px)] z-50" ref={formRef}>
             <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -168,9 +168,9 @@ export default function SupportForm() {
                     variant="default"
                     size="icon"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="rounded-full h-14 w-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                    className="h-[40px] w-[40px] rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
                 >
-                    <MessageCircle className="h-6 w-6" />
+                    <MessageCircle className="h-5 w-5" />
                 </Button>
             </motion.div>
             <AnimatePresence>
@@ -180,7 +180,7 @@ export default function SupportForm() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 50, scale: 0.5 }}
                         transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
-                        className="absolute bottom-20 right-0 w-80 bg-white dark:bg-[#121317] rounded-md shadow-lg overflow-hidden"
+                        className="absolute bottom-20 right-0 w-80 bg-white dark:bg-[#121317] rounded-none shadow-lg overflow-hidden"
                         style={{ zIndex: 9999 }}
                     >
                         <div className="p-4 space-y-4">
@@ -213,7 +213,7 @@ export default function SupportForm() {
                                             onChange={(e) => setMessage(e.target.value)}
                                             onDrop={handleDrop}
                                             onDragOver={(e) => e.preventDefault()}
-                                            className="min-h-[100px] max-h-[200px] text-sm placeholder:text-sm pr-8 bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 resize-y"
+                                            className="min-h-[100px] max-h-[200px] text-sm placeholder:text-sm pr-8 bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 resize-y rounded-none"
                                         />
                                         <Button
                                             variant="ghost"
@@ -236,7 +236,7 @@ export default function SupportForm() {
                                             Image attached: {image.name}
                                         </div>
                                     )}
-                                    <Button onClick={handleSubmit} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
+                                    <Button onClick={handleSubmit} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 rounded-none">
                                         Submit
                                     </Button>
                                 </>

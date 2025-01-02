@@ -81,3 +81,30 @@ FOR DELETE TO authenticated USING (
     bucket_id = 'kyc_documents' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
+
+-- Create the 'product_images' bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product_images', 'product_images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Policy for selecting (reading) product images
+CREATE POLICY "Allow public read access to product images" ON storage.objects
+FOR SELECT USING (bucket_id = 'product_images');
+
+-- Policy for inserting (uploading) product images
+CREATE POLICY "Allow authenticated users to upload product images" ON storage.objects
+FOR INSERT TO authenticated WITH CHECK (bucket_id = 'product_images');
+
+-- Policy for updating product images
+CREATE POLICY "Allow authenticated users to update their own product images" ON storage.objects
+FOR UPDATE TO authenticated USING (
+    bucket_id = 'product_images' 
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Policy for deleting product images
+CREATE POLICY "Allow authenticated users to delete their own product images" ON storage.objects
+FOR DELETE TO authenticated USING (
+    bucket_id = 'product_images' 
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);
