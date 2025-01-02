@@ -978,8 +978,8 @@ CREATE TABLE organization_checkout_settings (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Organization Fee Types table
-CREATE TABLE organization_fee_types (
+-- Organization Fees table
+CREATE TABLE organization_fees (
     fee_type_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     name VARCHAR(255) NOT NULL,
@@ -991,8 +991,6 @@ CREATE TABLE organization_fee_types (
 );
 
 -- Indexes
-CREATE INDEX idx_organization_checkout_settings_org_id ON organization_checkout_settings(organization_id);
-CREATE INDEX idx_organization_fee_types_org_id ON organization_fee_types(organization_id);
+CREATE INDEX idx_organization_fees_org_id ON organization_fees(organization_id);
 
-COMMENT ON TABLE organization_checkout_settings IS 'Stores checkout configuration for organizations';
-COMMENT ON TABLE organization_fee_types IS 'Stores custom fee types defined by organizations';
+COMMENT ON TABLE organization_fees IS 'Stores custom fees defined by organizations';

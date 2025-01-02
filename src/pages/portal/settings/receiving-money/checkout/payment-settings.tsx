@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Info } from 'lucide-react'
 import { toast } from "@/components/ui/use-toast"
 import { type CheckoutSettings } from '@/lib/types/checkoutsettings'
+import { supabase } from '@/utils/supabase/client'
 
 interface PaymentSettingsProps {
     settings: CheckoutSettings | null;
@@ -20,23 +21,71 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
     const [displayCurrency, setDisplayCurrency] = useState(settings?.display_currency || 'XOF')
     const [paymentLinkDuration, setPaymentLinkDuration] = useState(settings?.payment_link_duration || 1)
     const [isSaving, setIsSaving] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (settings) {
-            setDefaultLanguage(settings.default_language)
-            setDisplayCurrency(settings.display_currency)
-            setPaymentLinkDuration(settings.payment_link_duration)
+        const fetchSettings = async () => {
+            try {
+                if (!settings?.organization_id) return
+
+                setIsLoading(true)
+                const { data, error } = await supabase
+                    .rpc('fetch_organization_checkout_settings', {
+                        p_organization_id: settings.organization_id
+                    })
+
+                if (error) throw error
+
+                if (data && data[0]) {
+                    setDefaultLanguage(data[0].default_language)
+                    setDisplayCurrency(data[0].display_currency)
+                    setPaymentLinkDuration(data[0].payment_link_duration)
+                }
+            } catch (error) {
+                console.error('Error fetching payment settings:', error)
+                toast({
+                    title: "Error",
+                    description: "Failed to load payment settings",
+                    variant: "destructive",
+                })
+            } finally {
+                setIsLoading(false)
+            }
         }
-    }, [settings])
+
+        fetchSettings()
+    }, [settings?.organization_id])
 
     const handleSave = async () => {
+        if (!settings?.organization_id) {
+            toast({
+                title: "Error",
+                description: "Organization ID is required",
+                variant: "destructive",
+            })
+            return
+        }
+
+        setIsSaving(true)
         try {
-            setIsSaving(true)
+            const { error } = await supabase.rpc('update_organization_checkout_settings', {
+                p_organization_id: settings.organization_id,
+                p_settings: {
+                    default_language: defaultLanguage,
+                    display_currency: displayCurrency,
+                    payment_link_duration: paymentLinkDuration
+                }
+            })
+
+            if (error) throw error
+
             await onUpdate({
+                organization_id: settings.organization_id,
                 default_language: defaultLanguage,
                 display_currency: displayCurrency,
                 payment_link_duration: paymentLinkDuration
             })
+
             toast({
                 title: "Success",
                 description: "Payment settings updated successfully",
@@ -45,12 +94,20 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
             console.error('Error saving payment settings:', error)
             toast({
                 title: "Error",
-                description: "Failed to update payment settings",
+                description: error instanceof Error ? error.message : "Failed to update payment settings",
                 variant: "destructive",
             })
         } finally {
             setIsSaving(false)
         }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-[200px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        )
     }
 
     return (
@@ -65,10 +122,10 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                         <div className="space-y-2">
                             <Label htmlFor="defaultLanguage">Default Language</Label>
                             <Select value={defaultLanguage} onValueChange={setDefaultLanguage}>
-                                <SelectTrigger id="defaultLanguage">
+                                <SelectTrigger id="defaultLanguage" className="rounded-none">
                                     <SelectValue placeholder="Select language" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="rounded-none">
                                     <SelectItem value="en">English</SelectItem>
                                     <SelectItem value="fr">French</SelectItem>
                                 </SelectContent>
@@ -77,10 +134,10 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                         <div className="space-y-2">
                             <Label htmlFor="displayCurrency">Display Currency</Label>
                             <Select value={displayCurrency} onValueChange={setDisplayCurrency}>
-                                <SelectTrigger id="displayCurrency">
+                                <SelectTrigger id="displayCurrency" className="rounded-none">
                                     <SelectValue placeholder="Select currency" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="rounded-none">
                                     <SelectItem value="XOF">XOF</SelectItem>
                                     <SelectItem value="USD" disabled>USD (Coming soon)</SelectItem>
                                     <SelectItem value="EUR" disabled>EUR (Coming soon)</SelectItem>
@@ -105,17 +162,32 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                         <Input
                             id="paymentLinkDuration"
                             type="number"
-                            value={paymentLinkDuration}
-                            onChange={(e) => setPaymentLinkDuration(Number(e.target.value))}
-                            min={1}
-                            max={30}
+                            value={paymentLinkDuration || ''}
+                            onChange={(e) => {
+                                const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                                if (value === '') {
+                                    setPaymentLinkDuration(0);
+                                } else if (!isNaN(value)) {
+                                    if (value > 30) setPaymentLinkDuration(30);
+                                    else if (value < 1) setPaymentLinkDuration(1);
+                                    else setPaymentLinkDuration(value);
+                                }
+                            }}
+                            onBlur={(e) => {
+                                const value = parseInt(e.target.value);
+                                if (isNaN(value) || value < 1) {
+                                    setPaymentLinkDuration(1);
+                                }
+                            }}
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="Enter days (1-30)"
                         />
                     </div>
                 </CardContent>
                 <CardFooter>
                     <Button
                         onClick={handleSave}
-                        className="ml-auto"
+                        className="ml-auto rounded-none"
                         disabled={isSaving}
                     >
                         {isSaving ? 'Saving...' : 'Save Changes'}

@@ -6,7 +6,8 @@ RETURNS TABLE (
     display_currency currency_code,
     payment_link_duration INTEGER,
     customer_notifications JSONB,
-    merchant_recipients JSONB
+    merchant_recipients JSONB,
+    fee_types JSONB
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -16,9 +17,104 @@ BEGIN
         ocs.display_currency,
         ocs.payment_link_duration,
         ocs.customer_notifications,
-        ocs.merchant_recipients
+        ocs.merchant_recipients,
+        COALESCE(
+            (
+                SELECT jsonb_agg(jsonb_build_object(
+                    'id', of.fee_type_id,
+                    'name', of.name,
+                    'percentage', of.percentage,
+                    'enabled', of.is_enabled
+                ))
+                FROM organization_fees of
+                WHERE of.organization_id = ocs.organization_id
+            ),
+            '[]'::jsonb
+        ) as fee_types
     FROM organization_checkout_settings ocs
     WHERE ocs.organization_id = p_organization_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to manage organization fees
+CREATE OR REPLACE FUNCTION public.manage_organization_fee(
+    p_organization_id UUID,
+    p_fee_type_id UUID DEFAULT NULL,
+    p_name VARCHAR DEFAULT NULL,
+    p_percentage NUMERIC DEFAULT NULL,
+    p_is_enabled BOOLEAN DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+    v_fee_type_id UUID;
+BEGIN
+    -- If fee_type_id is provided, try to update, if not found then insert
+    IF p_fee_type_id IS NOT NULL THEN
+        UPDATE organization_fees
+        SET
+            name = COALESCE(p_name, name),
+            percentage = COALESCE(p_percentage, percentage),
+            is_enabled = COALESCE(p_is_enabled, is_enabled),
+            updated_at = NOW()
+        WHERE fee_type_id = p_fee_type_id AND organization_id = p_organization_id
+        RETURNING fee_type_id INTO v_fee_type_id;
+        
+        -- If update didn't find the record, insert a new one with the provided ID
+        IF v_fee_type_id IS NULL THEN
+            INSERT INTO organization_fees (
+                fee_type_id,
+                organization_id,
+                name,
+                percentage,
+                is_enabled
+            )
+            VALUES (
+                p_fee_type_id,
+                p_organization_id,
+                p_name,
+                COALESCE(p_percentage, 0),
+                COALESCE(p_is_enabled, true)
+            )
+            RETURNING fee_type_id INTO v_fee_type_id;
+        END IF;
+    -- If no fee_type_id, create new fee
+    ELSE
+        INSERT INTO organization_fees (
+            organization_id,
+            name,
+            percentage,
+            is_enabled
+        )
+        VALUES (
+            p_organization_id,
+            p_name,
+            COALESCE(p_percentage, 0),
+            COALESCE(p_is_enabled, true)
+        )
+        RETURNING fee_type_id INTO v_fee_type_id;
+    END IF;
+
+    RETURN v_fee_type_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to delete organization fee
+CREATE OR REPLACE FUNCTION public.delete_organization_fee(
+    p_organization_id UUID,
+    p_fee_type_id UUID
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_deleted BOOLEAN;
+BEGIN
+    WITH deleted AS (
+        DELETE FROM organization_fees
+        WHERE organization_id = p_organization_id AND fee_type_id = p_fee_type_id
+        RETURNING *
+    )
+    SELECT EXISTS (SELECT 1 FROM deleted) INTO v_deleted;
+
+    RETURN v_deleted;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

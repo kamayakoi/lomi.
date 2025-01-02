@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { PlusCircle } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { type CheckoutSettings, type FeeType } from '@/lib/types/checkoutsettings'
+import { supabase } from '@/utils/supabase/client'
 
 interface FeeSettingsProps {
     settings: CheckoutSettings | null;
@@ -17,32 +18,66 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
     const [newFeeType, setNewFeeType] = useState('')
     const [feeTypes, setFeeTypes] = useState<FeeType[]>([])
     const [isSaving, setIsSaving] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (settings?.fee_types) {
-            setFeeTypes(settings.fee_types)
-        } else {
-            // Default fee types if none exist
-            setFeeTypes([
-                { id: '1', name: 'Admin Fee', enabled: false, percentage: 0 },
-                { id: '2', name: 'Shipping Fee', enabled: false, percentage: 0 },
-                { id: '3', name: 'Discount', enabled: false, percentage: 0 },
-                { id: '4', name: 'Tax', enabled: false, percentage: 0 },
-            ])
+        const fetchFeeTypes = async () => {
+            try {
+                if (!settings?.organization_id) return
+
+                setIsLoading(true)
+                const { data, error } = await supabase
+                    .rpc('fetch_organization_checkout_settings', {
+                        p_organization_id: settings.organization_id
+                    })
+
+                if (error) throw error
+
+                if (data && data[0]?.fee_types) {
+                    setFeeTypes(data[0].fee_types)
+                }
+            } catch (error) {
+                console.error('Error fetching fee types:', error)
+                toast({
+                    title: "Error",
+                    description: "Failed to load fee settings",
+                    variant: "destructive",
+                })
+            } finally {
+                setIsLoading(false)
+            }
         }
-    }, [settings])
+
+        fetchFeeTypes()
+    }, [settings?.organization_id])
 
     const handleAddFeeType = () => {
-        if (newFeeType) {
-            const newFee = {
-                id: Date.now().toString(),
-                name: newFeeType,
-                enabled: false,
-                percentage: 5
-            }
-            setFeeTypes([...feeTypes, newFee])
-            setNewFeeType('')
+        if (!newFeeType.trim()) {
+            toast({
+                title: "Error",
+                description: "Fee type name cannot be empty",
+                variant: "destructive",
+            })
+            return
         }
+
+        if (feeTypes.some(fee => fee.name.toLowerCase() === newFeeType.toLowerCase())) {
+            toast({
+                title: "Error",
+                description: "A fee type with this name already exists",
+                variant: "destructive",
+            })
+            return
+        }
+
+        const newFee = {
+            id: crypto.randomUUID(),
+            name: newFeeType.trim(),
+            enabled: false,
+            percentage: 5
+        }
+        setFeeTypes([...feeTypes, newFee])
+        setNewFeeType('')
     }
 
     const handleToggleFeeType = (id: string) => {
@@ -51,32 +86,84 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
         ))
     }
 
-    const handlePercentageChange = (id: string, value: number) => {
-        setFeeTypes(feeTypes.map(fee =>
-            fee.id === id ? { ...fee, percentage: Math.min(Math.max(value, 0), 30) } : fee
-        ))
+    const handlePercentageChange = (id: string, value: string) => {
+        const numValue = value === '' ? '' : parseInt(value)
+        setFeeTypes(feeTypes.map(fee => {
+            if (fee.id !== id) return fee
+            if (numValue === '') {
+                return { ...fee, percentage: 0 }
+            }
+            if (!isNaN(numValue)) {
+                if (numValue > 100) return { ...fee, percentage: 100 }
+                if (numValue < 1) return { ...fee, percentage: 1 }
+                return { ...fee, percentage: numValue }
+            }
+            return fee
+        }))
+    }
+
+    const handlePercentageBlur = (id: string) => {
+        setFeeTypes(feeTypes.map(fee => {
+            if (fee.id === id && fee.percentage < 1) {
+                return { ...fee, percentage: 1 }
+            }
+            return fee
+        }))
     }
 
     const handleSave = async () => {
+        if (!settings?.organization_id) {
+            toast({
+                title: "Error",
+                description: "Organization ID is required",
+                variant: "destructive",
+            })
+            return
+        }
+
+        setIsSaving(true)
         try {
-            setIsSaving(true)
+            // Save each fee type
+            for (const fee of feeTypes) {
+                const { error } = await supabase.rpc('manage_organization_fee', {
+                    p_organization_id: settings.organization_id,
+                    p_fee_type_id: fee.id,
+                    p_name: fee.name,
+                    p_percentage: Number(fee.percentage),
+                    p_is_enabled: Boolean(fee.enabled)
+                })
+
+                if (error) throw error
+            }
+
+            // Update parent component
             await onUpdate({
+                organization_id: settings.organization_id,
                 fee_types: feeTypes
             })
+
             toast({
                 title: "Success",
                 description: "Fee settings updated successfully",
             })
         } catch (error) {
-            console.error('Error saving fee settings:', error)
+            console.error('Error saving fees:', error)
             toast({
                 title: "Error",
-                description: "Failed to update fee settings",
+                description: error instanceof Error ? error.message : "Failed to update fee settings",
                 variant: "destructive",
             })
         } finally {
             setIsSaving(false)
         }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-[200px]">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        )
     }
 
     return (
@@ -93,6 +180,12 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                             value={newFeeType}
                             onChange={(e) => setNewFeeType(e.target.value)}
                             className="flex-grow rounded-none"
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    handleAddFeeType()
+                                }
+                            }}
                         />
                         <Button
                             onClick={handleAddFeeType}
@@ -124,11 +217,11 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                                 <div className="flex items-center space-x-2">
                                     <Input
                                         type="number"
-                                        value={fee.percentage}
-                                        onChange={(e) => handlePercentageChange(fee.id, Number(e.target.value))}
-                                        className="w-20 h-8 text-right text-sm rounded-none"
-                                        min={0}
-                                        max={30}
+                                        value={fee.percentage || ''}
+                                        onChange={(e) => handlePercentageChange(fee.id, e.target.value)}
+                                        onBlur={() => handlePercentageBlur(fee.id)}
+                                        className="w-20 h-8 text-right text-sm rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                        placeholder="1-100"
                                         disabled={!fee.enabled}
                                     />
                                     <span className="text-sm text-muted-foreground">%</span>

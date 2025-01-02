@@ -22,15 +22,26 @@ function CheckoutSettingsPage() {
 
     const fetchCheckoutSettings = useCallback(async () => {
         try {
+            const orgId = sidebarData?.organization_id;
+            if (!orgId || typeof orgId !== 'string') {
+                throw new Error('Organization ID is required');
+            }
+
+            console.log('Fetching settings with org ID:', orgId);
             const { data, error } = await supabase
                 .rpc('fetch_organization_checkout_settings', {
-                    p_organization_id: sidebarData?.organization_id
+                    p_organization_id: orgId
                 })
 
             if (error) throw error
 
             if (data) {
-                setSettings(data)
+                console.log('Received settings:', data);
+                // Ensure organization_id is included in the settings
+                setSettings({
+                    ...data,
+                    organization_id: orgId
+                })
             }
         } catch (err) {
             console.error('Error fetching checkout settings:', err)
@@ -48,16 +59,31 @@ function CheckoutSettingsPage() {
 
     const handleSettingsUpdate = async (updatedSettings: Partial<CheckoutSettings>) => {
         try {
+            const orgId = sidebarData?.organization_id;
+            if (!orgId || typeof orgId !== 'string') {
+                throw new Error('Organization ID is required');
+            }
+
+            console.log('Updating settings:', updatedSettings);
+            console.log('Current organization ID:', orgId);
+
             const { error } = await supabase
                 .rpc('update_organization_checkout_settings', {
-                    p_organization_id: sidebarData?.organization_id,
+                    p_organization_id: orgId,
                     p_settings: updatedSettings
                 })
 
             if (error) throw error
 
-            // Update local state
-            setSettings(prev => prev ? { ...prev, ...updatedSettings } : null)
+            // Update local state with organization_id
+            setSettings(prev => {
+                if (!prev) return null;
+                return {
+                    ...prev,
+                    ...updatedSettings,
+                    organization_id: orgId
+                };
+            });
         } catch (err) {
             console.error('Error updating checkout settings:', err)
             throw err
