@@ -55,7 +55,7 @@ export default function Providers() {
             {sortedIntegrations.map((integration, index) => (
               <li
                 key={index}
-                className='rounded-lg border p-6 hover:shadow-md'
+                className='rounded-none border p-6 hover:shadow-md'
               >
                 <div className='mb-8 flex items-center justify-between'>
                   <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-black'>
@@ -66,7 +66,7 @@ export default function Providers() {
                   <Button
                     variant='outline'
                     size='sm'
-                    className='flex items-center px-4 py-2 text-sm font-medium'
+                    className='flex items-center px-4 py-2 text-sm font-medium rounded-none'
                     onClick={() => handleInstallClick(integration.installLink)}
                   >
                     Install
@@ -85,7 +85,7 @@ export default function Providers() {
             ))}
 
             {/* More Integrations Card - Spans 2 columns */}
-            <li className="rounded-lg border p-6 relative overflow-hidden hover:shadow-md md:col-span-2 lg:col-span-2">
+            <li className="rounded-none border p-6 relative overflow-hidden hover:shadow-md md:col-span-2 lg:col-span-2">
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200 dark:bg-amber-700 rounded-full -mr-16 -mt-16 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-200 dark:bg-emerald-700 rounded-full -ml-12 -mb-12 opacity-50"></div>
               <div className="relative z-10">
@@ -95,7 +95,7 @@ export default function Providers() {
                 </p>
                 <a
                   href="mailto:hello@lomi.africa?subject=Integration Request"
-                  className="bg-amber-500 text-white px-4 py-2 rounded-md inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg"
+                  className="bg-amber-500 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <IconPlus className="mr-2 h-4 w-4" />
                   Request an integration

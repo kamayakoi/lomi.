@@ -8,6 +8,7 @@ interface SubscriptionFiltersProps {
     setSelectedStatus?: (status: string | null) => void
     refetch: () => void
     isRefreshing: boolean
+    tabsList?: React.ReactNode
 }
 
 export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
@@ -15,10 +16,12 @@ export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
     setSelectedStatus,
     refetch,
     isRefreshing,
+    tabsList
 }) => {
     return (
         <div className='my-4 flex items-center justify-between sm:my-0'>
             <div className='flex items-center space-x-4'>
+                {tabsList}
                 <div className='relative w-60'>
                     <Input
                         placeholder='Search subscriptions...'

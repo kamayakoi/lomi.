@@ -170,7 +170,7 @@ function ProductsPage() {
                                 </div>
                             ) : products.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12">
-                                    <div className="bg-gray-100 dark:bg-gray-800 p-4">
+                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                                         <ClipboardList className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                     </div>
                                     <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">

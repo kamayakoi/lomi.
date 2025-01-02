@@ -38,35 +38,35 @@ export default function Dashboard() {
           <h1 className='text-2xl font-bold mb-6'>Getting Started</h1>
           <div className="grid md:grid-cols-2 gap-6">
             <Link to="/portal/settings/developers/api-keys" className="block">
-              <Card className="bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200">
+              <Card className="rounded-none bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">Manage API keys</CardTitle>
                   <Settings2 className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">View and manage your API keys.</p>
-                  <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
+                  <Button variant="link" className="rounded-none p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
                     Technical
                   </Button>
                 </CardContent>
               </Card>
             </Link>
             <Link to="/portal/settings/developers/webhooks" className="block">
-              <Card className="bg-sky-100 dark:bg-sky-800 hover:bg-sky-200 dark:hover:bg-sky-700 transition-colors duration-200">
+              <Card className="rounded-none bg-sky-100 dark:bg-sky-800 hover:bg-sky-200 dark:hover:bg-sky-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">Set callback URLs</CardTitle>
                   <ArrowRight className="h-6 w-6" />
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Set up your Callback URLs for us to inform you of successful payments.</p>
-                  <Button variant="link" className="p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
+                  <Button variant="link" className="rounded-none p-0 h-auto font-normal text-blue-600 dark:text-blue-400">
                     Technical
                   </Button>
                 </CardContent>
               </Card>
             </Link>
             <Link to="/portal/payment-links" className="block">
-              <Card className="bg-emerald-100 dark:bg-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
+              <Card className="rounded-none bg-emerald-100 dark:bg-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">Create payment links</CardTitle>
                   <LinkIcon className="h-6 w-6" />
@@ -77,7 +77,7 @@ export default function Dashboard() {
               </Card>
             </Link>
             <Link to="/portal/integrations" className="block">
-              <Card className="bg-violet-100 dark:bg-violet-800 hover:bg-violet-200 dark:hover:bg-violet-700 transition-colors duration-200">
+              <Card className="rounded-none bg-violet-100 dark:bg-violet-800 hover:bg-violet-200 dark:hover:bg-violet-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">Set integrations</CardTitle>
                   <Plug className="h-6 w-6" />
@@ -98,7 +98,7 @@ export default function Dashboard() {
               {developerResources.map((item, index) => (
                 <a key={index} href={item.link} target="_blank" rel="noopener noreferrer" className="block group">
                   <div className="w-64 p-1">
-                    <Card className="h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200 group-hover:bg-gray-100 dark:group-hover:bg-gray-800">
+                    <Card className="rounded-none h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200 group-hover:bg-gray-100 dark:group-hover:bg-gray-800">
                       <CardContent className="pt-6 h-full flex flex-col relative">
                         <div className="relative z-10">
                           {item.icon}

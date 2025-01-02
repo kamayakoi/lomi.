@@ -213,229 +213,227 @@ function SubscriptionsPage() {
           </div>
 
           <Tabs defaultValue="plans">
-            <TabsList className="rounded-none">
-              <TabsTrigger value="plans" className="rounded-none">Plans</TabsTrigger>
-              <TabsTrigger value="subscriptions" className="rounded-none">Subscriptions</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="plans">
-              <SubscriptionFilters
-                refetch={handleRefresh}
-                isRefreshing={isRefreshing}
-              />
-
-              <Card className="mt-4 rounded-none">
-                <CardContent className="p-4">
-                  <div className="border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
-                              Name
-                              {sortColumn === 'name' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('description')} className="rounded-none">
-                              Description
-                              {sortColumn === 'description' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
-                              Price
-                              {sortColumn === 'amount' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('billing_frequency')} className="rounded-none">
-                              Frequency
-                              {sortColumn === 'billing_frequency' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {isSubscriptionPlansLoading ? (
-                          Array.from({ length: 5 }).map((_, index) => (
-                            <TableRow key={index}>
-                              <TableCell colSpan={5}>
-                                <Skeleton className="w-full h-8 rounded-none" />
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : subscriptionPlans.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center py-8">
-                              <div className="flex flex-col items-center justify-center space-y-4">
-                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                  <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                </div>
-                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                  No subscription plans found
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                  Try changing your filter or create a new plan.
-                                </p>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          sortSubscriptionPlans(subscriptionPlans).map((plan: SubscriptionPlan) => (
-                            <TableRow
-                              key={plan.plan_id}
-                              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                              onClick={(e) => {
-                                if (!(e.target instanceof HTMLButtonElement)) {
-                                  handlePlanClick(plan);
-                                }
-                              }}
-                            >
-                              <TableCell className="text-center">{plan.name}</TableCell>
-                              <TableCell className="text-center">{plan.description}</TableCell>
-                              <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
-                              <TableCell className="text-center">
-                                <span className={`inline-block px-2 py-1 text-xs font-normal rounded-none ${frequencyColors[plan.billing_frequency]}`}>
-                                  {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <div className="flex justify-center space-x-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEditPlanClick(plan);
-                                    }}
-                                    className="rounded-none"
-                                  >
-                                    <Edit className="h-4 w-4 text-blue-500" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="subscriptions">
+            <div className="space-y-4">
               <SubscriptionFilters
                 selectedStatus={selectedStatus}
                 setSelectedStatus={setSelectedStatus}
                 refetch={handleRefresh}
                 isRefreshing={isRefreshing}
+                tabsList={
+                  <TabsList className="rounded-none">
+                    <TabsTrigger value="plans" className="rounded-none">Plans</TabsTrigger>
+                    <TabsTrigger value="subscriptions" className="rounded-none">Subscriptions</TabsTrigger>
+                  </TabsList>
+                }
               />
 
-              <Card className="mt-4 rounded-none">
-                <CardContent className="p-4">
-                  <div className="border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
-                              Customer
-                              {sortColumn === 'customer_name' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
-                              Plan
-                              {sortColumn === 'plan_name' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
-                              Price
-                              {sortColumn === 'amount' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
-                              Status
-                              {sortColumn === 'status' && (
-                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                              )}
-                            </Button>
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {isSubscriptionsLoading ? (
-                          Array.from({ length: 5 }).map((_, index) => (
-                            <TableRow key={index}>
-                              <TableCell colSpan={4}>
-                                <Skeleton className="w-full h-8 rounded-none" />
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : subscriptions.length === 0 ? (
+              <TabsContent value="plans">
+                <Card className="rounded-none">
+                  <CardContent className="p-4">
+                    <div className="border">
+                      <Table>
+                        <TableHeader>
                           <TableRow>
-                            <TableCell colSpan={4} className="text-center py-8">
-                              <div className="flex flex-col items-center justify-center space-y-4">
-                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                  <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                </div>
-                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                  No subscriptions found
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                  Try changing your filter or create a new subscription.
-                                </p>
-                              </div>
-                            </TableCell>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
+                                Name
+                                {sortColumn === 'name' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('description')} className="rounded-none">
+                                Description
+                                {sortColumn === 'description' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
+                                Price
+                                {sortColumn === 'amount' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('billing_frequency')} className="rounded-none">
+                                Frequency
+                                {sortColumn === 'billing_frequency' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center"></TableHead>
                           </TableRow>
-                        ) : (
-                          sortSubscriptions(subscriptions).map((subscription: Subscription) => (
-                            <TableRow
-                              key={subscription.subscription_id}
-                              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                              onClick={() => handleSubscriptionClick(subscription)}
-                            >
-                              <TableCell className="text-center">{subscription.customer_name}</TableCell>
-                              <TableCell className="text-center">{subscription.plan_name}</TableCell>
-                              <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
-                              <TableCell className="text-center">
-                                <span className={`
-                                  inline-block px-2 py-1 text-xs font-normal rounded-none
-                                  ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                  ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                  ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                `}>
-                                  {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                                </span>
+                        </TableHeader>
+                        <TableBody>
+                          {isSubscriptionPlansLoading ? (
+                            Array.from({ length: 5 }).map((_, index) => (
+                              <TableRow key={index}>
+                                <TableCell colSpan={5}>
+                                  <Skeleton className="w-full h-8 rounded-none" />
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          ) : subscriptionPlans.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={5} className="text-center py-8">
+                                <div className="flex flex-col items-center justify-center space-y-4">
+                                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                  </div>
+                                  <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                    No subscription plans found
+                                  </p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                    Try changing your filter or create a new plan.
+                                  </p>
+                                </div>
                               </TableCell>
                             </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                          ) : (
+                            sortSubscriptionPlans(subscriptionPlans).map((plan: SubscriptionPlan) => (
+                              <TableRow
+                                key={plan.plan_id}
+                                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                onClick={(e) => {
+                                  if (!(e.target instanceof HTMLButtonElement)) {
+                                    handlePlanClick(plan);
+                                  }
+                                }}
+                              >
+                                <TableCell className="text-center">{plan.name}</TableCell>
+                                <TableCell className="text-center">{plan.description}</TableCell>
+                                <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
+                                <TableCell className="text-center">
+                                  <span className={`inline-block px-2 py-1 text-xs font-normal rounded-none ${frequencyColors[plan.billing_frequency]}`}>
+                                    {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <div className="flex justify-center space-x-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditPlanClick(plan);
+                                      }}
+                                      className="rounded-none"
+                                    >
+                                      <Edit className="h-4 w-4 text-blue-500" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="subscriptions">
+                <Card className="rounded-none">
+                  <CardContent className="p-4">
+                    <div className="border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
+                                Customer
+                                {sortColumn === 'customer_name' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
+                                Plan
+                                {sortColumn === 'plan_name' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
+                                Price
+                                {sortColumn === 'amount' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                            <TableHead className="text-center">
+                              <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
+                                Status
+                                {sortColumn === 'status' && (
+                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                )}
+                              </Button>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {isSubscriptionsLoading ? (
+                            Array.from({ length: 5 }).map((_, index) => (
+                              <TableRow key={index}>
+                                <TableCell colSpan={4}>
+                                  <Skeleton className="w-full h-8 rounded-none" />
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          ) : subscriptions.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center py-8">
+                                <div className="flex flex-col items-center justify-center space-y-4">
+                                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                  </div>
+                                  <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                    No subscriptions found
+                                  </p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                    Try changing your filter or create a new subscription.
+                                  </p>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            sortSubscriptions(subscriptions).map((subscription: Subscription) => (
+                              <TableRow
+                                key={subscription.subscription_id}
+                                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                onClick={() => handleSubscriptionClick(subscription)}
+                              >
+                                <TableCell className="text-center">{subscription.customer_name}</TableCell>
+                                <TableCell className="text-center">{subscription.plan_name}</TableCell>
+                                <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
+                                <TableCell className="text-center">
+                                  <span className={`
+                                    inline-block px-2 py-1 text-xs font-normal rounded-none
+                                    ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                    ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                    ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                  `}>
+                                    {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                                  </span>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </div>
           </Tabs>
         </div>
       </Layout.Body>

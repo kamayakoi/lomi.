@@ -29,8 +29,8 @@ export default function ApiKeysSection() {
     }, [organizationId]);
 
     return (
-        <div className="w-64 p-1">
-            <Card className="h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+        <div className="w-full h-full mt-1">
+            <Card className="rounded-none h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
                 <CardContent className="pt-6 h-full flex flex-col relative">
                     <div className="absolute inset-0 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800" />
                     <div className="relative z-10">
@@ -41,13 +41,13 @@ export default function ApiKeysSection() {
                                 type="text"
                                 value={apiKey ? `${apiKey.slice(0, 8)}...` : 'Key not available'}
                                 readOnly
-                                className="pr-10 font-mono text-xs"
+                                className="rounded-none pr-10 font-mono text-xs"
                             />
                             <a href="/portal/settings/developers/api-keys">
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
+                                    className="rounded-none absolute right-1 top-1/2 -translate-y-1/2 h-7 px-2"
                                 >
                                     <ArrowRight className="h-4 w-4" />
                                     <span className="sr-only">Generate New Key</span>

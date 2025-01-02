@@ -148,7 +148,7 @@ export default function PaymentChannels() {
               return (
                 <li
                   key={provider.provider_code}
-                  className='rounded-lg border p-6 hover:shadow-md flex flex-col'
+                  className='rounded-none border p-6 hover:shadow-md flex flex-col'
                 >
                   <div className='mb-6 flex items-center justify-between'>
                     <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-black'>
@@ -159,7 +159,7 @@ export default function PaymentChannels() {
                     <Button
                       variant={isConnected ? 'default' : 'outline'}
                       size='sm'
-                      className='flex items-center px-4 py-2 text-sm font-medium'
+                      className='flex items-center px-4 py-2 text-sm font-medium rounded-none'
                       onClick={() => {
                         if (isConnected) {
                           handleDisconnectClick(provider.provider_code)
@@ -193,7 +193,7 @@ export default function PaymentChannels() {
             })}
 
             {/* Coming Soon panel as a grid item */}
-            <li className="rounded-lg border p-6 relative overflow-hidden hover:shadow-md md:col-span-2 lg:col-span-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
+            <li className="rounded-none border p-6 relative overflow-hidden hover:shadow-md md:col-span-2 lg:col-span-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
               <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-full -mr-20 -mt-20 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-full -ml-16 -mb-16 opacity-50"></div>
 
@@ -207,7 +207,7 @@ export default function PaymentChannels() {
                 <div className="flex space-x-4">
                   <a
                     href="mailto:hello@lomi.africa?subject=New Payment Channel Request"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-700"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-700"
                   >
                     <IconPlus className="mr-2 h-4 w-4" />
                     Request a new channel
