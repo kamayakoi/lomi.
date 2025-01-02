@@ -6,7 +6,7 @@ import { useNotifications } from '@/lib/hooks/useNotifications'
 
 const NotificationIcon = ({ type }: { type: string }) => {
     return (
-        <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center">
             {(() => {
                 switch (type) {
                     case 'onboarding':
@@ -70,14 +70,12 @@ export default function Notifications() {
             >
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-foreground">Notifications</h3>
-                    <Button
-                        variant="ghost"
-                        size="sm"
+                    <button
                         onClick={markAllNotificationsAsRead}
-                        className="text-muted-foreground hover:text-foreground"
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
                     >
                         Clear all
-                    </Button>
+                    </button>
                 </div>
                 {notifications.length === 0 || notifications.every(notif => notif.is_read) ? (
                     <div className="text-center py-4">
@@ -91,7 +89,7 @@ export default function Notifications() {
                                 key={notif.notification_id}
                                 className="flex items-start p-3 rounded-md transition-colors duration-200 bg-muted dark:bg-[#1c1f2a]"
                             >
-                                <div className="flex items-start space-x-3 flex-grow">
+                                <div className="flex items-center space-x-3 flex-grow min-h-[40px]">
                                     <NotificationIcon type={notif.type} />
                                     <div className="flex-grow">
                                         <p className="text-sm text-foreground text-justify">{notif.message}</p>
@@ -99,15 +97,13 @@ export default function Notifications() {
                                             {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
                                         </p>
                                     </div>
+                                    <button
+                                        onClick={() => markNotificationAsRead(notif.notification_id)}
+                                        className="text-muted-foreground hover:text-foreground transition-colors duration-200 p-1 self-start mt-1"
+                                    >
+                                        <Check className="h-4 w-4" />
+                                    </button>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => markNotificationAsRead(notif.notification_id)}
-                                    className="text-muted-foreground hover:text-foreground ml-4 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
-                                >
-                                    <Check className="h-4 w-4" />
-                                </Button>
                             </li>
                         ))}
                     </ul>
