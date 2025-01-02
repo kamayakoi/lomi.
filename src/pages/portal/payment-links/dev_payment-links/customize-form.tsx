@@ -71,7 +71,7 @@ const InstantLinkInput: React.FC<InstantLinkInputProps> = ({ name, label, value,
 };
 
 const BrowserMockup: React.FC<{ url: string; children: React.ReactNode; displayMode: DisplayMode }> = ({ url, children, displayMode }) => (
-    <div className={`border-2 border-gray-200 rounded-lg shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'w-full' : 'max-w-sm mx-auto'}`}>
+    <div className={`border-2 border-gray-200 rounded-none shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'w-full' : 'max-w-sm mx-auto'}`}>
         <div className="bg-gray-100 px-4 py-2 flex items-center space-x-2">
             <div className="flex space-x-1">
                 <Circle size={12} className="text-red-500" />
@@ -227,10 +227,10 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
         const fetchData = async () => {
             if (user?.id) {
                 const fetchedProducts = await fetchProducts(user.id, null)
-                setProducts(fetchedProducts)
+                setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : [])
 
                 const fetchedPlans = await fetchSubscriptionPlans(user.id, 1, 50)
-                setPlans(fetchedPlans)
+                setPlans(Array.isArray(fetchedPlans) ? fetchedPlans : [])
 
                 const { data: connectedProvidersData, error: connectedProvidersError } = await supabase
                     .rpc('get_payment_link_available_providers', { p_merchant_id: user.id })
@@ -287,7 +287,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     }, []);
 
     const CheckoutPage = () => (
-        <div className={`mx-auto bg-white rounded-lg shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'max-w-4xl' : 'max-w-sm'}`}>
+        <div className={`mx-auto bg-white rounded-none shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'max-w-4xl' : 'max-w-sm'}`}>
             <div className={`${displayMode === 'desktop' ? 'flex' : 'block'}`}>
                 <div className={`${displayMode === 'desktop' ? 'w-1/2 p-6 border-r flex flex-col justify-between' : 'p-4'}`}>
                     <div>
@@ -316,7 +316,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         {allowCouponCode && displayMode === 'desktop' && (
                             <div className="mt-4">
                                 <Label htmlFor="discount-code">Discount code</Label>
-                                <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1" readOnly />
+                                <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1 rounded-none" readOnly />
                             </div>
                         )}
                     </div>
@@ -339,16 +339,13 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     {allowCouponCode && displayMode === 'phone' && (
                         <div className="mt-[-6] mb-8">
                             <Label htmlFor="discount-code">Discount code</Label>
-                            <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1" readOnly />
+                            <Input id="discount-code" type="text" placeholder="Enter code" className="mt-1 rounded-none" readOnly />
                         </div>
                     )}
                     <h3 className={`font-semibold text-gray-800 ${displayMode === 'desktop' ? 'text-lg' : 'text-lg'} mb-4`}>Select a payment method</h3>
                     <div className="grid gap-4">
-                        {/* Always render the "Cards" element first */}
                         {allowedPaymentMethods.includes('CARDS') && (
-                            <button
-                                className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black`}
-                            >
+                            <button className="flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black">
                                 <div className="flex items-center">
                                     <img src="/cards.webp" alt="Cards" className="w-8 h-8 mr-3" />
                                     <span className="text-lg font-medium">Cards</span>
@@ -359,14 +356,10 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                                 </div>
                             </button>
                         )}
-                        {/* Render the remaining payment methods */}
                         {allowedPaymentMethods.filter(method => method !== 'CARDS').map((method) => {
                             const paymentMethod = paymentMethods.find(m => m.id === method)
                             return paymentMethod ? (
-                                <button
-                                    key={paymentMethod.id}
-                                    className={`flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black`}
-                                >
+                                <button key={paymentMethod.id} className="flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black">
                                     <div className="flex items-center">
                                         <img src={paymentMethod.icon} alt={paymentMethod.name} className="w-8 h-8 mr-3" />
                                         <span className="text-lg font-medium">{paymentMethod.name}</span>
@@ -377,23 +370,11 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     </div>
                 </div>
             </div>
-            {displayMode === 'phone' && (
-                <div className="mt-8 text-center">
-                    <span className="text-sm text-gray-500 font-semibold inline-flex items-center justify-center">
-                        Powered by <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
-                    </span>
-                    <div className="mt-4 mb-6 text-xs space-x-2">
-                        <a href="#" className="text-gray-500">Terms</a>
-                        <a href="#" className="text-gray-500">Conditions</a>
-                        <a href="#" className="text-gray-500">Language</a>
-                    </div>
-                </div>
-            )}
         </div>
     )
 
     const SuccessPage = () => (
-        <div className={`mx-auto bg-white rounded-lg shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'max-w-2xl' : 'max-w-md'}`}>
+        <div className={`mx-auto bg-white rounded-none shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'max-w-2xl' : 'max-w-md'}`}>
             <div className={`${displayMode === 'desktop' ? 'p-12' : 'p-8'} text-center h-full flex flex-col justify-center`}>
                 {redirectToCustomPage ? (
                     <>
@@ -516,6 +497,18 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             }
                         </div>
                     </div>
+                    <button
+                        onClick={() => setAllowCouponCode(!allowCouponCode)}
+                        className={`
+                            px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block
+                            ${allowCouponCode
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                            }
+                        `}
+                    >
+                        {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
+                    </button>
                 </>
             )}
 
@@ -547,16 +540,18 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             }
                         </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            checked={allowCouponCode}
-                            onCheckedChange={setAllowCouponCode}
-                            className="shrink-0"
-                        />
-                        <Label htmlFor="allow-coupon-code" className="mb-0">
-                            Allow coupon code
-                        </Label>
-                    </div>
+                    <button
+                        onClick={() => setAllowCouponCode(!allowCouponCode)}
+                        className={`
+                            px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block
+                            ${allowCouponCode
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                            }
+                        `}
+                    >
+                        {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
+                    </button>
                 </>
             )}
         </div>
@@ -797,12 +792,12 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         <SegmentedControl
                             value={activeTab}
                             onValueChange={setActiveTab}
-                            className="w-full"
+                            className="w-full rounded-none"
                         >
-                            <SegmentedControl.Item value="checkout" className="w-full">
+                            <SegmentedControl.Item value="checkout" className="w-full rounded-none">
                                 Checkout page
                             </SegmentedControl.Item>
-                            <SegmentedControl.Item value="success" className="w-full">
+                            <SegmentedControl.Item value="success" className="w-full rounded-none">
                                 Success page
                             </SegmentedControl.Item>
                         </SegmentedControl>

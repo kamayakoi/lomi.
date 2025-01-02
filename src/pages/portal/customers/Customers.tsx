@@ -22,7 +22,6 @@ import AnimatedLogoLoader from '@/components/dashboard/loader'
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Checkbox } from "@/components/ui/checkbox"
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
 import { Customer } from './dev_customers/types'
@@ -59,6 +58,7 @@ function CustomersPage() {
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
     const [customerType, setCustomerType] = useState<'all' | 'business' | 'individual'>('all')
     const [selectedCountry, setSelectedCountry] = useState('')
+    const [isBusinessCustomer, setIsBusinessCustomer] = useState(false)
 
     const topNav = [
         { title: 'Customers', href: '/portal/customers', isActive: true },
@@ -214,12 +214,12 @@ function CustomersPage() {
                         <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                                     <PlusCircle className="mr-2 h-4 w-4" />
-                                    Add a Customer
+                                    Create
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="rounded-none">
                                 <DialogHeader>
                                     <DialogTitle>Add a customer</DialogTitle>
                                     <DialogDescription>
@@ -229,7 +229,7 @@ function CustomersPage() {
                                 <form onSubmit={handleAddCustomer} className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="name">Name</Label>
-                                        <Input id="name" name="name" placeholder="Individual or business name" required />
+                                        <Input id="name" name="name" placeholder="Individual or business name" required className="rounded-none" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="email">Email address</Label>
@@ -241,6 +241,7 @@ function CustomersPage() {
                                             required
                                             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                             title="Please enter a valid email address"
+                                            className="rounded-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -254,13 +255,15 @@ function CustomersPage() {
                                                     value={countryCodeSearch}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
-                                                        setCountryCodeSearch(value);
-                                                        setIsCountryCodeDropdownOpen(true);
+                                                        if (/^[+\d]*$/.test(value)) {
+                                                            setCountryCodeSearch(value);
+                                                            setIsCountryCodeDropdownOpen(true);
+                                                        }
                                                     }}
                                                     onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                                     onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
                                                     className={cn(
-                                                        "w-full mb-2",
+                                                        "w-full mb-2 rounded-none",
                                                         "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                     )}
@@ -282,7 +285,7 @@ function CustomersPage() {
                                                     </ul>
                                                 )}
                                             </div>
-                                            <Input id="phone" name="phone" type="tel" className="flex-1" required />
+                                            <Input id="phone" name="phone" type="tel" className="flex-1 rounded-none" required />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
@@ -292,7 +295,7 @@ function CustomersPage() {
                                             value={selectedCountry}
                                             onChange={(e) => setSelectedCountry(e.target.value)}
                                             className={cn(
-                                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
+                                                "w-full mb-2 px-3 py-2 border h-10 rounded-none",
                                                 "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                                 "appearance-none"
@@ -308,28 +311,42 @@ function CustomersPage() {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="city">City</Label>
-                                        <Input id="city" name="city" placeholder="City" required />
+                                        <Input id="city" name="city" placeholder="City" required className="rounded-none" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="address">Address</Label>
-                                        <Input id="address" name="address" placeholder="Address" required />
+                                        <Input id="address" name="address" placeholder="Address" required className="rounded-none" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="postalCode">Postal Code</Label>
-                                        <Input id="postalCode" name="postalCode" placeholder="Postal Code" required />
+                                        <Input id="postalCode" name="postalCode" placeholder="Postal Code" required className="rounded-none" />
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="flex items-center h-5">
-                                            <Checkbox id="isBusiness" name="isBusiness" className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" />
-                                        </div>
-                                        <div className="ml-2 text-sm">
-                                            <Label htmlFor="isBusiness" className="font-medium text-gray-700">
-                                                Business customer
-                                            </Label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsBusinessCustomer(!isBusinessCustomer)}
+                                                className={cn(
+                                                    "px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer rounded-none",
+                                                    isBusinessCustomer
+                                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+                                                        : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800"
+                                                )}
+                                            >
+                                                {isBusinessCustomer ? 'Business Customer' : 'Individual Customer'}
+                                            </button>
+                                            <input
+                                                type="checkbox"
+                                                id="isBusiness"
+                                                name="isBusiness"
+                                                className="hidden"
+                                                checked={isBusinessCustomer}
+                                                onChange={(e) => setIsBusinessCustomer(e.target.checked)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="flex justify-end">
-                                        <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+                                        <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white rounded-none">
                                             Add
                                         </Button>
                                     </div>
@@ -347,15 +364,15 @@ function CustomersPage() {
                         isRefreshing={isRefreshing}
                     />
 
-                    <Card>
+                    <Card className="rounded-none">
                         <CardContent className="p-4">
-                            <div className="rounded-md border">
+                            <div className="border">
                                 <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('name')}>
+                                                    <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
                                                         Name
                                                         {sortColumn === 'name' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -363,7 +380,7 @@ function CustomersPage() {
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('email')}>
+                                                    <Button variant="ghost" onClick={() => handleSort('email')} className="rounded-none">
                                                         Email
                                                         {sortColumn === 'email' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -371,7 +388,7 @@ function CustomersPage() {
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('phone_number')}>
+                                                    <Button variant="ghost" onClick={() => handleSort('phone_number')} className="rounded-none">
                                                         Phone
                                                         {sortColumn === 'phone_number' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -379,7 +396,7 @@ function CustomersPage() {
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('country')}>
+                                                    <Button variant="ghost" onClick={() => handleSort('country')} className="rounded-none">
                                                         Country
                                                         {sortColumn === 'country' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -387,7 +404,7 @@ function CustomersPage() {
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('is_business')}>
+                                                    <Button variant="ghost" onClick={() => handleSort('is_business')} className="rounded-none">
                                                         Type
                                                         {sortColumn === 'is_business' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -403,8 +420,8 @@ function CustomersPage() {
                                                     <TableRow key={index}>
                                                         <TableCell colSpan={6}>
                                                             <div className="flex flex-col items-center justify-center space-y-2 py-2 text-center">
-                                                                <Skeleton className="h-2 w-48" />
-                                                                <Skeleton className="h-2 w-32" />
+                                                                <Skeleton className="h-2 w-48 rounded-none" />
+                                                                <Skeleton className="h-2 w-32 rounded-none" />
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>
@@ -432,10 +449,15 @@ function CustomersPage() {
                                                         <TableCell className="text-center">{customer.country}</TableCell>
                                                         <TableCell className="text-center">{customer.is_business ? 'Business' : 'Individual'}</TableCell>
                                                         <TableCell className="text-center">
-                                                            <Button variant="ghost" size="sm" onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                handleEditCustomer(customer)
-                                                            }}>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    handleEditCustomer(customer)
+                                                                }}
+                                                                className="rounded-none"
+                                                            >
                                                                 <Edit className="h-4 w-4 text-blue-500" />
                                                             </Button>
                                                         </TableCell>
@@ -452,7 +474,7 @@ function CustomersPage() {
             </Layout.Body>
 
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="rounded-none">
                     <DialogHeader>
                         <DialogTitle>Delete Customer</DialogTitle>
                         <DialogDescription>
@@ -467,10 +489,15 @@ function CustomersPage() {
                 </DialogContent>
             </Dialog>
 
-            <CustomerActions customer={selectedCustomer} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />
+            <CustomerActions
+                customer={selectedCustomer}
+                isOpen={isActionsOpen}
+                onClose={() => setIsActionsOpen(false)}
+                onUpdate={fetchCustomers}
+            />
 
             <Dialog open={isEditCustomerOpen} onOpenChange={setIsEditCustomerOpen}>
-                <DialogContent>
+                <DialogContent className="rounded-none">
                     <DialogHeader>
                         <DialogTitle>Edit Customer</DialogTitle>
                         <DialogDescription>

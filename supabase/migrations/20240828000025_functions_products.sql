@@ -60,7 +60,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Function to fetch products for a specific merchant
 CREATE OR REPLACE FUNCTION public.fetch_products(
     p_merchant_id UUID,
-    p_is_active BOOLEAN DEFAULT NULL
+    p_is_active BOOLEAN DEFAULT NULL,
+    p_limit INTEGER DEFAULT 15,
+    p_offset INTEGER DEFAULT 0
 )
 RETURNS TABLE (
     product_id UUID,
@@ -74,30 +76,37 @@ RETURNS TABLE (
     is_active BOOLEAN,
     display_on_storefront BOOLEAN,
     created_at TIMESTAMPTZ,
-    updated_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ,
+    total_count BIGINT
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
-        p.product_id,
-        p.merchant_id,
-        p.organization_id,
-        p.name,
-        p.description,
-        p.price,
-        p.currency_code,
-        p.image_url,
-        p.is_active,
-        p.display_on_storefront,
-        p.created_at,
-        p.updated_at
-    FROM 
-        merchant_products p
-    WHERE 
-        p.merchant_id = p_merchant_id
-        AND (p_is_active IS NULL OR p.is_active = p_is_active)
-    ORDER BY
-        p.created_at DESC;
+    WITH product_data AS (
+        SELECT 
+            p.product_id,
+            p.merchant_id,
+            p.organization_id,
+            p.name,
+            p.description,
+            p.price,
+            p.currency_code,
+            p.image_url,
+            p.is_active,
+            p.display_on_storefront,
+            p.created_at,
+            p.updated_at,
+            COUNT(*) OVER() as total_count
+        FROM 
+            merchant_products p
+        WHERE 
+            p.merchant_id = p_merchant_id
+            AND (p_is_active IS NULL OR p.is_active = p_is_active)
+        ORDER BY
+            p.created_at DESC
+        LIMIT p_limit
+        OFFSET p_offset
+    )
+    SELECT * FROM product_data;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -218,7 +227,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.fetch_products(UUID, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_products(UUID, BOOLEAN, INTEGER, INTEGER) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_product(UUID) TO authenticated;

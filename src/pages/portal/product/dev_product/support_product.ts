@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { Product, Transaction } from './types'
+import { Product, Transaction, ProductsResponse } from './types'
 
 export async function uploadProductImage(file: File, merchantId: string): Promise<string | null> {
     const fileExt = file.name.split('.').pop()
@@ -31,18 +31,35 @@ export async function deleteProductImage(imageUrl: string): Promise<void> {
     }
 }
 
-export async function fetchProducts(merchantId: string, isActive: boolean | null = null): Promise<Product[]> {
+export async function fetchProducts(
+    merchantId: string, 
+    isActive: boolean | null = null,
+    limit = 15,
+    offset = 0
+): Promise<ProductsResponse> {
     const { data, error } = await supabase.rpc('fetch_products', {
         p_merchant_id: merchantId,
-        p_is_active: isActive
+        p_is_active: isActive,
+        p_limit: limit,
+        p_offset: offset
     })
 
     if (error) {
         console.error('Error fetching products:', error)
-        return []
+        return { products: [], totalCount: 0 }
     }
 
-    return data as Product[]
+    if (!data || data.length === 0) {
+        return { products: [], totalCount: 0 }
+    }
+
+    // The total_count is the same for all rows, so we can take it from the first row
+    const totalCount = data[0].total_count || 0
+
+    // Remove total_count from the product objects using object rest/spread
+    const products = data.map(({ ...product }: { total_count: number } & Product) => product)
+
+    return { products, totalCount }
 }
 
 export async function createProduct(data: {

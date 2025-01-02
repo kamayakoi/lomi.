@@ -124,7 +124,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
             <div className="max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Create Subscription Plan</CardTitle>
+                        <CardTitle>Create subscription plan</CardTitle>
                         <CardDescription>Set up a new subscription plan for your customers</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">

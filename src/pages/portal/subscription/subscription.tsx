@@ -197,9 +197,9 @@ function SubscriptionsPage() {
             <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
             <Dialog open={isCreatePlanOpen} onOpenChange={setIsCreatePlanOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Create Plan
+                  Create
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[845px]">
@@ -213,9 +213,9 @@ function SubscriptionsPage() {
           </div>
 
           <Tabs defaultValue="plans">
-            <TabsList>
-              <TabsTrigger value="plans">Plans</TabsTrigger>
-              <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
+            <TabsList className="rounded-none">
+              <TabsTrigger value="plans" className="rounded-none">Plans</TabsTrigger>
+              <TabsTrigger value="subscriptions" className="rounded-none">Subscriptions</TabsTrigger>
             </TabsList>
 
             <TabsContent value="plans">
@@ -224,14 +224,14 @@ function SubscriptionsPage() {
                 isRefreshing={isRefreshing}
               />
 
-              <Card className="mt-4">
+              <Card className="mt-4 rounded-none">
                 <CardContent className="p-4">
-                  <div className="rounded-md border">
+                  <div className="border">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('name')}>
+                            <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
                               Name
                               {sortColumn === 'name' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -239,7 +239,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('description')}>
+                            <Button variant="ghost" onClick={() => handleSort('description')} className="rounded-none">
                               Description
                               {sortColumn === 'description' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -247,7 +247,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('amount')}>
+                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
                               Price
                               {sortColumn === 'amount' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -255,7 +255,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('billing_frequency')}>
+                            <Button variant="ghost" onClick={() => handleSort('billing_frequency')} className="rounded-none">
                               Frequency
                               {sortColumn === 'billing_frequency' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -270,7 +270,7 @@ function SubscriptionsPage() {
                           Array.from({ length: 5 }).map((_, index) => (
                             <TableRow key={index}>
                               <TableCell colSpan={5}>
-                                <Skeleton className="w-full h-8" />
+                                <Skeleton className="w-full h-8 rounded-none" />
                               </TableCell>
                             </TableRow>
                           ))
@@ -305,7 +305,7 @@ function SubscriptionsPage() {
                               <TableCell className="text-center">{plan.description}</TableCell>
                               <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
                               <TableCell className="text-center">
-                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-normal ${frequencyColors[plan.billing_frequency]}`}>
+                                <span className={`inline-block px-2 py-1 text-xs font-normal rounded-none ${frequencyColors[plan.billing_frequency]}`}>
                                   {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
                                 </span>
                               </TableCell>
@@ -318,6 +318,7 @@ function SubscriptionsPage() {
                                       e.stopPropagation();
                                       handleEditPlanClick(plan);
                                     }}
+                                    className="rounded-none"
                                   >
                                     <Edit className="h-4 w-4 text-blue-500" />
                                   </Button>
@@ -341,14 +342,14 @@ function SubscriptionsPage() {
                 isRefreshing={isRefreshing}
               />
 
-              <Card className="mt-4">
+              <Card className="mt-4 rounded-none">
                 <CardContent className="p-4">
-                  <div className="rounded-md border">
+                  <div className="border">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('customer_name')}>
+                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
                               Customer
                               {sortColumn === 'customer_name' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -356,7 +357,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('plan_name')}>
+                            <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
                               Plan
                               {sortColumn === 'plan_name' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -364,7 +365,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('amount')}>
+                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
                               Price
                               {sortColumn === 'amount' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -372,7 +373,7 @@ function SubscriptionsPage() {
                             </Button>
                           </TableHead>
                           <TableHead className="text-center">
-                            <Button variant="ghost" onClick={() => handleSort('status')}>
+                            <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
                               Status
                               {sortColumn === 'status' && (
                                 <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -386,7 +387,7 @@ function SubscriptionsPage() {
                           Array.from({ length: 5 }).map((_, index) => (
                             <TableRow key={index}>
                               <TableCell colSpan={4}>
-                                <Skeleton className="w-full h-8" />
+                                <Skeleton className="w-full h-8 rounded-none" />
                               </TableCell>
                             </TableRow>
                           ))
@@ -418,7 +419,7 @@ function SubscriptionsPage() {
                               <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
                               <TableCell className="text-center">
                                 <span className={`
-                                  inline-block px-2 py-1 rounded-full text-xs font-normal
+                                  inline-block px-2 py-1 text-xs font-normal rounded-none
                                   ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
                                   ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
                                   ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}

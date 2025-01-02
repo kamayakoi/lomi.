@@ -277,7 +277,7 @@ function TransactionsPage() {
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Transactions</h1>
 
                         <div className="grid gap-4 md:grid-cols-3 mb-6">
-                            <Card className="cursor-pointer" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
+                            <Card className="cursor-pointer rounded-none" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                                     <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
@@ -294,14 +294,14 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isTotalIncomingAmountLoading ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `XOF ${formatAmount(totalIncomingAmount)}`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {isTransactionCountLoading ? (
-                                                        <Skeleton className="w-20 h-4 inline-block" />
+                                                        <Skeleton className="w-20 h-4 rounded-none" />
                                                     ) : (
                                                         `${transactionCount} transactions`
                                                     )}
@@ -320,7 +320,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Gross</span>
                                                         <span className="text-sm font-medium">
                                                             {isGrossAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${formatAmount(grossAmount)}`
                                                             )}
@@ -330,7 +330,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Fees</span>
                                                         <span className="text-sm font-medium">
                                                             {isFeeAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${formatAmount(feeAmount)}`
                                                             )}
@@ -340,7 +340,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Net</span>
                                                         <span className="text-sm font-medium">
                                                             {isTotalIncomingAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${formatAmount(totalIncomingAmount)}`
                                                             )}
@@ -353,7 +353,7 @@ function TransactionsPage() {
                                 </CardContent>
                             </Card>
 
-                            <Card className="cursor-pointer" onClick={() => setShowAverageValue(!showAverageValue)}>
+                            <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageValue(!showAverageValue)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">
                                         {showAverageValue ? "Avg. Order Value" : "Completion Rate"}
@@ -376,14 +376,14 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isCompletionRateLoading ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {isCompletionRateLoading ? (
-                                                        <Skeleton className="w-20 h-4" />
+                                                        <Skeleton className="w-20 h-4 rounded-none" />
                                                     ) : (
                                                         <>
                                                             {completionRate.completed > 0 && (
@@ -413,7 +413,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageTransactionValueLoading ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `XOF ${averageTransactionValue ? averageTransactionValue.toFixed(2) : '0.00'}`
                                                     )}
@@ -427,7 +427,7 @@ function TransactionsPage() {
                                 </CardContent>
                             </Card>
 
-                            <Card className="cursor-pointer" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
+                            <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">
                                         {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Lifetime Value"}
@@ -450,7 +450,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageCustomerLifetimeValueLoading ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `XOF ${formatAmount(averageCustomerLifetimeValue)}`
                                                     )}
@@ -467,7 +467,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageRetentionRateLoading ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `${averageRetentionRate ? averageRetentionRate.toFixed(2) : '0.00'}%`
                                                     )}
@@ -508,21 +508,21 @@ function TransactionsPage() {
                             isRefreshing={isRefreshing}
                         />
 
-                        <Card>
+                        <Card className="rounded-none">
                             <CardContent className="p-4">
-                                <div className="rounded-md border">
+                                <div className="border">
                                     <InfiniteScroll
                                         dataLength={transactions.length}
                                         next={() => fetchNextPage()}
                                         hasMore={transactionsData?.pages?.[transactionsData.pages.length - 1]?.length === pageSize}
-                                        loader={<Skeleton className="w-full h-8" />}
+                                        loader={<Skeleton className="w-full h-8 rounded-none" />}
                                     >
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
                                                     {columns.includes('Transaction ID') && (
                                                         <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')}>
+                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none">
                                                                 Transaction ID
                                                                 {sortColumn === 'transaction_id' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -627,7 +627,7 @@ function TransactionsPage() {
                                                     Array.from({ length: 5 }).map((_, index) => (
                                                         <TableRow key={index}>
                                                             <TableCell colSpan={10}>
-                                                                <Skeleton className="w-full h-8" />
+                                                                <Skeleton className="w-full h-8 rounded-none" />
                                                             </TableCell>
                                                         </TableRow>
                                                     ))
@@ -635,7 +635,7 @@ function TransactionsPage() {
                                                     <TableRow>
                                                         <TableCell colSpan={10} className="text-center py-8">
                                                             <div className="flex flex-col items-center justify-center space-y-4">
-                                                                <div className="rounded-full bg-transparent dark:bg-transparent p-4">
+                                                                <div className="bg-transparent dark:bg-transparent p-4">
                                                                     <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
                                                                 </div>
                                                                 <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
@@ -677,7 +677,7 @@ function TransactionsPage() {
                                                             {columns.includes('Status') && (
                                                                 <TableCell className="text-center">
                                                                     <span className={`
-                                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                        inline-block px-2 py-1 text-xs font-normal rounded-none
                                                                         ${transaction.status === 'refunded' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
                                                                         ${transaction.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
                                                                         ${transaction.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
@@ -692,7 +692,7 @@ function TransactionsPage() {
                                                             {columns.includes('Provider') && (
                                                                 <TableCell className="text-center">
                                                                     <span className={`
-                                                                        inline-block px-2 py-1 rounded-full text-xs font-semibold
+                                                                        inline-block px-2 py-1 text-xs font-semibold rounded-none
                                                                         ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
                                                                         ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}

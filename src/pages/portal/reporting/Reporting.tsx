@@ -115,7 +115,7 @@ function ReportingPage() {
                             "after:content-[''] after:flex-grow after:h-0.5 after:bg-gray-200 after:dark:bg-gray-700 after:ml-4"
                         )}>
                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Global Analysis
+                                +
                             </span>
                         </div>
 
@@ -154,14 +154,14 @@ function RevenueTransactionsChart({
     const chartData = getChartData(revenueData, transactionVolumeData, selectedDateRange)
 
     return (
-        <Card>
+        <Card className="rounded-none">
             <CardHeader>
                 <CardTitle>Revenue | Transactions</CardTitle>
             </CardHeader>
             <CardContent>
                 {isLoading ? (
                     <div className="h-96">
-                        <Skeleton className="h-full" />
+                        <Skeleton className="h-full rounded-none" />
                     </div>
                 ) : chartData === null ? (
                     <div className="flex flex-col items-center justify-center h-full pt-12">
@@ -204,7 +204,7 @@ function RevenueTransactionsChart({
                                 labelStyle={{ color: 'black' }}
                                 cursor={false}
                                 contentStyle={{
-                                    borderRadius: '8px',
+                                    borderRadius: '0px',
                                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                                 }}
                             />
@@ -219,10 +219,6 @@ function RevenueTransactionsChart({
     )
 }
 
-function formatAmount(amount: number): string {
-    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
-}
-
 function TopPerformingItemsCard({
     topPerformingProducts,
     topPerformingSubscriptionPlans,
@@ -233,7 +229,7 @@ function TopPerformingItemsCard({
     isLoading: boolean;
 }) {
     return (
-        <Card>
+        <Card className="rounded-none">
             <CardHeader>
                 <CardTitle>Performing Items</CardTitle>
             </CardHeader>
@@ -256,7 +252,7 @@ function ProviderDistributionCard({
     isLoading: boolean;
 }) {
     return (
-        <Card>
+        <Card className="rounded-none">
             <CardHeader>
                 <CardTitle>Providers Distribution</CardTitle>
             </CardHeader>
@@ -268,6 +264,10 @@ function ProviderDistributionCard({
             </CardContent>
         </Card>
     )
+}
+
+function formatAmount(amount: number): string {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }
 
 function getChartData(revenueData: RevenueData[], transactionVolumeData: TransactionVolumeData[], selectedDateRange: string | null) {

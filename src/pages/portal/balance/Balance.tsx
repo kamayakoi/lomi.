@@ -200,7 +200,7 @@ function BalancePage() {
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Balance</h1>
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
-                            <Card>
+                            <Card className="rounded-none">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle
                                         className="text-sm font-medium cursor-pointer"
@@ -229,18 +229,18 @@ function BalancePage() {
                                                     onClick={() => setShowBalanceBreakdown(!showBalanceBreakdown)}
                                                 >
                                                     {isBalanceBreakdownLoading || isRefreshing ? (
-                                                        <Skeleton className="w-32 h-8" />
+                                                        <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
                                                         `XOF ${balanceBreakdown?.available_balance?.toLocaleString() || '0'}`
                                                     )}
                                                 </div>
                                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                                     <DialogTrigger asChild>
-                                                        <Button variant="default" className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white">
+                                                        <Button variant="default" className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none">
                                                             Withdraw
                                                         </Button>
                                                     </DialogTrigger>
-                                                    <DialogContent className="sm:max-w-[425px]">
+                                                    <DialogContent className="sm:max-w-[425px] rounded-none">
                                                         <DialogHeader>
                                                             <DialogTitle>Withdraw</DialogTitle>
                                                             <DialogDescription>
@@ -261,19 +261,19 @@ function BalancePage() {
                                                                             setWithdrawalAmount(value)
                                                                         }
                                                                     }}
-                                                                    className="col-span-3"
+                                                                    className="col-span-3 rounded-none"
                                                                     placeholder="Enter amount in XOF"
                                                                 />
                                                             </div>
                                                             <div className="grid grid-cols-4 items-center gap-4">
                                                                 <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
                                                                 <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
-                                                                    <SelectTrigger className="col-span-3">
+                                                                    <SelectTrigger className="col-span-3 rounded-none">
                                                                         <SelectValue placeholder="Select a bank account" />
                                                                     </SelectTrigger>
-                                                                    <SelectContent>
+                                                                    <SelectContent className="rounded-none">
                                                                         {bankAccounts.map((account) => (
-                                                                            <SelectItem key={account.bank_account_id} value={account.bank_account_id}>
+                                                                            <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
                                                                                 {account.bank_name} - {account.account_number}
                                                                             </SelectItem>
                                                                         ))}
@@ -285,7 +285,7 @@ function BalancePage() {
                                                             <Button
                                                                 onClick={handleWithdraw}
                                                                 disabled={isWithdrawing}
-                                                                className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
+                                                                className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none"
                                                             >
                                                                 {isWithdrawing ? (
                                                                     <>
@@ -318,7 +318,7 @@ function BalancePage() {
                                                         </span>
                                                         <span className="text-sm font-medium">
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${balanceBreakdown?.total_balance?.toLocaleString() || '0'}`
                                                             )}
@@ -333,7 +333,7 @@ function BalancePage() {
                                                         </span>
                                                         <span className="text-sm font-medium text-blue-500 dark:text-yellow-500">
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${balanceBreakdown?.pending_balance?.toLocaleString() || '0'}`
                                                             )}
@@ -348,7 +348,7 @@ function BalancePage() {
                                                         </span>
                                                         <span className="text-sm font-medium text-green-500">
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
-                                                                <Skeleton className="w-20 h-4 inline-block" />
+                                                                <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
                                                                 `XOF ${balanceBreakdown?.available_balance?.toLocaleString() || '0'}`
                                                             )}
@@ -378,21 +378,21 @@ function BalancePage() {
                             isRefreshing={isRefreshing}
                         />
 
-                        <Card>
+                        <Card className="rounded-none">
                             <CardContent className="p-4">
-                                <div className="rounded-md border">
+                                <div className="border">
                                     <InfiniteScroll
                                         dataLength={payouts.length}
                                         next={() => fetchNextPage()}
                                         hasMore={payoutsData?.pages?.[payoutsData.pages.length - 1]?.length === pageSize}
-                                        loader={<Skeleton className="w-full h-8" />}
+                                        loader={<Skeleton className="w-full h-8 rounded-none" />}
                                     >
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
                                                     {columns.includes('Payout ID') && (
                                                         <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('payout_id')}>
+                                                            <Button variant="ghost" onClick={() => handleSort('payout_id')} className="rounded-none">
                                                                 Payout ID
                                                                 {sortColumn === 'payout_id' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -447,7 +447,7 @@ function BalancePage() {
                                                     Array.from({ length: 5 }).map((_, index) => (
                                                         <TableRow key={index}>
                                                             <TableCell colSpan={6}>
-                                                                <Skeleton className="w-full h-8" />
+                                                                <Skeleton className="w-full h-8 rounded-none" />
                                                             </TableCell>
                                                         </TableRow>
                                                     ))
@@ -455,7 +455,7 @@ function BalancePage() {
                                                     <TableRow>
                                                         <TableCell colSpan={6} className="text-center py-8">
                                                             <div className="flex flex-col items-center justify-center space-y-4">
-                                                                <div className="rounded-full bg-transparent dark:bg-transparent p-4">
+                                                                <div className="bg-transparent dark:bg-transparent p-4">
                                                                     <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
                                                                 </div>
                                                                 <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
@@ -486,7 +486,7 @@ function BalancePage() {
                                                             {columns.includes('Status') && (
                                                                 <TableCell className="text-center">
                                                                     <span className={`
-                                                                        inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                        inline-block px-2 py-1 text-xs font-normal rounded-none
                                                                         ${payout.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
                                                                         ${payout.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
                                                                         ${payout.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}

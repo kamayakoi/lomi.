@@ -20,7 +20,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle, Edit, ImageIcon, ClipboardList } from 'lucide-react'
+import { PlusCircle, Edit, ImageIcon, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useQuery } from 'react-query'
 import ProductActions from './dev_product/actions_product'
 import { EditProductForm } from './dev_product/edit_product'
@@ -38,6 +38,8 @@ function ProductsPage() {
     const [isEditProductOpen, setIsEditProductOpen] = useState(false)
     const [sortColumn] = useState<keyof Product | null>(null)
     const [sortDirection] = useState<'asc' | 'desc'>('asc')
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 10
 
     const topNav = [
         { title: 'Products', href: '/portal/product', isActive: true },
@@ -45,14 +47,21 @@ function ProductsPage() {
     ]
 
     const { data: productsData, isLoading: isProductsLoading, refetch } = useQuery(
-        ['products', user?.id || '', selectedStatus],
-        () => fetchProducts(user?.id || '', selectedStatus === 'active' ? true : selectedStatus === 'inactive' ? false : null),
+        ['products', user?.id || '', selectedStatus, currentPage],
+        () => fetchProducts(
+            user?.id || '',
+            selectedStatus === 'active' ? true : selectedStatus === 'inactive' ? false : null,
+            itemsPerPage,
+            (currentPage - 1) * itemsPerPage
+        ),
         {
             enabled: !!user?.id,
         }
     )
 
-    const products = productsData || []
+    const products = productsData?.products || []
+    const totalProducts = productsData?.totalCount || 0
+    const totalPages = Math.ceil(totalProducts / itemsPerPage)
 
     const handleCreateProductSuccess = () => {
         refetch()
@@ -72,6 +81,10 @@ function ProductsPage() {
     const handleEditClick = (product: Product) => {
         setSelectedProduct(product)
         setIsEditProductOpen(true)
+    }
+
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage)
     }
 
     const sortProducts = (products: Product[]) => {
@@ -142,7 +155,7 @@ function ProductsPage() {
                         <CardContent className="p-4 rounded-none">
                             {isProductsLoading ? (
                                 <div className="space-y-4">
-                                    {Array.from({ length: 6 }).map((_, index) => (
+                                    {Array.from({ length: itemsPerPage }).map((_, index) => (
                                         <div key={index} className="p-4 border border-border">
                                             <div className="flex gap-4">
                                                 <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
@@ -168,88 +181,155 @@ function ProductsPage() {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="space-y-4">
-                                    {sortProducts(products).slice(0, 25).map((product: Product) => (
-                                        <div
-                                            key={product.product_id}
-                                            className="p-4 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer"
-                                            onClick={() => handleProductClick(product)}
-                                        >
-                                            <div className="flex gap-4">
-                                                <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
-                                                    {product.image_url ? (
-                                                        <img
-                                                            src={product.image_url}
-                                                            alt={product.name}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center">
-                                                            <ImageIcon className="h-12 w-12 text-gray-400" />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                <>
+                                    <div className="space-y-4">
+                                        {sortProducts(products).map((product: Product) => (
+                                            <div
+                                                key={product.product_id}
+                                                className="p-4 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer"
+                                                onClick={() => handleProductClick(product)}
+                                            >
+                                                <div className="flex gap-4">
+                                                    <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                                        {product.image_url ? (
+                                                            <img
+                                                                src={product.image_url}
+                                                                alt={product.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center">
+                                                                <ImageIcon className="h-12 w-12 text-gray-400" />
+                                                            </div>
+                                                        )}
+                                                    </div>
 
-                                                <div className="flex-grow h-32 flex flex-col">
-                                                    <div className="flex-1 min-h-0">
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="w-full pr-0">
-                                                                <div className="flex items-center justify-between">
-                                                                    <h3 className="font-medium text-foreground text-lg">{product.name}</h3>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation()
-                                                                            handleEditClick(product)
-                                                                        }}
-                                                                        className="text-blue-500 hover:text-blue-600 p-1.5"
-                                                                    >
-                                                                        <Edit className="h-4.5 w-4.5" />
-                                                                    </button>
-                                                                </div>
-                                                                {product.description && (
-                                                                    <p className="text-sm text-muted-foreground overflow-y-auto max-h-[40px] w-[850px] whitespace-pre-wrap break-words scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800 scrollbar-track-transparent mt-1.5">
-                                                                        {product.description}
-                                                                    </p>
-                                                                )}
-                                                                <div className="mt-1">
-                                                                    <span className="text-lg font-medium">
-                                                                        {product.price.toLocaleString('en-US', {
-                                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                        })}
-                                                                        <span className="text-sm text-muted-foreground ml-1">
-                                                                            {product.currency_code}
+                                                    <div className="flex-grow h-32 flex flex-col">
+                                                        <div className="flex-1 min-h-0">
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="w-full pr-0">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <h3 className="font-medium text-foreground text-lg">{product.name}</h3>
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation()
+                                                                                handleEditClick(product)
+                                                                            }}
+                                                                            className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                                        >
+                                                                            <Edit className="h-4.5 w-4.5" />
+                                                                        </button>
+                                                                    </div>
+                                                                    {product.description && (
+                                                                        <p className="text-sm text-muted-foreground overflow-y-auto max-h-[40px] w-[850px] whitespace-pre-wrap break-words scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800 scrollbar-track-transparent mt-1.5">
+                                                                            {product.description}
+                                                                        </p>
+                                                                    )}
+                                                                    <div className="mt-1">
+                                                                        <span className="text-lg font-medium">
+                                                                            {product.price.toLocaleString('en-US', {
+                                                                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                            })}
+                                                                            <span className="text-sm text-muted-foreground ml-1">
+                                                                                {product.currency_code}
+                                                                            </span>
                                                                         </span>
-                                                                    </span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`
-                                                            px-3 py-1 text-xs font-medium
-                                                            ${product.is_active
-                                                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
-                                                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                                                            }
-                                                        `}>
-                                                            {product.is_active ? 'Active' : 'Inactive'}
-                                                        </span>
-                                                        <span className={`
-                                                            px-3 py-1 text-xs font-medium
-                                                            ${product.display_on_storefront
-                                                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-                                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                                                            }
-                                                        `}>
-                                                            Storefront
-                                                        </span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`
+                                                                px-3 py-1 text-xs font-medium
+                                                                ${product.is_active
+                                                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
+                                                                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                                }
+                                                            `}>
+                                                                {product.is_active ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                            <span className={`
+                                                                px-3 py-1 text-xs font-medium
+                                                                ${product.display_on_storefront
+                                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                                                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+                                                                }
+                                                            `}>
+                                                                Storefront
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {totalPages > 1 && (
+                                        <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6 mt-4">
+                                            <div className="flex flex-1 justify-between sm:hidden">
+                                                <Button
+                                                    onClick={() => handlePageChange(currentPage - 1)}
+                                                    disabled={currentPage === 1}
+                                                    variant="outline"
+                                                >
+                                                    Previous
+                                                </Button>
+                                                <Button
+                                                    onClick={() => handlePageChange(currentPage + 1)}
+                                                    disabled={currentPage === totalPages}
+                                                    variant="outline"
+                                                >
+                                                    Next
+                                                </Button>
+                                            </div>
+                                            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                                                        <span className="font-medium">
+                                                            {Math.min(currentPage * itemsPerPage, totalProducts)}
+                                                        </span>{' '}
+                                                        of <span className="font-medium">{totalProducts}</span> products
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                                        <Button
+                                                            variant="outline"
+                                                            className="rounded-l-md"
+                                                            onClick={() => handlePageChange(currentPage - 1)}
+                                                            disabled={currentPage === 1}
+                                                        >
+                                                            <span className="sr-only">Previous</span>
+                                                            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                                                        </Button>
+                                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                                            <Button
+                                                                key={page}
+                                                                variant={page === currentPage ? "default" : "outline"}
+                                                                onClick={() => handlePageChange(page)}
+                                                                className="px-4 py-2"
+                                                            >
+                                                                {page}
+                                                            </Button>
+                                                        ))}
+                                                        <Button
+                                                            variant="outline"
+                                                            className="rounded-r-md"
+                                                            onClick={() => handlePageChange(currentPage + 1)}
+                                                            disabled={currentPage === totalPages}
+                                                        >
+                                                            <span className="sr-only">Next</span>
+                                                            <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                                                        </Button>
+                                                    </nav>
+                                                </div>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
+                                    )}
+                                </>
                             )}
                         </CardContent>
                     </Card>

@@ -1,10 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+import { cn } from '@/lib/actions/utils'
 import { fetchCustomer, updateCustomer, deleteCustomer } from './support_customers'
+import { countries } from '@/utils/data/onboarding'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
 interface EditCustomerFormProps {
     customerId: string
@@ -25,6 +34,7 @@ interface CustomerFormData {
 
 export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, onClose, onSuccess }) => {
     const { register, handleSubmit, setValue, control } = useForm<CustomerFormData>()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,6 +66,7 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
     const handleDelete = async () => {
         try {
             await deleteCustomer(customerId)
+            setIsDeleteDialogOpen(false)
             onSuccess()
             onClose()
         } catch (error) {
@@ -64,64 +75,115 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" {...register('name')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register('email')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="phone_number">Phone Number</Label>
-                <Input id="phone_number" {...register('phone_number')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
-                <Input id="country" {...register('country')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" {...register('city')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" {...register('address')} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="postal_code">Postal Code</Label>
-                <Input id="postal_code" {...register('postal_code')} />
-            </div>
-            <div className="flex items-center space-x-2">
-                <Controller
-                    name="is_business"
-                    control={control}
-                    render={({ field }) => (
-                        <Checkbox
-                            id="is_business"
-                            checked={field.value}
-                            onCheckedChange={(checked) => field.onChange(checked)}
-                        />
-                    )}
-                />
-                <Label htmlFor="is_business" className="font-normal">Business Customer</Label>
-            </div>
-            <div className="flex justify-end space-x-2">
-                <Button
-                    type="button"
-                    className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
-                    onClick={handleDelete}
-                >
-                    Delete Customer
-                </Button>
-                <Button
-                    type="submit"
-                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
-                >
-                    Save Changes
-                </Button>
-            </div>
-        </form>
+        <>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" {...register('name')} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" {...register('email')} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phone_number">Phone Number</Label>
+                    <Input id="phone_number" {...register('phone_number')} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <select
+                        id="country"
+                        {...register('country')}
+                        className={cn(
+                            "w-full mb-2 px-3 py-2 border h-10 rounded-none",
+                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                            "appearance-none"
+                        )}
+                    >
+                        <option value="">Select a country</option>
+                        {countries.map((country) => (
+                            <option key={country} value={country}>
+                                {country}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" {...register('city')} className="rounded-none" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input id="address" {...register('address')} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="postal_code">Postal Code</Label>
+                    <Input id="postal_code" {...register('postal_code')} className="rounded-none" />
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Controller
+                        name="is_business"
+                        control={control}
+                        render={({ field }) => (
+                            <button
+                                type="button"
+                                onClick={() => field.onChange(!field.value)}
+                                className={cn(
+                                    "px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer rounded-none",
+                                    field.value
+                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+                                        : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800"
+                                )}
+                            >
+                                {field.value ? 'Business Customer' : 'Individual Customer'}
+                            </button>
+                        )}
+                    />
+                </div>
+                <div className="flex justify-end space-x-2">
+                    <Button
+                        type="button"
+                        className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10 rounded-none"
+                        onClick={() => setIsDeleteDialogOpen(true)}
+                    >
+                        Delete Customer
+                    </Button>
+                    <Button
+                        type="submit"
+                        className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10 rounded-none"
+                    >
+                        Save Changes
+                    </Button>
+                </div>
+            </form>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <DialogContent className="rounded-none">
+                    <DialogHeader>
+                        <DialogTitle>Delete Customer</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to delete this customer? This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsDeleteDialogOpen(false)}
+                            className="rounded-none"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={handleDelete}
+                            className="rounded-none"
+                        >
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </>
     )
 }

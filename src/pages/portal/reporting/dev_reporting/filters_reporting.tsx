@@ -17,6 +17,7 @@ export default function ReportingFilters({
                     variant={selectedDateRange === range ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSelectedDateRange(range)}
+                    className="rounded-none"
                 >
                     {range}
                 </Button>

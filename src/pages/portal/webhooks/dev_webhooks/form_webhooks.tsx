@@ -72,7 +72,7 @@ export const CreateWebhookForm: React.FC<CreateWebhookFormProps> = ({ onClose, o
             </div>
             <div className="flex justify-end">
                 <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
-                    Create Webhook
+                    Create a webhook
                 </Button>
             </div>
         </form>

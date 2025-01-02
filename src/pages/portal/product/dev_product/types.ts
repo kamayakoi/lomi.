@@ -11,6 +11,7 @@ export interface Product {
     display_on_storefront: boolean
     created_at: string
     updated_at: string
+    total_count?: number
 }
 
 export interface Transaction {
@@ -19,4 +20,9 @@ export interface Transaction {
     gross_amount: number
     currency_code: string
     created_at: string
+}
+
+export interface ProductsResponse {
+    products: Product[]
+    totalCount: number
 }
