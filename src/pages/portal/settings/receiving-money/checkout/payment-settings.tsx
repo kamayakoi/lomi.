@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -7,11 +7,51 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Info } from 'lucide-react'
+import { toast } from "@/components/ui/use-toast"
+import { type CheckoutSettings } from '@/lib/types/checkoutsettings'
 
-export function PaymentSettings() {
-    const [defaultLanguage, setDefaultLanguage] = useState('en')
-    const [displayCurrency, setDisplayCurrency] = useState('XOF')
-    const [paymentLinkDuration, setPaymentLinkDuration] = useState(1)
+interface PaymentSettingsProps {
+    settings: CheckoutSettings | null;
+    onUpdate: (settings: Partial<CheckoutSettings>) => Promise<void>;
+}
+
+export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
+    const [defaultLanguage, setDefaultLanguage] = useState(settings?.default_language || 'en')
+    const [displayCurrency, setDisplayCurrency] = useState(settings?.display_currency || 'XOF')
+    const [paymentLinkDuration, setPaymentLinkDuration] = useState(settings?.payment_link_duration || 1)
+    const [isSaving, setIsSaving] = useState(false)
+
+    useEffect(() => {
+        if (settings) {
+            setDefaultLanguage(settings.default_language)
+            setDisplayCurrency(settings.display_currency)
+            setPaymentLinkDuration(settings.payment_link_duration)
+        }
+    }, [settings])
+
+    const handleSave = async () => {
+        try {
+            setIsSaving(true)
+            await onUpdate({
+                default_language: defaultLanguage,
+                display_currency: displayCurrency,
+                payment_link_duration: paymentLinkDuration
+            })
+            toast({
+                title: "Success",
+                description: "Payment settings updated successfully",
+            })
+        } catch (error) {
+            console.error('Error saving payment settings:', error)
+            toast({
+                title: "Error",
+                description: "Failed to update payment settings",
+                variant: "destructive",
+            })
+        } finally {
+            setIsSaving(false)
+        }
+    }
 
     return (
         <ScrollArea className="h-[calc(100vh-12rem)] pr-4">
@@ -73,7 +113,13 @@ export function PaymentSettings() {
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button className="ml-auto">Save Changes</Button>
+                    <Button
+                        onClick={handleSave}
+                        className="ml-auto"
+                        disabled={isSaving}
+                    >
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                    </Button>
                 </CardFooter>
             </Card>
         </ScrollArea>

@@ -80,7 +80,7 @@ export default function SidebarNav({
               <CollapsibleTrigger
                 className={cn(
                   buttonVariants({ variant: 'ghost' }),
-                  'justify-between w-full text-left whitespace-nowrap' // Added text-left and whitespace-nowrap
+                  'justify-between w-full text-left whitespace-nowrap rounded-none hover:bg-muted'
                 )}
                 onClick={() => toggleSection(item.href)}
               >
@@ -93,7 +93,7 @@ export default function SidebarNav({
                 )}
               </CollapsibleTrigger>
               <CollapsibleContent
-                className="space-y-1 pl-8 pr-2" // Increased left padding for subsections
+                className="space-y-1 pl-8 pr-2"
               >
                 {item.subItems?.map((subItem) => (
                   <Link
@@ -102,9 +102,9 @@ export default function SidebarNav({
                     className={cn(
                       buttonVariants({ variant: 'ghost' }),
                       pathname === subItem.href
-                        ? 'bg-muted hover:bg-muted'
-                        : 'hover:bg-transparent hover:underline',
-                      'justify-start block whitespace-nowrap' // Added whitespace-nowrap
+                        ? 'bg-muted hover:bg-muted rounded-none'
+                        : 'hover:bg-muted hover:no-underline rounded-none',
+                      'justify-start block whitespace-nowrap'
                     )}
                   >
                     {subItem.title}

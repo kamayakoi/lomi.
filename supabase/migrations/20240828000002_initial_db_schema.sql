@@ -256,6 +256,8 @@ CREATE TABLE organization_providers_settings (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(code),
     is_connected BOOLEAN NOT NULL DEFAULT false,
+    phone_number VARCHAR,
+    is_phone_verified BOOLEAN NOT NULL DEFAULT false,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -264,10 +266,14 @@ CREATE TABLE organization_providers_settings (
 );
 
 CREATE INDEX idx_org_providers_provider_code ON organization_providers_settings(provider_code);
+CREATE INDEX idx_org_providers_phone ON organization_providers_settings(phone_number) WHERE phone_number IS NOT NULL;
+CREATE INDEX idx_org_providers_verified ON organization_providers_settings(is_phone_verified) WHERE is_phone_verified = true;
 
 COMMENT ON TABLE organization_providers_settings IS 'Links organizations to their chosen payment providers';
 COMMENT ON COLUMN organization_providers_settings.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';
-COMMENT ON COLUMN organization_providers_settings.metadata IS 'Save Organizations / Providers crucial information such as Stripe account ID or withdrawing phone numbers';
+COMMENT ON COLUMN organization_providers_settings.phone_number IS 'The phone number associated with the provider account';
+COMMENT ON COLUMN organization_providers_settings.is_phone_verified IS 'Indicates if the phone number has been verified';
+COMMENT ON COLUMN organization_providers_settings.metadata IS 'Save Organizations / Providers crucial information such as partner account ID or other settings';
 
 -- Currencies table
 CREATE TABLE currencies (
@@ -485,7 +491,8 @@ CREATE TABLE transactions (
     payment_method_code payment_method_code NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code)
+    FOREIGN KEY (payment_method_code, provider_code) REFERENCES payment_methods(payment_method_code, provider_code),
+    additional_fees JSONB DEFAULT '[]'::jsonb
 );
 
 CREATE INDEX idx_transactions_merchant_id ON transactions(merchant_id);
@@ -526,8 +533,8 @@ CREATE TABLE providers_transactions (
     orange_payment_status VARCHAR(50),
     mtn_transaction_id VARCHAR(255),
     mtn_payment_status VARCHAR(50),
-    stripe_transaction_id VARCHAR(255),
-    stripe_payment_status VARCHAR(50),
+    ecobank_transaction_id VARCHAR(255),
+    ecobank_payment_status VARCHAR(50),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (transaction_id, provider_code)
@@ -954,3 +961,38 @@ CREATE INDEX idx_storefronts_organization_id ON storefronts(organization_id);
 CREATE INDEX idx_storefronts_slug ON storefronts(slug);
 
 COMMENT ON TABLE storefronts IS 'Stores storefront settings and configurations for each merchant';
+
+-- Organization Checkout Settings table
+CREATE TABLE organization_checkout_settings (
+    organization_id UUID PRIMARY KEY REFERENCES organizations(organization_id),
+    default_language VARCHAR(10) NOT NULL DEFAULT 'en',
+    display_currency currency_code NOT NULL DEFAULT 'XOF',
+    payment_link_duration INTEGER NOT NULL DEFAULT 1,
+    customer_notifications JSONB NOT NULL DEFAULT '{
+        "new_payment_links": {"email": false, "whatsapp": false},
+        "payment_reminders": {"email": false, "whatsapp": false},
+        "successful_payment_attempts": {"email": false, "whatsapp": false}
+    }'::jsonb,
+    merchant_recipients JSONB NOT NULL DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Organization Fee Types table
+CREATE TABLE organization_fee_types (
+    fee_type_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    name VARCHAR(255) NOT NULL,
+    percentage NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (percentage >= 0 AND percentage <= 100),
+    is_enabled BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (organization_id, name)
+);
+
+-- Indexes
+CREATE INDEX idx_organization_checkout_settings_org_id ON organization_checkout_settings(organization_id);
+CREATE INDEX idx_organization_fee_types_org_id ON organization_fee_types(organization_id);
+
+COMMENT ON TABLE organization_checkout_settings IS 'Stores checkout configuration for organizations';
+COMMENT ON TABLE organization_fee_types IS 'Stores custom fee types defined by organizations';

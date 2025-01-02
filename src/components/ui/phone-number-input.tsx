@@ -1,12 +1,15 @@
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Phone } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
-export default function Input46() {
-    const [value, setValue] = useState("");
+interface PhoneNumberInputProps {
+    value: string;
+    onChange: (value: string | undefined) => void;
+}
 
+export default function PhoneNumberInput({ value, onChange }: PhoneNumberInputProps) {
     return (
         <div className="space-y-2">
             <RPNInput.default
@@ -15,10 +18,9 @@ export default function Input46() {
                 flagComponent={FlagComponent}
                 countrySelectComponent={CountrySelect}
                 inputComponent={PhoneInput}
-                id="input-46"
                 placeholder="Enter phone number"
                 value={value}
-                onChange={(newValue) => setValue(newValue ?? "")}
+                onChange={onChange}
             />
         </div>
     );

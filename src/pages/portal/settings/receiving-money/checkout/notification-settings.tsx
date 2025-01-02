@@ -1,122 +1,213 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { PlusCircle } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { PlusCircle, X } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { toast } from "@/components/ui/use-toast"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { type CheckedState } from "@radix-ui/react-checkbox"
+import { type CheckoutSettings, type CustomerNotifications, type MerchantRecipient } from '@/lib/types/checkoutsettings'
 
-interface CustomerNotifications {
-    newPaymentLinks: { email: boolean; whatsapp: boolean };
-    paymentReminders: { email: boolean; whatsapp: boolean };
-    successfulPaymentAttempts: { email: boolean; whatsapp: boolean };
+const DEFAULT_CUSTOMER_NOTIFICATIONS: CustomerNotifications = {
+    new_payment_links: { email: false, whatsapp: false },
+    payment_reminders: { email: false, whatsapp: false },
+    successful_payment_attempts: { email: false, whatsapp: false },
 }
 
-interface MerchantRecipient {
-    email: string;
-    notification: string;
+interface NotificationSettingsProps {
+    settings: CheckoutSettings | null;
+    onUpdate: (settings: Partial<CheckoutSettings>) => Promise<void>;
 }
 
-export function NotificationSettings() {
-    const [customerNotifications, setCustomerNotifications] = useState<CustomerNotifications>({
-        newPaymentLinks: { email: false, whatsapp: false },
-        paymentReminders: { email: false, whatsapp: false },
-        successfulPaymentAttempts: { email: false, whatsapp: false },
-    })
+export function NotificationSettings({ settings, onUpdate }: NotificationSettingsProps) {
+    const [customerNotifications, setCustomerNotifications] = useState<CustomerNotifications>(DEFAULT_CUSTOMER_NOTIFICATIONS)
     const [merchantRecipients, setMerchantRecipients] = useState<MerchantRecipient[]>([])
+    const [isSaving, setIsSaving] = useState(false)
 
-    const handleCustomerNotificationChange = (type: keyof CustomerNotifications, method: keyof CustomerNotifications[keyof CustomerNotifications]) => {
-        setCustomerNotifications(prev => ({
-            ...prev,
-            [type]: { ...prev[type], [method]: !prev[type][method] }
-        }))
+    useEffect(() => {
+        if (settings) {
+            setCustomerNotifications(settings.customer_notifications || DEFAULT_CUSTOMER_NOTIFICATIONS)
+            setMerchantRecipients(settings.merchant_recipients || [])
+        }
+    }, [settings])
+
+    const handleCustomerNotificationChange = (type: keyof CustomerNotifications, method: 'email' | 'whatsapp', checked: CheckedState) => {
+        if (typeof checked === 'boolean') {
+            setCustomerNotifications(prev => ({
+                ...prev,
+                [type]: { ...prev[type], [method]: checked }
+            }))
+        }
     }
 
     const addMerchantRecipient = () => {
-        setMerchantRecipients([...merchantRecipients, { email: '', notification: '' }])
+        const newRecipient: MerchantRecipient = {
+            email: '',
+            notification: 'all'
+        }
+        setMerchantRecipients(prevRecipients => [...prevRecipients, newRecipient])
     }
 
     const updateMerchantRecipient = (index: number, field: keyof MerchantRecipient, value: string) => {
-        const updatedRecipients = [...merchantRecipients]
-        if (updatedRecipients[index]) {
-            updatedRecipients[index][field] = value
-            setMerchantRecipients(updatedRecipients)
+        setMerchantRecipients(prevRecipients => {
+            const updatedRecipients = [...prevRecipients]
+            const currentRecipient = updatedRecipients[index] || { email: '', notification: 'all' }
+
+            if (field === 'notification' && (value === 'all' || value === 'important')) {
+                updatedRecipients[index] = {
+                    ...currentRecipient,
+                    notification: value
+                }
+            } else if (field === 'email') {
+                updatedRecipients[index] = {
+                    ...currentRecipient,
+                    email: value
+                }
+            }
+
+            return updatedRecipients
+        })
+    }
+
+    const removeMerchantRecipient = (index: number) => {
+        setMerchantRecipients(prevRecipients => prevRecipients.filter((_, i) => i !== index))
+    }
+
+    const handleSave = async () => {
+        try {
+            setIsSaving(true)
+            await onUpdate({
+                customer_notifications: customerNotifications,
+                merchant_recipients: merchantRecipients.filter(r => r.email && r.notification)
+            })
+            toast({
+                title: "Success",
+                description: "Notification settings updated successfully",
+            })
+        } catch (error) {
+            console.error('Error saving notification settings:', error)
+            toast({
+                title: "Error",
+                description: "Failed to update notification settings",
+                variant: "destructive",
+            })
+        } finally {
+            setIsSaving(false)
         }
     }
 
     return (
-        <Card className="w-full max-w-3xl mx-auto">
-            <CardHeader>
-                <CardTitle>Notifications</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Customer Notifications</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                        Select the types of notifications you want to send to your customers. If you are using WhatsApp notifications, please make sure you have your customers&apos; consent to receive messages.
-                    </p>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr>
-                                    <th className="text-left py-2">Notification Type</th>
-                                    <th className="text-center py-2">Email</th>
-                                    <th className="text-center py-2">WhatsApp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Customer Notifications</CardTitle>
+                    <CardDescription>
+                        Configure notifications sent to your customers during the payment process
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="border rounded-none">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Notification Type</TableHead>
+                                    <TableHead className="text-center">Email</TableHead>
+                                    <TableHead className="text-center">WhatsApp</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
                                 {Object.entries(customerNotifications).map(([type, methods]) => (
-                                    <tr key={type}>
-                                        <td className="py-2">{type.replace(/([A-Z])/g, ' $1').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</td>
+                                    <TableRow key={type}>
+                                        <TableCell>
+                                            {type.replace(/([A-Z])/g, ' $1')
+                                                .split('_')
+                                                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                                .join(' ')}
+                                        </TableCell>
                                         {Object.entries(methods).map(([method, isChecked]) => (
-                                            <td key={method} className="py-2 text-center">
+                                            <TableCell key={method} className="text-center">
                                                 <Checkbox
                                                     checked={isChecked as boolean}
-                                                    onCheckedChange={() => handleCustomerNotificationChange(type as keyof CustomerNotifications, method as keyof CustomerNotifications[keyof CustomerNotifications])}
+                                                    onCheckedChange={(checked) => handleCustomerNotificationChange(
+                                                        type as keyof CustomerNotifications,
+                                                        method as 'email' | 'whatsapp',
+                                                        checked
+                                                    )}
                                                 />
-                                            </td>
+                                            </TableCell>
                                         ))}
-                                    </tr>
+                                    </TableRow>
                                 ))}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
-                </div>
+                </CardContent>
+            </Card>
 
-                <div>
-                    <h3 className="text-lg font-semibold mb-2">Merchant Notifications</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Add recipients who will be notified about invoice updates.</p>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Merchant Recipients</CardTitle>
+                    <CardDescription>
+                        Add team members who should receive payment notifications
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     {merchantRecipients.map((recipient, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
-                            <Input
-                                placeholder="Email"
-                                value={recipient.email}
-                                onChange={(e) => updateMerchantRecipient(index, 'email', e.target.value)}
-                                className="flex-grow"
-                            />
-                            <Select
-                                value={recipient.notification}
-                                onValueChange={(value) => updateMerchantRecipient(index, 'notification', value)}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Notification" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Notifications</SelectItem>
-                                    <SelectItem value="important">Important Only</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                            <div className="flex-grow">
+                                <Input
+                                    placeholder="Email address"
+                                    value={recipient.email}
+                                    onChange={(e) => updateMerchantRecipient(index, 'email', e.target.value)}
+                                    className="rounded-none"
+                                />
+                            </div>
+                            <div className="flex space-x-2">
+                                <Select
+                                    value={recipient.notification || 'all'}
+                                    onValueChange={(value: 'all' | 'important') => updateMerchantRecipient(index, 'notification', value)}
+                                >
+                                    <SelectTrigger className="w-[180px] rounded-none">
+                                        <SelectValue placeholder="Notification type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Notifications</SelectItem>
+                                        <SelectItem value="important">Important Only</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => removeMerchantRecipient(index)}
+                                    className="rounded-none hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     ))}
-                    <Button variant="outline" onClick={addMerchantRecipient} className="mt-2">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Add recipient
+                    <Button
+                        variant="outline"
+                        onClick={addMerchantRecipient}
+                        className="w-full rounded-none"
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add Recipient
                     </Button>
-                </div>
-            </CardContent>
-            <CardFooter>
-                <Button className="w-full">Save Changes</Button>
-            </CardFooter>
-        </Card>
+                    <div className="pt-4">
+                        <Button
+                            onClick={handleSave}
+                            className="w-full rounded-none"
+                            disabled={isSaving}
+                        >
+                            {isSaving ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     )
 }
 

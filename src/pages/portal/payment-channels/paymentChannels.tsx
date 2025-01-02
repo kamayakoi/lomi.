@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/dashboard/notifications'
 import { UserNav } from '@/components/dashboard/user-nav'
 import { Button } from '@/components/custom/button'
-import { providers } from './data'
+import { providers, type Provider } from './data'
 import { supabase } from '@/utils/supabase/client'
 import { Database } from '@/../database.types'
 import { TopNav } from '@/components/dashboard/top-nav'
@@ -18,11 +18,15 @@ import Loader from '@/components/dashboard/loader'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import SupportForm from '@/components/dashboard/support-form'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import PhoneNumberInput from '@/components/ui/phone-number-input'
 
 export default function PaymentChannels() {
   const [showMessage, setShowMessage] = useState<Record<string, boolean>>({})
   const [disconnectingProvider, setDisconnectingProvider] = useState<string | null>(null)
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false)
+  const [phoneDialogOpen, setPhoneDialogOpen] = useState(false)
+  const [connectingProvider, setConnectingProvider] = useState<string | null>(null)
+  const [phoneNumber, setPhoneNumber] = useState("")
   const { user, isLoading: isUserLoading } = useUser()
   const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
   const [organizationProviders, setOrganizationProviders] = useState<Pick<Database['public']['Tables']['organization_providers_settings']['Row'], 'provider_code' | 'is_connected'>[]>([])
@@ -55,26 +59,61 @@ export default function PaymentChannels() {
       return
     }
 
+    const provider = providers.find(p => p.provider_code === providerCode) as Provider
+    if (provider && (provider.type === 'Mobile Money' || provider.type === 'E-Wallet')) {
+      setConnectingProvider(providerCode)
+      setPhoneDialogOpen(true)
+      return
+    }
+
+    await connectProvider(providerCode)
+  }
+
+  const connectProvider = async (providerCode: string) => {
     if (sidebarData?.organization_id) {
       const { error } = await supabase
         .rpc('update_organization_provider_connection', {
           p_organization_id: sidebarData.organization_id,
           p_provider_code: providerCode,
-          p_is_connected: isConnected,
+          p_is_connected: true,
         })
 
       if (error) {
         console.error('Error updating provider connection:', error)
       } else {
         fetchOrganizationProviders(sidebarData.organization_id)
-        if (isConnected) {
-          setShowMessage((prevState) => ({
-            ...prevState,
-            [providerCode]: true,
-          }))
-        }
+        setShowMessage((prevState) => ({
+          ...prevState,
+          [providerCode]: true,
+        }))
       }
     }
+  }
+
+  const handlePhoneSubmit = async () => {
+    if (!connectingProvider || !sidebarData?.organization_id || !phoneNumber) return
+
+    // First update the phone number
+    const { error: phoneError } = await supabase
+      .rpc('update_organization_provider_phone', {
+        p_organization_id: sidebarData.organization_id,
+        p_provider_code: connectingProvider,
+        p_phone_number: phoneNumber,
+        p_is_phone_verified: false // Initially set as unverified
+      })
+
+    if (phoneError) {
+      console.error('Error updating provider phone:', phoneError)
+      return
+    }
+
+    // Then connect the provider
+    await connectProvider(connectingProvider)
+
+    // Close dialog and reset states
+    setPhoneDialogOpen(false)
+    setConnectingProvider(null)
+    setPhoneNumber("")
   }
 
   const confirmDisconnect = async () => {
@@ -218,6 +257,42 @@ export default function PaymentChannels() {
           </ul>
         </div>
       </Layout.Body>
+      <Dialog open={phoneDialogOpen} onOpenChange={setPhoneDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Enter Phone Number for {providers.find(p => p.provider_code === connectingProvider)?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Please enter the phone number associated with your {providers.find(p => p.provider_code === connectingProvider)?.name} account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <PhoneNumberInput
+              value={phoneNumber}
+              onChange={(value: string | undefined) => setPhoneNumber(value || "")}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPhoneDialogOpen(false)
+                setConnectingProvider(null)
+                setPhoneNumber("")
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handlePhoneSubmit}
+              disabled={!phoneNumber}
+            >
+              Connect
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={disconnectDialogOpen} onOpenChange={setDisconnectDialogOpen}>
         <DialogContent>
           <DialogHeader>

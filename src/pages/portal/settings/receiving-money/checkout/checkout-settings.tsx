@@ -1,36 +1,149 @@
+import { useState, useEffect, useCallback } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PaymentSettings } from './payment-settings'
 import { FeeSettings } from './fee-settings'
 import { NotificationSettings } from './notification-settings'
 import ContentSection from '@/components/dashboard/content-section'
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { supabase } from '@/utils/supabase/client'
+import { useSidebarData } from '@/lib/hooks/useSidebarData'
+import Loader from '@/components/dashboard/loader'
+import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { AlertCircle } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card"
+import { type CheckoutSettings } from '@/lib/types/checkoutsettings'
 
-export default function CheckoutSettings() {
+function CheckoutSettingsPage() {
+    const [activeTab, setActiveTab] = useState('payment')
+    const [settings, setSettings] = useState<CheckoutSettings | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+    const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
+
+    const fetchCheckoutSettings = useCallback(async () => {
+        try {
+            const { data, error } = await supabase
+                .rpc('fetch_organization_checkout_settings', {
+                    p_organization_id: sidebarData?.organization_id
+                })
+
+            if (error) throw error
+
+            if (data) {
+                setSettings(data)
+            }
+        } catch (err) {
+            console.error('Error fetching checkout settings:', err)
+            setError('Failed to load checkout settings. Please try again later.')
+        } finally {
+            setLoading(false)
+        }
+    }, [sidebarData?.organization_id])
+
+    useEffect(() => {
+        if (sidebarData?.organization_id) {
+            fetchCheckoutSettings()
+        }
+    }, [sidebarData?.organization_id, fetchCheckoutSettings])
+
+    const handleSettingsUpdate = async (updatedSettings: Partial<CheckoutSettings>) => {
+        try {
+            const { error } = await supabase
+                .rpc('update_organization_checkout_settings', {
+                    p_organization_id: sidebarData?.organization_id,
+                    p_settings: updatedSettings
+                })
+
+            if (error) throw error
+
+            // Update local state
+            setSettings(prev => prev ? { ...prev, ...updatedSettings } : null)
+        } catch (err) {
+            console.error('Error updating checkout settings:', err)
+            throw err
+        }
+    }
+
+    if (loading || isSidebarLoading) {
+        return <Loader />
+    }
+
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 py-6">
+        <div style={{
+            overflowY: 'auto',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
             <ContentSection
                 title="Checkout"
                 desc="Configure the appearance, payment options, fees, and notifications for your customers checkout experience."
             >
-                <Tabs defaultValue="payment" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 lg:w-[400px] mb-6">
-                        <TabsTrigger value="payment">Payment</TabsTrigger>
-                        <TabsTrigger value="fees">Fees</TabsTrigger>
-                        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                    </TabsList>
-                    <ScrollArea className="h-[calc(100vh-16rem)]" style={{ overflowX: 'hidden' }}>
-                        <TabsContent value="payment">
-                            <PaymentSettings />
-                        </TabsContent>
-                        <TabsContent value="fees">
-                            <FeeSettings />
-                        </TabsContent>
-                        <TabsContent value="notifications">
-                            <NotificationSettings />
-                        </TabsContent>
-                    </ScrollArea>
-                </Tabs>
+                {error ? (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                ) : (
+                    <div className="space-y-4">
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full"
+                        >
+                            <div className="space-y-4">
+                                <TabsList className="rounded-none">
+                                    <TabsTrigger value="payment" className="rounded-none">Payment</TabsTrigger>
+                                    <TabsTrigger value="fees" className="rounded-none">Fees</TabsTrigger>
+                                    <TabsTrigger value="notifications" className="rounded-none">Notifications</TabsTrigger>
+                                </TabsList>
+
+                                <TabsContent value="payment">
+                                    <Card className="rounded-none">
+                                        <CardContent className="p-4">
+                                            <PaymentSettings
+                                                settings={settings}
+                                                onUpdate={handleSettingsUpdate}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+
+                                <TabsContent value="fees">
+                                    <Card className="rounded-none">
+                                        <CardContent className="p-4">
+                                            <FeeSettings
+                                                settings={settings}
+                                                onUpdate={handleSettingsUpdate}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+
+                                <TabsContent value="notifications">
+                                    <Card className="rounded-none">
+                                        <CardContent className="p-4">
+                                            <NotificationSettings
+                                                settings={settings}
+                                                onUpdate={handleSettingsUpdate}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </TabsContent>
+                            </div>
+                        </Tabs>
+                    </div>
+                )}
             </ContentSection>
         </div>
     )
 }
+
+const CheckoutSettingsWithActivationCheck = withActivationCheck(CheckoutSettingsPage)
+export default CheckoutSettingsWithActivationCheck

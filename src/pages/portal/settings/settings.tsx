@@ -37,20 +37,22 @@ function Settings() {
       <Separator className='my-0' />
 
       <Layout.Body className='flex flex-col h-full'>
-        <div style={{ marginBottom: '1rem' }}>
-          <h1 className='text-2xl font-bold tracking-tight' style={{ marginBottom: '0.5rem' }}>
+        <div className='mb-4'>
+          <h1 className='text-2xl font-bold tracking-tight mb-2'>
             Settings
           </h1>
           <p className='text-muted-foreground'>
             Configure your account, set up payments and payouts, and customize your experience.
           </p>
         </div>
-        <Separator className='my-4 lg:my-6' />
-        <div className='flex flex-1 flex-col space-y-8 md:space-y-2 md:overflow-hidden lg:flex-row lg:space-x-8 lg:space-y-0'>
-          <aside className='top-0 lg:sticky lg:w-1/4 h-full overflow-y-auto'>
-            <SidebarNav items={sidebarNavItems} />
+        <Separator className='my-4' />
+        <div className='flex flex-1 flex-col lg:flex-row lg:gap-8 min-h-0'>
+          <aside className='lg:w-1/4 border-r overflow-y-auto'>
+            <nav className='grid gap-1 p-1'>
+              <SidebarNav items={sidebarNavItems} />
+            </nav>
           </aside>
-          <div className='flex-1 lg:max-w-3xl p-1 pr-4 md:overflow-y-auto'>
+          <div className='flex-1 lg:max-w-3xl p-1 overflow-y-auto'>
             <Outlet />
           </div>
         </div>
@@ -76,8 +78,8 @@ const sidebarNavItems = [
     icon: <IconCreditCard size={18} />,
     href: '/portal/settings/receiving-money/payment-methods',
     subItems: [
-      { title: 'Payment Methods', href: '/portal/settings/receiving-money/payment-methods' },
-      { title: 'Checkout Options', href: '/portal/settings/receiving-money/checkout' },
+      { title: 'Payment methods', href: '/portal/settings/receiving-money/payment-methods' },
+      { title: 'Checkout options', href: '/portal/settings/receiving-money/checkout' },
     ],
   },
   // {
@@ -103,8 +105,8 @@ const sidebarNavItems = [
     icon: <IconReceipt size={18} />,
     href: '/portal/settings/billing/statements',
     subItems: [
-      { title: 'Billing Statements', href: '/portal/settings/billing/statements' },
-      { title: 'Fee Structure', href: '/portal/settings/billing/fee-structure' },
+      { title: 'Billing statements', href: '/portal/settings/billing/statements' },
+      { title: 'Fee structure', href: '/portal/settings/billing/fee-structure' },
     ],
   },
   {
@@ -112,9 +114,9 @@ const sidebarNavItems = [
     icon: <IconCode size={18} />,
     href: '/portal/settings/developers/api-keys',
     subItems: [
-      { title: 'API Keys', href: '/portal/settings/developers/api-keys' },
+      { title: 'API keys', href: '/portal/settings/developers/api-keys' },
       { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
-      // { title: 'IP Allowlist', href: '/portal/settings/developers/ip-allowlist' },
+      // { title: 'IP allowlist', href: '/portal/settings/developers/ip-allowlist' },
     ],
   },
   {
@@ -122,9 +124,9 @@ const sidebarNavItems = [
     icon: <IconWallet size={18} />,
     href: '/portal/settings/withdrawals/bank-accounts',
     subItems: [
-      { title: 'Bank Accounts', href: '/portal/settings/withdrawals/bank-accounts' },
-      { title: 'Email Notifications', href: '/portal/settings/withdrawals/email-notifications' },
-      { title: 'Automated Payouts', href: '/portal/settings/withdrawals/auto-withdrawal' },
+      { title: 'Bank accounts', href: '/portal/settings/withdrawals/bank-accounts' },
+      { title: 'Email notifications', href: '/portal/settings/withdrawals/email-notifications' },
+      { title: 'Automated payouts', href: '/portal/settings/withdrawals/auto-withdrawal' },
     ],
   },
 ]
