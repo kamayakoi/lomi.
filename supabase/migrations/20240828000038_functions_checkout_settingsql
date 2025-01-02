@@ -1,5 +1,5 @@
 -- Function to fetch organization checkout settings
-CREATE OR REPLACE FUNCTION public.get_organization_checkout_settings(p_organization_id UUID)
+CREATE OR REPLACE FUNCTION public.fetch_organization_checkout_settings(p_organization_id UUID)
 RETURNS TABLE (
     organization_id UUID,
     default_language VARCHAR,
@@ -7,7 +7,7 @@ RETURNS TABLE (
     payment_link_duration INTEGER,
     customer_notifications JSONB,
     merchant_recipients JSONB
-) SECURITY DEFINER AS $$
+) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
@@ -20,13 +20,13 @@ BEGIN
     FROM organization_checkout_settings ocs
     WHERE ocs.organization_id = p_organization_id;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update customer notifications
 CREATE OR REPLACE FUNCTION public.update_customer_notifications(
     p_organization_id UUID,
     p_notifications JSONB
-) RETURNS void SECURITY DEFINER AS $$
+) RETURNS void AS $$
 BEGIN
     INSERT INTO organization_checkout_settings (
         organization_id,
@@ -40,13 +40,13 @@ BEGIN
         customer_notifications = p_notifications,
         updated_at = NOW();
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update merchant recipients
 CREATE OR REPLACE FUNCTION public.update_merchant_recipients(
     p_organization_id UUID,
     p_recipients JSONB
-) RETURNS void SECURITY DEFINER AS $$
+) RETURNS void AS $$
 BEGIN
     INSERT INTO organization_checkout_settings (
         organization_id,
@@ -60,13 +60,13 @@ BEGIN
         merchant_recipients = p_recipients,
         updated_at = NOW();
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update all checkout settings
-CREATE OR REPLACE FUNCTION public.update_all_checkout_settings(
+CREATE OR REPLACE FUNCTION public.update_organization_checkout_settings(
     p_organization_id UUID,
     p_settings JSONB
-) RETURNS void SECURITY DEFINER AS $$
+) RETURNS void AS $$
 BEGIN
     INSERT INTO organization_checkout_settings (
         organization_id,
@@ -96,4 +96,4 @@ BEGIN
         merchant_recipients = COALESCE(EXCLUDED.merchant_recipients, organization_checkout_settings.merchant_recipients),
         updated_at = NOW();
 END;
-$$ LANGUAGE plpgsql; 
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp; 

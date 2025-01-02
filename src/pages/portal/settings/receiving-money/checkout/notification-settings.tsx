@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -9,6 +9,9 @@ import { toast } from "@/components/ui/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { type CheckedState } from "@radix-ui/react-checkbox"
 import { type CheckoutSettings, type CustomerNotifications, type MerchantRecipient } from '@/lib/types/checkoutsettings'
+import { OrganizationContext } from '@/lib/contexts/OrganizationContext'
+import { supabase } from '@/utils/supabase/client'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const DEFAULT_CUSTOMER_NOTIFICATIONS: CustomerNotifications = {
     new_payment_links: { email: false, whatsapp: false },
@@ -16,29 +19,73 @@ const DEFAULT_CUSTOMER_NOTIFICATIONS: CustomerNotifications = {
     successful_payment_attempts: { email: false, whatsapp: false },
 }
 
-interface NotificationSettingsProps {
-    settings: CheckoutSettings | null;
-    onUpdate: (settings: Partial<CheckoutSettings>) => Promise<void>;
-}
-
-export function NotificationSettings({ settings, onUpdate }: NotificationSettingsProps) {
+export function NotificationSettings() {
+    const { organizationId } = useContext(OrganizationContext)
+    const queryClient = useQueryClient()
     const [customerNotifications, setCustomerNotifications] = useState<CustomerNotifications>(DEFAULT_CUSTOMER_NOTIFICATIONS)
     const [merchantRecipients, setMerchantRecipients] = useState<MerchantRecipient[]>([])
     const [isSaving, setIsSaving] = useState(false)
 
-    useEffect(() => {
-        if (settings) {
-            setCustomerNotifications(settings.customer_notifications || DEFAULT_CUSTOMER_NOTIFICATIONS)
-            setMerchantRecipients(settings.merchant_recipients || [])
+    // Fetch settings
+    const { data: checkoutSettings } = useQuery({
+        queryKey: ['checkoutSettings', organizationId],
+        queryFn: async () => {
+            if (!organizationId) return null
+            const { data, error } = await supabase.rpc('fetch_organization_checkout_settings', {
+                p_organization_id: organizationId
+            })
+            if (error) throw error
+            return data?.[0] || null
+        },
+        enabled: !!organizationId
+    })
+
+    // Update settings mutation
+    const updateSettingsMutation = useMutation({
+        mutationFn: async (settings: Partial<CheckoutSettings>) => {
+            if (!organizationId) throw new Error('No organization ID')
+            const { error } = await supabase.rpc('update_organization_checkout_settings', {
+                p_organization_id: organizationId,
+                p_settings: settings
+            })
+            if (error) throw error
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['checkoutSettings'] })
+            toast({
+                title: "Success",
+                description: "Settings updated successfully",
+            })
+        },
+        onError: (error) => {
+            console.error('Error updating settings:', error)
+            toast({
+                title: "Error",
+                description: "Failed to update settings",
+                variant: "destructive",
+            })
         }
-    }, [settings])
+    })
+
+    useEffect(() => {
+        if (checkoutSettings) {
+            setCustomerNotifications(checkoutSettings.customer_notifications || DEFAULT_CUSTOMER_NOTIFICATIONS)
+            setMerchantRecipients(checkoutSettings.merchant_recipients || [])
+        }
+    }, [checkoutSettings])
 
     const handleCustomerNotificationChange = (type: keyof CustomerNotifications, method: 'email' | 'whatsapp', checked: CheckedState) => {
         if (typeof checked === 'boolean') {
-            setCustomerNotifications(prev => ({
-                ...prev,
-                [type]: { ...prev[type], [method]: checked }
-            }))
+            const updatedNotifications = {
+                ...customerNotifications,
+                [type]: { ...customerNotifications[type], [method]: checked }
+            }
+            setCustomerNotifications(updatedNotifications)
+
+            // Update just the notifications
+            updateSettingsMutation.mutate({
+                customer_notifications: updatedNotifications
+            })
         }
     }
 
@@ -78,20 +125,9 @@ export function NotificationSettings({ settings, onUpdate }: NotificationSetting
     const handleSave = async () => {
         try {
             setIsSaving(true)
-            await onUpdate({
+            await updateSettingsMutation.mutateAsync({
                 customer_notifications: customerNotifications,
                 merchant_recipients: merchantRecipients.filter(r => r.email && r.notification)
-            })
-            toast({
-                title: "Success",
-                description: "Notification settings updated successfully",
-            })
-        } catch (error) {
-            console.error('Error saving notification settings:', error)
-            toast({
-                title: "Error",
-                description: "Failed to update notification settings",
-                variant: "destructive",
             })
         } finally {
             setIsSaving(false)

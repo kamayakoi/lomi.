@@ -129,10 +129,7 @@ function CheckoutSettingsPage() {
                                 <TabsContent value="notifications">
                                     <Card className="rounded-none">
                                         <CardContent className="p-4">
-                                            <NotificationSettings
-                                                settings={settings}
-                                                onUpdate={handleSettingsUpdate}
-                                            />
+                                            <NotificationSettings />
                                         </CardContent>
                                     </Card>
                                 </TabsContent>

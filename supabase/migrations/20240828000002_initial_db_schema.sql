@@ -969,9 +969,9 @@ CREATE TABLE organization_checkout_settings (
     display_currency currency_code NOT NULL DEFAULT 'XOF',
     payment_link_duration INTEGER NOT NULL DEFAULT 1,
     customer_notifications JSONB NOT NULL DEFAULT '{
-        "new_payment_links": {"email": false, "whatsapp": false},
-        "payment_reminders": {"email": false, "whatsapp": false},
-        "successful_payment_attempts": {"email": false, "whatsapp": false}
+        "new_payment_links": {"email": true, "whatsapp": false},
+        "payment_reminders": {"email": true, "whatsapp": false},
+        "successful_payment_attempts": {"email": true, "whatsapp": false}
     }'::jsonb,
     merchant_recipients JSONB NOT NULL DEFAULT '[]'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
