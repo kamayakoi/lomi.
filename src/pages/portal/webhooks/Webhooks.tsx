@@ -75,6 +75,7 @@ function WebhooksPage() {
     const handleWebhookClick = (webhook: Webhook) => {
         setSelectedWebhook(webhook)
         setIsActionsOpen(true)
+        console.log('Opening webhook details:', webhook)
     }
 
     const handleSort = (column: keyof Webhook) => {
@@ -122,12 +123,12 @@ function WebhooksPage() {
                         <h1 className="text-2xl font-bold tracking-tight">Webhooks</h1>
                         <Dialog open={isCreateWebhookOpen} onOpenChange={setIsCreateWebhookOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                                     <PlusCircle className="mr-2 h-4 w-4" />
                                     Create
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="rounded-none">
                                 <DialogHeader>
                                     <DialogTitle>Create a webhook</DialogTitle>
                                     <DialogDescription>
@@ -148,9 +149,9 @@ function WebhooksPage() {
                         isRefreshing={isRefreshing}
                     />
 
-                    <Card className="mt-4">
+                    <Card className="mt-4 rounded-none">
                         <CardContent className="p-4">
-                            <div className="rounded-md border">
+                            <div className="border rounded-none">
                                 <div className="max-h-[calc(100vh-210px)] overflow-y-auto pr-2 scrollbar-hide">
                                     <Table>
                                         <TableHeader>
@@ -195,7 +196,7 @@ function WebhooksPage() {
                                                     <TableCell colSpan={4}>
                                                         <div className="py-24 text-center">
                                                             <div className="flex justify-center mb-6">
-                                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-none">
                                                                     <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                                                 </div>
                                                             </div>
@@ -210,12 +211,18 @@ function WebhooksPage() {
                                                 </TableRow>
                                             ) : (
                                                 sortWebhooks(webhooks).map((webhook: Webhook) => (
-                                                    <TableRow key={webhook.webhook_id} onClick={() => handleWebhookClick(webhook)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                    <TableRow
+                                                        key={webhook.webhook_id}
+                                                        onClick={() => handleWebhookClick(webhook)}
+                                                        className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                        role="button"
+                                                        tabIndex={0}
+                                                    >
                                                         <TableCell className="text-left pl-4">{webhook.url}</TableCell>
                                                         <TableCell className="text-left pl-2">{webhook.event}</TableCell>
                                                         <TableCell className="text-center">
                                                             <span className={`
-                                                                inline-block px-2 py-1 rounded-full text-xs font-normal
+                                                                inline-block px-2 py-1 rounded-none text-xs font-normal
                                                                 ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
                                                             `}>
                                                                 {webhook.is_active ? 'Active' : 'Inactive'}
@@ -232,7 +239,12 @@ function WebhooksPage() {
                     </Card>
                 </div>
             </Layout.Body>
-            <WebhookActions webhook={selectedWebhook} isOpen={isActionsOpen} onClose={() => setIsActionsOpen(false)} />
+            <WebhookActions
+                webhook={selectedWebhook}
+                isOpen={isActionsOpen}
+                onClose={() => setIsActionsOpen(false)}
+                onSuccess={() => refetch()}
+            />
         </Layout>
     )
 }

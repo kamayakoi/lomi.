@@ -9,7 +9,7 @@ export const fetchWebhooks = async (
   const { data, error } = await supabase.rpc('fetch_webhooks', {
     p_merchant_id: merchantId,
     p_event: event === 'all' ? null : event,
-    p_is_active: isActive === 'active' ? true : isActive === 'inactive' ? false : null,
+    p_is_active: isActive === 'all' ? null : isActive === 'active'
   })
 
   if (error) {

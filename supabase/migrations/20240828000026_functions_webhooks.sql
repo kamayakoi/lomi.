@@ -187,8 +187,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to fetch webhooks with optional filters
+CREATE OR REPLACE FUNCTION public.fetch_webhooks(
+    p_merchant_id UUID,
+    p_event webhook_event DEFAULT NULL,
+    p_is_active BOOLEAN DEFAULT NULL
+)
+RETURNS SETOF webhooks AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM webhooks
+    WHERE merchant_id = p_merchant_id
+    AND (p_event IS NULL OR event = p_event)
+    AND (p_is_active IS NULL OR is_active = p_is_active)
+    ORDER BY created_at DESC;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to fetch webhook details
+CREATE OR REPLACE FUNCTION public.fetch_webhook_details(
+    p_webhook_id UUID
+)
+RETURNS SETOF webhooks AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM webhooks
+    WHERE webhook_id = p_webhook_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.create_webhook(UUID, VARCHAR, webhook_event, BOOLEAN, JSONB) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_webhook(UUID, VARCHAR, BOOLEAN, JSONB) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_webhook(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_webhook_status(UUID, INT, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_webhooks(UUID, webhook_event, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_webhook_details(UUID) TO authenticated;

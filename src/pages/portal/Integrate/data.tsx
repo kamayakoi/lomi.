@@ -29,4 +29,11 @@ export const integrationOptions = [
     logo: <img src="/wordpress.webp" alt="WordPress" className="w-12 h-12 object-contain" />,
     installLink: "#",
   },
+  {
+    title: "WhatsApp",
+    description: "Accept payments directly on WhatsApp with our generated storefront pages.",
+    link: "#",
+    logo: <img src="/whatsapp.webp" alt="WhatsApp" className="w-12 h-12 object-contain" />,
+    installLink: "#",
+  },
 ];
