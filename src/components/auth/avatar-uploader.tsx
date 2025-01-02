@@ -180,6 +180,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                             e.preventDefault();
                             document.getElementById('profile-upload')?.click();
                         }}
+                        className="rounded-none"
                     >
                         {previewUrl ? 'Replace image' : 'Upload image'}
                     </Button>
@@ -187,6 +188,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         variant="outline"
                         onClick={handleRemove}
                         disabled={!previewUrl}
+                        className="rounded-none"
                     >
                         Remove
                     </Button>
@@ -215,8 +217,8 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         )}
                     </div>
                     <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSave}>Save</Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">Cancel</Button>
+                        <Button onClick={handleSave} className="rounded-none">Save</Button>
                     </div>
                 </DialogContent>
             </Dialog>

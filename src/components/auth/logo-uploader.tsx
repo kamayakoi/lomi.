@@ -182,6 +182,7 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                             e.preventDefault();
                             document.getElementById('logo-upload')?.click();
                         }}
+                        className="rounded-none"
                     >
                         {previewUrl ? 'Replace image' : 'Upload image'}
                     </Button>
@@ -189,6 +190,7 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         variant="outline"
                         onClick={handleRemove}
                         disabled={!previewUrl}
+                        className="rounded-none"
                     >
                         Remove
                     </Button>
@@ -217,8 +219,8 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         )}
                     </div>
                     <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                        <Button onClick={handleSave}>Save</Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">Cancel</Button>
+                        <Button onClick={handleSave} className="rounded-none">Save</Button>
                     </div>
                 </DialogContent>
             </Dialog>

@@ -5,16 +5,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 
 const paymentMethods = [
-    { channel: 'Credit Card', type: 'Card', provider: 'Stripe' },
-    { channel: 'Debit Card', type: 'Card', provider: 'Stripe' },
-    { channel: 'Apple Pay', type: 'E-Wallet', provider: 'Stripe' },
-    { channel: 'PayPal', type: 'E-Wallet', provider: 'Stripe' },
-    { channel: 'Orange', type: 'Mobile Money', provider: 'Orange' },
-    { channel: 'MTN', type: 'Mobile Money', provider: 'MTN' },
-    { channel: 'Wave', type: 'Mobile Money', provider: 'Wave' },
+    { channel: 'Visa', type: 'Card' },
+    { channel: 'Mastercard', type: 'Card' },
+    { channel: 'Orange', type: 'Mobile Money' },
+    { channel: 'MTN', type: 'Mobile Money' },
+    { channel: 'Wave', type: 'E-Wallet' },
 ]
 
 const typeIcons: Record<string, JSX.Element> = {
@@ -31,8 +28,7 @@ export default function PaymentMethods() {
         .filter(method => filter === 'all' || method.type.toLowerCase() === filter)
         .filter(method =>
             method.channel.toLowerCase().includes(search.toLowerCase()) ||
-            method.type.toLowerCase().includes(search.toLowerCase()) ||
-            method.provider.toLowerCase().includes(search.toLowerCase())
+            method.type.toLowerCase().includes(search.toLowerCase())
         )
 
     return (
@@ -70,7 +66,6 @@ export default function PaymentMethods() {
                                 <TableRow>
                                     <TableHead className="w-[40%]">CHANNEL</TableHead>
                                     <TableHead className="w-[30%]">TYPE</TableHead>
-                                    <TableHead className="w-[30%]">PROVIDER</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -82,9 +77,6 @@ export default function PaymentMethods() {
                                                 {typeIcons[method.type]}
                                                 <span>{method.type}</span>
                                             </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge variant="outline">{method.provider}</Badge>
                                         </TableCell>
                                     </TableRow>
                                 ))}

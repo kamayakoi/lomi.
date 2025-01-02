@@ -230,7 +230,12 @@ const PinInputFieldNoRef = <T extends React.ElementType = 'input'>(
       ref={ref}
       type={mask ? 'password' : type === 'numeric' ? 'tel' : 'text'}
       inputMode={type === 'numeric' ? 'numeric' : 'text'}
-      className={cn('size-10 text-center', className)}
+      className={cn(
+        'w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        'placeholder-gray-400',
+        className
+      )}
       {...rest}
     />
   )
@@ -401,13 +406,12 @@ const usePinInput = ({
     if (type === 'numeric') {
       const canTypeSign =
         key === 'Backspace' ||
-          key === 'Tab' ||
-          key === 'Control' ||
-          key === 'Delete' ||
-          (ctrlKey && key === 'v') ||
-          (metaKey && key === 'v')
-          ? true
-          : !Number.isNaN(Number(key))
+        key === 'Tab' ||
+        key === 'Control' ||
+        key === 'Delete' ||
+        (ctrlKey && key === 'v') ||
+        (metaKey && key === 'v') ||
+        (key >= '0' && key <= '9')
 
       if (!canTypeSign || readOnly) {
         event.preventDefault()
@@ -422,11 +426,17 @@ const usePinInput = ({
       focusInput(index + 1)
     } else if (key === 'Delete') {
       event.preventDefault()
+      updateInputField('', index)
+      if (index < length - 1) {
+        focusInput(index + 1)
+      }
     } else if (key === 'Backspace') {
       event.preventDefault()
-      updateInputField('', index)
       if ((event.target as HTMLInputElement).value === '') {
+        updateInputField('', index - 1)
         focusInput(index - 1)
+      } else {
+        updateInputField('', index)
       }
     }
   }

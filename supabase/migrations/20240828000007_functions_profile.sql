@@ -34,7 +34,8 @@ CREATE OR REPLACE FUNCTION public.update_merchant_details(
     p_name VARCHAR,
     p_email VARCHAR,
     p_phone_number VARCHAR,
-    p_pin_code VARCHAR
+    p_pin_code VARCHAR,
+    p_preferred_language VARCHAR(10)
 )
 RETURNS VOID AS $$
 BEGIN
@@ -44,6 +45,7 @@ BEGIN
         email = p_email,
         phone_number = p_phone_number,
         pin_code = p_pin_code,
+        preferred_language = p_preferred_language,
         updated_at = NOW()
     WHERE 
         merchant_id = p_merchant_id;

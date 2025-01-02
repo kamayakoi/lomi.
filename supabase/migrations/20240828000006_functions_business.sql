@@ -59,7 +59,7 @@ BEGIN
         email = p_email,
         website_url = p_website_url,
         verified = p_verified,
-        default_currency = p_default_currency,
+        default_currency = p_default_currency::currency_code,
         updated_at = NOW()
     WHERE 
         organization_id = p_organization_id;

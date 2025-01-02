@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '@/components/dashboard/content-section'
 import { supabase } from '@/utils/supabase/client'
-import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle, PencilIcon, CheckIcon, X } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import ProfilePictureUploader from '@/components/auth/avatar-uploader'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MerchantDetails {
     merchant_id: string;
@@ -33,9 +33,48 @@ function Profile() {
     const [newPin, setNewPin] = useState(['', '', '', ''])
     const [hasPIN, setHasPIN] = useState(false)
     const [currentPinInput, setCurrentPinInput] = useState(['', '', '', ''])
+    const [isRemovingPin, setIsRemovingPin] = useState(false)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
     const [currentPinError, setCurrentPinError] = useState('')
     const [isPasswordAuth, setIsPasswordAuth] = useState(false)
+    const [editedMerchant, setEditedMerchant] = useState<MerchantDetails | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        if (merchant) {
+            setEditedMerchant(merchant);
+        }
+    }, [merchant]);
+
+    const cancelEdit = useCallback(() => {
+        setIsEditing(false);
+        setEditedMerchant(merchant);
+    }, [merchant]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isEditing) {
+                const target = event.target as HTMLElement;
+                if (!target.closest('.relative') && !target.closest('button')) {
+                    cancelEdit();
+                }
+            }
+        };
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (isEditing && event.key === 'Enter') {
+                cancelEdit();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isEditing, cancelEdit]);
 
     useEffect(() => {
         fetchMerchant()
@@ -333,6 +372,112 @@ function Profile() {
         }
     }
 
+    const handleInputChange = (field: keyof MerchantDetails, value: string) => {
+        if (!editedMerchant) return;
+
+        if (field === 'phone_number') {
+            // Remove all non-numeric characters
+            const numericValue = value.replace(/\D/g, '');
+
+            // Format phone number with country code
+            if (numericValue.length > 0) {
+                let formattedNumber = numericValue;
+                if (numericValue.startsWith('225')) {
+                    formattedNumber = `+225 ${numericValue.slice(3)}`;
+                } else if (!numericValue.startsWith('225')) {
+                    formattedNumber = `+225 ${numericValue}`;
+                }
+                setEditedMerchant({ ...editedMerchant, [field]: formattedNumber });
+            } else {
+                setEditedMerchant({ ...editedMerchant, [field]: value });
+            }
+        } else {
+            setEditedMerchant({ ...editedMerchant, [field]: value });
+        }
+    };
+
+    const handleFieldValidate = async (field: keyof MerchantDetails) => {
+        if (!editedMerchant) return;
+
+        try {
+            const { error } = await supabase.rpc('update_merchant_details', {
+                p_merchant_id: editedMerchant.merchant_id,
+                p_name: editedMerchant.name,
+                p_email: editedMerchant.email,
+                p_phone_number: editedMerchant.phone_number.replace(/\s/g, ''),
+                p_pin_code: editedMerchant.pin_code,
+                p_preferred_language: editedMerchant.preferred_language
+            });
+
+            if (error) throw error;
+
+            setMerchant(editedMerchant);
+            setIsEditing(false);
+            toast({
+                title: "Success",
+                description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
+            });
+        } catch (error) {
+            console.error('Error updating field:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update field",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleLanguageChange = (value: string) => {
+        if (!editedMerchant) return;
+        setEditedMerchant({ ...editedMerchant, preferred_language: value });
+    };
+
+    const handleFieldEdit = (field: string) => {
+        setIsEditing(true);
+        // Focus the field that was clicked
+        setTimeout(() => {
+            const element = document.getElementById(field);
+            if (element) element.focus();
+        }, 0);
+    };
+
+    const handleRemovePin = async () => {
+        if (!merchant) return;
+
+        try {
+            if (currentPinInput.join('') !== merchant.pin_code) {
+                setCurrentPinError('Current PIN is incorrect');
+                return;
+            }
+
+            const { error } = await supabase.rpc('update_merchant_details', {
+                p_merchant_id: merchant.merchant_id,
+                p_name: merchant.name,
+                p_email: merchant.email,
+                p_phone_number: merchant.phone_number,
+                p_pin_code: null,
+                p_preferred_language: merchant.preferred_language
+            });
+
+            if (error) throw error;
+
+            setHasPIN(false);
+            setMerchant({ ...merchant, pin_code: '' });
+            setShowPinModal(false);
+            toast({
+                title: "Success",
+                description: "PIN removed successfully",
+            });
+        } catch (error) {
+            console.error('Error removing PIN:', error);
+            toast({
+                title: "Error",
+                description: "Failed to remove PIN",
+                variant: "destructive",
+            });
+        }
+    };
+
     if (typeof window === 'undefined' || loading) {
         return (
             <ContentSection
@@ -443,19 +588,127 @@ function Profile() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="name">Full name</Label>
-                                <Input id="name" value={merchant.name} readOnly className="bg-muted" />
+                                <div className="relative ml-[1px]">
+                                    <Input
+                                        id="name"
+                                        value={editedMerchant?.name || ''}
+                                        onChange={(e) => handleInputChange('name', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('name')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('name')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input id="email" value={merchant.email} readOnly className="bg-muted" />
+                                <div className="relative">
+                                    <Input
+                                        id="email"
+                                        value={editedMerchant?.email || ''}
+                                        onChange={(e) => handleInputChange('email', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('email')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('email')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="phone">Phone number</Label>
-                                <Input id="phone" value={merchant.phone_number} readOnly className="bg-muted" />
+                                <div className="relative ml-[1px]">
+                                    <Input
+                                        id="phone"
+                                        value={editedMerchant?.phone_number || ''}
+                                        onChange={(e) => handleInputChange('phone_number', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                        placeholder="+225 XXXXXXXXXX"
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('phone')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('phone_number')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="language">Language</Label>
-                                <Input id="language" value={merchant.preferred_language} readOnly className="bg-muted" />
+                                <div className="relative">
+                                    {isEditing ? (
+                                        <div className="relative">
+                                            <Select
+                                                value={editedMerchant?.preferred_language || ''}
+                                                onValueChange={handleLanguageChange}
+                                            >
+                                                <SelectTrigger className="rounded-none w-full pr-8">
+                                                    <SelectValue placeholder="Select language" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="en">English</SelectItem>
+                                                    <SelectItem value="fr">French</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <button
+                                                onClick={() => handleFieldValidate('preferred_language')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                            >
+                                                <CheckIcon className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="relative">
+                                            <Input
+                                                id="language"
+                                                value={editedMerchant?.preferred_language === 'en' ? 'English' : 'French'}
+                                                className="bg-muted rounded-none pr-8"
+                                                readOnly
+                                            />
+                                            <button
+                                                onClick={() => handleFieldEdit('language')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                            >
+                                                <PencilIcon className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
@@ -499,7 +752,7 @@ function Profile() {
                                             <Button
                                                 size="sm"
                                                 onClick={handlePasswordChange}
-                                                className="absolute right-0 h-full px-4 rounded-l-none bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                                className="absolute right-0 h-full px-4 rounded-none bg-gray-200 text-gray-700 hover:bg-gray-300"
                                             >
                                                 Save
                                             </Button>
@@ -515,21 +768,36 @@ function Profile() {
                                 <div>
                                     <h4 className="text-sm font-medium">PIN</h4>
                                     <p className="text-sm text-muted-foreground">
-                                        Required for payouts.
+                                        Activated, your pin will be mandatory for all payouts.
                                     </p>
                                 </div>
-                                <Button variant="outline" onClick={() => setShowPinModal(true)}>
-                                    {hasPIN ? 'Update your PIN' : 'Set your PIN'}
-                                </Button>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h4 className="text-sm font-medium">2-factor Authentication</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        Require a security key in addition to your password.
-                                    </p>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setShowPinModal(true);
+                                            setCurrentPinInput(['', '', '', '']);
+                                            setIsRemovingPin(false);
+                                        }}
+                                        className="rounded-none"
+                                    >
+                                        {hasPIN ? 'Update your PIN' : 'Set your PIN'}
+                                    </Button>
+                                    {hasPIN && (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setShowPinModal(true);
+                                                setCurrentPinInput(['', '', '', '']);
+                                                setNewPin(['', '', '', '']);
+                                                setIsRemovingPin(true);
+                                            }}
+                                            className="rounded-none p-2 hover:bg-red-100 hover:text-red-600 text-red-500 border-red-200"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </div>
-                                <Switch disabled />
                             </div>
                         </div>
 
@@ -544,11 +812,11 @@ function Profile() {
                                 <DialogHeader>
                                     <DialogTitle className="text-center flex items-center justify-center gap-2">
                                         <KeyRound className="w-4 h-4" />
-                                        {hasPIN ? 'Change your PIN' : 'Set your PIN'}
+                                        {hasPIN ? (isRemovingPin ? 'Remove your PIN' : 'Change your PIN') : 'Set your PIN'}
                                     </DialogTitle>
                                     {hasPIN && (
                                         <DialogDescription className="text-center mt-2">
-                                            Enter your current PIN to change it
+                                            Enter your current PIN to {isRemovingPin ? 'remove' : 'change'} it
                                         </DialogDescription>
                                     )}
                                 </DialogHeader>
@@ -566,7 +834,7 @@ function Profile() {
                                                     value={currentPinInput[index] || ''}
                                                     onChange={(e) => handleCurrentPinChange(index, e.target.value)}
                                                     onKeyDown={(e) => handleCurrentPinKeyDown(index, e)}
-                                                    className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
                                                     aria-label={`Current PIN digit ${index + 1}`}
                                                 />
                                             ))}
@@ -576,36 +844,41 @@ function Profile() {
                                         )}
                                     </div>
                                 )}
-                                <div className="flex flex-col items-center gap-3 my-4">
-                                    <div className="flex justify-center gap-2">
-                                        {Array.from({ length: 4 }).map((_, index) => (
-                                            <input
-                                                key={index}
-                                                ref={el => inputRefs.current[index + (hasPIN ? 4 : 0)] = el}
-                                                type={newPin.join('').length === 4 ? 'password' : 'text'}
-                                                inputMode="numeric"
-                                                pattern="\d*"
-                                                maxLength={1}
-                                                value={newPin[index] || ''}
-                                                onChange={(e) => handlePinChange(index, e.target.value)}
-                                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                                className="w-12 h-12 text-center text-xl bg-muted rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                                aria-label={`New PIN digit ${index + 1}`}
-                                            />
-                                        ))}
+                                {(!hasPIN || !isRemovingPin) && (
+                                    <div className="flex flex-col items-center gap-3 my-4">
+                                        <div className="flex justify-center gap-2">
+                                            {Array.from({ length: 4 }).map((_, index) => (
+                                                <input
+                                                    key={index}
+                                                    ref={el => inputRefs.current[index + (hasPIN ? 4 : 0)] = el}
+                                                    type={newPin.join('').length === 4 ? 'password' : 'text'}
+                                                    inputMode="numeric"
+                                                    pattern="\d*"
+                                                    maxLength={1}
+                                                    value={newPin[index] || ''}
+                                                    onChange={(e) => handlePinChange(index, e.target.value)}
+                                                    onKeyDown={(e) => handleKeyDown(index, e)}
+                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
+                                                    aria-label={`New PIN digit ${index + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="flex items-center justify-center text-xs text-muted-foreground text-center mt-1">
+                                            <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 mb-2" />
+                                            <p>This code is crucial for transaction security.<br />Kindly store it safely.</p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-center text-xs text-muted-foreground text-center mt-1">
-                                        <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 mb-2" />
-                                        <p>This code is crucial for transaction security.<br />Kindly store it safely.</p>
-                                    </div>
-                                </div>
+                                )}
                                 <DialogFooter>
                                     <Button
-                                        onClick={handleSavePIN}
-                                        disabled={newPin.some((digit: string) => digit === '') || (hasPIN && currentPinInput.some((digit: string) => digit === ''))}
-                                        className="w-full"
+                                        onClick={isRemovingPin ? handleRemovePin : handleSavePIN}
+                                        disabled={
+                                            (hasPIN && currentPinInput.some((digit: string) => digit === '')) ||
+                                            (!isRemovingPin && newPin.some((digit: string) => digit === ''))
+                                        }
+                                        className="w-full rounded-none"
                                     >
-                                        {hasPIN ? 'Change' : 'Save'}
+                                        {hasPIN ? (isRemovingPin ? 'Remove' : 'Change') : 'Save'}
                                     </Button>
                                 </DialogFooter>
                             </DialogContent>

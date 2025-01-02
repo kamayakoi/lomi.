@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import ContentSection from '@/components/dashboard/content-section'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import LogoUploader from '@/components/auth/logo-uploader'
+import { PencilIcon, CheckIcon } from 'lucide-react'
 
 interface OrganizationDetails {
     organization_id: string;
@@ -17,7 +18,7 @@ interface OrganizationDetails {
     logo_url: string | null;
     website_url: string | null;
     verified: boolean;
-    default_currency: string;
+    default_currency: 'XOF' | 'USD' | 'EUR';
     country: string;
     region: string;
     city: string;
@@ -32,6 +33,44 @@ export default function Business() {
     const [logoUrl, setLogoUrl] = useState<string | null>(null)
     const addressRef = useRef<HTMLTextAreaElement>(null);
     const [isCopied, setIsCopied] = useState(false);
+    const [editedOrganization, setEditedOrganization] = useState<OrganizationDetails | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        if (organization) {
+            setEditedOrganization(organization);
+        }
+    }, [organization]);
+
+    const cancelEdit = useCallback(() => {
+        setIsEditing(false);
+        setEditedOrganization(organization);
+    }, [organization]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isEditing) {
+                const target = event.target as HTMLElement;
+                if (!target.closest('.relative') && !target.closest('button')) {
+                    cancelEdit();
+                }
+            }
+        };
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (isEditing && event.key === 'Enter') {
+                cancelEdit();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isEditing, cancelEdit]);
 
     useEffect(() => {
         fetchOrganization()
@@ -149,6 +188,79 @@ export default function Business() {
         }
     };
 
+    const handleInputChange = (field: keyof OrganizationDetails, value: string) => {
+        if (!editedOrganization) return;
+        setEditedOrganization({ ...editedOrganization, [field]: value });
+    };
+
+    const handleFieldValidate = useCallback(async (field: keyof OrganizationDetails) => {
+        if (!editedOrganization) return;
+
+        try {
+            console.log('Updating organization with:', {
+                p_organization_id: editedOrganization.organization_id,
+                p_name: editedOrganization.name,
+                p_email: editedOrganization.email,
+                p_website_url: editedOrganization.website_url,
+                p_verified: editedOrganization.verified,
+                p_default_currency: editedOrganization.default_currency
+            });
+
+            const { error } = await supabase.rpc('update_organization_details', {
+                p_organization_id: editedOrganization.organization_id,
+                p_name: editedOrganization.name,
+                p_email: editedOrganization.email,
+                p_website_url: editedOrganization.website_url,
+                p_verified: editedOrganization.verified,
+                p_default_currency: editedOrganization.default_currency as 'XOF' | 'USD' | 'EUR'
+            });
+
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+
+            setOrganization(editedOrganization);
+            setIsEditing(false);
+            toast({
+                title: "Success",
+                description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
+            });
+        } catch (error) {
+            console.error('Error updating field:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update field",
+                variant: "destructive",
+            });
+        }
+    }, [editedOrganization]);
+
+    const handleFieldEdit = (field: string) => {
+        setIsEditing(true);
+        setTimeout(() => {
+            const element = document.getElementById(field);
+            if (element) element.focus();
+        }, 0);
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (isEditing && event.key === 'Enter') {
+                const activeElement = document.activeElement as HTMLElement;
+                const field = activeElement?.id;
+                if (field) {
+                    handleFieldValidate(field as keyof OrganizationDetails);
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isEditing, handleFieldValidate]);
+
     if (typeof window === 'undefined' || loading) {
         return (
             <ContentSection
@@ -233,22 +345,79 @@ export default function Business() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Business name</Label>
-                                <Input id="name" value={organization.name} readOnly className="bg-muted" />
+                                <div className="relative ml-[1px]">
+                                    <Input
+                                        id="name"
+                                        value={editedOrganization?.name || ''}
+                                        onChange={(e) => handleInputChange('name', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleFieldValidate('name');
+                                            }
+                                        }}
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('name')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('name')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Business email</Label>
-                                <Input id="email" type="email" value={organization.email || ''} readOnly className="bg-muted" />
+                                <div className="relative">
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={editedOrganization?.email || ''}
+                                        onChange={(e) => handleInputChange('email', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleFieldValidate('email');
+                                            }
+                                        }}
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('email')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('email')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="business-id">Business ID</Label>
-                                <div className="flex">
-                                    <Input id="business-id" value={organization.organization_id} readOnly className="rounded-r-none bg-muted" />
+                                <div className="flex ml-[1px]">
+                                    <Input id="business-id" value={organization.organization_id} readOnly className="rounded-none bg-muted" />
                                     <Button
                                         variant={isCopied ? "default" : "outline"}
-                                        className={`rounded-l-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                        className={`rounded-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                                         onClick={copyBusinessId}
                                     >
                                         {isCopied ? (
@@ -264,19 +433,49 @@ export default function Business() {
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="website">Website URL</Label>
-                                <Input id="website" value={organization.website_url || ''} readOnly className="bg-muted" />
+                                <div className="relative">
+                                    <Input
+                                        id="website"
+                                        value={editedOrganization?.website_url || ''}
+                                        onChange={(e) => handleInputChange('website_url', e.target.value)}
+                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
+                                        readOnly={!isEditing}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleFieldValidate('website_url');
+                                            }
+                                        }}
+                                    />
+                                    {!isEditing ? (
+                                        <button
+                                            onClick={() => handleFieldEdit('website')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                        >
+                                            <PencilIcon className="h-3 w-3" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleFieldValidate('website_url')}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                        >
+                                            <CheckIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="verified">Status</Label>
-                                <Input
-                                    id="verified"
-                                    value={organization.verified ? 'Verified' : 'Unverified'}
-                                    readOnly
-                                    className="bg-muted"
-                                />
+                                <div className="relative ml-[1px]">
+                                    <Input
+                                        id="verified"
+                                        value={organization.verified ? 'Verified' : 'Unverified'}
+                                        readOnly
+                                        className="bg-muted rounded-none"
+                                    />
+                                </div>
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="default_currency">Currency</Label>
@@ -292,7 +491,7 @@ export default function Business() {
                                                     : organization.default_currency
                                     }
                                     readOnly
-                                    className="bg-muted"
+                                    className="bg-muted rounded-none"
                                 />
                             </div>
                         </div>
@@ -300,7 +499,9 @@ export default function Business() {
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="grid gap-2">
                                 <Label htmlFor="country">Billing country</Label>
-                                <Input id="country" value={organization.country || ''} readOnly className="bg-muted" />
+                                <div className="relative ml-[1px]">
+                                    <Input id="country" value={organization.country || ''} readOnly className="bg-muted rounded-none" />
+                                </div>
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="address">Business address</Label>
@@ -310,7 +511,7 @@ export default function Business() {
                                         id="address"
                                         value={`${organization.region || ''}, ${organization.city || ''}, ${organization.district || ''}, ${organization.street || ''}, ${organization.postal_code || ''}`}
                                         readOnly
-                                        className="bg-muted w-full px-3 py-2 rounded-md border border-input text-sm resize-none focus:outline-none"
+                                        className="bg-muted w-full px-3 py-2 rounded-none border border-input text-sm resize-none focus:outline-none"
                                         style={{
                                             minHeight: '2.5rem',
                                             overflow: 'hidden',
