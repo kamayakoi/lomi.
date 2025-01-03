@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { PlusCircle, X } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { type CheckedState } from "@radix-ui/react-checkbox"
@@ -135,8 +135,8 @@ export function NotificationSettings() {
     }
 
     return (
-        <div className="space-y-6">
-            <Card>
+        <div className="space-y-4">
+            <Card className="rounded-none">
                 <CardHeader>
                     <CardTitle>Customer notifications</CardTitle>
                     <CardDescription>
@@ -182,48 +182,50 @@ export function NotificationSettings() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-none">
                 <CardHeader>
-                    <CardTitle>Merchant Recipients</CardTitle>
+                    <CardTitle>Merchant recipients</CardTitle>
                     <CardDescription>
                         Add team members who should receive payment notifications
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {merchantRecipients.map((recipient, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                            <div className="flex-grow">
-                                <Input
-                                    placeholder="Email address"
-                                    value={recipient.email}
-                                    onChange={(e) => updateMerchantRecipient(index, 'email', e.target.value)}
-                                    className="rounded-none"
-                                />
+                    <div className="max-h-[240px] overflow-y-auto space-y-2 pr-1">
+                        {merchantRecipients.map((recipient, index) => (
+                            <div key={index} className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                                <div className="flex-grow">
+                                    <Input
+                                        placeholder="Email address"
+                                        value={recipient.email}
+                                        onChange={(e) => updateMerchantRecipient(index, 'email', e.target.value)}
+                                        className="rounded-none"
+                                    />
+                                </div>
+                                <div className="flex space-x-2">
+                                    <Select
+                                        value={recipient.notification || 'all'}
+                                        onValueChange={(value: 'all' | 'important') => updateMerchantRecipient(index, 'notification', value)}
+                                    >
+                                        <SelectTrigger className="w-[180px] rounded-none">
+                                            <SelectValue placeholder="Notification type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Notifications</SelectItem>
+                                            <SelectItem value="important">Important Only</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeMerchantRecipient(index)}
+                                        className="rounded-none hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="flex space-x-2">
-                                <Select
-                                    value={recipient.notification || 'all'}
-                                    onValueChange={(value: 'all' | 'important') => updateMerchantRecipient(index, 'notification', value)}
-                                >
-                                    <SelectTrigger className="w-[180px] rounded-none">
-                                        <SelectValue placeholder="Notification type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Notifications</SelectItem>
-                                        <SelectItem value="important">Important Only</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeMerchantRecipient(index)}
-                                    className="rounded-none hover:bg-destructive/10 hover:text-destructive"
-                                >
-                                    <X className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                     <Button
                         variant="outline"
                         onClick={addMerchantRecipient}
@@ -232,16 +234,16 @@ export function NotificationSettings() {
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add Recipient
                     </Button>
-                    <div className="pt-4">
-                        <Button
-                            onClick={handleSave}
-                            className="w-full rounded-none"
-                            disabled={isSaving}
-                        >
-                            {isSaving ? 'Saving...' : 'Save Changes'}
-                        </Button>
-                    </div>
                 </CardContent>
+                <CardFooter>
+                    <Button
+                        onClick={handleSave}
+                        className="ml-auto rounded-none bg-blue-500 hover:bg-blue-600 text-white"
+                        disabled={isSaving}
+                    >
+                        {isSaving ? 'Saving...' : 'Save'}
+                    </Button>
+                </CardFooter>
             </Card>
         </div>
     )

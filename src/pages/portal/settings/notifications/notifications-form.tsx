@@ -100,7 +100,7 @@ export function NotificationsForm() {
           )}
         />
         <div>
-          <h3 className='mb-4 text-lg font-medium'>Email Notifications</h3>
+          <h3 className='mb-4 text-lg font-medium'>Email notifications</h3>
           <div className='space-y-4'>
             <FormField
               control={form.control}

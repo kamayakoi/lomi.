@@ -107,7 +107,6 @@ const sidebarNavItems = [
     subItems: [
       { title: 'Bank accounts', href: '/portal/settings/withdrawals/bank-accounts' },
       { title: 'Email notifications', href: '/portal/settings/withdrawals/email-notifications' },
-      { title: 'Automated payouts', href: '/portal/settings/withdrawals/auto-withdrawal' },
     ],
   },
 ]

@@ -82,9 +82,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update the status of an API key
 CREATE OR REPLACE FUNCTION public.update_api_key_status(
-    p_merchant_id UUID,
-    p_api_key VARCHAR, 
-    p_is_active BOOLEAN
+    p_api_key VARCHAR,
+    p_is_active BOOLEAN,
+    p_merchant_id UUID
 )
 RETURNS VOID AS $$
 BEGIN

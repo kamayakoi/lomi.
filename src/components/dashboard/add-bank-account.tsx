@@ -10,7 +10,6 @@ import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { BankAccount } from '@/pages/portal/settings/withdrawals/types'
 import { countries } from '@/utils/data/onboarding'
-import { cn } from '@/lib/actions/utils'
 
 interface AddBankButtonProps {
     onAddAccount: (account: BankAccount) => Promise<void>
@@ -97,11 +96,11 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" disabled={disabled}>
+                <Button variant="outline" disabled={disabled} className="rounded-none">
                     <PlusIcon className="mr-2 h-4 w-4" /> Add bank account
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] rounded-none">
                 <DialogHeader>
                     <DialogTitle>Add a new bank account</DialogTitle>
                     <DialogDescription>
@@ -118,12 +117,7 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                                 setSelectedCountry(e.target.value)
                                 setNewAccount({ ...newAccount, country: e.target.value })
                             }}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
+                            className="w-full px-3 py-2 border rounded-none h-10 bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                             <option value="">Select a country</option>
                             {countries.map((country) => (
@@ -140,26 +134,31 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                             id="bankName"
                             value={newAccount.bank_name || ''}
                             onChange={(e) => setNewAccount({ ...newAccount, bank_name: e.target.value })}
+                            className="rounded-none"
                         />
                         {errors.bank_name && <p className="text-sm text-red-500">{errors.bank_name}</p>}
                     </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="bankCode">Bank Code</Label>
-                        <Input
-                            id="bankCode"
-                            value={newAccount.bank_code || ''}
-                            onChange={(e) => setNewAccount({ ...newAccount, bank_code: e.target.value })}
-                        />
-                        {errors.bank_code && <p className="text-sm text-red-500">{errors.bank_code}</p>}
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="branchCode">Branch Code</Label>
-                        <Input
-                            id="branchCode"
-                            value={newAccount.branch_code || ''}
-                            onChange={(e) => setNewAccount({ ...newAccount, branch_code: e.target.value })}
-                        />
-                        {errors.branch_code && <p className="text-sm text-red-500">{errors.branch_code}</p>}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="bankCode">Bank Code</Label>
+                            <Input
+                                id="bankCode"
+                                value={newAccount.bank_code || ''}
+                                onChange={(e) => setNewAccount({ ...newAccount, bank_code: e.target.value })}
+                                className="rounded-none"
+                            />
+                            {errors.bank_code && <p className="text-sm text-red-500">{errors.bank_code}</p>}
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="branchCode">Branch Code</Label>
+                            <Input
+                                id="branchCode"
+                                value={newAccount.branch_code || ''}
+                                onChange={(e) => setNewAccount({ ...newAccount, branch_code: e.target.value })}
+                                className="rounded-none"
+                            />
+                            {errors.branch_code && <p className="text-sm text-red-500">{errors.branch_code}</p>}
+                        </div>
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="accountNumber">Account Number</Label>
@@ -167,6 +166,7 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                             id="accountNumber"
                             value={newAccount.account_number || ''}
                             onChange={(e) => setNewAccount({ ...newAccount, account_number: e.target.value })}
+                            className="rounded-none"
                         />
                         {errors.account_number && <p className="text-sm text-red-500">{errors.account_number}</p>}
                     </div>
@@ -176,6 +176,7 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                             id="accountName"
                             value={newAccount.account_name || ''}
                             onChange={(e) => setNewAccount({ ...newAccount, account_name: e.target.value })}
+                            className="rounded-none"
                         />
                         {errors.account_name && <p className="text-sm text-red-500">{errors.account_name}</p>}
                     </div>
@@ -185,13 +186,14 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                                 id="isDefault"
                                 checked={newAccount.is_default}
                                 onCheckedChange={(checked) => setNewAccount({ ...newAccount, is_default: checked as boolean })}
+                                className="rounded-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
-                            <Label htmlFor="isDefault">Set as default account</Label>
+                            <Label htmlFor="isDefault" className="text-sm">Set as default account</Label>
                         </div>
                     )}
-                    <div className="flex justify-end">
-                        <Button type="submit" className="bg-blue-500 text-white hover:bg-blue-600" disabled={isLoading}>
-                            {isLoading ? "Adding..." : "Add"}
+                    <div className="flex justify-end pt-4">
+                        <Button type="submit" disabled={isLoading} className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">
+                            {isLoading ? "Adding..." : "Add account"}
                         </Button>
                     </div>
                 </form>

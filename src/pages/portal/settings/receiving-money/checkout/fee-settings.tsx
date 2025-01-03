@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { PlusCircle } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { type CheckoutSettings, type FeeType } from '@/lib/types/checkoutsettings'
@@ -167,79 +167,77 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
     }
 
     return (
-        <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Additional fees</CardTitle>
-                    <CardDescription>Configure additional fees to apply to transactions</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex space-x-2">
-                        <Input
-                            placeholder="New fee type"
-                            value={newFeeType}
-                            onChange={(e) => setNewFeeType(e.target.value)}
-                            className="flex-grow rounded-none"
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault()
-                                    handleAddFeeType()
-                                }
-                            }}
-                        />
-                        <Button
-                            onClick={handleAddFeeType}
-                            variant="outline"
-                            className="rounded-none"
+        <Card className="rounded-none">
+            <CardHeader>
+                <CardTitle>Additional fees</CardTitle>
+                <CardDescription>Configure additional fees to apply to transactions</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                    <Input
+                        placeholder="New fee type"
+                        value={newFeeType}
+                        onChange={(e) => setNewFeeType(e.target.value)}
+                        className="flex-grow rounded-none"
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault()
+                                handleAddFeeType()
+                            }
+                        }}
+                    />
+                    <Button
+                        onClick={handleAddFeeType}
+                        variant="outline"
+                        className="rounded-none"
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" /> Add
+                    </Button>
+                </div>
+                <div className="space-y-2 max-h-[170px] overflow-y-auto pr-1">
+                    {feeTypes.map((fee) => (
+                        <div
+                            key={fee.id}
+                            className="flex items-center justify-between space-x-2 py-2 px-3 border rounded-none hover:bg-muted/50 transition-colors"
                         >
-                            <PlusCircle className="mr-2 h-4 w-4" /> Add
-                        </Button>
-                    </div>
-                    <div className="space-y-2">
-                        {feeTypes.map((fee) => (
-                            <div
-                                key={fee.id}
-                                className="flex items-center justify-between space-x-2 py-2 px-3 border rounded-none hover:bg-muted/50 transition-colors"
-                            >
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id={`toggle-${fee.id}`}
-                                        checked={fee.enabled}
-                                        onCheckedChange={() => handleToggleFeeType(fee.id)}
-                                    />
-                                    <Label
-                                        htmlFor={`toggle-${fee.id}`}
-                                        className="text-sm font-medium cursor-pointer"
-                                    >
-                                        {fee.name}
-                                    </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Input
-                                        type="number"
-                                        value={fee.percentage || ''}
-                                        onChange={(e) => handlePercentageChange(fee.id, e.target.value)}
-                                        onBlur={() => handlePercentageBlur(fee.id)}
-                                        className="w-20 h-8 text-right text-sm rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                        placeholder="1-100"
-                                        disabled={!fee.enabled}
-                                    />
-                                    <span className="text-sm text-muted-foreground">%</span>
-                                </div>
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    id={`toggle-${fee.id}`}
+                                    checked={fee.enabled}
+                                    onCheckedChange={() => handleToggleFeeType(fee.id)}
+                                />
+                                <Label
+                                    htmlFor={`toggle-${fee.id}`}
+                                    className="text-sm font-medium cursor-pointer"
+                                >
+                                    {fee.name}
+                                </Label>
                             </div>
-                        ))}
-                    </div>
-                    <div className="pt-4">
-                        <Button
-                            onClick={handleSave}
-                            className="w-full rounded-none"
-                            disabled={isSaving}
-                        >
-                            {isSaving ? 'Saving...' : 'Save Changes'}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+                            <div className="flex items-center space-x-2">
+                                <Input
+                                    type="number"
+                                    value={fee.percentage || ''}
+                                    onChange={(e) => handlePercentageChange(fee.id, e.target.value)}
+                                    onBlur={() => handlePercentageBlur(fee.id)}
+                                    className="w-20 h-8 text-right text-sm rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    placeholder="1-100"
+                                    disabled={!fee.enabled}
+                                />
+                                <span className="text-sm text-muted-foreground">%</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button
+                    onClick={handleSave}
+                    className="ml-auto rounded-none bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={isSaving}
+                >
+                    {isSaving ? 'Saving...' : 'Save'}
+                </Button>
+            </CardFooter>
+        </Card>
     )
 }

@@ -779,7 +779,7 @@ function Profile() {
                                             setCurrentPinInput(['', '', '', '']);
                                             setIsRemovingPin(false);
                                         }}
-                                        className="rounded-none"
+                                        className="rounded-none bg-blue-500 hover:bg-blue-600 text-white"
                                     >
                                         {hasPIN ? 'Update your PIN' : 'Set your PIN'}
                                     </Button>
@@ -876,7 +876,7 @@ function Profile() {
                                             (hasPIN && currentPinInput.some((digit: string) => digit === '')) ||
                                             (!isRemovingPin && newPin.some((digit: string) => digit === ''))
                                         }
-                                        className="w-full rounded-none"
+                                        className="w-full rounded-none bg-blue-500 hover:bg-blue-600 text-white"
                                     >
                                         {hasPIN ? (isRemovingPin ? 'Remove' : 'Change') : 'Save'}
                                     </Button>

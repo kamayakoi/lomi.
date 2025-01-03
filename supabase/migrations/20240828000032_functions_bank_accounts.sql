@@ -112,7 +112,105 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to set a bank account as default
+CREATE OR REPLACE FUNCTION public.set_default_bank_account(p_bank_account_id UUID)
+RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+    v_current_default_id UUID;
+BEGIN
+    -- Get the merchant_id and current default account for the bank account
+    SELECT merchant_id INTO v_merchant_id
+    FROM merchant_bank_accounts
+    WHERE bank_account_id = p_bank_account_id
+    AND merchant_id = auth.uid();
+
+    -- Get current default account ID
+    SELECT bank_account_id INTO v_current_default_id
+    FROM merchant_bank_accounts
+    WHERE merchant_id = v_merchant_id
+    AND is_default = true;
+
+    IF v_merchant_id IS NOT NULL THEN
+        -- Begin transaction
+        BEGIN
+            -- First, unset the current default account if exists
+            IF v_current_default_id IS NOT NULL THEN
+                UPDATE merchant_bank_accounts
+                SET is_default = false
+                WHERE bank_account_id = v_current_default_id;
+            END IF;
+
+            -- Then set the selected account as default
+            UPDATE merchant_bank_accounts
+            SET is_default = true
+            WHERE bank_account_id = p_bank_account_id
+            AND merchant_id = v_merchant_id;
+
+            -- Log the change
+            PERFORM public.log_event(
+                p_merchant_id := v_merchant_id,
+                p_event := 'edit_bank_account'::event_type,
+                p_details := jsonb_build_object(
+                    'bank_account_id', p_bank_account_id,
+                    'previous_default_id', v_current_default_id,
+                    'action', 'set_default'
+                ),
+                p_severity := 'CRITICAL'
+            );
+        EXCEPTION WHEN OTHERS THEN
+            -- If anything fails, rollback to previous state
+            RAISE;
+        END;
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to update auto-withdrawal settings
+CREATE OR REPLACE FUNCTION public.update_auto_withdrawal_settings(
+    p_bank_account_id UUID,
+    p_enabled BOOLEAN,
+    p_day INT
+)
+RETURNS VOID AS $$
+DECLARE
+    v_merchant_id UUID;
+BEGIN
+    -- Get the merchant_id for the bank account
+    SELECT merchant_id INTO v_merchant_id
+    FROM merchant_bank_accounts
+    WHERE bank_account_id = p_bank_account_id
+    AND merchant_id = auth.uid();
+
+    IF v_merchant_id IS NOT NULL THEN
+        -- Update the auto-withdrawal settings
+        UPDATE merchant_bank_accounts
+        SET 
+            auto_withdrawal_enabled = p_enabled,
+            auto_withdrawal_day = CASE WHEN p_enabled THEN p_day ELSE NULL END,
+            updated_at = NOW()
+        WHERE bank_account_id = p_bank_account_id
+        AND merchant_id = v_merchant_id;
+
+        -- Log the change
+        PERFORM public.log_event(
+            p_merchant_id := v_merchant_id,
+            p_event := 'edit_bank_account'::event_type,
+            p_details := jsonb_build_object(
+                'bank_account_id', p_bank_account_id,
+                'auto_withdrawal_enabled', p_enabled,
+                'auto_withdrawal_day', p_day,
+                'action', 'update_auto_withdrawal'
+            ),
+            p_severity := 'CRITICAL'
+        );
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.create_bank_account(VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fetch_bank_accounts() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_bank_account(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_default_bank_account(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_auto_withdrawal_settings(UUID, BOOLEAN, INT) TO authenticated;

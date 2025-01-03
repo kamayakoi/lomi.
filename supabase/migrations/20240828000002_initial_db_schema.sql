@@ -47,6 +47,7 @@ CREATE TYPE event_type AS ENUM (
     'remove_bank_account',
     'create_payout',
     'payout_status_change',
+    'edit_bank_account'
     
     -- Payments & Transactions
     'create_invoice',
@@ -580,6 +581,9 @@ CREATE TABLE merchant_bank_accounts (
     country VARCHAR,
     is_default BOOLEAN NOT NULL DEFAULT false,
     is_valid BOOLEAN NOT NULL DEFAULT false,
+    auto_withdrawal_enabled BOOLEAN NOT NULL DEFAULT false,
+    auto_withdrawal_day INT CHECK (auto_withdrawal_day >= 1 AND auto_withdrawal_day <= 31),
+    auto_withdrawal_last_run TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (merchant_id, account_number)

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { PlusIcon, XIcon } from 'lucide-react'
+import { PlusIcon, XIcon, Mail } from 'lucide-react'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/components/ui/use-toast"
 
@@ -48,7 +48,7 @@ export default function EmailNotifications() {
 
     return (
         <ContentSection
-            title="Email Notifications"
+            title="Email notifications"
             desc="Configure email recipients of withdrawal notifications"
         >
             {/* Wrap all content in a single div */}
@@ -81,8 +81,8 @@ export default function EmailNotifications() {
                                         <p className="text-sm text-muted-foreground">Use space or comma to separate email addresses</p>
                                     </div>
                                     <DialogFooter>
-                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                                        <Button type="submit">Save</Button>
+                                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">Cancel</Button>
+                                        <Button type="submit" className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">Save</Button>
                                     </DialogFooter>
                                 </form>
                             </DialogContent>
@@ -90,7 +90,17 @@ export default function EmailNotifications() {
                     </CardHeader>
                     <CardContent>
                         {emails.length === 0 ? (
-                            <p className="text-center text-muted-foreground py-4">You don&apos;t have any emails added yet!</p>
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                    <Mail className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                </div>
+                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                                    No email recipients yet
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
+                                    Add email recipients to receive withdrawal notifications.
+                                </p>
+                            </div>
                         ) : (
                             <ScrollArea className="h-[200px] w-full rounded-md border p-4">
                                 <ul className="space-y-2">

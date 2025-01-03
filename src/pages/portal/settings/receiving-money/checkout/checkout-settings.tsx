@@ -7,7 +7,6 @@ import ContentSection from '@/components/dashboard/content-section'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from '@/utils/supabase/client'
 import { useSidebarData } from '@/lib/hooks/useSidebarData'
-import Loader from '@/components/dashboard/loader'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { AlertCircle } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,9 +15,8 @@ import { type CheckoutSettings } from '@/lib/types/checkoutsettings'
 function CheckoutSettingsPage() {
     const [activeTab, setActiveTab] = useState('payment')
     const [settings, setSettings] = useState<CheckoutSettings | null>(null)
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
+    const { sidebarData } = useSidebarData()
 
     const fetchCheckoutSettings = useCallback(async () => {
         try {
@@ -37,7 +35,6 @@ function CheckoutSettingsPage() {
 
             if (data) {
                 console.log('Received settings:', data);
-                // Ensure organization_id is included in the settings
                 setSettings({
                     ...data,
                     organization_id: orgId
@@ -46,8 +43,6 @@ function CheckoutSettingsPage() {
         } catch (err) {
             console.error('Error fetching checkout settings:', err)
             setError('Failed to load checkout settings. Please try again later.')
-        } finally {
-            setLoading(false)
         }
     }, [sidebarData?.organization_id])
 
@@ -75,7 +70,6 @@ function CheckoutSettingsPage() {
 
             if (error) throw error
 
-            // Update local state with organization_id
             setSettings(prev => {
                 if (!prev) return null;
                 return {
@@ -88,10 +82,6 @@ function CheckoutSettingsPage() {
             console.error('Error updating checkout settings:', err)
             throw err
         }
-    }
-
-    if (loading || isSidebarLoading) {
-        return <Loader />
     }
 
     return (

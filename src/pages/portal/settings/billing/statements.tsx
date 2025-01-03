@@ -3,7 +3,6 @@ import ContentSection from '@/components/dashboard/content-section'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Download, FileText, ChevronRight, Loader2, ArrowDownIcon } from 'lucide-react'
-import { Skeleton } from "@/components/ui/skeleton"
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { supabase } from '@/utils/supabase/client'
 import { format } from 'date-fns'
@@ -36,7 +35,6 @@ function BillingStatements() {
     const [lastMonthFees, setLastMonthFees] = useState(0)
     const [outstandingBalance, setOutstandingBalance] = useState(0)
     const [statements, setStatements] = useState<Statement[]>([])
-    const [loading, setLoading] = useState(true)
     const [downloadingId, setDownloadingId] = useState<string | null>(null)
     const [showFeesBreakdown, setShowFeesBreakdown] = useState(false)
 
@@ -75,8 +73,6 @@ function BillingStatements() {
                 description: "Failed to fetch statements. Please try again later.",
                 variant: "destructive",
             })
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -104,51 +100,6 @@ function BillingStatements() {
         } finally {
             setDownloadingId(null)
         }
-    }
-
-    if (loading) {
-        return (
-            <ContentSection
-                title="Billing Statements"
-                desc="View your platform fees and monthly statements"
-            >
-                <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <Skeleton className="h-4 w-[200px]" />
-                            <Skeleton className="h-8 w-[150px]" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <Skeleton className="h-4 w-[150px]" />
-                                    <Skeleton className="h-4 w-4 rounded-full" />
-                                </div>
-                                <Skeleton className="h-10 w-[120px]" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <Skeleton className="h-4 w-[150px]" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {[1, 2, 3].map((i) => (
-                                    <div key={i} className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <Skeleton className="h-4 w-[200px]" />
-                                            <Skeleton className="h-4 w-[150px]" />
-                                        </div>
-                                        <Skeleton className="h-8 w-[100px]" />
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </ContentSection>
-        )
     }
 
     return (
@@ -187,11 +138,7 @@ function BillingStatements() {
                                                 Last 30 days fees
                                             </p>
                                             <p className="text-2xl font-bold mt-1">
-                                                {loading ? (
-                                                    <Skeleton className="w-32 h-8 rounded-none" />
-                                                ) : (
-                                                    `XOF ${last30DaysFees.toLocaleString()}`
-                                                )}
+                                                XOF {last30DaysFees.toLocaleString()}
                                             </p>
                                         </div>
                                         {outstandingBalance > 0 && (
@@ -219,21 +166,13 @@ function BillingStatements() {
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Last 30 Days</p>
                                                 <p className="text-xl font-semibold mt-1">
-                                                    {loading ? (
-                                                        <Skeleton className="w-20 h-4 rounded-none" />
-                                                    ) : (
-                                                        `XOF ${last30DaysFees.toLocaleString()}`
-                                                    )}
+                                                    XOF {last30DaysFees.toLocaleString()}
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="text-sm text-muted-foreground">Last Month</p>
                                                 <p className="text-xl font-semibold mt-1">
-                                                    {loading ? (
-                                                        <Skeleton className="w-20 h-4 rounded-none" />
-                                                    ) : (
-                                                        `XOF ${lastMonthFees.toLocaleString()}`
-                                                    )}
+                                                    XOF {lastMonthFees.toLocaleString()}
                                                 </p>
                                             </div>
                                         </div>
