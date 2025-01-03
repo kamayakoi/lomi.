@@ -994,3 +994,23 @@ CREATE TABLE organization_fees (
 CREATE INDEX idx_organization_fees_org_id ON organization_fees(organization_id);
 
 COMMENT ON TABLE organization_fees IS 'Stores custom fees defined by organizations';
+
+-- Merchant Outstanding Balance table
+CREATE TABLE merchant_outstanding_balance (
+    balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    amount NUMERIC(15,2) NOT NULL DEFAULT 0,
+    currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
+    last_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    metadata JSONB,
+    UNIQUE (merchant_id, organization_id, currency_code)
+);
+
+CREATE INDEX idx_merchant_outstanding_balance_merchant ON merchant_outstanding_balance(merchant_id);
+CREATE INDEX idx_merchant_outstanding_balance_org ON merchant_outstanding_balance(organization_id);
+CREATE INDEX idx_merchant_outstanding_balance_currency ON merchant_outstanding_balance(currency_code);
+
+COMMENT ON TABLE merchant_outstanding_balance IS 'Tracks outstanding balances that merchants owe to the platform (e.g., from chargebacks)';
+COMMENT ON COLUMN merchant_outstanding_balance.amount IS 'Current outstanding balance amount';
+COMMENT ON COLUMN merchant_outstanding_balance.metadata IS 'Additional information about the outstanding balance, including history of changes';
