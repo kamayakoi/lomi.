@@ -72,7 +72,10 @@ function NavLink({
   subLink = false,
 }: NavLinkProps) {
   const location = useLocation();
-  const isActive = location.pathname === href;
+  const isSettingsLink = href.startsWith('/portal/settings');
+  const isActive = isSettingsLink
+    ? location.pathname.startsWith('/portal/settings')
+    : location.pathname === href;
 
   return (
     <Link

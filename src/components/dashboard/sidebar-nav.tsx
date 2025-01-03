@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { buttonVariants } from '@/components/custom/button'
 import {
@@ -34,9 +34,17 @@ export default function SidebarNav({
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const [val, setVal] = useState(pathname ?? '/settings')
-  const [openSections, setOpenSections] = useState<OpenSections>(
-    items.reduce((acc, item) => ({ ...acc, [item.href]: item.defaultOpen || false }), {})
-  )
+  const [openSections, setOpenSections] = useState<OpenSections>({})
+
+  // Initialize and update open sections based on current pathname
+  useEffect(() => {
+    const newOpenSections = items.reduce((acc, item) => {
+      // Check if any subItem's href matches the current pathname
+      const isActive = item.subItems?.some(subItem => pathname.startsWith(subItem.href))
+      return { ...acc, [item.href]: isActive || item.defaultOpen || false }
+    }, {})
+    setOpenSections(newOpenSections)
+  }, [pathname, items])
 
   const handleSelect = (e: string) => {
     setVal(e)
