@@ -170,7 +170,7 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Fee Types</CardTitle>
+                    <CardTitle>Additional fees</CardTitle>
                     <CardDescription>Configure additional fees to apply to transactions</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

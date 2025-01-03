@@ -156,7 +156,7 @@ export default function Component() {
             <div className="space-y-4">
                 <Card className="w-full max-w-7xl mx-auto">
                     <CardHeader>
-                        <CardTitle className="text-2xl font-bold">Secret Keys</CardTitle>
+                        <CardTitle className="text-2xl font-bold">Secret keys</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {apiKeys.length > 0 ? (

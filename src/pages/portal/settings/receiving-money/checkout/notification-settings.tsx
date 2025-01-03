@@ -138,7 +138,7 @@ export function NotificationSettings() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Customer Notifications</CardTitle>
+                    <CardTitle>Customer notifications</CardTitle>
                     <CardDescription>
                         Configure notifications sent to your customers during the payment process
                     </CardDescription>

@@ -101,7 +101,7 @@ export default function Webhooks() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>General Settings</CardTitle>
+                            <CardTitle>General settings</CardTitle>
                             <CardDescription>Configure global webhook settings</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">

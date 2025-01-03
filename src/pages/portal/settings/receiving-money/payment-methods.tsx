@@ -90,7 +90,7 @@ export default function PaymentMethods() {
                 }
             `}</style>
             <ContentSection
-                title="Payment Methods"
+                title="Payment methods"
                 desc="Activate and configure bank transfers, cards, e-wallets and other payment methods"
             >
                 <div className="space-y-6">

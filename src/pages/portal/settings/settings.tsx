@@ -82,24 +82,6 @@ const sidebarNavItems = [
       { title: 'Checkout options', href: '/portal/settings/receiving-money/checkout' },
     ],
   },
-  // {
-  //   title: 'Sending Money',
-  //   icon: <IconSend size={18} />,
-  //   href: '/portal/settings/sending-money/disbursements',
-  //   subItems: [
-  //     { title: 'Disbursements', href: '/portal/settings/sending-money/disbursements' },
-  //     { title: 'Notifications', href: '/portal/settings/sending-money/notifications' },
-  //   ],
-  // },
-  // {
-  //   title: 'Your Team',
-  //   icon: <IconUsers size={18} />,
-  //   href: 'portal/settings/team/members',
-  //   subItems: [
-  //     { title: 'Members', href: '/portal/settings/team/members' },
-  //     { title: 'Email Recipients', href: '/portal/settings/team/email-recipients' },
-  //   ],
-  // },
   {
     title: 'Billing and Fees',
     icon: <IconReceipt size={18} />,
@@ -116,7 +98,6 @@ const sidebarNavItems = [
     subItems: [
       { title: 'API keys', href: '/portal/settings/developers/api-keys' },
       { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
-      // { title: 'IP allowlist', href: '/portal/settings/developers/ip-allowlist' },
     ],
   },
   {

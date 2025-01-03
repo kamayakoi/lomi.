@@ -164,7 +164,7 @@ function BillingStatements() {
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <div>
                             <CardTitle className="text-sm font-medium">
-                                Platform Fees Summary
+                                Billing summary
                             </CardTitle>
                         </div>
                         <ArrowDownIcon
@@ -184,7 +184,7 @@ function BillingStatements() {
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="text-sm text-muted-foreground">
-                                                Last 30 Days Platform Fees
+                                                Last 30 days fees
                                             </p>
                                             <p className="text-2xl font-bold mt-1">
                                                 {loading ? (
@@ -261,7 +261,7 @@ function BillingStatements() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg font-medium">Monthly Statements</CardTitle>
+                        <CardTitle className="text-lg font-medium">Monthly statements</CardTitle>
                         <CardDescription>Download your monthly platform fee statements</CardDescription>
                     </CardHeader>
                     <CardContent>

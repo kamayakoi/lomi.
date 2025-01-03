@@ -55,7 +55,7 @@ export default function BankAccounts() {
 
     return (
         <ContentSection
-            title="Bank Accounts"
+            title="Bank accounts"
             desc="Add or delete bank accounts for withdrawals"
         >
             <div className="space-y-2">

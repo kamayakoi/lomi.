@@ -114,7 +114,7 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
         <ScrollArea className="h-[calc(100vh-12rem)] pr-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Payment Settings</CardTitle>
+                    <CardTitle>Payment settings</CardTitle>
                     <CardDescription>Configure your default payment preferences</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
