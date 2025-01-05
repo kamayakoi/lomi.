@@ -79,7 +79,6 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
             if (error) throw error
 
             await onUpdate({
-                organization_id: settings.organization_id,
                 default_language: defaultLanguage,
                 display_currency: displayCurrency,
                 payment_link_duration: paymentLinkDuration

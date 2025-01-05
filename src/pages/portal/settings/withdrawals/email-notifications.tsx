@@ -70,7 +70,7 @@ export default function EmailNotifications() {
                             <CardTitle className="text-lg font-medium">Email recipients</CardTitle>
                             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm" className="rounded-none">
+                                    <Button variant="outline" size="sm" className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">
                                         <PlusIcon className="mr-2 h-4 w-4" /> Add email
                                     </Button>
                                 </DialogTrigger>

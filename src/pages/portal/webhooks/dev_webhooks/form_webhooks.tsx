@@ -158,7 +158,7 @@ export function CreateWebhookForm({ onClose, onSuccess }: CreateWebhookFormProps
                     type="submit"
                     disabled={isSubmitting}
                 >
-                    {isSubmitting ? 'Creating...' : 'Create webhook'}
+                    {isSubmitting ? 'Creating...' : 'Create'}
                 </Button>
             </div>
         </form>

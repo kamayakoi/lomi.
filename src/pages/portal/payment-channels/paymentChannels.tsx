@@ -131,6 +131,7 @@ export default function PaymentChannels() {
         fetchOrganizationProviders(sidebarData.organization_id)
       }
       setDisconnectingProvider(null)
+      setDisconnectDialogOpen(false)
     }
   }
 
@@ -140,17 +141,6 @@ export default function PaymentChannels() {
     }, 1000)
     return () => clearTimeout(timer)
   }, [showMessage])
-
-  const handleDisconnectClick = (providerCode: string) => {
-    setDisconnectingProvider(providerCode)
-    setDisconnectDialogOpen(true)
-  }
-
-  const handleConfirmDisconnect = () => {
-    confirmDisconnect()
-    setDisconnectDialogOpen(false)
-    setDisconnectingProvider(null)
-  }
 
   if (isUserLoading || isSidebarLoading) {
     return <Loader />
@@ -198,16 +188,18 @@ export default function PaymentChannels() {
                     <Button
                       variant={isConnected ? 'default' : 'outline'}
                       size='sm'
-                      className='flex items-center px-4 py-2 text-sm font-medium rounded-none'
+                      className={`flex items-center px-4 py-2 text-sm font-medium rounded-none ${isConnected ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''
+                        }`}
                       onClick={() => {
                         if (isConnected) {
-                          handleDisconnectClick(provider.provider_code)
+                          setDisconnectingProvider(provider.provider_code)
+                          setDisconnectDialogOpen(true)
                         } else {
                           updateProviderConnection(provider.provider_code, true)
                         }
                       }}
                     >
-                      {isConnected ? 'Disconnect' : 'Connect'}
+                      {isConnected ? 'Connected' : 'Connect'}
                     </Button>
                   </div>
                   <div className="flex-grow">
@@ -246,7 +238,7 @@ export default function PaymentChannels() {
                 <div className="flex space-x-4">
                   <a
                     href="mailto:hello@lomi.africa?subject=New Payment Channel Request"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-700"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-600"
                   >
                     <IconPlus className="mr-2 h-4 w-4" />
                     Request a new channel
@@ -261,7 +253,7 @@ export default function PaymentChannels() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Enter Phone Number for {providers.find(p => p.provider_code === connectingProvider)?.name}
+              Enter your {providers.find(p => p.provider_code === connectingProvider)?.name} phone number
             </DialogTitle>
             <DialogDescription>
               Please enter the phone number associated with your {providers.find(p => p.provider_code === connectingProvider)?.name} account.
@@ -287,6 +279,7 @@ export default function PaymentChannels() {
             <Button
               onClick={handlePhoneSubmit}
               disabled={!phoneNumber}
+              className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               Connect
             </Button>
@@ -306,7 +299,7 @@ export default function PaymentChannels() {
           <DialogFooter>
             <Button
               variant="destructive"
-              onClick={handleConfirmDisconnect}
+              onClick={confirmDisconnect}
             >
               Confirm
             </Button>

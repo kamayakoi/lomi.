@@ -26,7 +26,7 @@ export default function Nav({
       return (
         <div
           key={item.title}
-          className='px-3 py-1 text-xs font-semibold text-muted-foreground'
+          className='px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground'
         >
           {item.title}
         </div>
@@ -47,11 +47,11 @@ export default function Nav({
   return (
     <div
       className={cn(
-        'group border-b bg-background py-1 transition-[max-height,padding] duration-500 md:border-none',
+        'group border-b bg-background py-1.5 transition-[max-height,padding] duration-500 md:border-none',
         className
       )}
     >
-      <nav className='grid gap-1 px-2'>
+      <nav className='grid gap-0.5 px-2'>
         {links.map(renderItem)}
       </nav>
     </div>
@@ -86,15 +86,16 @@ function NavLink({
           variant: isActive ? 'secondary' : 'ghost',
           size: 'sm',
         }),
-        'h-8 justify-start text-wrap rounded-none px-6',
-        subLink && 'h-7 w-full border-l border-l-slate-500 px-2'
+        'h-9 justify-start text-wrap rounded-none px-4',
+        subLink && 'h-8 w-full border-l border-l-border/50 px-3',
+        'hover:bg-accent/50 transition-colors duration-200'
       )}
       aria-current={isActive ? 'page' : undefined}
     >
-      <div className='mr-2'>{icon}</div>
-      {title}
+      <div className='mr-2.5 scale-105'>{icon}</div>
+      <span className="font-medium">{title}</span>
       {label && (
-        <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
+        <div className='ml-2 rounded-md bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground'>
           {label}
         </div>
       )}
@@ -112,29 +113,29 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }:
       <CollapsibleTrigger
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'group h-8 w-full justify-start rounded-none',
-          subLink ? 'pl-8' : 'px-6'
+          'group h-9 w-full justify-start rounded-none hover:bg-accent/50',
+          subLink ? 'pl-6' : 'px-4'
         )}
       >
-        <div className='mr-2'>{icon}</div>
-        {title}
+        <div className='mr-2.5 scale-105'>{icon}</div>
+        <span className="font-medium">{title}</span>
         {label && (
-          <div className='ml-2 rounded-lg bg-primary px-1 text-[0.625rem] text-primary-foreground'>
+          <div className='ml-2 rounded-md bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground'>
             {label}
           </div>
         )}
         <span
           className={cn(
-            'ml-auto transition-all group-data-[state="open"]:-rotate-180'
+            'ml-auto transition-transform duration-200 group-data-[state="open"]:-rotate-180'
           )}
         >
-          <IconChevronDown stroke={1} />
+          <IconChevronDown className="h-4 w-4" stroke={1.5} />
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent className='collapsibleDropdown max-h-[60vh] overflow-y-auto'>
-        <ul className={cn(subLink ? 'pl-4' : 'pl-6')}>
+        <ul className={cn('mt-0.5 space-y-0.5', subLink ? 'pl-4' : 'pl-6')}>
           {sub?.map((sublink) => (
-            <li key={sublink.title} className='my-0.5'>
+            <li key={sublink.title}>
               {sublink.subSub ? (
                 <NavLinkDropdown {...sublink} closeNav={closeNav} subLink />
               ) : (

@@ -13,7 +13,7 @@ export default function PhoneNumberInput({ value, onChange }: PhoneNumberInputPr
     return (
         <div className="space-y-2">
             <RPNInput.default
-                className="flex rounded-lg shadow-sm shadow-black/[.04]"
+                className="flex border border-black/20"
                 international
                 flagComponent={FlagComponent}
                 countrySelectComponent={CountrySelect}
@@ -32,7 +32,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
     ({ ...props }, ref) => {
         return (
             <Input
-                className="-ml-px rounded-l-none shadow-none focus-visible:z-10"
+                className="-ml-px border-l border-black/20 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 ref={ref}
                 {...props}
             />
@@ -55,7 +55,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
     };
 
     return (
-        <div className="relative inline-flex items-center self-stretch rounded-l-lg border border-input bg-background py-2 pe-2 ps-3 text-muted-foreground ring-offset-background transition-shadow focus-within:z-10 focus-within:border-ring focus-within:text-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring/30 focus-within:ring-offset-2 hover:bg-accent hover:text-foreground has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50">
+        <div className="relative inline-flex items-center self-stretch bg-background py-2 pe-2 ps-3 text-muted-foreground transition-colors hover:bg-accent/50 has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50">
             <div className="inline-flex items-center gap-1" aria-hidden="true">
                 <FlagComponent country={value} countryName={value} aria-hidden="true" />
                 <span className="text-muted-foreground/80">

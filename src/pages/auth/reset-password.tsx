@@ -49,7 +49,7 @@ export default function ResetPassword() {
     }
 
     return (
-        <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>
+        <div className='container grid h-svh flex-col items-center justify-center lg:max-w-none lg:px-0'>
             <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
                 <Card className='p-6'>
                     <h1 className='text-2xl font-semibold tracking-tight mb-4'>Reset Your Password</h1>

@@ -66,11 +66,26 @@ BEGIN
         NOW()
     )
     ON CONFLICT (organization_id) DO UPDATE SET
-        default_language = COALESCE((EXCLUDED.default_language)::VARCHAR, organization_checkout_settings.default_language),
-        display_currency = COALESCE((EXCLUDED.display_currency)::currency_code, organization_checkout_settings.display_currency),
-        payment_link_duration = COALESCE(EXCLUDED.payment_link_duration, organization_checkout_settings.payment_link_duration),
-        customer_notifications = COALESCE(EXCLUDED.customer_notifications, organization_checkout_settings.customer_notifications),
-        merchant_recipients = COALESCE(EXCLUDED.merchant_recipients, organization_checkout_settings.merchant_recipients),
+        default_language = CASE 
+            WHEN p_settings->>'default_language' IS NOT NULL THEN (p_settings->>'default_language')::VARCHAR 
+            ELSE organization_checkout_settings.default_language 
+        END,
+        display_currency = CASE 
+            WHEN p_settings->>'display_currency' IS NOT NULL THEN (p_settings->>'display_currency')::currency_code 
+            ELSE organization_checkout_settings.display_currency 
+        END,
+        payment_link_duration = CASE 
+            WHEN p_settings->>'payment_link_duration' IS NOT NULL THEN (p_settings->>'payment_link_duration')::INTEGER 
+            ELSE organization_checkout_settings.payment_link_duration 
+        END,
+        customer_notifications = CASE 
+            WHEN p_settings->'customer_notifications' IS NOT NULL THEN p_settings->'customer_notifications' 
+            ELSE organization_checkout_settings.customer_notifications 
+        END,
+        merchant_recipients = CASE 
+            WHEN p_settings->'merchant_recipients' IS NOT NULL THEN p_settings->'merchant_recipients' 
+            ELSE organization_checkout_settings.merchant_recipients 
+        END,
         updated_at = NOW();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
