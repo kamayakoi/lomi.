@@ -100,8 +100,8 @@ export default function FeeStructure() {
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow className="rounded-none">
-                                                        <TableHead className="w-1/2 rounded-none text-center">Payment Method</TableHead>
-                                                        <TableHead className="w-1/2 rounded-none text-center">Fee</TableHead>
+                                                        <TableHead className="w-1/2 rounded-none text-center">PAYMENT METHOD</TableHead>
+                                                        <TableHead className="w-1/2 rounded-none text-center">FEE</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -124,8 +124,8 @@ export default function FeeStructure() {
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow className="rounded-none">
-                                                        <TableHead className="w-1/2 rounded-none text-center">Service</TableHead>
-                                                        <TableHead className="w-1/2 rounded-none text-center">Fee</TableHead>
+                                                        <TableHead className="w-1/2 rounded-none text-center">SERVICE</TableHead>
+                                                        <TableHead className="w-1/2 rounded-none text-center">FEE</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>

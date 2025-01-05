@@ -10,6 +10,7 @@ import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { toast } from "@/components/ui/use-toast"
 
 type ApiKey = {
     name: string;
@@ -25,6 +26,7 @@ export default function Component() {
     const [newKeyName, setNewKeyName] = useState("")
     const [organizationId, setOrganizationId] = useState<string | null>(null)
     const [newApiKey, setNewApiKey] = useState<string | null>(null)
+    const [isCopied, setIsCopied] = useState(false)
 
     const fetchOrganizationDetails = useCallback(async () => {
         const { data, error } = await supabase
@@ -131,6 +133,13 @@ export default function Component() {
     const handleCopyApiKey = () => {
         if (newApiKey) {
             navigator.clipboard.writeText(newApiKey)
+            setIsCopied(true)
+            toast({
+                title: "Copied!",
+                description: "API key has been copied to clipboard",
+                duration: 3000,
+            })
+            setTimeout(() => setIsCopied(false), 2000)
         }
     }
 
@@ -246,10 +255,10 @@ export default function Component() {
                         </div>
 
                         <Dialog open={!!newApiKey} onOpenChange={handleCloseDialogs}>
-                            <DialogContent className="rounded-none">
+                            <DialogContent className="rounded-non">
                                 <DialogHeader>
                                     <DialogTitle>Success! You safely generated a new secret key.</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogDescription className="text-sm text-red-500">
                                         Please store this key safely as you won&apos;t be able to view it again. If you lose it, you&apos;ll need to generate a new one.
                                     </DialogDescription>
                                 </DialogHeader>
@@ -266,11 +275,18 @@ export default function Component() {
                                                 className="flex-grow rounded-none"
                                             />
                                             <Button
-                                                variant="outline"
+                                                variant={isCopied ? "default" : "outline"}
                                                 onClick={handleCopyApiKey}
-                                                className="ml-2 rounded-none"
+                                                className={`ml-2 rounded-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                                             >
-                                                <Copy className="h-4 w-4" />
+                                                {isCopied ? (
+                                                    "Copied"
+                                                ) : (
+                                                    <>
+                                                        <Copy className="h-4 w-4 mr-2" />
+                                                        Copy
+                                                    </>
+                                                )}
                                             </Button>
                                         </div>
                                     </div>

@@ -51,18 +51,17 @@ export default function EmailNotifications() {
             title="Email notifications"
             desc="Configure email recipients of withdrawal notifications"
         >
-            {/* Wrap all content in a single div */}
             <div>
-                <Card>
+                <Card className="rounded-none border">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-lg font-medium">Email recipients</CardTitle>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" className="rounded-none">
                                     <PlusIcon className="mr-2 h-4 w-4" /> Add email
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
+                            <DialogContent className="rounded-none sm:max-w-[425px]">
                                 <DialogHeader>
                                     <DialogTitle>Add email recipients</DialogTitle>
                                     <DialogDescription>
@@ -77,6 +76,7 @@ export default function EmailNotifications() {
                                             placeholder="alan@email.com, bob@email.com, etc."
                                             value={newEmail}
                                             onChange={(e) => setNewEmail(e.target.value)}
+                                            className="rounded-none"
                                         />
                                         <p className="text-sm text-muted-foreground">Use space or comma to separate email addresses</p>
                                     </div>
@@ -102,12 +102,12 @@ export default function EmailNotifications() {
                                 </p>
                             </div>
                         ) : (
-                            <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                            <ScrollArea className="h-[200px] w-full border p-4 rounded-none">
                                 <ul className="space-y-2">
                                     {emails.map((email, index) => (
-                                        <li key={index} className="flex justify-between items-center p-2 bg-secondary rounded-md">
+                                        <li key={index} className="flex justify-between items-center p-2 bg-secondary">
                                             <span className="text-sm">{email}</span>
-                                            <Button variant="ghost" size="sm" onClick={() => handleRemoveEmail(email)}>
+                                            <Button variant="ghost" size="sm" className="rounded-none" onClick={() => handleRemoveEmail(email)}>
                                                 <XIcon className="h-4 w-4" />
                                                 <span className="sr-only">Remove {email}</span>
                                             </Button>
