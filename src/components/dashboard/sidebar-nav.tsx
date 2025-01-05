@@ -91,7 +91,7 @@ export default function SidebarNav({
               <CollapsibleTrigger
                 className={cn(
                   buttonVariants({ variant: 'ghost' }),
-                  'justify-between w-full text-left whitespace-nowrap rounded-none hover:bg-muted'
+                  'justify-between w-full text-left whitespace-nowrap rounded-none hover:bg-accent hover:text-accent-foreground transition-colors duration-200'
                 )}
                 onClick={() => toggleSection(item.href)}
               >
@@ -113,9 +113,9 @@ export default function SidebarNav({
                     className={cn(
                       buttonVariants({ variant: 'ghost' }),
                       pathname === subItem.href
-                        ? 'bg-muted hover:bg-muted rounded-none'
-                        : 'hover:bg-muted hover:no-underline rounded-none',
-                      'justify-start block whitespace-nowrap'
+                        ? 'bg-accent text-accent-foreground rounded-none'
+                        : 'hover:bg-accent hover:text-accent-foreground hover:no-underline rounded-none',
+                      'justify-start block whitespace-nowrap transition-colors duration-200'
                     )}
                   >
                     {subItem.title}

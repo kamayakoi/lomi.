@@ -314,6 +314,7 @@ export default function Business() {
     return (
         <div style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             maxHeight: '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',

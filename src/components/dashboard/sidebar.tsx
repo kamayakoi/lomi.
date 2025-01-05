@@ -7,7 +7,7 @@ import { cn } from '@/lib/actions/utils'
 import { sidelinks } from '../../utils/data/sidelinks'
 import { useTheme } from '@/lib/hooks/useTheme'
 import iconLight from "/transparent2.webp"
-import iconDark from "/icon_dark.webp"
+import iconDark from "/transparent.webp"
 import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
 import { useSidebar } from '@/lib/hooks/useSidebar'

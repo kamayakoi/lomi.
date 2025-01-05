@@ -29,19 +29,18 @@ export default function ApiKeysSection() {
     }, [organizationId]);
 
     return (
-        <div className="w-full h-full mt-1">
-            <Card className="rounded-none h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200">
-                <CardContent className="pt-6 h-full flex flex-col relative">
-                    <div className="absolute inset-0 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800" />
+        <div className="w-64 p-1">
+            <Card className="rounded-none h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800">
+                <CardContent className="pt-6 pb-5">
                     <div className="relative z-10">
                         <Key className="h-10 w-10 text-pink-600 dark:text-pink-400 mb-4" />
                         <h3 className="font-semibold mb-2">API Key</h3>
-                        <div className="relative mb-4">
+                        <div className="relative">
                             <Input
                                 type="text"
                                 value={apiKey ? `${apiKey.slice(0, 8)}...` : 'Key not available'}
                                 readOnly
-                                className="rounded-none pr-10 font-mono text-xs"
+                                className="rounded-none pr-10 font-mono text-xs h-8"
                             />
                             <a href="/portal/settings/developers/api-keys">
                                 <Button

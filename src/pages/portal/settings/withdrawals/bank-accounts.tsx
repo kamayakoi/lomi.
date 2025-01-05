@@ -156,10 +156,22 @@ export default function BankAccounts() {
     const isAutoWithdrawalEnabled = defaultAccount?.auto_withdrawal_enabled || false
 
     return (
-        <div className="space-y-6">
+        <div style={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
             <ContentSection
                 title="Bank accounts"
-                desc="Add or delete bank accounts for withdrawals"
+                desc="Add or delete bank accounts for withdrawals."
             >
                 <div className="space-y-6">
                     <Alert variant="info">
@@ -242,69 +254,71 @@ export default function BankAccounts() {
                 </div>
             </ContentSection>
 
-            <ContentSection
-                title="Auto-Withdrawal"
-                desc="Configure and schedule your withdrawals"
-            >
-                <Card className="rounded-none">
-                    <CardContent className="p-6">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-medium">Auto-Withdrawal</h2>
-                            <Dialog open={isAutoWithdrawalDialogOpen} onOpenChange={setIsAutoWithdrawalDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="link" className="text-blue-600 hover:text-blue-600">
-                                        Learn more <ChevronRightIcon className="ml-1 h-4 w-4" />
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px] rounded-none">
-                                    <DialogHeader>
-                                        <DialogTitle>Try automating your withdrawals!</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                        <img
-                                            src="/autopayout.webp"
-                                            alt="Auto-withdrawal illustration"
-                                            className="w-full"
-                                        />
-                                        <DialogDescription>
-                                            <ul className="list-disc pl-5 space-y-2">
-                                                <li>Schedule your withdrawals on a recurring basis: monthly, weekly, or daily. It&apos;s up to you!</li>
-                                                <li>Get a detailed withdrawal report directly through your email.</li>
-                                                <li>Only takes less than 3 mins to set up!</li>
-                                            </ul>
-                                        </DialogDescription>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
-                        </div>
-                        <p className="text-muted-foreground mt-2">
-                            {hasDefaultAccount
-                                ? isAutoWithdrawalEnabled
-                                    ? `Auto-withdrawal is enabled for day ${defaultAccount?.auto_withdrawal_day} of each month.`
-                                    : "Configure your auto-withdrawal settings."
-                                : "Add a bank account before setting Auto-Withdrawal."}
-                        </p>
-                        <div className="mt-4">
-                            <Button
-                                disabled={!hasDefaultAccount}
-                                className="rounded-none bg-blue-500 hover:bg-blue-600 text-white"
-                                onClick={() => {
-                                    if (isAutoWithdrawalEnabled) {
-                                        handleAutoWithdrawalToggle(false)
-                                    } else {
-                                        setWithdrawalDay(defaultAccount?.auto_withdrawal_day || 1)
-                                        setIsSettingsDialogOpen(true)
-                                    }
-                                }}
-                            >
-                                {isAutoWithdrawalEnabled ? 'Disable Auto-Withdrawal' : 'Set up Auto-Withdrawal'}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            </ContentSection>
+            <div className="mt-6">
+                <ContentSection
+                    title="Auto-withdrawal"
+                    desc="Configure and schedule your withdrawals"
+                >
+                    <Card className="rounded-none">
+                        <CardContent className="p-6">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-lg font-medium">Auto-withdrawal</h2>
+                                <Dialog open={isAutoWithdrawalDialogOpen} onOpenChange={setIsAutoWithdrawalDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="link" className="text-blue-600 hover:text-blue-600">
+                                            Learn more <ChevronRightIcon className="ml-1 h-4 w-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px] rounded-none">
+                                        <DialogHeader>
+                                            <DialogTitle>Try automating your withdrawals!</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4">
+                                            <img
+                                                src="/autopayout.webp"
+                                                alt="Auto-withdrawal illustration"
+                                                className="w-full"
+                                            />
+                                            <DialogDescription>
+                                                <ul className="list-disc pl-5 space-y-2">
+                                                    <li>Schedule your withdrawals on a recurring basis: monthly, weekly, or daily. It&apos;s up to you!</li>
+                                                    <li>Get a detailed withdrawal report directly through your email.</li>
+                                                    <li>Only takes less than 3 mins to set up!</li>
+                                                </ul>
+                                            </DialogDescription>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                            <p className="text-muted-foreground mt-2">
+                                {hasDefaultAccount
+                                    ? isAutoWithdrawalEnabled
+                                        ? `Auto-withdrawal is enabled for day ${defaultAccount?.auto_withdrawal_day} of each month.`
+                                        : "Configure your auto-withdrawal settings."
+                                    : "Add a bank account before setting Auto-withdrawal."}
+                            </p>
+                            <div className="mt-4">
+                                <Button
+                                    disabled={!hasDefaultAccount}
+                                    className="rounded-none bg-blue-500 hover:bg-blue-600 text-white"
+                                    onClick={() => {
+                                        if (isAutoWithdrawalEnabled) {
+                                            handleAutoWithdrawalToggle(false)
+                                        } else {
+                                            setWithdrawalDay(defaultAccount?.auto_withdrawal_day || 1)
+                                            setIsSettingsDialogOpen(true)
+                                        }
+                                    }}
+                                >
+                                    {isAutoWithdrawalEnabled ? 'Disable' : 'Enable'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </ContentSection>
+            </div>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mt-4">
                 Contact <a href="mailto:help@lomi.africa" className="underline">help@lomi.africa</a> if you need assistance with managing your bank accounts.
             </p>
 
@@ -383,7 +397,7 @@ export default function BankAccounts() {
                             onClick={() => handleAutoWithdrawalToggle(true)}
                             className="rounded-none bg-blue-500 hover:bg-blue-600 text-white"
                         >
-                            Enable Auto-Withdrawal
+                            Enable auto-withdrawal
                         </Button>
                     </DialogFooter>
                 </DialogContent>

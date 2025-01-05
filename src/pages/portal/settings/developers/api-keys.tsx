@@ -154,148 +154,162 @@ export default function Component() {
     }
 
     return (
-        <ContentSection
-            title="API Keys"
-            desc="Create and manage your API keys to authenticate requests coming from your servers."
-        >
-            <div className="space-y-6">
-                <Alert variant="info">
-                    <AlertDescription>
-                        Secret keys should be kept secure and only shared with trusted services. Never expose them in client-side code or version control systems.
-                    </AlertDescription>
-                </Alert>
+        <div style={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+            <ContentSection
+                title="API keys"
+                desc="Create and manage your API keys to authenticate requests coming from your servers."
+            >
+                <div className="space-y-6">
+                    <Alert variant="info">
+                        <AlertDescription>
+                            Secret keys should be kept secure and only shared with trusted services. Never expose them in client-side code or version control systems.
+                        </AlertDescription>
+                    </Alert>
 
-                <Card className="rounded-none">
-                    <CardContent className="p-6">
-                        <div className="rounded-none border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow className="rounded-none">
-                                        <TableHead className="w-[25%] rounded-none">NAME</TableHead>
-                                        <TableHead className="w-[35%] rounded-none">API KEY</TableHead>
-                                        <TableHead className="w-[20%] rounded-none">STATUS</TableHead>
-                                        <TableHead className="w-[15%] rounded-none">CREATED</TableHead>
-                                        <TableHead className="w-[5%] rounded-none"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {apiKeys.map((key, index) => (
-                                        <TableRow key={index} className="rounded-none">
-                                            <TableCell>{key.name}</TableCell>
-                                            <TableCell>
-                                                <code className="bg-muted px-2 py-1 rounded-none text-xs">
-                                                    {maskApiKey(key.api_key)}
-                                                </code>
-                                            </TableCell>
-                                            <TableCell>
-                                                <button
-                                                    onClick={() => handleToggleKeyStatus(key)}
-                                                    className={`
-                                                        px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer
-                                                        ${key.is_active
-                                                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
-                                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
-                                                        }
-                                                    `}>
-                                                    {key.is_active ? 'Active' : 'Inactive'}
-                                                </button>
-                                            </TableCell>
-                                            <TableCell>
-                                                {new Date(key.created_at).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteKey(key.api_key)}
-                                                    className="h-8 w-8 p-0"
-                                                >
-                                                    <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                                </Button>
-                                            </TableCell>
+                    <Card className="rounded-none">
+                        <CardContent className="p-6">
+                            <div className="rounded-none border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="rounded-none">
+                                            <TableHead className="w-[25%] rounded-none">NAME</TableHead>
+                                            <TableHead className="w-[35%] rounded-none">API KEY</TableHead>
+                                            <TableHead className="w-[20%] rounded-none">STATUS</TableHead>
+                                            <TableHead className="w-[15%] rounded-none">CREATED</TableHead>
+                                            <TableHead className="w-[5%] rounded-none"></TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {apiKeys.map((key, index) => (
+                                            <TableRow key={index} className="rounded-none">
+                                                <TableCell>{key.name}</TableCell>
+                                                <TableCell>
+                                                    <code className="bg-muted px-2 py-1 rounded-none text-xs">
+                                                        {maskApiKey(key.api_key)}
+                                                    </code>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <button
+                                                        onClick={() => handleToggleKeyStatus(key)}
+                                                        className={`
+                                                            px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer
+                                                            ${key.is_active
+                                                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
+                                                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                                                            }
+                                                        `}>
+                                                        {key.is_active ? 'Active' : 'Inactive'}
+                                                    </button>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {new Date(key.created_at).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => handleDeleteKey(key.api_key)}
+                                                        className="h-8 w-8 p-0"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
 
-                        <div className="mt-6 flex justify-end">
-                            <Dialog open={isGeneratingKey} onOpenChange={setIsGeneratingKey}>
-                                <DialogTrigger asChild>
-                                    <Button className="rounded-none bg-blue-500 hover:bg-blue-600 text-white" onClick={() => setIsGeneratingKey(true)} disabled={apiKeys.length >= 3}>
-                                        <PlusCircle className="h-4 w-4 mr-2" />
-                                        Generate a secret key
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="rounded-none">
+                            <div className="mt-6 flex justify-end">
+                                <Dialog open={isGeneratingKey} onOpenChange={setIsGeneratingKey}>
+                                    <DialogTrigger asChild>
+                                        <Button className="rounded-none bg-blue-500 hover:bg-blue-600 text-white" onClick={() => setIsGeneratingKey(true)} disabled={apiKeys.length >= 3}>
+                                            <PlusCircle className="h-4 w-4 mr-2" />
+                                            Generate a secret key
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="rounded-none">
+                                        <DialogHeader>
+                                            <DialogTitle>Generate a new secret key</DialogTitle>
+                                            <DialogDescription>
+                                                Enter a name to identify your new API key.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor="name" className="text-right">
+                                                    Name
+                                                </Label>
+                                                <Input
+                                                    id="name"
+                                                    value={newKeyName}
+                                                    onChange={(e) => setNewKeyName(e.target.value)}
+                                                    className="col-span-3 rounded-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button onClick={handleGenerateKey} className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">Generate Key</Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+
+                            <Dialog open={!!newApiKey} onOpenChange={handleCloseDialogs}>
+                                <DialogContent className="rounded-non">
                                     <DialogHeader>
-                                        <DialogTitle>Generate a new secret key</DialogTitle>
-                                        <DialogDescription>
-                                            Enter a name to identify your new API key.
+                                        <DialogTitle>Success! You safely generated a new secret key.</DialogTitle>
+                                        <DialogDescription className="text-sm text-red-500">
+                                            Please store this key safely as you won&apos;t be able to view it again. If you lose it, you&apos;ll need to generate a new one.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="grid gap-4 py-4">
                                         <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor="name" className="text-right">
-                                                Name
+                                            <Label htmlFor="api-key" className="text-right">
+                                                Your secret key
                                             </Label>
-                                            <Input
-                                                id="name"
-                                                value={newKeyName}
-                                                onChange={(e) => setNewKeyName(e.target.value)}
-                                                className="col-span-3 rounded-none"
-                                            />
+                                            <div className="col-span-3 flex">
+                                                <Input
+                                                    id="api-key"
+                                                    value={newApiKey || ''}
+                                                    readOnly
+                                                    className="flex-grow rounded-none"
+                                                />
+                                                <Button
+                                                    variant={isCopied ? "default" : "outline"}
+                                                    onClick={handleCopyApiKey}
+                                                    className={`ml-2 rounded-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                                                >
+                                                    {isCopied ? (
+                                                        "Copied"
+                                                    ) : (
+                                                        <>
+                                                            <Copy className="h-4 w-4 mr-2" />
+                                                            Copy
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <DialogFooter>
-                                        <Button onClick={handleGenerateKey} className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">Generate Key</Button>
-                                    </DialogFooter>
                                 </DialogContent>
                             </Dialog>
-                        </div>
-
-                        <Dialog open={!!newApiKey} onOpenChange={handleCloseDialogs}>
-                            <DialogContent className="rounded-non">
-                                <DialogHeader>
-                                    <DialogTitle>Success! You safely generated a new secret key.</DialogTitle>
-                                    <DialogDescription className="text-sm text-red-500">
-                                        Please store this key safely as you won&apos;t be able to view it again. If you lose it, you&apos;ll need to generate a new one.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="api-key" className="text-right">
-                                            Your secret key
-                                        </Label>
-                                        <div className="col-span-3 flex">
-                                            <Input
-                                                id="api-key"
-                                                value={newApiKey || ''}
-                                                readOnly
-                                                className="flex-grow rounded-none"
-                                            />
-                                            <Button
-                                                variant={isCopied ? "default" : "outline"}
-                                                onClick={handleCopyApiKey}
-                                                className={`ml-2 rounded-none ${isCopied ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
-                                            >
-                                                {isCopied ? (
-                                                    "Copied"
-                                                ) : (
-                                                    <>
-                                                        <Copy className="h-4 w-4 mr-2" />
-                                                        Copy
-                                                    </>
-                                                )}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </CardContent>
-                </Card>
-            </div>
-        </ContentSection>
+                        </CardContent>
+                    </Card>
+                </div>
+            </ContentSection>
+        </div>
     )
 }

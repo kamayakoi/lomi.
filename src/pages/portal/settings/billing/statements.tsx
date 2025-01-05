@@ -103,185 +103,199 @@ function BillingStatements() {
     }
 
     return (
-        <ContentSection
-            title="Billing Statements"
-            desc="View your platform fees and monthly statements"
-        >
-            <div className="space-y-6">
-                <Card
-                    className="rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => setShowFeesBreakdown(!showFeesBreakdown)}
-                >
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <div>
-                            <CardTitle className="text-sm font-medium">
-                                Billing summary
-                            </CardTitle>
-                        </div>
-                        <ArrowDownIcon
-                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showFeesBreakdown ? 'rotate-180' : ''}`}
-                        />
-                    </CardHeader>
-                    <CardContent>
-                        <AnimatePresence mode="wait">
-                            {!showFeesBreakdown ? (
-                                <motion.div
-                                    key="total"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">
-                                                Last 30 days fees
-                                            </p>
-                                            <p className="text-2xl font-bold mt-1">
-                                                XOF {last30DaysFees.toLocaleString()}
-                                            </p>
-                                        </div>
-                                        {outstandingBalance > 0 && (
-                                            <div className="text-right">
-                                                <p className="text-sm font-medium text-red-500">
-                                                    Outstanding Balance
-                                                </p>
-                                                <p className="text-2xl font-bold text-red-500 mt-1">
-                                                    XOF {outstandingBalance.toLocaleString()}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="breakdown"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <div className="space-y-6">
-                                        <div className="grid grid-cols-2 gap-6">
+        <div style={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            maxHeight: '100vh',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+        }}>
+            <style>{`
+                div::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+            <ContentSection
+                title="Billing statements"
+                desc="View your platform fees and monthly statements."
+            >
+                <div className="space-y-6">
+                    <Card
+                        className="rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => setShowFeesBreakdown(!showFeesBreakdown)}
+                    >
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <div>
+                                <CardTitle className="text-sm font-medium">
+                                    Billing summary
+                                </CardTitle>
+                            </div>
+                            <ArrowDownIcon
+                                className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${showFeesBreakdown ? 'rotate-180' : ''}`}
+                            />
+                        </CardHeader>
+                        <CardContent>
+                            <AnimatePresence mode="wait">
+                                {!showFeesBreakdown ? (
+                                    <motion.div
+                                        key="total"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <div className="flex justify-between items-start">
                                             <div>
-                                                <p className="text-sm text-muted-foreground">Last 30 Days</p>
-                                                <p className="text-xl font-semibold mt-1">
+                                                <p className="text-sm text-muted-foreground">
+                                                    Last 30 days fees
+                                                </p>
+                                                <p className="text-2xl font-bold mt-1">
                                                     XOF {last30DaysFees.toLocaleString()}
                                                 </p>
                                             </div>
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Last Month</p>
-                                                <p className="text-xl font-semibold mt-1">
-                                                    XOF {lastMonthFees.toLocaleString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {outstandingBalance > 0 && (
-                                            <div className="pt-4 border-t">
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <p className="text-sm font-medium text-red-500">Outstanding Balance</p>
-                                                        <p className="text-xl font-semibold text-red-500 mt-1">
-                                                            XOF {outstandingBalance.toLocaleString()}
-                                                        </p>
-                                                    </div>
+                                            {outstandingBalance > 0 && (
+                                                <div className="text-right">
+                                                    <p className="text-sm font-medium text-red-500">
+                                                        Outstanding Balance
+                                                    </p>
+                                                    <p className="text-2xl font-bold text-red-500 mt-1">
+                                                        XOF {outstandingBalance.toLocaleString()}
+                                                    </p>
                                                 </div>
-                                                <p className="text-xs text-red-500/80 mt-2">
-                                                    This amount includes pending adjustments such as chargebacks and messaging fees.
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg font-medium">Monthly statements</CardTitle>
-                        <CardDescription>Download your monthly platform fee statements</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {statements.length === 0 ? (
-                            <div className="text-center py-6">
-                                <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
-                                <h3 className="mt-4 text-lg font-semibold">No statements yet</h3>
-                                <p className="mt-2 text-sm text-muted-foreground">
-                                    Your monthly statements will be generated on the 25th of each month
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {statements.map((statement) => (
-                                    <div
-                                        key={statement.platform_invoice_id}
-                                        className="flex items-center justify-between p-4 border rounded-none hover:bg-muted/50 transition-colors"
-                                    >
-                                        <div className="space-y-1">
-                                            <p className="font-medium">{statement.description}</p>
-                                            <div className="flex items-center space-x-2">
-                                                <p className="text-sm text-muted-foreground">
-                                                    {statement.currency_code} {statement.monthly_fees.toLocaleString()}
-                                                </p>
-                                                {statement.outstanding_balance > 0 && (
-                                                    <>
-                                                        <span className="text-sm text-muted-foreground">+</span>
-                                                        <p className="text-sm text-red-500">
-                                                            {statement.outstanding_balance.toLocaleString()} (outstanding)
-                                                        </p>
-                                                        <span className="text-sm text-muted-foreground">=</span>
-                                                        <p className="text-sm font-medium">
-                                                            {statement.total_amount.toLocaleString()}
-                                                        </p>
-                                                    </>
-                                                )}
-                                                <span className="text-sm text-muted-foreground">•</span>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Generated on {format(new Date(statement.created_at), 'MMM d, yyyy')}
-                                                </p>
-                                                <span
-                                                    className={`px-2 py-0.5 text-xs rounded-full ${statement.status === 'paid'
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : statement.status === 'overdue'
-                                                            ? 'bg-red-100 text-red-700'
-                                                            : statement.status === 'cancelled'
-                                                                ? 'bg-gray-100 text-gray-700'
-                                                                : 'bg-yellow-100 text-yellow-700'
-                                                        }`}
-                                                >
-                                                    {statement.status.charAt(0).toUpperCase() + statement.status.slice(1)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="space-x-2"
-                                            onClick={() => handleDownload(statement.platform_invoice_id)}
-                                            disabled={downloadingId === statement.platform_invoice_id}
-                                        >
-                                            {downloadingId === statement.platform_invoice_id ? (
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                            ) : (
-                                                <Download className="h-4 w-4" />
                                             )}
-                                            <span>Download</span>
-                                            <ChevronRight className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="breakdown"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <div className="space-y-6">
+                                            <div className="grid grid-cols-2 gap-6">
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">Last 30 Days</p>
+                                                    <p className="text-xl font-semibold mt-1">
+                                                        XOF {last30DaysFees.toLocaleString()}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">Last Month</p>
+                                                    <p className="text-xl font-semibold mt-1">
+                                                        XOF {lastMonthFees.toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {outstandingBalance > 0 && (
+                                                <div className="pt-4 border-t">
+                                                    <div className="flex justify-between items-center">
+                                                        <div>
+                                                            <p className="text-sm font-medium text-red-500">Outstanding Balance</p>
+                                                            <p className="text-xl font-semibold text-red-500 mt-1">
+                                                                XOF {outstandingBalance.toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-xs text-red-500/80 mt-2">
+                                                        This amount includes pending adjustments such as chargebacks and messaging fees.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </CardContent>
+                    </Card>
 
-                <p className="text-sm text-muted-foreground">
-                    Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Platform Fees Inquiry" className="underline">hello@lomi.africa</a> for any questions about your platform fees.
-                </p>
-            </div>
-        </ContentSection>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg font-medium">Monthly statements</CardTitle>
+                            <CardDescription>Download your monthly platform fee statements</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {statements.length === 0 ? (
+                                <div className="text-center py-6">
+                                    <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
+                                    <h3 className="mt-4 text-lg font-semibold">No statements yet</h3>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        Your monthly statements will be generated on the 25th of each month
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {statements.map((statement) => (
+                                        <div
+                                            key={statement.platform_invoice_id}
+                                            className="flex items-center justify-between p-4 border rounded-none hover:bg-muted/50 transition-colors"
+                                        >
+                                            <div className="space-y-1">
+                                                <p className="font-medium">{statement.description}</p>
+                                                <div className="flex items-center space-x-2">
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {statement.currency_code} {statement.monthly_fees.toLocaleString()}
+                                                    </p>
+                                                    {statement.outstanding_balance > 0 && (
+                                                        <>
+                                                            <span className="text-sm text-muted-foreground">+</span>
+                                                            <p className="text-sm text-red-500">
+                                                                {statement.outstanding_balance.toLocaleString()} (outstanding)
+                                                            </p>
+                                                            <span className="text-sm text-muted-foreground">=</span>
+                                                            <p className="text-sm font-medium">
+                                                                {statement.total_amount.toLocaleString()}
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                    <span className="text-sm text-muted-foreground">•</span>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        Generated on {format(new Date(statement.created_at), 'MMM d, yyyy')}
+                                                    </p>
+                                                    <span
+                                                        className={`px-2 py-0.5 text-xs rounded-full ${statement.status === 'paid'
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : statement.status === 'overdue'
+                                                                ? 'bg-red-100 text-red-700'
+                                                                : statement.status === 'cancelled'
+                                                                    ? 'bg-gray-100 text-gray-700'
+                                                                    : 'bg-yellow-100 text-yellow-700'
+                                                            }`}
+                                                    >
+                                                        {statement.status.charAt(0).toUpperCase() + statement.status.slice(1)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="space-x-2"
+                                                onClick={() => handleDownload(statement.platform_invoice_id)}
+                                                disabled={downloadingId === statement.platform_invoice_id}
+                                            >
+                                                {downloadingId === statement.platform_invoice_id ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <Download className="h-4 w-4" />
+                                                )}
+                                                <span>Download</span>
+                                                <ChevronRight className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <p className="text-sm text-muted-foreground">
+                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Platform Fees Inquiry" className="underline">hello@lomi.africa</a> for any questions about your platform fees.
+                    </p>
+                </div>
+            </ContentSection>
+        </div>
     )
 }
 

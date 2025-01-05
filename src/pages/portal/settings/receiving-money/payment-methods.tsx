@@ -79,6 +79,7 @@ export default function PaymentMethods() {
     return (
         <div style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             maxHeight: '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -91,7 +92,7 @@ export default function PaymentMethods() {
             `}</style>
             <ContentSection
                 title="Payment methods"
-                desc="Activate and configure bank transfers, cards, e-wallets and other payment methods"
+                desc="Activate and configure bank transfers, cards, e-wallets and other payment methods."
             >
                 <div className="space-y-6">
                     <Alert variant="info">

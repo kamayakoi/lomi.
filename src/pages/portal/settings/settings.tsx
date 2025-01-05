@@ -1,6 +1,6 @@
 import { Outlet, Navigate } from 'react-router-dom'
 import {
-  IconBuildingStore,
+  IconBriefcase,
   IconCreditCard,
   IconReceipt,
   IconCode,
@@ -45,6 +45,7 @@ function Settings() {
             Configure your account, set up payments and payouts, and customize your experience.
           </p>
         </div>
+
         <Separator className='my-4' />
         <div className='flex flex-1 flex-col lg:flex-row lg:gap-8 min-h-0'>
           <aside className='lg:w-1/4 border-r overflow-y-auto'>
@@ -65,7 +66,7 @@ function Settings() {
 const sidebarNavItems = [
   {
     title: 'Business and Profile',
-    icon: <IconBuildingStore size={18} />,
+    icon: <IconBriefcase size={18} className="text-gray-500" />,
     href: '/portal/settings/profile',
     subItems: [
       { title: 'Profile', href: '/portal/settings/profile' },
@@ -75,7 +76,7 @@ const sidebarNavItems = [
   },
   {
     title: 'Receiving Money',
-    icon: <IconCreditCard size={18} />,
+    icon: <IconCreditCard size={18} className="text-gray-500" />,
     href: '/portal/settings/receiving-money/payment-methods',
     subItems: [
       { title: 'Payment methods', href: '/portal/settings/receiving-money/payment-methods' },
@@ -84,7 +85,7 @@ const sidebarNavItems = [
   },
   {
     title: 'Billing and Fees',
-    icon: <IconReceipt size={18} />,
+    icon: <IconReceipt size={18} className="text-gray-500" />,
     href: '/portal/settings/billing/statements',
     subItems: [
       { title: 'Billing statements', href: '/portal/settings/billing/statements' },
@@ -93,7 +94,7 @@ const sidebarNavItems = [
   },
   {
     title: 'Developers',
-    icon: <IconCode size={18} />,
+    icon: <IconCode size={18} className="text-gray-500" />,
     href: '/portal/settings/developers/api-keys',
     subItems: [
       { title: 'API keys', href: '/portal/settings/developers/api-keys' },
@@ -101,7 +102,7 @@ const sidebarNavItems = [
   },
   {
     title: 'Withdrawals',
-    icon: <IconWallet size={18} />,
+    icon: <IconWallet size={18} className="text-gray-500" />,
     href: '/portal/settings/withdrawals/bank-accounts',
     subItems: [
       { title: 'Bank accounts', href: '/portal/settings/withdrawals/bank-accounts' },

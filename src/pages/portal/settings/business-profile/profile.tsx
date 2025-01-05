@@ -561,6 +561,7 @@ function Profile() {
     return (
         <div style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             maxHeight: '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -575,7 +576,7 @@ function Profile() {
                 title="Profile"
                 desc="Update your profile details and adjust your security settings."
             >
-                <div>
+                <div className="max-w-3xl">
                     <div className="space-y-6">
                         <div className="flex items-center space-x-4">
                             <ProfilePictureUploader

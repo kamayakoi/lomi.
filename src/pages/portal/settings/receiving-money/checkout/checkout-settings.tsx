@@ -87,6 +87,7 @@ function CheckoutSettingsPage() {
     return (
         <div style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             maxHeight: '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -99,7 +100,7 @@ function CheckoutSettingsPage() {
             `}</style>
             <ContentSection
                 title="Checkout"
-                desc="Configure the appearance, payment options, fees, and notifications for your customers checkout experience."
+                desc="Configure options, fees, and notifications for your customers checkout experience."
             >
                 {error ? (
                     <Alert variant="destructive">

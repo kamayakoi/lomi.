@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ContentSection from '@/components/dashboard/content-section'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { InfoIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -60,21 +60,27 @@ export default function FeeStructure() {
     return (
         <div style={{
             overflowY: 'auto',
+            overflowX: 'hidden',
             maxHeight: '100vh',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            paddingRight: '6px'
         }}>
             <style>{`
                 div::-webkit-scrollbar {
                     display: none;
                 }
+                
+                div {
+                    scroll-behavior: smooth;
+                }
             `}</style>
             <ContentSection
-                title="Fee Structure"
-                desc="View fee structure across different products and services"
+                title="Fee structure"
+                desc="View fee structure across different products and services."
             >
-                <div className="space-y-6">
+                <div className="space-y-6 pb-6">
                     <Alert variant="info">
                         <AlertDescription>
                             Review the fees associated with different payment methods and services. Fees may vary based on currency and payment provider.
@@ -83,8 +89,7 @@ export default function FeeStructure() {
 
                     <Card className="rounded-none">
                         <CardHeader>
-                            <CardTitle>Fee Structure</CardTitle>
-                            <CardDescription>View all applicable fees for your transactions</CardDescription>
+                            <CardTitle>Applicable fees</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Tabs value={activeCurrency} onValueChange={(value) => setActiveCurrency(value as CurrencyCode)}>
