@@ -26,9 +26,18 @@ function Settings() {
     <Layout fixed>
       {/* ===== Top Heading ===== */}
       <Layout.Header>
-        <TopNav links={topNav} />
-        <div className='ml-auto flex items-center space-x-4'>
+        <div className='hidden md:block'>
+          <TopNav links={topNav} />
+        </div>
+
+        <div className='block md:hidden'>
           <FeedbackForm />
+        </div>
+
+        <div className='ml-auto flex items-center space-x-4'>
+          <div className='hidden md:block'>
+            <FeedbackForm />
+          </div>
           <Notifications />
           <UserNav />
         </div>
@@ -48,9 +57,33 @@ function Settings() {
 
         <Separator className='my-4' />
         <div className='flex flex-1 flex-col lg:flex-row lg:gap-8 min-h-0'>
-          <aside className='lg:w-1/4 border-r overflow-y-auto'>
+          <aside className='lg:w-1/4 lg:border-r overflow-y-auto'>
             <nav className='grid gap-1 p-1'>
-              <SidebarNav items={sidebarNavItems} />
+              <div className='lg:hidden'>
+                <select
+                  className='w-full p-2 mb-4 border rounded-none bg-background focus:ring-0 focus:outline-none hover:bg-background'
+                  onChange={(e) => {
+                    const selectedHref = e.target.value;
+                    window.location.href = selectedHref;
+                  }}
+                >
+                  {sidebarNavItems.map((section) => (
+                    <>
+                      <option value={section.href} key={section.title}>
+                        {section.title}
+                      </option>
+                      {section.subItems?.map((subItem) => (
+                        <option value={subItem.href} key={subItem.href}>
+                          &nbsp;&nbsp;{subItem.title}
+                        </option>
+                      ))}
+                    </>
+                  ))}
+                </select>
+              </div>
+              <div className='hidden lg:block'>
+                <SidebarNav items={sidebarNavItems} />
+              </div>
             </nav>
           </aside>
           <div className='flex-1 lg:max-w-3xl p-1 overflow-y-auto'>

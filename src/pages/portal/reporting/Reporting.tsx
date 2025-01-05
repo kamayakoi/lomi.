@@ -82,9 +82,18 @@ function ReportingPage() {
     return (
         <Layout fixed>
             <Layout.Header>
-                <TopNav links={topNav} />
-                <div className='ml-auto flex items-center space-x-4'>
+                <div className='hidden md:block'>
+                    <TopNav links={topNav} />
+                </div>
+
+                <div className='block md:hidden'>
                     <FeedbackForm />
+                </div>
+
+                <div className='ml-auto flex items-center space-x-4'>
+                    <div className='hidden md:block'>
+                        <FeedbackForm />
+                    </div>
                     <Notifications />
                     <UserNav />
                 </div>

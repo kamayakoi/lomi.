@@ -237,7 +237,7 @@ export default function Component() {
                                     <DialogTrigger asChild>
                                         <Button className="rounded-none bg-blue-500 hover:bg-blue-600 text-white" onClick={() => setIsGeneratingKey(true)} disabled={apiKeys.length >= 3}>
                                             <PlusCircle className="h-4 w-4 mr-2" />
-                                            Generate a secret key
+                                            Generate a key
                                         </Button>
                                     </DialogTrigger>
                                     <DialogContent className="rounded-none">

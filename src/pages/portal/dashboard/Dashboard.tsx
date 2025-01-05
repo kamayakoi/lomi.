@@ -21,10 +21,19 @@ export default function Dashboard() {
 
   return (
     <Layout fixed>
-      <Layout.Header>
-        <TopNav links={topNav} />
-        <div className='ml-auto flex items-center space-x-4'>
+      <Layout.Header className="flex items-center justify-between">
+        <div className='hidden md:block'>
+          <TopNav links={topNav} />
+        </div>
+
+        <div className='block md:hidden'>
           <FeedbackForm />
+        </div>
+
+        <div className='flex items-center space-x-4 ml-auto'>
+          <div className='hidden md:block'>
+            <FeedbackForm />
+          </div>
           <Notifications />
           <UserNav />
         </div>

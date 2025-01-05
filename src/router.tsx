@@ -33,7 +33,7 @@ import Reporting from './pages/portal/reporting/Reporting.tsx';
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx';
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx';
 import Customers from './pages/portal/customers/Customers.tsx';
-import Subscription from "./pages/portal/subscription/subscription.tsx";
+import Subscription from "./pages/portal/subscription/subscription";
 import Product from "./pages/portal/product/Product.tsx";
 import Storefront from "./pages/portal/storefront/Storefront.tsx";
 
