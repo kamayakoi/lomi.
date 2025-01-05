@@ -41,7 +41,7 @@ BEGIN
     PERFORM public.generate_api_key(
         NEW.merchant_id,
         NEW.organization_id,
-        'Default API Key',
+        'Test Key',
         NULL
     );
 

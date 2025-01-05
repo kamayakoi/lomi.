@@ -38,13 +38,13 @@ export default function SidebarNav({
 
   // Initialize and update open sections based on current pathname
   useEffect(() => {
-    const newOpenSections = items.reduce((acc, item) => {
-      // Check if any subItem's href matches the current pathname
-      const isActive = item.subItems?.some(subItem => pathname.startsWith(subItem.href))
-      return { ...acc, [item.href]: isActive || item.defaultOpen || false }
-    }, {})
-    setOpenSections(newOpenSections)
-  }, [pathname, items])
+    setOpenSections(prev => items.reduce((acc, item) => ({
+      ...acc,
+      [item.href]: prev[item.href] !== undefined
+        ? prev[item.href]
+        : item.subItems?.some(subItem => pathname.startsWith(subItem.href)) || item.defaultOpen || false
+    }), {}));
+  }, [pathname, items]);
 
   const handleSelect = (e: string) => {
     setVal(e)
@@ -52,7 +52,10 @@ export default function SidebarNav({
   }
 
   const toggleSection = (href: string) => {
-    setOpenSections(prev => ({ ...prev, [href]: !prev[href] }))
+    setOpenSections(prev => ({
+      ...prev,  // Preserve all other section states
+      [href]: !prev[href]  // Toggle only the clicked section
+    }))
   }
 
   return (

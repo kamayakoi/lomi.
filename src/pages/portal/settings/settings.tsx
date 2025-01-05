@@ -97,7 +97,6 @@ const sidebarNavItems = [
     href: '/portal/settings/developers/api-keys',
     subItems: [
       { title: 'API keys', href: '/portal/settings/developers/api-keys' },
-      { title: 'Webhooks', href: '/portal/settings/developers/webhooks' },
     ],
   },
   {
