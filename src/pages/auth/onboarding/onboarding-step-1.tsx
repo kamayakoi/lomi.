@@ -76,7 +76,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             {...onboardingForm.register("firstName")}
                             className={cn(
                                 "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -90,7 +90,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             {...onboardingForm.register("lastName")}
                             className={cn(
                                 "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -117,8 +117,8 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                                 onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                 onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
                                 className={cn(
-                                    "w-full mb-2",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
@@ -126,11 +126,11 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                                 <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>
                             )}
                             {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
+                                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 mt-1 max-h-60 overflow-auto">
                                     {filteredCountryCodes.map((code: string) => (
                                         <li
                                             key={code}
-                                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                            className="px-3 py-2 h-[48px] flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                                             onClick={() => {
                                                 setCountryCodeSearch(code);
                                                 onboardingForm.setValue("countryCode", code, { shouldValidate: true });
@@ -154,7 +154,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             })}
                             className={cn(
                                 "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -180,8 +180,8 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             id="country"
                             {...onboardingForm.register("country")}
                             className={cn(
-                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                 "appearance-none"
                             )}
@@ -200,8 +200,8 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             id="position"
                             {...onboardingForm.register("position")}
                             className={cn(
-                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                 "appearance-none"
                             )}
@@ -216,7 +216,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                     </div>
                 </div>
             </div>
-            <Button type="submit" className="w-full mt-6">
+            <Button type="submit" className="w-full mt-6 h-[48px]">
                 Next
             </Button>
         </form>

@@ -52,7 +52,7 @@ export default function ForgotPassword() {
                 Don&apos;t have an account?{' '}
                 <Link
                   to='/sign-up'
-                  className='underline underline-offset-4 hover:text-primary'
+                  className='underline underline-offset-4 text-blue-600 hover:text-blue-600'
                 >
                   Sign up
                 </Link>

@@ -8,7 +8,7 @@ import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { fetchWebhooks } from './dev_webhooks/support_webhooks'
-import { Webhook, webhook_event } from './dev_webhooks/types'
+import { Webhook, webhook_event, webhookCategories } from './dev_webhooks/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateWebhookForm } from './dev_webhooks/form_webhooks'
@@ -21,7 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { PlusCircle, ArrowUpDown } from 'lucide-react'
+import { PlusCircle, ArrowUpDown, Edit } from 'lucide-react'
 import {
     Table,
     TableBody,
@@ -31,10 +31,61 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useQuery } from 'react-query'
-import WebhookActions from './dev_webhooks/actions_webhooks'
+import WebhookActions from './dev_webhooks/edit_webhooks'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import WebhookView from './dev_webhooks/actions_webhooks'
+
+function getEventCategoryColor(categoryName: string): string {
+    switch (categoryName) {
+        case 'PAYMENTS':
+            return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        case 'SUBSCRIPTIONS':
+            return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        case 'PAYMENT SESSIONS':
+            return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        case 'PAYOUTS':
+            return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+        case 'INVOICES':
+            return 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300';
+        default:
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
+}
+
+function EventBadges({ events }: { events: webhook_event[] }) {
+    const groupedEvents = webhookCategories.map(category => ({
+        ...category,
+        activeEvents: category.events.filter(event => events.includes(event.id))
+    })).filter(category => category.activeEvents.length > 0);
+
+    return (
+        <div className="flex flex-wrap gap-1.5">
+            {groupedEvents.map((category, idx) => (
+                <TooltipProvider key={idx}>
+                    <Tooltip>
+                        <TooltipTrigger>
+                            <Badge
+                                variant="secondary"
+                                className={`rounded-none px-2 py-1 text-xs font-normal ${getEventCategoryColor(category.name)}`}
+                            >
+                                {category.name} ({category.activeEvents.length})
+                            </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <div className="text-sm">
+                                {category.activeEvents.map(event => event.label).join(', ')}
+                            </div>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            ))}
+        </div>
+    );
+}
 
 function WebhooksPage() {
     const { user } = useUser()
@@ -46,6 +97,8 @@ function WebhooksPage() {
     const [isActionsOpen, setIsActionsOpen] = useState(false)
     const [sortColumn, setSortColumn] = useState<keyof Webhook | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+    const [selectedWebhookForView, setSelectedWebhookForView] = useState<Webhook | null>(null)
+    const [isViewOpen, setIsViewOpen] = useState(false)
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
@@ -72,12 +125,6 @@ function WebhooksPage() {
         setIsRefreshing(false)
     }
 
-    const handleWebhookClick = (webhook: Webhook) => {
-        setSelectedWebhook(webhook)
-        setIsActionsOpen(true)
-        console.log('Opening webhook details:', webhook)
-    }
-
     const handleSort = (column: keyof Webhook) => {
         if (sortColumn === column) {
             setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
@@ -98,10 +145,19 @@ function WebhooksPage() {
                 return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
             } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
                 return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
-            } else {
-                return 0
+            } else if (Array.isArray(aValue) && Array.isArray(bValue)) {
+                // For authorized_events array, compare the first event
+                const aEvent = aValue[0] || ''
+                const bEvent = bValue[0] || ''
+                return sortDirection === 'asc' ? aEvent.localeCompare(bEvent) : bEvent.localeCompare(aEvent)
             }
+            return 0
         })
+    }
+
+    const handleRowClick = (webhook: Webhook) => {
+        setSelectedWebhookForView(webhook)
+        setIsViewOpen(true)
     }
 
     return (
@@ -123,7 +179,7 @@ function WebhooksPage() {
                         <h1 className="text-2xl font-bold tracking-tight">Webhooks</h1>
                         <Dialog open={isCreateWebhookOpen} onOpenChange={setIsCreateWebhookOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                                     <PlusCircle className="mr-2 h-4 w-4" />
                                     Create
                                 </Button>
@@ -165,9 +221,9 @@ function WebhooksPage() {
                                                     </Button>
                                                 </TableHead>
                                                 <TableHead className="text-left w-1/3 pl-2">
-                                                    <Button variant="ghost" onClick={() => handleSort('event')}>
-                                                        Event
-                                                        {sortColumn === 'event' && (
+                                                    <Button variant="ghost" onClick={() => handleSort('authorized_events')}>
+                                                        Events
+                                                        {sortColumn === 'authorized_events' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                         )}
                                                     </Button>
@@ -180,6 +236,7 @@ function WebhooksPage() {
                                                         )}
                                                     </Button>
                                                 </TableHead>
+                                                <TableHead className="w-[100px]"></TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -196,7 +253,7 @@ function WebhooksPage() {
                                                     <TableCell colSpan={4}>
                                                         <div className="py-24 text-center">
                                                             <div className="flex justify-center mb-6">
-                                                                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-none">
+                                                                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-full">
                                                                     <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                                                                 </div>
                                                             </div>
@@ -213,13 +270,13 @@ function WebhooksPage() {
                                                 sortWebhooks(webhooks).map((webhook: Webhook) => (
                                                     <TableRow
                                                         key={webhook.webhook_id}
-                                                        onClick={() => handleWebhookClick(webhook)}
-                                                        className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                        role="button"
-                                                        tabIndex={0}
+                                                        className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                                                        onClick={() => handleRowClick(webhook)}
                                                     >
                                                         <TableCell className="text-left pl-4">{webhook.url}</TableCell>
-                                                        <TableCell className="text-left pl-2">{webhook.event}</TableCell>
+                                                        <TableCell className="text-left pl-2">
+                                                            <EventBadges events={webhook.authorized_events} />
+                                                        </TableCell>
                                                         <TableCell className="text-center">
                                                             <span className={`
                                                                 inline-block px-2 py-1 rounded-none text-xs font-normal
@@ -227,6 +284,18 @@ function WebhooksPage() {
                                                             `}>
                                                                 {webhook.is_active ? 'Active' : 'Inactive'}
                                                             </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setSelectedWebhook(webhook);
+                                                                    setIsActionsOpen(true);
+                                                                }}
+                                                                className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                            >
+                                                                <Edit className="h-4.5 w-4.5" />
+                                                            </button>
                                                         </TableCell>
                                                     </TableRow>
                                                 ))
@@ -244,6 +313,11 @@ function WebhooksPage() {
                 isOpen={isActionsOpen}
                 onClose={() => setIsActionsOpen(false)}
                 onSuccess={() => refetch()}
+            />
+            <WebhookView
+                webhook={selectedWebhookForView}
+                isOpen={isViewOpen}
+                onClose={() => setIsViewOpen(false)}
             />
         </Layout>
     )

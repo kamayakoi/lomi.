@@ -112,7 +112,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             {...onboardingForm.register("orgName")}
                             className={cn(
                                 "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -126,7 +126,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             {...onboardingForm.register("orgEmail")}
                             className={cn(
                                 "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -138,8 +138,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             id="orgEmployees"
                             {...onboardingForm.register("orgEmployees")}
                             className={cn(
-                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                 "appearance-none"
                             )}
@@ -162,8 +162,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             id="orgCountry"
                             {...onboardingForm.register("orgCountry")}
                             className={cn(
-                                "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                 "appearance-none"
                             )}
@@ -184,8 +184,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 id="orgRegion"
                                 {...onboardingForm.register("orgRegion")}
                                 className={cn(
-                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                     "appearance-none"
                                 )}
@@ -207,8 +207,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 placeholder="Enter your region"
                                 {...onboardingForm.register("orgRegion")}
                                 className={cn(
-                                    "w-full mb-2",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
@@ -230,7 +230,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                 </div>
                 <div className="w-1/2 space-y-10">
                     <Label htmlFor="workspaceHandle" className="block mb-2">Workspace Handle</Label>
-                    <div className="flex items-center border border-gray-300 rounded-md dark:border-gray-600">
+                    <div className="flex items-center border dark:border-gray-600 h-[48px]">
                         <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-base">
                             portal.lomi.africa/
                         </div>
@@ -239,7 +239,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             placeholder="my-workspace"
                             {...onboardingForm.register("workspaceHandle")}
                             className={cn(
-                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px] text-base",
+                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px] text-base h-[48px]",
                                 "dark:bg-gray-800 dark:text-white"
                             )}
                         />
@@ -251,11 +251,11 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                 <Button
                     type="button"
                     onClick={onPrevious}
-                    className="mt-6 dark:bg-primary-600 dark:hover:bg-primary-700"
+                    className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
                 >
                     Previous
                 </Button>
-                <Button type="submit" className="mt-6">
+                <Button type="submit" className="mt-6 h-[48px]">
                     Next
                 </Button>
             </div>

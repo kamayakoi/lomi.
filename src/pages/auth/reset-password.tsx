@@ -61,7 +61,7 @@ export default function ResetPassword() {
                                     id='password'
                                     type='password'
                                     {...register('password')}
-                                    className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500'
+                                    className='h-12 border border-gray-300 rounded-none focus:border-blue-500 focus:ring-blue-500'
                                 />
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
                             </div>
@@ -71,7 +71,7 @@ export default function ResetPassword() {
                                     id='confirmPassword'
                                     type='password'
                                     {...register('confirmPassword')}
-                                    className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500'
+                                    className='h-12 border border-gray-300 rounded-none focus:border-blue-500 focus:ring-blue-500'
                                 />
                                 {errors.confirmPassword && <p className='text-red-500 text-sm'>{errors.confirmPassword.message}</p>}
                             </div>

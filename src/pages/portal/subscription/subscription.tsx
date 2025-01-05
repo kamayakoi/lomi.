@@ -197,7 +197,7 @@ function SubscriptionsPage() {
             <h1 className="text-2xl font-bold tracking-tight">Subscriptions</h1>
             <Dialog open={isCreatePlanOpen} onOpenChange={setIsCreatePlanOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
+                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Create
                 </Button>

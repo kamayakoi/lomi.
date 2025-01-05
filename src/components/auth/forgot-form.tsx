@@ -72,14 +72,14 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
                     <Input
                       placeholder='Email address**'
                       {...field}
-                      className='h-12 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
+                      className='h-12 border border-gray-300 rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className='w-full mt-2' disabled={isLoading}>
+            <Button type="submit" className='w-full h-12 mt-2' disabled={isLoading}>
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
           </div>

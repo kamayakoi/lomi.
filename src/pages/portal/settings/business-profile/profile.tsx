@@ -736,7 +736,7 @@ function Profile() {
                                                 type={showNewPassword ? "text" : "password"}
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                className="pr-24 transition-all duration-200 focus:ring-2 focus:ring-primary"
+                                                className="pr-24 transition-all duration-200 focus:ring-1 focus:ring-primary"
                                             />
                                             <button
                                                 type="button"
@@ -834,7 +834,7 @@ function Profile() {
                                                     value={currentPinInput[index] || ''}
                                                     onChange={(e) => handleCurrentPinChange(index, e.target.value)}
                                                     onKeyDown={(e) => handleCurrentPinKeyDown(index, e)}
-                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
+                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-1 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
                                                     aria-label={`Current PIN digit ${index + 1}`}
                                                 />
                                             ))}
@@ -858,7 +858,7 @@ function Profile() {
                                                     value={newPin[index] || ''}
                                                     onChange={(e) => handlePinChange(index, e.target.value)}
                                                     onKeyDown={(e) => handleKeyDown(index, e)}
-                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
+                                                    className="w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-1 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50"
                                                     aria-label={`New PIN digit ${index + 1}`}
                                                 />
                                             ))}

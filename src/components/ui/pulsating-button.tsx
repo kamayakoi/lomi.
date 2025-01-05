@@ -18,7 +18,7 @@ export default function PulsatingButton({
   return (
     <button
       className={cn(
-        "relative text-center cursor-pointer flex justify-center items-center rounded-lg text-white dark:text-black bg-blue-500 dark:bg-blue-500 px-4 py-2",
+        "relative text-center cursor-pointer flex justify-center items-center text-white dark:text-black bg-blue-500 dark:bg-blue-500 px-4 py-2 rounded-none",
         className,
       )}
       style={
@@ -30,7 +30,7 @@ export default function PulsatingButton({
       {...props}
     >
       <div className="relative z-10">{children}</div>
-      <div className="absolute top-1/2 left-1/2 size-full rounded-lg bg-inherit animate-pulse -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-1/2 left-1/2 size-full bg-inherit animate-pulse -translate-x-1/2 -translate-y-1/2 rounded-none" />
     </button>
   );
 }

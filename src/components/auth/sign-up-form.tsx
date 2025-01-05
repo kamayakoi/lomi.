@@ -99,7 +99,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             onChange={handleFullNameChange}
             autoComplete="name"
             className={cn(
-              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
                 'border-gray-300 dark:border-gray-600': !isValidFullName && fullName === '',
                 'border-red-500 dark:border-red-500': !isValidFullName && fullName !== '',
@@ -115,7 +115,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             onChange={handleEmailChange}
             autoComplete="username"
             className={cn(
-              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
                 'border-gray-300 dark:border-gray-600': !isValidEmail && email === '',
                 'border-red-500 dark:border-red-500': !isValidEmail && email !== '',
@@ -130,7 +130,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             onChange={handlePasswordChange}
             autoComplete="new-password"
             className={cn(
-              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
                 'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
                 'border-red-500 dark:border-red-500': !isValidPassword && password !== '',

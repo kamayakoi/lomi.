@@ -96,7 +96,7 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
                         {...register('country')}
                         className={cn(
                             "w-full mb-2 px-3 py-2 border h-10 rounded-none",
-                            "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                             "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                             "appearance-none"
                         )}

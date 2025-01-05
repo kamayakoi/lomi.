@@ -1,119 +1,164 @@
-import React, { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { toast } from "@/components/ui/use-toast"
+import { webhook_event, webhookCategories } from './types'
 import { createWebhook } from './support_webhooks'
-import { useUser } from '@/lib/hooks/useUser'
-import { webhook_event } from './types'
-import { AlertCircle } from 'lucide-react'
 
 interface CreateWebhookFormProps {
     onClose: () => void
     onSuccess: () => void
 }
 
-interface WebhookFormData {
-    url: string
-    event: webhook_event
-    isActive: boolean
-    metadata: Record<string, unknown>
-}
+export function CreateWebhookForm({ onClose, onSuccess }: CreateWebhookFormProps) {
+    const [url, setUrl] = useState("")
+    const [selectedEvents, setSelectedEvents] = useState<webhook_event[]>([])
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-interface WebhookError {
-    message: string;
-    code?: string;
-    details?: unknown;
-}
+    // Get all possible events
+    const allEvents = webhookCategories.flatMap(category =>
+        category.events.map(event => event.id)
+    )
 
-const urlPattern = /^https?:\/\/.+/i
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!url) {
+            toast({
+                title: "Error",
+                description: "Please enter a webhook URL",
+                variant: "destructive",
+            })
+            return
+        }
+        if (selectedEvents.length === 0) {
+            toast({
+                title: "Error",
+                description: "Please select at least one event",
+                variant: "destructive",
+            })
+            return
+        }
 
-export const CreateWebhookForm: React.FC<CreateWebhookFormProps> = ({ onClose, onSuccess }) => {
-    const { user } = useUser()
-    const [submitError, setSubmitError] = useState<string | null>(null)
-    const { register, handleSubmit, control, formState: { errors } } = useForm<WebhookFormData>()
-
-    const onSubmit = async (data: WebhookFormData) => {
+        setIsSubmitting(true)
         try {
-            setSubmitError(null)
             await createWebhook({
-                merchantId: user?.id || '',
-                url: data.url,
-                event: data.event,
-                isActive: true,
-                metadata: {},
+                url,
+                authorized_events: selectedEvents,
+            })
+            toast({
+                title: "Success",
+                description: "Webhook created successfully",
             })
             onSuccess()
             onClose()
-        } catch (error: unknown) {
+        } catch (error) {
             console.error('Error creating webhook:', error)
-            const webhookError = error as WebhookError
-            setSubmitError(webhookError.message || 'Failed to create webhook. Please try again.')
+            toast({
+                title: "Error",
+                description: "Failed to create webhook",
+                variant: "destructive",
+            })
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
+    const toggleEvent = (event: webhook_event) => {
+        setSelectedEvents(prev =>
+            prev.includes(event)
+                ? prev.filter(e => e !== event)
+                : [...prev, event]
+        )
+    }
+
+    const toggleAllEvents = () => {
+        const allSelected = allEvents.every(event => selectedEvents.includes(event))
+        if (allSelected) {
+            setSelectedEvents([])
+        } else {
+            setSelectedEvents(allEvents)
+        }
+    }
+
+    const allSelected = allEvents.every(event => selectedEvents.includes(event))
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
                 <Label htmlFor="url">Webhook URL</Label>
                 <Input
                     id="url"
-                    placeholder="Enter webhook URL (e.g., https://api.example.com/webhook)"
-                    className={`rounded-none ${errors.url ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                    {...register('url', {
-                        required: 'Webhook URL is required',
-                        pattern: {
-                            value: urlPattern,
-                            message: 'URL must start with http:// or https://'
-                        }
-                    })}
+                    placeholder="https://example.com/webhook"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
                 />
-                {errors.url && (
-                    <div className="flex items-center gap-x-2 text-sm text-red-500 mt-1">
-                        <AlertCircle className="h-4 w-4" />
-                        <span>{errors.url.message}</span>
-                    </div>
-                )}
             </div>
+
             <div className="space-y-2">
-                <Label htmlFor="event">Event</Label>
-                <Controller
-                    name="event"
-                    control={control}
-                    rules={{ required: 'Event type is required' }}
-                    render={({ field, fieldState: { error } }) => (
-                        <div>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <SelectTrigger className={`w-full rounded-none ${error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}>
-                                    <SelectValue placeholder="Select an event" />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-none">
-                                    <SelectItem value="new_payment">New Payment</SelectItem>
-                                    <SelectItem value="new_subscription">New Subscription</SelectItem>
-                                    <SelectItem value="payment_status_change">Payment Status Change</SelectItem>
-                                    <SelectItem value="subscription_status_change">Subscription Status Change</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {error && (
-                                <div className="flex items-center gap-x-2 text-sm text-red-500 mt-1">
-                                    <AlertCircle className="h-4 w-4" />
-                                    <span>{error.message}</span>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                />
-            </div>
-            {submitError && (
-                <div className="flex items-center gap-x-2 text-sm text-red-500 bg-red-50 p-3 rounded-sm border border-red-200">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>{submitError}</span>
+                <div className="flex items-center justify-between mb-2">
+                    <Label>Events</Label>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={toggleAllEvents}
+                    >
+                        {allSelected ? 'Deselect All' : 'Select All'}
+                    </Button>
                 </div>
-            )}
-            <div className="flex justify-end">
-                <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white rounded-none">
-                    Create a webhook
+                <Accordion type="single" collapsible className="w-full">
+                    {webhookCategories.map((category, index) => (
+                        <AccordionItem value={`item-${index}`} key={index} className="cursor-pointer">
+                            <AccordionTrigger className="w-full text-sm font-medium hover:no-underline">
+                                <div className="flex items-center justify-between w-full">
+                                    <span>{category.name}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {category.events.filter(event => selectedEvents.includes(event.id)).length}
+                                        {' / '}
+                                        {category.events.length} selected
+                                    </span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-2">
+                                    {category.events.map((event) => (
+                                        <div key={event.id} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={event.id}
+                                                checked={selectedEvents.includes(event.id)}
+                                                onCheckedChange={() => toggleEvent(event.id)}
+                                            />
+                                            <Label
+                                                htmlFor={event.id}
+                                                className="text-sm font-normal cursor-pointer"
+                                            >
+                                                {event.label}
+                                            </Label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+                </Accordion>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? 'Creating...' : 'Create webhook'}
                 </Button>
             </div>
         </form>

@@ -124,22 +124,37 @@ BEGIN
         CASE p_event
             -- Security Messages
             WHEN 'create_api_key' THEN 'New API key created'
+            WHEN 'edit_api_key' THEN 'API key settings updated'
             WHEN 'remove_api_key' THEN 'API key deleted'
             WHEN 'create_user_2fa' THEN '2FA enabled for your account'
             WHEN 'remove_user_2fa' THEN '2FA disabled for your account'
+            WHEN 'authorize_user_2fa' THEN '2FA authorization successful'
             WHEN 'create_pin' THEN 'New PIN created'
             WHEN 'edit_pin' THEN 'PIN updated'
+            WHEN 'edit_user_password' THEN 'Password updated successfully'
+            WHEN 'edit_user_details' THEN 'Account details updated'
+            WHEN 'edit_user_phone' THEN 'Phone number updated'
             -- Payment Messages
             WHEN 'process_payment' THEN format('New payment of %s %s processed', p_details->>'amount', p_details->>'currency')
-            WHEN 'payment_status_change' THEN format('Payment status changed to %s', p_details->>'status')
+            WHEN 'payment_status_change' THEN format('Payment status updated to %s', p_details->>'status')
             WHEN 'create_payout' THEN format('New payout of %s %s initiated', p_details->>'amount', p_details->>'currency')
-            WHEN 'payout_status_change' THEN format('Payout status changed to %s', p_details->>'status')
+            WHEN 'payout_status_change' THEN format('Payout status updated to %s', p_details->>'status')
             -- Product Messages
             WHEN 'create_product' THEN format('New product "%s" created at %s %s', p_details->>'name', p_details->>'price', p_details->>'currency')
-            WHEN 'update_product' THEN format('Product "%s" updated - Price changed from %s to %s %s', p_details->>'name', p_details->>'old_price', p_details->>'new_price', p_details->>'currency')
+            WHEN 'update_product' THEN format('Product "%s" details updated', p_details->>'name')
             WHEN 'delete_product' THEN format('Product "%s" deleted', p_details->>'name')
             -- Bank Account Messages
-            WHEN 'add_bank_account' THEN format('New bank account added: %s - %s', p_details->>'bank_name', p_details->>'account_name')
+            WHEN 'add_bank_account' THEN 
+                CASE p_details->>'action'
+                    WHEN 'set_default' THEN format('Default bank account updated to %s', p_details->>'bank_name')
+                    WHEN 'update_auto_withdrawal' THEN 
+                        CASE 
+                            WHEN (p_details->>'auto_withdrawal_enabled')::boolean 
+                            THEN format('Auto-withdrawal enabled for bank account %s', p_details->>'bank_name')
+                            ELSE format('Auto-withdrawal disabled for bank account %s', p_details->>'bank_name')
+                        END
+                    ELSE format('New bank account added: %s - %s', p_details->>'bank_name', p_details->>'account_name')
+                END
             WHEN 'remove_bank_account' THEN format('Bank account removed: %s - %s', p_details->>'bank_name', p_details->>'account_name')
             -- Webhook Messages
             WHEN 'update_webhook' THEN 
@@ -148,29 +163,38 @@ BEGIN
                     WHEN 'update' THEN format('Webhook endpoint updated for %s events', p_details->>'event')
                     WHEN 'delete' THEN format('Webhook endpoint removed for %s events', p_details->>'event')
                     WHEN 'delivery_failed' THEN format('Webhook delivery failed for %s events (Status: %s)', p_details->>'event', p_details->>'status')
-                    ELSE format('Webhook %s for %s events', p_details->>'action', p_details->>'event')
+                    ELSE format('Webhook settings updated for %s events', p_details->>'event')
                 END
             -- Refund Messages
-            WHEN 'create_refund' THEN format('Refund of %s %s initiated', p_details->>'amount', p_details->>'currency')
-            WHEN 'refund_status_change' THEN format('Refund status changed to %s', p_details->>'status')
+            WHEN 'create_refund' THEN format('New refund of %s %s initiated', p_details->>'amount', p_details->>'currency')
+            WHEN 'refund_status_change' THEN format('Refund status updated to %s', p_details->>'status')
             -- Subscription Messages
-            WHEN 'subscription_status_change' THEN format('Subscription status changed to %s', p_details->>'status')
-            WHEN 'subscription_payment_failed' THEN 'Subscription payment failed'
+            WHEN 'create_subscription' THEN format('New subscription created for %s', p_details->>'customer_name')
+            WHEN 'cancel_subscription' THEN format('Subscription cancelled for %s', p_details->>'customer_name')
+            WHEN 'subscription_status_change' THEN format('Subscription status updated to %s', p_details->>'status')
+            WHEN 'subscription_payment_failed' THEN format('Subscription payment failed for %s', p_details->>'customer_name')
             -- Provider Messages
-            WHEN 'provider_status_change' THEN format('Provider %s status changed to %s', p_details->>'provider', p_details->>'status')
+            WHEN 'provider_status_change' THEN format('Provider %s status updated to %s', p_details->>'provider', p_details->>'status')
             WHEN 'provider_connection_error' THEN format('Connection error with provider %s', p_details->>'provider')
             WHEN 'provider_integration_success' THEN format('Successfully integrated with provider %s', p_details->>'provider')
             -- System Messages
             WHEN 'system_maintenance' THEN 'System maintenance scheduled'
             WHEN 'system_update' THEN 'System update available'
             WHEN 'compliance_update' THEN 'Important compliance update'
-            WHEN 'api_status_change' THEN format('API status changed to %s', p_details->>'status')
+            WHEN 'api_status_change' THEN format('API status updated to %s', p_details->>'status')
             -- Customer Messages
-            WHEN 'customer_verification_required' THEN 'Customer verification required'
-            WHEN 'customer_verification_success' THEN 'Customer verification successful'
-            WHEN 'customer_verification_failed' THEN 'Customer verification failed'
-            -- Default Message
-            ELSE p_event::TEXT || ' event occurred'
+            WHEN 'customer_verification_required' THEN format('Verification required for customer %s', p_details->>'customer_name')
+            WHEN 'customer_verification_success' THEN format('Customer %s verified successfully', p_details->>'customer_name')
+            WHEN 'customer_verification_failed' THEN format('Verification failed for customer %s', p_details->>'customer_name')
+            -- Default Message (should never happen with proper event handling)
+            ELSE format('%s completed successfully', 
+                regexp_replace(
+                    regexp_replace(p_event::TEXT, '_', ' ', 'g'),
+                    '(\w+)',
+                    '\1',
+                    'g'
+                )
+            )
         END
     INTO v_notification_type, v_notification_message;
 

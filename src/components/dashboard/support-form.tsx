@@ -176,15 +176,14 @@ export default function SupportForm() {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.3 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.5 }}
-                        transition={{ duration: 0.3, type: "spring", stiffness: 260, damping: 20 }}
-                        className="absolute bottom-20 right-0 w-80 bg-white dark:bg-[#121317] rounded-none shadow-lg overflow-hidden"
-                        style={{ zIndex: 9999 }}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute bottom-16 right-0 w-80 bg-white dark:bg-[#121317] rounded-none shadow-lg z-50"
                     >
                         <div className="p-4 space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Contact Support</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Contact support</h3>
                             {isSubmitted ? (
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}

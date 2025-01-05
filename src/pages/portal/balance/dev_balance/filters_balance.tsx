@@ -94,7 +94,7 @@ export default function PayoutFilters({
                   px-2 py-2 text-sm font-medium transition-colors duration-150 h-10
                   ${selectedDateRange === range ? 'bg-muted text-muted-foreground' : 'bg-card text-card-foreground'}
                   rounded-none border border-border
-                  focus:outline-none focus:ring-2 focus:ring-primary focus:z-10
+                  focus:outline-none focus:ring-1 focus:ring-primary focus:z-10
                   flex-1
                 `}
                             >
@@ -109,7 +109,7 @@ export default function PayoutFilters({
                     px-3 py-2 text-sm font-medium transition-colors duration-150 h-10
                     ${selectedDateRange === 'custom' ? 'bg-muted text-muted-foreground' : 'bg-card text-card-foreground'}
                     rounded-none border border-border
-                    focus:outline-none focus:ring-2 focus:ring-primary focus:z-10
+                    focus:outline-none focus:ring-1 focus:ring-primary focus:z-10
                     flex-1
                   `}
                                     onClick={() => setSelectedDateRange('custom')}

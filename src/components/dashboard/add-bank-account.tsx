@@ -117,7 +117,7 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
                                 setSelectedCountry(e.target.value)
                                 setNewAccount({ ...newAccount, country: e.target.value })
                             }}
-                            className="w-full px-3 py-2 border rounded-none h-10 bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full px-3 py-2 border rounded-none h-10 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
                         >
                             <option value="">Select a country</option>
                             {countries.map((country) => (

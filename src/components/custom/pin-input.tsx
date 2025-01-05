@@ -231,7 +231,7 @@ const PinInputFieldNoRef = <T extends React.ElementType = 'input'>(
       type={mask ? 'password' : type === 'numeric' ? 'tel' : 'text'}
       inputMode={type === 'numeric' ? 'numeric' : 'text'}
       className={cn(
-        'w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50',
+        'w-12 h-12 text-center text-xl border rounded-none focus:outline-none focus:ring-1 focus:ring-primary transition-all duration-200 bg-background hover:bg-muted/50',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'placeholder-gray-400',
         className

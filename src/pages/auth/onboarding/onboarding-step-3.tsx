@@ -110,8 +110,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 id="orgCity"
                                 {...onboardingForm.register("orgCity")}
                                 className={cn(
-                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                     "appearance-none"
                                 )}
@@ -133,8 +133,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 placeholder="Enter your city"
                                 {...onboardingForm.register("orgCity")}
                                 className={cn(
-                                    "w-full mb-2",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
@@ -148,8 +148,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 id="orgDistrict"
                                 {...onboardingForm.register("orgDistrict")}
                                 className={cn(
-                                    "w-full mb-2 px-3 py-2 border rounded-md h-10",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                     "appearance-none"
                                 )}
@@ -171,8 +171,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 placeholder="Enter your district"
                                 {...onboardingForm.register("orgDistrict")}
                                 className={cn(
-                                    "w-full mb-2",
-                                    "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                    "w-full mb-2 px-3 py-2 border h-[48px]",
+                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
@@ -190,8 +190,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                             placeholder="Enter your postal code"
                             {...onboardingForm.register("orgPostalCode")}
                             className={cn(
-                                "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -204,8 +204,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                             placeholder="Enter your street"
                             {...onboardingForm.register("orgStreet")}
                             className={cn(
-                                "w-full mb-2",
-                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
@@ -217,11 +217,11 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                 <Button
                     type="button"
                     onClick={onPrevious}
-                    className="mt-6 dark:bg-primary-600 dark:hover:bg-primary-700"
+                    className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
                 >
                     Previous
                 </Button>
-                <Button type="submit" className="mt-6">
+                <Button type="submit" className="mt-6 h-[48px]">
                     Next
                 </Button>
             </div>

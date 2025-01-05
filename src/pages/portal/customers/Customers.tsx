@@ -214,7 +214,7 @@ function CustomersPage() {
                         <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
                         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
+                                <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none">
                                     <PlusCircle className="mr-2 h-4 w-4" />
                                     Create
                                 </Button>
@@ -264,7 +264,7 @@ function CustomersPage() {
                                                     onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
                                                     className={cn(
                                                         "w-full mb-2 rounded-none",
-                                                        "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                     )}
                                                 />
@@ -296,7 +296,7 @@ function CustomersPage() {
                                             onChange={(e) => setSelectedCountry(e.target.value)}
                                             className={cn(
                                                 "w-full mb-2 px-3 py-2 border h-10 rounded-none",
-                                                "focus:ring-2 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
                                                 "appearance-none"
                                             )}

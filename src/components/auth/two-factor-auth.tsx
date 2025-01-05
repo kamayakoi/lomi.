@@ -195,7 +195,7 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
                                                 className={cn(
                                                     "w-10 h-10 text-center text-xl",
                                                     "bg-muted rounded-none",
-                                                    "focus:outline-none focus:ring-2 focus:ring-primary",
+                                                    "focus:outline-none focus:ring-1 focus:ring-primary",
                                                     "border border-input"
                                                 )}
                                             />

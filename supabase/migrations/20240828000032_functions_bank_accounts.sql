@@ -150,7 +150,7 @@ BEGIN
             -- Log the change
             PERFORM public.log_event(
                 p_merchant_id := v_merchant_id,
-                p_event := 'edit_bank_account'::event_type,
+                p_event := 'add_bank_account'::event_type,
                 p_details := jsonb_build_object(
                     'bank_account_id', p_bank_account_id,
                     'previous_default_id', v_current_default_id,
@@ -195,7 +195,7 @@ BEGIN
         -- Log the change
         PERFORM public.log_event(
             p_merchant_id := v_merchant_id,
-            p_event := 'edit_bank_account'::event_type,
+            p_event := 'add_bank_account'::event_type,
             p_details := jsonb_build_object(
                 'bank_account_id', p_bank_account_id,
                 'auto_withdrawal_enabled', p_enabled,

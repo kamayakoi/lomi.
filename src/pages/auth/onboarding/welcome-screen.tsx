@@ -83,7 +83,8 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className={cn(
-                        "text-white font-semibold py-3 px-6 rounded-md w-full transition duration-300",
+                        "text-white font-semibold px-8 h-12 transition duration-300 mx-auto",
+                        "flex items-center justify-center",
                         "bg-gray-900 hover:bg-gray-800",
                         "dark:bg-blue-600 dark:hover:bg-blue-700"
                     )}

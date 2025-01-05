@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION verify_totp_code(
 ) RETURNS BOOLEAN AS $$
 DECLARE
     time_step INTEGER := 30;  -- 30 seconds time step
-    current_time INTEGER;
+    current_unix_time INTEGER;
     counter INTEGER;
     time_counter BIGINT;
     message BYTEA;
@@ -24,7 +24,7 @@ BEGIN
     END IF;
 
     -- Get current Unix timestamp as an integer
-    current_time := EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::INTEGER;
+    current_unix_time := EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::INTEGER;
     
     -- Convert secret to bytes
     key := decode(secret, 'hex');
@@ -32,7 +32,7 @@ BEGIN
     -- Check tokens within time window
     FOR counter IN -1..1 LOOP
         -- Calculate time counter
-        time_counter := current_time / time_step + counter;
+        time_counter := current_unix_time / time_step + counter;
         
         -- Convert counter to 8-byte big-endian bytes
         message := decode(lpad(to_hex(time_counter), 16, '0'), 'hex');
@@ -151,4 +151,10 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER; 
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permissions to authenticated users
+GRANT EXECUTE ON FUNCTION public.verify_totp_code(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.enable_2fa(UUID, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.verify_2fa_login(UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.disable_2fa(UUID) TO authenticated; 

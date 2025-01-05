@@ -103,7 +103,7 @@ export const Navbar = () => {
                         setIsFormOpen(true);
                         setIsOpen(false);
                       }}
-                      className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })}`}
+                      className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })} rounded-none`}
                       style={{ padding: '0.75rem 1rem' }}
                     >
                       {t('navbar.contactSales')}
@@ -122,7 +122,7 @@ export const Navbar = () => {
                   key={i}
                   className={`navbar-menu-item text-[17px] ${buttonVariants({
                     variant: "ghost",
-                  })}`}
+                  })} rounded-none`}
                   style={{ fontSize: '1.06rem' }}
                 >
                   {t(`navbar.${route.label}`)}
@@ -131,38 +131,38 @@ export const Navbar = () => {
               <div className="navbar-contact-sales">
                 <button
                   onClick={() => setIsFormOpen(true)}
-                  className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })}`}
+                  className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })} rounded-none`}
                   style={{ fontSize: '1.06rem', padding: '0.75rem 1rem' }}
                 >
                   {t('navbar.contactSales')}
                 </button>
               </div>
             </nav>
+
+            {/* Airtable form modal */}
+            {isFormOpen && (
+              <div
+                className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+                onClick={() => setIsFormOpen(false)}
+              >
+                <div
+                  className="bg-white p-3 w-full max-w-3xl mx-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <iframe
+                    className="airtable-embed"
+                    src="https://airtable.com/embed/appFQadFIGVMYNnHq/pagphA6Lt1pPzWMhX/form"
+                    frameBorder="0"
+                    width="100%"
+                    height="800"
+                    style={{ background: 'transparent', border: '1px solid #ccc' }}
+                  ></iframe>
+                </div>
+              </div>
+            )}
           </NavigationMenuList>
         </NavigationMenu>
       </header>
-
-      {/* Airtable form modal */}
-      {isFormOpen && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-          onClick={() => setIsFormOpen(false)}
-        >
-          <div
-            className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              className="airtable-embed"
-              src="https://airtable.com/embed/appFQadFIGVMYNnHq/pagphA6Lt1pPzWMhX/form"
-              frameBorder="0"
-              width="100%"
-              height="800"
-              style={{ background: 'transparent', border: '1px solid #ccc' }}
-            ></iframe>
-          </div>
-        </div>
-      )}
     </Dock>
   );
 };

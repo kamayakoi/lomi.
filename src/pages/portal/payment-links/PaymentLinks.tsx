@@ -158,7 +158,7 @@ function PaymentLinksPage() {
             <Button
               variant="outline"
               onClick={() => setIsCreateLinkOpen(true)}
-              className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none"
+              className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create
@@ -303,7 +303,7 @@ function PaymentLinksPage() {
                                 e.stopPropagation();
                                 handleEditClick(link);
                               }}
-                              className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-none"
+                              className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none"
                             >
                               <Edit className="h-4 w-4 text-blue-500" />
                             </Button>

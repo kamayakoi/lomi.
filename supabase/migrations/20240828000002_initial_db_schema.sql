@@ -34,12 +34,10 @@ CREATE TYPE event_type AS ENUM (
     'authorize_user_2fa',
     'create_user_2fa',
     'remove_user_2fa',
-    'edit_user_2fa',
     'edit_user_phone',
     
     -- Settings & Configuration
     'set_callback_url',
-    'update_ip_whitelist',
     'update_webhook',
     
     -- Banking & Payouts
@@ -47,18 +45,14 @@ CREATE TYPE event_type AS ENUM (
     'remove_bank_account',
     'create_payout',
     'payout_status_change',
-    'edit_bank_account'
     
     -- Payments & Transactions
-    'create_invoice',
     'process_payment',
     'payment_status_change',
     'create_refund',
     'refund_status_change',
     'create_dispute',
     'dispute_status_change',
-    'create_chargeback',
-    'chargeback_status_change',
     
     -- Subscriptions
     'create_subscription',
@@ -87,7 +81,21 @@ CREATE TYPE event_type AS ENUM (
     'customer_verification_success',
     'customer_verification_failed'
 );
-CREATE TYPE webhook_event AS ENUM ('new_payment', 'new_subscription', 'payment_status_change', 'subscription_status_change');
+CREATE TYPE webhook_event AS ENUM (
+    'new_payment',
+    'new_subscription',
+    'payment_status_change',
+    'subscription_status_change',
+    'payout_status_change',
+    'payment_session_completed',
+    'payment_session_expired',
+    'invoice_paid',
+    'payment_succeeded',
+    'payment_pending',
+    'payment_failed',
+    'payment_token_status',
+    'recurring'
+);
 CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
 
@@ -664,24 +672,25 @@ COMMENT ON TABLE api_usage IS 'Tracks API usage statistics for each organization
 
 -- Webhooks table
 CREATE TABLE webhooks (
-  webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-  url VARCHAR NOT NULL,
-  event webhook_event NOT NULL,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  last_triggered_at TIMESTAMPTZ,
-  last_payload JSONB,
-  last_response_status INT,
-  last_response_body TEXT,
-  retry_count INT DEFAULT 0,
-  metadata JSONB,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  UNIQUE (merchant_id, event, url)
+    webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    url VARCHAR NOT NULL,
+    authorized_events webhook_event[] NOT NULL DEFAULT '{}',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    verification_token TEXT NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+    last_triggered_at TIMESTAMPTZ,
+    last_payload JSONB,
+    last_response_status INT,
+    last_response_body TEXT,
+    retry_count INT DEFAULT 0,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (merchant_id, url)
 );
 
 CREATE INDEX idx_webhooks_merchant_id ON webhooks(merchant_id);
-CREATE INDEX idx_webhooks_event ON webhooks(event);
+CREATE INDEX idx_webhooks_authorized_events ON webhooks USING gin(authorized_events);
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';
 

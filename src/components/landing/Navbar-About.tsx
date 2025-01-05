@@ -101,7 +101,7 @@ export const NavbarAbout = () => {
                                                 setIsFormOpen(true);
                                                 setIsOpen(false);
                                             }}
-                                            className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })} text-white`}
+                                            className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 text-lg ${buttonVariants({ variant: "secondary" })} text-white rounded-none`}
                                             style={{ padding: '0.75rem 1rem' }}
                                         >
                                             {t('navbar.contactSales')}
@@ -120,7 +120,7 @@ export const NavbarAbout = () => {
                                     key={i}
                                     className={`navbar-menu-item text-[17px] ${buttonVariants({
                                         variant: "ghost",
-                                    })} text-white`}
+                                    })} text-white rounded-none`}
                                     style={{ fontSize: '1.06rem' }}
                                 >
                                     {t(`navbar.${route.label}`)}
@@ -129,7 +129,7 @@ export const NavbarAbout = () => {
                             <div className="navbar-contact-sales">
                                 <button
                                     onClick={() => setIsFormOpen(true)}
-                                    className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })} text-white`}
+                                    className={`border border-gray-300 bg-transparent hover:border-[#2563EB] transition-colors duration-200 ${buttonVariants({ variant: "secondary" })} text-white rounded-none`}
                                     style={{ fontSize: '1.06rem', padding: '0.75rem 1rem' }}
                                 >
                                     {t('navbar.contactSales')}
@@ -147,7 +147,7 @@ export const NavbarAbout = () => {
                     onClick={() => setIsFormOpen(false)}
                 >
                     <div
-                        className="bg-white rounded-lg p-3 w-full max-w-3xl mx-2"
+                        className="bg-white p-3 w-full max-w-3xl mx-2"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <iframe

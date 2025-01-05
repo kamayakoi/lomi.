@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button'
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
@@ -129,25 +131,101 @@ function LogsPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All events</SelectItem>
-                                    <SelectItem value="user_login">User logged in</SelectItem>
-                                    <SelectItem value="edit_user_password">User password edited</SelectItem>
-                                    <SelectItem value="create_pin">PIN created</SelectItem>
-                                    <SelectItem value="edit_pin">PIN edited</SelectItem>
-                                    <SelectItem value="edit_user_details">User details edited</SelectItem>
-                                    <SelectItem value="authorize_user_2fa">User 2FA authorized</SelectItem>
-                                    <SelectItem value="create_user_2fa">User 2FA created</SelectItem>
-                                    <SelectItem value="remove_user_2fa">User 2FA removed</SelectItem>
-                                    <SelectItem value="edit_user_2fa">User 2FA edited</SelectItem>
-                                    <SelectItem value="edit_user_phone">User phone edited</SelectItem>
-                                    <SelectItem value="set_callback_url">Callback URL set</SelectItem>
-                                    <SelectItem value="update_ip_whitelist">IP whitelist updated</SelectItem>
-                                    <SelectItem value="add_bank_account">Bank account added</SelectItem>
-                                    <SelectItem value="remove_bank_account">Bank account removed</SelectItem>
-                                    <SelectItem value="create_payout">Payout created</SelectItem>
-                                    <SelectItem value="create_invoice">Invoice created</SelectItem>
-                                    <SelectItem value="process_payment">Payment processed</SelectItem>
-                                    <SelectItem value="update_webhook">Webhook updated</SelectItem>
-                                    <SelectItem value="create_refund">Refund created</SelectItem>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Authentication & Security
+                                        </SelectLabel>
+                                        <SelectItem value="create_api_key">API key created</SelectItem>
+                                        <SelectItem value="edit_api_key">API key edited</SelectItem>
+                                        <SelectItem value="remove_api_key">API key deleted</SelectItem>
+                                        <SelectItem value="user_login">User logged in</SelectItem>
+                                        <SelectItem value="edit_user_password">Password updated</SelectItem>
+                                        <SelectItem value="create_pin">PIN created</SelectItem>
+                                        <SelectItem value="edit_pin">PIN updated</SelectItem>
+                                        <SelectItem value="edit_user_details">User details updated</SelectItem>
+                                        <SelectItem value="authorize_user_2fa">2FA authorization successful</SelectItem>
+                                        <SelectItem value="create_user_2fa">2FA enabled</SelectItem>
+                                        <SelectItem value="remove_user_2fa">2FA disabled</SelectItem>
+                                        <SelectItem value="edit_user_phone">Phone number updated</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Settings & Configuration
+                                        </SelectLabel>
+                                        <SelectItem value="set_callback_url">Callback URL updated</SelectItem>
+                                        <SelectItem value="update_webhook">Webhook endpoint updated</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Banking & Payouts
+                                        </SelectLabel>
+                                        <SelectItem value="add_bank_account">Bank account added</SelectItem>
+                                        <SelectItem value="remove_bank_account">Bank account removed</SelectItem>
+                                        <SelectItem value="create_payout">New payout initiated</SelectItem>
+                                        <SelectItem value="payout_status_change">Payout status updated</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Payments & Transactions
+                                        </SelectLabel>
+                                        <SelectItem value="process_payment">New payment processed</SelectItem>
+                                        <SelectItem value="payment_status_change">Payment status updated</SelectItem>
+                                        <SelectItem value="create_refund">New refund initiated</SelectItem>
+                                        <SelectItem value="refund_status_change">Refund status updated</SelectItem>
+                                        <SelectItem value="create_dispute">New dispute opened</SelectItem>
+                                        <SelectItem value="dispute_status_change">Dispute status updated</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Subscriptions
+                                        </SelectLabel>
+                                        <SelectItem value="create_subscription">New subscription created</SelectItem>
+                                        <SelectItem value="cancel_subscription">Subscription cancelled</SelectItem>
+                                        <SelectItem value="subscription_status_change">Subscription status updated</SelectItem>
+                                        <SelectItem value="subscription_payment_failed">Subscription payment failed</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Products & Services
+                                        </SelectLabel>
+                                        <SelectItem value="create_product">New product created</SelectItem>
+                                        <SelectItem value="update_product">Product details updated</SelectItem>
+                                        <SelectItem value="delete_product">Product deleted</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Provider Integration
+                                        </SelectLabel>
+                                        <SelectItem value="provider_status_change">Provider status updated</SelectItem>
+                                        <SelectItem value="provider_connection_error">Provider connection failed</SelectItem>
+                                        <SelectItem value="provider_integration_success">Provider integration successful</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            System & Maintenance
+                                        </SelectLabel>
+                                        <SelectItem value="system_maintenance">System maintenance scheduled</SelectItem>
+                                        <SelectItem value="system_update">System update available</SelectItem>
+                                        <SelectItem value="compliance_update">Compliance update required</SelectItem>
+                                        <SelectItem value="api_status_change">API status changed</SelectItem>
+                                    </SelectGroup>
+
+                                    <SelectGroup>
+                                        <SelectLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                                            Customer Management
+                                        </SelectLabel>
+                                        <SelectItem value="customer_verification_required">Customer verification needed</SelectItem>
+                                        <SelectItem value="customer_verification_success">Customer verification successful</SelectItem>
+                                        <SelectItem value="customer_verification_failed">Customer verification failed</SelectItem>
+                                    </SelectGroup>
                                 </SelectContent>
                             </Select>
                             <Select value={selectedSeverity || undefined} onValueChange={setSelectedSeverity}>
@@ -358,46 +436,112 @@ function formatDate(dateString: string): string {
 
 function formatEventName(event: string): string {
     switch (event) {
+        // Authentication & Security
+        case 'create_api_key':
+            return 'API key created'
+        case 'edit_api_key':
+            return 'API key edited'
+        case 'remove_api_key':
+            return 'API key deleted'
         case 'user_login':
             return 'User logged in'
         case 'edit_user_password':
-            return 'User password edited'
+            return 'Password updated'
         case 'create_pin':
             return 'PIN created'
         case 'edit_pin':
-            return 'PIN edited'
+            return 'PIN updated'
         case 'edit_user_details':
-            return 'User details edited'
+            return 'User details updated'
         case 'authorize_user_2fa':
-            return 'User 2FA authorized'
+            return '2FA authorization successful'
         case 'create_user_2fa':
-            return 'User 2FA created'
+            return '2FA enabled'
         case 'remove_user_2fa':
-            return 'User 2FA removed'
-        case 'edit_user_2fa':
-            return 'User 2FA edited'
+            return '2FA disabled'
         case 'edit_user_phone':
-            return 'User phone edited'
+            return 'Phone number updated'
+
+        // Settings & Configuration
         case 'set_callback_url':
-            return 'Callback URL set'
-        case 'update_ip_whitelist':
-            return 'IP whitelist updated'
+            return 'Callback URL updated'
+        case 'update_webhook':
+            return 'Webhook endpoint updated'
+
+        // Banking & Payouts
         case 'add_bank_account':
             return 'Bank account added'
         case 'remove_bank_account':
             return 'Bank account removed'
         case 'create_payout':
-            return 'Payout created'
-        case 'create_invoice':
-            return 'Invoice created'
+            return 'New payout initiated'
+        case 'payout_status_change':
+            return 'Payout status updated'
+
+        // Payments & Transactions
         case 'process_payment':
-            return 'Payment processed'
-        case 'update_webhook':
-            return 'Webhook updated'
+            return 'New payment processed'
+        case 'payment_status_change':
+            return 'Payment status updated'
         case 'create_refund':
-            return 'Refund created'
+            return 'New refund initiated'
+        case 'refund_status_change':
+            return 'Refund status updated'
+        case 'create_dispute':
+            return 'New dispute opened'
+        case 'dispute_status_change':
+            return 'Dispute status updated'
+
+        // Subscriptions
+        case 'create_subscription':
+            return 'New subscription created'
+        case 'cancel_subscription':
+            return 'Subscription cancelled'
+        case 'subscription_status_change':
+            return 'Subscription status updated'
+        case 'subscription_payment_failed':
+            return 'Subscription payment failed'
+
+        // Products & Services
+        case 'create_product':
+            return 'New product created'
+        case 'update_product':
+            return 'Product details updated'
+        case 'delete_product':
+            return 'Product deleted'
+
+        // Provider Integration
+        case 'provider_status_change':
+            return 'Provider status updated'
+        case 'provider_connection_error':
+            return 'Provider connection failed'
+        case 'provider_integration_success':
+            return 'Provider integration successful'
+
+        // System & Maintenance
+        case 'system_maintenance':
+            return 'System maintenance scheduled'
+        case 'system_update':
+            return 'System update available'
+        case 'compliance_update':
+            return 'Compliance update required'
+        case 'api_status_change':
+            return 'API status changed'
+
+        // Customer Management
+        case 'customer_verification_required':
+            return 'Customer verification needed'
+        case 'customer_verification_success':
+            return 'Customer verification successful'
+        case 'customer_verification_failed':
+            return 'Customer verification failed'
+
         default:
+            // Convert snake_case to Title Case with spaces
             return event
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ')
     }
 }
 

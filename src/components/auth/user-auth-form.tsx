@@ -110,7 +110,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             value={email}
             onChange={handleEmailChange}
             className={cn(
-              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
                 'border-gray-300 dark:border-gray-600': !isValidEmail && email === '',
                 'border-red-500 dark:border-red-500': !isValidEmail && email !== '',
@@ -133,7 +133,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             value={password}
             onChange={handlePasswordChange}
             className={cn(
-              'h-12 border rounded-md focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
               {
                 'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
                 'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
