@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, RefreshCw } from 'lucide-react'
 
-type SubscriptionStatus = 'all' | 'active' | 'pending' | 'cancelled';
+export type SubscriptionStatus = 'all' | 'active' | 'pending' | 'cancelled';
 
 interface SubscriptionFiltersProps {
     selectedStatus: SubscriptionStatus;

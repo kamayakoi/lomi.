@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Webhook, webhookCategories } from './types'
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import { X } from "lucide-react"
 
 type WebhookViewProps = {
   webhook: Webhook | null
@@ -37,52 +38,91 @@ export default function WebhookView({ webhook, isOpen, onClose }: WebhookViewPro
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-2xl overflow-y-auto rounded-none">
-        <Card className="border-0 shadow-none rounded-none">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-2xl font-bold">Webhook Details</CardTitle>
+      <SheetContent className="sm:max-w-2xl w-full p-0 overflow-y-auto rounded-none">
+        <Card className="border-0 shadow-none rounded-none h-full">
+          <CardHeader className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-medium">Webhook details</CardTitle>
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground md:hidden">
+              <X className="h-4 w-4" />
+            </button>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <section>
-                <div className="grid gap-4 text-sm border rounded-none p-4">
-                  <div>{webhook.url || '-'}</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {webhook.authorized_events.map((event) => (
-                      <Badge
-                        key={event}
-                        variant="secondary"
-                        className={`rounded-none px-2 py-1 text-xs font-normal ${getEventCategoryColor(event)}`}
-                      >
-                        {event}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className={`inline-flex px-2 py-1 rounded-none text-xs font-normal w-fit ${webhook.is_active
+          <CardContent className="p-4 space-y-4 overflow-auto">
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Status</span>
+                <span className={`
+                  inline-flex px-2 py-1 rounded-none text-xs font-normal
+                  ${webhook.is_active
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                     : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                    }`}>
-                    {webhook.is_active ? 'Active' : 'Inactive'}
-                  </div>
-                  <div className="text-gray-500">Last triggered: {formatDate(webhook.last_triggered_at) || '-'}</div>
-                  <div className="text-gray-500">Retry count: {webhook.retry_count || '0'}</div>
+                  }`}
+                >
+                  {webhook.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+
+              <div>
+                <span className="text-muted-foreground text-xs">Endpoint URL</span>
+                <code className="mt-1 block break-all bg-gray-50 dark:bg-gray-900 p-2 text-xs rounded-none">
+                  {webhook.url || '-'}
+                </code>
+              </div>
+
+              <div>
+                <span className="text-muted-foreground text-xs">Events</span>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {webhook.authorized_events.map((event) => (
+                    <Badge
+                      key={event}
+                      variant="secondary"
+                      className={`rounded-none px-2 py-0.5 text-xs font-normal ${getEventCategoryColor(event)}`}
+                    >
+                      {event}
+                    </Badge>
+                  ))}
                 </div>
-              </section>
-              <Separator />
-              <section>
-                <h3 className="text-lg font-semibold mb-2">Last Payload</h3>
-                <pre className="text-sm overflow-x-auto p-4 bg-gray-50 dark:bg-gray-900 rounded-none">
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Last Triggered</span>
+                <span>{formatDate(webhook.last_triggered_at)}</span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Retry Count</span>
+                <span>{webhook.retry_count || '0'}</span>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Last Payload</h3>
+              <div className="overflow-x-auto">
+                <pre className="text-xs p-2 bg-gray-50 dark:bg-gray-900 rounded-none whitespace-pre-wrap">
                   {JSON.stringify(webhook.last_payload, null, 2) || '{}'}
                 </pre>
-              </section>
-              <Separator />
-              <section>
-                <h3 className="text-lg font-semibold mb-2">Last Response</h3>
-                <div className="grid gap-2 text-sm">
-                  <div className="text-gray-500">Status: {webhook.last_response_status || '-'}</div>
-                  <div className="text-gray-500">Response: {webhook.last_response_body || '-'}</div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium">Last Response</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Status</span>
+                  <span>{webhook.last_response_status || '-'}</span>
                 </div>
-              </section>
+                <div>
+                  <span className="text-muted-foreground text-xs">Response Body</span>
+                  <div className="mt-1 bg-gray-50 dark:bg-gray-900 p-2 rounded-none">
+                    <p className="text-xs break-all">
+                      {webhook.last_response_body || '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

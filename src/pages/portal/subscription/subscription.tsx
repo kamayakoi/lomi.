@@ -15,6 +15,7 @@ import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './dev_subscription/form_subscriptions'
 import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
+import { SubscriptionStatus } from './dev_subscription/filters_subscriptions'
 import SupportForm from '@/components/dashboard/support-form'
 import {
   Dialog,
@@ -42,7 +43,7 @@ const frequencyColors: Record<frequency, string> = {
 function SubscriptionsPage() {
   const { user } = useUser()
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<SubscriptionStatus>('all')
   const pageSize = 50
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)

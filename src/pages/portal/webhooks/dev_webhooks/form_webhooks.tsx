@@ -103,6 +103,7 @@ export function CreateWebhookForm({ onClose, onSuccess }: CreateWebhookFormProps
                     <Button
                         type="button"
                         variant="outline"
+                        className="rounded-none border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 focus:ring-blue-500"
                         size="sm"
                         onClick={toggleAllEvents}
                     >
@@ -157,6 +158,7 @@ export function CreateWebhookForm({ onClose, onSuccess }: CreateWebhookFormProps
                 <Button
                     type="submit"
                     disabled={isSubmitting}
+                    className="rounded-none bg-blue-600 hover:bg-blue-700 w-full sm:w-auto text-white"
                 >
                     {isSubmitting ? 'Creating...' : 'Create'}
                 </Button>

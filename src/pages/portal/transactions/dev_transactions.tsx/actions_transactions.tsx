@@ -165,7 +165,7 @@ export default function TransactionActions({ transaction, isOpen, onClose, isGen
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(128, 128, 128);
-        doc.text('Powered by lomi. | © 2024 lomi.africa, Inc — All rights reserved', 15, footerY);
+        doc.text('Powered by lomi. | © 2025 lomi.africa, Inc — All rights reserved', 15, footerY);
 
         // Save the PDF
         doc.save(`transaction_receipt_${transaction.transaction_id}.pdf`);

@@ -151,8 +151,8 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                                         variant={isActive ? 'outline' : 'outline'}
                                         onClick={() => setIsActive(!isActive)}
                                         className={`rounded-none h-8 px-3 text-xs ${isActive
-                                            ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 border-green-200'
-                                            : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 border-red-200'
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200'
+                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200'
                                             }`}
                                     >
                                         {isActive ? 'Active' : 'Inactive'}
@@ -241,7 +241,7 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                                     type="button"
                                     onClick={handleSave}
                                     disabled={isSubmitting}
-                                    className="rounded-none bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                                    className="rounded-none bg-blue-600 hover:bg-blue-700 w-full sm:w-auto dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
                                 >
                                     {isSubmitting ? 'Saving...' : 'Save'}
                                 </Button>

@@ -15,8 +15,8 @@ import FeedbackForm from '@/components/dashboard/feedback-form'
 
 export default function EWalletsPage() {
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: new Date(2024, 7, 27),
-        to: new Date(2024, 8, 27),
+        from: new Date(2025, 7, 27),
+        to: new Date(2025, 8, 27),
     })
 
     const topNav = [

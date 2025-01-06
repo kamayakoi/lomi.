@@ -13,7 +13,7 @@ export default function PhoneNumberInput({ value, onChange }: PhoneNumberInputPr
     return (
         <div className="space-y-2">
             <RPNInput.default
-                className="flex border border-black/20"
+                className="flex gap-[1px] border border-black/20"
                 international
                 flagComponent={FlagComponent}
                 countrySelectComponent={CountrySelect}
@@ -32,7 +32,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
     ({ ...props }, ref) => {
         return (
             <Input
-                className="-ml-px border-l border-black/20 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="border-l border-black/20 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 ref={ref}
                 {...props}
             />

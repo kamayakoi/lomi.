@@ -265,160 +265,192 @@ function LogsPage() {
 
                     <Card className="rounded-none">
                         <CardContent className="p-4">
-                            <div className="rounded-none border">
+                            <div className="border">
                                 <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('created_at')}>
-                                                        Date
-                                                        {sortColumn === 'created_at' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('event')}>
-                                                        Event
-                                                        {sortColumn === 'event' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('severity')}>
-                                                        Severity
-                                                        {sortColumn === 'severity' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('ip_address')}>
-                                                        IP Address
-                                                        {sortColumn === 'ip_address' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('operating_system')}>
-                                                        Operating System
-                                                        {sortColumn === 'operating_system' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('browser')}>
-                                                        Browser
-                                                        {sortColumn === 'browser' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {isLogsLoading ? (
-                                                Array.from({ length: 50 }).map((_, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell colSpan={6}>
-                                                            <Skeleton className="w-full h-8" />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            ) : !logsData?.data?.length ? (
+                                    {/* Desktop Table View */}
+                                    <div className="hidden md:block">
+                                        <Table>
+                                            <TableHeader>
                                                 <TableRow>
-                                                    <TableCell colSpan={6}>
-                                                        <div className="py-24 text-center">
-                                                            <div className="flex justify-center mb-6">
-                                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                                                </div>
-                                                            </div>
-                                                            <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                                No logs found
-                                                            </h3>
-                                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                                                                Start performing actions to see your activity logs here.
-                                                            </p>
-                                                        </div>
-                                                    </TableCell>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('created_at')}>
+                                                            Date
+                                                            {sortColumn === 'created_at' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('event')}>
+                                                            Event
+                                                            {sortColumn === 'event' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('severity')}>
+                                                            Severity
+                                                            {sortColumn === 'severity' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('ip_address')}>
+                                                            IP Address
+                                                            {sortColumn === 'ip_address' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('operating_system')}>
+                                                            Operating System
+                                                            {sortColumn === 'operating_system' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center whitespace-nowrap">
+                                                        <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('browser')}>
+                                                            Browser
+                                                            {sortColumn === 'browser' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
                                                 </TableRow>
-                                            ) : logsData && logsData.data ? (
-                                                sortLogs(logsData.data).map((log: Log) => (
-                                                    <TableRow key={log.log_id} className="hover:bg-muted/50">
-                                                        <TableCell className="font-medium">
-                                                            <div className="flex flex-col">
-                                                                <span>{formatDate(log.created_at)}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center space-x-2">
-                                                                <span className="font-medium">{formatEventName(log.event)}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <span className={`
-                                                                inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
-                                                                ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                                                ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                                ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                            `}>
-                                                                {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
-                                                            </span>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <code className="text-sm">{log.ip_address}</code>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {formatUserAgent(log.operating_system)}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {formatBrowser(log.browser)}
+                                            </TableHeader>
+                                            <TableBody>
+                                                {isLogsLoading ? (
+                                                    Array.from({ length: 50 }).map((_, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell colSpan={6}>
+                                                                <Skeleton className="w-full h-8" />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : !logsData?.data?.length ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={6}>
+                                                            <div className="py-24 text-center">
+                                                                <div className="flex justify-center mb-6">
+                                                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                        <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                                    </div>
+                                                                </div>
+                                                                <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                    No logs found
+                                                                </h3>
+                                                                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                                    Start performing actions to see your activity logs here.
+                                                                </p>
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>
-                                                ))
-                                            ) : null}
-                                        </TableBody>
-                                    </Table>
+                                                ) : logsData && logsData.data ? (
+                                                    sortLogs(logsData.data).map((log: Log) => (
+                                                        <TableRow key={log.log_id} className="hover:bg-muted/50">
+                                                            <TableCell className="font-medium">
+                                                                <div className="flex flex-col">
+                                                                    <span>{formatDate(log.created_at)}</span>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span className="font-medium">{formatEventName(log.event)}</span>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <span className={`
+                                                                    inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
+                                                                    ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                                                                    ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                                                    ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                    ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                                                `}>
+                                                                    {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
+                                                                </span>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <code className="text-sm">{log.ip_address}</code>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="text-sm text-muted-foreground">
+                                                                    {formatUserAgent(log.operating_system)}
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="text-sm text-muted-foreground">
+                                                                    {formatBrowser(log.browser)}
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : null}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+
+                                    {/* Mobile Card View */}
+                                    <div className="md:hidden">
+                                        {isLogsLoading ? (
+                                            Array.from({ length: 3 }).map((_, index) => (
+                                                <div key={index} className="p-4 border-b last:border-b-0">
+                                                    <Skeleton className="w-full h-24" />
+                                                </div>
+                                            ))
+                                        ) : !logsData?.data?.length ? (
+                                            <div className="py-24 text-center">
+                                                <div className="flex justify-center mb-6">
+                                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                        <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                    </div>
+                                                </div>
+                                                <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                    No logs found
+                                                </h3>
+                                                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                                                    Start performing actions to see your activity logs here.
+                                                </p>
+                                            </div>
+                                        ) : logsData && logsData.data ? (
+                                            sortLogs(logsData.data).map((log: Log) => (
+                                                <LogCard key={log.log_id} log={log} />
+                                            ))
+                                        ) : null}
+                                    </div>
                                 </div>
                                 {logsData && logsData.totalCount > 0 && (
                                     <div className="flex items-center justify-between border-t border-border px-4 py-4">
                                         <div className="flex-1 text-sm text-muted-foreground">
-                                            Showing {offset + 1} to {Math.min(offset + 50, logsData.totalCount)} of {logsData.totalCount} entries
+                                            <span className="hidden md:inline">
+                                                Showing {offset + 1} to {Math.min(offset + 50, logsData.totalCount)} of {logsData.totalCount} entries
+                                            </span>
+                                            <span className="md:hidden">
+                                                Page {Math.floor(offset / 50) + 1} of {Math.ceil(logsData.totalCount / 50)}
+                                            </span>
                                         </div>
-                                        <div className="flex items-center space-x-6 lg:space-x-8">
-                                            <div className="flex items-center space-x-2">
-                                                <Button
-                                                    variant="outline"
-                                                    className="h-8 w-8 p-0 rounded-none"
-                                                    onClick={() => setOffset(Math.max(0, offset - 50))}
-                                                    disabled={offset === 0}
-                                                >
-                                                    <span className="sr-only">Previous page</span>
-                                                    <ChevronLeftIcon className="h-4 w-4" />
-                                                </Button>
-                                                <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                                                    Page {Math.floor(offset / 50) + 1} of {Math.ceil(logsData.totalCount / 50)}
-                                                </div>
-                                                <Button
-                                                    variant="outline"
-                                                    className="h-8 w-8 p-0 rounded-none"
-                                                    onClick={() => setOffset(offset + 50)}
-                                                    disabled={offset + 50 >= logsData.totalCount}
-                                                >
-                                                    <span className="sr-only">Next page</span>
-                                                    <ChevronRightIcon className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Button
+                                                variant="outline"
+                                                className="h-8 w-8 p-0 rounded-none"
+                                                onClick={() => setOffset(Math.max(0, offset - 50))}
+                                                disabled={offset === 0}
+                                            >
+                                                <span className="sr-only">Previous page</span>
+                                                <ChevronLeftIcon className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="h-8 w-8 p-0 rounded-none"
+                                                onClick={() => setOffset(offset + 50)}
+                                                disabled={offset + 50 >= logsData.totalCount}
+                                            >
+                                                <span className="sr-only">Next page</span>
+                                                <ChevronRightIcon className="h-4 w-4" />
+                                            </Button>
                                         </div>
                                     </div>
                                 )}
@@ -564,6 +596,37 @@ function formatBrowser(browser: string): string {
     // Extract browser name and version
     const browserInfo = browser.split('"').filter(part => part.includes('/'))[0]
     return browserInfo || browser
+}
+
+function LogCard({ log }: { log: Log }) {
+    return (
+        <div className="p-4 border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <div className="font-medium">{formatEventName(log.event)}</div>
+                    <span className={`
+                        inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
+                        ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
+                        ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                        ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                        ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                    `}>
+                        {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
+                    </span>
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex justify-between items-center">
+                        <span>{formatDate(log.created_at)}</span>
+                        <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1">{log.ip_address}</code>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                        <span>{formatUserAgent(log.operating_system)}</span>
+                        <span>{formatBrowser(log.browser)}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 function LogsWithActivationCheck() {

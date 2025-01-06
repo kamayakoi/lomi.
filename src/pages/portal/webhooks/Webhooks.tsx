@@ -117,23 +117,31 @@ function WebhookCard({ webhook, onEditClick, onClick }: {
         >
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                    <div className="font-medium truncate flex-1">{webhook.url}</div>
+                    <div className="font-medium">Endpoint</div>
                     <button
                         onClick={onEditClick}
-                        className="text-blue-500 hover:text-blue-600 p-1.5 ml-2 flex-shrink-0"
+                        className="text-blue-500 hover:text-blue-600 p-1.5 ml-2"
                     >
-                        <Edit className="h-4.5 w-4.5" />
+                        <Edit className="h-4 w-4" />
                     </button>
                 </div>
-                <div className="space-y-2">
-                    <EventBadges events={webhook.authorized_events} />
-                    <div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-between">
                         <span className={`
                             inline-block px-2 py-1 rounded-none text-xs font-normal
                             ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
                         `}>
                             {webhook.is_active ? 'Active' : 'Inactive'}
                         </span>
+                    </div>
+                    <div>
+                        <div className="text-xs font-medium mb-1">Authorized Events</div>
+                        <EventBadges events={webhook.authorized_events} />
+                    </div>
+                    <div className="pt-1">
+                        <code className="text-xs break-all bg-gray-100 dark:bg-gray-800 p-2 block">
+                            {webhook.url}
+                        </code>
                     </div>
                 </div>
             </div>

@@ -98,8 +98,8 @@ export function PortalPreview({
                                         </div>
                                     )
                                 },
-                                { label: 'Start Date', value: 'November 24, 2024' },
-                                { label: 'Renewal Date', value: 'December 24, 2024' },
+                                { label: 'Start Date', value: 'November 24, 2025' },
+                                { label: 'Renewal Date', value: 'December 24, 2025' },
                                 {
                                     label: 'Benefits',
                                     value: (
@@ -132,7 +132,7 @@ export function PortalPreview({
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td className="p-4">November 24, 2024</td>
+                                        <td className="p-4">November 24, 2025</td>
                                         <td className="p-4">Pro Tier</td>
                                         <td className="p-4">$100</td>
                                         <td className="p-4 text-right">

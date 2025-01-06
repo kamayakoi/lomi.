@@ -42,6 +42,48 @@ import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 
+function CustomerCard({ customer, onEditClick, onClick }: {
+    customer: Customer,
+    onEditClick: (e: React.MouseEvent) => void,
+    onClick: () => void
+}) {
+    return (
+        <div
+            className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+            onClick={onClick}
+        >
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <div className="font-medium">{customer.name}</div>
+                    <button
+                        onClick={onEditClick}
+                        className="text-blue-500 hover:text-blue-600 p-1.5 ml-2"
+                    >
+                        <Edit className="h-4 w-4" />
+                    </button>
+                </div>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                        <span>{customer.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span>{customer.phone_number}</span>
+                        <span>{customer.country}</span>
+                    </div>
+                    <div>
+                        <span className={`
+                            inline-block px-2 py-1 rounded-none text-xs font-normal
+                            ${customer.is_business ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'}
+                        `}>
+                            {customer.is_business ? 'Business' : 'Individual'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function CustomersPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -379,104 +421,140 @@ function CustomersPage() {
                         <CardContent className="p-4">
                             <div className="border">
                                 <div className="max-h-[calc(100vh-250px)] overflow-y-auto pr-2 scrollbar-hide">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
-                                                        Name
-                                                        {sortColumn === 'name' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('email')} className="rounded-none">
-                                                        Email
-                                                        {sortColumn === 'email' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('phone_number')} className="rounded-none">
-                                                        Phone
-                                                        {sortColumn === 'phone_number' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('country')} className="rounded-none">
-                                                        Country
-                                                        {sortColumn === 'country' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center">
-                                                    <Button variant="ghost" onClick={() => handleSort('is_business')} className="rounded-none">
-                                                        Type
-                                                        {sortColumn === 'is_business' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center"></TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {isCustomersLoading ? (
-                                                Array.from({ length: 5 }).map((_, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell colSpan={6}>
-                                                            <div className="flex flex-col items-center justify-center space-y-2 py-2 text-center">
-                                                                <Skeleton className="h-2 w-48 rounded-none" />
-                                                                <Skeleton className="h-2 w-32 rounded-none" />
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            ) : customers.length === 0 ? (
+                                    {/* Desktop Table View */}
+                                    <div className="hidden md:block">
+                                        <Table>
+                                            <TableHeader>
                                                 <TableRow>
-                                                    <TableCell colSpan={6}>
-                                                        <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
-                                                            <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                                                <UsersIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                                            </div>
-                                                            <div>
-                                                                <h2 className="text-xl font-semibold mb-2">No customer data records exist yet</h2>
-                                                                <p className="text-gray-500 dark:text-gray-400">Start by adding your first customer.</p>
-                                                            </div>
-                                                        </div>
-                                                    </TableCell>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
+                                                            Name
+                                                            {sortColumn === 'name' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('email')} className="rounded-none">
+                                                            Email
+                                                            {sortColumn === 'email' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('phone_number')} className="rounded-none">
+                                                            Phone
+                                                            {sortColumn === 'phone_number' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('country')} className="rounded-none">
+                                                            Country
+                                                            {sortColumn === 'country' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center">
+                                                        <Button variant="ghost" onClick={() => handleSort('is_business')} className="rounded-none">
+                                                            Type
+                                                            {sortColumn === 'is_business' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                    <TableHead className="text-center"></TableHead>
                                                 </TableRow>
-                                            ) : (
-                                                sortCustomers(customers).map((customer) => (
-                                                    <TableRow key={customer.customer_id} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => handleCustomerClick(customer)}>
-                                                        <TableCell className="text-center">{customer.name}</TableCell>
-                                                        <TableCell className="text-center">{customer.email}</TableCell>
-                                                        <TableCell className="text-center">{customer.phone_number}</TableCell>
-                                                        <TableCell className="text-center">{customer.country}</TableCell>
-                                                        <TableCell className="text-center">{customer.is_business ? 'Business' : 'Individual'}</TableCell>
-                                                        <TableCell className="text-center">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    handleEditCustomer(customer)
-                                                                }}
-                                                                className="rounded-none"
-                                                            >
-                                                                <Edit className="h-4 w-4 text-blue-500" />
-                                                            </Button>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {isCustomersLoading ? (
+                                                    Array.from({ length: 5 }).map((_, index) => (
+                                                        <TableRow key={index}>
+                                                            <TableCell colSpan={6}>
+                                                                <div className="flex flex-col items-center justify-center space-y-2 py-2 text-center">
+                                                                    <Skeleton className="h-2 w-48 rounded-none" />
+                                                                    <Skeleton className="h-2 w-32 rounded-none" />
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                ) : customers.length === 0 ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={6}>
+                                                            <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
+                                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                                    <UsersIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <h2 className="text-xl font-semibold mb-2">No customer data records exist yet</h2>
+                                                                    <p className="text-gray-500 dark:text-gray-400">Start by adding your first customer.</p>
+                                                                </div>
+                                                            </div>
                                                         </TableCell>
                                                     </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                    </Table>
+                                                ) : (
+                                                    sortCustomers(customers).map((customer) => (
+                                                        <TableRow key={customer.customer_id} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => handleCustomerClick(customer)}>
+                                                            <TableCell className="text-center">{customer.name}</TableCell>
+                                                            <TableCell className="text-center">{customer.email}</TableCell>
+                                                            <TableCell className="text-center">{customer.phone_number}</TableCell>
+                                                            <TableCell className="text-center">{customer.country}</TableCell>
+                                                            <TableCell className="text-center">{customer.is_business ? 'Business' : 'Individual'}</TableCell>
+                                                            <TableCell className="text-center">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        handleEditCustomer(customer)
+                                                                    }}
+                                                                    className="rounded-none"
+                                                                >
+                                                                    <Edit className="h-4 w-4 text-blue-500" />
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+
+                                    {/* Mobile Card View */}
+                                    <div className="md:hidden">
+                                        {isCustomersLoading ? (
+                                            Array.from({ length: 3 }).map((_, index) => (
+                                                <div key={index} className="p-4 border-b last:border-b-0">
+                                                    <Skeleton className="w-full h-24" />
+                                                </div>
+                                            ))
+                                        ) : customers.length === 0 ? (
+                                            <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
+                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                                    <UsersIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                                </div>
+                                                <div>
+                                                    <h2 className="text-xl font-semibold mb-2">No customer data records exist yet</h2>
+                                                    <p className="text-gray-500 dark:text-gray-400">Start by adding your first customer.</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            sortCustomers(customers).map((customer) => (
+                                                <CustomerCard
+                                                    key={customer.customer_id}
+                                                    customer={customer}
+                                                    onEditClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEditCustomer(customer);
+                                                    }}
+                                                    onClick={() => handleCustomerClick(customer)}
+                                                />
+                                            ))
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>
