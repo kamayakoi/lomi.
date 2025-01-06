@@ -14,7 +14,7 @@ BEGIN
         (current_setting('request.headers', true)::json->>'sec-ch-ua')::VARCHAR
     LIMIT 1;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Main logging function
 CREATE OR REPLACE FUNCTION public.log_event(

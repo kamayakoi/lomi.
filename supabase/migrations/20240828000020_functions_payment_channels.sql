@@ -63,4 +63,4 @@ BEGIN
         is_phone_verified = EXCLUDED.is_phone_verified,
         updated_at = NOW();
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;

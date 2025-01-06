@@ -61,7 +61,7 @@ BEGIN
     
     RETURN FALSE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to enable 2FA
 CREATE OR REPLACE FUNCTION public.enable_2fa(
@@ -96,7 +96,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to verify 2FA during login
 CREATE OR REPLACE FUNCTION public.verify_2fa_login(
@@ -133,7 +133,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to disable 2FA
 CREATE OR REPLACE FUNCTION public.disable_2fa(
@@ -151,7 +151,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION public.verify_totp_code(TEXT, TEXT) TO authenticated;

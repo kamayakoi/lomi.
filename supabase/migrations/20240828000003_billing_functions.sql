@@ -57,7 +57,7 @@ BEGIN
         ), 0) as outstanding_balance,
         v_organization_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to fetch billing statements with monthly fees and outstanding balance
 CREATE OR REPLACE FUNCTION fetch_billing_statements(
@@ -125,7 +125,7 @@ BEGIN
     AND pi.organization_id = v_organization_id
     ORDER BY pi.created_at DESC;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 -- Function to generate monthly platform invoice (to be run on the 25th of each month)
 CREATE OR REPLACE FUNCTION generate_monthly_platform_invoice(
@@ -196,4 +196,4 @@ BEGIN
 
     RETURN v_invoice_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER; 
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public; 
