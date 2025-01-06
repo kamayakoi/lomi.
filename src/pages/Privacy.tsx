@@ -160,12 +160,9 @@ const Privacy = () => {
                                     If you have questions or concerns regarding this privacy policy, or any feedback pertaining to the above Privacy Notice and your privacy, please contact:
                                 </p>
                                 <p className="mt-6 text-lg text-muted-foreground"> {/* Increased font size and margin */}
-                                    <strong>The Founder</strong>
+                                    <strong>lomi.africa Inc.</strong>
                                 </p>
                                 <p className="mt-3 text-lg text-muted-foreground"> {/* Reduced margin */}
-                                    lomi.africa Inc.
-                                </p>
-                                <p className="mt-1 text-lg text-muted-foreground"> {/* Slightly larger margin to separate email */}
                                     hello@lomi.africa
                                 </p>
                                 <hr className="my-4" /> {/* Horizontal line with margin */}

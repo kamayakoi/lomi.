@@ -58,7 +58,7 @@ const About = () => {
                                 <div className="flex justify-start">
                                     <Link to="/integrations">
                                         <PulsatingButton
-                                            className="text-xl mt-4 px-6 py-3 bg-red-600 text-black font-semibold rounded-lg shadow-lg hover:bg-red-700 transition-colors duration-300"
+                                            className="text-xl mt-4 px-6 py-3 bg-red-600 font-semibold rounded-none shadow-lg hover:bg-red-700 transition-colors duration-300 text-white"
                                             pulseColor="#ff4d4d"
                                         >
                                             {t('about.getStarted')}
