@@ -25,7 +25,7 @@ import MaintenanceError from './pages/errors/maintenance-error.tsx';
 import AppShell from './components/dashboard/app-shell';
 import Dashboard from '@/pages/portal/dashboard/Dashboard';
 import Integrators from '@/pages/portal/Integrate/Integrate.tsx';
-import PaymentChannels from './pages/portal/payment-channels/paymentChannels';
+import PaymentChannels from './pages/portal/payment-channels/PaymentChannels.tsx';
 import Logs from './pages/portal/logs-page/Logs.tsx';
 import Balance from './pages/portal/balance/Balance.tsx';
 import Transactions from './pages/portal/transactions/Transactions.tsx';
@@ -33,7 +33,7 @@ import Reporting from './pages/portal/reporting/Reporting.tsx';
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx';
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx';
 import Customers from './pages/portal/customers/Customers.tsx';
-import Subscription from "./pages/portal/subscription/subscription";
+import Subscription from "./pages/portal/subscription/Subscription.tsx";
 import Product from "./pages/portal/product/Product.tsx";
 import Storefront from "./pages/portal/storefront/Storefront.tsx";
 
