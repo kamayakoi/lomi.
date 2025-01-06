@@ -133,7 +133,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                         {onboardingForm.formState.errors.orgEmail && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgEmail.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgEmployees" className="block mb-2">Nb. of collaborators</Label>
+                        <Label htmlFor="orgEmployees" className="block mb-2">Number of collaborators</Label>
                         <select
                             id="orgEmployees"
                             {...onboardingForm.register("orgEmployees")}
@@ -229,20 +229,21 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                     </div>
                 </div>
                 <div className="w-1/2 space-y-10">
-                    <Label htmlFor="workspaceHandle" className="block mb-2">Workspace Handle</Label>
-                    <div className="flex items-center border dark:border-gray-600 h-[48px]">
-                        <div className="px-3 py-2 text-gray-500 dark:text-gray-400 text-base">
-                            portal.lomi.africa/
-                        </div>
+                    <Label htmlFor="workspaceHandle" className="block mb-2">Workspace handle</Label>
+                    <div className="relative flex items-center h-[48px]">
                         <Input
                             id="workspaceHandle"
                             placeholder="my-workspace"
                             {...onboardingForm.register("workspaceHandle")}
                             className={cn(
-                                "w-full border-0 focus:ring-0 pl-0 ml-[-10px] text-base h-[48px]",
-                                "dark:bg-gray-800 dark:text-white"
+                                "w-full h-[48px] pl-[138.5px] text-base",
+                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
+                        <div className="absolute left-3 text-base text-muted-foreground">
+                            portal.lomi.africa/
+                        </div>
                     </div>
                     {onboardingForm.formState.errors.workspaceHandle && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.workspaceHandle.message}</p>}
                 </div>
@@ -251,11 +252,11 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                 <Button
                     type="button"
                     onClick={onPrevious}
-                    className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
+                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
                 >
-                    Previous
+                    Back
                 </Button>
-                <Button type="submit" className="mt-6 h-[48px]">
+                <Button type="submit" className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
                     Next
                 </Button>
             </div>

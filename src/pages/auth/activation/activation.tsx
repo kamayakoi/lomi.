@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { Check } from 'lucide-react'
+import { Check, ChevronLeft } from 'lucide-react'
 import ActivationStep1 from './activation-step-1'
 import ActivationStep2 from './activation-step-2'
 import ActivationStep3 from './activation-step-3'
@@ -12,6 +12,7 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
+import { Button } from '@/components/ui/button';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-8 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -195,6 +196,29 @@ const Activation: React.FC = () => {
         }
     };
 
+    const MobileStepHeader = () => (
+        <div className="md:hidden flex items-center justify-between mb-6 border-b pb-4">
+            <div className="flex items-center">
+                {currentStep > 0 && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handlePrevious}
+                        className="mr-2"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                )}
+                <h2 className="text-lg font-semibold">
+                    {steps[currentStep]?.title}
+                </h2>
+            </div>
+            <div className="text-sm text-muted-foreground">
+                Step {currentStep + 1} of {steps.length}
+            </div>
+        </div>
+    );
+
     if (userLoading || activationStatusLoading || loading) {
         return <LoadingButton />;
     }
@@ -227,9 +251,9 @@ const Activation: React.FC = () => {
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <Card className="w-full max-w-4xl">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/3 pr-6 mb-6 md:mb-0">
+                        <div className="hidden md:block md:w-1/3 pr-6 mb-6 md:mb-0">
                             <h1 className="text-2xl font-bold tracking-tight mb-6">Account Activation</h1>
                             {steps.map((step, index) => (
                                 <StepIndicator
@@ -243,6 +267,7 @@ const Activation: React.FC = () => {
                             ))}
                         </div>
                         <div className="md:w-2/3 md:border-l md:pl-6">
+                            <MobileStepHeader />
                             <div className="space-y-6 h-[445px] overflow-y-auto scrollbar-hide p-2">
                                 {renderStep()}
                             </div>

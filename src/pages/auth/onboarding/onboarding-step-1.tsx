@@ -175,7 +175,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                 </div>
                 <div className="w-1/2 space-y-4">
                     <div>
-                        <Label htmlFor="country" className="block mb-2">Where are you based?</Label>
+                        <Label htmlFor="country" className="block mb-2">Where are you based ?</Label>
                         <select
                             id="country"
                             {...onboardingForm.register("country")}
@@ -216,7 +216,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                     </div>
                 </div>
             </div>
-            <Button type="submit" className="w-full mt-6 h-[48px]">
+            <Button type="submit" className="w-full mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
                 Next
             </Button>
         </form>

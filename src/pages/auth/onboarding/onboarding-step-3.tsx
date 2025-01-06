@@ -219,9 +219,12 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                     onClick={onPrevious}
                     className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
                 >
-                    Previous
+                    Back
                 </Button>
-                <Button type="submit" className="mt-6 h-[48px]">
+                <Button
+                    type="submit"
+                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                >
                     Next
                 </Button>
             </div>

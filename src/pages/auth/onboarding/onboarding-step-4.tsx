@@ -89,7 +89,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                         {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">language</Label>
+                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">Language</Label>
                         <select
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}
@@ -111,7 +111,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                 </div>
             </div>
             <div className="mb-6">
-                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">How did you hear about us?</Label>
+                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">How did you hear about us ?</Label>
                 <Input
                     id="howDidYouHearAboutUs"
                     placeholder="Share how you heard about us..."
@@ -130,12 +130,12 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                 <Button
                     type="button"
                     onClick={onPrevious}
-                    className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
+                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
                 >
-                    Previous
+                    Back
                 </Button>
-                <Button type="submit" className="mt-6 h-[48px]">
-                    Let&apos;s Go!
+                <Button type="submit" className="mt-6 h-[48px] bg-black hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
+                    Submit!
                 </Button>
             </div>
         </form>

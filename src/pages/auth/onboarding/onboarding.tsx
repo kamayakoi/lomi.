@@ -199,7 +199,7 @@ const Onboarding: React.FC = () => {
             if (error) {
                 if (error.message.includes('already taken')) {
                     toast({
-                        title: "Workspace Handle Unavailable",
+                        title: "Workspace handle Unavailable",
                         description: "This workspace handle is already taken. Please choose a different one.",
                         variant: "destructive",
                     });
@@ -273,11 +273,11 @@ const Onboarding: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center p-4">
             {showWelcome ? (
                 <WelcomeScreen onGetStarted={() => setShowWelcome(false)} />
             ) : (
-                <Card className="w-full max-w-4xl bg-white dark:bg-gray-800 shadow-xl">
+                <Card className="w-full max-w-4xl bg-white dark:bg-background shadow-xl rounded-none border dark:border-gray-800">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-center">
                             {steps[currentStep]?.title}
@@ -289,10 +289,10 @@ const Onboarding: React.FC = () => {
                                 {steps.map((_, index) => (
                                     <div key={index} className="flex-1 flex">
                                         <div
-                                            className={`flex-1 ${index <= currentStep ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+                                            className={`flex-1 ${index <= currentStep ? 'bg-blue-500 dark:bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                                                 } transition-all duration-300 ease-out`}
                                         />
-                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-gray-800" />}
+                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-background" />}
                                     </div>
                                 ))}
                             </div>
@@ -301,7 +301,7 @@ const Onboarding: React.FC = () => {
                                     <div
                                         key={index}
                                         className={`text-xs ${index <= currentStep
-                                            ? 'text-blue-600 dark:text-blue-400 font-bold'
+                                            ? 'text-blue-500 dark:text-blue-600 font-bold'
                                             : 'text-gray-400 dark:text-gray-500'
                                             }`}
                                     >
