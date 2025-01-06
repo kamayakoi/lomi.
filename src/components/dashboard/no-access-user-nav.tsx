@@ -84,7 +84,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => navigate('')}>
+          <DropdownMenuItem onClick={() => window.location.href = 'https://developers.lomi.africa/'}>
             Docs
           </DropdownMenuItem>
         </DropdownMenuGroup>

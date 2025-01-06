@@ -36,14 +36,16 @@ export default function Component() {
                             Your organization has not been given access yet.
                         </p>
                         <p className="text-white text-sm sm:text-base max-w-md mt-2">
-                            To gain access, you can{' '}
-                            <a
-                                href="mailto:hello@lomi.africa?subject=[Activation]%20—%20Contact%20sales"
-                                className="text-primary text-white hover:underline inline-block"
-                            >
-                                email us
-                            </a>{' '}
-                            or go through the Activation process.
+                            <span className="sm:whitespace-nowrap break-words sm:break-normal">
+                                To gain access, you can{' '}
+                                <a
+                                    href="mailto:hello@lomi.africa?subject=[Activation]%20—%20Contact%20sales"
+                                    className="text-primary text-white hover:underline inline-block"
+                                >
+                                    email us
+                                </a>{' '}
+                                or go through the Activation process.
+                            </span>
                         </p>
                     </div>
                 </div>
