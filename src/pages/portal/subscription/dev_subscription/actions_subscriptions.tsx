@@ -236,7 +236,6 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                                                     navigator.clipboard.writeText(plan.plan_id);
                                                     toast({
                                                         description: "Copied to clipboard",
-                                                        duration: 1000
                                                     });
                                                 }}
                                                 className="font-mono text-xs text-blue-500 hover:text-blue-500"

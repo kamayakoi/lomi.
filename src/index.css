@@ -28,6 +28,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 240 7.7% 7.1%;
     --radius: 0.5rem;
+    --toast-border-radius: 0px; /* Add this for square toasts */
   }
 
   .dark {
@@ -254,4 +255,42 @@ collapsibleDropdown[data-state='closed'] {
 
 *::-webkit-scrollbar {
     display: none;
+}
+
+/* Toast styles */
+[role="status"][data-state="open"],
+[role="alert"][data-state="open"] {
+  border-radius: 0 !important; /* Force square corners */
+}
+
+[role="region"][id^="toast-"] {
+  border-radius: 0 !important; /* Force square corners for toast viewport */
+}
+
+.toast-root {
+  border-radius: 0 !important;
+}
+
+.toast-viewport {
+  border-radius: 0 !important;
+}
+
+.toast-action {
+  border-radius: 0 !important;
+}
+
+/* Toast Progress Bar Animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.progress-animation {
+  animation: progress 3000ms linear forwards;
+  transform-origin: left;
+  will-change: transform;
 }

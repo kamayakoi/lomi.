@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import { cn } from '@/lib/actions/utils'
 import { fetchCustomer, updateCustomer, deleteCustomer } from './support_customers'
 import { countries } from '@/utils/data/onboarding'
+import PhoneNumberInput from "@/components/ui/phone-number-input"
 import {
     Dialog,
     DialogContent,
@@ -87,7 +88,16 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="phone_number">Phone Number</Label>
-                    <Input id="phone_number" {...register('phone_number')} />
+                    <Controller
+                        name="phone_number"
+                        control={control}
+                        render={({ field }) => (
+                            <PhoneNumberInput
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                            />
+                        )}
+                    />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="country">Country</Label>

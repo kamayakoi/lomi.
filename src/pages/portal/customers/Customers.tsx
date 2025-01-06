@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -35,12 +35,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { countries, countryCodes } from '@/utils/data/onboarding'
+import { countries } from '@/utils/data/onboarding'
 import { CustomerFilters } from './dev_customers/filters_customers'
 import { EditCustomerForm } from './dev_customers/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import SupportForm from '@/components/dashboard/support-form'
 import { Card, CardContent } from "@/components/ui/card"
+import { toast } from "@/components/ui/use-toast"
+import PhoneNumberInput from "@/components/ui/phone-number-input"
 
 function CustomerCard({ customer, onEditClick, onClick }: {
     customer: Customer,
@@ -91,8 +93,7 @@ function CustomersPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
-    const [countryCodeSearch, setCountryCodeSearch] = useState('')
-    const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false)
+    const [phoneNumber, setPhoneNumber] = useState("")
     const [searchTerm, setSearchTerm] = useState('')
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [isEditCustomerOpen, setIsEditCustomerOpen] = useState(false)
@@ -136,6 +137,15 @@ function CustomersPage() {
         event.preventDefault()
         const formData = new FormData(event.currentTarget)
 
+        if (!phoneNumber) {
+            toast({
+                title: "Error",
+                description: "Please enter a valid phone number",
+                variant: "destructive",
+            })
+            return
+        }
+
         const { data: organizationData, error: organizationError } = await supabase
             .rpc('fetch_organization_details', { p_merchant_id: user?.id })
 
@@ -149,7 +159,7 @@ function CustomersPage() {
             p_organization_id: organizationData[0].organization_id,
             p_name: formData.get('name') as string,
             p_email: formData.get('email') as string,
-            p_phone_number: `${countryCodeSearch}${formData.get('phone')}`,
+            p_phone_number: phoneNumber,
             p_country: selectedCountry,
             p_city: formData.get('city') as string,
             p_address: formData.get('address') as string,
@@ -189,13 +199,6 @@ function CustomersPage() {
         setSelectedCustomer(customer)
         setIsEditCustomerOpen(true)
     }
-
-    const filteredCountryCodes = useMemo(() => {
-        const lowercaseSearch = countryCodeSearch.toLowerCase();
-        return Array.from(new Set(countryCodes.filter(code =>
-            code.toLowerCase().includes(lowercaseSearch)
-        ))).slice(0, 5); // Limit to 5 results
-    }, [countryCodeSearch]);
 
     const handleRefresh = async () => {
         setIsRefreshing(true)
@@ -296,48 +299,11 @@ function CustomersPage() {
                                         />
                                     </div>
                                     <div className="space-y-1 sm:space-y-2">
-                                        <Label htmlFor="phone" className="text-sm">Mobile number</Label>
-                                        <div className="flex space-x-2">
-                                            <div className="relative w-24">
-                                                <Input
-                                                    id="countryCode"
-                                                    type="text"
-                                                    placeholder="+225"
-                                                    value={countryCodeSearch}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        if (/^[+\d]*$/.test(value)) {
-                                                            setCountryCodeSearch(value);
-                                                            setIsCountryCodeDropdownOpen(true);
-                                                        }
-                                                    }}
-                                                    onFocus={() => setIsCountryCodeDropdownOpen(true)}
-                                                    onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
-                                                    className={cn(
-                                                        "w-full rounded-none h-8 sm:h-10",
-                                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                                    )}
-                                                />
-                                                {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                                    <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-32 sm:max-h-60 overflow-auto">
-                                                        {filteredCountryCodes.map((code: string) => (
-                                                            <li
-                                                                key={code}
-                                                                className="px-3 py-1.5 sm:py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                                                                onClick={() => {
-                                                                    setCountryCodeSearch(code);
-                                                                    setIsCountryCodeDropdownOpen(false);
-                                                                }}
-                                                            >
-                                                                {code}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                )}
-                                            </div>
-                                            <Input id="phone" name="phone" type="tel" className="flex-1 rounded-none h-8 sm:h-10" required />
-                                        </div>
+                                        <Label htmlFor="phone" className="text-sm">Phone number</Label>
+                                        <PhoneNumberInput
+                                            value={phoneNumber}
+                                            onChange={(value) => setPhoneNumber(value || "")}
+                                        />
                                     </div>
                                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                         <div className="space-y-1 sm:space-y-2">

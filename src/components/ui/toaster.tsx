@@ -5,6 +5,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  ToastProgressBar,
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -24,6 +25,7 @@ export function Toaster() {
             </div>
             {action}
             <ToastClose />
+            <ToastProgressBar />
           </Toast>
         )
       })}

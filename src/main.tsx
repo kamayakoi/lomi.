@@ -5,6 +5,7 @@ import { UserProvider } from '@/lib/contexts/UserContext';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster";
 import AppRouter from "./router";
 import "./index.css";
 import './i18n';
@@ -25,6 +26,7 @@ export function App() {
               }}
             >
               <AppRouter />
+              <Toaster />
             </BrowserRouter>
             <Analytics />
           </UserProvider>

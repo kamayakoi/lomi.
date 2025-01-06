@@ -263,8 +263,7 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
                                         onClick={() => {
                                             navigator.clipboard.writeText(product.product_id);
                                             toast({
-                                                description: "Copied to clipboard",
-                                                duration: 1000
+                                                description: "Copied to clipboard"
                                             });
                                         }}
                                         className="font-mono text-xs text-blue-500 hover:text-blue-500"
