@@ -97,7 +97,7 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" disabled={disabled} className="rounded-none bg-blue-500 hover:bg-blue-600 text-white">
-                    <PlusIcon className="mr-2 h-4 w-4" /> Add bank account
+                    <PlusIcon className="mr-2 h-4 w-4" /> Add an account
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] rounded-none">

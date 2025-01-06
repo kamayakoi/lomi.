@@ -229,9 +229,9 @@ function SubscriptionsPage() {
                 refetch={handleRefresh}
                 isRefreshing={isRefreshing}
                 tabsList={
-                  <TabsList className="rounded-none">
-                    <TabsTrigger value="plans" className="rounded-none">Plans</TabsTrigger>
-                    <TabsTrigger value="subscriptions" className="rounded-none">Subscriptions</TabsTrigger>
+                  <TabsList className="rounded-none h-[40px]">
+                    <TabsTrigger value="plans" className="rounded-none h-[35px]">Plans</TabsTrigger>
+                    <TabsTrigger value="subscriptions" className="rounded-none h-[35px]">Subscriptions</TabsTrigger>
                   </TabsList>
                 }
               />

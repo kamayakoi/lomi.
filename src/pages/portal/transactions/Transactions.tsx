@@ -281,8 +281,8 @@ function TransactionsPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8">
+                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-4 pb-8 max-w-full">
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Transactions</h1>
 
                         <div className="grid gap-4 md:grid-cols-3 mb-6">
@@ -530,8 +530,8 @@ function TransactionsPage() {
                                             <TableHeader>
                                                 <TableRow>
                                                     {columns.includes('Transaction ID') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none">
+                                                        <TableHead className="text-center w-[25%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none whitespace-nowrap px-2 md:px-4">
                                                                 Transaction ID
                                                                 {sortColumn === 'transaction_id' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -540,8 +540,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Customer') && (
-                                                        <TableHead className="text-left">
-                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')}>
+                                                        <TableHead className="text-left w-[20%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Customer
                                                                 {sortColumn === 'customer_name' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -550,8 +550,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Gross Amount') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Gross Amount
                                                                 {sortColumn === 'gross_amount' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -560,8 +560,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Net Amount') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Net Amount
                                                                 {sortColumn === 'net_amount' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -570,8 +570,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Currency') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('currency')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('currency')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Currency
                                                                 {sortColumn === 'currency' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -580,8 +580,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Payment Method') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')}>
+                                                        <TableHead className="text-center w-[20%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Payment Method
                                                                 {sortColumn === 'payment_method' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -590,8 +590,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Status') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('status')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Status
                                                                 {sortColumn === 'status' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -600,8 +600,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Type') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('type')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('type')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Type
                                                                 {sortColumn === 'type' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -610,8 +610,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Date') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('date')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('date')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Date
                                                                 {sortColumn === 'date' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -620,8 +620,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Provider') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')}>
+                                                        <TableHead className="text-center w-[15%] md:w-auto">
+                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')} className="whitespace-nowrap px-2 md:px-4">
                                                                 Provider
                                                                 {sortColumn === 'provider_code' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />

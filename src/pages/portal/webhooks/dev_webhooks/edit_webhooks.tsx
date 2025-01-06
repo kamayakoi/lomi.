@@ -141,8 +141,23 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                     <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-hide">
                         <Card className="rounded-none border-none shadow-none">
                             <CardHeader className="p-0">
-                                <CardTitle className="text-base font-medium">URL</CardTitle>
-                                <CardDescription>The endpoint that will receive webhook events</CardDescription>
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-base font-medium">URL</CardTitle>
+                                        <CardDescription>The endpoint that will receive webhook events</CardDescription>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant={isActive ? 'outline' : 'outline'}
+                                        onClick={() => setIsActive(!isActive)}
+                                        className={`rounded-none h-8 px-3 text-xs ${isActive
+                                            ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 border-green-200'
+                                            : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 border-red-200'
+                                            }`}
+                                    >
+                                        {isActive ? 'Active' : 'Inactive'}
+                                    </Button>
+                                </div>
                             </CardHeader>
                             <CardContent className="p-0 pt-4">
                                 <Input
@@ -194,13 +209,13 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                             </CardContent>
                         </Card>
 
-                        <div className="flex justify-between pt-6">
-                            <div className="space-x-2">
+                        <div className="flex flex-col sm:flex-row sm:justify-between space-y-4 sm:space-y-0 pt-6">
+                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={() => setShowDeleteDialog(true)}
-                                    className="rounded-none text-red-600 hover:text-red-700"
+                                    className="rounded-none text-red-600 hover:text-red-700 w-full sm:w-auto"
                                 >
                                     Delete
                                 </Button>
@@ -208,28 +223,17 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                                     type="button"
                                     variant="outline"
                                     onClick={handleTest}
-                                    className="rounded-none"
+                                    className="rounded-none w-full sm:w-auto"
                                 >
                                     Send test
                                 </Button>
                             </div>
-                            <div className="space-x-2 flex items-center">
-                                <Button
-                                    type="button"
-                                    variant={isActive ? 'outline' : 'outline'}
-                                    onClick={() => setIsActive(!isActive)}
-                                    className={`rounded-none h-10 px-4 ${isActive
-                                        ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 border-green-200'
-                                        : 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 border-red-200'
-                                        }`}
-                                >
-                                    {isActive ? 'Active' : 'Inactive'}
-                                </Button>
+                            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={onClose}
-                                    className="rounded-none"
+                                    className="rounded-none w-full sm:w-auto"
                                 >
                                     Cancel
                                 </Button>
@@ -237,7 +241,7 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                                     type="button"
                                     onClick={handleSave}
                                     disabled={isSubmitting}
-                                    className="rounded-none bg-blue-600 hover:bg-blue-700"
+                                    className="rounded-none bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                                 >
                                     {isSubmitting ? 'Saving...' : 'Save'}
                                 </Button>
@@ -255,12 +259,12 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                             Are you sure you want to delete this webhook? This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="rounded-none">Cancel</AlertDialogCancel>
+                    <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+                        <AlertDialogCancel className="rounded-none w-full sm:w-auto mt-0">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
                             disabled={isSubmitting}
-                            className="rounded-none bg-red-600 hover:bg-red-700"
+                            className="rounded-none bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                         >
                             {isSubmitting ? 'Deleting...' : 'Delete webhook'}
                         </AlertDialogAction>

@@ -74,17 +74,17 @@ const BrowserMockup: React.FC<{ url: string; children: React.ReactNode; displayM
     <div className={`border-2 border-gray-200 rounded-none shadow-lg overflow-hidden ${displayMode === 'desktop' ? 'w-full' : 'max-w-sm mx-auto'}`}>
         <div className="bg-gray-100 px-4 py-2 flex items-center space-x-2">
             <div className="flex space-x-1">
-                <Circle size={12} className="text-red-500" />
-                <Circle size={12} className="text-yellow-500" />
-                <Circle size={12} className="text-green-500" />
+                <Circle size={10} className="text-red-500" />
+                <Circle size={10} className="text-yellow-500" />
+                <Circle size={10} className="text-green-500" />
             </div>
             <div className="flex-1 bg-white rounded-none px-2 py-1 text-sm text-gray-800 flex items-center justify-center relative">
                 <Lock className="h-3 w-3 absolute left-2 text-green-600" />
                 <span className="text-xs font-semibold text-gray-400">{url}</span>
             </div>
         </div>
-        <div className={`bg-white ${displayMode === 'desktop' ? 'h-[560px]' : 'h-[565px]'} overflow-y-auto`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="p-6">
+        <div className={`bg-white ${displayMode === 'desktop' ? 'h-[450px]' : 'h-[455px]'} overflow-y-auto`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="p-4">
                 {children}
             </div>
         </div>
@@ -419,7 +419,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             setSelectedProduct(products.find(p => p.product_id === value) || null)
                         }
                     }}>
-                        <SelectTrigger id="product-select" className="w-full">
+                        <SelectTrigger id="product-select" className="w-full rounded-none">
                             <SelectValue placeholder="Select a product" />
                         </SelectTrigger>
                         <SelectContent>
@@ -446,7 +446,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             setSelectedPlan(plans.find(p => p.plan_id === value) || null)
                         }
                     }}>
-                        <SelectTrigger id="plan-select" className="w-full">
+                        <SelectTrigger id="plan-select" className="w-full rounded-none">
                             <SelectValue placeholder="Select a plan" />
                         </SelectTrigger>
                         <SelectContent>
@@ -472,20 +472,38 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         onChange={handleInstantLinkChange}
                         optional
                     />
-                    <ExpirationDateInput
-                        value={expirationDate}
-                        onChange={setExpirationDate}
-                    />
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:space-x-4">
+                        <div className="flex-1">
+                            <ExpirationDateInput
+                                value={expirationDate}
+                                onChange={setExpirationDate}
+                            />
+                        </div>
+                    </div>
                     <div className="space-y-4">
-                        <Label className="block">Payment methods</Label>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center justify-between">
+                            <Label className="block">Payment methods</Label>
+                            <button
+                                onClick={() => setAllowCouponCode(!allowCouponCode)}
+                                className={`
+                                    px-3 py-1.5 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block rounded-none
+                                    ${allowCouponCode
+                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
+                                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                                    }
+                                `}
+                            >
+                                {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                             {paymentMethods
                                 .filter((method) => connectedProviders.includes(method.id))
                                 .map((method) => (
                                     <Badge
                                         key={method.id}
                                         variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                        className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
+                                        className={`cursor-pointer rounded-none px-3 py-1.5 text-xs ${allowedPaymentMethods.includes(method.id)
                                             ? getBadgeColor(method.id)
                                             : 'bg-transparent hover:bg-transparent'
                                             }`}
@@ -497,38 +515,44 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             }
                         </div>
                     </div>
-                    <button
-                        onClick={() => setAllowCouponCode(!allowCouponCode)}
-                        className={`
-                            px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block
-                            ${allowCouponCode
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
-                            }
-                        `}
-                    >
-                        {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
-                    </button>
                 </>
             )}
 
             {paymentType === 'instant' && (
                 <>
                     <InstantLinkCustomizer />
-                    <ExpirationDateInput
-                        value={expirationDate}
-                        onChange={setExpirationDate}
-                    />
+                    <div className="flex flex-col lg:flex-row lg:items-end lg:space-x-4">
+                        <div className="flex-1">
+                            <ExpirationDateInput
+                                value={expirationDate}
+                                onChange={setExpirationDate}
+                            />
+                        </div>
+                    </div>
                     <div className="space-y-4">
-                        <Label className="block">Payment methods</Label>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex items-center justify-between">
+                            <Label className="block">Payment methods</Label>
+                            <button
+                                onClick={() => setAllowCouponCode(!allowCouponCode)}
+                                className={`
+                                    px-3 py-1.5 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block rounded-none
+                                    ${allowCouponCode
+                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
+                                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
+                                    }
+                                `}
+                            >
+                                {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
                             {paymentMethods
                                 .filter((method) => connectedProviders.includes(method.id))
                                 .map((method) => (
                                     <Badge
                                         key={method.id}
                                         variant={allowedPaymentMethods.includes(method.id) ? "default" : "outline"}
-                                        className={`cursor-pointer rounded-none px-4 py-2 ${allowedPaymentMethods.includes(method.id)
+                                        className={`cursor-pointer rounded-none px-3 py-1.5 text-xs ${allowedPaymentMethods.includes(method.id)
                                             ? getBadgeColor(method.id)
                                             : 'bg-transparent hover:bg-transparent'
                                             }`}
@@ -540,18 +564,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                             }
                         </div>
                     </div>
-                    <button
-                        onClick={() => setAllowCouponCode(!allowCouponCode)}
-                        className={`
-                            px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer inline-block
-                            ${allowCouponCode
-                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-800'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800'
-                            }
-                        `}
-                    >
-                        {allowCouponCode ? 'Coupon Code' : 'Coupon Code'}
-                    </button>
                 </>
             )}
         </div>
@@ -597,16 +609,16 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
         return (
             <div>
-                <Label htmlFor="customSuccessUrl" className="mb-2 block">Custom success page URL</Label>
-                <div className="mt-1 flex rounded-none shadow-sm">
-                    <span className="inline-flex items-center rounded-none border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
+                <Label htmlFor="customSuccessUrl" className="mb-2 block text-sm sm:text-base">Custom success page URL</Label>
+                <div className="mt-1 flex flex-row rounded-none shadow-sm">
+                    <span className="inline-flex items-center px-3 py-2 text-xs sm:text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 w-[72px] sm:w-[85px] justify-center">
                         https://
                     </span>
                     <Input
                         type="text"
                         name="customSuccessUrl"
                         id="customSuccessUrl"
-                        className="block w-full flex-1 rounded-none border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        className="block w-full flex-1 rounded-none text-sm sm:text-base border-l-0"
                         placeholder="example.com/success"
                         value={localValue}
                         onChange={handleChange}
@@ -619,9 +631,9 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
     const SuccessCustomizer = () => (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Set up the success page</h2>
-            <div className="flex items-center justify-between">
-                <Label htmlFor="redirectToggle" className="text-base font-medium">
+            <h2 className="text-xl sm:text-2xl font-bold">Set up the success page</h2>
+            <div className="flex items-center justify-between space-x-4">
+                <Label htmlFor="redirectToggle" className="text-sm sm:text-base font-medium flex-1">
                     Redirect to a custom success page
                 </Label>
                 <Switch
@@ -734,14 +746,27 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
     return (
         <div className="flex flex-col">
-            <div className="flex overflow-hidden">
-                <div className="w-[35%] p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
-                    {/* Add the new title and description here */}
-                    <div className="mb-6">
+            <div className="flex flex-col lg:flex-row overflow-hidden">
+                <div className="w-full lg:w-[35%] p-6 overflow-auto border-r bg-white dark:bg-[#121317]">
+                    {/* Title and description */}
+                    <div className="mb-4">
                         <h2 className="text-2xl font-bold">Create a payment link</h2>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Fill in the details to get started.
-                        </p>
+                    </div>
+
+                    {/* Show SegmentedControl only on mobile */}
+                    <div className="mb-6 lg:hidden">
+                        <SegmentedControl
+                            value={activeTab}
+                            onValueChange={setActiveTab}
+                            className="w-full rounded-none"
+                        >
+                            <SegmentedControl.Item value="checkout" className="w-full rounded-none">
+                                Checkout page
+                            </SegmentedControl.Item>
+                            <SegmentedControl.Item value="success" className="w-full rounded-none">
+                                Success page
+                            </SegmentedControl.Item>
+                        </SegmentedControl>
                     </div>
 
                     {/* Render the appropriate customizer based on the active tab */}
@@ -763,7 +788,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         </div>
                     )}
                 </div>
-                <div className="w-[65%] p-6 bg-transparent dark:bg-[#121317] overflow-auto">
+                <div className="hidden lg:block w-full lg:w-[65%] p-6 bg-transparent dark:bg-[#121317] overflow-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Preview</h2>
                         <div className="flex items-center space-x-2">
@@ -788,6 +813,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     <p className="text-sm text-muted-foreground mb-6 -mt-6">
                         This preview simplifies the actual checkout experience.
                     </p>
+                    {/* Show SegmentedControl only on desktop */}
                     <div className="mb-6">
                         <SegmentedControl
                             value={activeTab}

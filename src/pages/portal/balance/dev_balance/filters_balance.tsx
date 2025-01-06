@@ -80,11 +80,11 @@ export default function PayoutFilters({
     }
 
     return (
-        <div className="w-full bg-card shadow-sm rounded-lg p-4 text-card-foreground">
+        <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full p-4">
             <div className="flex flex-wrap items-end gap-4">
                 <div className="w-full sm:w-auto flex-grow">
                     <label htmlFor="date-range" className="block text-sm font-medium mb-1">Date Range</label>
-                    <div className="flex rounded-md shadow-sm w-full max-w-2xl">
+                    <div className="flex rounded-md shadow-sm w-full max-w-xl">
                         {['24H', '7D', '1M', '3M', '6M', 'YTD'].map((range) => (
                             <Button
                                 key={range}

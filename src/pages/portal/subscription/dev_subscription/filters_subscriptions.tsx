@@ -3,56 +3,60 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, RefreshCw } from 'lucide-react'
 
+type SubscriptionStatus = 'all' | 'active' | 'pending' | 'cancelled';
+
 interface SubscriptionFiltersProps {
-    selectedStatus?: string | null
-    setSelectedStatus?: (status: string | null) => void
-    refetch: () => void
-    isRefreshing: boolean
-    tabsList?: React.ReactNode
+    selectedStatus: SubscriptionStatus;
+    setSelectedStatus: (status: SubscriptionStatus) => void;
+    refetch: () => void;
+    isRefreshing: boolean;
+    tabsList: React.ReactNode;
 }
 
-export const SubscriptionFilters: React.FC<SubscriptionFiltersProps> = ({
+export function SubscriptionFilters({
     selectedStatus,
     setSelectedStatus,
     refetch,
     isRefreshing,
-    tabsList
-}) => {
+    tabsList,
+}: SubscriptionFiltersProps) {
     return (
-        <div className='my-4 flex items-center justify-between sm:my-0'>
-            <div className='flex items-center space-x-4'>
-                {tabsList}
-                <div className='relative w-60'>
-                    <Input
-                        placeholder='Search subscriptions...'
-                        className='w-full pl-10 pr-4 py-2 rounded-none'
-                        type="search"
-                    />
-                    <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+        <div className='w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full'>
+            <div className='flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 sm:p-0'>
+                <div className="w-full sm:w-auto">
+                    {tabsList}
                 </div>
-                {setSelectedStatus && (
-                    <Select value={selectedStatus || undefined} onValueChange={setSelectedStatus}>
-                        <SelectTrigger className="w-[120px] rounded-none">
+                <div className='flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto'>
+                    <div className='relative w-full sm:w-60'>
+                        <Input
+                            placeholder='Search subscriptions...'
+                            className='w-full pl-10 pr-4 py-2 rounded-none'
+                            type="search"
+                        />
+                        <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                    </div>
+                    <Select value={selectedStatus} onValueChange={(value: string) => setSelectedStatus(value as SubscriptionStatus)}>
+                        <SelectTrigger className="w-full sm:w-[120px] rounded-none">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-none">
                             <SelectItem value="all">All Status</SelectItem>
                             <SelectItem value="active">Active</SelectItem>
                             <SelectItem value="pending">Pending</SelectItem>
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                     </Select>
-                )}
-                <Button
-                    variant="outline"
-                    onClick={() => refetch()}
-                    className="border-border text-card-foreground px-2 h-10 rounded-none"
-                    disabled={isRefreshing}
-                >
-                    <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    <span className="sr-only">Refresh</span>
-                </Button>
+                    <Button
+                        variant="outline"
+                        onClick={refetch}
+                        className="hidden sm:flex border-border text-card-foreground px-2 h-10 rounded-none"
+                        disabled={isRefreshing}
+                    >
+                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span className="sr-only">Refresh</span>
+                    </Button>
+                </div>
             </div>
         </div>
-    )
+    );
 }

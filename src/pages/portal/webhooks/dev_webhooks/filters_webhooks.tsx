@@ -26,41 +26,45 @@ export function WebhookFilters({
     }, []);
 
     return (
-        <div className="flex flex-col sm:flex-row gap-2">
-            <Select value={selectedEvent} onValueChange={(value) => setSelectedEvent(value as webhook_event | 'all')}>
-                <SelectTrigger className="w-full sm:w-[200px] rounded-none">
-                    <SelectValue placeholder="Filter by event" />
-                </SelectTrigger>
-                <SelectContent className="rounded-none">
-                    <SelectItem value="all">All events</SelectItem>
-                    {allEvents.map((event) => (
-                        <SelectItem key={event.id} value={event.id}>
-                            {event.label}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+        <div className='my-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
+            <div className='flex flex-wrap items-center gap-4'>
+                <Select value={selectedEvent} onValueChange={(value) => setSelectedEvent(value as webhook_event | 'all')}>
+                    <SelectTrigger className="w-full sm:w-[200px] rounded-none">
+                        <SelectValue placeholder="Filter by event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All events</SelectItem>
+                        {allEvents.map((event) => (
+                            <SelectItem key={event.id} value={event.id}>
+                                {event.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
-            <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all')}>
-                <SelectTrigger className="w-full sm:w-[200px] rounded-none">
-                    <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent className="rounded-none">
-                    <SelectItem value="all">All statuses</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-            </Select>
+                <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as 'active' | 'inactive' | 'all')}>
+                    <SelectTrigger className="w-full sm:w-[120px] rounded-none">
+                        <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
 
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={refetch}
-                disabled={isRefreshing}
-                className="rounded-none"
-            >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
+                <div className="hidden sm:flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        onClick={refetch}
+                        className="border-border text-card-foreground px-2 h-10 rounded-none"
+                        disabled={isRefreshing}
+                    >
+                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                        <span className="sr-only">Refresh</span>
+                    </Button>
+                </div>
+            </div>
         </div>
     )
 }

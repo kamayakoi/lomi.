@@ -64,9 +64,10 @@ export default function Notifications() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-80 sm:w-96 bg-white dark:bg-[#121317] border border-border shadow-lg rounded-lg"
+                className="w-60 sm:w-96 bg-white dark:bg-[#121317] border border-border shadow-lg rounded-none"
                 align="end"
                 alignOffset={-15}
+                sideOffset={14}
             >
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="font-semibold text-foreground">Notifications</h3>

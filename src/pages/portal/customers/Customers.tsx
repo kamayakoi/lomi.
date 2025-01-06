@@ -228,20 +228,20 @@ function CustomersPage() {
                                     Create
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="rounded-none">
-                                <DialogHeader>
+                            <DialogContent className="rounded-none max-h-[95vh] overflow-y-auto">
+                                <DialogHeader className="sm:py-4 py-2">
                                     <DialogTitle>Add a customer</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogDescription className="text-sm">
                                         Fill in the details to add a new customer for billing.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <form onSubmit={handleAddCustomer} className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="name">Name</Label>
-                                        <Input id="name" name="name" placeholder="Individual or business name" required className="rounded-none" />
+                                <form onSubmit={handleAddCustomer} className="space-y-3 sm:space-y-4">
+                                    <div className="space-y-1 sm:space-y-2">
+                                        <Label htmlFor="name" className="text-sm">Name</Label>
+                                        <Input id="name" name="name" placeholder="Individual or business name" required className="rounded-none h-8 sm:h-10" />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email">Email address</Label>
+                                    <div className="space-y-1 sm:space-y-2">
+                                        <Label htmlFor="email" className="text-sm">Email address</Label>
                                         <Input
                                             id="email"
                                             name="email"
@@ -250,11 +250,11 @@ function CustomersPage() {
                                             required
                                             pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                                             title="Please enter a valid email address"
-                                            className="rounded-none"
+                                            className="rounded-none h-8 sm:h-10"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="phone">Mobile number</Label>
+                                    <div className="space-y-1 sm:space-y-2">
+                                        <Label htmlFor="phone" className="text-sm">Mobile number</Label>
                                         <div className="flex space-x-2">
                                             <div className="relative w-24">
                                                 <Input
@@ -272,17 +272,17 @@ function CustomersPage() {
                                                     onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                                     onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
                                                     className={cn(
-                                                        "w-full mb-2 rounded-none",
+                                                        "w-full rounded-none h-8 sm:h-10",
                                                         "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                                     )}
                                                 />
                                                 {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                                    <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
+                                                    <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-32 sm:max-h-60 overflow-auto">
                                                         {filteredCountryCodes.map((code: string) => (
                                                             <li
                                                                 key={code}
-                                                                className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                className="px-3 py-1.5 sm:py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                                                                 onClick={() => {
                                                                     setCountryCodeSearch(code);
                                                                     setIsCountryCodeDropdownOpen(false);
@@ -294,71 +294,73 @@ function CustomersPage() {
                                                     </ul>
                                                 )}
                                             </div>
-                                            <Input id="phone" name="phone" type="tel" className="flex-1 rounded-none" required />
+                                            <Input id="phone" name="phone" type="tel" className="flex-1 rounded-none h-8 sm:h-10" required />
                                         </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="country">Country</Label>
-                                        <select
-                                            id="country"
-                                            value={selectedCountry}
-                                            onChange={(e) => setSelectedCountry(e.target.value)}
-                                            className={cn(
-                                                "w-full mb-2 px-3 py-2 border h-10 rounded-none",
-                                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                                "appearance-none"
-                                            )}
-                                        >
-                                            <option value="">Select a country</option>
-                                            {countries.map((country) => (
-                                                <option key={country} value={country}>
-                                                    {country}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="city">City</Label>
-                                        <Input id="city" name="city" placeholder="City" required className="rounded-none" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="address">Address</Label>
-                                        <Input id="address" name="address" placeholder="Address" required className="rounded-none" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="postalCode">Postal Code</Label>
-                                        <Input id="postalCode" name="postalCode" placeholder="Postal Code" required className="rounded-none" />
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="flex items-center h-5">
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsBusinessCustomer(!isBusinessCustomer)}
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
+                                            <Label htmlFor="country" className="text-sm">Country</Label>
+                                            <select
+                                                id="country"
+                                                value={selectedCountry}
+                                                onChange={(e) => setSelectedCountry(e.target.value)}
                                                 className={cn(
-                                                    "px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer rounded-none",
-                                                    isBusinessCustomer
-                                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
-                                                        : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800"
+                                                    "w-full px-3 border rounded-none h-8 sm:h-10",
+                                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                                    "appearance-none text-sm"
                                                 )}
                                             >
-                                                {isBusinessCustomer ? 'Business Customer' : 'Individual Customer'}
-                                            </button>
-                                            <input
-                                                type="checkbox"
-                                                id="isBusiness"
-                                                name="isBusiness"
-                                                className="hidden"
-                                                checked={isBusinessCustomer}
-                                                onChange={(e) => setIsBusinessCustomer(e.target.checked)}
-                                            />
+                                                <option value="">Select</option>
+                                                {countries.map((country) => (
+                                                    <option key={country} value={country}>
+                                                        {country}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-1 sm:space-y-2">
+                                            <Label htmlFor="city" className="text-sm">City</Label>
+                                            <Input id="city" name="city" placeholder="City" required className="rounded-none h-8 sm:h-10" />
                                         </div>
                                     </div>
-                                    <div className="flex justify-end">
-                                        <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white rounded-none">
-                                            Add
-                                        </Button>
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="space-y-1 sm:space-y-2">
+                                            <Label htmlFor="address" className="text-sm">Address</Label>
+                                            <Input id="address" name="address" placeholder="Address" required className="rounded-none h-8 sm:h-10" />
+                                        </div>
+                                        <div className="space-y-1 sm:space-y-2">
+                                            <Label htmlFor="postalCode" className="text-sm">Postal Code</Label>
+                                            <Input id="postalCode" name="postalCode" placeholder="Postal Code" required className="rounded-none h-8 sm:h-10" />
+                                        </div>
                                     </div>
+                                    <div className="flex items-center space-x-2 pt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsBusinessCustomer(!isBusinessCustomer)}
+                                            className={cn(
+                                                "px-3 py-1 text-xs font-medium transition-colors duration-200 cursor-pointer rounded-none",
+                                                isBusinessCustomer
+                                                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800"
+                                                    : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800"
+                                            )}
+                                        >
+                                            {isBusinessCustomer ? 'Business Customer' : 'Individual Customer'}
+                                        </button>
+                                        <input
+                                            type="checkbox"
+                                            id="isBusiness"
+                                            name="isBusiness"
+                                            className="hidden"
+                                            checked={isBusinessCustomer}
+                                            onChange={(e) => setIsBusinessCustomer(e.target.checked)}
+                                        />
+                                    </div>
+                                    <DialogFooter className="sm:pt-4 pt-2">
+                                        <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white rounded-none w-full sm:w-auto">
+                                            Add Customer
+                                        </Button>
+                                    </DialogFooter>
                                 </form>
                             </DialogContent>
                         </Dialog>

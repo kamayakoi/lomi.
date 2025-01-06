@@ -102,21 +102,27 @@ function ReportingPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8 pl-[-22] pr-8">
-                        <h1 className="text-2xl font-bold tracking-tight">Reporting</h1>
+                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-4 pb-8 px-4 md:px-0 max-w-full">
+                        <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                            <h1 className="text-2xl font-bold tracking-tight">Reporting</h1>
+                        </div>
 
-                        <ReportingFilters
-                            selectedDateRange={selectedDateRange}
-                            setSelectedDateRange={setSelectedDateRange}
-                        />
+                        <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                            <ReportingFilters
+                                selectedDateRange={selectedDateRange}
+                                setSelectedDateRange={setSelectedDateRange}
+                            />
+                        </div>
 
-                        <RevenueTransactionsChart
-                            revenueData={revenueData}
-                            transactionVolumeData={transactionVolumeData}
-                            selectedDateRange={selectedDateRange}
-                            isLoading={isRevenueLoading || isTransactionVolumeLoading}
-                        />
+                        <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                            <RevenueTransactionsChart
+                                revenueData={revenueData}
+                                transactionVolumeData={transactionVolumeData}
+                                selectedDateRange={selectedDateRange}
+                                isLoading={isRevenueLoading || isTransactionVolumeLoading}
+                            />
+                        </Card>
 
                         <div className={cn(
                             "flex items-center my-8",
@@ -129,16 +135,20 @@ function ReportingPage() {
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2">
-                            <TopPerformingItemsCard
-                                topPerformingProducts={topPerformingProducts}
-                                topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
-                                isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionPlansLoading}
-                            />
+                            <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                                <TopPerformingItemsCard
+                                    topPerformingProducts={topPerformingProducts}
+                                    topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
+                                    isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionPlansLoading}
+                                />
+                            </Card>
 
-                            <ProviderDistributionCard
-                                providerDistribution={providerDistribution}
-                                isLoading={isProviderDistributionLoading}
-                            />
+                            <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                                <ProviderDistributionCard
+                                    providerDistribution={providerDistribution}
+                                    isLoading={isProviderDistributionLoading}
+                                />
+                            </Card>
                         </div>
                     </div>
                 </div>

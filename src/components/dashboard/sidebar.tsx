@@ -70,7 +70,7 @@ export default function Sidebar({ className }: SidebarProps) {
       <aside
         className={cn(
           `fixed z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60
-           border-r border-border/40 shadow-sm transition-all duration-300 ease-in-out
+           border-r-[1.25px] border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300 ease-in-out
            md:bottom-0 md:right-auto md:h-svh md:w-64`,
           // Mobile: full height minus header height, and slide from left
           'top-16 left-0 right-0 h-[calc(100svh-4rem)] md:top-0',

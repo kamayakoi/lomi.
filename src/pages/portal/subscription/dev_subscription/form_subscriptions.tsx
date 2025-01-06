@@ -121,19 +121,19 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            <div className="max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
-                <Card>
-                    <CardHeader>
+            <div className="max-h-[70vh] overflow-y-auto px-4 sm:px-2 pb-4 scrollbar-hide">
+                <Card className="rounded-none">
+                    <CardHeader className="px-4 sm:px-6">
                         <CardTitle>Create subscription plan</CardTitle>
                         <CardDescription>Set up a new subscription plan for your customers</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 px-4 sm:px-6">
                         <div className="space-y-2">
                             <Label htmlFor="name">Plan name</Label>
                             <Input
                                 id="name"
                                 placeholder="Enter plan name"
-                                className="rounded-none"
+                                className="rounded-none w-full"
                                 {...register('name', { required: 'Plan name is required' })}
                             />
                             {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
@@ -144,7 +144,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                             <Textarea
                                 id="description"
                                 placeholder="Describe the plan"
-                                className="rounded-none"
+                                className="rounded-none min-h-[100px]"
                                 {...register('description')}
                             />
                         </div>
@@ -169,12 +169,12 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 rules={{ required: 'Billing frequency is required' }}
                                 render={({ field }) => (
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <SelectTrigger className="w-full">
+                                        <SelectTrigger className="w-full rounded-none">
                                             <SelectValue placeholder="Select billing frequency">
                                                 {frequencyOptions.find(f => f === field.value)?.charAt(0).toUpperCase() + (frequencyOptions.find(f => f === field.value)?.slice(1) ?? '')}
                                             </SelectValue>
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="rounded-none">
                                             {frequencyOptions.map((frequency) => (
                                                 <SelectItem key={frequency} value={frequency}>
                                                     {frequency.charAt(0).toUpperCase() + frequency.slice(1)}
@@ -189,18 +189,18 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
                         {!isOneTimeFrequency && (
                             <>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <Label>Subscription length</Label>
                                     <RadioGroup
                                         defaultValue="automatic"
                                         onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
-                                        className="rounded-none"
+                                        className="rounded-none space-y-3"
                                     >
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-3">
                                             <RadioGroupItem value="automatic" id="automatic" />
                                             <Label htmlFor="automatic">Automatic renewal</Label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-3">
                                             <RadioGroupItem value="fixed" id="fixed" />
                                             <Label htmlFor="fixed">End after specific charges</Label>
                                         </div>
@@ -216,10 +216,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                             rules={{ required: 'Number of charges is required' }}
                                             render={({ field }) => (
                                                 <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                                    <SelectTrigger className="w-full">
+                                                    <SelectTrigger className="w-full rounded-none">
                                                         <SelectValue placeholder="Select number of charges" />
                                                     </SelectTrigger>
-                                                    <SelectContent className="max-h-60 overflow-y-auto">
+                                                    <SelectContent className="max-h-60 overflow-y-auto rounded-none">
                                                         {fixedChargesOptions.map((option) => (
                                                             <SelectItem key={option} value={option.toString()}>
                                                                 End after {option} charges
@@ -236,7 +236,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                         )}
 
                         <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-3">
                                 <Switch
                                     checked={showAdvancedSettings}
                                     onCheckedChange={setShowAdvancedSettings}
@@ -247,20 +247,20 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
                         {showAdvancedSettings && !isOneTimeFrequency && (
                             <div className="space-y-6">
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <Label>Collection Date</Label>
                                     <RadioGroup
                                         defaultValue="maintain"
                                         onValueChange={(value: CollectionDateType) => setValue('collection_date_type', value)}
-                                        className="space-y-2"
+                                        className="space-y-3"
                                     >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="maintain" id="maintain" />
-                                            <Label htmlFor="maintain">Maintain the collection date according to the frequency of the subscription</Label>
+                                        <div className="flex items-start space-x-3">
+                                            <RadioGroupItem value="maintain" id="maintain" className="mt-1" />
+                                            <Label htmlFor="maintain" className="leading-tight">Maintain the collection date according to the frequency of the subscription</Label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="specific_day" id="specific_day" />
-                                            <Label htmlFor="specific_day">Charge subscription on a specific day of the month</Label>
+                                        <div className="flex items-start space-x-3">
+                                            <RadioGroupItem value="specific_day" id="specific_day" className="mt-1" />
+                                            <Label htmlFor="specific_day" className="leading-tight">Charge subscription on a specific day of the month</Label>
                                         </div>
                                     </RadioGroup>
                                 </div>
@@ -274,10 +274,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                             rules={{ required: 'Collection day is required' }}
                                             render={({ field }) => (
                                                 <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                                    <SelectTrigger className="w-full">
+                                                    <SelectTrigger className="w-full rounded-none">
                                                         <SelectValue placeholder="Select collection day" />
                                                     </SelectTrigger>
-                                                    <SelectContent className="max-h-60 overflow-y-auto">
+                                                    <SelectContent className="max-h-60 overflow-y-auto rounded-none">
                                                         {collectionDayOptions.map((day) => (
                                                             <SelectItem key={day} value={day.toString()}>
                                                                 {day}
@@ -291,33 +291,33 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                     </div>
                                 )}
 
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <Label>First payment of the subscription</Label>
                                     <Controller
                                         name="first_payment_type"
                                         control={control}
                                         render={({ field }) => (
-                                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-2">
-                                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                                                    <Card>
-                                                        <CardHeader>
-                                                            <CardTitle>
-                                                                <RadioGroupItem value="initial" id="initial" className="mr-2" />
+                                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="space-y-4">
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    <Card className="rounded-none">
+                                                        <CardHeader className="px-4">
+                                                            <CardTitle className="flex items-center">
+                                                                <RadioGroupItem value="initial" id="initial" className="mr-3" />
                                                                 <Label htmlFor="initial">Initial charge</Label>
                                                             </CardTitle>
                                                         </CardHeader>
-                                                        <CardContent>
+                                                        <CardContent className="px-4 text-sm text-muted-foreground">
                                                             The subscription will be charged at the beginning and in each subsequent period.
                                                         </CardContent>
                                                     </Card>
-                                                    <Card>
-                                                        <CardHeader>
-                                                            <CardTitle>
-                                                                <RadioGroupItem value="non_initial" id="non_initial" className="mr-2" />
+                                                    <Card className="rounded-none">
+                                                        <CardHeader className="px-4">
+                                                            <CardTitle className="flex items-center">
+                                                                <RadioGroupItem value="non_initial" id="non_initial" className="mr-3" />
                                                                 <Label htmlFor="non_initial">Non-initial charge</Label>
                                                             </CardTitle>
                                                         </CardHeader>
-                                                        <CardContent>
+                                                        <CardContent className="px-4 text-sm text-muted-foreground">
                                                             Subscription will be initiated without charge. A charge will be applied on the nearest selected debit day.
                                                         </CardContent>
                                                     </Card>
@@ -334,10 +334,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                         control={control}
                                         render={({ field }) => (
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <SelectTrigger className="w-full">
+                                                <SelectTrigger className="w-full rounded-none">
                                                     <SelectValue placeholder="Select action" />
                                                 </SelectTrigger>
-                                                <SelectContent>
+                                                <SelectContent className="rounded-none">
                                                     <SelectItem value="cancel">Cancel subscription</SelectItem>
                                                     <SelectItem value="pause">Pause subscription</SelectItem>
                                                     <SelectItem value="continue">Continue subscription</SelectItem>
@@ -352,10 +352,10 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                 </Card>
             </div>
 
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-2 px-4 sm:px-0">
                 <Button
                     type="submit"
-                    className="bg-green-500 text-white hover:bg-green-600 px-4 py-2 h-10"
+                    className="bg-green-500 text-white hover:bg-green-600 px-4 py-2 h-10 w-full sm:w-auto rounded-none"
                 >
                     Create
                 </Button>

@@ -5,6 +5,7 @@ import {
   IconReceipt,
   IconCode,
   IconWallet,
+  IconMenu2,
 } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
@@ -15,8 +16,15 @@ import FeedbackForm from '@/components/dashboard/feedback-form'
 import SidebarNav from '@/components/dashboard/sidebar-nav'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Settings() {
+  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate()
+
   const topNav = [
     { title: 'Settings', href: '/portal/settings', isActive: true },
     { title: 'Documentation', href: 'https://developers.lomi.africa', isActive: false },
@@ -31,7 +39,48 @@ function Settings() {
         </div>
 
         <div className='block md:hidden'>
-          <FeedbackForm />
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                <IconMenu2 className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[85%] p-0">
+              <div className="h-full flex flex-col">
+                <div className="p-4 border-b">
+                  <h2 className="text-lg font-semibold">Settings</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your account settings
+                  </p>
+                </div>
+                <nav className="flex-1 overflow-y-auto">
+                  {sidebarNavItems.map((section) => (
+                    <div key={section.href} className="border-b last:border-b-0">
+                      <div className="flex items-center gap-2 p-4 text-sm font-medium">
+                        {section.icon}
+                        {section.title}
+                      </div>
+                      <div className="pb-2">
+                        {section.subItems?.map((item) => (
+                          <Button
+                            key={item.href}
+                            variant="ghost"
+                            className="w-full justify-start rounded-none h-10 px-6"
+                            onClick={() => {
+                              navigate(item.href)
+                              setIsOpen(false)
+                            }}
+                          >
+                            {item.title}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </nav>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         <div className='ml-auto flex items-center space-x-4'>
@@ -59,28 +108,6 @@ function Settings() {
         <div className='flex flex-1 flex-col lg:flex-row lg:gap-8 min-h-0'>
           <aside className='lg:w-1/4 lg:border-r overflow-y-auto'>
             <nav className='grid gap-1 p-1'>
-              <div className='lg:hidden'>
-                <select
-                  className='w-full p-2 mb-4 border rounded-none bg-background focus:ring-0 focus:outline-none hover:bg-background'
-                  onChange={(e) => {
-                    const selectedHref = e.target.value;
-                    window.location.href = selectedHref;
-                  }}
-                >
-                  {sidebarNavItems.map((section) => (
-                    <>
-                      <option value={section.href} key={section.title}>
-                        {section.title}
-                      </option>
-                      {section.subItems?.map((subItem) => (
-                        <option value={subItem.href} key={subItem.href}>
-                          &nbsp;&nbsp;{subItem.title}
-                        </option>
-                      ))}
-                    </>
-                  ))}
-                </select>
-              </div>
               <div className='hidden lg:block'>
                 <SidebarNav items={sidebarNavItems} />
               </div>

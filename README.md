@@ -1,10 +1,3 @@
-## Get Started
-
-1. Clone the repo.
-2. Run `npm i`
-3. Run `npm update`
-4. Run `npm run dev` or `npm build` then `npm run server` to start the server.
-
 ## License
 
 This project is licensed under a strict proprietary license exclusive to lomi.africa. The software is confidential and may not be distributed in any manner. Only individuals employed by or officially associated with lomi.africa are allowed to modify this software. See the LICENSE file for full details.

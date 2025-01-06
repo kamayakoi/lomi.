@@ -204,8 +204,8 @@ function BalancePage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8">
+                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    <div className="space-y-4 pb-8 max-w-full">
                         <h1 className="text-2xl font-bold tracking-tight mb-4">Balance</h1>
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
