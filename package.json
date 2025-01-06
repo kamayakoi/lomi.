@@ -1,6 +1,6 @@
 {
   "name": "lomi.africa",
-  "description": "Your all-in-one payment orchestration platform. Seamlessly accept and process payments via mobile money, bank transfers, credit cards, and cash, all through a single API.",
+  "description": "Your all-in-one payment orchestration platform. Seamlessly accept and process payments via mobile money, bank transfers, and credit cards, all through a single API.",
   "author": {
     "name": "Babacar Diop",
     "email": "hello@lomi.africa",

@@ -48,24 +48,25 @@ BEGIN
   -- Compose the email content  
   email_content := format(E'Hello %s,
 
-Babacar here, the founder of lomi. thank you so much for joigning us — we''re very happy to have you on board. What began as a simple side project has grown into a mission: building francophone West Africa''s most reliable payment orchestration platform. To achieve this, we’ve crafted tools to empower businesses like yours to start accepting payments effortlessly.
+Welcome to lomi.! We''re very happy to have you on board. What began as a simple side project has grown into a mission: building francophone West Africa''s most reliable payment orchestration platform. To achieve this, we’ve crafted tools to empower businesses like yours to start accepting payments effortlessly.
 
 Here''s how you can get started:
 
 1. Activate your account by going through our business onboarding process
 2. Connect your preferred payment providers
-3. Create your first product
-4. Create your first payment link; or set up our API in your application
+3. Create your first product or subscription plan
+4. Create and share your first payment link; or set up our API in your application
 
 We’ve designed lomi. to be exceptionally developer-friendly, offering comprehensive documentation and powerful APIs that give you the freedom to build exactly what you need.
 
-Access your portal: https://lomi.africa/portal
-Access your docs: https://developers.lomi.africa
+Access the portal: https://lomi.africa/portal
+Access the docs: https://developers.lomi.africa
 
-If you need any help or there''s anything we could do to improve lomi. for you, our team is at your entire disposal — anytime. Making this platform phenomenal for our users is our number one priority.
+This is an automated email but if you need any help or there''s anything we could do to improve lomi. for you, our team is at your entire disposal — we will respond to anything you send us, anytime. Making this platform phenomenal for our merchants is our number one priority.
 
 Best regards,
 Babacar
+Founder @ lomi.
 
 ---
 

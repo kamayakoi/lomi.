@@ -188,6 +188,58 @@ export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuc
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
+                                    <Label htmlFor="name">Plan name</Label>
+                                    <Input
+                                        id="name"
+                                        placeholder="Enter plan name"
+                                        {...register('name', { required: 'Plan name is required' })}
+                                        className="rounded-none w-full"
+                                    />
+                                    {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="description">Plan description</Label>
+                                    <Textarea
+                                        id="description"
+                                        placeholder="Describe the plan"
+                                        value={watch("description") || ""}
+                                        onChange={(e) => setValue("description", e.target.value)}
+                                        className="rounded-none min-h-[80px] resize-y"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="amount">Plan price</Label>
+                                    <InputRightAddon
+                                        id="amount"
+                                        type="text"
+                                        placeholder="Enter amount"
+                                        value={formatAmount(watch("amount"))}
+                                        onChange={(value) => setValue("amount", parseAmount(value))}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="billing_frequency">Frequency</Label>
+                                    <Select
+                                        value={watch("billing_frequency")}
+                                        onValueChange={(value) => setValue("billing_frequency", value as frequency)}
+                                    >
+                                        <SelectTrigger className="w-full rounded-none">
+                                            <SelectValue placeholder="Select billing frequency" />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-none">
+                                            {frequencyOptions.map((frequency) => (
+                                                <SelectItem key={frequency} value={frequency}>
+                                                    {frequency.charAt(0).toUpperCase() + frequency.slice(1)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
                                     <Label htmlFor="image">Plan image</Label>
                                     <div className="mt-1.5">
                                         <div className="flex items-center gap-4">
@@ -230,58 +282,6 @@ export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuc
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Plan name</Label>
-                                    <Input
-                                        id="name"
-                                        placeholder="Enter plan name"
-                                        {...register('name', { required: 'Plan name is required' })}
-                                        className="rounded-none w-full"
-                                    />
-                                    {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Plan description</Label>
-                                    <Textarea
-                                        id="description"
-                                        placeholder="Describe the plan"
-                                        value={watch("description") || ""}
-                                        onChange={(e) => setValue("description", e.target.value)}
-                                        className="rounded-none"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="amount">Plan price</Label>
-                                    <InputRightAddon
-                                        id="amount"
-                                        type="text"
-                                        placeholder="Enter amount"
-                                        value={formatAmount(watch("amount"))}
-                                        onChange={(value) => setValue("amount", parseAmount(value))}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="billing_frequency">Frequency</Label>
-                                    <Select
-                                        value={watch("billing_frequency")}
-                                        onValueChange={(value) => setValue("billing_frequency", value as frequency)}
-                                    >
-                                        <SelectTrigger className="w-full rounded-none">
-                                            <SelectValue placeholder="Select billing frequency" />
-                                        </SelectTrigger>
-                                        <SelectContent className="rounded-none">
-                                            {frequencyOptions.map((frequency) => (
-                                                <SelectItem key={frequency} value={frequency}>
-                                                    {frequency.charAt(0).toUpperCase() + frequency.slice(1)}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
                                 </div>
 
                                 <div className="flex justify-end space-x-2 pt-4">

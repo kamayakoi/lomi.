@@ -8,6 +8,7 @@ import { LifeBuoy, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { fetchSubscriptionTransactions } from './support_subscriptions'
 import { cn } from '@/lib/actions/utils'
+import { ImageIcon } from 'lucide-react'
 
 type SubscriptionActionsProps = {
     subscription?: Subscription | null
@@ -43,29 +44,55 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                         <div className="space-y-3 text-sm">
                             {plan && (
                                 <>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-muted-foreground">Status</span>
-                                        <Badge variant="secondary" className={cn(
-                                            "rounded-none px-2 py-0.5 text-xs font-normal",
-                                            plan.is_active
-                                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                        )}>
-                                            {plan.is_active ? 'Active' : 'Inactive'}
-                                        </Badge>
-                                    </div>
+                                    <div className="flex gap-4">
+                                        {plan.image_url ? (
+                                            <div className="flex-shrink-0 self-stretch min-h-[140px] w-[140px]">
+                                                <img
+                                                    src={plan.image_url}
+                                                    alt={plan.name}
+                                                    className="w-full h-full object-cover rounded-lg"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="flex-shrink-0 self-stretch min-h-[140px] w-[140px] bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                                                <ImageIcon className="h-12 w-12 text-gray-400" />
+                                            </div>
+                                        )}
 
-                                    <div>
-                                        <span className="text-muted-foreground text-xs">Name</span>
-                                        <p className="mt-1 text-sm">{plan.name}</p>
-                                    </div>
+                                        <div className="flex-grow min-h-[128px] flex flex-col">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-sm text-muted-foreground">Status</span>
+                                                <Badge variant="secondary" className={cn(
+                                                    "rounded-none px-2 py-0.5 text-xs font-normal",
+                                                    plan.is_active
+                                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                                )}>
+                                                    {plan.is_active ? 'Active' : 'Inactive'}
+                                                </Badge>
+                                            </div>
 
-                                    {plan.description && (
-                                        <div>
-                                            <span className="text-muted-foreground text-xs">Description</span>
-                                            <p className="mt-1 text-sm">{plan.description}</p>
+                                            <div className="flex-grow flex flex-col justify-between overflow-hidden">
+                                                <div className="space-y-2">
+                                                    <div>
+                                                        <span className="text-sm text-muted-foreground block">Name</span>
+                                                        <p className="text-sm font-medium line-clamp-1">{plan.name}</p>
+                                                    </div>
+
+                                                    {plan.description && (
+                                                        <div>
+                                                            <span className="text-sm text-muted-foreground block">Description</span>
+                                                            <p className="text-sm line-clamp-2">
+                                                                {plan.description}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
-                                    )}
+                                    </div>
+
+                                    <Separator />
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-muted-foreground">Amount</span>
