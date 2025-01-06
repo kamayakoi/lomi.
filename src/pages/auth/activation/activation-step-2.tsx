@@ -47,7 +47,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             <h2 className="text-lg font-semibold">Business details</h2>
 
             <div>
-                <Label htmlFor="legalName">Legal company name</Label>
+                <Label htmlFor="legalName" className="block mb-4">Legal company name</Label>
                 <Controller
                     name="legalName"
                     control={control}
@@ -55,6 +55,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
                         <Input
                             id="legalName"
                             placeholder="e.g. Ashanti Enterprises"
+                            className="rounded-none"
                             {...field}
                         />
                     )}
@@ -63,7 +64,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div>
-                <Label htmlFor="taxNumber">Tax number (optional)</Label>
+                <Label htmlFor="taxNumber" className="block mb-4">Tax number (optional)</Label>
                 <Controller
                     name="taxNumber"
                     control={control}
@@ -71,6 +72,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
                         <Input
                             id="taxNumber"
                             placeholder="e.g. CI-ABJ-03-2024-B12-07612"
+                            className="rounded-none"
                             {...field}
                         />
                     )}
@@ -78,7 +80,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div>
-                <Label htmlFor="businessDescription">Business description</Label>
+                <Label htmlFor="businessDescription" className="block mb-4">Business description</Label>
                 <Controller
                     name="businessDescription"
                     control={control}
@@ -86,6 +88,7 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
                         <Textarea
                             id="businessDescription"
                             placeholder="e.g. We're selling second-hand smartphones via Instagram."
+                            className="rounded-none min-h-[100px]"
                             {...field}
                         />
                     )}
@@ -95,13 +98,13 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div>
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country" className="block mb-4">Country</Label>
                 <Controller
                     name="country"
                     control={control}
                     render={({ field }) => (
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger>
+                            <SelectTrigger className="rounded-none">
                                 <SelectValue placeholder="Select your country" />
                             </SelectTrigger>
                             <SelectContent>
@@ -118,61 +121,81 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div>
-                <Label htmlFor="region">Region</Label>
+                <Label htmlFor="region" className="block mb-4">Region</Label>
                 <Controller
                     name="region"
                     control={control}
                     render={({ field }) => (
-                        <Input id="region" placeholder="e.g. Lagunes" {...field} />
+                        <Input
+                            id="region"
+                            placeholder="e.g. Lagunes"
+                            className="rounded-none"
+                            {...field}
+                        />
                     )}
                 />
                 {errors.region && <p className="text-red-500 text-sm mt-1">{errors.region.message}</p>}
             </div>
 
             <div>
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city" className="block mb-4">City</Label>
                 <Controller
                     name="city"
                     control={control}
                     render={({ field }) => (
-                        <Input id="city" placeholder="e.g. Abidjan" {...field} />
+                        <Input
+                            id="city"
+                            placeholder="e.g. Abidjan"
+                            className="rounded-none"
+                            {...field}
+                        />
                     )}
                 />
                 {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
             </div>
 
             <div>
-                <Label htmlFor="postalCode">Postal code</Label>
+                <Label htmlFor="postalCode" className="block mb-4">Postal code</Label>
                 <Controller
                     name="postalCode"
                     control={control}
                     render={({ field }) => (
-                        <Input id="postalCode" placeholder="e.g. 01012" {...field} />
+                        <Input
+                            id="postalCode"
+                            placeholder="e.g. 01012"
+                            className="rounded-none"
+                            {...field}
+                        />
                     )}
                 />
                 {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode.message}</p>}
             </div>
 
             <div>
-                <Label htmlFor="street">Street</Label>
+                <Label htmlFor="street" className="block mb-4">Street</Label>
                 <Controller
                     name="street"
                     control={control}
                     render={({ field }) => (
-                        <Input id="street" placeholder="e.g. 123 Rue des Perles" {...field} />
+                        <Input
+                            id="street"
+                            placeholder="e.g. 123 Rue des Perles"
+                            className="rounded-none"
+                            {...field}
+                        />
                     )}
                 />
                 {errors.street && <p className="text-red-500 text-sm mt-1">{errors.street.message}</p>}
             </div>
 
             <div>
-                <Label htmlFor="proofOfBusiness">Proof of business</Label>
+                <Label htmlFor="proofOfBusiness" className="block mb-4">Proof of business</Label>
                 <Controller
                     name="proofOfBusiness"
                     control={control}
                     render={({ field }) => (
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <SelectTrigger>
+                            <SelectTrigger className="rounded-none">
                                 <SelectValue placeholder="Select your proof of business" />
                             </SelectTrigger>
                             <SelectContent>
@@ -187,12 +210,17 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div>
-                <Label htmlFor="businessUrl">Link to your business page</Label>
+                <Label htmlFor="businessUrl" className="block mb-4">Link to your business page</Label>
                 <Controller
                     name="businessUrl"
                     control={control}
                     render={({ field }) => (
-                        <Input id="businessUrl" placeholder="e.g. https://www.ashantishoes.ci" {...field} />
+                        <Input
+                            id="businessUrl"
+                            placeholder="e.g. https://www.ashantishoes.ci"
+                            className="rounded-none"
+                            {...field}
+                        />
                     )}
                 />
                 {errors.businessUrl && <p className="text-red-500 text-sm mt-1">{errors.businessUrl.message}</p>}
@@ -209,7 +237,9 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
                 <Button type="button" variant="outline" onClick={onPrevious}>
                     Back
                 </Button>
-                <Button type="submit">Next</Button>
+                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
+                    Next
+                </Button>
             </div>
 
             <button type="submit" className="hidden">Submit</button>

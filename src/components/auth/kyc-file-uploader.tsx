@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { FileUp, X, CheckCircle, AlertCircle, FileIcon, Loader2 } from "lucide-react";
+import { FileUp, X, FileIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
@@ -205,33 +205,24 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                 </div>
             )}
             {file && (
-                <div className="border rounded-lg p-4 relative">
+                <div className="border rounded-none p-4 relative">
                     <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-3">
-                        <div className={`p-2 rounded ${getFileTypeColor(file.name)}`}>
+                        <div className={`p-2 rounded-none ${getFileTypeColor(file.name)}`}>
                             <FileIcon className="h-6 w-6" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">
+                            <p className="text-sm font-medium truncate">
                                 {file.name}
                             </p>
                             <p className="text-xs text-gray-500">
                                 {formatFileSize(progress / 100 * file.size)} of {formatFileSize(file.size)}
                             </p>
                         </div>
-                        {status === "uploading" && (
-                            <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-                        )}
-                        {status === "completed" && (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
-                        )}
-                        {status === "failed" && (
-                            <AlertCircle className="h-5 w-5 text-red-500" />
-                        )}
                     </div>
                     {status === "uploading" && (
-                        <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                        <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 h-1.5">
                             <div
-                                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300 ease-out"
+                                className="bg-blue-500 h-1.5 transition-all duration-300 ease-out"
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
@@ -253,7 +244,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                 </div>
             )}
             {fileName && !file && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm">
                     Uploaded: {fileName}
                 </p>
             )}

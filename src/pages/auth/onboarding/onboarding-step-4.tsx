@@ -89,7 +89,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                         {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">Preferred language</Label>
+                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">language</Label>
                         <select
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}

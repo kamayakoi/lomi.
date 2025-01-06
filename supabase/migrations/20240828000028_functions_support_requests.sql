@@ -20,6 +20,93 @@ USING (
     AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
+-- Function to send support request notifications
+CREATE OR REPLACE FUNCTION public.send_support_request_notification(
+    p_merchant_name TEXT,
+    p_merchant_email TEXT,
+    p_category support_category,
+    p_message TEXT,
+    p_image_url TEXT,
+    p_created_at TIMESTAMPTZ
+) RETURNS void AS $$
+DECLARE
+  resend_api_key TEXT;
+  email_subject TEXT;
+  email_content TEXT;
+  response_status INTEGER;
+  response_body TEXT;
+BEGIN
+  -- Get the Resend API key securely with error handling
+  BEGIN
+    resend_api_key := secrets.get_resend_api_key();
+    RAISE NOTICE 'Successfully retrieved Resend API key';
+  EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'Failed to get Resend API key: %', SQLERRM;
+    RETURN;
+  END;
+  
+  -- Format the subject
+  email_subject := format('New Support Request from %s', p_merchant_name);
+  
+  -- Compose the email content  
+  email_content := format(
+    'A new support request has been submitted.
+
+Request Details:
+- Merchant Name: %s
+- Merchant Email: %s
+- Category: %s
+- Message: %s
+- Image Attachment: %s
+- Submitted at: %s
+
+Please handle this request according to our support guidelines.
+
+Best regards,
+lomi. System',
+    p_merchant_name,
+    p_merchant_email,
+    p_category,
+    p_message,
+    COALESCE(p_image_url, 'No image attached'),
+    to_char(p_created_at, 'DD-MM-YYYY HH24:MI:SS')
+  );
+
+  -- Send the email to all recipients at once
+  BEGIN
+    SELECT 
+      status,
+      content::text
+    INTO 
+      response_status,
+      response_body
+    FROM extensions.http((
+      'POST',
+      'https://api.resend.com/emails',
+      ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
+      'application/json',
+      jsonb_build_object(
+        'from', 'lomi. Support Requests <support@updates.lomi.africa>',
+        'to', ARRAY['babacar@lomi.africa', 'hello@lomi.africa'],
+        'subject', email_subject,
+        'text', email_content,
+        'click_tracking', true,
+        'open_tracking', true
+      )::text
+    ));
+
+    IF response_status >= 400 THEN
+      RAISE WARNING 'Resend API returned error status %: %', response_status, response_body;
+    ELSE
+      RAISE NOTICE 'Support request notification sent successfully. Status: %, Response: %', response_status, response_body;
+    END IF;
+
+  EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'Failed to send support request notification: %', SQLERRM;
+  END;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Function to create a new support request
 CREATE OR REPLACE FUNCTION public.create_support_request(
     p_merchant_id UUID,
@@ -31,10 +118,29 @@ CREATE OR REPLACE FUNCTION public.create_support_request(
 RETURNS UUID AS $$
 DECLARE
     v_support_request_id UUID;
+    v_merchant_name TEXT;
+    v_merchant_email TEXT;
 BEGIN
+    -- Get merchant details
+    SELECT name, email 
+    INTO v_merchant_name, v_merchant_email
+    FROM merchants 
+    WHERE merchant_id = p_merchant_id;
+
+    -- Create the support request
     INSERT INTO support_requests (merchant_id, category, message, image_url, priority)
     VALUES (p_merchant_id, p_category, p_message, p_image_url, p_priority)
     RETURNING support_requests_id INTO v_support_request_id;
+
+    -- Send notification
+    PERFORM public.send_support_request_notification(
+        v_merchant_name,
+        v_merchant_email,
+        p_category,
+        p_message,
+        p_image_url,
+        NOW()
+    );
 
     RETURN v_support_request_id;
 END;

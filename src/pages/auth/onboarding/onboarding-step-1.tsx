@@ -75,7 +75,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             placeholder="Enter your first name"
                             {...onboardingForm.register("firstName")}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -89,7 +89,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                             placeholder="Enter your last name"
                             {...onboardingForm.register("lastName")}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -153,7 +153,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                                 setValueAs: (value) => value.replace(/\s/g, ''),
                             })}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}

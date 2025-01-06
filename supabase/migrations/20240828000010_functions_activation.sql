@@ -198,8 +198,8 @@ If you have any questions, please reply to this email or contact our support tea
         'to', signatory_email,
         'subject', email_subject, 
         'text', email_content,
-        'click_tracking', false,
-        'open_tracking', false
+        'click_tracking', true,
+        'open_tracking', true
       )::text
     ));
 
@@ -284,7 +284,9 @@ Babacar',
           'reply_to', 'Support from lomi. <hello@lomi.africa>',
           'to', signatory_email,
           'subject', email_subject,
-          'text', email_content  
+          'text', email_content,
+          'click_tracking', true,
+          'open_tracking', true
         )::text
       ));
 

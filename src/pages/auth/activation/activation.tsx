@@ -14,7 +14,7 @@ import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
-    <div className={`flex items-center mb-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+    <div className={`flex items-center mb-8 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
         <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${isCompleted || (step === 1 && isActive) ? 'bg-green-500 border-green-500' : isActive ? 'border-primary' : 'border-muted'}`}>
             {isCompleted || (step === 1 && isActive) ? <Check className="w-5 h-5 text-white" /> : step}
         </div>

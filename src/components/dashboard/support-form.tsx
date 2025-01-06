@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { MessageCircle, ImagePlus, CheckCircle } from "lucide-react"
+import { MessageCircle, ImagePlus, CheckCircle, FileIcon, X } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
@@ -75,6 +75,8 @@ export default function SupportForm() {
     const [message, setMessage] = useState('')
     const [image, setImage] = useState<File | null>(null)
     const [isSubmitted, setIsSubmitted] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
+    const [isUploading, setIsUploading] = useState(false)
     const formRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { user } = useUser()
@@ -155,6 +157,20 @@ export default function SupportForm() {
         const file = e.target.files?.[0]
         if (file && file.type.startsWith('image/')) {
             setImage(file)
+            setIsUploading(true)
+            setUploadProgress(0)
+
+            // Simulate upload progress
+            const interval = setInterval(() => {
+                setUploadProgress(prev => {
+                    if (prev >= 100) {
+                        clearInterval(interval)
+                        setIsUploading(false)
+                        return 100
+                    }
+                    return Math.min(prev + 10, 100)
+                })
+            }, 200)
         }
     }
 
@@ -231,8 +247,38 @@ export default function SupportForm() {
                                         />
                                     </div>
                                     {image && (
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                                            Image attached: {image.name}
+                                        <div className="border rounded-none p-2 relative">
+                                            <div className="flex items-center space-x-2">
+                                                <div className={`p-1.5 rounded-none ${image.type.includes('png') ? 'bg-green-100 text-green-500' : 'bg-blue-100 text-blue-500'}`}>
+                                                    <FileIcon className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-medium truncate">
+                                                        {image.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {(image.size / 1024).toFixed(0)} KB
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setImage(null)
+                                                        setUploadProgress(0)
+                                                        setIsUploading(false)
+                                                    }}
+                                                    className="text-muted-foreground hover:text-foreground"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                            {isUploading && (
+                                                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 h-1">
+                                                    <div
+                                                        className="bg-blue-500 h-1 transition-all duration-300 ease-out"
+                                                        style={{ width: `${uploadProgress}%` }}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                     <Button onClick={handleSubmit} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 rounded-none">

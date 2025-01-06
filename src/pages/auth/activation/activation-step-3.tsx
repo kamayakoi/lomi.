@@ -55,7 +55,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <h2 className="text-lg font-semibold">Authorized Signatory</h2>
             <div>
-                <Label htmlFor="fullName">Full name</Label>
+                <Label htmlFor="fullName" className="block mb-4">Full name</Label>
                 <Controller
                     name="fullName"
                     control={control}
@@ -63,6 +63,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                         <Input
                             id="fullName"
                             placeholder="e.g. Jessy Luckey"
+                            className="rounded-none"
                             {...field}
                         />
                     )}
@@ -70,7 +71,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                 {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
             </div>
             <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="block mb-4">Email</Label>
                 <Controller
                     name="email"
                     control={control}
@@ -79,6 +80,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                             id="email"
                             type="email"
                             placeholder="e.g. jessy@gmail.com"
+                            className="rounded-none"
                             {...field}
                         />
                     )}
@@ -86,7 +88,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
             </div>
             <div>
-                <Label htmlFor="mobileNumber">Mobile number</Label>
+                <Label htmlFor="mobileNumber" className="block mb-4">Mobile number</Label>
                 <div className="flex">
                     <div className="relative w-1/3">
                         <Controller
@@ -107,10 +109,10 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                                         }}
                                         onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                         onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
-                                        className="w-full mb-2"
+                                        className="w-full mb-2 rounded-none"
                                     />
                                     {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                        <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md mt-1 max-h-60 overflow-auto">
+                                        <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-none mt-1 max-h-60 overflow-auto">
                                             {filteredCountryCodes.map((code: string) => (
                                                 <li
                                                     key={code}
@@ -139,6 +141,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                                 <Input
                                     id="mobileNumber"
                                     placeholder="01 60 223 401"
+                                    className="rounded-none"
                                     {...field}
                                 />
                             )}
@@ -151,7 +154,9 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                 <Button type="button" variant="outline" onClick={onPrevious}>
                     Back
                 </Button>
-                <Button type="submit">Next</Button>
+                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
+                    Next
+                </Button>
             </div>
         </form>
     )

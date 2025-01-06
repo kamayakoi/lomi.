@@ -111,7 +111,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             placeholder="Ashanti Shoes Inc."
                             {...onboardingForm.register("orgName")}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
@@ -125,7 +125,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             placeholder="jessy@ashantishoes.com"
                             {...onboardingForm.register("orgEmail")}
                             className={cn(
-                                "w-full mb-2",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}

@@ -69,6 +69,40 @@ const Onboarding: React.FC = () => {
                 setUser(session.user);
                 setIsEmailVerified(session.user.email_confirmed_at !== null);
 
+                // Extract name from user metadata if available
+                const userMetadata = session.user.user_metadata;
+                if (userMetadata) {
+                    let firstName = '';
+                    let lastName = '';
+
+                    // Handle different OAuth providers
+                    if (userMetadata['full_name']) {
+                        // Split full name into first and last name
+                        const nameParts = userMetadata['full_name'].split(' ');
+                        firstName = nameParts[0] || '';
+                        lastName = nameParts.slice(1).join(' ') || '';
+                    } else if (userMetadata['name']) {
+                        // Some providers use 'name' instead of 'full_name'
+                        const nameParts = userMetadata['name'].split(' ');
+                        firstName = nameParts[0] || '';
+                        lastName = nameParts.slice(1).join(' ') || '';
+                    } else {
+                        // Try to get first_name and last_name directly
+                        firstName = userMetadata['first_name'] || userMetadata['given_name'] || '';
+                        lastName = userMetadata['last_name'] || userMetadata['family_name'] || '';
+                    }
+
+                    // Update onboarding data with the extracted names
+                    if (firstName || lastName) {
+                        setOnboardingData(prev => ({
+                            ...prev,
+                            firstName,
+                            lastName,
+                            orgEmail: session.user.email || ''
+                        }));
+                    }
+                }
+
                 const { data: isOnboarded, error: onboardingError } = await supabase
                     .rpc('check_onboarding_status', { p_merchant_id: session.user.id });
 

@@ -103,8 +103,8 @@ Product Hunt: https://www.producthunt.com/posts/lomi',
         'to', user_email,
         'subject', email_subject,
         'text', email_content,
-        'click_tracking', false,
-        'open_tracking', false
+        'click_tracking', true,
+        'open_tracking', true
       )::text
     ));
 

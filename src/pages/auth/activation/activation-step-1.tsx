@@ -38,7 +38,9 @@ const ActivationStep1: React.FC<ActivationStep1Props> = ({ onNext }) => {
                     This verification ensures the security of our platform and compliance with regulations in your country and in the Republic of Côte d&apos;Ivoire.
                 </p>
             </div>
-            <Button onClick={() => onNext({})}>Next</Button>
+            <Button onClick={() => onNext({})} className="bg-green-500 hover:bg-green-600 text-white">
+                Next
+            </Button>
         </div>
     );
 };
