@@ -8,6 +8,7 @@ import { Product } from './types'
 import InputRightAddon from "@/components/ui/input-right-addon"
 import { Loader2, X, Upload } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/use-toast"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -49,29 +50,18 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
     const onSubmit = async (data: ProductFormData) => {
         try {
             setIsUploading(true)
-            let imageUrl = product.image_url
-
-            // Handle image upload if a new image is selected
-            if (data.image?.[0]) {
-                // Delete old image if it exists
-                if (product.image_url) {
-                    await deleteProductImage(product.image_url)
-                }
-                // Upload new image
-                imageUrl = await uploadProductImage(data.image[0], product.merchant_id)
-            }
-
             await updateProduct(product.product_id, {
                 name: data.name,
                 description: data.description,
                 price: data.price,
                 is_active: data.is_active,
-                image_url: imageUrl,
+                image_url: product.image_url,
             })
             onSuccess()
             onClose()
         } catch (error) {
             console.error('Error updating product:', error)
+            toast({ title: "Error", description: "Failed to update product", variant: "destructive" })
         } finally {
             setIsUploading(false)
         }
@@ -87,14 +77,55 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
             onClose()
         } catch (error) {
             console.error('Error deleting product:', error)
+            toast({ title: "Error", description: "Failed to delete product", variant: "destructive" })
         }
     }
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
-        if (file) {
-            const url = URL.createObjectURL(file)
-            setPreviewUrl(url)
+        if (!file) return
+
+        // Validate file size
+        if (file.size > 3 * 1024 * 1024) {
+            toast({ title: "Error", description: "File size must be less than 3MB", variant: "destructive" })
+            return
+        }
+
+        // Validate file type
+        const fileType = file.type.toLowerCase()
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(fileType)) {
+            toast({ title: "Error", description: "Only JPG and PNG files are allowed", variant: "destructive" })
+            return
+        }
+
+        try {
+            setIsUploading(true)
+            // Create preview
+            const previewUrl = URL.createObjectURL(file)
+            setPreviewUrl(previewUrl)
+
+            // Delete old image if it exists
+            if (product.image_url) {
+                await deleteProductImage(product.image_url)
+            }
+
+            // Upload new image
+            const uploadedUrl = await uploadProductImage(file, product.merchant_id)
+            if (!uploadedUrl) {
+                throw new Error('Failed to upload image')
+            }
+
+            // Update product with new image URL
+            await updateProduct(product.product_id, {
+                ...product,
+                image_url: uploadedUrl
+            })
+        } catch (error) {
+            console.error('Error handling image:', error)
+            toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
+            setPreviewUrl(product.image_url) // Revert to original image
+        } finally {
+            setIsUploading(false)
         }
     }
 
@@ -110,6 +141,7 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                 })
             } catch (error) {
                 console.error('Error removing image:', error)
+                toast({ title: "Error", description: "Failed to remove image", variant: "destructive" })
             }
         } else {
             setPreviewUrl(null)

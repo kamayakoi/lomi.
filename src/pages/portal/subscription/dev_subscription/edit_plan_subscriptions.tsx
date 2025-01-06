@@ -1,116 +1,170 @@
-import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { Button } from "@/components/ui/button"
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { updateSubscriptionPlan, deleteSubscriptionPlan } from './support_subscriptions'
-import { frequency, failed_payment_action, FirstPaymentType, SubscriptionPlan, SubscriptionLength } from './types'
-import React from 'react'
-import { SelectProps } from '@radix-ui/react-select'
-import { Switch } from "@/components/ui/switch"
+import { updateSubscriptionPlan, deleteSubscriptionPlan, uploadPlanImage, deletePlanImage } from './support_subscriptions'
+import { SubscriptionPlan, frequency, failed_payment_action } from './types'
 import InputRightAddon from "@/components/ui/input-right-addon"
+import { Loader2, X, Upload } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { toast } from "@/components/ui/use-toast"
 
 interface EditPlanFormProps {
+    plan: SubscriptionPlan
     onClose: () => void
     onSuccess: () => void
-    plan: SubscriptionPlan
 }
 
-type CollectionDateType = 'maintain' | 'specific_day'
-
-interface SubscriptionPlanFormData {
-    merchant_id: string
-    name: string
-    description: string
-    billing_frequency: frequency
-    amount: number
-    currency_code: 'XOF'
-    subscription_length: SubscriptionLength
-    fixed_charges?: number
-    failed_payment_action: failed_payment_action
-    first_payment_type: FirstPaymentType
-    collection_date_type: CollectionDateType
-    collection_day?: number
-    metadata: Record<string, unknown>
+interface PlanFormData {
+    name: string;
+    description: string | null;
+    billing_frequency: frequency;
+    amount: number;
+    failed_payment_action: failed_payment_action;
+    charge_day: number | null;
+    metadata: Record<string, unknown>;
+    display_on_storefront: boolean;
+    image: FileList;
 }
 
 const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time']
 
-const fixedChargesOptions: number[] = [3, 6, 9, 12, 18, 24, 36, 48, 60, 72, 84, 96];
-const collectionDayOptions: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
-
-interface ForwardedSelectProps extends SelectProps {
-    placeholder?: string;
-    value?: string;
-}
-
-const ForwardedSelect = React.forwardRef<HTMLButtonElement, ForwardedSelectProps>((props, ref) => (
-    <Select {...props}>
-        <SelectTrigger ref={ref} className="w-full">
-            <SelectValue placeholder={props.placeholder}>
-                {props.value}
-            </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-            {props.children}
-        </SelectContent>
-    </Select>
-));
-
-ForwardedSelect.displayName = 'ForwardedSelect';
-
-export function EditPlanForm({ onClose, onSuccess, plan }: EditPlanFormProps) {
-    const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<SubscriptionPlanFormData>({
+export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuccess }) => {
+    const [isUploading, setIsUploading] = useState(false)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(plan.image_url)
+    const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<PlanFormData>({
         defaultValues: {
-            merchant_id: plan.merchant_id,
             name: plan.name,
             description: plan.description,
             billing_frequency: plan.billing_frequency,
             amount: plan.amount,
-            currency_code: plan.currency_code as 'XOF',
-            subscription_length: plan.metadata?.['subscription_length'] as SubscriptionLength || 'automatic',
-            fixed_charges: plan.metadata?.['fixed_charges'] as number,
-            failed_payment_action: plan.failed_payment_action || 'continue',
-            first_payment_type: plan.first_payment_type,
-            collection_date_type: plan.charge_day ? 'specific_day' : 'maintain',
-            collection_day: plan.charge_day,
-            metadata: plan.metadata || {},
+            failed_payment_action: plan.failed_payment_action,
+            charge_day: plan.charge_day,
+            metadata: plan.metadata,
+            display_on_storefront: plan.display_on_storefront,
         },
     })
 
-    const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
-
-    const subscriptionLength = watch('subscription_length')
-    const collectionDateType = watch('collection_date_type')
-    const billingFrequency = watch('billing_frequency')
-
-    const isOneTimeFrequency = billingFrequency === 'one-time'
-
-    const onSubmit = async (data: SubscriptionPlanFormData) => {
+    const onSubmit = async (data: PlanFormData) => {
         try {
-            const metadata: Record<string, unknown> = {
-                subscription_length: data.subscription_length,
-                fixed_charges: data.fixed_charges,
-            };
-
-            await updateSubscriptionPlan({
-                planId: plan.plan_id,
+            setIsUploading(true)
+            await updateSubscriptionPlan(plan.plan_id, {
                 name: data.name,
                 description: data.description,
-                billingFrequency: data.billing_frequency,
+                billing_frequency: data.billing_frequency,
                 amount: data.amount,
-                failedPaymentAction: data.failed_payment_action,
-                chargeDay: data.collection_date_type === 'specific_day' ? data.collection_day : undefined,
-                metadata,
-            });
-            onSuccess();
-            onClose();
+                failed_payment_action: data.failed_payment_action,
+                charge_day: data.charge_day,
+                metadata: data.metadata,
+                display_on_storefront: data.display_on_storefront,
+                image_url: plan.image_url,
+            })
+            onSuccess()
+            onClose()
         } catch (error) {
-            console.error('Error updating subscription plan:', error);
+            console.error('Error updating plan:', error)
+            toast({ title: "Error", description: "Failed to update plan", variant: "destructive" })
+        } finally {
+            setIsUploading(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        try {
+            if (plan.image_url) {
+                await deletePlanImage(plan.image_url)
+            }
+            await deleteSubscriptionPlan(plan.plan_id)
+            onSuccess()
+            onClose()
+        } catch (error) {
+            console.error('Error deleting plan:', error)
+        }
+    }
+
+    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+
+        // Validate file size
+        if (file.size > 3 * 1024 * 1024) {
+            toast({ title: "Error", description: "File size must be less than 3MB", variant: "destructive" })
+            return
+        }
+
+        // Validate file type
+        const fileType = file.type.toLowerCase()
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(fileType)) {
+            toast({ title: "Error", description: "Only JPG and PNG files are allowed", variant: "destructive" })
+            return
+        }
+
+        try {
+            setIsUploading(true)
+            // Create preview
+            const previewUrl = URL.createObjectURL(file)
+            setPreviewUrl(previewUrl)
+
+            // Delete old image if it exists
+            if (plan.image_url) {
+                await deletePlanImage(plan.image_url)
+            }
+
+            // Upload new image
+            const uploadedUrl = await uploadPlanImage(file, plan.merchant_id)
+            if (!uploadedUrl) {
+                throw new Error('Failed to upload image')
+            }
+
+            // Update plan with new image URL
+            await updateSubscriptionPlan(plan.plan_id, {
+                ...plan,
+                image_url: uploadedUrl
+            })
+        } catch (error) {
+            console.error('Error handling image:', error)
+            toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
+            setPreviewUrl(plan.image_url) // Revert to original image
+        } finally {
+            setIsUploading(false)
+        }
+    }
+
+    const handleRemoveImage = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        if (plan.image_url) {
+            try {
+                await deletePlanImage(plan.image_url)
+                setPreviewUrl(null)
+                await updateSubscriptionPlan(plan.plan_id, {
+                    ...plan,
+                    image_url: null
+                })
+            } catch (error) {
+                console.error('Error removing image:', error)
+            }
+        } else {
+            setPreviewUrl(null)
         }
     }
 
@@ -122,72 +176,105 @@ export function EditPlanForm({ onClose, onSuccess, plan }: EditPlanFormProps) {
         return parseFloat(amount.replace(/,/g, ""));
     };
 
-    const onDelete = async () => {
-        try {
-            await deleteSubscriptionPlan(plan.plan_id);
-            onSuccess();
-            onClose();
-        } catch (error) {
-            console.error('Error deleting subscription plan:', error);
-        }
-    }
-
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            <div className="max-h-[70vh] overflow-y-auto pr-2 scrollbar-hide">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Edit Subscription Plan</CardTitle>
-                        <CardDescription>Modify the details of the subscription plan</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Plan name</Label>
-                            <Input
-                                id="name"
-                                placeholder="Enter plan name"
-                                className="rounded-none"
-                                {...register('name', { required: 'Plan name is required' })}
-                            />
-                            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-                        </div>
+        <>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="max-w-lg">
+                    <div className="max-h-[70vh] overflow-y-auto">
+                        <Card className="rounded-none">
+                            <CardHeader>
+                                <CardTitle>Edit subscription plan</CardTitle>
+                                <CardDescription>Update your subscription plan details</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="image">Plan image</Label>
+                                    <div className="mt-1.5">
+                                        <div className="flex items-center gap-4">
+                                            {previewUrl && (
+                                                <div className="relative w-56 h-36 overflow-hidden border border-border">
+                                                    <img
+                                                        src={previewUrl}
+                                                        alt="Plan preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <button
+                                                        onClick={handleRemoveImage}
+                                                        className="absolute top-1 right-1 p-1 bg-red-500/90 hover:bg-red-500 text-white transition-colors"
+                                                    >
+                                                        <X className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                            <label
+                                                htmlFor="image"
+                                                className="flex flex-col items-center justify-center w-full h-36 cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50"
+                                            >
+                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                    <Upload className="h-8 w-8 text-gray-400 mb-3" />
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                        <span className="font-medium">Click to upload</span> or drag and drop
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        PNG, JPG up to 3MB
+                                                    </p>
+                                                </div>
+                                                <Input
+                                                    id="image"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    {...register('image')}
+                                                    onChange={handleImageChange}
+                                                    className="hidden"
+                                                />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Plan description</Label>
-                            <Textarea
-                                id="description"
-                                placeholder="Describe the plan"
-                                className="rounded-none"
-                                {...register('description')}
-                            />
-                        </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="name">Plan name</Label>
+                                    <Input
+                                        id="name"
+                                        placeholder="Enter plan name"
+                                        {...register('name', { required: 'Plan name is required' })}
+                                        className="rounded-none w-full"
+                                    />
+                                    {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+                                </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="amount">Plan price</Label>
-                            <InputRightAddon
-                                id="amount"
-                                type="text"
-                                placeholder="Enter amount"
-                                value={formatAmount(watch("amount"))}
-                                onChange={(value) => setValue("amount", parseAmount(value))}
-                            />
-                            {errors.amount && <p className="text-sm text-red-500">{errors.amount.message}</p>}
-                        </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="description">Plan description</Label>
+                                    <Textarea
+                                        id="description"
+                                        placeholder="Describe the plan"
+                                        value={watch("description") || ""}
+                                        onChange={(e) => setValue("description", e.target.value)}
+                                        className="rounded-none"
+                                    />
+                                </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="billing_frequency">Plan frequency</Label>
-                            <Controller
-                                name="billing_frequency"
-                                control={control}
-                                rules={{ required: 'Billing frequency is required' }}
-                                render={({ field }) => (
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select billing frequency">
-                                                {frequencyOptions.find(f => f === field.value)?.charAt(0).toUpperCase() + (frequencyOptions.find(f => f === field.value)?.slice(1) ?? '')}
-                                            </SelectValue>
+                                <div className="space-y-2">
+                                    <Label htmlFor="amount">Plan price</Label>
+                                    <InputRightAddon
+                                        id="amount"
+                                        type="text"
+                                        placeholder="Enter amount"
+                                        value={formatAmount(watch("amount"))}
+                                        onChange={(value) => setValue("amount", parseAmount(value))}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="billing_frequency">Frequency</Label>
+                                    <Select
+                                        value={watch("billing_frequency")}
+                                        onValueChange={(value) => setValue("billing_frequency", value as frequency)}
+                                    >
+                                        <SelectTrigger className="w-full rounded-none">
+                                            <SelectValue placeholder="Select billing frequency" />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="rounded-none">
                                             {frequencyOptions.map((frequency) => (
                                                 <SelectItem key={frequency} value={frequency}>
                                                     {frequency.charAt(0).toUpperCase() + frequency.slice(1)}
@@ -195,155 +282,51 @@ export function EditPlanForm({ onClose, onSuccess, plan }: EditPlanFormProps) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                )}
-                            />
-                            {errors.billing_frequency && <p className="text-sm text-red-500">{errors.billing_frequency.message}</p>}
-                        </div>
+                                </div>
 
-                        {!isOneTimeFrequency && (
-                            <>
-                                <div className="space-y-2">
-                                    <Label>Subscription length</Label>
-                                    <RadioGroup
-                                        defaultValue={subscriptionLength}
-                                        onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
-                                        className="rounded-none"
+                                <div className="flex justify-end space-x-2 pt-4">
+                                    <Button
+                                        type="button"
+                                        onClick={() => setShowDeleteAlert(true)}
+                                        disabled={isUploading}
+                                        className="bg-red-500 text-white hover:bg-red-600 rounded-none"
                                     >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="automatic" id="automatic" />
-                                            <Label htmlFor="automatic">Automatic renewal</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="fixed" id="fixed" />
-                                            <Label htmlFor="fixed">End after specific charges</Label>
-                                        </div>
-                                    </RadioGroup>
-                                </div>
-
-                                {subscriptionLength === 'fixed' && (
-                                    <div className="space-y-2">
-                                        <Label htmlFor="fixed_charges">Number of charges</Label>
-                                        <Controller
-                                            name="fixed_charges"
-                                            control={control}
-                                            rules={{ required: 'Number of charges is required' }}
-                                            render={({ field }) => (
-                                                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Select number of charges" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="max-h-60 overflow-y-auto">
-                                                        {fixedChargesOptions.map((option) => (
-                                                            <SelectItem key={option} value={option.toString()}>
-                                                                End after {option} charges
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            )}
-                                        />
-                                        {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
-                                    </div>
-                                )}
-                            </>
-                        )}
-
-                        <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
-                                <Switch
-                                    checked={showAdvancedSettings}
-                                    onCheckedChange={setShowAdvancedSettings}
-                                />
-                                <Label>Show Advanced Settings</Label>
-                            </div>
-                        </div>
-
-                        {showAdvancedSettings && !isOneTimeFrequency && (
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label>Collection Date</Label>
-                                    <RadioGroup
-                                        defaultValue={collectionDateType}
-                                        onValueChange={(value: CollectionDateType) => setValue('collection_date_type', value)}
-                                        className="space-y-2"
+                                        Delete
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isUploading}
+                                        className="rounded-none bg-blue-500 text-white hover:bg-blue-600"
                                     >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="maintain" id="maintain" />
-                                            <Label htmlFor="maintain">Maintain the collection date according to the frequency of the subscription</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="specific_day" id="specific_day" />
-                                            <Label htmlFor="specific_day">Charge subscription on a specific day of the month</Label>
-                                        </div>
-                                    </RadioGroup>
+                                        {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        Save
+                                    </Button>
                                 </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </form>
 
-                                {collectionDateType === 'specific_day' && (
-                                    <div className="space-y-2">
-                                        <Label htmlFor="collection_day">Collection day of the month</Label>
-                                        <Controller
-                                            name="collection_day"
-                                            control={control}
-                                            rules={{ required: 'Collection day is required' }}
-                                            render={({ field }) => (
-                                                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                                    <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Select collection day" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="max-h-60 overflow-y-auto">
-                                                        {collectionDayOptions.map((day) => (
-                                                            <SelectItem key={day} value={day.toString()}>
-                                                                {day}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            )}
-                                        />
-                                        {errors.collection_day && <p className="text-sm text-red-500">{errors.collection_day.message}</p>}
-                                    </div>
-                                )}
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="failed_payment_action">Failed Payment Action</Label>
-                                    <Controller
-                                        name="failed_payment_action"
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select action" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="cancel">Cancel subscription</SelectItem>
-                                                    <SelectItem value="pause">Pause subscription</SelectItem>
-                                                    <SelectItem value="continue">Continue subscription</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        )}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="flex justify-end space-x-2">
-                <Button
-                    type="button"
-                    className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
-                    onClick={onDelete}
-                >
-                    Delete Plan
-                </Button>
-                <Button
-                    type="submit"
-                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
-                >
-                    Save Changes
-                </Button>
-            </div>
-        </form>
+            <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+                <AlertDialogContent className="rounded-none">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to delete this plan?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the subscription plan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="rounded-none">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-red-500 text-white hover:bg-red-600 rounded-none"
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     )
 }

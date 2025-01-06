@@ -8,6 +8,7 @@ import { createProduct, uploadProductImage } from './support_product'
 import InputRightAddon from "@/components/ui/input-right-addon"
 import { useUser } from '@/lib/hooks/useUser'
 import { Loader2, X, Upload } from 'lucide-react'
+import { toast } from "@/components/ui/use-toast"
 
 interface CreateProductFormProps {
     onClose: () => void
@@ -19,6 +20,7 @@ interface ProductFormData {
     description: string | null
     price: number
     image: FileList
+    image_url: string | null
 }
 
 export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, onSuccess }) => {
@@ -32,41 +34,65 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
 
         try {
             setIsUploading(true)
-            let imageUrl: string | null = null
-
-            // Upload image if selected
-            if (data.image?.[0]) {
-                imageUrl = await uploadProductImage(data.image[0], user.id)
-            }
-
             await createProduct({
                 name: data.name,
                 description: data.description,
                 price: data.price,
-                image_url: imageUrl,
+                image_url: data.image_url,
             })
 
             onSuccess()
             onClose()
         } catch (error) {
             console.error('Error creating product:', error)
+            toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
         } finally {
             setIsUploading(false)
         }
     }
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
-        if (file) {
-            const url = URL.createObjectURL(file)
-            setPreviewUrl(url)
+        if (!file || !user?.id) return
+
+        // Validate file size
+        if (file.size > 3 * 1024 * 1024) {
+            toast({ title: "Error", description: "File size must be less than 3MB", variant: "destructive" })
+            return
+        }
+
+        // Validate file type
+        const fileType = file.type.toLowerCase()
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(fileType)) {
+            toast({ title: "Error", description: "Only JPG and PNG files are allowed", variant: "destructive" })
+            return
+        }
+
+        try {
+            setIsUploading(true)
+            // Create preview
+            const previewUrl = URL.createObjectURL(file)
+            setPreviewUrl(previewUrl)
+
+            // Upload image
+            const uploadedUrl = await uploadProductImage(file, user.id)
+            if (!uploadedUrl) {
+                throw new Error('Failed to upload image')
+            }
+            setValue('image_url', uploadedUrl)
+        } catch (error) {
+            console.error('Error handling image:', error)
+            toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
+            setPreviewUrl(null)
+        } finally {
+            setIsUploading(false)
         }
     }
 
     const handleRemoveImage = (e: React.MouseEvent) => {
         e.preventDefault()
         setPreviewUrl(null)
-        // Create an empty DataTransfer to get an empty FileList
+        setValue('image_url', null)
         const dt = new DataTransfer()
         setValue('image', dt.files)
     }
@@ -82,7 +108,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input
                     id="name"
                     placeholder="Enter product name"
@@ -91,7 +117,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="description">Product Description</Label>
+                <Label htmlFor="description">Description</Label>
                 <Textarea
                     id="description"
                     placeholder="Enter product description"
@@ -110,7 +136,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                 />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="image">Product Image</Label>
+                <Label htmlFor="image">Image</Label>
                 <div className="mt-1.5">
                     <div className="flex items-center gap-4">
                         {previewUrl && (

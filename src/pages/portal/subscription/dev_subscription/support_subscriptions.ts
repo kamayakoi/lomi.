@@ -1,148 +1,173 @@
 import { supabase } from '@/utils/supabase/client'
-import { SubscriptionPlan, Subscription, Transaction, frequency, currency_code, failed_payment_action, FirstPaymentType } from './types'
+import { SubscriptionPlan, Subscription, frequency, failed_payment_action, Transaction } from './types'
 
-export const fetchSubscriptionPlans = async (
-  merchantId: string,
-  page: number,
-  pageSize: number
-) => {
-  const { data, error } = await supabase.rpc('fetch_subscription_plans', {
-    p_merchant_id: merchantId,
-    p_page: page,
-    p_page_size: pageSize,
-  })
+export async function uploadPlanImage(file: File, merchantId: string): Promise<string | null> {
+    try {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${merchantId}/${Date.now()}.${fileExt}`
 
-  if (error) {
-    console.error('Error fetching subscription plans:', error)
-    return []
-  }
+        // Upload the file
+        const { error: uploadError } = await supabase.storage
+            .from('plan_images')
+            .upload(fileName, file)
 
-  return data as SubscriptionPlan[]
+        if (uploadError) {
+            console.error('Error uploading image:', uploadError)
+            return null
+        }
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+            .from('plan_images')
+            .getPublicUrl(fileName)
+
+        if (!publicUrl) {
+            console.error('Failed to get public URL for uploaded image')
+            return null
+        }
+
+        return publicUrl
+    } catch (error) {
+        console.error('Error in uploadPlanImage:', error)
+        return null
+    }
 }
 
-export const fetchSubscriptions = async (
-  merchantId: string,
-  status: string | null,
-  page: number,
-  pageSize: number
-) => {
-  const { data, error } = await supabase.rpc('fetch_subscriptions', {
-    p_merchant_id: merchantId,
-    p_status: status === 'all' ? null : status,
-    p_page: page,
-    p_page_size: pageSize,
-  })
+export async function deletePlanImage(imageUrl: string): Promise<void> {
+    const path = imageUrl.split('/').slice(-2).join('/')
+    const { error } = await supabase.storage
+        .from('plan_images')
+        .remove([path])
 
-  if (error) {
-    console.error('Error fetching subscriptions:', error)
-    return []
-  }
-
-  return data as Subscription[]
+    if (error) {
+        console.error('Error deleting image:', error)
+    }
 }
 
-export const fetchSubscriptionPlan = async (planId: string) => {
-  const { data, error } = await supabase
-    .from('subscription_plans')
-    .select('name')
-    .eq('plan_id', planId)
-    .single()
+export async function fetchSubscriptionPlans(
+    merchantId: string,
+    page = 1,
+    pageSize = 50
+): Promise<SubscriptionPlan[]> {
+    const { data, error } = await supabase.rpc('fetch_subscription_plans', {
+        p_merchant_id: merchantId,
+        p_page: page,
+        p_page_size: pageSize
+    })
 
-  if (error) {
-    console.error('Error fetching subscription plan:', error)
-    return null
-  }
+    if (error) {
+        console.error('Error fetching subscription plans:', error)
+        return []
+    }
 
-  return data as SubscriptionPlan
+    return data || []
 }
 
-interface CreateSubscriptionPlanData {
-  merchantId: string
-  name: string
-  description?: string
-  billingFrequency: frequency
-  amount: number
-  currencyCode: currency_code
-  failedPaymentAction: failed_payment_action
-  chargeDay?: number
-  metadata: Record<string, unknown>
-  firstPaymentType: FirstPaymentType
+export async function createSubscriptionPlan(data: {
+    name: string
+    description: string | null
+    billing_frequency: frequency
+    amount: number
+    failed_payment_action?: failed_payment_action
+    charge_day?: number | null
+    metadata?: Record<string, unknown>
+    first_payment_type?: string
+    display_on_storefront?: boolean
+    image_url?: string | null
+}): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('No user found')
+
+    const { data: organizationData, error: organizationError } = await supabase
+        .rpc('fetch_organization_details', { p_merchant_id: user.id })
+
+    if (organizationError) throw organizationError
+    if (!organizationData?.length) throw new Error('No organization found')
+
+    const { error } = await supabase.rpc('create_subscription_plan', {
+        p_merchant_id: user.id,
+        p_organization_id: organizationData[0].organization_id,
+        p_name: data.name,
+        p_description: data.description,
+        p_billing_frequency: data.billing_frequency,
+        p_amount: data.amount,
+        p_currency_code: 'XOF',
+        p_failed_payment_action: data.failed_payment_action || 'continue',
+        p_charge_day: data.charge_day,
+        p_metadata: data.metadata || {},
+        p_first_payment_type: data.first_payment_type || 'initial',
+        p_display_on_storefront: data.display_on_storefront ?? true,
+        p_image_url: data.image_url
+    })
+
+    if (error) throw error
 }
 
-export const createSubscriptionPlan = async (data: CreateSubscriptionPlanData) => {
-  const { data: organizationData, error: organizationError } = await supabase
-    .rpc('fetch_organization_details', { p_merchant_id: data.merchantId })
+export async function updateSubscriptionPlan(planId: string, data: {
+    name: string
+    description: string | null
+    billing_frequency: frequency
+    amount: number
+    failed_payment_action?: failed_payment_action
+    charge_day?: number | null
+    metadata?: Record<string, unknown>
+    display_on_storefront?: boolean
+    image_url?: string | null
+}): Promise<void> {
+    const { error } = await supabase.rpc('update_subscription_plan', {
+        p_plan_id: planId,
+        p_name: data.name,
+        p_description: data.description,
+        p_billing_frequency: data.billing_frequency,
+        p_amount: data.amount,
+        p_failed_payment_action: data.failed_payment_action || 'continue',
+        p_charge_day: data.charge_day,
+        p_metadata: data.metadata || {},
+        p_display_on_storefront: data.display_on_storefront ?? true,
+        p_image_url: data.image_url
+    })
 
-  if (organizationError) {
-    console.error('Error fetching organization details:', organizationError)
-    throw organizationError
-  }
-
-  const { error } = await supabase.rpc('create_subscription_plan', {
-    p_merchant_id: data.merchantId,
-    p_organization_id: organizationData[0].organization_id,
-    p_name: data.name,
-    p_description: data.description,
-    p_billing_frequency: data.billingFrequency,
-    p_amount: data.amount,
-    p_currency_code: data.currencyCode,
-    p_failed_payment_action: data.failedPaymentAction,
-    p_charge_day: data.chargeDay,
-    p_metadata: data.metadata,
-    p_first_payment_type: data.firstPaymentType,
-  })
-
-  if (error) {
-    throw error
-  }
+    if (error) throw error
 }
 
-export const fetchSubscriptionTransactions = async (subscriptionId: string) => {
-    const { data, error } = await supabase
-        .rpc('fetch_subscription_transactions', { p_subscription_id: subscriptionId })
+export async function deleteSubscriptionPlan(planId: string): Promise<void> {
+    const { error } = await supabase.rpc('delete_subscription_plan', {
+        p_plan_id: planId
+    })
+
+    if (error) throw error
+}
+
+export async function fetchSubscriptions(
+    merchantId: string,
+    status = 'all',
+    page = 1,
+    pageSize = 50
+): Promise<Subscription[]> {
+    const { data, error } = await supabase.rpc('fetch_subscriptions', {
+        p_merchant_id: merchantId,
+        p_status: status === 'all' ? null : status,
+        p_page: page,
+        p_page_size: pageSize
+    })
+
+    if (error) {
+        console.error('Error fetching subscriptions:', error)
+        return []
+    }
+
+    return data || []
+}
+
+export async function fetchSubscriptionTransactions(subscriptionId: string): Promise<Transaction[]> {
+    const { data, error } = await supabase.rpc('fetch_subscription_transactions', {
+        p_subscription_id: subscriptionId
+    })
 
     if (error) {
         console.error('Error fetching subscription transactions:', error)
         return []
     }
 
-    return data as Transaction[]
-}
-
-interface UpdateSubscriptionPlanData {
-  planId: string
-  name: string
-  description?: string
-  billingFrequency: frequency
-  amount: number
-  failedPaymentAction: failed_payment_action
-  chargeDay?: number
-  metadata: Record<string, unknown>
-}
-
-export const updateSubscriptionPlan = async (data: UpdateSubscriptionPlanData) => {
-  const { error } = await supabase.rpc('update_subscription_plan', {
-    p_plan_id: data.planId,
-    p_name: data.name,
-    p_description: data.description,
-    p_billing_frequency: data.billingFrequency,
-    p_amount: data.amount.toString(),
-    p_charge_day: data.chargeDay ?? null,
-    p_failed_payment_action: data.failedPaymentAction,
-    p_metadata: JSON.stringify(data.metadata),
-  })
-
-  if (error) {
-    throw error
-  }
-}
-
-export const deleteSubscriptionPlan = async (planId: string) => {
-  const { error } = await supabase.rpc('delete_subscription_plan', {
-    p_plan_id: planId,
-  })
-
-  if (error) {
-    throw error
-  }
+    return data || []
 }

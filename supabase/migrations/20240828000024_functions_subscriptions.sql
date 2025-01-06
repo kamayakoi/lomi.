@@ -104,7 +104,8 @@ CREATE OR REPLACE FUNCTION public.create_subscription_plan(
     p_charge_day INT DEFAULT NULL,
     p_metadata JSONB DEFAULT '{}'::jsonb,
     p_first_payment_type first_payment_type DEFAULT 'initial',
-    p_display_on_storefront BOOLEAN DEFAULT true
+    p_display_on_storefront BOOLEAN DEFAULT true,
+    p_image_url TEXT DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
@@ -116,12 +117,12 @@ BEGIN
 
     INSERT INTO subscription_plans (
         merchant_id, organization_id, name, description, billing_frequency, amount, currency_code,
-        failed_payment_action, charge_day, metadata, first_payment_type
+        failed_payment_action, charge_day, metadata, first_payment_type, image_url
     )
     VALUES (
         p_merchant_id, p_organization_id, p_name, p_description, p_billing_frequency, p_amount, p_currency_code,
         p_failed_payment_action, CASE WHEN p_metadata->>'subscription_length' = 'automatic' THEN NULL ELSE p_charge_day END, 
-        v_metadata, p_first_payment_type
+        v_metadata, p_first_payment_type, p_image_url
     )
     RETURNING plan_id INTO v_plan_id;
 
@@ -147,7 +148,8 @@ RETURNS TABLE (
     metadata JSONB,
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ,
-    display_on_storefront BOOLEAN
+    display_on_storefront BOOLEAN,
+    image_url TEXT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -163,7 +165,8 @@ BEGIN
         sp.metadata,
         sp.created_at,
         sp.updated_at,
-        COALESCE((sp.metadata->>'display_on_storefront')::boolean, true) as display_on_storefront
+        COALESCE((sp.metadata->>'display_on_storefront')::boolean, true) as display_on_storefront,
+        sp.image_url
     FROM
         subscription_plans sp
     WHERE
@@ -213,7 +216,8 @@ CREATE OR REPLACE FUNCTION public.update_subscription_plan(
     p_failed_payment_action failed_payment_action,
     p_charge_day INT,
     p_metadata JSONB,
-    p_display_on_storefront BOOLEAN DEFAULT NULL
+    p_display_on_storefront BOOLEAN DEFAULT NULL,
+    p_image_url TEXT DEFAULT NULL
 )
 RETURNS VOID AS $$
 DECLARE
@@ -241,6 +245,7 @@ BEGIN
         failed_payment_action = p_failed_payment_action,
         charge_day = COALESCE(p_charge_day, charge_day),
         metadata = v_metadata,
+        image_url = COALESCE(p_image_url, image_url),
         updated_at = NOW()
     WHERE plan_id = p_plan_id;
 END;
@@ -258,7 +263,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permissions to authenticated users
-GRANT EXECUTE ON FUNCTION public.create_subscription_plan(UUID, UUID, VARCHAR, TEXT, frequency, NUMERIC, currency_code, failed_payment_action, INT, JSONB, first_payment_type, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_subscription_plan(UUID, UUID, VARCHAR, TEXT, frequency, NUMERIC, currency_code, failed_payment_action, INT, JSONB, first_payment_type, BOOLEAN, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fetch_subscription_plans(UUID, INTEGER, INTEGER) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.update_subscription_plan(UUID, VARCHAR, TEXT, frequency, NUMERIC, failed_payment_action, INT, JSONB, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_subscription_plan(UUID, VARCHAR, TEXT, frequency, NUMERIC, failed_payment_action, INT, JSONB, BOOLEAN, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_subscription_plan(UUID) TO authenticated;

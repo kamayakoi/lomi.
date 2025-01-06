@@ -56,3 +56,6 @@ src/utils/prompts
 
 # Cursor rules
 .cursorrules
+
+# Supabase
+*_secrets.sql

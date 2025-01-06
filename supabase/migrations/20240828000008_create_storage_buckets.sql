@@ -108,3 +108,30 @@ FOR DELETE TO authenticated USING (
     bucket_id = 'product_images' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
+
+-- Create the 'plan_images' bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('plan_images', 'plan_images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Policy for selecting (reading) plan images
+CREATE POLICY "Allow public read access to plan images" ON storage.objects
+FOR SELECT USING (bucket_id = 'plan_images');
+
+-- Policy for inserting (uploading) plan images
+CREATE POLICY "Allow authenticated users to upload plan images" ON storage.objects
+FOR INSERT TO authenticated WITH CHECK (bucket_id = 'plan_images');
+
+-- Policy for updating plan images
+CREATE POLICY "Allow authenticated users to update their own plan images" ON storage.objects
+FOR UPDATE TO authenticated USING (
+    bucket_id = 'plan_images' 
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Policy for deleting plan images
+CREATE POLICY "Allow authenticated users to delete their own plan images" ON storage.objects
+FOR DELETE TO authenticated USING (
+    bucket_id = 'plan_images' 
+    AND auth.uid()::text = (storage.foldername(name))[1]
+);

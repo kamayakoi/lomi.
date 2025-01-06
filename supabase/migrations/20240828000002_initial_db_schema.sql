@@ -404,6 +404,7 @@ CREATE TABLE subscription_plans (
     charge_day INT CHECK (charge_day >= 1 AND charge_day <= 31 OR charge_day IS NULL),
     metadata JSONB,
     display_on_storefront BOOLEAN NOT NULL DEFAULT true,
+    image_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     first_payment_type first_payment_type NOT NULL DEFAULT 'initial',

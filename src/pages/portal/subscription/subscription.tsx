@@ -9,7 +9,7 @@ import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/dashboard/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
-import { SubscriptionPlan, Subscription, frequency } from './dev_subscription/types'
+import { SubscriptionPlan, Subscription, frequencyColors } from './dev_subscription/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
@@ -28,17 +28,8 @@ import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
-
-const frequencyColors: Record<frequency, string> = {
-  'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-  'bi-weekly': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-  'monthly': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-  'bi-monthly': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-  'quarterly': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
-  'semi-annual': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
-  'yearly': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-  'one-time': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-};
+import { ClipboardList, ImageIcon } from 'lucide-react'
+import { cn } from '@/lib/actions/utils'
 
 function SubscriptionsPage() {
   const { user } = useUser()
@@ -120,10 +111,6 @@ function SubscriptionsPage() {
   const handleEditPlanClick = (plan: SubscriptionPlan) => {
     setSelectedPlan(plan)
     setIsEditPlanOpen(true)
-  }
-
-  const handleEditPlanSuccess = () => {
-    refetchPlans()
   }
 
   const handleSort = (column: keyof SubscriptionPlan | keyof Subscription) => {
@@ -212,7 +199,7 @@ function SubscriptionsPage() {
                   Create
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[845px]">
+              <DialogContent className="p-0 max-w-lg">
                 <CreatePlanForm
                   onClose={() => setIsCreatePlanOpen(false)}
                   onSuccess={handleCreatePlanSuccess}
@@ -239,111 +226,116 @@ function SubscriptionsPage() {
 
               <TabsContent value="plans">
                 <Card className="rounded-none">
-                  <CardContent className="p-4">
-                    <div className="border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('name')} className="rounded-none">
-                                Name
-                                {sortColumn === 'name' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('description')} className="rounded-none">
-                                Description
-                                {sortColumn === 'description' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
-                                Price
-                                {sortColumn === 'amount' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('billing_frequency')} className="rounded-none">
-                                Frequency
-                                {sortColumn === 'billing_frequency' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {isSubscriptionPlansLoading ? (
-                            Array.from({ length: 5 }).map((_, index) => (
-                              <TableRow key={index}>
-                                <TableCell colSpan={5}>
-                                  <Skeleton className="w-full h-8 rounded-none" />
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          ) : subscriptionPlans.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8">
-                                <div className="flex flex-col items-center justify-center space-y-4">
-                                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                  <CardContent className="p-4 rounded-none">
+                    {isSubscriptionPlansLoading ? (
+                      <div className="space-y-4">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <div key={index} className="p-4 border border-border">
+                            <div className="flex gap-4">
+                              <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
+                              <div className="flex-grow space-y-2">
+                                <Skeleton className="w-1/3 h-6" />
+                                <Skeleton className="w-2/3 h-4" />
+                                <Skeleton className="w-24 h-4" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : subscriptionPlans.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12">
+                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                          <ClipboardList className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                          No subscription plans found
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
+                          Try changing your filter or create a new subscription plan.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                          <div
+                            key={plan.plan_id}
+                            className="p-4 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer"
+                            onClick={() => handlePlanClick(plan)}
+                          >
+                            <div className="flex gap-4">
+                              <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                {plan.image_url ? (
+                                  <img
+                                    src={plan.image_url}
+                                    alt={plan.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <ImageIcon className="h-12 w-12 text-gray-400" />
                                   </div>
-                                  <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                    No subscription plans found
-                                  </p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                    Try changing your filter or create a new plan.
-                                  </p>
+                                )}
+                              </div>
+
+                              <div className="flex-grow h-32 flex flex-col">
+                                <div className="flex-1 min-h-0">
+                                  <div className="flex items-start justify-between">
+                                    <div className="w-full pr-0">
+                                      <div className="flex items-center justify-between">
+                                        <h3 className="font-medium text-foreground text-lg">{plan.name}</h3>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEditPlanClick(plan)
+                                          }}
+                                          className="text-blue-500 hover:text-blue-600 p-1.5"
+                                        >
+                                          <Edit className="h-4.5 w-4.5" />
+                                        </button>
+                                      </div>
+                                      {plan.description && (
+                                        <p className="text-sm text-muted-foreground overflow-y-auto max-h-[40px] w-[850px] whitespace-pre-wrap break-words scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800 scrollbar-track-transparent mt-1.5">
+                                          {plan.description}
+                                        </p>
+                                      )}
+                                      <div className="mt-1">
+                                        <span className="text-lg font-medium">
+                                          {formatCurrency(plan.amount, plan.currency_code)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            sortSubscriptionPlans(subscriptionPlans).map((plan: SubscriptionPlan) => (
-                              <TableRow
-                                key={plan.plan_id}
-                                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                onClick={(e) => {
-                                  if (!(e.target instanceof HTMLButtonElement)) {
-                                    handlePlanClick(plan);
-                                  }
-                                }}
-                              >
-                                <TableCell className="text-center">{plan.name}</TableCell>
-                                <TableCell className="text-center">{plan.description}</TableCell>
-                                <TableCell className="text-center">{formatCurrency(plan.amount, plan.currency_code)}</TableCell>
-                                <TableCell className="text-center">
-                                  <span className={`inline-block px-2 py-1 text-xs font-normal rounded-none ${frequencyColors[plan.billing_frequency]}`}>
+                                <div className="flex items-center gap-2">
+                                  <span className={cn(
+                                    "px-3 py-1 text-xs font-medium",
+                                    plan.is_active
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                  )}>
+                                    {plan.is_active ? 'Active' : 'Inactive'}
+                                  </span>
+                                  <span className={cn(
+                                    "px-3 py-1 text-xs font-medium",
+                                    plan.display_on_storefront
+                                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                      : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                  )}>
+                                    Storefront
+                                  </span>
+                                  <span className={cn(
+                                    "px-3 py-1 text-xs font-medium",
+                                    frequencyColors[plan.billing_frequency]
+                                  )}>
                                     {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
                                   </span>
-                                </TableCell>
-                                <TableCell className="text-center">
-                                  <div className="flex justify-center space-x-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEditPlanClick(plan);
-                                      }}
-                                      className="rounded-none"
-                                    >
-                                      <Edit className="h-4 w-4 text-blue-500" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -461,12 +453,15 @@ function SubscriptionsPage() {
       />
 
       <Dialog open={isEditPlanOpen} onOpenChange={setIsEditPlanOpen}>
-        <DialogContent className="sm:max-w-[845px]">
+        <DialogContent className="p-0 max-w-lg">
           {selectedPlan && (
             <EditPlanForm
-              onClose={() => setIsEditPlanOpen(false)}
-              onSuccess={handleEditPlanSuccess}
               plan={selectedPlan}
+              onClose={() => setIsEditPlanOpen(false)}
+              onSuccess={() => {
+                handleRefresh()
+                setIsEditPlanOpen(false)
+              }}
             />
           )}
         </DialogContent>
