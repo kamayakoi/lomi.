@@ -56,6 +56,7 @@ src/utils/prompts
 
 # Cursor rules
 .cursorrules
+llm-prompt.md
 
 # Supabase
 *_secrets.sql

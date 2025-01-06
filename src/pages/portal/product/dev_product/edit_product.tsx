@@ -55,7 +55,8 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                 description: data.description,
                 price: data.price,
                 is_active: data.is_active,
-                image_url: product.image_url,
+                image_url: previewUrl,
+                display_on_storefront: product.display_on_storefront
             })
             onSuccess()
             onClose()
@@ -115,11 +116,8 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                 throw new Error('Failed to upload image')
             }
 
-            // Update product with new image URL
-            await updateProduct(product.product_id, {
-                ...product,
-                image_url: uploadedUrl
-            })
+            setPreviewUrl(uploadedUrl)
+            product.image_url = uploadedUrl // Update the product reference
         } catch (error) {
             console.error('Error handling image:', error)
             toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
@@ -133,15 +131,16 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
         e.preventDefault()
         if (product.image_url) {
             try {
+                setIsUploading(true)
                 await deleteProductImage(product.image_url)
                 setPreviewUrl(null)
-                await updateProduct(product.product_id, {
-                    ...product,
-                    image_url: null
-                })
+                product.image_url = null // Update the product reference
             } catch (error) {
                 console.error('Error removing image:', error)
                 toast({ title: "Error", description: "Failed to remove image", variant: "destructive" })
+                setPreviewUrl(product.image_url) // Revert on error
+            } finally {
+                setIsUploading(false)
             }
         } else {
             setPreviewUrl(null)

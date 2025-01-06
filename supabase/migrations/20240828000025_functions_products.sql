@@ -188,25 +188,26 @@ DECLARE
     v_merchant_id UUID;
     v_old_price NUMERIC;
     v_currency currency_code;
+    v_old_image_url TEXT;
 BEGIN
     -- Get current product details
-    SELECT merchant_id, price, currency_code
-    INTO v_merchant_id, v_old_price, v_currency
+    SELECT merchant_id, price, currency_code, image_url
+    INTO v_merchant_id, v_old_price, v_currency, v_old_image_url
     FROM merchant_products
     WHERE product_id = p_product_id;
 
     UPDATE merchant_products
     SET
-        name = p_name,
+        name = COALESCE(p_name, name),
         description = p_description,
-        price = p_price,
+        price = COALESCE(p_price, price),
         image_url = p_image_url,
-        is_active = p_is_active,
-        display_on_storefront = p_display_on_storefront,
+        is_active = COALESCE(p_is_active, is_active),
+        display_on_storefront = COALESCE(p_display_on_storefront, display_on_storefront),
         updated_at = NOW()
     WHERE product_id = p_product_id;
 
-    -- Log product update
+    -- Log product update with image change info
     PERFORM public.log_event(
         p_merchant_id := v_merchant_id,
         p_event := 'update_product'::event_type,
@@ -217,7 +218,9 @@ BEGIN
             'new_price', p_price,
             'currency', v_currency,
             'is_active', p_is_active,
-            'has_image', p_image_url IS NOT NULL,
+            'old_image_url', v_old_image_url,
+            'new_image_url', p_image_url,
+            'image_changed', (v_old_image_url IS DISTINCT FROM p_image_url),
             'display_on_storefront', p_display_on_storefront
         ),
         p_severity := 'NOTICE'

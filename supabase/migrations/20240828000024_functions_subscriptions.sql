@@ -222,9 +222,13 @@ CREATE OR REPLACE FUNCTION public.update_subscription_plan(
 RETURNS VOID AS $$
 DECLARE
     v_metadata JSONB;
+    v_old_image_url TEXT;
 BEGIN
-    -- Get current metadata
-    SELECT metadata INTO v_metadata FROM subscription_plans WHERE plan_id = p_plan_id;
+    -- Get current metadata and image_url
+    SELECT metadata, image_url 
+    INTO v_metadata, v_old_image_url 
+    FROM subscription_plans 
+    WHERE plan_id = p_plan_id;
     
     -- Update display_on_storefront in metadata if provided
     IF p_display_on_storefront IS NOT NULL THEN
@@ -238,16 +242,31 @@ BEGIN
 
     UPDATE subscription_plans
     SET
-        name = p_name,
+        name = COALESCE(p_name, name),
         description = p_description,
-        billing_frequency = p_billing_frequency,
-        amount = p_amount,
-        failed_payment_action = p_failed_payment_action,
+        billing_frequency = COALESCE(p_billing_frequency, billing_frequency),
+        amount = COALESCE(p_amount, amount),
+        failed_payment_action = COALESCE(p_failed_payment_action, failed_payment_action),
         charge_day = COALESCE(p_charge_day, charge_day),
         metadata = v_metadata,
-        image_url = COALESCE(p_image_url, image_url),
+        image_url = p_image_url,
         updated_at = NOW()
     WHERE plan_id = p_plan_id;
+
+    -- Log plan update with image change info
+    PERFORM public.log_event(
+        p_merchant_id := (SELECT merchant_id FROM subscription_plans WHERE plan_id = p_plan_id),
+        p_event := 'update_subscription_plan'::event_type,
+        p_details := jsonb_build_object(
+            'plan_id', p_plan_id,
+            'name', p_name,
+            'old_image_url', v_old_image_url,
+            'new_image_url', p_image_url,
+            'image_changed', (v_old_image_url IS DISTINCT FROM p_image_url),
+            'display_on_storefront', p_display_on_storefront
+        ),
+        p_severity := 'NOTICE'
+    );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

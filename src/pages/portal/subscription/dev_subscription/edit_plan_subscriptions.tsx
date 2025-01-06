@@ -77,7 +77,7 @@ export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuc
                 charge_day: data.charge_day,
                 metadata: data.metadata,
                 display_on_storefront: data.display_on_storefront,
-                image_url: plan.image_url,
+                image_url: previewUrl,
             })
             onSuccess()
             onClose()
@@ -136,15 +136,12 @@ export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuc
                 throw new Error('Failed to upload image')
             }
 
-            // Update plan with new image URL
-            await updateSubscriptionPlan(plan.plan_id, {
-                ...plan,
-                image_url: uploadedUrl
-            })
+            setPreviewUrl(uploadedUrl)
+            plan.image_url = uploadedUrl
         } catch (error) {
             console.error('Error handling image:', error)
             toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
-            setPreviewUrl(plan.image_url) // Revert to original image
+            setPreviewUrl(plan.image_url)
         } finally {
             setIsUploading(false)
         }
@@ -154,14 +151,16 @@ export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuc
         e.preventDefault()
         if (plan.image_url) {
             try {
+                setIsUploading(true)
                 await deletePlanImage(plan.image_url)
                 setPreviewUrl(null)
-                await updateSubscriptionPlan(plan.plan_id, {
-                    ...plan,
-                    image_url: null
-                })
+                plan.image_url = null
             } catch (error) {
                 console.error('Error removing image:', error)
+                toast({ title: "Error", description: "Failed to remove image", variant: "destructive" })
+                setPreviewUrl(plan.image_url)
+            } finally {
+                setIsUploading(false)
             }
         } else {
             setPreviewUrl(null)

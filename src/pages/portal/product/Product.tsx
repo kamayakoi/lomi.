@@ -27,6 +27,7 @@ import { EditProductForm } from './dev_product/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Card, CardContent } from "@/components/ui/card"
 import { fetchProducts } from './dev_product/support_product'
+import { cn } from '@/lib/actions/utils'
 
 function ProductsPage() {
     const { user } = useUser()
@@ -195,11 +196,11 @@ function ProductsPage() {
                                         {sortProducts(products).map((product: Product) => (
                                             <div
                                                 key={product.product_id}
-                                                className="p-4 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer"
+                                                className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
                                                 onClick={() => handleProductClick(product)}
                                             >
-                                                <div className="flex gap-4">
-                                                    <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                                <div className="flex gap-6">
+                                                    <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
                                                         {product.image_url ? (
                                                             <img
                                                                 src={product.image_url}
@@ -213,60 +214,56 @@ function ProductsPage() {
                                                         )}
                                                     </div>
 
-                                                    <div className="flex-grow h-32 flex flex-col">
-                                                        <div className="flex-1 min-h-0">
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="w-full pr-0">
-                                                                    <div className="flex items-center justify-between">
-                                                                        <h3 className="font-medium text-foreground text-lg">{product.name}</h3>
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation()
-                                                                                handleEditClick(product)
-                                                                            }}
-                                                                            className="text-blue-500 hover:text-blue-600 p-1.5"
-                                                                        >
-                                                                            <Edit className="h-4.5 w-4.5" />
-                                                                        </button>
-                                                                    </div>
-                                                                    {product.description && (
-                                                                        <p className="text-sm text-muted-foreground overflow-y-auto max-h-[40px] w-[850px] whitespace-pre-wrap break-words scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800 scrollbar-track-transparent mt-1.5">
-                                                                            {product.description}
-                                                                        </p>
-                                                                    )}
-                                                                    <div className="mt-1">
-                                                                        <span className="text-lg font-medium">
-                                                                            {product.price.toLocaleString('en-US', {
-                                                                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                            })}
-                                                                            <span className="text-sm text-muted-foreground ml-1">
-                                                                                {product.currency_code}
-                                                                            </span>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
+                                                    <div className="flex-grow min-h-[128px] flex flex-col">
+                                                        <div className="flex items-start justify-between mb-2">
+                                                            <h3 className="font-medium text-foreground text-lg leading-tight">{product.name}</h3>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className={cn(
+                                                                    "px-3 py-1 text-xs font-medium",
+                                                                    product.is_active
+                                                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                                                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                                                )}>
+                                                                    {product.is_active ? 'Active' : 'Inactive'}
+                                                                </span>
+                                                                <span className={cn(
+                                                                    "px-3 py-1 text-xs font-medium",
+                                                                    product.display_on_storefront
+                                                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                                                        : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                                                )}>
+                                                                    Storefront
+                                                                </span>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        handleEditClick(product)
+                                                                    }}
+                                                                    className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                                >
+                                                                    <Edit className="h-4.5 w-4.5" />
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`
-                                                                px-3 py-1 text-xs font-medium
-                                                                ${product.is_active
-                                                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300'
-                                                                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                                                                }
-                                                            `}>
-                                                                {product.is_active ? 'Active' : 'Inactive'}
-                                                            </span>
-                                                            <span className={`
-                                                                px-3 py-1 text-xs font-medium
-                                                                ${product.display_on_storefront
-                                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-                                                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
-                                                                }
-                                                            `}>
-                                                                Storefront
-                                                            </span>
+
+                                                        <div className="flex flex-col flex-grow justify-between">
+                                                            {product.description && (
+                                                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                                                    {product.description}
+                                                                </p>
+                                                            )}
+
+                                                            <div className="flex items-center gap-2 mt-auto pt-2">
+                                                                <span className="text-lg font-semibold tracking-tight">
+                                                                    {product.price.toLocaleString('en-US', {
+                                                                        minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                        maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                    })}
+                                                                    <span className="text-sm text-muted-foreground ml-1">
+                                                                        {product.currency_code}
+                                                                    </span>
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
