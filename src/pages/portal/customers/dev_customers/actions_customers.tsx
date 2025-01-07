@@ -89,7 +89,9 @@ export default function CustomerActions({ customer, isOpen, onClose, onUpdate }:
     return (
         <>
             <Sheet open={isOpen} onOpenChange={onClose}>
-                <SheetContent className="sm:max-w-2xl w-full p-0 overflow-y-auto rounded-none">
+                <SheetContent
+                    className="sm:max-w-2xl w-full p-0 overflow-y-auto rounded-none"
+                >
                     <Card className="border-0 shadow-none rounded-none h-full">
                         <CardHeader className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex flex-row items-center justify-between">
                             <CardTitle className="text-lg font-medium">Customer details</CardTitle>

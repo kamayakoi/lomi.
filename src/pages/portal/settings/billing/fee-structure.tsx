@@ -33,7 +33,7 @@ const feeData: FeeData = {
         otherFees: [
             { name: 'Refund Processing', amount: '1.5%' },
             { name: 'Currency Conversion', amount: '1.5%' },
-            { name: 'Express Payout', amount: '$2.00' },
+            { name: 'Express Payout', amount: '$1.00' },
         ],
     },
     XOF: {

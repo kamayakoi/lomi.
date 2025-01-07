@@ -59,9 +59,9 @@ function CustomerCard({ customer, onEditClick, onClick }: {
                     <div className="font-medium">{customer.name}</div>
                     <button
                         onClick={onEditClick}
-                        className="text-blue-500 hover:text-blue-600 p-1.5 ml-2"
+                        className="text-blue-500 hover:text-blue-600 p-1.5"
                     >
-                        <Edit className="h-4 w-4" />
+                        <Edit className="h-4.5 w-4.5" />
                     </button>
                 </div>
                 <div className="space-y-2 text-sm text-muted-foreground">
@@ -479,7 +479,7 @@ function CustomersPage() {
                                                                     }}
                                                                     className="rounded-none"
                                                                 >
-                                                                    <Edit className="h-4 w-4 text-blue-500" />
+                                                                    <Edit className="h-4.5 w-4.5 text-blue-500" />
                                                                 </Button>
                                                             </TableCell>
                                                         </TableRow>

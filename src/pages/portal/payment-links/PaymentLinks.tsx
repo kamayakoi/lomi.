@@ -56,29 +56,29 @@ function PaymentLinkCard({ paymentLink, onEditClick, onClick }: {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="font-medium">{paymentLink.title}</div>
-          <button
-            onClick={onEditClick}
-            className="text-blue-500 hover:text-blue-600 p-1.5 ml-2"
-          >
-            <Edit className="h-4 w-4" />
-          </button>
-        </div>
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div>{paymentLink.public_description}</div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <span className={`
-                            inline-block px-2 py-1 rounded-none text-xs font-normal
-                            ${linkTypeColors[paymentLink.link_type]}
-                        `}>
+              inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
+              ${linkTypeColors[paymentLink.link_type]}
+            `}>
               {paymentLink.link_type.charAt(0).toUpperCase() + paymentLink.link_type.slice(1)}
             </span>
             <span className={`
-                            inline-block px-2 py-1 rounded-none text-xs font-normal
-                            ${paymentLink.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                        `}>
+              inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
+              ${paymentLink.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+            `}>
               {paymentLink.is_active ? 'Active' : 'Inactive'}
             </span>
+            <button
+              onClick={onEditClick}
+              className="text-blue-500 hover:text-blue-600 p-1.5"
+            >
+              <Edit className="h-4.5 w-4.5" />
+            </button>
           </div>
+        </div>
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div>{paymentLink.public_description}</div>
           <div className="flex items-center justify-between">
             <span>
               {paymentLink.link_type === 'instant' && paymentLink.price ? (
@@ -370,17 +370,15 @@ function PaymentLinksPage() {
                               </span>
                             </TableCell>
                             <TableCell className="text-center">
-                              <Button
-                                variant="ghost"
-                                size="sm"
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleEditClick(link);
                                 }}
-                                className="hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-1 focus:ring-offset-2 focus:ring-blue-500 rounded-none"
+                                className="text-blue-500 hover:text-blue-600 p-1.5"
                               >
-                                <Edit className="h-4 w-4 text-blue-500" />
-                              </Button>
+                                <Edit className="h-4.5 w-4.5" />
+                              </button>
                             </TableCell>
                           </TableRow>
                         ))

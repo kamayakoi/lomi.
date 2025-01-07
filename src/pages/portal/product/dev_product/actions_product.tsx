@@ -153,9 +153,9 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
         <>
             <Sheet open={isOpen} onOpenChange={onClose}>
                 <SheetContent
-                    className="sm:max-w-2xl overflow-y-auto focus:outline-none focus-visible:outline-none [&:has(:focus)]:outline-none [&:focus-within]:outline-none [&>button]:hidden"
+                    className="sm:max-w-2xl w-full p-0 overflow-y-auto rounded-none"
                 >
-                    <Card className="border-0 shadow-none">
+                    <Card className="border-0 shadow-none rounded-none h-full">
                         <CardHeader className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex flex-row items-center justify-between">
                             <CardTitle className="text-lg font-medium">Product details</CardTitle>
                             <button onClick={onClose} className="text-muted-foreground hover:text-foreground md:hidden">

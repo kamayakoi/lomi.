@@ -64,7 +64,7 @@ export default function Notifications() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent
-                className="w-60 sm:w-96 bg-white dark:bg-[#121317] border border-border shadow-lg rounded-none"
+                className="w-[90vw] sm:w-[400px] bg-white dark:bg-[#121317] border border-border shadow-lg rounded-none translate-x-[5px] sm:-translate-x-[15px]"
                 align="end"
                 alignOffset={-15}
                 sideOffset={14}

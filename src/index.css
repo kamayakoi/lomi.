@@ -290,7 +290,7 @@ collapsibleDropdown[data-state='closed'] {
 }
 
 .progress-animation {
-  animation: progress 3000ms linear forwards;
+  animation: progress 2000ms linear forwards;
   transform-origin: left;
   will-change: transform;
 }

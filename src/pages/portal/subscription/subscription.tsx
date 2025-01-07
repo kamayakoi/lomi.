@@ -31,6 +31,124 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ClipboardList, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/actions/utils'
 
+function formatCurrency(amount: number | undefined, currency: string | undefined): string {
+  if (amount === undefined || amount === null || currency === undefined) {
+    return '-';
+  }
+  return `${amount.toLocaleString('en-US', {
+    minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+    maximumFractionDigits: amount % 1 !== 0 ? 2 : 0,
+  })} ${currency}`;
+}
+
+function PlanCard({ plan, onEditClick, onClick }: {
+  plan: SubscriptionPlan,
+  onEditClick: (e: React.MouseEvent) => void,
+  onClick: () => void
+}) {
+  return (
+    <div
+      className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      onClick={onClick}
+    >
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="font-medium">{plan.name}</div>
+          <div className="flex items-center gap-1.5">
+            <span className={cn(
+              "px-3 py-1 text-xs font-medium",
+              plan.is_active
+                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+            )}>
+              {plan.is_active ? 'Active' : 'Inactive'}
+            </span>
+            <span className={cn(
+              "px-3 py-1 text-xs font-medium",
+              plan.display_on_storefront
+                ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+            )}>
+              Storefront
+            </span>
+            <button
+              onClick={onEditClick}
+              className="text-blue-500 hover:text-blue-600 p-1.5"
+            >
+              <Edit className="h-4.5 w-4.5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2 text-sm text-muted-foreground">
+          {plan.description && (
+            <p className="line-clamp-2 leading-relaxed">
+              {plan.description}
+            </p>
+          )}
+          <div className="pt-1">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold tracking-tight text-foreground">
+                {formatCurrency(plan.amount, plan.currency_code)}
+              </span>
+              <span className={cn(
+                "px-3 py-1 text-xs font-medium",
+                frequencyColors[plan.billing_frequency]
+              )}>
+                {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubscriptionCard({ subscription, onEditClick, onClick }: {
+  subscription: Subscription,
+  onEditClick: (e: React.MouseEvent) => void,
+  onClick: () => void
+}) {
+  return (
+    <div
+      className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      onClick={onClick}
+    >
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="font-medium">{subscription.customer_name}</div>
+          <button
+            onClick={onEditClick}
+            className="text-blue-500 hover:text-blue-600 p-1.5"
+          >
+            <Edit className="h-4.5 w-4.5" />
+          </button>
+        </div>
+
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="flex items-center justify-between">
+            <span>{subscription.plan_name}</span>
+            <span className={`
+                            inline-block px-2 py-1 text-xs font-normal
+                            ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                            ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                            ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                        `}>
+              {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+            </span>
+          </div>
+          <div className="pt-1">
+            <span className="text-lg font-semibold tracking-tight text-foreground">
+              {formatCurrency(subscription.amount, subscription.currency_code)}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SubscriptionsPage() {
   const { user } = useUser()
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
@@ -156,16 +274,6 @@ function SubscriptionsPage() {
     })
   }
 
-  function formatCurrency(amount: number | undefined, currency: string | undefined): string {
-    if (amount === undefined || amount === null || currency === undefined) {
-      return '-';
-    }
-    return `${amount.toLocaleString('en-US', {
-      minimumFractionDigits: amount % 1 !== 0 ? 2 : 0,
-      maximumFractionDigits: amount % 1 !== 0 ? 2 : 0,
-    })} ${currency}`;
-  }
-
   return (
     <Layout fixed>
       <Layout.Header>
@@ -255,84 +363,102 @@ function SubscriptionsPage() {
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
-                          <div
-                            key={plan.plan_id}
-                            className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
-                            onClick={() => handlePlanClick(plan)}
-                          >
-                            <div className="flex gap-6">
-                              <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
-                                {plan.image_url ? (
-                                  <img
-                                    src={plan.image_url}
-                                    alt={plan.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <ImageIcon className="h-12 w-12 text-gray-400" />
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="flex-grow min-h-[128px] flex flex-col">
-                                <div className="flex items-start justify-between mb-2">
-                                  <h3 className="font-medium text-foreground text-lg leading-tight">{plan.name}</h3>
-                                  <div className="flex items-center gap-1.5">
-                                    <span className={cn(
-                                      "px-3 py-1 text-xs font-medium",
-                                      plan.is_active
-                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                    )}>
-                                      {plan.is_active ? 'Active' : 'Inactive'}
-                                    </span>
-                                    <span className={cn(
-                                      "px-3 py-1 text-xs font-medium",
-                                      plan.display_on_storefront
-                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                                        : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                    )}>
-                                      Storefront
-                                    </span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleEditPlanClick(plan)
-                                      }}
-                                      className="text-blue-500 hover:text-blue-600 p-1.5"
-                                    >
-                                      <Edit className="h-4.5 w-4.5" />
-                                    </button>
-                                  </div>
+                      <>
+                        {/* Desktop View */}
+                        <div className="hidden md:block space-y-4">
+                          {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                            <div
+                              key={plan.plan_id}
+                              className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
+                              onClick={() => handlePlanClick(plan)}
+                            >
+                              <div className="flex gap-6">
+                                <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
+                                  {plan.image_url ? (
+                                    <img
+                                      src={plan.image_url}
+                                      alt={plan.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <ImageIcon className="h-12 w-12 text-gray-400" />
+                                    </div>
+                                  )}
                                 </div>
 
-                                <div className="flex flex-col flex-grow justify-between">
-                                  {plan.description && (
-                                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                      {plan.description}
-                                    </p>
-                                  )}
+                                <div className="flex-grow min-h-[128px] flex flex-col">
+                                  <div className="flex items-start justify-between mb-2">
+                                    <h3 className="font-medium text-foreground text-lg leading-tight">{plan.name}</h3>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={cn(
+                                        "px-3 py-1 text-xs font-medium",
+                                        plan.is_active
+                                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                      )}>
+                                        {plan.is_active ? 'Active' : 'Inactive'}
+                                      </span>
+                                      <span className={cn(
+                                        "px-3 py-1 text-xs font-medium",
+                                        plan.display_on_storefront
+                                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                          : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                      )}>
+                                        Storefront
+                                      </span>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          handleEditPlanClick(plan)
+                                        }}
+                                        className="text-blue-500 hover:text-blue-600 p-1.5"
+                                      >
+                                        <Edit className="h-4.5 w-4.5" />
+                                      </button>
+                                    </div>
+                                  </div>
 
-                                  <div className="flex items-center gap-2 mt-auto pt-2">
-                                    <span className="text-lg font-semibold tracking-tight">
-                                      {formatCurrency(plan.amount, plan.currency_code)}
-                                    </span>
-                                    <span className={cn(
-                                      "px-3 py-1 text-xs font-medium",
-                                      frequencyColors[plan.billing_frequency]
-                                    )}>
-                                      {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
-                                    </span>
+                                  <div className="flex flex-col flex-grow justify-between">
+                                    {plan.description && (
+                                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                        {plan.description}
+                                      </p>
+                                    )}
+
+                                    <div className="flex items-center gap-2 mt-auto pt-2">
+                                      <span className="text-lg font-semibold tracking-tight">
+                                        {formatCurrency(plan.amount, plan.currency_code)}
+                                      </span>
+                                      <span className={cn(
+                                        "px-3 py-1 text-xs font-medium",
+                                        frequencyColors[plan.billing_frequency]
+                                      )}>
+                                        {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+
+                        {/* Mobile View */}
+                        <div className="md:hidden border rounded-none">
+                          {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                            <PlanCard
+                              key={plan.plan_id}
+                              plan={plan}
+                              onEditClick={(e) => {
+                                e.stopPropagation();
+                                handleEditPlanClick(plan);
+                              }}
+                              onClick={() => handlePlanClick(plan)}
+                            />
+                          ))}
+                        </div>
+                      </>
                     )}
                   </CardContent>
                 </Card>
@@ -342,93 +468,133 @@ function SubscriptionsPage() {
                 <Card className="rounded-none">
                   <CardContent className="p-4">
                     <div className="border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
-                                Customer
-                                {sortColumn === 'customer_name' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
-                                Plan
-                                {sortColumn === 'plan_name' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
-                                Price
-                                {sortColumn === 'amount' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                            <TableHead className="text-center">
-                              <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
-                                Status
-                                {sortColumn === 'status' && (
-                                  <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                )}
-                              </Button>
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {isSubscriptionsLoading ? (
-                            Array.from({ length: 5 }).map((_, index) => (
-                              <TableRow key={index}>
-                                <TableCell colSpan={4}>
-                                  <Skeleton className="w-full h-8 rounded-none" />
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          ) : subscriptions.length === 0 ? (
+                      {/* Desktop View */}
+                      <div className="hidden md:block">
+                        <Table>
+                          <TableHeader>
                             <TableRow>
-                              <TableCell colSpan={4} className="text-center py-8">
-                                <div className="flex flex-col items-center justify-center space-y-4">
-                                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                                  </div>
-                                  <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                    No subscriptions found
-                                  </p>
-                                  <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                    Try changing your filter or create a new subscription.
-                                  </p>
-                                </div>
-                              </TableCell>
+                              <TableHead className="text-center">
+                                <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
+                                  Customer
+                                  {sortColumn === 'customer_name' && (
+                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                  )}
+                                </Button>
+                              </TableHead>
+                              <TableHead className="text-center">
+                                <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
+                                  Plan
+                                  {sortColumn === 'plan_name' && (
+                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                  )}
+                                </Button>
+                              </TableHead>
+                              <TableHead className="text-center">
+                                <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
+                                  Price
+                                  {sortColumn === 'amount' && (
+                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                  )}
+                                </Button>
+                              </TableHead>
+                              <TableHead className="text-center">
+                                <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
+                                  Status
+                                  {sortColumn === 'status' && (
+                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                  )}
+                                </Button>
+                              </TableHead>
                             </TableRow>
-                          ) : (
-                            sortSubscriptions(subscriptions).map((subscription: Subscription) => (
-                              <TableRow
-                                key={subscription.subscription_id}
-                                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                onClick={() => handleSubscriptionClick(subscription)}
-                              >
-                                <TableCell className="text-center">{subscription.customer_name}</TableCell>
-                                <TableCell className="text-center">{subscription.plan_name}</TableCell>
-                                <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
-                                <TableCell className="text-center">
-                                  <span className={`
-                                    inline-block px-2 py-1 text-xs font-normal rounded-none
-                                    ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                    ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                    ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                  `}>
-                                    {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
-                                  </span>
+                          </TableHeader>
+                          <TableBody>
+                            {isSubscriptionsLoading ? (
+                              Array.from({ length: 5 }).map((_, index) => (
+                                <TableRow key={index}>
+                                  <TableCell colSpan={4}>
+                                    <Skeleton className="w-full h-8 rounded-none" />
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            ) : subscriptions.length === 0 ? (
+                              <TableRow>
+                                <TableCell colSpan={4} className="text-center py-8">
+                                  <div className="flex flex-col items-center justify-center space-y-4">
+                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                      <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                    </div>
+                                    <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                      No subscriptions found
+                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                      Try changing your filter or create a new subscription.
+                                    </p>
+                                  </div>
                                 </TableCell>
                               </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
+                            ) : (
+                              sortSubscriptions(subscriptions).map((subscription: Subscription) => (
+                                <TableRow
+                                  key={subscription.subscription_id}
+                                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                  onClick={() => handleSubscriptionClick(subscription)}
+                                >
+                                  <TableCell className="text-center">{subscription.customer_name}</TableCell>
+                                  <TableCell className="text-center">{subscription.plan_name}</TableCell>
+                                  <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
+                                  <TableCell className="text-center">
+                                    <span className={`
+                                      inline-block px-2 py-1 text-xs font-normal rounded-none
+                                      ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
+                                      ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
+                                      ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
+                                    `}>
+                                      {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+                                    </span>
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                      {/* Mobile View */}
+                      <div className="md:hidden">
+                        {isSubscriptionsLoading ? (
+                          Array.from({ length: 3 }).map((_, index) => (
+                            <div key={index} className="p-4 border-b last:border-b-0">
+                              <Skeleton className="w-full h-24" />
+                            </div>
+                          ))
+                        ) : subscriptions.length === 0 ? (
+                          <div className="py-24 text-center">
+                            <div className="flex flex-col items-center justify-center space-y-4">
+                              <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
+                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                              </div>
+                              <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                No subscriptions found
+                              </p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                Try changing your filter or create a new subscription.
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          sortSubscriptions(subscriptions).map((subscription: Subscription) => (
+                            <SubscriptionCard
+                              key={subscription.subscription_id}
+                              subscription={subscription}
+                              onEditClick={(e) => {
+                                e.stopPropagation();
+                                handleSubscriptionClick(subscription);
+                              }}
+                              onClick={() => handleSubscriptionClick(subscription)}
+                            />
+                          ))
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

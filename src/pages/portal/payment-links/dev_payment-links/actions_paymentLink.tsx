@@ -1,8 +1,26 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { PaymentLink, provider_code } from './types'
-import { LifeBuoy } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PaymentLink, provider_code, link_type } from './types'
+import { LifeBuoy, X } from 'lucide-react'
+import { toast } from "@/components/ui/use-toast"
+import { Separator } from "@/components/ui/separator"
+
+const linkTypeColors: Record<link_type, string> = {
+    'instant': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    'product': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    'plan': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+};
+
+function formatPrice(price: number | undefined): string {
+    if (price === undefined) {
+        return '-';
+    }
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    }).format(price);
+}
 
 const providerColors: Record<provider_code, string> = {
     'ORANGE': 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white',
@@ -30,81 +48,137 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent className="sm:max-w-2xl overflow-y-auto">
-                <Card className="border-0 shadow-none">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-2xl font-bold">Payment Link Details</CardTitle>
+            <SheetContent
+                className="sm:max-w-2xl w-full p-0 overflow-y-auto rounded-none"
+            >
+                <Card className="border-0 shadow-none rounded-none h-full">
+                    <CardHeader className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex flex-row items-center justify-between">
+                        <CardTitle className="text-lg font-medium">Link details</CardTitle>
+                        <button onClick={onClose} className="text-muted-foreground hover:text-foreground md:hidden">
+                            <X className="h-4 w-4" />
+                        </button>
                     </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4">
-                            <section>
-                                <h3 className="text-lg font-semibold mb-2">Payment Link Information</h3>
-                                <div className="grid grid-cols-2 gap-2 text-sm">
-                                    <div className="font-medium">ID:</div>
-                                    <div>{paymentLink.link_id}</div>
-                                    <div className="font-medium">Title:</div>
-                                    <div>{paymentLink.title}</div>
-                                    <div className="font-medium">Public Description:</div>
-                                    <div>{paymentLink.public_description}</div>
-                                    <div className="font-medium">Private Description:</div>
-                                    <div>{paymentLink.private_description}</div>
-                                    <div className="font-medium">Price:</div>
-                                    <div>
-                                        {paymentLink.link_type === 'instant' && paymentLink.price ? (
-                                            `${paymentLink.price} ${paymentLink.currency_code}`
-                                        ) : paymentLink.link_type === 'product' && paymentLink.product_price ? (
-                                            `${paymentLink.product_price} ${paymentLink.currency_code}`
-                                        ) : paymentLink.link_type === 'plan' && paymentLink.plan_amount ? (
-                                            `${paymentLink.plan_amount} ${paymentLink.currency_code}`
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </div>
-                                    <div className="font-medium">Status:</div>
-                                    <div>{paymentLink.is_active ? 'Active' : 'Inactive'}</div>
-                                    <div className="font-medium">Expiration Date:</div>
-                                    <div>{paymentLink.expires_at ? formatDate(paymentLink.expires_at) : '-'}</div>
-                                    <div className="font-medium">Success URL:</div>
-                                    <div>{paymentLink.success_url || '-'}</div>
-                                    <div className="font-medium">Allowed Providers:</div>
-                                    <div>
-                                        {paymentLink.allowed_providers.length > 0 ? (
-                                            <div className="flex flex-wrap gap-2">
-                                                {paymentLink.allowed_providers.map((provider) => (
-                                                    <span
-                                                        key={provider}
-                                                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${providerColors[provider]}`}
-                                                    >
-                                                        {formatProviderCode(provider)}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            '-'
-                                        )}
-                                    </div>
-                                    {paymentLink.link_type === 'product' && (
-                                        <>
-                                            <div className="font-medium">Associated Product:</div>
-                                            <div>{paymentLink.product_name || '-'}</div>
-                                        </>
+                    <CardContent className="p-4 space-y-4 overflow-auto">
+                        <div className="space-y-3 text-sm">
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Link ID</span>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(paymentLink.link_id);
+                                        toast({
+                                            description: "Copied to clipboard",
+                                        });
+                                    }}
+                                    className="font-mono text-xs text-blue-500 hover:text-blue-500"
+                                >
+                                    {paymentLink.link_id}
+                                </button>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Status</span>
+                                <span className={`
+                                    inline-block px-2 py-1 rounded-none text-xs font-normal
+                                    ${paymentLink.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                `}>
+                                    {paymentLink.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+
+                            <Separator />
+
+                            {paymentLink.link_type === 'product' ? (
+                                <div>
+                                    <span className="text-sm text-muted-foreground block">Associated Product</span>
+                                    <p className="text-sm mt-1">{paymentLink.product_name || '-'}</p>
+                                </div>
+                            ) : paymentLink.link_type === 'plan' ? (
+                                <div>
+                                    <span className="text-sm text-muted-foreground block">Associated Plan</span>
+                                    <p className="text-sm mt-1">{paymentLink.plan_name || '-'}</p>
+                                </div>
+                            ) : null}
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Private Description</span>
+                                <p className="text-sm mt-1">{paymentLink.private_description || '-'}</p>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Price</span>
+                                <p className="text-sm mt-1">
+                                    {paymentLink.link_type === 'instant' && paymentLink.price ? (
+                                        `${formatPrice(paymentLink.price)} ${paymentLink.currency_code}`
+                                    ) : paymentLink.link_type === 'product' && paymentLink.product_price ? (
+                                        `${formatPrice(paymentLink.product_price)} ${paymentLink.currency_code}`
+                                    ) : paymentLink.link_type === 'plan' && paymentLink.plan_amount ? (
+                                        `${formatPrice(paymentLink.plan_amount)} ${paymentLink.currency_code}`
+                                    ) : (
+                                        '-'
                                     )}
-                                    {paymentLink.link_type === 'plan' && (
-                                        <>
-                                            <div className="font-medium">Associated Plan:</div>
-                                            <div>{paymentLink.plan_name || '-'}</div>
-                                        </>
+                                </p>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Link Type</span>
+                                <span className={`
+                                    inline-block px-2 py-1 rounded-none text-xs font-normal mt-1
+                                    ${linkTypeColors[paymentLink.link_type]}
+                                `}>
+                                    {paymentLink.link_type.charAt(0).toUpperCase() + paymentLink.link_type.slice(1)}
+                                </span>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">URL</span>
+                                <a
+                                    href={paymentLink.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-500 hover:underline mt-1 block"
+                                >
+                                    {paymentLink.url}
+                                </a>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Success URL</span>
+                                <p className="text-sm mt-1">{paymentLink.success_url || '-'}</p>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Expiration Date</span>
+                                <p className="text-sm mt-1">{paymentLink.expires_at ? formatDate(paymentLink.expires_at) : '-'}</p>
+                            </div>
+
+                            <div>
+                                <span className="text-sm text-muted-foreground block">Allowed Providers</span>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {paymentLink.allowed_providers.length > 0 ? (
+                                        paymentLink.allowed_providers.map((provider) => (
+                                            <span
+                                                key={provider}
+                                                className={`inline-block px-2 py-1 rounded-none text-xs font-semibold ${providerColors[provider]}`}
+                                            >
+                                                {formatProviderCode(provider)}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span>-</span>
                                     )}
                                 </div>
-                            </section>
+                            </div>
+
+                            <Separator />
+
+                            <div className="flex justify-end">
+                                <Button variant="outline" className="w-full sm:w-auto rounded-none" onClick={handleContactSupport}>
+                                    <LifeBuoy className="mr-2 h-4 w-4" />
+                                    Contact Support
+                                </Button>
+                            </div>
                         </div>
                     </CardContent>
-                    <CardFooter className="flex justify-end">
-                        <Button variant="outline" onClick={handleContactSupport}>
-                            <LifeBuoy className="mr-2 h-4 w-4" />
-                            Contact Support
-                        </Button>
-                    </CardFooter>
                 </Card>
             </SheetContent>
         </Sheet>

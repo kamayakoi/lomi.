@@ -29,6 +29,68 @@ import { Card, CardContent } from "@/components/ui/card"
 import { fetchProducts } from './dev_product/support_product'
 import { cn } from '@/lib/actions/utils'
 
+function ProductCard({ product, onEditClick, onClick }: {
+    product: Product,
+    onEditClick: (e: React.MouseEvent) => void,
+    onClick: () => void
+}) {
+    return (
+        <div
+            className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+            onClick={onClick}
+        >
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                    <div className="font-medium">{product.name}</div>
+                    <div className="flex items-center gap-1.5">
+                        <span className={cn(
+                            "px-3 py-1 text-xs font-medium",
+                            product.is_active
+                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        )}>
+                            {product.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                        <span className={cn(
+                            "px-3 py-1 text-xs font-medium",
+                            product.display_on_storefront
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                        )}>
+                            Storefront
+                        </span>
+                        <button
+                            onClick={onEditClick}
+                            className="text-blue-500 hover:text-blue-600 p-1.5"
+                        >
+                            <Edit className="h-4.5 w-4.5" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-2 text-sm text-muted-foreground">
+                    {product.description && (
+                        <p className="line-clamp-2 leading-relaxed">
+                            {product.description}
+                        </p>
+                    )}
+                    <div className="pt-1">
+                        <span className="text-lg font-semibold tracking-tight">
+                            {product.price.toLocaleString('en-US', {
+                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                            })}
+                            <span className="text-sm text-muted-foreground ml-1">
+                                {product.currency_code}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function ProductsPage() {
     const { user } = useUser()
     const [isCreateProductOpen, setIsCreateProductOpen] = useState(false)
@@ -192,7 +254,8 @@ function ProductsPage() {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="space-y-4">
+                                    {/* Desktop View */}
+                                    <div className="hidden md:block space-y-4">
                                         {sortProducts(products).map((product: Product) => (
                                             <div
                                                 key={product.product_id}
@@ -268,6 +331,21 @@ function ProductsPage() {
                                                     </div>
                                                 </div>
                                             </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Mobile View */}
+                                    <div className="md:hidden border rounded-none">
+                                        {sortProducts(products).map((product: Product) => (
+                                            <ProductCard
+                                                key={product.product_id}
+                                                product={product}
+                                                onEditClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEditClick(product);
+                                                }}
+                                                onClick={() => handleProductClick(product)}
+                                            />
                                         ))}
                                     </div>
 
