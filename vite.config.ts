@@ -12,6 +12,9 @@ export default defineConfig({
       compress: {
         drop_console: true,
       },
+      format: {
+        comments: false,
+      },
     }),
     visualizer({
       filename: 'bundle-analysis.html',
@@ -19,7 +22,7 @@ export default defineConfig({
     }),
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
-      exclude: [/node_modules/],
+      exclude: [/node_modules/, /\.d\.ts$/],
       apply: "build",
       debugger: true,
       options: {
@@ -51,7 +54,7 @@ export default defineConfig({
         seed: 0,
         selfDefending: true,
         simplify: true,
-        sourceMap: true,
+        sourceMap: false,
         sourceMapBaseUrl: '',
         sourceMapFileName: '',
         sourceMapMode: 'separate',
@@ -84,9 +87,14 @@ export default defineConfig({
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
-      mangle: true,
+      mangle: {
+        keep_fnames: /^[A-Z]|use[A-Z]|^on[A-Z]/,
+      },
       compress: {
         drop_console: true,
+      },
+      format: {
+        comments: false,
       },
     },
     rollupOptions: {
@@ -96,6 +104,7 @@ export default defineConfig({
             return id.toString().split('node_modules/')[1].split('/')[0].toString();
           }
         },
+        sourcemap: false,
       },
     },
   },
