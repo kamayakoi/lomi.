@@ -34,9 +34,9 @@ export const Hero = () => {
           {t('hero.description')}
         </p>
 
-        <div className="flex flex-row justify-start space-x-3 mb-8">
+        <div className="flex flex-col lg:flex-row justify-start space-y-3 lg:space-y-0 lg:space-x-3 mb-8">
           <Button
-            className="w-[200px] text-lg md:text-xl lg:text-2xl px-4 py-2 h-[54px]"
+            className="w-full lg:w-[200px] text-lg md:text-xl lg:text-2xl px-4 py-2 h-[54px]"
             onClick={() => setIsFormOpen(true)}
           >
             {t('hero.learnMore')}
@@ -44,7 +44,7 @@ export const Hero = () => {
 
           <Link to="/sign-in">
             <PulsatingButton
-              className="w-[200px] text-lg md:text-xl lg:text-2xl px-4 py-2 h-[55px] bg-blue-600 text-white font-semibold rounded-none shadow-lg hover:bg-blue-700"
+              className="w-full lg:w-[200px] text-lg md:text-xl lg:text-2xl px-4 py-2 h-[55px] bg-blue-600 text-white font-semibold rounded-none shadow-lg hover:bg-blue-700"
               pulseColor="#2563EB"
             >
               <span className="font-bold text-white">{t('hero.connect')}</span>
