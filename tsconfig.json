@@ -36,10 +36,11 @@
         "alwaysStrict": true,
         "noImplicitReturns": true,
         "noUncheckedIndexedAccess": true,
-        "noPropertyAccessFromIndexSignature": true,
+        "noPropertyAccessFromIndexSignature": true
     },
     "include": [
-        "src",
+        "src/**/*.ts",
+        "src/**/*.tsx",
         "api/routes/server.js"
     ],
     "references": [
