@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollToTop } from '@/components/landing/ScrollToTop';
 import SideNav from '@/components/design/side-nav';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function TermsPage() {
+    const navigate = useNavigate();
     const [mounted, setMounted] = useState(false);
     const [activeSection, setActiveSection] = useState('interpretation');
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -13,34 +17,63 @@ export default function TermsPage() {
     // Handle hydration mismatch
     useEffect(() => {
         setMounted(true);
+        // Scroll to top on mount
+        window.scrollTo(0, 0);
+    }, []);
+
+    const scrollToSection = useCallback((id: string) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const offset = 100; // Increased offset to account for header
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.scrollY - offset;
+
+            window.scrollTo({
+                top: Math.max(0, offsetPosition),
+                behavior: 'smooth'
+            });
+            setActiveSection(id);
+        }
     }, []);
 
     useEffect(() => {
-        const handleScroll = () => {
-            const sections = document.querySelectorAll('[data-section]');
-            const scrollPosition = window.scrollY + 100;
-
-            sections.forEach((section) => {
-                if (section instanceof HTMLElement) {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.offsetHeight;
-
-                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                        setActiveSection(section.id);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        setActiveSection(sectionId);
                     }
-                }
-            });
+                });
+            },
+            {
+                rootMargin: '-100px 0px -66%',
+                threshold: 0.1
+            }
+        );
 
-            // Calculate scroll progress
+        // Observe all sections
+        document.querySelectorAll('[data-section]').forEach((section) => {
+            observer.observe(section);
+        });
+
+        // Calculate scroll progress
+        const handleScroll = () => {
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
+            const scrollPosition = window.scrollY;
             const maxScroll = documentHeight - windowHeight;
-            const progress = Math.min((window.scrollY / maxScroll) * 100, 100);
+            const progress = Math.min((scrollPosition / maxScroll) * 100, 100);
             setScrollProgress(progress);
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Initial calculation
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleScroll);
+        };
     }, []);
 
     const navItems = [
@@ -60,21 +93,22 @@ export default function TermsPage() {
         { id: 'miscellaneous', label: 'Miscellaneous' },
     ];
 
-    const scrollToSection = (id: string) => {
-        const element = document.getElementById(id);
-        if (element) {
-            const yOffset = -100;
-            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-    };
-
     if (!mounted) {
         return null; // Prevent hydration issues by not rendering until mounted
     }
 
     return (
         <div className="relative min-h-screen bg-background">
+            {/* Back button */}
+            <Button
+                variant="ghost"
+                size="icon"
+                className="fixed top-6 left-6 z-50"
+                onClick={() => navigate(-1)}
+            >
+                <ChevronLeft className="h-6 w-6" />
+            </Button>
+
             {/* Progress bar */}
             <div
                 className="fixed top-0 left-0 h-1 bg-blue-500 z-50 transition-all duration-300"
@@ -97,8 +131,8 @@ export default function TermsPage() {
                         transition={{ duration: 0.5 }}
                         className="relative"
                     >
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6 text-foreground">Terms and Conditions</h1>
-                        <div className="inline-flex items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md">
+                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mt-[67px]  text-foreground">Terms and Conditions</h1>
+                        <div className="inline-flex h-10 mt-6 items-center px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-md">
                             <span className="relative flex h-2 w-2 mr-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
@@ -425,7 +459,7 @@ export default function TermsPage() {
             {/* Large background text - Only render when mounted */}
 
             {mounted && (
-                <div className="w-full overflow-hidden mt-[-100px] py-[-100px] h-[380px] relative z-0">
+                <div className="w-full -z-200 overflow-hidden mt-[-100px] py-[-100px] h-[380px] relative z-0">
                     <div
                         className="text-[#161616] dark:text-blue-100 text-[500px] leading-none text-center font-bold select-none opacity-10 flex items-baseline justify-center"
                         onClick={() => {
