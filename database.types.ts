@@ -1274,6 +1274,7 @@ export type Database = {
       organization_providers_settings: {
         Row: {
           created_at: string
+          email_sent: boolean
           is_connected: boolean
           is_phone_verified: boolean
           metadata: Json | null
@@ -1284,6 +1285,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_sent?: boolean
           is_connected?: boolean
           is_phone_verified?: boolean
           metadata?: Json | null
@@ -1294,6 +1296,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_sent?: boolean
           is_connected?: boolean
           is_phone_verified?: boolean
           metadata?: Json | null
@@ -1944,6 +1947,7 @@ export type Database = {
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
           first_payment_type: Database["public"]["Enums"]["first_payment_type"]
+          image_url: string | null
           merchant_id: string
           metadata: Json | null
           name: string
@@ -1963,6 +1967,7 @@ export type Database = {
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
           first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+          image_url?: string | null
           merchant_id: string
           metadata?: Json | null
           name: string
@@ -1982,6 +1987,7 @@ export type Database = {
             | Database["public"]["Enums"]["failed_payment_action"]
             | null
           first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+          image_url?: string | null
           merchant_id?: string
           metadata?: Json | null
           name?: string
@@ -2465,23 +2471,42 @@ export type Database = {
         }
         Returns: string
       }
-      create_subscription_plan: {
-        Args: {
-          p_merchant_id: string
-          p_organization_id: string
-          p_name: string
-          p_description: string
-          p_billing_frequency: Database["public"]["Enums"]["frequency"]
-          p_amount: number
-          p_currency_code?: Database["public"]["Enums"]["currency_code"]
-          p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
-          p_charge_day?: number
-          p_metadata?: Json
-          p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
-          p_display_on_storefront?: boolean
-        }
-        Returns: string
-      }
+      create_subscription_plan:
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_currency_code?: Database["public"]["Enums"]["currency_code"]
+              p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day?: number
+              p_metadata?: Json
+              p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+              p_display_on_storefront?: boolean
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_currency_code?: Database["public"]["Enums"]["currency_code"]
+              p_failed_payment_action?: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day?: number
+              p_metadata?: Json
+              p_first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
+              p_display_on_storefront?: boolean
+              p_image_url?: string
+            }
+            Returns: string
+          }
       create_support_request: {
         Args: {
           p_merchant_id: string
@@ -3227,6 +3252,7 @@ export type Database = {
           created_at: string
           updated_at: string
           display_on_storefront: boolean
+          image_url: string
         }[]
       }
       fetch_subscription_transactions: {
@@ -3692,11 +3718,36 @@ export type Database = {
         }
         Returns: undefined
       }
+      send_provider_connected_notification: {
+        Args: {
+          p_organization_id: string
+          p_provider_code: Database["public"]["Enums"]["provider_code"]
+        }
+        Returns: undefined
+      }
       send_signup_notification: {
         Args: {
           merchant_name: string
           merchant_email: string
           signup_date: string
+        }
+        Returns: undefined
+      }
+      send_support_request_notification: {
+        Args: {
+          p_merchant_name: string
+          p_merchant_email: string
+          p_category: Database["public"]["Enums"]["support_category"]
+          p_message: string
+          p_image_url: string
+          p_created_at: string
+        }
+        Returns: undefined
+      }
+      send_wave_provider_connected_notification: {
+        Args: {
+          p_organization_id: string
+          p_provider_code: Database["public"]["Enums"]["provider_code"]
         }
         Returns: undefined
       }
@@ -3898,20 +3949,36 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_subscription_plan: {
-        Args: {
-          p_plan_id: string
-          p_name: string
-          p_description: string
-          p_billing_frequency: Database["public"]["Enums"]["frequency"]
-          p_amount: number
-          p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
-          p_charge_day: number
-          p_metadata: Json
-          p_display_on_storefront?: boolean
-        }
-        Returns: undefined
-      }
+      update_subscription_plan:
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+              p_display_on_storefront?: boolean
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+              p_display_on_storefront?: boolean
+              p_image_url?: string
+            }
+            Returns: undefined
+          }
       update_transaction_status: {
         Args: {
           transaction_id: string

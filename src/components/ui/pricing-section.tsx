@@ -8,7 +8,7 @@ interface PricingSectionProps {
   title: string
   subtitle: string
   tiers: PricingTier[]
-  frequencies: string[]
+  frequencies: [string, ...string[]]
 }
 
 export function PricingSection({
@@ -17,7 +17,7 @@ export function PricingSection({
   tiers,
   frequencies,
 }: PricingSectionProps) {
-  const [selectedFrequency, setSelectedFrequency] = React.useState(frequencies[0])
+  const [selectedFrequency, setSelectedFrequency] = React.useState<string>(frequencies[0])
 
   return (
     <section className="flex flex-col items-center gap-10 py-10">
