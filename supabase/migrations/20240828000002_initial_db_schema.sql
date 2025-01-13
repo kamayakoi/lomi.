@@ -270,6 +270,7 @@ CREATE TABLE organization_providers_settings (
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    email_sent BOOLEAN NOT NULL DEFAULT false,
     PRIMARY KEY (organization_id, provider_code),
     UNIQUE (organization_id, provider_code)
 );
