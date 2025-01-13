@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/actions/utils";
-import { Footer } from "@/components/landing/footer";
+import { Footer } from "@/components/landing/footer.tsx";
 
 export function ScrollFooter() {
     const [isVisible, setIsVisible] = useState(false);
