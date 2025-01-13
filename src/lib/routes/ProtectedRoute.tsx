@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
-import AnimatedLogoLoader from '@/components/dashboard/loader';
+import AnimatedLogoLoader from '@/components/portal/loader';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { isLoading, isAuthenticated, isOnboarded } = useAuthStatus();

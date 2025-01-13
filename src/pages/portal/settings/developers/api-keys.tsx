@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { PlusCircle, Trash2, Copy } from 'lucide-react'
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { Card, CardContent } from "@/components/ui/card"

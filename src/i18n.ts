@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from '@/lib/locales/en.json';
 import fr from '@/lib/locales/fr.json';
-
+import es from '@/lib/locales/es.json';
 const defaultLanguage = 'en';
 
 i18n
@@ -11,6 +11,7 @@ i18n
     resources: {
       en: { translation: en },
       fr: { translation: fr },
+      es: { translation: es },
     },
     lng: localStorage.getItem('language') || navigator.language.split('-')[0] || defaultLanguage,
     fallbackLng: defaultLanguage,

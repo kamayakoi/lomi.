@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useActivationContext } from '@/lib/actions/Activation-utils';
-import LoadingButton from '@/components/dashboard/loader';
+import LoadingButton from '@/components/portal/loader';
 
 export function ActivationRoute({ children }: { children: React.ReactNode }) {
     const { isLoading, isActivated, error } = useActivationContext();

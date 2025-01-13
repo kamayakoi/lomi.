@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from '@/utils/supabase/client'
 import { useSidebarData } from '@/lib/hooks/useSidebarData'
-import Loader from '@/components/dashboard/loader'
+import Loader from '@/components/portal/loader'
 
 interface PaymentMethod {
     channel: string;

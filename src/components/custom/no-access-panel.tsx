@@ -1,4 +1,4 @@
-import { UserNav } from '@/components/dashboard/no-access-user-nav';
+import { UserNav } from '@/components/portal/no-access-user-nav';
 
 export default function Component() {
     return (

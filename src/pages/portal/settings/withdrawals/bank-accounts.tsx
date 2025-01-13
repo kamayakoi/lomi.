@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { TrashIcon, ChevronRightIcon, CreditCard } from 'lucide-react'
-import { AddBankButton } from '@/components/dashboard/add-bank-account'
+import { AddBankButton } from '@/components/portal/add-bank-account'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { BankAccount } from './types'

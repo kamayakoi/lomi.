@@ -1,13 +1,13 @@
 import { Layout } from '@/components/custom/layout'
-import Notifications from '@/components/dashboard/notifications'
-import { UserNav } from '@/components/dashboard/user-nav'
+import Notifications from '@/components/portal/notifications'
+import { UserNav } from '@/components/portal/user-nav'
 import { Button } from '@/components/custom/button'
 import { integrationOptions } from './data.tsx'
-import { TopNav } from '@/components/dashboard/top-nav'
+import { TopNav } from '@/components/portal/top-nav'
 import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
-import FeedbackForm from '@/components/dashboard/feedback-form.tsx'
-import SupportForm from '@/components/dashboard/support-form'
+import FeedbackForm from '@/components/portal/feedback-form.tsx'
+import SupportForm from '@/components/portal/support-form'
 
 export default function Providers() {
   const topNav = [

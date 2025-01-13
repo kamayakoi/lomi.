@@ -1,6 +1,6 @@
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
 import NoAccessPanel from '@/components/custom/no-access-panel';
-import Loader from '@/components/dashboard/loader'
+import Loader from '@/components/portal/loader'
 
 export function withActivationCheck<P extends object>(WrappedComponent: React.ComponentType<P>) {
     return function WithActivationCheck(props: P) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/utils/supabase/client';
-import Loader from '@/components/dashboard/loader';
+import Loader from '@/components/portal/loader';
 import { ActivationContext } from '../actions/Activation-utils';
 
 interface ActivationProviderProps {

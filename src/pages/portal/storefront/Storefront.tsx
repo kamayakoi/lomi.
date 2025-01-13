@@ -2,18 +2,18 @@
 
 import { useState } from 'react'
 import { Layout } from '@/components/custom/layout'
-import { TopNav } from '@/components/dashboard/top-nav'
+import { TopNav } from '@/components/portal/top-nav'
 import { Separator } from '@/components/ui/separator';
-import FeedbackForm from '@/components/dashboard/feedback-form'
-import Notifications from '@/components/dashboard/notifications'
-import { UserNav } from '@/components/dashboard/user-nav'
+import FeedbackForm from '@/components/portal/feedback-form'
+import Notifications from '@/components/portal/notifications'
+import { UserNav } from '@/components/portal/user-nav'
 import { StorefrontPreview } from './storefront/storefront-preview'
 import { OrganizationSettings } from './storefront/settings'
 import { CheckoutPreview } from './storefront/checkout-preview'
 import { ConfirmationPreview } from './storefront/confirmation-preview'
 import { PortalPreview } from './storefront/portal-preview'
 import { PreviewSwitcher } from './storefront/preview-switcher'
-import SupportForm from '@/components/dashboard/support-form'
+import SupportForm from '@/components/portal/support-form'
 
 interface StorefrontSettings {
     orgName: string

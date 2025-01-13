@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Download, FileText, ChevronRight, Loader2, ArrowDownIcon } from 'lucide-react'

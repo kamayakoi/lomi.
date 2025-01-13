@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label'
 import { toast } from "@/components/ui/use-toast"
 import { supabase } from '@/utils/supabase/client'
 import Verify2FA from './verify-2fa'
-import { useRouter } from 'next/navigation'
 import { AuthError } from '@supabase/supabase-js'
+import { useNavigate } from 'react-router-dom'
 
 interface SignInFormData {
     email: string;
@@ -14,7 +14,7 @@ interface SignInFormData {
 }
 
 export default function SignInWith2FA() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<SignInFormData>({
         email: '',
         password: ''
@@ -92,7 +92,7 @@ export default function SignInWith2FA() {
             description: "Successfully signed in",
         });
         // Redirect to dashboard or home page
-        router.push('/portal/dashboard');
+        navigate('/portal/dashboard');
     };
 
     const handle2FACancel = async () => {

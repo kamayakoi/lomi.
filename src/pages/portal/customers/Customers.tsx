@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { PlusCircle, Edit, ArrowUpDown } from 'lucide-react'
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { useUser } from '@/lib/hooks/useUser'
-import AnimatedLogoLoader from '@/components/dashboard/loader'
+import AnimatedLogoLoader from '@/components/portal/loader'
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
 import { Skeleton } from '@/components/ui/skeleton'
-import FeedbackForm from '@/components/dashboard/feedback-form'
+import FeedbackForm from '@/components/portal/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
 import { Customer } from './dev_customers/types'
 import CustomerActions from './dev_customers/actions_customers'
@@ -39,7 +39,7 @@ import { countries } from '@/utils/data/onboarding'
 import { CustomerFilters } from './dev_customers/filters_customers'
 import { EditCustomerForm } from './dev_customers/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
-import SupportForm from '@/components/dashboard/support-form'
+import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
 import PhoneNumberInput from "@/components/ui/phone-number-input"

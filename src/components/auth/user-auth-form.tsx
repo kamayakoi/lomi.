@@ -9,7 +9,7 @@ import { cn } from '@/lib/actions/utils'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { AlertCircle } from "lucide-react"
-import Spinner from '@/components/dashboard/spinner'
+import Spinner from '@/components/portal/spinner'
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 

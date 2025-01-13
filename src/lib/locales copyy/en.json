@@ -1,0 +1,211 @@
+{
+  "dashboard": {
+    "title": "Getting Started",
+    "apiKeys": "Manage API keys",
+    "apiKeysDescription": "View and manage your API keys.",
+    "webhooks": "Set callback URLs",
+    "webhooksDescription": "Set up your Callback URLs for us to inform you of successful payments.",
+    "paymentLinks": "Create payment links",
+    "paymentLinksDescription": "Generate payment links to collect money easily.",
+    "integrations": "Set integrations",
+    "integrationsDescription": "Connect with various payment providers and services.",
+    "developerResources": "Developer Resources",
+    "documentation": "Documentation",
+    "documentationDescription": "Familiarize yourself with lomi. products with our docs.",
+    "apiReference": "API reference",
+    "apiReferenceDescription": "Find out how our APIs work and how you can deploy them.",
+    "integrationGuides": "Integration guides",
+    "integrationGuidesDescription": "Step-by-step guides to integrate lomi. into your app.",
+    "sampleProjects": "Sample projects",
+    "sampleProjectsDescription": "Explore sample projects to kickstart your integration.",
+    "support": "Support",
+    "supportDescription": "Get help and support from our team.",
+    "videos": "Videos",
+    "videosDescription": "Watch some videos to get you started very quickly."
+  },
+  
+  "footer": {
+    "company": "Company",
+    "solutions": "Solutions",
+    "caseStudies": "Case Studies",
+    "customers": "Customers",
+    "createAccount": "Create an Account",
+    "brandAssets": "Brand Assets",
+    "careers": "Careers",
+    "aboutUs": "About us",
+    "products": "Products",
+    "payments": "Payments",
+    "subscriptions": "Subscriptions",
+    "checkout": "Checkout",
+    "payouts": "Payouts",
+    "resources": "Resources",
+    "developers": "Developers",
+    "recipes": "Recipes",
+    "support": "Support",
+    "pricing": "Pricing",
+    "links": "Links",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "leaveTestimony": "Leave us a testimony",
+    "helpCenter": "Help center",
+    "community": "Community",
+    "github": "Github",
+    "linkedIn": "LinkedIn",
+    "twitter": "X | Twitter",
+    "slack": "Join our Slack",
+    "newsletters": "Newsletters",
+    "cookiePreferences": "Cookie Preferences",
+    "language": "Language",
+    "english": "English",
+    "french": "French",
+    "copyright": "© 2025 lomi.africa",
+    "address": "Abidjan, Côte d'Ivoire"
+  },
+
+  "faq": {
+    "support": "SUPPORT",
+    "title": "Frequently asked questions",
+    "description": "Get answers to common questions about our products.",
+    "stillHaveQuestions": "Still have questions for us?",
+    "visitSupportCenter": "visit our support center",
+    "questions": [
+      {
+        "question": "How quickly can I get started with lomi.?",
+        "answer": "Our onboarding is fast and straightforward. Once you set up your account and meet the KYC requirements outlined in our <a href='/terms' class='text-primary hover:underline'>Terms of Service</a>, you can start accepting payments."
+      },
+      {
+        "question": "How do I create an account to start accepting payments?",
+        "answer": "To access our platform, simply click on this <a href='/sign-in' class='text-primary hover:underline'>connect</a> link and follow the steps to create your account."
+      },
+      {
+        "question": "Can I schedule a demo to see how lomi. can help my business?",
+        "answer": "Absolutely! You can schedule a demo by contacting our team through the contact sales. We will respond promptly and guide you through the setup and integration process."
+      },
+      {
+        "question": "What are the requirements for registering my website or app?",
+        "answer": "Your app must meet our security and compliance standards. After registration, complete the KYC proces and once verified, you can integrate our API and begin accepting payments."
+      }
+    ]
+  },
+
+  "products": {
+    "customerLove": "CUSTOMER LOVE",
+    "title": "Our products",
+    "atLaunch": "at launch",
+    "description": "Our platform provide a frictionless customer experience for receiving funds.",
+    "hero": {
+      "title": "Frictionless payments for businesses",
+      "description": "Enable online payments and invoicing in minutes.\nAccept mobile money, cards, eWallets and bank payments with API, low-code, or no-code integration options.",
+      "start": "Start",
+      "inMinutes": "— in minutes"
+    },
+    "integrations": {
+      "title": "Payment Channel Partners",
+      "description": "lomi. integrates with a variety of providers to support your customers where they are.",
+      "comingSoon": "More integrations coming soon..."
+    }
+  },
+
+  "howItWorks": {
+    "keyBenefits": "Key Benefits",
+    "whyChooseUs": "Why choose",
+    "us": "us ?",
+    "description": "Accept online payments and offer your clients flexibility through our seamless checkout experience and payment methods integrations",
+    "products": {
+      "Accessibility": {
+        "title": "Accessibility",
+        "description": "Easily integrate our API to start accepting payments from multiple channels."
+      },
+      "Support": {
+        "title": "Support",
+        "description": "Our resources and support can help make integration quick and straightforward."
+      },
+      "Scalability": {
+        "title": "Scalability",
+        "description": "Our platform is built to scale with you, ensuring fast processing regardless of volume."
+      },
+      "Security": {
+        "title": "Security",
+        "description": "Advanced security features to protect your funds and customer data at all times."
+      }
+    }
+  },
+
+  "hero": {
+    "oneIntegration": "One integration",
+    "forAllYour": "for all your",
+    "paymentNeeds": "payment needs.",
+    "description": "We offer an easy-to-use API & financial gateway that connects with banks and networks across West Africa — making it simple for your business to handle transactions and scale faster.",
+    "lovedByBusinesses": "Loved by dozens of businesses and entrepreneurs.",
+    "learnMore": "Learn more",
+    "connect": "Connect"
+  },
+
+  "navbar": {
+    "Products": "Products",
+    "Integration": "Integration",
+    "Resources": "Resources",
+    "About": "About",
+    "contactSales": "Contact sales"
+  },
+
+  "bentoGrid": {
+    "paymentChannels": "Payment channels",
+    "paymentChannelsDescription": "Supports 5+ providers and more than 10 payment methods and counting.",
+    "getStarted": "Get started",
+    "checkout": "Checkout",
+    "checkoutDescription": "Streamline your customer checkout process with a flexible, customizable interface tailored to your business needs.",
+    "setUpYourCheckout": "Set up your checkout",
+    "orchestration": "Orchestration",
+    "orchestrationDescription": "Manage all your payments, subscriptions, payouts and more in one single place.",
+    "learnMore": "Learn more"
+  },
+
+  "integrations": {
+    "title": "Integration made easy",
+    "description": "Choose the integration option that best suits your needs",
+    "fullAPI": {
+      "title": "Full API",
+      "description": "<strong>Looking for a full API integration for a seamless user experience?</strong>",
+      "details": "It takes only a few lines of code to integrate our front-end module into your B2B platform.<br><br>Customize our product to fit your website and branding, and provide a fully integrated experience to your buyers."
+    },
+    "lowCode": {
+      "title": "Low Code",
+      "description": "<strong>Not ready for a full integration? Learn about our low-code option.</strong>",
+      "details": "No front-end java script code needed. Our low-code solution lets you get started quickly with minimal coding. Perfect for small businesses or those with limited tech resources. You can direct buyers to our hosted checkout page for payment.<br><br>Customize the interface to fit your brand and start accepting payments swiftly. This option is great for a quick start to all lomi. has to offer."
+    },
+    "noCode": {
+      "title": "No Code",
+      "description": "<strong>No developers? No problem. Use our no-code option to get started today.</strong>",
+      "details": "Easily create a one-time payment link from your lomi.'s dashboard and send it to your buyer for payment. Buyers will select their payment terms and method using the generated order URL.<br><br>No integration necessary!",
+      "linkText": "Get started now →"
+    },
+    "contactUs": "Contact us to learn more →",
+    "exploreDocs": "Explore our developer docs →"
+  },
+
+  "animatedList": {
+    "paymentReceived": "Payment received",
+    "minutesAgo": "{{minutes}}m ago",
+    "newMonthlySubscriber": "New monthly subscriber",
+    "payoutProcessed": "Payout processed"
+  },
+
+  "about": {
+    "mission": "Our mission is to make online payments simple, secure, and accessible for businesses across West Africa.",
+    "ourStory": "Our story",
+    "storyParagraph1": "Founded in 2025, lomi. emerged to address the challenges businesses face in managing transactions and enabling customer payments in a fragmented ecosystem.",
+    "storyParagraph2": "Managing diverse and growing payment methods is a headache for businesses and entrepreneurs alike. The payment providers are ever-increasing, and companies don't necessarly have the tools to orchestrate them effectively.",
+    "storyParagraph3": "We built a platform that can helps you sell your products, maximize your reach, and connect with your customers wherever they are, on the channels they use the most.",
+    "getStarted": "Get started",
+    "ourValues": "Our values",
+    "innovation": "Innovation",
+    "innovationDescription": "Constantly evolving to exceed our clients and partners expectations.",
+    "customerObsession": "Customer obsession",
+    "customerObsessionDescription": "Delivering unparalleled service and great support.",
+    "integrity": "Integrity",
+    "integrityDescription": "Upholding trust and transparency in every interaction.",
+    "speed": "Speed",
+    "speedDescription": "Delivering fast results with a focus on merchant-centered metrics."
+  }
+}

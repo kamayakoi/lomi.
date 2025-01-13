@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon } from 'lucide-react'
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -15,13 +15,13 @@ import { useUser } from '@/lib/hooks/useUser'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery, useQueryClient } from 'react-query'
-import AnimatedLogoLoader from '@/components/dashboard/loader'
+import AnimatedLogoLoader from '@/components/portal/loader'
 import TransactionActions from './dev_transactions.tsx/actions_transactions'
 import TransactionFilters from './dev_transactions.tsx/filters_transactions'
 import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
-import FeedbackForm from '@/components/dashboard/feedback-form'
-import SupportForm from '@/components/dashboard/support-form'
+import FeedbackForm from '@/components/portal/feedback-form'
+import SupportForm from '@/components/portal/support-form'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 
 

@@ -10,7 +10,7 @@ import OnboardingStep2 from './onboarding-step-2';
 import OnboardingStep3 from './onboarding-step-3';
 import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
-import LoadingButton from '@/components/dashboard/loader';
+import LoadingButton from '@/components/portal/loader';
 import WelcomeScreen from './welcome-screen';
 
 const steps = [

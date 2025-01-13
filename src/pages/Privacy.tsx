@@ -1,10 +1,7 @@
-import { Navbar } from '@/components/landing/Navbar';
-import { Footer } from '@/components/landing/Footer';
 
 const Privacy = () => {
     return (
         <>
-            <Navbar />
             <div className="bg-background text-dark-text dark:text-light-text"> {/* Adjust text color for light and dark modes */}
                 <div className="h-20"></div>
                 <main className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -180,7 +177,6 @@ const Privacy = () => {
                     </div>
                 </main >
             </div >
-            <Footer />
         </>
     );
 };

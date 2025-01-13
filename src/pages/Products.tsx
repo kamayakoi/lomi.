@@ -1,7 +1,5 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar } from '@/components/landing/Navbar-Signin';
-import { Footer } from '@/components/landing/Footer';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { OrbitingCirclesDemo } from '@/components/landing/OrbitingCircles';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +66,6 @@ const Products = () => {
 
     return (
         <div className="flex flex-col min-h-[100dvh] bg-background dark:bg-background">
-            <Navbar />
             <div className="h-24 md:hidden"></div>
             {/* Hero Section */}
             <section className="py-12 md:py-24 lg:py-32 text-left">
@@ -140,8 +137,6 @@ const Products = () => {
                     </div>
                 </div>
             </section>
-
-            <Footer />
         </div>
     );
 };

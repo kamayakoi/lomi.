@@ -7,7 +7,7 @@ import ActivationStep4 from './activation-step-4'
 import ActivationStep5 from './activation-step-5'
 import { useToast } from '@/components/ui/use-toast';
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
-import LoadingButton from '@/components/dashboard/loader';
+import LoadingButton from '@/components/portal/loader';
 import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/lib/hooks/useUser';

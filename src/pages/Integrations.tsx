@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { Navbar } from '@/components/landing/Navbar';
-import { Footer } from '@/components/landing/Footer';
 import { useTranslation } from 'react-i18next';
 
 import '@/lib/styles/home.css';
@@ -41,7 +39,6 @@ const Integrations = () => {
 
     return (
         <div className="flex flex-col min-h-screen bg-background dark:bg-background font-poppins">
-            <Navbar />
             <div className="h-24"></div>
             <div className="flex flex-1 flex-col items-center p-4 md:p-8 bg-background dark:bg-background border-b border-gray-300 dark:border-gray-700">
                 <div className="container mx-auto">
@@ -84,7 +81,6 @@ const Integrations = () => {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 };

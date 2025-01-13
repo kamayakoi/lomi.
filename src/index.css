@@ -2,57 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  background: hsl(var(--background));
+}
+
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior: none;
+  scroll-behavior: smooth;
+  background: hsl(var(--background));
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure smooth scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
 @layer base {
   :root {
     /* Custom CSS Variables */
     --header-height: 4rem;
 
     /* CSS Variables for light theme */
-    --background: 0 0% 100%;
-    --foreground: 240 7.7% 7.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 7.7% 7.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 7.7% 7.1%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%; /* Light theme */
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --background: 0, 0%, 100%;
+    --foreground: 0, 0%, 5%;
+    --card: 45 18% 96%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 45 18% 96%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 40, 11%, 89%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 40, 11%, 89%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 40, 10%, 94%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 240 7.7% 7.1%;
+    --destructive-foreground: 0 0% 98%;
+    --muted-foreground: 0, 0%, 38%;
+    --border: 45, 5%, 85%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
     --radius: 0.5rem;
-    --toast-border-radius: 0px; /* Add this for square toasts */
+    --toast-border-radius: 0px;
   }
 
   .dark {
-    --background: 240 7.7% 7.1%;
-    --foreground: 210 40% 98%;
-    --card: 240 7.7% 7.1%; /* #121317 */
-    --card-foreground: 210 40% 98%;
-    --popover: 240 7.7% 7.1%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 240 7.7% 7.1%; /* Update the --muted variable for dark mode */
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: 0, 0%, 5%;
+    --foreground: 0 0% 98%;
+    --card: 0, 0%, 5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0, 0%, 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 0, 0%, 11%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0, 0%, 11%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 0, 0%, 11%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 359, 100%, 61%;
+    --destructive-foreground: 0, 0%, 100%;
+    --muted-foreground: 0, 0%, 38%;
+    --border: 0, 0%, 17%;
+    --input: 0, 0%, 11%;
+    --ring: 240 4.9% 83.9%;
   }
+}
 
+@layer base {
   * {
     @apply border-border;
   }
@@ -88,7 +120,7 @@
 .collapsibleDropdown[data-state='open'] {
   animation: slideDown 200ms ease-out;
 }
-collapsibleDropdown[data-state='closed'] {
+.collapsibleDropdown[data-state='closed'] {
   animation: slideUp 200ms ease-out;
 }
 
@@ -173,25 +205,25 @@ collapsibleDropdown[data-state='closed'] {
 
 /* Side Navigation Hover Effect */
 .side-nav {
-    width: 250px; /* Initial width */
-    overflow: hidden; /* Hide overflow */
-    transition: width 0.3s ease-in-out; /* Smooth transition */
-    background-color: hsl(211, 100%, 89%); /* Light mode friendly */
-    color: var(--background); /* Light mode friendly */
+    width: 250px;
+    overflow: hidden;
+    transition: width 0.3s ease-in-out;
+    background-color: hsl(211, 100%, 89%);
+    color: var(--background);
     position: fixed;
-    right: 20px; /* Add some space from the right border */
+    right: 20px;
     top: 25%;
-    z-index: 1000; /* Ensure it stays on top */
-    border-radius: 1rem; /* More rounded corners */
+    z-index: 1000;
+    border-radius: 1rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    opacity: 0.7; /* Reduced opacity */
-        max-height: 50vh; /* Limit height to 50% of viewport */
-    overflow-y: auto; /* Enable vertical scrolling */
+    opacity: 0.7;
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 .side-nav:hover {
-    width: 160px; /* Expanded width on hover */
-    opacity: 1; /* Full opacity on hover */
+    width: 160px;
+    opacity: 1;
 }
 
 .side-nav ul {
@@ -201,17 +233,17 @@ collapsibleDropdown[data-state='closed'] {
 }
 
 .side-nav ul li {
-    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    transition: opacity 0.3s ease-in-out;
     padding: 0.5rem 1rem;
 }
 
 .side-nav ul li a {
-    color: black; /* Ensure text is always visible */
+    color: black;
     text-decoration: none;
 }
 
 .side-nav:hover ul li {
-    opacity: 1; /* Fully visible on hover */
+    opacity: 1;
 }
 
 .toggle-button {
@@ -227,44 +259,40 @@ collapsibleDropdown[data-state='closed'] {
     background-color: #0056b3;
 }
 
-/* New section styles for mobile */
-@media (max-width: 640px) { /* Tailwind's sm breakpoint */
+/* Mobile styles */
+@media (max-width: 640px) {
   .relative.flex.items-center.mt-6.group {
-    flex-direction: column; /* Stack items vertically on mobile */
-    align-items: center; /* Center items horizontally */
+    flex-direction: column;
+    align-items: center;
   }
   .relative.-ml,
   .relative.-ml-2 {
-    margin-left: 0; /* Remove negative margin on mobile */
-    margin-bottom: 1rem; /* Add space between items */
+    margin-left: 0;
+    margin-bottom: 1rem;
   }
   .relative.-ml img,
   .relative.-ml-2 img {
-    margin-left: 0; /* Ensure images are aligned properly */
+    margin-left: 0;
   }
   .relative.-ml img + img,
   .relative.-ml-2 img + img {
-    left: 0 !important; /* Adjust heart icon position */
-    top: 0 !important; /* Adjust heart icon position */
+    left: 0 !important;
+    top: 0 !important;
   }
   .text-lg.text-gray-600.dark:text-gray-300.ml-2 {
-    margin-left: 0; /* Remove left margin on mobile */
-    text-align: center; /* Center text on mobile */
+    margin-left: 0;
+    text-align: center;
   }
-}
-
-*::-webkit-scrollbar {
-    display: none;
 }
 
 /* Toast styles */
 [role="status"][data-state="open"],
 [role="alert"][data-state="open"] {
-  border-radius: 0 !important; /* Force square corners */
+  border-radius: 0 !important;
 }
 
 [role="region"][id^="toast-"] {
-  border-radius: 0 !important; /* Force square corners for toast viewport */
+  border-radius: 0 !important;
 }
 
 .toast-root {

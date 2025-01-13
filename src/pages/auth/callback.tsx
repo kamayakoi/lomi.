@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
-import LoadingButton from '@/components/dashboard/loader';
+import LoadingButton from '@/components/portal/loader';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 

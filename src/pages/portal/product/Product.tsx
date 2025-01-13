@@ -1,17 +1,17 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
-import FeedbackForm from '@/components/dashboard/feedback-form'
+import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { Product } from './dev_product/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CreateProductForm } from './dev_product/form_product'
 import { ProductFilters } from './dev_product/filters_product'
-import SupportForm from '@/components/dashboard/support-form'
+import SupportForm from '@/components/portal/support-form'
 import {
     Dialog,
     DialogContent,

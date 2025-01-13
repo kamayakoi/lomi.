@@ -9,10 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { X } from "lucide-react"
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
-import FeedbackForm from "@/components/dashboard/feedback-form"
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
+import FeedbackForm from "@/components/portal/feedback-form"
 
 export default function PayoutLinksPage() {
     const [isCreateOpen, setIsCreateOpen] = useState(false)

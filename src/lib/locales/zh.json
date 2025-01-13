@@ -1,0 +1,198 @@
+{
+    "footer": {
+        "tagline": "连接非洲与世界，一次交易一步到位。",
+        "features": {
+            "title": "功能",
+            "overview": "概览",
+            "sellProducts": "销售产品",
+            "sellSubscriptions": "销售订阅",
+            "sellWhatsApp": "在WhatsApp上销售",
+            "sellWebsite": "在您的网站上销售",
+            "sendInvoices": "账单",
+            "pricing": "定价",
+            "faq": "常见问题"
+        },
+        "resources": {
+            "title": "资源",
+            "github": "Github",
+            "support": "支持",
+            "privacy": "隐私政策",
+            "terms": "条款和条件",
+            "branding": "品牌",
+            "featureRequest": "请求功能 | 集成",
+            "review": "给我们评价"
+        },
+        "company": {
+            "title": "公司",
+            "story": "故事",
+            "blog": "博客",
+            "openSource": "开源"
+        },
+        "subscribe": {
+            "placeholder": "电子邮件地址**",
+            "button": "订阅"
+        },
+        "status": "系统运行正常",
+        "copyright": "版权所有 © 2025 — lomi.africa",
+        "star": "星标"
+    },
+    "hero": {
+        "buttons": {
+            "launch": "阅读我们的发布文章",
+            "developers": "访问 developers.lomi.africa"
+        },
+        "title": {
+            "prefix": "一个",
+            "rotatingWords": ["集成", "基础设施", "API", "网关", "解决方案"],
+            "suffix": "满足您所有支付需求。"
+        },
+        "description": "我们提供对开发者友好的支付编排平台，连接西非的银行和网络 — 让您的企业更简单地处理交易并更快地扩展。"
+    },
+    "topBanner": {
+        "text": "我们已在 Product Hunt 上线",
+        "cta": "支持我们！"
+    },
+    "actions": {
+        "talk": "联系我们",
+        "connect": "连接"
+    },
+    "auth": {
+        "sign_in": {
+            "title": "欢迎回来",
+            "subtitle": "登录以探索 psychoroid.com",
+            "email_placeholder": "电子邮箱**",
+            "password_placeholder": "密码**",
+      "forgot_password": "忘记密码？",
+      "connect_button": "登录",
+      "processing": "处理中...",
+      "or_continue": "或继续使用",
+      "google": "Google",
+      "github": "GitHub",
+      "no_account": "还没有账号？",
+      "sign_up_link": "注册",
+      "success": "成功",
+      "success_message": "登录成功。",
+      "error": {
+        "default": "登录时出现错误。请重试。",
+        "invalid_credentials": "邮箱或密码无效。请重试或注册新账号。",
+        "email_not_confirmed": "请在登录前确认您的邮箱。",
+        "unexpected": "发生意外错误。请稍后重试。",
+        "oauth": "使用 {provider} 登录时出现问题。请重试。"
+      }
+    },
+    "sign_up": {
+      "title": "创建账户",
+      "full_name_placeholder": "全名**",
+      "email_placeholder": "电子邮箱**",
+      "password_placeholder": "密码**",
+      "submit_button": "创建账户",
+      "creating": "正在创建账户...",
+      "processing": "正在创建账户...",
+      "continue_with": "或继续使用",
+      "google": "Google",
+      "github": "GitHub",
+      "error": {
+        "default": "创建账户时出错。请重试。",
+        "email_in_use": "此电子邮箱已被使用。请使用其他邮箱或登录。",
+        "invalid_email": "请输入有效的电子邮箱。",
+        "invalid_password": "密码必须至少包含8个字符。",
+        "invalid_name": "请输入您的全名。"
+      },
+      "resend_email": {
+        "title": "邮件已重发",
+        "success": "新的验证邮件已发送到您的邮箱。",
+        "error": {
+          "title": "错误",
+          "description": "重发验证邮件时出现问题。请重试。"
+        }
+      }
+    },
+    "forgot_password": {
+      "title": "重置密码",
+      "email_placeholder": "电子邮箱**",
+      "submit_button": "发送重置链接",
+      "sending": "发送中...",
+      "success": "成功",
+      "success_message": "重置密码邮件已发送。请检查您的收件箱。",
+      "error": "发送邮件时出现问题。请重试。",
+      "rate_limit_error": "请求过于频繁。请等待几分钟后再试。"
+    },
+    "check_email": {
+      "title": "检查您的邮箱",
+      "message": "我们已向 <email> 发送确认邮件。请检查您的收件箱并按照说明完成注册。",
+      "resend": "没有收到邮件？检查垃圾邮件文件夹或",
+      "resend_link": "重新发送邮件"
+    },
+    "modal": {
+      "title": "登录 psychoroid.com",
+      "description": "登录以继续使用 psychoroid.com 并访问您的账号"
+    },
+    "otp": {
+      "title": "输入验证码",
+      "submit_button": "验证邮箱",
+      "processing": "验证中...",
+      "success": "成功",
+      "success_message": "OTP 验证成功。",
+      "error": {
+        "default": "OTP 无效。请重试。",
+        "unexpected": "验证 OTP 时出现错误。请重试。"
+      }
+    },
+    "pages": {
+      "sign_in": {
+        "title": "欢迎回来",
+        "subtitle": "输入您的邮箱以登录账号。",
+        "home_link": "首页",
+        "quote": "为艺术家和企业提供领先的3D解决方案。",
+        "company": "psychoroid.com"
+      },
+      "sign_up": {
+        "title": "创建账号",
+        "terms_text": "创建账号即表示您同意我们的",
+        "terms_link": "服务条款",
+        "and": "和",
+        "privacy_link": "隐私政策",
+        "period": "。"
+      },
+      "forgot_password": {
+        "title": "重置密码",
+        "no_account": "还没有账号？",
+        "sign_up_link": "注册",
+        "email_resent": {
+          "title": "邮件已重发",
+          "description": "新的验证邮件已发送到您的收件箱。"
+        },
+        "error": {
+          "title": "错误",
+          "description": "重发邮件时出现问题。请重试。"
+        }
+      },
+      "reset_password": {
+        "title": "重置密码",
+        "new_password": "新密码",
+        "confirm_password": "确认密码",
+        "placeholder": {
+          "new": "新密码**",
+          "confirm": "确认密码**"
+        },
+        "validation": {
+          "min_length": "密码必须至少包含8个字符",
+          "match": "密码不匹配"
+        },
+        "button": {
+          "submit": "重置密码",
+          "processing": "重置中..."
+        },
+        "success": {
+          "title": "成功",
+          "description": "您的密码已成功重置。"
+        },
+        "error": {
+          "title": "错误",
+          "description": "重置密码时出现问题。请重试。",
+          "invalid_link": "重置链接无效或已过期。请重新申请。"
+        }
+      }
+    }
+  }
+}

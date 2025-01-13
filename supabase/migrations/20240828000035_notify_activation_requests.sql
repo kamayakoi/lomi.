@@ -117,14 +117,14 @@ AFTER INSERT OR UPDATE ON organization_kyc
 FOR EACH ROW
 EXECUTE FUNCTION public.notify_new_activation_request();
 
--- Function to send notification when Wave provider is connected
-CREATE OR REPLACE FUNCTION public.send_wave_provider_connected_notification(
+-- Function to send notification when a provider is connected
+CREATE OR REPLACE FUNCTION public.send_provider_connected_notification(
     p_organization_id UUID,
     p_provider_code provider_code
 ) RETURNS void AS $$
 DECLARE
   resend_api_key TEXT;
-  notification_email TEXT := 'hello@lomi.africa';
+  notification_emails TEXT[];
   email_subject TEXT;
   email_content TEXT;
   response_status INTEGER;
@@ -136,28 +136,46 @@ DECLARE
   business_description TEXT;
   country TEXT;
   email_already_sent BOOLEAN;
+  provider_name TEXT;
+  from_email TEXT;
+  recipient TEXT;
+  business_platform_url TEXT;
+  legal_organization_name TEXT;
+  tax_number TEXT;
 BEGIN
-  -- Log the function entry
-  RAISE NOTICE 'Starting Wave provider notification for organization_id: % and provider_code: %', p_organization_id, p_provider_code;
+  -- Set provider-specific details
+  provider_name := CASE p_provider_code
+    WHEN 'WAVE'::provider_code THEN 'Wave'
+    WHEN 'ORANGE'::provider_code THEN 'Orange Money'
+    WHEN 'MTN'::provider_code THEN 'MTN Mobile Money'
+    ELSE 'Unknown Provider'
+  END;
 
-  -- Only send for Wave provider
-  IF p_provider_code != 'WAVE'::provider_code THEN
-    RAISE NOTICE 'Provider code is not WAVE, exiting function';
-    RETURN;
-  END IF;
+  from_email := CASE p_provider_code
+    WHEN 'WAVE'::provider_code THEN 'wave@updates.lomi.africa'
+    WHEN 'ORANGE'::provider_code THEN 'orange@updates.lomi.africa'
+    WHEN 'MTN'::provider_code THEN 'mtn@updates.lomi.africa'
+    ELSE 'system@updates.lomi.africa'
+  END;
 
-  -- Check if email has already been sent for this organization-provider combination
+  -- Set notification emails based on provider
+  notification_emails := CASE p_provider_code
+    WHEN 'WAVE'::provider_code THEN ARRAY[
+      'ci-payment-admins@wave.com',
+      'hello@lomi.africa'
+    ]
+    WHEN 'ORANGE'::provider_code THEN ARRAY['hello@lomi.africa']
+    WHEN 'MTN'::provider_code THEN ARRAY['hello@lomi.africa']
+    ELSE ARRAY['hello@lomi.africa']
+  END;
+
+  -- Check if email has already been sent
   SELECT email_sent 
   INTO email_already_sent
   FROM organization_providers_settings
   WHERE organization_id = p_organization_id AND provider_code = p_provider_code;
 
-  -- Log email sent status
-  RAISE NOTICE 'Email already sent status: %', email_already_sent;
-
-  -- If email has already been sent, return early
   IF email_already_sent THEN
-    RAISE NOTICE 'Email was already sent, exiting function';
     RETURN;
   END IF;
 
@@ -168,128 +186,122 @@ BEGIN
     ok.authorized_signatory_name,
     ok.authorized_signatory_email,
     ok.business_description,
-    ok.legal_country
+    ok.legal_country,
+    ok.business_platform_url,
+    ok.legal_organization_name,
+    ok.tax_number
   INTO
     merchant_id,
     organization_name,
     signatory_name,
     signatory_email,
     business_description,
-    country
+    country,
+    business_platform_url,
+    legal_organization_name,
+    tax_number
   FROM organizations o
   JOIN merchant_organization_links mol ON o.organization_id = mol.organization_id
   LEFT JOIN organization_kyc ok ON o.organization_id = ok.organization_id AND ok.status = 'approved'
   WHERE o.organization_id = p_organization_id;
 
-  -- Log merchant details retrieval
-  RAISE NOTICE 'Retrieved merchant details - merchant_id: %, org_name: %, signatory: %', merchant_id, organization_name, signatory_name;
-
-  -- Get the Resend API key securely with error handling
+  -- Get the Resend API key
   BEGIN
     resend_api_key := secrets.get_resend_api_key();
-    RAISE NOTICE 'Successfully retrieved Resend API key';
   EXCEPTION WHEN OTHERS THEN
-    RAISE WARNING 'Failed to get Resend API key: %', SQLERRM;
     RETURN;
   END;
   
   -- Format the subject 
-  email_subject := format('Organization Connected Wave Provider - %s', organization_name);
+  email_subject := format('An organization has connected %s - %s', provider_name, COALESCE(legal_organization_name, organization_name));
   
   -- Compose the email content  
   email_content := format(
-    'An organization has succesfully connected the Wave payment channel on lomi.
+    'An organization has succesfully connected the %s payment channel on the lomi. platform.
 
 Organization details:
 - Organization ID (internal): %s
 - Organization Name: %s
 - Authorized Signatory: %s
 - Signatory Email: %s
+- Tax Number: %s
 - Business Description: %s
+- Website: %s
 - Country: %s
 
-The organization can now enable Wave payments for their customers. Thank you so much for your trust.
+The organization can now enable %s payments for their customers. Thank you so much for your trust.
 
-Please reply to this email to get more information about the concerned organization including their legal representative ID (passport / ID card), their address proof and business registration documents.
+Please reply to this email to get more details about the concerned organization including their legal representative ID (passport / ID card), their address proof and business registration documents.
 
-lomi. System',
+lomi.',
+    provider_name,
     merchant_id,
-    organization_name,
-    signatory_name,
-    signatory_email,
-    business_description,
-    country
+    COALESCE(legal_organization_name, 'Not provided'),
+    COALESCE(signatory_name, 'Not provided'),
+    COALESCE(signatory_email, 'Not provided'),
+    COALESCE(tax_number, 'Not provided'),
+    COALESCE(business_description, 'Not provided'),
+    COALESCE(business_platform_url, 'Not provided'),
+    COALESCE(country, 'Not provided'),
+
+    provider_name
   );
 
-  -- Log email preparation
-  RAISE NOTICE 'Prepared email with subject: %', email_subject;
+  -- Send the email to each recipient for the provider
+  FOREACH recipient IN ARRAY notification_emails
+  LOOP
+    BEGIN
+      SELECT 
+        status,
+        content::text
+      INTO 
+        response_status,
+        response_body  
+      FROM extensions.http((
+        'POST',
+        'https://api.resend.com/emails',
+        ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
+        'application/json',
+        jsonb_build_object(
+          'from', format('lomi. — %s <%s>', provider_name, from_email),
+          'to', recipient,
+          'reply_to', 'hello@lomi.africa',
+          'subject', email_subject,
+          'text', email_content,
+          'click_tracking', true,
+          'open_tracking', true
+        )::text
+      ));
 
-  -- Send the email via Resend with error handling
-  BEGIN
-    SELECT 
-      status,
-      content::text
-    INTO 
-      response_status,
-      response_body  
-    FROM extensions.http((
-      'POST',
-      'https://api.resend.com/emails',
-      ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
-      'application/json',
-      jsonb_build_object(
-        'from', 'lomi. — Wave <wave@updates.lomi.africa>',
-        'to', notification_email,
-        'subject', email_subject,
-        'text', email_content,
-        'click_tracking', true,
-        'open_tracking', true
-      )::text
-    ));
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END;
+  END LOOP;
 
-    -- Log response from Resend API
-    RAISE NOTICE 'Resend API response - status: %, body: %', response_status, response_body;
+  -- Update email_sent flag after attempting to send to all recipients
+  UPDATE organization_providers_settings
+  SET email_sent = true
+  WHERE organization_id = p_organization_id AND provider_code = p_provider_code;
 
-    IF response_status >= 400 THEN
-      RAISE WARNING 'Resend API returned error status %: %', response_status, response_body;
-    ELSE
-      RAISE NOTICE 'Wave provider connected notification sent successfully. Status: %, Response: %', response_status, response_body;
-      -- Update email_sent flag
-      UPDATE organization_providers_settings
-      SET email_sent = true
-      WHERE organization_id = p_organization_id AND provider_code = p_provider_code;
-      
-      -- Log the update of email_sent flag
-      RAISE NOTICE 'Updated email_sent flag to true for organization_id: % and provider_code: %', p_organization_id, p_provider_code;
-    END IF;
-
-  EXCEPTION WHEN OTHERS THEN
-    RAISE WARNING 'Failed to send Wave provider connected notification: %', SQLERRM;
-  END;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Create trigger function for Wave provider connected
-CREATE OR REPLACE FUNCTION public.notify_wave_provider_connected()
+-- Create trigger function for provider connections
+CREATE OR REPLACE FUNCTION public.notify_provider_connected()
 RETURNS TRIGGER AS $$  
 BEGIN
-  -- Log trigger execution
-  RAISE NOTICE 'Wave provider trigger fired - Operation: %, is_connected: %, provider_code: %', TG_OP, NEW.is_connected, NEW.provider_code;
-
-  -- Only send notification when is_connected changes to true for Wave provider
-  IF TG_OP = 'UPDATE' AND NEW.is_connected = true AND NEW.provider_code = 'WAVE'::provider_code THEN
-    RAISE NOTICE 'Conditions met, calling send_wave_provider_connected_notification for organization_id: %', NEW.organization_id;
-    PERFORM public.send_wave_provider_connected_notification(NEW.organization_id, NEW.provider_code);
-  ELSE
-    RAISE NOTICE 'Conditions not met - TG_OP: %, is_connected: %, provider_code: %', TG_OP, NEW.is_connected, NEW.provider_code;
+  -- Only send notification when is_connected changes to true for supported providers
+  IF TG_OP = 'UPDATE' AND NEW.is_connected = true AND 
+     NEW.provider_code IN ('WAVE'::provider_code, 'ORANGE'::provider_code, 'MTN'::provider_code) THEN
+    PERFORM public.send_provider_connected_notification(NEW.organization_id, NEW.provider_code);
   END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Create trigger for Wave provider connected notifications  
-DROP TRIGGER IF EXISTS notify_wave_provider_connected_trigger ON organization_providers_settings;
-CREATE TRIGGER notify_wave_provider_connected_trigger
+-- Create trigger for provider connected notifications  
+DROP TRIGGER IF EXISTS notify_provider_connected_trigger ON organization_providers_settings;
+CREATE TRIGGER notify_provider_connected_trigger
 AFTER UPDATE ON organization_providers_settings
 FOR EACH ROW  
-EXECUTE FUNCTION public.notify_wave_provider_connected(); 
+EXECUTE FUNCTION public.notify_provider_connected(); 

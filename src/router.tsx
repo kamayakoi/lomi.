@@ -22,7 +22,7 @@ import NotFoundError from './pages/errors/not-found-error.tsx';
 import MaintenanceError from './pages/errors/maintenance-error.tsx';
 
 // Dashboard
-import AppShell from './components/dashboard/app-shell';
+import AppShell from './components/portal/app-shell';
 import Dashboard from '@/pages/portal/dashboard/Dashboard';
 import Integrators from '@/pages/portal/Integrate/Integrate.tsx';
 import PaymentChannels from './pages/portal/payment-channels/paymentChannels.tsx';

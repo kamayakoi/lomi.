@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PaymentSettings } from './payment-settings'
 import { FeeSettings } from './fee-settings'
 import { NotificationSettings } from './notification-settings'
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from '@/utils/supabase/client'
 import { useSidebarData } from '@/lib/hooks/useSidebarData'

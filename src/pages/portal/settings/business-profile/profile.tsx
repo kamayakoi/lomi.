@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
-import ContentSection from '@/components/dashboard/content-section'
+import ContentSection from '@/components/portal/content-section'
 import { supabase } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle, PencilIcon, CheckIcon, X } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"

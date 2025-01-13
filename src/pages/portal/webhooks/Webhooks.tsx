@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
-import FeedbackForm from '@/components/dashboard/feedback-form'
+import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { fetchWebhooks } from './dev_webhooks/support_webhooks'
 import { Webhook, webhook_event, webhookCategories } from './dev_webhooks/types'
@@ -33,7 +33,7 @@ import {
 import { useQuery } from 'react-query'
 import WebhookActions from './dev_webhooks/edit_webhooks'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
-import SupportForm from '@/components/dashboard/support-form'
+import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"

@@ -1,33 +1,42 @@
-import { FAQ } from "@/components/landing/FAQ";
-import { Footer } from "@/components/landing/Footer";
-import { Hero } from "@/components/landing/Hero";
-import { Navbar } from "@/components/landing/Navbar";
-import { Products } from "@/components/landing/Products"
-import { HowItWorks } from "@/components/landing/HowItWorks";
+import { Hero } from "@/components/landing/animated-hero"
+import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
+import { TopBanner } from '@/components/landing/top-banner'
+import { ScrollFooter } from '@/components/landing/scroll-footer'
+import ThreeDImage from '@/components/landing/3d-image'
 
-function Homepage() {
+export default function Page() {
   return (
-    <>
-      <Navbar />
-      <main>
-        <div className="h-16"></div>
-        <section className="hero-section">
-          <Hero />
-        </section>
-        <section>
-          <HowItWorks />
-        </section>
-        <section>
-          <Products />
-        </section>
-        <section>
-          <FAQ />
-        </section>
-      </main>
-      <div className="border-b border-gray-300 dark:border-gray-700"></div>
-      <Footer />
-    </>
-  );
-}
+    <main className="relative bg-background">
+      <div className="min-h-[80vh] sm:min-h-screen select-none">
+        <TopBanner />
+        {/* Main Content */}
+        <div className="container mx-auto px-4 sm:px-6 flex flex-col min-h-[calc(80vh-40px)] sm:min-h-[calc(100vh-40px)] pt-8 sm:pt-16">
+          {/* Hero Section */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 -mt-12 sm:-mt-24">
+            <div className="text-zinc-900 dark:text-white w-full sm:max-w-2xl relative z-20">
+              <Hero />
+              {/* Custom Buttons */}
+              <div className="flex flex-row items-start gap-3 mt-6 sm:mt-8 relative z-20 pl-4 sm:pl-2">
+                <ButtonExpandTalkToUs />
+                <ButtonExpandIconRight />
+              </div>
+            </div>
 
-export default Homepage;
+            {/* 3D Image */}
+            <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[32%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
+              <ThreeDImage
+                src="/portal2.png"
+                alt="Dashboard Preview"
+                width={700}
+                height={500}
+                className="w-full max-w-[900px]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ScrollFooter />
+    </main>
+  )
+}

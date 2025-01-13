@@ -1,17 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Code, FileText, BookOpen, FileCode, HelpCircle, Link as LinkIcon, Plug } from 'lucide-react'
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Link } from 'react-router-dom'
 import { Settings2 } from 'lucide-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { Video } from 'lucide-react'
-import FeedbackForm from '@/components/dashboard/feedback-form'
-import SupportForm from '@/components/dashboard/support-form'
-import ApiKeysSection from '@/components/dashboard/api-key-panel'
+import FeedbackForm from '@/components/portal/feedback-form'
+import SupportForm from '@/components/portal/support-form'
+import ApiKeysSection from '@/components/portal/api-key-panel'
 
 export default function Dashboard() {
   const topNav = [

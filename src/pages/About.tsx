@@ -1,8 +1,6 @@
-import { NavbarAbout } from '@/components/landing/Navbar-About';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTranslation } from 'react-i18next';
-import { FooterAbout } from '@/components/landing/Footer-About';
 import { useEffect } from 'react';
 import { useTheme } from '@/lib/hooks/useTheme';
 
@@ -20,7 +18,6 @@ const About = () => {
     return (
         <div className="relative w-full min-h-screen bg-gray-900 overflow-hidden">
             <div className="min-h-screen pb-20">
-                <NavbarAbout />
                 <div className="h-(-10)"></div>
 
                 <div
@@ -108,7 +105,6 @@ const About = () => {
                 </div>
             </div>
             <div className="relative z-20">
-                <FooterAbout />
             </div>
         </div>
     );

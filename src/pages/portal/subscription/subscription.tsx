@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TopNav } from '@/components/dashboard/top-nav'
-import { UserNav } from '@/components/dashboard/user-nav'
-import Notifications from '@/components/dashboard/notifications'
+import { TopNav } from '@/components/portal/top-nav'
+import { UserNav } from '@/components/portal/user-nav'
+import Notifications from '@/components/portal/notifications'
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
-import FeedbackForm from '@/components/dashboard/feedback-form'
+import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
 import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
 import { SubscriptionPlan, Subscription, frequencyColors } from './dev_subscription/types'
@@ -16,7 +16,7 @@ import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './dev_subscription/form_subscriptions'
 import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
 import { SubscriptionStatus } from './dev_subscription/filters_subscriptions'
-import SupportForm from '@/components/dashboard/support-form'
+import SupportForm from '@/components/portal/support-form'
 import {
   Dialog,
   DialogContent,
