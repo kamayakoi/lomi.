@@ -1,7 +1,7 @@
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
-import { ScrollFooter } from '@/components/design/scroll-footer'
+import { Footer } from '@/components/landing/footer'
 import ThreeDImage from '@/components/landing/3d-image'
 
 export default function Page() {
@@ -36,7 +36,9 @@ export default function Page() {
         </div>
       </div>
 
-      <ScrollFooter />
+      <div className="scroll-footer bottom-0 left-0 mt-16 right-0 pb-0">
+        <Footer />
+      </div>
     </main>
   )
 }
