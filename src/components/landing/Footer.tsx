@@ -57,16 +57,24 @@ export function Footer() {
 
     useEffect(() => {
         const fetchStarCount = async () => {
+            setIsLoading(true)
             try {
                 const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
                     headers: {
-                        'Authorization': `Bearer ${process.env['GITHUB_API_TOKEN']}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
+                        'Accept': 'application/vnd.github.v3+json',
+                        'User-Agent': 'LomiFooter'
+                    },
+                    cache: 'no-store'
                 });
+
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`)
+                }
+
                 const data = await response.json();
-                setStarCount(data.stargazers_count || 6);
-            } catch {
+                setStarCount(data.stargazers_count || 0);
+            } catch (err) {
+                console.error('Error fetching star count:', err);
                 setStarCount(0);
             } finally {
                 setIsLoading(false);
@@ -127,7 +135,10 @@ export function Footer() {
                             className="text-zinc-900 dark:text-white cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={toggleTheme}
                         />
-                        <span className="text-zinc-900 dark:text-white text-2xl select-none">lomi.</span>
+                        <span className="text-zinc-900 dark:text-white text-2xl select-none flex items-baseline">
+                            <span>lomi</span>
+                            <div className="w-[3px] h-[3px] bg-current ml-[2px] mb-[2px]"></div>
+                        </span>
                     </div>
                     <div className="hidden sm:block text-zinc-900 dark:text-white text-lg select-none mt-[5px]">
                         {t('footer.tagline')}

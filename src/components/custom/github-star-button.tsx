@@ -1,56 +1,60 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Star } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
 
-export default function Component() {
-    const [starCount, setStarCount] = useState<number>(0)
-    const [isLoading, setIsLoading] = useState(true)
+export default function GitHubStars() {
+    const [stars, setStars] = useState<number | null>(null)
     const [error, setError] = useState<string | null>(null)
-
-    const repoUrl = 'https://github.com/lomiafrica/lomi-docs'
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        const fetchStarCount = async () => {
-            setIsLoading(true)
-            setError(null)
+        async function fetchStars() {
             try {
-                const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs')
+                const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        'User-Agent': 'GitHubStars'
+                    },
+                    cache: 'no-store'
+                })
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
+                    throw new Error(`GitHub API error: ${response.status}`)
                 }
+
                 const data = await response.json()
-                setStarCount(data.stargazers_count)
+                setStars(data.stargazers_count)
             } catch (err) {
-                console.error('Fetch error:', err)
-                setError(err instanceof Error ? err.message : 'Failed to fetch star count')
+                console.error('Error fetching stars:', err)
+                setError(err instanceof Error ? err.message : 'Failed to fetch stars')
             } finally {
                 setIsLoading(false)
             }
         }
 
-        fetchStarCount()
+        fetchStars()
     }, [])
 
     const handleClick = () => {
-        window.open(repoUrl, '_blank', 'noopener,noreferrer')
-    }
-
-    if (error) {
-        return null
+        window.open('https://github.com/lomiafrica/lomi-docs', '_blank', 'noopener,noreferrer')
     }
 
     return (
-        <button
-            onClick={handleClick}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium 
-                text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 
-                transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label={`Star Lomi Docs on GitHub (${starCount} stars)`}
-        >
-            <Star className="w-4 h-4 dark:stroke-gray-400 dark:group-hover:stroke-gray-200" />
-            <span className="sr-only">Star</span>
-            <span className="tabular-nums">
-                {isLoading ? '...' : new Intl.NumberFormat('en-US').format(starCount)}
-            </span>
-        </button>
+        <div className="inline-flex items-center">
+            <Button
+                variant="secondary"
+                size="sm"
+                className="gap-2 h-9 px-4"
+                disabled={isLoading}
+                onClick={handleClick}
+            >
+                <Star className="h-4 w-4" />
+                <span className="text-sm">
+                    {isLoading ? 'Loading...' : error ? 'Error' : `Star ${stars ?? 0}`}
+                </span>
+            </Button>
+        </div>
     )
 }
