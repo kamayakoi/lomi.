@@ -25,7 +25,10 @@ export default function Page() {
             {/* 3D Image */}
             <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[32%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
               <ThreeDImage
-                src="/portal2.png"
+                src={{
+                  light: "/portal.png",
+                  dark: "/portal2.png"
+                }}
                 alt="Dashboard Preview"
                 width={700}
                 height={500}

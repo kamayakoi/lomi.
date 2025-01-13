@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import '@/lib/styles/home.css';
-
 const Integrations = () => {
     const [expandedStates, setExpandedStates] = useState<boolean[]>([false, false, true]);
     const { t } = useTranslation();
