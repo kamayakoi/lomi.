@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import icon from "/transparent2.webp";
 import icon11 from "/lomi-icon.webp"
-import shield from "/shield.webp";
-import shieldwhite from "/shieldwhite.webp";
 import kwameadjei from "/kwameadjei.webp";
 import iconDark from "/whiteblack.webp";
 import mtnLogo from '/mtn.webp';
@@ -123,24 +121,6 @@ export const VisitIcon = () => {
   );
 };
 
-export const ShieldIcon = () => {
-  const { theme } = useTheme();
-  const [currentShield, setCurrentShield] = useState(shield);
-
-  useEffect(() => {
-    setCurrentShield(theme === 'dark' ? shieldwhite : shield);
-  }, [theme]);
-
-  return (
-    <img
-      src={currentShield}
-      alt="Trust and safety shield icon"
-      className="lucide lucide-panels-top-left mr-2"
-      width="45"
-      height="45"
-    />
-  );
-};
 
 export function BarChartIcon(props: React.SVGProps<SVGSVGElement>) {
   return (

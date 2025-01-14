@@ -1,10 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
 import AnimatedLogoLoader from '@/components/portal/loader';
 
 // Auth routes that should redirect to /portal if user is already authenticated
 const authRoutes = ['/sign-in', '/sign-up', '/log-in', '/sign-in-test', '/forgot-password', '/otp', '/auth/reset-password'];
+
+// Public routes that don't need auth check
+const publicRoutes = ['/', '/home', '/about', '/products', '/integrations', '/terms', '/privacy', '/status'];
 
 export function SessionCheck({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
@@ -14,6 +17,11 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!isLoading) {
             const currentPath = location.pathname;
+
+            // Skip auth check for public routes
+            if (publicRoutes.includes(currentPath)) {
+                return;
+            }
 
             if (!isAuthenticated) {
                 if (currentPath.startsWith('/portal') || currentPath.startsWith('/onboarding')) {
@@ -31,5 +39,10 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
         return <AnimatedLogoLoader />;
     }
 
-    return <>{children}</>;
+    // Wrap children in Suspense for code splitting
+    return (
+        <Suspense fallback={<AnimatedLogoLoader />}>
+            {children}
+        </Suspense>
+    );
 }
