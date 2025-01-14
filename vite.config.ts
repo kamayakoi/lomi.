@@ -7,18 +7,10 @@ import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
 
 export default defineConfig({
   plugins: [
-    react({
-      babel: {
-        plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
-        ]
-      }
-    }),
+    react(),
     terser({
       compress: {
         drop_console: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
-        passes: 2,
       },
       format: {
         comments: false,
@@ -36,17 +28,23 @@ export default defineConfig({
       options: {
         compact: true,
         controlFlowFlattening: true,
-        controlFlowFlatteningThreshold: 0.3,
+        controlFlowFlatteningThreshold: 1,
         deadCodeInjection: true,
-        deadCodeInjectionThreshold: 0.3,
-        debugProtection: true,
-        debugProtectionInterval: 4000,
+        deadCodeInjectionThreshold: 0.9,
+        debugProtection: false,
+        debugProtectionInterval: 0,
         disableConsoleOutput: true,
         domainLock: [],
         domainLockRedirectUrl: 'about:blank',
+        forceTransformStrings: [],
+        identifierNamesCache: null,
         identifierNamesGenerator: 'hexadecimal',
+        identifiersDictionary: [],
+        identifiersPrefix: '',
+        ignoreImports: false,
+        inputFileName: '',
         log: false,
-        numbersToExpressions: true,
+        numbersToExpressions: false,
         optionsPreset: 'default',
         renameGlobals: true,
         renameProperties: false,
@@ -56,12 +54,17 @@ export default defineConfig({
         seed: 0,
         selfDefending: true,
         simplify: true,
-        splitStrings: true,
-        splitStringsChunkLength: 5,
+        sourceMap: false,
+        sourceMapBaseUrl: '',
+        sourceMapFileName: '',
+        sourceMapMode: 'separate',
+        sourceMapSourcesMode: 'sources-content',
+        splitStrings: false,
+        splitStringsChunkLength: 10,
         stringArray: true,
         stringArrayCallsTransform: true,
-        stringArrayCallsTransformThreshold: 0.3,
-        stringArrayEncoding: ['rc4'],
+        stringArrayCallsTransformThreshold: 0.5,
+        stringArrayEncoding: [],
         stringArrayIndexesType: [
           'hexadecimal-number'
         ],
@@ -72,7 +75,8 @@ export default defineConfig({
         stringArrayWrappersChainedCalls: true,
         stringArrayWrappersParametersMaxCount: 2,
         stringArrayWrappersType: 'variable',
-        stringArrayThreshold: 0.5,
+        stringArrayThreshold: 1,
+        target: 'browser',
         transformObjectKeys: false,
         unicodeEscapeSequence: false
       },
@@ -88,8 +92,6 @@ export default defineConfig({
       },
       compress: {
         drop_console: true,
-        pure_funcs: ['console.log'],
-        passes: 2,
       },
       format: {
         comments: false,
@@ -97,54 +99,19 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': [
-            'react',
-            'react-dom',
-            'react-router-dom',
-            '@radix-ui/react-icons',
-            'framer-motion',
-            'lucide-react'
-          ],
-          'auth': [
-            './src/pages/auth/sign-in.tsx',
-            './src/pages/auth/sign-up.tsx',
-            './src/pages/auth/forgot-password.tsx',
-            './src/pages/auth/reset-password.tsx',
-            './src/pages/auth/otp.tsx'
-          ],
-          'landing': [
-            './src/pages/Home.tsx',
-            './src/pages/Privacy.tsx'
-          ]
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          }
         },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        sourcemap: false,
       },
     },
-    modulePreload: {
-      polyfill: true,
-      resolveDependencies: (filename, deps) => deps,
-    },
-    cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000,
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-  },
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@radix-ui/react-icons',
-      'framer-motion',
-      'lucide-react'
-    ],
-    exclude: [],
   },
   server: {
     proxy: {
