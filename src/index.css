@@ -55,13 +55,32 @@
 
   * {
     @apply border-border;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
   }
+  
+  html {
+    @apply h-full w-full;
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+  }
+  
   body {
-    @apply min-h-svh w-full bg-background text-foreground;
-    overflow-x: hidden;
+    @apply bg-background text-foreground h-full w-full;
+    overscroll-behavior: none;
   }
-  body > #root {
-    @apply h-svh;
+  
+  #root {
+    @apply h-full;
+    scroll-snap-type: y mandatory;
+  }
+
+  /* Add scroll snap points for Home and Footer */
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 100vh;
+    height: 100vh;
   }
 }
 

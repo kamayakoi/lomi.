@@ -84,7 +84,6 @@ export default defineConfig({
   ],
   base: '/',
   build: {
-    outDir: 'dist',
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
@@ -110,9 +109,9 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: [
-      { find: '@', replacement: path.resolve(__dirname, './src') }
-    ],
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   server: {
     proxy: {
