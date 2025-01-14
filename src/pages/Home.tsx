@@ -24,7 +24,7 @@ export default function Page() {
             </div>
 
             {/* 3D Image */}
-            <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[32%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
+            <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[36%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
               <Suspense fallback={<div className="w-[700px] h-[500px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />}>
                 <ThreeDImage
                   src={{

@@ -6,6 +6,8 @@ import { cn } from '@/lib/actions/utils'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/custom/password-input'
 import { supabase } from '@/utils/supabase/client'
+import { useTranslation } from 'react-i18next'
+import Spinner from '@/components/portal/spinner'
 
 interface SignUpFormProps {
   className?: string
@@ -23,12 +25,15 @@ const formSchema = z.object({
 })
 
 export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent, onResendEmail, errorMessage, ...props }: SignUpFormProps) {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [isValidEmail, setIsValidEmail] = useState(false)
   const [isValidPassword, setIsValidPassword] = useState(false)
   const [isValidFullName, setIsValidFullName] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [isGithubLoading, setIsGithubLoading] = useState(false)
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -54,6 +59,9 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
 
   const handleOAuthSignUp = async (provider: 'github' | 'google') => {
     try {
+      if (provider === 'google') setIsGoogleLoading(true)
+      if (provider === 'github') setIsGithubLoading(true)
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -66,21 +74,24 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
       window.location.href = data.url;
     } catch (error) {
       console.error(`Error signing up with ${provider}:`, error);
+    } finally {
+      if (provider === 'google') setIsGoogleLoading(false)
+      if (provider === 'github') setIsGithubLoading(false)
     }
   }
 
   if (isConfirmationSent) {
     return (
       <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105">
-        <h2 className="text-2xl font-semibold mb-4">Check your email</h2>
-        <p className="mb-4">We&apos;ve sent you a confirmation email. Please check your inbox and follow the instructions to complete your registration.</p>
+        <h2 className="text-2xl font-semibold mb-4">{t('auth.check_email.title')}</h2>
+        <p className="mb-4">{t('auth.check_email.message').replace('<email>', email)}</p>
         <p className="text-sm text-muted-foreground">
-          Didn&apos;t receive the email? Check your spam folder or{' '}
+          {t('auth.check_email.resend')}{' '}
           <button
             className="text-primary hover:underline"
             onClick={onResendEmail}
           >
-            resend the email
+            {t('auth.check_email.resend_link')}
           </button>
         </p>
       </div>
@@ -94,7 +105,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           <Input
             id="fullName"
             type="text"
-            placeholder='Full Name**'
+            placeholder={t('auth.sign_up.full_name_placeholder')}
             value={fullName}
             onChange={handleFullNameChange}
             autoComplete="name"
@@ -110,7 +121,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           <Input
             id="email"
             type="email"
-            placeholder='Email address**'
+            placeholder={t('auth.sign_up.email_placeholder')}
             value={email}
             onChange={handleEmailChange}
             autoComplete="username"
@@ -125,7 +136,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           />
           <PasswordInput
             id="password"
-            placeholder='Password**'
+            placeholder={t('auth.sign_up.password_placeholder')}
             value={password}
             onChange={handlePasswordChange}
             autoComplete="new-password"
@@ -144,7 +155,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             disabled={isLoading || !isValidEmail || !isValidPassword || !isValidFullName}
           >
             <span className="text-base font-semibold">
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? t('auth.sign_up.processing') : t('auth.sign_up.submit_button')}
             </span>
           </Button>
           {errorMessage && (
@@ -158,37 +169,41 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
         </div>
         <div className='relative flex justify-center text-xs uppercase'>
           <span className='bg-background px-2 text-gray-500'>
-            Or continue with
+            {t('auth.sign_up.continue_with')}
           </span>
         </div>
       </div>
       <div className='flex flex-col gap-4'>
         <Button className="w-full h-12" variant="outline" onClick={() => handleOAuthSignUp('google')}>
           <div className="flex items-center justify-center">
-            <svg
-              className="w-5 h-5 mr-2"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            <span>&nbsp;Google</span>
+            {isGoogleLoading ? (
+              <Spinner size={20} color="#4285F4" />
+            ) : (
+              <svg
+                className="w-5 h-5 mr-2"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+            )}
+            <span>&nbsp;{t('auth.sign_up.google')}</span>
           </div>
         </Button>
         <Button
@@ -199,8 +214,12 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
           onClick={() => handleOAuthSignUp('github')}
         >
           <div className="flex items-center justify-center">
-            <IconBrandGithub className='h-6 w-6 mr-2' />
-            <span>&nbsp;GitHub</span>
+            {isGithubLoading ? (
+              <Spinner size={20} color="#24292e" />
+            ) : (
+              <IconBrandGithub className='h-6 w-6 mr-2' />
+            )}
+            <span>&nbsp;{t('auth.sign_up.github')}</span>
           </div>
         </Button>
       </div>

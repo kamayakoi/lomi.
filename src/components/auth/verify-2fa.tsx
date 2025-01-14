@@ -7,6 +7,7 @@ import { SmartphoneIcon } from 'lucide-react'
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { supabase } from '@/utils/supabase/client'
 import { cn } from "@/lib/actions/utils"
+import { useTranslation } from 'react-i18next'
 
 interface Verify2FAProps {
     merchantId: string;
@@ -15,6 +16,7 @@ interface Verify2FAProps {
 }
 
 export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FAProps) {
+    const { t } = useTranslation();
     const [verificationCode, setVerificationCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +24,7 @@ export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FA
         if (!verificationCode || verificationCode.length !== 6) {
             toast({
                 title: "Error",
-                description: "Please enter a valid 6-digit code",
+                description: t('auth.2fa.error.invalid_code'),
                 variant: "destructive",
             });
             return;
@@ -39,7 +41,7 @@ export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FA
                 if (error.message.includes('Invalid verification code')) {
                     toast({
                         title: "Error",
-                        description: "Invalid code. Please try again.",
+                        description: t('auth.2fa.error.invalid_code'),
                         variant: "destructive",
                     });
                     return;
@@ -49,14 +51,14 @@ export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FA
 
             toast({
                 title: "Success",
-                description: "2FA verification successful",
+                description: t('auth.2fa.success'),
             });
             onSuccess();
         } catch (error) {
             console.error('Error verifying 2FA:', error);
             toast({
                 title: "Error",
-                description: "Failed to verify code",
+                description: t('auth.2fa.error.verify_failed'),
                 variant: "destructive",
             });
         } finally {
@@ -70,13 +72,13 @@ export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FA
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <SmartphoneIcon className="w-5 h-5" />
-                        Two-Factor Authentication
+                        {t('auth.2fa.title')}
                     </DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-full space-y-2">
                         <Label htmlFor="verification-code">
-                            Enter the 6-digit code from your authenticator app
+                            {t('auth.2fa.subtitle')}
                         </Label>
                         <div className="flex justify-center">
                             <PinInput
@@ -108,14 +110,14 @@ export default function Verify2FA({ merchantId, onSuccess, onCancel }: Verify2FA
                         className="rounded-none"
                         disabled={isLoading}
                     >
-                        Cancel
+                        {t('auth.2fa.cancel_button')}
                     </Button>
                     <Button
                         onClick={handleVerify}
                         disabled={verificationCode.length !== 6 || isLoading}
                         className="rounded-none"
                     >
-                        Verify
+                        {isLoading ? t('auth.2fa.processing') : t('auth.2fa.verify_button')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

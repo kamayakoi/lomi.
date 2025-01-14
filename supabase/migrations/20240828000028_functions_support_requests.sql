@@ -86,7 +86,7 @@ lomi. System',
       ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
       'application/json',
       jsonb_build_object(
-        'from', 'lomi. Support Requests <support@updates.lomi.africa>',
+        'from', 'Support from lomi. <support@updates.lomi.africa>',
         'to', ARRAY['babacar@lomi.africa', 'hello@lomi.africa'],
         'subject', email_subject,
         'text', email_content,
@@ -103,6 +103,72 @@ lomi. System',
 
   EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Failed to send support request notification: %', SQLERRM;
+  END;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to send confirmation email to merchant
+CREATE OR REPLACE FUNCTION public.send_merchant_support_confirmation(
+    p_merchant_email TEXT,
+    p_support_request_id UUID
+) RETURNS void AS $$
+DECLARE
+  resend_api_key TEXT;
+  email_subject TEXT;
+  email_content TEXT;
+  response_status INTEGER;
+  response_body TEXT;
+BEGIN
+  -- Get the Resend API key securely with error handling
+  BEGIN
+    resend_api_key := secrets.get_resend_api_key();
+    RAISE NOTICE 'Successfully retrieved Resend API key';
+  EXCEPTION WHEN OTHERS THEN
+    RAISE WARNING 'Failed to get Resend API key: %', SQLERRM;
+    RETURN;
+  END;
+  
+  -- Format the subject and content
+  email_subject := 'Thank you for contacting support';
+  email_content := format(
+    '##- Please type your reply above this line -##
+
+Thank you for reaching out to the lomi. support team! Our team will reply via email to help you or request more information on your issue.
+
+We typically reach out with our first response within 24 hours, though we work to respond faster than that. For additional information about lomi. please see our developers center: https://developers.lomi.africa/
+
+To add more comments, please reply to this email. For reference, your ticket number is %s.
+
+This email is a service from lomi. Support Team.',
+    p_support_request_id
+  );
+
+  -- Send the confirmation email to merchant
+  BEGIN
+    SELECT 
+      status,
+      content::text
+    INTO 
+      response_status,
+      response_body
+    FROM extensions.http((
+      'POST',
+      'https://api.resend.com/emails',
+      ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
+      'application/json',
+      jsonb_build_object(
+        'from', 'Support from lomi. <support@updates.lomi.africa>',
+        'to', ARRAY[p_merchant_email],
+        'subject', email_subject,
+        'text', email_content,
+        'click_tracking', true,
+        'open_tracking', true
+      )::text
+    ));
+
+    IF response_status >= 400 THEN
+      RAISE WARNING 'Failed to send merchant confirmation: %', response_body;
+    END IF;
   END;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
@@ -128,11 +194,23 @@ BEGIN
     WHERE merchant_id = p_merchant_id;
 
     -- Create the support request
-    INSERT INTO support_requests (merchant_id, category, message, image_url, priority)
-    VALUES (p_merchant_id, p_category, p_message, p_image_url, p_priority)
+    INSERT INTO support_requests (
+        merchant_id,
+        category,
+        message,
+        image_url,
+        priority
+    )
+    VALUES (
+        p_merchant_id,
+        p_category,
+        p_message,
+        p_image_url,
+        p_priority
+    )
     RETURNING support_requests_id INTO v_support_request_id;
 
-    -- Send notification
+    -- Send notification to support team
     PERFORM public.send_support_request_notification(
         v_merchant_name,
         v_merchant_email,
@@ -140,6 +218,12 @@ BEGIN
         p_message,
         p_image_url,
         NOW()
+    );
+
+    -- Send confirmation to merchant
+    PERFORM public.send_merchant_support_confirmation(
+        v_merchant_email,
+        v_support_request_id
     );
 
     RETURN v_support_request_id;

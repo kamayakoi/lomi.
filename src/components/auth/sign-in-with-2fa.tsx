@@ -7,6 +7,7 @@ import { supabase } from '@/utils/supabase/client'
 import Verify2FA from './verify-2fa'
 import { AuthError } from '@supabase/supabase-js'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface SignInFormData {
     email: string;
@@ -14,6 +15,7 @@ interface SignInFormData {
 }
 
 export default function SignInWith2FA() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [formData, setFormData] = useState<SignInFormData>({
         email: '',
@@ -36,7 +38,6 @@ export default function SignInWith2FA() {
         setIsLoading(true);
 
         try {
-            // 1. First attempt regular sign in
             const { error: authError } = await supabase.auth.signInWithPassword({
                 email: formData.email,
                 password: formData.password
@@ -44,7 +45,6 @@ export default function SignInWith2FA() {
 
             if (authError) throw authError;
 
-            // 2. Check if user has 2FA enabled and if verification is needed
             const { data: merchant, error: merchantError } = await supabase
                 .from('merchants')
                 .select('merchant_id, has_2fa')
@@ -54,7 +54,6 @@ export default function SignInWith2FA() {
             if (merchantError) throw merchantError;
 
             if (merchant.has_2fa) {
-                // Check if 2FA verification is needed
                 const { data: needs2FA, error: checkError } = await supabase.rpc(
                     'should_require_2fa',
                     { p_merchant_id: merchant.merchant_id }
@@ -63,22 +62,19 @@ export default function SignInWith2FA() {
                 if (checkError) throw checkError;
 
                 if (needs2FA) {
-                    // Show 2FA verification only if needed
                     setMerchantId(merchant.merchant_id);
                     setShow2FA(true);
                 } else {
-                    // 2FA not needed this time
                     handleLoginSuccess();
                 }
             } else {
-                // No 2FA enabled, proceed with login
                 handleLoginSuccess();
             }
         } catch (error) {
             console.error('Sign in error:', error);
             toast({
                 title: "Error",
-                description: error instanceof AuthError ? error.message : "Failed to sign in",
+                description: error instanceof AuthError ? error.message : t('auth.2fa.error.unexpected'),
                 variant: "destructive",
             });
         } finally {
@@ -89,15 +85,13 @@ export default function SignInWith2FA() {
     const handleLoginSuccess = () => {
         toast({
             title: "Success",
-            description: "Successfully signed in",
+            description: t('auth.2fa.success'),
         });
-        // Redirect to dashboard or home page
         navigate('/portal/dashboard');
     };
 
     const handle2FACancel = async () => {
         setShow2FA(false);
-        // Sign out if they cancel 2FA
         await supabase.auth.signOut();
         setMerchantId(null);
     };
@@ -105,20 +99,20 @@ export default function SignInWith2FA() {
     return (
         <div className="w-full max-w-md space-y-6">
             <div className="space-y-2 text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <h1 className="text-2xl font-bold">{t('auth.2fa.sign_in.title')}</h1>
                 <p className="text-muted-foreground">
-                    Enter your credentials to access your account
+                    {t('auth.2fa.sign_in.subtitle')}
                 </p>
             </div>
 
             <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('auth.2fa.sign_in.email_label')}</Label>
                     <Input
                         id="email"
                         name="email"
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder={t('auth.2fa.sign_in.email_placeholder')}
                         required
                         value={formData.email}
                         onChange={handleInputChange}
@@ -126,7 +120,7 @@ export default function SignInWith2FA() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('auth.2fa.sign_in.password_label')}</Label>
                     <Input
                         id="password"
                         name="password"
@@ -143,11 +137,10 @@ export default function SignInWith2FA() {
                     className="w-full rounded-none"
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Signing in...' : 'Sign in'}
+                    {isLoading ? t('auth.2fa.sign_in.signing_in') : t('auth.2fa.sign_in.sign_in_button')}
                 </Button>
             </form>
 
-            {/* 2FA Verification Dialog */}
             {show2FA && merchantId && (
                 <Verify2FA
                     merchantId={merchantId}

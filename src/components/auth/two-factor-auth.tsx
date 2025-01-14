@@ -9,6 +9,7 @@ import { supabase } from '@/utils/supabase/client'
 import QRCode from 'qrcode'
 import { cn } from "@/lib/actions/utils"
 import { authenticator } from 'otplib'
+import { useTranslation } from 'react-i18next'
 
 interface TwoFactorAuthProps {
     merchantId: string;
@@ -27,6 +28,7 @@ function generateSecret(): string {
 }
 
 export default function TwoFactorAuth({ merchantId, initialStatus = false }: TwoFactorAuthProps) {
+    const { t } = useTranslation()
     const [showSetupModal, setShowSetupModal] = useState(false);
     const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
     const [verificationCode, setVerificationCode] = useState('');
@@ -49,7 +51,6 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
         if (!isEnabled) {
             try {
                 setIsLoading(true);
-                // Generate a proper TOTP secret
                 const newSecret = generateSecret();
                 setSecret(newSecret);
                 await generateQRCode(newSecret);
@@ -57,8 +58,8 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
             } catch (error) {
                 console.error('Error setting up 2FA:', error);
                 toast({
-                    title: "Error",
-                    description: "Failed to setup 2FA",
+                    title: t('auth.two_factor.error.title'),
+                    description: t('auth.two_factor.error.setup'),
                     variant: "destructive",
                 });
             } finally {
@@ -75,14 +76,14 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
 
                 setIsEnabled(false);
                 toast({
-                    title: "Success",
-                    description: "2FA has been disabled",
+                    title: t('auth.two_factor.success.title'),
+                    description: t('auth.two_factor.success.disabled'),
                 });
             } catch (error) {
                 console.error('Error disabling 2FA:', error);
                 toast({
-                    title: "Error",
-                    description: "Failed to disable 2FA",
+                    title: t('auth.two_factor.error.title'),
+                    description: t('auth.two_factor.error.disable'),
                     variant: "destructive",
                 });
             } finally {
@@ -94,8 +95,8 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
     const verifyAndEnable = async () => {
         if (!verificationCode || verificationCode.length !== 6) {
             toast({
-                title: "Error",
-                description: "Please enter a valid 6-digit code",
+                title: t('auth.two_factor.error.title'),
+                description: t('auth.two_factor.error.invalid_code'),
                 variant: "destructive",
             });
             return;
@@ -112,8 +113,8 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
             if (error) {
                 if (error.message.includes('Invalid verification code')) {
                     toast({
-                        title: "Error",
-                        description: "Invalid verification code. Please try again.",
+                        title: t('auth.two_factor.error.title'),
+                        description: t('auth.two_factor.error.invalid_code'),
                         variant: "destructive",
                     });
                     return;
@@ -125,14 +126,14 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
             setShowSetupModal(false);
             setVerificationCode('');
             toast({
-                title: "Success",
-                description: "2FA has been enabled successfully",
+                title: t('auth.two_factor.success.title'),
+                description: t('auth.two_factor.success.enabled'),
             });
         } catch (error) {
             console.error('Error enabling 2FA:', error);
             toast({
-                title: "Error",
-                description: "Failed to verify 2FA code",
+                title: t('auth.two_factor.error.title'),
+                description: t('auth.two_factor.error.verify'),
                 variant: "destructive",
             });
         } finally {
@@ -143,9 +144,9 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
     return (
         <div className="flex items-center justify-between">
             <div>
-                <h4 className="text-sm font-medium">2-factor Authentication</h4>
+                <h4 className="text-sm font-medium">{t('auth.two_factor.title')}</h4>
                 <p className="text-sm text-muted-foreground">
-                    Add an extra layer of security to your account.
+                    {t('auth.two_factor.description')}
                 </p>
             </div>
             <Button
@@ -154,7 +155,7 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
                 disabled={isLoading}
                 className="rounded-none"
             >
-                {isEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+                {isEnabled ? t('auth.two_factor.disable_button') : t('auth.two_factor.enable_button')}
             </Button>
 
             {showSetupModal && (
@@ -163,10 +164,10 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                                 <SmartphoneIcon className="w-5 h-5" />
-                                Set up 2FA
+                                {t('auth.two_factor.setup.title')}
                             </DialogTitle>
                             <DialogDescription>
-                                Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                                {t('auth.two_factor.setup.description')}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="flex flex-col items-center gap-4">
@@ -180,7 +181,7 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
                                 </div>
                             )}
                             <div className="w-full space-y-2">
-                                <Label htmlFor="verification-code">Enter the 6-digit code from your authenticator app</Label>
+                                <Label htmlFor="verification-code">{t('auth.two_factor.setup.enter_code')}</Label>
                                 <div className="flex justify-center">
                                     <PinInput
                                         value={verificationCode}
@@ -211,14 +212,14 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
                                 className="rounded-none"
                                 disabled={isLoading}
                             >
-                                Cancel
+                                {t('auth.two_factor.setup.cancel_button')}
                             </Button>
                             <Button
                                 onClick={verifyAndEnable}
                                 disabled={verificationCode.length !== 6 || isLoading}
                                 className="rounded-none"
                             >
-                                Enable
+                                {t('auth.two_factor.setup.enable_button')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

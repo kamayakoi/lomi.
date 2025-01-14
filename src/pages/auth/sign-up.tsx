@@ -3,13 +3,18 @@ import { Card } from '@/components/ui/card'
 import { SignUpForm } from '@/components/auth/sign-up-form'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/custom/button'
+import { ChevronLeft } from 'lucide-react'
 
 export default function SignUp() {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [isConfirmationSent, setIsConfirmationSent] = useState(false)
   const [email, setEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const navigate = useNavigate()
 
   const handleSignUp = async (data: { email: string; password: string; fullName: string }) => {
     setIsLoading(true);
@@ -33,24 +38,24 @@ export default function SignUp() {
 
       if (error) {
         console.error('Error during sign-up:', error);
-        let message = 'An error occurred while creating your account. Please try again.';
+        let message = t('auth.sign_up.error.default');
         if (error.message.includes('Password should be at least 6 characters')) {
-          message = 'Password should be at least 6 characters long.';
+          message = t('auth.sign_up.error.invalid_password');
         }
         setErrorMessage(message);
         setIsLoading(false);
       } else {
         setIsConfirmationSent(true);
         toast({
-          title: 'Success',
-          description: 'Please check your email for the confirmation link.',
+          title: t('auth.sign_up.resend_email.title'),
+          description: t('auth.sign_up.resend_email.success'),
         });
         await new Promise((resolve) => setTimeout(resolve, 4000));
         setIsLoading(false);
       }
     } catch (error) {
       console.error('Unexpected error during sign-up:', error);
-      setErrorMessage('An unexpected error occurred. Please try again.');
+      setErrorMessage(t('auth.sign_up.error.default'));
       setIsLoading(false);
     }
   };
@@ -63,14 +68,14 @@ export default function SignUp() {
       })
       if (error) throw error
       toast({
-        title: "Email Resent",
-        description: "A new verification email has been sent to your inbox.",
+        title: t('auth.sign_up.resend_email.title'),
+        description: t('auth.sign_up.resend_email.success'),
       })
     } catch (error) {
       console.error('Error resending email:', error)
       toast({
-        title: "Error",
-        description: "There was a problem resending the verification email. Please try again.",
+        title: t('auth.pages.forgot_password.error.title'),
+        description: t('auth.pages.forgot_password.error.description'),
         variant: "destructive",
       })
     }
@@ -78,11 +83,20 @@ export default function SignUp() {
 
   return (
     <div className='container grid h-svh flex-col items-center justify-center lg:max-w-none lg:px-0'>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-6 left-6 z-50"
+        onClick={() => navigate(-1)}
+      >
+        <ChevronLeft className="h-6 w-6" />
+      </Button>
+
       <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[500px] lg:p-8'>
         <Card className='p-6'>
           <div className='mb-2 flex flex-col space-y-2 text-left'>
             <h1 className='text-2xl font-semibold tracking-tight'>
-              Create an account
+              {t('auth.pages.sign_up.title')}
             </h1>
           </div>
           <div className='mb-4'></div>
@@ -94,21 +108,21 @@ export default function SignUp() {
             errorMessage={errorMessage}
           />
           <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-            By creating an account, you agree to our{' '}
+            {t('auth.pages.sign_up.terms_text')}{' '}
             <Link
               to='/terms'
               className='text-blue-600 hover:underline'
             >
-              Terms of Service
+              {t('auth.pages.sign_up.terms_link')}
             </Link>{' '}
-            and{' '}
+            {t('auth.pages.sign_up.and')}{' '}
             <Link
               to='/privacy'
               className='text-blue-600 hover:underline'
             >
-              Privacy Policy
+              {t('auth.pages.sign_up.privacy_link')}
             </Link>
-            .
+            {t('auth.pages.sign_up.period')}
           </p>
         </Card>
       </div>

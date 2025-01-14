@@ -72,7 +72,8 @@
       "sign_up_link": "Regístrate",
       "success": "Éxito",
       "success_message": "Has iniciado sesión correctamente.",
-      "quote": "We're just getting started.",
+      "home_link": "Inicio",
+      "quote": "Estamos empezando.",
       "company": "lomi.",
       "error": {
         "default": "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo.",
@@ -143,10 +144,7 @@
     "pages": {
       "sign_in": {
         "title": "Bienvenido de nuevo",
-        "subtitle": "Ingresa tu correo electrónico para iniciar sesión en tu cuenta.",
-        "home_link": "Inicio",
-        "quote": "Soluciones 3D de vanguardia para artistas y empresas.",
-        "company": "lomi."
+        "subtitle": "Ingresa tu correo electrónico para iniciar una sesión."
       },
       "sign_up": {
         "title": "Crear cuenta",
@@ -195,5 +193,74 @@
           "invalid_link": "Enlace de restablecimiento inválido o expirado. Por favor, solicita uno nuevo."
         }
       }
+    },
+    "avatar_uploader": {
+        "replace_image": "Reemplazar imagen",
+        "upload_image": "Subir imagen",
+        "remove": "Eliminar",
+        "file_requirements": "*png, *jpeg archivos hasta 1MB de al menos 200px por 200px",
+        "error": {
+            "file_size": "El tamaño del archivo debe ser menor a 1MB",
+            "upload_failed": "Error al subir la foto de perfil"
+        },
+        "success": "Foto de perfil actualizada exitosamente",
+        "crop": {
+            "title": "Recortar foto de perfil",
+            "cancel": "Cancelar",
+            "save": "Guardar"
+        }
+    },
+    "kyc_uploader": {
+        "upload_document": "Subir documento",
+        "change_file": "Cambiar archivo",
+        "remove": "Eliminar",
+        "uploading": "Subiendo...",
+        "error": {
+            "file_size": "El tamaño del archivo debe ser menor a 3MB",
+            "file_type": "Solo se permiten archivos PDF, JPG o PNG",
+            "network": "Error de red. Por favor, verifica tu conexión a internet.",
+            "upload_failed": "Error al subir el documento"
+        },
+        "success": "Documento subido exitosamente",
+        "success_remove": "Documento eliminado exitosamente",
+        "try_again": "Intentar de nuevo"
+    },
+    "logo_uploader": {
+        "replace_image": "Reemplazar logo",
+        "upload_image": "Subir logo",
+        "remove": "Eliminar",
+        "file_requirements": "*png, *jpeg archivos hasta 1MB de al menos 200px por 200px",
+        "error": {
+            "file_size": "El tamaño del archivo debe ser menor a 1MB",
+            "upload_failed": "Error al subir el logo"
+        },
+        "success": "Logo actualizado exitosamente",
+        "crop": {
+            "title": "Recortar logo",
+            "cancel": "Cancelar",
+            "save": "Guardar"
+        }
+    },
+    "2fa": {
+        "title": "Autenticación de dos factores",
+        "subtitle": "Ingresa el código de 6 dígitos de tu aplicación de autenticación",
+        "verify_button": "Verificar",
+        "cancel_button": "Cancelar",
+        "processing": "Verificando...",
+        "error": {
+            "invalid_code": "Código inválido. Por favor, inténtalo de nuevo.",
+            "verify_failed": "Error al verificar el código",
+            "unexpected": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
+        },
+        "success": "Verificación 2FA exitosa",
+        "sign_in": {
+            "title": "Bienvenido de nuevo",
+            "subtitle": "Ingresa tus credenciales para acceder a tu cuenta",
+            "email_label": "Correo electrónico",
+            "email_placeholder": "m@ejemplo.com",
+            "password_label": "Contraseña",
+            "sign_in_button": "Iniciar sesión",
+            "signing_in": "Iniciando sesión..."
+        }
     }
-  }   }
+}   }

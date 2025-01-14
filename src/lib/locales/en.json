@@ -46,7 +46,7 @@
             "rotatingWords": ["integration", "solution", "API", "gateway", "infrastructure", "interface", "marketplace" ],
             "suffix": "for all your payment needs."
         },
-        "description": "We empowers online payment processing and financial solutions for franconphone West African businesses of all sizes. Accept payments, send payouts, and automate financial workflows with ease."
+        "description": "We empower online payment processing and financial solutions for francophone West African businesses of all sizes. Accept payments, send payouts, and automate financial workflows with ease."
     },
     "topBanner": {
         "text": "We are live on Product Hunt",
@@ -192,6 +192,75 @@
           "description": "There was a problem resetting your password. Please try again.",
                 "invalid_link": "Invalid or expired password reset link. Please request a new one."
             }
+        }
+    },
+    "avatar_uploader": {
+        "replace_image": "Replace image",
+        "upload_image": "Upload image",
+        "remove": "Remove",
+        "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
+        "error": {
+            "file_size": "File size must be less than 1MB",
+            "upload_failed": "Failed to upload profile picture"
+        },
+        "success": "Profile picture updated successfully",
+        "crop": {
+            "title": "Crop Profile Picture",
+            "cancel": "Cancel",
+            "save": "Save"
+        }
+    },
+    "kyc_uploader": {
+        "upload_document": "Upload document",
+        "change_file": "Change file",
+        "remove": "Remove",
+        "uploading": "Uploading...",
+        "error": {
+            "file_size": "File size must be less than 3MB",
+            "file_type": "Only PDF, JPG, or PNG files are allowed",
+            "network": "Network error. Please check your internet connection.",
+            "upload_failed": "Failed to upload document"
+        },
+        "success": "Document uploaded successfully",
+        "success_remove": "Document removed successfully",
+        "try_again": "Try Again"
+    },
+    "logo_uploader": {
+        "replace_image": "Replace image",
+        "upload_image": "Upload image",
+        "remove": "Remove",
+        "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
+        "error": {
+            "file_size": "File size must be less than 1MB",
+            "upload_failed": "Failed to upload logo"
+        },
+        "success": "Logo updated successfully",
+        "crop": {
+            "title": "Crop Logo",
+            "cancel": "Cancel",
+            "save": "Save"
+        }
+    },
+    "2fa": {
+        "title": "Two-Factor Authentication",
+        "subtitle": "Enter the 6-digit code from your authenticator app",
+        "verify_button": "Verify",
+        "cancel_button": "Cancel",
+        "processing": "Verifying...",
+        "error": {
+            "invalid_code": "Invalid code. Please try again.",
+            "verify_failed": "Failed to verify code",
+            "unexpected": "An unexpected error occurred. Please try again."
+        },
+        "success": "2FA verification successful",
+        "sign_in": {
+            "title": "Welcome back",
+            "subtitle": "Enter your credentials to access your account",
+            "email_label": "Email",
+            "email_placeholder": "m@example.com",
+            "password_label": "Password",
+            "sign_in_button": "Sign in",
+            "signing_in": "Signing in..."
         }
     }
 }}

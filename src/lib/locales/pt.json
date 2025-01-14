@@ -1,52 +1,52 @@
 {
     "footer": {
-        "tagline": "Connecting Africa to the World, one transaction at a time.",
+        "tagline": "Conectando a África ao Mundo, uma transação por vez.",
         "features": {
             "title": "Soluções",
             "overview": "Visão geral",
             "sellProducts": "Vender produtos",
             "sellSubscriptions": "Vender assinaturas",
             "sellWhatsApp": "Vender no WhatsApp",
-            "sellWebsite": "Vender no seu site",
+            "sellWebsite": "Vender em seu site",
             "sendInvoices": "Faturamento",
             "pricing": "Preços",
-            "faq": "Perguntas frequentes"
+            "faq": "FAQ"
         },
         "resources": {
             "title": "Recursos",
             "github": "Github",
             "support": "Suporte",
-            "privacy": "Política de privacidade",
-            "terms": "Termos e condições",
+            "privacy": "Política de Privacidade",
+            "terms": "Termos e Condições",
             "branding": "Marca",
             "featureRequest": "Solicitar um recurso | integração",
             "review": "Deixe-nos uma avaliação"
         },
         "company": {
-            "title": "Company",
-            "story": "Story",
+            "title": "Empresa",
+            "story": "História",
             "blog": "Blog",
-            "openSource": "Open Source"
+            "openSource": "Código Aberto"
         },
         "subscribe": {
             "placeholder": "Endereço de e-mail**",
             "button": "Inscrever-se"
         },
-        "status": "Operacional",
+        "status": "Sistemas Operacionais",
         "copyright": "Copyright © 2025 — lomi.africa",
         "star": "Star"
     },
     "hero": {
         "buttons": {
             "launch": "Leia nosso artigo de lançamento",
-            "developers": "Acessar developers.lomi.africa"
+            "developers": "Acesse developers.lomi.africa"
         },
         "title": {
             "prefix": "Uma",
             "rotatingWords": ["integração", "solução", "API", "gateway", "infraestrutura", "interface", "marketplace"],
             "suffix": "para todas as suas necessidades de pagamento."
         },
-        "description": "Capacitamos o processamento de pagamentos online e soluções financeiras para empresas da África Ocidental francófona de todos os tamanhos. Aceite pagamentos, envie desembolsos e automatize fluxos financeiros com facilidade."
+        "description": "Capacitamos o processamento de pagamentos online e soluções financeiras para empresas da África Ocidental francófona de todos os tamanhos. Aceite pagamentos, envie pagamentos e automatize fluxos de trabalho financeiros com facilidade."
     },
     "topBanner": {
         "text": "Estamos ao vivo no Product Hunt",
@@ -59,28 +59,28 @@
     "auth": {
         "sign_in": {
             "title": "Bem-vindo de volta",
-            "subtitle": "Entre para explorar lomi.",
-            "email_placeholder": "E-mail**",
+            "subtitle": "Entre para explorar o lomi.",
+            "email_placeholder": "Endereço de e-mail**",
             "password_placeholder": "Senha**",
-            "forgot_password": "Esqueceu sua senha?",
+            "forgot_password": "Esqueceu a senha?",
             "connect_button": "Conectar",
             "processing": "Processando...",
-            "or_continue": "Ou continuar com",
+            "or_continue": "Ou continue com",
             "google": "Google",
             "github": "GitHub",
             "no_account": "Não tem uma conta?",
             "sign_up_link": "Cadastre-se",
             "success": "Sucesso",
-            "success_message": "Login realizado com sucesso.",
             "home_link": "Início",
-            "quote": "We're just getting started.",
             "company": "lomi.",
+            "quote": "Estamos apenas começando.",
+            "success_message": "Você entrou com sucesso.",
             "error": {
-                "default": "Ocorreu um erro ao fazer login. Por favor, tente novamente.",
+                "default": "Ocorreu um erro ao entrar. Por favor, tente novamente.",
                 "invalid_credentials": "E-mail ou senha inválidos. Por favor, tente novamente ou cadastre-se se não tiver uma conta.",
-                "email_not_confirmed": "Por favor, confirme seu e-mail antes de fazer login.",
+                "email_not_confirmed": "Por favor, confirme seu e-mail antes de entrar.",
                 "unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
-                "oauth": "Houve um problema ao fazer login com {provider}. Por favor, tente novamente."
+                "oauth": "Houve um problema ao entrar com {provider}. Por favor, tente novamente."
             }
         },
         "sign_up": {
@@ -140,115 +140,128 @@
                 "default": "OTP inválido. Por favor, tente novamente.",
                 "unexpected": "Ocorreu um erro durante a verificação do OTP. Por favor, tente novamente."
             }
-        }
-    },
-    "sign_up": {
-        "title": "Criar conta",
-        "full_name_placeholder": "Nome completo**",
-        "email_placeholder": "E-mail**",
-        "password_placeholder": "Senha**",
-        "submit_button": "Criar conta",
-        "creating": "Criando conta...",
-        "processing": "Criando conta...",
-        "continue_with": "Ou continuar com",
-        "google": "Google",
-        "github": "GitHub",
-        "error": {
-            "default": "Ocorreu um erro ao criar sua conta. Por favor, tente novamente.",
-            "email_in_use": "Este e-mail já está em uso. Por favor, use outro ou faça login.",
-            "invalid_email": "Por favor, insira um e-mail válido.",
-            "invalid_password": "A senha deve ter pelo menos 8 caracteres.",
-            "invalid_name": "Por favor, insira seu nome completo."
         },
-        "resend_email": {
-            "title": "E-mail reenviado",
-            "success": "Um novo e-mail foi enviado para sua caixa de entrada.",
-            "error": {
-                "title": "Erro",
-                "description": "Houve um problema ao reenviar o e-mail. Por favor, tente novamente."
-            }
-        }
-    },
-    "forgot_password": {
-        "title": "Redefinir senha",
-        "email_placeholder": "E-mail**",
-        "submit_button": "Enviar link",
-        "sending": "Enviando...",
-        "success": "Sucesso",
-        "success_message": "E-mail de redefinição enviado. Por favor, verifique sua caixa de entrada.",
-        "error": "Houve um problema ao enviar o e-mail. Por favor, tente novamente.",
-        "rate_limit_error": "Muitas solicitações. Por favor, aguarde alguns minutos antes de tentar novamente."
-    },
-    "check_email": {
-        "title": "Verifique seu e-mail",
-        "message": "Enviamos um e-mail de confirmação para <email>. Por favor, verifique sua caixa de entrada e siga as instruções para completar seu registro.",
-        "resend": "Não recebeu o e-mail? Verifique sua pasta de spam ou",
-        "resend_link": "reenviar e-mail"
-    },
-    "modal": {
-        "title": "Entrar no lomi.",
-        "description": "Entre para continuar no lomi. e acessar sua conta"
-    },
-    "otp": {
-        "title": "Digite o código de verificação",
-        "submit_button": "Verificar e-mail",
-        "processing": "Verificando...",
-        "success": "Sucesso",
-        "success_message": "OTP verificado com sucesso.",
-        "error": {
-            "default": "OTP inválido. Por favor, tente novamente.",
-            "unexpected": "Ocorreu um erro durante a verificação do OTP. Por favor, tente novamente."
-        }
-    },
-    "pages": {
-        "sign_in": {
-            "subtitle": "Digite seu e-mail para entrar em sua conta."
-        },
-        "sign_up": {
-            "title": "Criar conta",
-            "terms_text": "Ao criar uma conta, você concorda com nossos",
-            "terms_link": "Termos de Serviço",
-            "and": "e",
-            "privacy_link": "Política de Privacidade",
-            "period": "."
-        },
-        "forgot_password": {
-            "title": "Redefinir senha",
-            "no_account": "Não tem uma conta?",
-            "sign_up_link": "Cadastre-se",
-            "email_resent": {
-                "title": "E-mail reenviado",
-                "description": "Um novo e-mail de verificação foi enviado para sua caixa de entrada."
+        "pages": {
+            "sign_in": {
+                "title": "Bem-vindo de volta",
+                "subtitle": "Digite seu e-mail abaixo para entrar em sua conta.",
+                "company": "lomi."
             },
-            "error": {
-                "title": "Erro",
-                "description": "Houve um problema ao reenviar o e-mail. Por favor, tente novamente."
+            "sign_up": {
+                "title": "Criar conta",
+                "terms_text": "Ao criar uma conta, você concorda com nossos",
+                "terms_link": "Termos de Serviço",
+                "and": "e",
+                "privacy_link": "Política de Privacidade",
+                "period": "."
+            },
+            "forgot_password": {
+                "title": "Redefinir sua senha",
+                "no_account": "Não tem uma conta?",
+                "sign_up_link": "Cadastre-se",
+                "email_resent": {
+                    "title": "E-mail reenviado",
+                    "description": "Um novo e-mail de verificação foi enviado para sua caixa de entrada."
+                },
+                "error": {
+                    "title": "Erro",
+                    "description": "Houve um problema ao reenviar o e-mail. Por favor, tente novamente."
+                }
+            },
+            "reset_password": {
+                "title": "Redefinir sua senha",
+                "new_password": "Nova senha",
+                "confirm_password": "Confirmar senha",
+                "placeholder": {
+                    "new": "Nova senha**",
+                    "confirm": "Confirmar senha**"
+                },
+                "validation": {
+                    "min_length": "A senha deve ter pelo menos 8 caracteres",
+                    "match": "As senhas não coincidem"
+                },
+                "button": {
+                    "submit": "Redefinir senha",
+                    "processing": "Redefinindo..."
+                },
+                "success": {
+                    "title": "Sucesso",
+                    "description": "Sua senha foi redefinida com sucesso."
+                },
+                "error": {
+                    "title": "Erro",
+                    "description": "Houve um problema ao redefinir sua senha. Por favor, tente novamente.",
+                    "invalid_link": "Link de redefinição inválido ou expirado. Por favor, solicite um novo."
+                }
             }
         },
-        "reset_password": {
-            "title": "Redefinir senha",
-            "new_password": "Nova senha",
-            "confirm_password": "Confirmar senha",
-            "placeholder": {
-                "new": "Nova senha**",
-                "confirm": "Confirmar senha**"
-            },
-            "validation": {
-                "min_length": "A senha deve ter pelo menos 8 caracteres",
-                "match": "As senhas não coincidem"
-            },
-            "button": {
-                "submit": "Redefinir senha",
-                "processing": "Redefinindo..."
-            },
-            "success": {
-                "title": "Sucesso",
-                "description": "Sua senha foi redefinida com sucesso."
-            },
+        "avatar_uploader": {
+            "replace_image": "Substituir imagem",
+            "upload_image": "Carregar imagem",
+            "remove": "Remover",
+            "file_requirements": "*png, *jpeg arquivos até 1MB com pelo menos 200px por 200px",
             "error": {
-                "title": "Erro",
-                "description": "Houve um problema ao redefinir sua senha. Por favor, tente novamente.",
-                "invalid_link": "Link de redefinição inválido ou expirado. Por favor, solicite um novo."
+                "file_size": "O tamanho do arquivo deve ser menor que 1MB",
+                "upload_failed": "Falha ao carregar a foto do perfil"
+            },
+            "success": "Foto do perfil atualizada com sucesso",
+            "crop": {
+                "title": "Recortar Foto do Perfil",
+                "cancel": "Cancelar",
+                "save": "Salvar"
+            }
+        },
+        "kyc_uploader": {
+            "upload_document": "Carregar documento",
+            "change_file": "Alterar arquivo",
+            "remove": "Remover",
+            "uploading": "Carregando...",
+            "error": {
+                "file_size": "O tamanho do arquivo deve ser menor que 3MB",
+                "file_type": "Apenas arquivos PDF, JPG ou PNG são permitidos",
+                "network": "Erro de rede. Por favor, verifique sua conexão com a internet.",
+                "upload_failed": "Falha ao carregar documento"
+            },
+            "success": "Documento carregado com sucesso",
+            "success_remove": "Documento removido com sucesso",
+            "try_again": "Tentar Novamente"
+        },
+        "logo_uploader": {
+            "replace_image": "Substituir logo",
+            "upload_image": "Carregar logo",
+            "remove": "Remover",
+            "file_requirements": "*png, *jpeg arquivos até 1MB com pelo menos 200px por 200px",
+            "error": {
+                "file_size": "O tamanho do arquivo deve ser menor que 1MB",
+                "upload_failed": "Falha ao carregar o logo"
+            },
+            "success": "Logo atualizado com sucesso",
+            "crop": {
+                "title": "Recortar Logo",
+                "cancel": "Cancelar",
+                "save": "Salvar"
+            }
+        },
+        "2fa": {
+            "title": "Autenticação de dois fatores",
+            "subtitle": "Digite o código de 6 dígitos do seu aplicativo de autenticação",
+            "verify_button": "Verificar",
+            "cancel_button": "Cancelar",
+            "processing": "Verificando...",
+            "error": {
+                "invalid_code": "Código inválido. Por favor, tente novamente.",
+                "verify_failed": "Falha ao verificar o código",
+                "unexpected": "Ocorreu um erro inesperado. Por favor, tente novamente."
+            },
+            "success": "Verificação 2FA bem-sucedida",
+            "sign_in": {
+                "title": "Bem-vindo de volta",
+                "subtitle": "Digite suas credenciais para acessar sua conta",
+                "email_label": "E-mail",
+                "email_placeholder": "m@exemplo.com",
+                "password_label": "Senha",
+                "sign_in_button": "Entrar",
+                "signing_in": "Entrando..."
             }
         }
     }

@@ -4,6 +4,7 @@ import { FileUp, X, FileIcon } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 interface KYCFileUploaderProps {
     documentType: 'legal_representative_ID' | 'address_proof' | 'business_registration';
@@ -18,6 +19,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
     currentFile,
     organizationId
 }) => {
+    const { t } = useTranslation();
     const [isUploading, setIsUploading] = useState(false);
     const [fileName, setFileName] = useState<string | null>(currentFile ?? null);
     const [file, setFile] = useState<File | null>(null);
@@ -63,13 +65,13 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
         if (!selectedFile) return;
 
         if (selectedFile.size > 3 * 1024 * 1024) {
-            toast({ title: "Error", description: "File size must be less than 3MB", variant: "destructive" });
+            toast({ title: "Error", description: t('auth.kyc_uploader.error.file_size'), variant: "destructive" });
             return;
         }
 
         const fileExtension = selectedFile.name.split('.').pop()?.toLowerCase();
         if (!['pdf', 'jpg', 'jpeg', 'png'].includes(fileExtension || '')) {
-            toast({ title: "Error", description: "Only PDF, JPG, or PNG files are allowed", variant: "destructive" });
+            toast({ title: "Error", description: t('auth.kyc_uploader.error.file_type'), variant: "destructive" });
             return;
         }
 
@@ -90,7 +92,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
 
             if (error) {
                 if (error.message.includes('network')) {
-                    throw new Error('Network error. Please check your internet connection.');
+                    throw new Error(t('auth.kyc_uploader.error.network'));
                 } else {
                     throw error;
                 }
@@ -110,12 +112,12 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                 setFileName(selectedFile.name);
                 onFileUploaded(publicUrl);
                 setStatus("completed");
-                toast({ title: "Success", description: "Document uploaded successfully" });
+                toast({ title: "Success", description: t('auth.kyc_uploader.success') });
             }
         } catch (error: Error | unknown) {
             console.error('Error uploading file:', error);
             setStatus("failed");
-            const errorMessage = error instanceof Error ? error.message : "Failed to upload document";
+            const errorMessage = error instanceof Error ? error.message : t('auth.kyc_uploader.error.upload_failed');
             toast({ title: "Error", description: errorMessage, variant: "destructive" });
         } finally {
             setIsUploading(false);
@@ -138,10 +140,10 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
-            toast({ title: "Success", description: "Document removed successfully" });
+            toast({ title: "Success", description: t('auth.kyc_uploader.success_remove') });
         } catch (error: Error | unknown) {
             console.error('Error removing file:', error);
-            const errorMessage = error instanceof Error ? error.message : "Failed to remove document";
+            const errorMessage = error instanceof Error ? error.message : t('auth.kyc_uploader.error.upload_failed');
             toast({ title: "Error", description: errorMessage, variant: "destructive" });
         }
     };
@@ -190,7 +192,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                         className="w-full sm:w-auto"
                     >
                         <FileUp className="mr-2 h-4 w-4" />
-                        {isUploading ? 'Uploading...' : (fileName ? 'Change file' : 'Upload document')}
+                        {isUploading ? t('auth.kyc_uploader.uploading') : (fileName ? t('auth.kyc_uploader.change_file') : t('auth.kyc_uploader.upload_document'))}
                     </Button>
                     {fileName && (
                         <Button
@@ -199,7 +201,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                             onClick={handleRemove}
                             className="w-full sm:w-auto"
                         >
-                            Remove
+                            {t('auth.kyc_uploader.remove')}
                         </Button>
                     )}
                 </div>
@@ -232,7 +234,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
                             onClick={handleTryAgain}
                             className="mt-2 text-sm text-red-500 hover:underline"
                         >
-                            Try Again
+                            {t('auth.kyc_uploader.try_again')}
                         </button>
                     )}
                     <button

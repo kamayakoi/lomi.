@@ -144,9 +144,8 @@
         "pages": {
             "sign_in": {
                 "title": "Bienvenue",
-                "subtitle": "Entrez votre e-mail ci-dessous pour vous connecter à votre compte.",
-                "company": "lomi."
-            },
+                "subtitle": "Entrez votre e-mail ci-dessous pour vous connecter à votre compte."
+           },
             "sign_up": {
                 "title": "Créer un compte",
                 "terms_text": "En créant un compte, vous acceptez nos",
@@ -193,6 +192,75 @@
                     "description": "Un problème est survenu lors de la réinitialisation de votre mot de passe. Veuillez réessayer.",
                     "invalid_link": "Lien de réinitialisation invalide ou expiré. Veuillez en demander un nouveau."
                 }
+            }
+        },
+        "avatar_uploader": {
+            "replace_image": "Remplacer l'image",
+            "upload_image": "Télécharger l'image",
+            "remove": "Supprimer",
+            "file_requirements": "*png, *jpeg fichiers jusqu'à 1MB d'au moins 200px par 200px",
+            "error": {
+                "file_size": "La taille du fichier doit être inférieure à 1MB",
+                "upload_failed": "Échec du téléchargement de la photo de profil"
+            },
+            "success": "Photo de profil mise à jour avec succès",
+            "crop": {
+                "title": "Recadrer la photo de profil",
+                "cancel": "Annuler",
+                "save": "Enregistrer"
+            }
+        },
+        "kyc_uploader": {
+            "upload_document": "Télécharger le document",
+            "change_file": "Modifier le fichier",
+            "remove": "Supprimer",
+            "uploading": "Téléchargement...",
+            "error": {
+                "file_size": "La taille du fichier doit être inférieure à 3MB",
+                "file_type": "Seuls les fichiers PDF, JPG ou PNG sont autorisés",
+                "network": "Erreur réseau. Veuillez vérifier votre connexion internet.",
+                "upload_failed": "Échec du téléchargement du document"
+            },
+            "success": "Document téléchargé avec succès",
+            "success_remove": "Document supprimé avec succès",
+            "try_again": "Réessayer"
+        },
+        "logo_uploader": {
+            "replace_image": "Remplacer le logo",
+            "upload_image": "Télécharger le logo",
+            "remove": "Supprimer",
+            "file_requirements": "*png, *jpeg fichiers jusqu'à 1MB d'au moins 200px par 200px",
+            "error": {
+                "file_size": "La taille du fichier doit être inférieure à 1MB",
+                "upload_failed": "Échec du téléchargement du logo"
+            },
+            "success": "Logo mis à jour avec succès",
+            "crop": {
+                "title": "Recadrer le logo",
+                "cancel": "Annuler",
+                "save": "Enregistrer"
+            }
+        },
+        "2fa": {
+            "title": "Authentification à deux facteurs",
+            "subtitle": "Entrez le code à 6 chiffres de votre application d'authentification",
+            "verify_button": "Vérifier",
+            "cancel_button": "Annuler",
+            "processing": "Vérification...",
+            "error": {
+                "invalid_code": "Code invalide. Veuillez réessayer.",
+                "verify_failed": "Échec de la vérification du code",
+                "unexpected": "Une erreur inattendue s'est produite. Veuillez réessayer."
+            },
+            "success": "Vérification 2FA réussie",
+            "sign_in": {
+                "title": "Bienvenue",
+                "subtitle": "Entrez vos identifiants pour accéder à votre compte",
+                "email_label": "E-mail",
+                "email_placeholder": "m@exemple.com",
+                "password_label": "Mot de passe",
+                "sign_in_button": "Se connecter",
+                "signing_in": "Connexion..."
             }
         }
     }

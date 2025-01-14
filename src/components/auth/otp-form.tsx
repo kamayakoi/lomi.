@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {
   email: string;
@@ -28,6 +29,7 @@ const formSchema = z.object({
 })
 
 export function OtpForm({ className, email, errorMessage, setErrorMessage, ...props }: OtpFormProps) {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
@@ -47,13 +49,13 @@ export function OtpForm({ className, email, errorMessage, setErrorMessage, ...pr
       })
       if (error) throw error
       toast({
-        title: "Success",
-        description: "OTP verified successfully.",
+        title: t('auth.otp.success'),
+        description: t('auth.otp.success_message'),
       })
       navigate('/portal')
     } catch (error) {
       console.error('Error during OTP verification:', error)
-      setErrorMessage('Invalid OTP. Please try again.')
+      setErrorMessage(t('auth.otp.error.default'))
     } finally {
       setIsLoading(false)
     }
@@ -89,7 +91,7 @@ export function OtpForm({ className, email, errorMessage, setErrorMessage, ...pr
               )}
             />
             <Button type="submit" className='w-full' disabled={isLoading}>
-              {isLoading ? 'Verifying...' : 'Verify Email'}
+              {isLoading ? t('auth.otp.processing') : t('auth.otp.submit_button')}
             </Button>
             {errorMessage && (
               <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>

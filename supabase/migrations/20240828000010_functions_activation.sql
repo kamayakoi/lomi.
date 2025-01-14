@@ -39,14 +39,18 @@ CREATE OR REPLACE FUNCTION public.complete_activation(
 DECLARE
     v_organization_id UUID;
     v_signatory_name TEXT;
-    v_signatory_email TEXT;
+    v_merchant_email TEXT;
 BEGIN
     -- Get the organization_id for the merchant
     v_organization_id := get_merchant_organization_id(p_merchant_id);
 
     -- Store signatory details for email
     v_signatory_name := p_authorized_signatory_name;
-    v_signatory_email := p_authorized_signatory_email;
+    
+    -- Get merchant email
+    SELECT email INTO v_merchant_email
+    FROM merchants
+    WHERE merchant_id = p_merchant_id;
 
     -- Insert or update the organization_kyc record
     INSERT INTO organization_kyc (
@@ -111,8 +115,8 @@ BEGIN
 
     -- Send activation submitted email with error handling
     BEGIN
-        PERFORM public.send_activation_submitted_email(v_signatory_email, v_signatory_name);
-        RAISE NOTICE 'Activation submitted email sent to %', v_signatory_email;
+        PERFORM public.send_activation_submitted_email(v_merchant_email, v_signatory_name);
+        RAISE NOTICE 'Activation submitted email sent to %', v_merchant_email;
     EXCEPTION WHEN OTHERS THEN
         RAISE WARNING 'Failed to send activation submitted email: %', SQLERRM;
     END;
@@ -140,7 +144,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to send activation submitted email via Resend
-CREATE OR REPLACE FUNCTION public.send_activation_submitted_email(signatory_email TEXT, signatory_name TEXT)
+CREATE OR REPLACE FUNCTION public.send_activation_submitted_email(merchant_email TEXT, signatory_name TEXT)
 RETURNS void AS $$
 DECLARE
   resend_api_key TEXT;
@@ -160,24 +164,26 @@ BEGIN
   
   -- Compose the email content  
   email_content := format(
-    'Hello %s,
+    '##- Please type your reply above this line -##
+
+Hello %s,
 
 Thank you for submitting your account activation information. Our team is currently reviewing your application.
 
-We will notify you as soon as the review is complete, usually within 24 hours. In the meantime, please feel free to explore the lomi.''s portal and documentation to familiarize yourself with our platform.
+We will notify you as soon as the review is complete, usually within 24 hours. In the meantime, please feel free to explore the lomi.''s portal and documentation to familiarize yourself with our platform : https://developers.lomi.africa/
 
-If we need any additional information to process your application, we will reach out to you directly. 
+If we need any additional information to process your application, we will reach out to you directly.
 
 Best regards,
 Babacar
 
 ---
 
-If you have any questions, please reply to this email or contact our support team at [hello@lomi.africa](mailto:hello@lomi.africa).',
+This email is a service from lomi. Support Team. To add more comments, please reply to this email. ',
     split_part(signatory_name, ' ', 1)  
   );
 
-  RAISE NOTICE 'Sending activation submitted email to % with subject: %', signatory_email, email_subject;
+  RAISE NOTICE 'Sending activation submitted email to % with subject: %', merchant_email, email_subject;
 
   -- Send the email via Resend with error handling
   BEGIN
@@ -195,7 +201,7 @@ If you have any questions, please reply to this email or contact our support tea
       jsonb_build_object(
         'from', 'Babacar Diop <welcome@updates.lomi.africa>',
         'reply_to', 'Support from lomi. <hello@lomi.africa>',
-        'to', signatory_email,
+        'to', ARRAY[merchant_email],
         'subject', email_subject, 
         'text', email_content,
         'click_tracking', true,

@@ -5,6 +5,7 @@ import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
+import { useTranslation } from 'react-i18next'
 
 interface ProfilePictureUploaderProps {
     currentAvatar: string | null
@@ -20,6 +21,7 @@ const colors = [
 ];
 
 export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, name }: ProfilePictureUploaderProps) {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -35,7 +37,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
         const file = event.target.files?.[0]
         if (file) {
             if (file.size > 1024 * 1024) {
-                toast({ title: "Error", description: "File size must be less than 1MB" })
+                toast({ title: "Error", description: t('auth.avatar_uploader.error.file_size') })
                 return
             }
             setSelectedFile(file)
@@ -119,7 +121,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         onAvatarUpdate(publicUrl);
                         toast({
                             title: "Success",
-                            description: "Profile picture updated successfully",
+                            description: t('auth.avatar_uploader.success'),
                         });
                     }
                 }
@@ -127,7 +129,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 console.error('Error:', error);
                 toast({
                     title: "Error",
-                    description: "Failed to upload profile picture",
+                    description: t('auth.avatar_uploader.error.upload_failed'),
                     variant: "destructive",
                 });
             } finally {
@@ -182,7 +184,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         }}
                         className="rounded-none"
                     >
-                        {previewUrl ? 'Replace image' : 'Upload image'}
+                        {previewUrl ? t('auth.avatar_uploader.replace_image') : t('auth.avatar_uploader.upload_image')}
                     </Button>
                     <Button
                         variant="outline"
@@ -190,18 +192,18 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         disabled={!previewUrl}
                         className="rounded-none"
                     >
-                        Remove
+                        {t('auth.avatar_uploader.remove')}
                     </Button>
                 </div>
             </div>
             <p className="text-xs text-muted-foreground">
-                *png, *jpeg files up to 1MB at least 200px by 200px
+                {t('auth.avatar_uploader.file_requirements')}
             </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Crop Profile Picture</DialogTitle>
+                        <DialogTitle>{t('auth.avatar_uploader.crop.title')}</DialogTitle>
                     </DialogHeader>
                     <div className="relative h-64 w-full">
                         {selectedFile && (
@@ -217,8 +219,12 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                         )}
                     </div>
                     <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">Cancel</Button>
-                        <Button onClick={handleSave} className="rounded-none">Save</Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">
+                            {t('auth.avatar_uploader.crop.cancel')}
+                        </Button>
+                        <Button onClick={handleSave} className="rounded-none">
+                            {t('auth.avatar_uploader.crop.save')}
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>

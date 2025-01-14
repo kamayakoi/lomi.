@@ -144,8 +144,7 @@
         "pages": {
             "sign_in": {
                 "title": "欢迎回来",
-                "subtitle": "输入您的邮箱以登录账号。",
-                "company": "lomi."
+                "subtitle": "输入您的邮箱以登录账号。"
             },
             "sign_up": {
                 "title": "创建账号",
@@ -193,6 +192,75 @@
                     "description": "重置密码时出现问题。请重试。",
                     "invalid_link": "重置链接无效或已过期。请重新申请。"
                 }
+            }
+        },
+        "avatar_uploader": {
+            "replace_image": "更换图片",
+            "upload_image": "上传图片",
+            "remove": "删除",
+            "file_requirements": "*png, *jpeg 文件大小不超过1MB，至少200px x 200px",
+            "error": {
+                "file_size": "文件大小必须小于1MB",
+                "upload_failed": "头像上传失败"
+            },
+            "success": "头像更新成功",
+            "crop": {
+                "title": "裁剪头像",
+                "cancel": "取消",
+                "save": "保存"
+            }
+        },
+        "kyc_uploader": {
+            "upload_document": "上传文件",
+            "change_file": "更换文件",
+            "remove": "删除",
+            "uploading": "上传中...",
+            "error": {
+                "file_size": "文件大小必须小于3MB",
+                "file_type": "仅支持PDF、JPG或PNG文件",
+                "network": "网络错误。请检查您的互联网连接。",
+                "upload_failed": "文件上传失败"
+            },
+            "success": "文件上传成功",
+            "success_remove": "文件删除成功",
+            "try_again": "重试"
+        },
+        "logo_uploader": {
+            "replace_image": "更换标志",
+            "upload_image": "上传标志",
+            "remove": "删除",
+            "file_requirements": "*png, *jpeg 文件大小不超过1MB，至少200px x 200px",
+            "error": {
+                "file_size": "文件大小必须小于1MB",
+                "upload_failed": "标志上传失败"
+            },
+            "success": "标志更新成功",
+            "crop": {
+                "title": "裁剪标志",
+                "cancel": "取消",
+                "save": "保存"
+            }
+        },
+        "2fa": {
+            "title": "双重认证",
+            "subtitle": "请输入认证应用程序中的6位验证码",
+            "verify_button": "验证",
+            "cancel_button": "取消",
+            "processing": "验证中...",
+            "error": {
+                "invalid_code": "验证码无效，请重试。",
+                "verify_failed": "验证失败",
+                "unexpected": "发生意外错误，请重试。"
+            },
+            "success": "双重认证验证成功",
+            "sign_in": {
+                "title": "欢迎回来",
+                "subtitle": "请输入您的凭据以访问您的帐户",
+                "email_label": "电子邮件",
+                "email_placeholder": "m@example.com",
+                "password_label": "密码",
+                "sign_in_button": "登录",
+                "signing_in": "登录中..."
             }
         }
     }

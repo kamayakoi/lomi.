@@ -5,6 +5,7 @@ import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from "@/components/ui/use-toast"
+import { useTranslation } from 'react-i18next'
 
 interface LogoUploaderProps {
     currentLogo: string | null
@@ -13,6 +14,7 @@ interface LogoUploaderProps {
 }
 
 export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }: LogoUploaderProps) {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -28,7 +30,7 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
         if (event.target.files && event.target.files.length > 0) {
             const file = event.target.files[0]
             if (file && file.size > 1024 * 1024) {
-                toast({ title: "Error", description: "File size must be less than 1MB" })
+                toast({ title: "Error", description: t('auth.logo_uploader.error.file_size') })
                 return
             }
             setSelectedFile(file || null)
@@ -88,10 +90,8 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                 );
 
                 if (croppedImage) {
-                    // For preview purposes
                     setPreviewUrl(URL.createObjectURL(croppedImage));
 
-                    // Upload to Supabase
                     const { data: { user } } = await supabase.auth.getUser();
                     if (!user) throw new Error('No user found');
 
@@ -111,7 +111,6 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(data.path);
                         onLogoUpdate(publicUrl);
 
-                        // Update the organization's logo URL in the database
                         const { data: { user } } = await supabase.auth.getUser();
                         if (user) {
                             const { data: organizationDetails, error: organizationError } = await supabase
@@ -131,12 +130,12 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                             }
                         }
 
-                        toast({ title: "Success", description: "Logo updated successfully" });
+                        toast({ title: "Success", description: t('auth.logo_uploader.success') });
                     }
                 }
             } catch (error) {
                 console.error('Error:', error);
-                toast({ title: "Error", description: "Failed to upload logo" });
+                toast({ title: "Error", description: t('auth.logo_uploader.error.upload_failed') });
             } finally {
                 setIsDialogOpen(false);
             }
@@ -184,7 +183,7 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         }}
                         className="rounded-none"
                     >
-                        {previewUrl ? 'Replace image' : 'Upload image'}
+                        {previewUrl ? t('auth.logo_uploader.replace_image') : t('auth.logo_uploader.upload_image')}
                     </Button>
                     <Button
                         variant="outline"
@@ -192,18 +191,18 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         disabled={!previewUrl}
                         className="rounded-none"
                     >
-                        Remove
+                        {t('auth.logo_uploader.remove')}
                     </Button>
                 </div>
             </div>
             <p className="text-xs text-muted-foreground">
-                *png, *jpeg files up to 1MB at least 200px by 200px
+                {t('auth.logo_uploader.file_requirements')}
             </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Crop Logo</DialogTitle>
+                        <DialogTitle>{t('auth.logo_uploader.crop.title')}</DialogTitle>
                     </DialogHeader>
                     <div className="relative h-64 w-full">
                         {selectedFile && (
@@ -219,8 +218,12 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                         )}
                     </div>
                     <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">Cancel</Button>
-                        <Button onClick={handleSave} className="rounded-none">Save</Button>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">
+                            {t('auth.logo_uploader.crop.cancel')}
+                        </Button>
+                        <Button onClick={handleSave} className="rounded-none">
+                            {t('auth.logo_uploader.crop.save')}
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>

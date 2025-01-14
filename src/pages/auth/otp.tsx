@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
-import { useLocation, } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/card'
 import { OtpForm } from '@/components/auth/otp-form'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/custom/button'
+import { ChevronLeft } from 'lucide-react'
 
 export default function Otp() {
+  const { t } = useTranslation()
   const [isResending, setIsResending] = useState(false)
   const [email, setEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Get email from query parameter or localStorage
@@ -33,12 +38,12 @@ export default function Otp() {
       })
       if (error) throw error
       toast({
-        title: "Success",
-        description: "A new OTP has been sent to your email.",
+        title: t('auth.otp.success'),
+        description: t('auth.otp.success_message'),
       })
     } catch (error) {
       console.error('Error resending OTP:', error)
-      setErrorMessage('There was a problem resending the OTP. Please try again.')
+      setErrorMessage(t('auth.otp.error.unexpected'))
     } finally {
       setIsResending(false)
     }
@@ -47,26 +52,36 @@ export default function Otp() {
   return (
     <>
       <div className='container grid h-svh flex-col items-center justify-center lg:max-w-none lg:px-0'>
+        {/* Back button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed top-6 left-6 z-50"
+          onClick={() => navigate(-1)}
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+
         <div className='mx-auto flex w-full flex-col justify-center space-y-2 sm:w-[480px] lg:p-8'>
           <Card className='p-6'>
             <div className='mb-2 flex flex-col space-y-2 text-center'>
               <h1 className='text-2xl font-semibold tracking-tight'>
-                Two-factor Authentication
+                {t('auth.otp.title')}
               </h1>
               <p className='text-sm text-muted-foreground'>
-                We have sent an authentication code to your email.
+                {t('auth.check_email.message').replace('<email>', email)}
               </p>
             </div>
             <div className='mb-4'></div>
             <OtpForm email={email} errorMessage={errorMessage} setErrorMessage={setErrorMessage} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
-              Haven&apos;t received it?{' '}
+              {t('auth.check_email.resend')}{' '}
               <button
                 onClick={handleResendOtp}
                 disabled={isResending}
                 className='underline underline-offset-4 hover:text-primary'
               >
-                {isResending ? 'Resending...' : 'Resend a new code'}
+                {isResending ? t('auth.sign_up.processing') : t('auth.check_email.resend_link')}
               </button>
             </p>
             {errorMessage && (
