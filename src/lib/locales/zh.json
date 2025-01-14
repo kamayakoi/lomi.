@@ -263,5 +263,147 @@
                 "signing_in": "登录中..."
             }
         }
+    },
+    "activation": {
+        "title": "账户激活",
+        "step_indicator": "第 {step} 步，共 {total} 步",
+        "steps": {
+            "create_account": "创建账户",
+            "business_details": "企业详情",
+            "authorized_signatory": "授权签字人",
+            "documents": "文件",
+            "verification": "验证进行中",
+            "activated": "账户已激活"
+        },
+        "step1": {
+            "success_message": "您的账户已成功创建！",
+            "verification_intro": "为完成注册，我们需要验证您的企业信息。",
+            "process_title": "请按照我们的企业验证流程进行：",
+            "steps": [
+                "确认您的企业详情",
+                "提交所需文件",
+                "激活您的账户",
+                "开始使用我们的平台"
+            ],
+            "compliance_notice": "此验证确保我们平台的安全性，并符合您所在国家和科特迪瓦共和国的法规要求。"
+        },
+        "step2": {
+            "title": "企业详情",
+            "legal_name": {
+                "label": "企业法定名称",
+                "placeholder": "例如：Ashanti Enterprises",
+                "error": "企业法定名称为必填项"
+            },
+            "tax_number": {
+                "label": "税号（可选）",
+                "placeholder": "例如：CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "企业描述",
+                "placeholder": "例如：我们通过Instagram销售二手智能手机。",
+                "helper": "描述您的产品和销售渠道。",
+                "error": "描述必须至少包含40个字符"
+            },
+            "country": {
+                "label": "国家",
+                "placeholder": "选择您的国家",
+                "error": "国家为必填项"
+            },
+            "region": {
+                "label": "地区",
+                "placeholder": "例如：Lagunes",
+                "error": "地区为必填项"
+            },
+            "city": {
+                "label": "城市",
+                "placeholder": "例如：Abidjan",
+                "error": "城市为必填项"
+            },
+            "postal_code": {
+                "label": "邮政编码",
+                "placeholder": "例如：01012",
+                "error": "邮政编码为必填项"
+            },
+            "street": {
+                "label": "街道",
+                "placeholder": "例如：123 Rue des Perles",
+                "error": "地址为必填项"
+            },
+            "proof_of_business": {
+                "label": "企业证明",
+                "placeholder": "选择您的企业证明",
+                "error": "企业证明为必填项",
+                "options": {
+                    "website": "网站 | 应用",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "电子商务 | 市场"
+                }
+            },
+            "business_url": {
+                "label": "企业页面链接",
+                "placeholder": "例如：https://www.ashantishoes.ci",
+                "error": "必须是有效的URL"
+            },
+            "legal_notice": "请确保提供的信息与您的法律文件相符。"
+        },
+        "step3": {
+            "title": "授权签字人",
+            "full_name": {
+                "label": "全名",
+                "placeholder": "例如：Jessy Luckey",
+                "error": "全名为必填项"
+            },
+            "email": {
+                "label": "电子邮箱",
+                "placeholder": "例如：jessy@gmail.com",
+                "error": "无效的电子邮箱地址"
+            },
+            "mobile": {
+                "label": "手机号码",
+                "country_code": {
+                    "placeholder": "+225",
+                    "error": "国家代码必须以+开头，后跟数字"
+                },
+                "number": {
+                    "placeholder": "01 60 223 401",
+                    "error": "无效的电话号码格式"
+                }
+            }
+        },
+        "step4": {
+            "title": "文件",
+            "identity_proof": {
+                "label": "身份证明",
+                "description": "身份证，护照"
+            },
+            "address_proof": {
+                "label": "地址证明",
+                "description": "水电费账单，银行对账单"
+            },
+            "business_registration": {
+                "label": "企业注册文件",
+                "description": "营业执照，商业许可证，税务登记证"
+            },
+            "required_field": "此文件为必需项",
+            "file_requirements": "请确保所有文件清晰、可读，并为PDF、JPG或PNG格式。每个文件最大大小：3MB。",
+            "confirmation": {
+                "title": "激活我的账户",
+                "description": "请确保所有上传的文件正确且清晰可读。"
+            }
+        },
+        "step5": {
+            "title": "验证进行中",
+            "description": "我们正在审核您的信息。此过程可能需要1-3个工作日。",
+            "day_1": "第1天",
+            "day_2": "第2天",
+            "day_3": "第3天"
+        }
+    },
+    "common": {
+        "next": "下一步",
+        "back": "返回",
+        "submit": "提交",
+        "cancel": "取消",
+        "save": "保存"
     }
 }

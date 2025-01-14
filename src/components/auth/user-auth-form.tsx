@@ -87,12 +87,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'email',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       })
       if (error) throw error
       if (!data.url) throw new Error('No URL returned from Supabase')
-      window.location.href = data.url
+
+      // Use replace instead of assigning to href to prevent history issues
+      window.location.replace(data.url)
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       setErrorMessage(t('auth.sign_in.error.oauth', { provider }))

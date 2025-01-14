@@ -262,5 +262,147 @@
             "sign_in_button": "Iniciar sesión",
             "signing_in": "Iniciando sesión..."
         }
+    },
+    "activation": {
+        "title": "Activación de cuenta",
+        "step_indicator": "Paso {step} de {total}",
+        "steps": {
+            "create_account": "Crear cuenta",
+            "business_details": "Detalles del negocio",
+            "authorized_signatory": "Firmante autorizado",
+            "documents": "Documentos",
+            "verification": "Verificación en progreso",
+            "activated": "Cuenta activada"
+        },
+        "step1": {
+            "success_message": "¡Tu cuenta ha sido creada exitosamente!",
+            "verification_intro": "Para completar tu registro, necesitamos verificar la información de tu negocio.",
+            "process_title": "Por favor, procede con nuestro proceso de verificación de negocio para:",
+            "steps": [
+                "Confirmar los detalles de tu negocio",
+                "Enviar la documentación requerida",
+                "Activar tu cuenta",
+                "Comenzar a usar nuestra plataforma"
+            ],
+            "compliance_notice": "Esta verificación asegura la seguridad de nuestra plataforma y el cumplimiento de las regulaciones en tu país y en la República de Costa de Marfil."
+        },
+        "step2": {
+            "title": "Detalles del negocio",
+            "legal_name": {
+                "label": "Nombre legal de la empresa",
+                "placeholder": "ej. Ashanti Enterprises",
+                "error": "El nombre legal de la empresa es requerido"
+            },
+            "tax_number": {
+                "label": "Número fiscal (opcional)",
+                "placeholder": "ej. CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "Descripción del negocio",
+                "placeholder": "ej. Vendemos smartphones de segunda mano a través de Instagram.",
+                "helper": "Describe tus productos y canales de venta.",
+                "error": "La descripción debe tener al menos 40 caracteres"
+            },
+            "country": {
+                "label": "País",
+                "placeholder": "Selecciona tu país",
+                "error": "El país es requerido"
+            },
+            "region": {
+                "label": "Región",
+                "placeholder": "ej. Lagunes",
+                "error": "La región es requerida"
+            },
+            "city": {
+                "label": "Ciudad",
+                "placeholder": "ej. Abidjan",
+                "error": "La ciudad es requerida"
+            },
+            "postal_code": {
+                "label": "Código postal",
+                "placeholder": "ej. 01012",
+                "error": "El código postal es requerido"
+            },
+            "street": {
+                "label": "Calle",
+                "placeholder": "ej. 123 Rue des Perles",
+                "error": "La dirección es requerida"
+            },
+            "proof_of_business": {
+                "label": "Prueba de negocio",
+                "placeholder": "Selecciona tu prueba de negocio",
+                "error": "La prueba de negocio es requerida",
+                "options": {
+                    "website": "Sitio Web | Aplicación",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "E-Commerce | Marketplace"
+                }
+            },
+            "business_url": {
+                "label": "Enlace a tu página de negocio",
+                "placeholder": "ej. https://www.ashantishoes.ci",
+                "error": "Debe ser una URL válida"
+            },
+            "legal_notice": "Por favor, asegúrate de que la información proporcionada coincida con tus documentos legales."
+        },
+        "step3": {
+            "title": "Firmante autorizado",
+            "full_name": {
+                "label": "Nombre completo",
+                "placeholder": "ej. Jessy Luckey",
+                "error": "El nombre completo es requerido"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "ej. jessy@gmail.com",
+                "error": "Dirección de email inválida"
+            },
+            "mobile": {
+                "label": "Número de teléfono",
+                "country_code": {
+                    "placeholder": "+225",
+                    "error": "El código de país debe comenzar con + seguido de números"
+                },
+                "number": {
+                    "placeholder": "01 60 223 401",
+                    "error": "Formato de número de teléfono inválido"
+                }
+            }
+        },
+        "step4": {
+            "title": "Documentos",
+            "identity_proof": {
+                "label": "Prueba de identidad",
+                "description": "DNI, Pasaporte"
+            },
+            "address_proof": {
+                "label": "Comprobante de domicilio",
+                "description": "Factura de servicios, Estado de cuenta bancario"
+            },
+            "business_registration": {
+                "label": "Documento de registro del negocio",
+                "description": "Certificado de Constitución, Licencia Comercial, Certificado de Registro Fiscal"
+            },
+            "required_field": "Este documento es requerido",
+            "file_requirements": "Por favor, asegúrate de que todos los documentos sean claros, legibles y estén en formato PDF, JPG o PNG. Tamaño máximo: 3MB por documento.",
+            "confirmation": {
+                "title": "Activar mi cuenta",
+                "description": "Por favor, asegúrate de que todos los documentos cargados sean correctos y legibles."
+            }
+        },
+        "step5": {
+            "title": "Verificación en Progreso",
+            "description": "Estamos revisando tu información. Este proceso puede tomar de 1 a 3 días hábiles.",
+            "day_1": "Día 1",
+            "day_2": "Día 2",
+            "day_3": "Día 3"
+        }
+    },
+    "common": {
+        "next": "Siguiente",
+        "back": "Atrás",
+        "submit": "Enviar",
+        "cancel": "Cancelar",
+        "save": "Guardar"
     }
 }   }

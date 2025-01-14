@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { countryCodes } from '@/utils/data/onboarding';
 import { ActivationData } from "./activation";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from 'react-i18next';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$/;
 
 const activationStep3Schema = z.object({
-    fullName: z.string().min(1, 'Full name is required'),
-    email: z.string().email('Invalid email address'),
-    countryCode: z.string().regex(/^\+\d+$/, 'Country code must start with + followed by numbers'),
-    mobileNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
+    fullName: z.string().min(1, 'activation.step3.full_name.error'),
+    email: z.string().email('activation.step3.email.error'),
+    countryCode: z.string().regex(/^\+\d+$/, 'activation.step3.mobile.country_code.error'),
+    mobileNumber: z.string().regex(phoneRegex, 'activation.step3.mobile.number.error'),
 });
 
 type ActivationStep3Data = z.infer<typeof activationStep3Schema>;
@@ -26,6 +27,7 @@ interface ActivationStep3Props {
 }
 
 const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, data }) => {
+    const { t } = useTranslation();
     const { control, handleSubmit, formState: { errors } } = useForm<ActivationStep3Data>({
         resolver: zodResolver(activationStep3Schema),
         mode: 'onChange',
@@ -41,6 +43,11 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
         onNext(data);
     };
 
+    const getErrorMessage = (error: { message?: string }) => {
+        if (!error.message) return '';
+        return t(error.message);
+    };
+
     const [countryCodeSearch, setCountryCodeSearch] = useState('');
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
 
@@ -53,25 +60,25 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <h2 className="text-lg font-semibold">Authorized Signatory</h2>
+            <h2 className="text-lg font-semibold">{t('activation.step3.title')}</h2>
             <div>
-                <Label htmlFor="fullName" className="block mb-4">Full name</Label>
+                <Label htmlFor="fullName" className="block mb-4">{t('activation.step3.full_name.label')}</Label>
                 <Controller
                     name="fullName"
                     control={control}
                     render={({ field }) => (
                         <Input
                             id="fullName"
-                            placeholder="e.g. Jessy Luckey"
+                            placeholder={t('activation.step3.full_name.placeholder')}
                             className="rounded-none"
                             {...field}
                         />
                     )}
                 />
-                {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>}
+                {errors.fullName && <p className="text-red-500 text-sm mt-1">{getErrorMessage(errors.fullName)}</p>}
             </div>
             <div>
-                <Label htmlFor="email" className="block mb-4">Email</Label>
+                <Label htmlFor="email" className="block mb-4">{t('activation.step3.email.label')}</Label>
                 <Controller
                     name="email"
                     control={control}
@@ -79,16 +86,16 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                         <Input
                             id="email"
                             type="email"
-                            placeholder="e.g. jessy@gmail.com"
+                            placeholder={t('activation.step3.email.placeholder')}
                             className="rounded-none"
                             {...field}
                         />
                     )}
                 />
-                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                {errors.email && <p className="text-red-500 text-sm mt-1">{getErrorMessage(errors.email)}</p>}
             </div>
             <div>
-                <Label htmlFor="mobileNumber" className="block mb-4">Mobile number</Label>
+                <Label htmlFor="mobileNumber" className="block mb-4">{t('activation.step3.mobile.label')}</Label>
                 <div className="flex">
                     <div className="relative w-1/3">
                         <Controller
@@ -99,7 +106,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                                     <Input
                                         id="countryCode"
                                         type="text"
-                                        placeholder="+225"
+                                        placeholder={t('activation.step3.mobile.country_code.placeholder')}
                                         value={countryCodeSearch}
                                         onChange={(e) => {
                                             const value = e.target.value;
@@ -131,7 +138,7 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                                 </>
                             )}
                         />
-                        {errors.countryCode && <p className="text-red-500 text-sm mt-1">{errors.countryCode.message}</p>}
+                        {errors.countryCode && <p className="text-red-500 text-sm mt-1">{getErrorMessage(errors.countryCode)}</p>}
                     </div>
                     <div className="flex-1 ml-2">
                         <Controller
@@ -140,22 +147,22 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                             render={({ field }) => (
                                 <Input
                                     id="mobileNumber"
-                                    placeholder="01 60 223 401"
+                                    placeholder={t('activation.step3.mobile.number.placeholder')}
                                     className="rounded-none"
                                     {...field}
                                 />
                             )}
                         />
-                        {errors.mobileNumber && <p className="text-red-500 text-sm mt-1">{errors.mobileNumber.message}</p>}
+                        {errors.mobileNumber && <p className="text-red-500 text-sm mt-1">{getErrorMessage(errors.mobileNumber)}</p>}
                     </div>
                 </div>
             </div>
             <div className="flex justify-between">
                 <Button type="button" variant="outline" onClick={onPrevious}>
-                    Back
+                    {t('common.back')}
                 </Button>
                 <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
-                    Next
+                    {t('common.next')}
                 </Button>
             </div>
         </form>

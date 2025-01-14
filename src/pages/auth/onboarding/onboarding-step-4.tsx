@@ -135,7 +135,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     Back
                 </Button>
                 <Button type="submit" className="mt-6 h-[48px] bg-black hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
-                    Submit!
+                    Submit
                 </Button>
             </div>
         </form>

@@ -262,5 +262,195 @@
             "sign_in_button": "Sign in",
             "signing_in": "Signing in..."
         }
+    },
+    "dashboard": {
+        "getting_started": {
+            "title": "Getting Started",
+            "api_keys": {
+                "title": "Manage API keys",
+                "description": "View and manage your API keys.",
+                "technical": "Technical"
+            },
+            "webhooks": {
+                "title": "Set callback URLs",
+                "description": "Set up your Callback URLs for us to inform you of successful payments.",
+                "technical": "Technical"
+            },
+            "payment_links": {
+                "title": "Create payment links",
+                "description": "Generate payment links to collect money easily."
+            },
+            "integrations": {
+                "title": "Set integrations",
+                "description": "Connect with various payment providers and services."
+            }
+        },
+        "developer_resources": {
+            "title": "Developer Resources",
+            "resources": {
+                "documentation": {
+                    "title": "Documentation",
+                    "description": "Familiarize yourself with lomi. products with our docs."
+                },
+                "api_reference": {
+                    "title": "API reference",
+                    "description": "Find out how our APIs work and how you can deploy them."
+                },
+                "product_catalog": {
+                    "title": "Product catalog",
+                    "description": "Discover lomi. products and how to use them."
+                },
+                "sample_projects": {
+                    "title": "Boilerplates",
+                    "description": "Explore boilerplates to kickstart your integration."
+                },
+                "support": {
+                    "title": "Support",
+                    "description": "Get on call help and support from our team."
+                }
+            }
+        }
+    },
+    "activation": {
+        "title": "Account Activation",
+        "step_indicator": "Step {step} of {total}",
+        "steps": {
+            "create_account": "Create your account",
+            "business_details": "Business details",
+            "authorized_signatory": "Authorized signatory",
+            "documents": "Documents",
+            "verification": "Verification in progress",
+            "activated": "Account activated"
+        },
+        "step1": {
+            "success_message": "Your account has been created successfully!",
+            "verification_intro": "To complete your registration, we need to verify your business information.",
+            "process_title": "Please proceed with our business verification process to:",
+            "steps": [
+                "Confirm your business details",
+                "Submit required documentation",
+                "Get your account activated",
+                "Start using our platform"
+            ],
+            "compliance_notice": "This verification ensures the security of our platform and compliance with regulations in your country and in the Republic of Côte d'Ivoire."
+        },
+        "step2": {
+            "title": "Business details",
+            "legal_name": {
+                "label": "Legal company name",
+                "placeholder": "e.g. Ashanti Enterprises",
+                "error": "Legal company name is required"
+            },
+            "tax_number": {
+                "label": "Tax number (optional)",
+                "placeholder": "e.g. CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "Business description",
+                "placeholder": "e.g. We're selling second-hand smartphones via Instagram.",
+                "helper": "Describe your products and sales channels.",
+                "error": "Business description must be at least 40 characters"
+            },
+            "country": {
+                "label": "Country",
+                "placeholder": "Select your country",
+                "error": "Country is required"
+            },
+            "region": {
+                "label": "Region",
+                "placeholder": "e.g. Lagunes",
+                "error": "Region is required"
+            },
+            "city": {
+                "label": "City",
+                "placeholder": "e.g. Abidjan",
+                "error": "City is required"
+            },
+            "postal_code": {
+                "label": "Postal code",
+                "placeholder": "e.g. 01012",
+                "error": "Postal code is required"
+            },
+            "street": {
+                "label": "Street",
+                "placeholder": "e.g. 123 Rue des Perles",
+                "error": "Street is required"
+            },
+            "proof_of_business": {
+                "label": "Proof of business",
+                "placeholder": "Select your proof of business",
+                "error": "Proof of business is required",
+                "options": {
+                    "website": "Live Website | Application",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "E-Commerce | Marketplace"
+                }
+            },
+            "business_url": {
+                "label": "Link to your business page",
+                "placeholder": "e.g. https://www.ashantishoes.ci",
+                "error": "Must be a valid URL"
+            },
+            "legal_notice": "Please ensure that the information provided matches your legal documents."
+        },
+        "step3": {
+            "title": "Authorized Signatory",
+            "full_name": {
+                "label": "Full name",
+                "placeholder": "e.g. Jessy Luckey",
+                "error": "Full name is required"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "e.g. jessy@gmail.com",
+                "error": "Invalid email address"
+            },
+            "mobile": {
+                "label": "Mobile number",
+                "country_code": {
+                    "placeholder": "+225",
+                    "error": "Country code must start with + followed by numbers"
+                },
+                "number": {
+                    "placeholder": "01 60 223 401",
+                    "error": "Invalid phone number format"
+                }
+            }
+        },
+        "step4": {
+            "title": "Documents",
+            "identity_proof": {
+                "label": "Identity proof",
+                "description": "National ID, Passport"
+            },
+            "address_proof": {
+                "label": "Address proof",
+                "description": "Utility Bill, Bank Statement"
+            },
+            "business_registration": {
+                "label": "Business registration document",
+                "description": "Certificate of Incorporation, Business License, Tax Registration Certificate"
+            },
+            "required_field": "This document is required",
+            "file_requirements": "Please ensure all documents are clear, legible, and in PDF, JPG, or PNG format. Maximum file size: 3MB per document.",
+            "confirmation": {
+                "title": "Activate my account",
+                "description": "Please ensure all uploaded documents are correct and legible."
+            }
+        },
+        "step5": {
+            "title": "Verification in Progress",
+            "description": "We are reviewing your information. This process may take 1-3 business days.",
+            "day_1": "Day 1",
+            "day_2": "Day 2",
+            "day_3": "Day 3"
+        }
+    },
+    "common": {
+        "next": "Next",
+        "back": "Back",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "save": "Save"
     }
 }}

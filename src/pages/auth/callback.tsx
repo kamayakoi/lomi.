@@ -12,14 +12,22 @@ const AuthCallback = () => {
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                const { error } = await supabase.auth.getSession();
+                const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
-                if (!isLoading) {
+                // Wait for session to be established
+                if (!session) {
+                    console.log('No session found, waiting...');
+                    return;
+                }
+
+                // Only proceed with navigation when we have both session and loading state
+                if (!isLoading && session) {
+                    console.log('Session established, navigating...');
                     if (!isOnboarded) {
-                        navigate('/onboarding');
+                        navigate('/onboarding', { replace: true });
                     } else {
-                        navigate('/portal');
+                        navigate('/portal', { replace: true });
                     }
                 }
             } catch (error) {
@@ -29,7 +37,7 @@ const AuthCallback = () => {
                     description: "There was a problem signing you in. Please try again.",
                     variant: "destructive",
                 });
-                navigate('/sign-in');
+                navigate('/sign-in', { replace: true });
             }
         };
 

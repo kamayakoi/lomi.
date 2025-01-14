@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 type ActivationStep4Data = {
     identityProof: string;
@@ -27,6 +28,7 @@ interface ActivationStep4Props {
 }
 
 const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious, data }) => {
+    const { t } = useTranslation();
     const { user } = useUser();
     const [documents, setDocuments] = useState<ActivationStep4Data>({
         identityProof: data.identityProof || '',
@@ -90,11 +92,11 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious,
 
     return (
         <div className="space-y-6 overflow-hidden">
-            <h2 className="text-lg font-semibold mb-2">Documents</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('activation.step4.title')}</h2>
             {[
-                { id: "identityProof", label: "Identity proof", description: "National ID, Passport", documentType: 'legal_representative_ID' },
-                { id: "addressProof", label: "Address proof", description: "Utility Bill, Bank Statement", documentType: 'address_proof' },
-                { id: "businessRegistration", label: "Business registration document", description: "Certificate of Incorporation, Business License, Tax Registration Certificate", documentType: 'business_registration' },
+                { id: "identityProof", label: t('activation.step4.identity_proof.label'), description: t('activation.step4.identity_proof.description'), documentType: 'legal_representative_ID' },
+                { id: "addressProof", label: t('activation.step4.address_proof.label'), description: t('activation.step4.address_proof.description'), documentType: 'address_proof' },
+                { id: "businessRegistration", label: t('activation.step4.business_registration.label'), description: t('activation.step4.business_registration.description'), documentType: 'business_registration' },
             ].map((doc) => (
                 <div key={doc.id} className="space-y-1">
                     <Label htmlFor={doc.id} className="text-sm font-medium">
@@ -113,39 +115,37 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious,
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-red-500">
                                 <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
                             </svg>
-                            <p className="text-sm text-red-500">This document is required</p>
+                            <p className="text-sm text-red-500">{t('activation.step4.required_field')}</p>
                         </div>
                     )}
                 </div>
             ))}
             <div className="text-xs text-muted-foreground bg-muted p-1.5 rounded-md">
-                <p>
-                    Please ensure all documents are clear, legible, and in PDF, JPG, or PNG format. Maximum file size: 3MB per document.
-                </p>
+                <p>{t('activation.step4.file_requirements')}</p>
             </div>
             <div className="flex justify-between">
                 <Button type="button" variant="outline" onClick={onPrevious}>
-                    Back
+                    {t('common.back')}
                 </Button>
                 <Button onClick={handleSubmitClick} className="bg-green-500 hover:bg-green-600 text-white">
-                    Submit
+                    {t('common.submit')}
                 </Button>
             </div>
 
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Activate my account</DialogTitle>
+                        <DialogTitle>{t('activation.step4.confirmation.title')}</DialogTitle>
                         <DialogDescription>
-                            Please ensure all uploaded documents are correct and legible.
+                            {t('activation.step4.confirmation.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="flex space-x-2">
                         <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button onClick={handleConfirmedSubmit} className="bg-green-500 hover:bg-green-600 text-white">
-                            Confirm
+                            {t('common.submit')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

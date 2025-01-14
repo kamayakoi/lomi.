@@ -195,8 +195,8 @@
             }
         },
         "avatar_uploader": {
-            "replace_image": "Remplacer l'image",
-            "upload_image": "Télécharger l'image",
+            "replace_image": "Remplacer",
+            "upload_image": "Ajouter",
             "remove": "Supprimer",
             "file_requirements": "*png, *jpeg fichiers jusqu'à 1MB d'au moins 200px par 200px",
             "error": {
@@ -263,5 +263,195 @@
                 "signing_in": "Connexion..."
             }
         }
+    },
+    "dashboard": {
+        "getting_started": {
+            "title": "Getting started",
+            "api_keys": {
+                "title": "Gérer vos API keys",
+                "description": "Consultez et gérez vos API Keys.",
+                "technical": "Technique"
+            },
+            "webhooks": {
+                "title": "Configurer des URLs de callback",
+                "description": "Configurez vos URLs de callback pour être informé des paiements réussis.",
+                "technical": "Technique"
+            },
+            "payment_links": {
+                "title": "Créer des liens de paiement",
+                "description": "Générez des liens de paiement pour collecter de l'argent facilement."
+            },
+            "integrations": {
+                "title": "Configurer vos intégrations",
+                "description": "Connectez-vous avec différents fournisseurs de paiement et services."
+            }
+        },
+        "developer_resources": {
+            "title": "Ressources",
+            "resources": {
+                "documentation": {
+                    "title": "Documentation",
+                    "description": "Familiarisez-vous avec les produits lomi. grâce à notre documentation."
+                },
+                "api_reference": {
+                    "title": "Référence API",
+                    "description": "Découvrez comment fonctionnent nos APIs et comment les déployer."
+                },
+                "product_catalog": {
+                    "title": "Catalogue de produits",
+                    "description": "Découvrez les produits lomi. et comment les intégrer dans votre application."
+                },
+                "sample_projects": {
+                    "title": "Boilerplates",
+                    "description": "Explorez des exemples de code pour démarrer votre intégration."
+                },
+                "support": {
+                    "title": "Support",
+                    "description": "Obtenez rapidement de l'aide et des conseils de notre équipe."
+                }
+            }
+        }
+    },
+    "activation": {
+        "title": "Activation du compte",
+        "step_indicator": "Étape {step} sur {total}",
+        "steps": {
+            "create_account": "Créer votre compte",
+            "business_details": "Détails de l'entreprise",
+            "authorized_signatory": "Signataire autorisé",
+            "documents": "Documents",
+            "verification": "Vérification en cours",
+            "activated": "Compte activé"
+        },
+        "step1": {
+            "success_message": "Votre compte a été créé avec succès !",
+            "verification_intro": "Pour compléter votre inscription, nous devons vérifier les informations de votre entreprise.",
+            "process_title": "Veuillez procéder à notre processus de vérification d'entreprise pour :",
+            "steps": [
+                "Confirmer les détails de votre entreprise",
+                "Soumettre les documents requis",
+                "Faire activer votre compte",
+                "Commencer à utiliser notre plateforme"
+            ],
+            "compliance_notice": "Cette vérification assure la sécurité de notre plateforme et la conformité aux réglementations de votre pays et de la République de Côte d'Ivoire."
+        },
+        "step2": {
+            "title": "Détails de l'entreprise",
+            "legal_name": {
+                "label": "Nom légal de l'entreprise",
+                "placeholder": "ex. Ashanti Enterprises",
+                "error": "Le nom légal de l'entreprise est requis"
+            },
+            "tax_number": {
+                "label": "Numéro fiscal (optionnel)",
+                "placeholder": "ex. CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "Description de l'entreprise",
+                "placeholder": "ex. Nous vendons des smartphones d'occasion via Instagram.",
+                "helper": "Décrivez vos produits et canaux de vente.",
+                "error": "La description doit contenir au moins 40 caractères"
+            },
+            "country": {
+                "label": "Pays",
+                "placeholder": "Sélectionnez votre pays",
+                "error": "Le pays est requis"
+            },
+            "region": {
+                "label": "Région",
+                "placeholder": "ex. Lagunes",
+                "error": "La région est requise"
+            },
+            "city": {
+                "label": "Ville",
+                "placeholder": "ex. Abidjan",
+                "error": "La ville est requise"
+            },
+            "postal_code": {
+                "label": "Code postal",
+                "placeholder": "ex. 01012",
+                "error": "Le code postal est requis"
+            },
+            "street": {
+                "label": "Rue",
+                "placeholder": "ex. 123 Rue des Perles",
+                "error": "L'adresse est requise"
+            },
+            "proof_of_business": {
+                "label": "Preuve d'activité",
+                "placeholder": "Sélectionnez votre preuve d'activité",
+                "error": "La preuve d'activité est requise",
+                "options": {
+                    "website": "Site Web | Application",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "E-Commerce | Marketplace"
+                }
+            },
+            "business_url": {
+                "label": "Lien vers votre page professionnelle",
+                "placeholder": "ex. https://www.ashantishoes.ci",
+                "error": "L'URL doit être valide"
+            },
+            "legal_notice": "Veuillez vous assurer que les informations fournies correspondent à vos documents légaux."
+        },
+        "step3": {
+            "title": "Signataire autorisé",
+            "full_name": {
+                "label": "Nom complet",
+                "placeholder": "ex. Jessy Luckey",
+                "error": "Le nom complet est requis"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "ex. jessy@gmail.com",
+                "error": "Adresse email invalide"
+            },
+            "mobile": {
+                "label": "Numéro de téléphone",
+                "country_code": {
+                    "placeholder": "+225",
+                    "error": "Le code pays doit commencer par + suivi de chiffres"
+                },
+                "number": {
+                    "placeholder": "01 60 223 401",
+                    "error": "Format de numéro de téléphone invalide"
+                }
+            }
+        },
+        "step4": {
+            "title": "Documents",
+            "identity_proof": {
+                "label": "Preuve d'identité",
+                "description": "Carte Nationale d'Identité, Passeport"
+            },
+            "address_proof": {
+                "label": "Justificatif de domicile",
+                "description": "Facture d'électricité, Relevé bancaire"
+            },
+            "business_registration": {
+                "label": "Document d'enregistrement de l'entreprise",
+                "description": "Certificat d'incorporation, Licence commerciale, Attestation fiscale"
+            },
+            "required_field": "Ce document est requis",
+            "file_requirements": "Veuillez vous assurer que tous les documents sont clairs, lisibles et au format PDF, JPG ou PNG. Taille maximale : 3 Mo par document.",
+            "confirmation": {
+                "title": "Activer mon compte",
+                "description": "Veuillez vous assurer que tous les documents téléchargés sont corrects et lisibles."
+            }
+        },
+        "step5": {
+            "title": "Vérification en cours",
+            "description": "Nous examinons vos informations. Ce processus peut prendre 1 à 3 jours ouvrables.",
+            "day_1": "Jour 1",
+            "day_2": "Jour 2",
+            "day_3": "Jour 3"
+        }
+    },
+    "common": {
+        "next": "Suivant",
+        "back": "Retour",
+        "submit": "Soumettre",
+        "cancel": "Annuler",
+        "save": "Enregistrer"
     }
 }

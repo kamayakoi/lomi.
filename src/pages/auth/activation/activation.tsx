@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-8 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -65,13 +66,13 @@ const initialActivationData: ActivationData = {
 };
 
 const steps = [
-    { title: "Create your account", component: ActivationStep1 },
-    { title: "Business details", component: ActivationStep2 },
-    { title: "Authorized signatory", component: ActivationStep3 },
-    { title: "Documents", component: ActivationStep4 },
-    { title: "Verification in progress", component: ActivationStep5 },
-    { title: "Account activated" },
-]
+    { title: "activation.steps.create_account", component: ActivationStep1 },
+    { title: "activation.steps.business_details", component: ActivationStep2 },
+    { title: "activation.steps.authorized_signatory", component: ActivationStep3 },
+    { title: "activation.steps.documents", component: ActivationStep4 },
+    { title: "activation.steps.verification", component: ActivationStep5 },
+    { title: "activation.steps.activated" },
+] as const;
 
 enum KycStatus {
     NotSubmitted = 'not_submitted',
@@ -82,6 +83,7 @@ enum KycStatus {
 }
 
 const Activation: React.FC = () => {
+    const { t } = useTranslation();
     const [currentStep, setCurrentStep] = useLocalStorage('kycCurrentStep', 0);
     const [activationData, setActivationData] = useLocalStorage<ActivationData>('kycActivationData', initialActivationData);
     const { toast } = useToast();
@@ -210,11 +212,11 @@ const Activation: React.FC = () => {
                     </Button>
                 )}
                 <h2 className="text-lg font-semibold">
-                    {steps[currentStep]?.title}
+                    {t(steps[currentStep]?.title || 'activation.steps.create_account')}
                 </h2>
             </div>
             <div className="text-sm text-muted-foreground">
-                Step {currentStep + 1} of {steps.length}
+                {t('activation.step_indicator', { step: currentStep + 1, total: steps.length })}
             </div>
         </div>
     );
@@ -254,7 +256,7 @@ const Activation: React.FC = () => {
                 <CardContent className="p-4 sm:p-6">
                     <div className="flex flex-col md:flex-row">
                         <div className="hidden md:block md:w-1/3 pr-6 mb-6 md:mb-0">
-                            <h1 className="text-2xl font-bold tracking-tight mb-6">Account Activation</h1>
+                            <h1 className="text-2xl font-bold tracking-tight mb-6">{t('activation.title')}</h1>
                             {steps.map((step, index) => (
                                 <StepIndicator
                                     key={index}
@@ -262,7 +264,7 @@ const Activation: React.FC = () => {
                                     isCompleted={index < currentStep}
                                     isActive={index === currentStep}
                                 >
-                                    {step.title}
+                                    {t(step.title)}
                                 </StepIndicator>
                             ))}
                         </div>

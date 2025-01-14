@@ -264,5 +264,147 @@
                 "signing_in": "Entrando..."
             }
         }
+    },
+    "activation": {
+        "title": "Ativação da conta",
+        "step_indicator": "Etapa {step} de {total}",
+        "steps": {
+            "create_account": "Criar conta",
+            "business_details": "Detalhes do negócio",
+            "authorized_signatory": "Signatário autorizado",
+            "documents": "Documentos",
+            "verification": "Verificação em andamento",
+            "activated": "Conta ativada"
+        },
+        "step1": {
+            "success_message": "Sua conta foi criada com sucesso!",
+            "verification_intro": "Para completar seu registro, precisamos verificar as informações do seu negócio.",
+            "process_title": "Por favor, prossiga com nosso processo de verificação de negócio para:",
+            "steps": [
+                "Confirmar os detalhes do seu negócio",
+                "Enviar a documentação necessária",
+                "Ativar sua conta",
+                "Começar a usar nossa plataforma"
+            ],
+            "compliance_notice": "Esta verificação garante a segurança de nossa plataforma e a conformidade com as regulamentações em seu país e na República da Costa do Marfim."
+        },
+        "step2": {
+            "title": "Detalhes do negócio",
+            "legal_name": {
+                "label": "Nome legal da empresa",
+                "placeholder": "ex. Ashanti Enterprises",
+                "error": "O nome legal da empresa é obrigatório"
+            },
+            "tax_number": {
+                "label": "Número fiscal (opcional)",
+                "placeholder": "ex. CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "Descrição do negócio",
+                "placeholder": "ex. Vendemos smartphones usados através do Instagram.",
+                "helper": "Descreva seus produtos e canais de venda.",
+                "error": "A descrição deve ter pelo menos 40 caracteres"
+            },
+            "country": {
+                "label": "País",
+                "placeholder": "Selecione seu país",
+                "error": "O país é obrigatório"
+            },
+            "region": {
+                "label": "Região",
+                "placeholder": "ex. Lagunes",
+                "error": "A região é obrigatória"
+            },
+            "city": {
+                "label": "Cidade",
+                "placeholder": "ex. Abidjan",
+                "error": "A cidade é obrigatória"
+            },
+            "postal_code": {
+                "label": "Código postal",
+                "placeholder": "ex. 01012",
+                "error": "O código postal é obrigatório"
+            },
+            "street": {
+                "label": "Rua",
+                "placeholder": "ex. 123 Rue des Perles",
+                "error": "O endereço é obrigatório"
+            },
+            "proof_of_business": {
+                "label": "Comprovante de negócio",
+                "placeholder": "Selecione seu comprovante de negócio",
+                "error": "O comprovante de negócio é obrigatório",
+                "options": {
+                    "website": "Site | Aplicativo",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "E-Commerce | Marketplace"
+                }
+            },
+            "business_url": {
+                "label": "Link para sua página de negócio",
+                "placeholder": "ex. https://www.ashantishoes.ci",
+                "error": "Deve ser uma URL válida"
+            },
+            "legal_notice": "Por favor, certifique-se de que as informações fornecidas correspondem aos seus documentos legais."
+        },
+        "step3": {
+            "title": "Signatário autorizado",
+            "full_name": {
+                "label": "Nome completo",
+                "placeholder": "ex. Jessy Luckey",
+                "error": "O nome completo é obrigatório"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "ex. jessy@gmail.com",
+                "error": "Endereço de email inválido"
+            },
+            "mobile": {
+                "label": "Número de telefone",
+                "country_code": {
+                    "placeholder": "+225",
+                    "error": "O código do país deve começar com + seguido de números"
+                },
+                "number": {
+                    "placeholder": "01 60 223 401",
+                    "error": "Formato de número de telefone inválido"
+                }
+            }
+        },
+        "step4": {
+            "title": "Documentos",
+            "identity_proof": {
+                "label": "Comprovante de identidade",
+                "description": "RG, Passaporte"
+            },
+            "address_proof": {
+                "label": "Comprovante de endereço",
+                "description": "Conta de luz, Extrato bancário"
+            },
+            "business_registration": {
+                "label": "Documento de registro do negócio",
+                "description": "Certificado de Constituição, Licença Comercial, Certificado de Registro Fiscal"
+            },
+            "required_field": "Este documento é obrigatório",
+            "file_requirements": "Por favor, certifique-se de que todos os documentos estejam claros, legíveis e em formato PDF, JPG ou PNG. Tamanho máximo: 3MB por documento.",
+            "confirmation": {
+                "title": "Ativar minha conta",
+                "description": "Por favor, certifique-se de que todos os documentos enviados estejam corretos e legíveis."
+            }
+        },
+        "step5": {
+            "title": "Verificação em Andamento",
+            "description": "Estamos analisando suas informações. Este processo pode levar de 1 a 3 dias úteis.",
+            "day_1": "Dia 1",
+            "day_2": "Dia 2",
+            "day_3": "Dia 3"
+        }
+    },
+    "common": {
+        "next": "Próximo",
+        "back": "Voltar",
+        "submit": "Enviar",
+        "cancel": "Cancelar",
+        "save": "Salvar"
     }
 }
