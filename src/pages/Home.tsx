@@ -1,8 +1,11 @@
+import { lazy, Suspense } from 'react'
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
 import { Footer } from '@/components/landing/Footer'
-import ThreeDImage from '@/components/landing/3d-image'
+
+// Lazy load the 3D image component
+const ThreeDImage = lazy(() => import('@/components/landing/3d-image'))
 
 export default function Page() {
   return (
@@ -24,16 +27,18 @@ export default function Page() {
 
             {/* 3D Image */}
             <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[32%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
-              <ThreeDImage
-                src={{
-                  light: "/portal.png",
-                  dark: "/portal2.png"
-                }}
-                alt="Dashboard Preview"
-                width={700}
-                height={500}
-                className="w-full max-w-[900px]"
-              />
+              <Suspense fallback={<div className="w-[700px] h-[500px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />}>
+                <ThreeDImage
+                  src={{
+                    light: "/portal.png",
+                    dark: "/portal2.png"
+                  }}
+                  alt="Dashboard Preview"
+                  width={700}
+                  height={500}
+                  className="w-full max-w-[900px]"
+                />
+              </Suspense>
             </div>
           </div>
         </div>

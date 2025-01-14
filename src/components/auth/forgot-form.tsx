@@ -3,7 +3,7 @@ import { cn } from '@/lib/actions/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Button } from '@/components/custom/button'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
+import { useTranslation } from 'react-i18next'
 
 interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> {
   onSuccess: (email: string) => void;
@@ -27,6 +28,7 @@ const formSchema = z.object({
 })
 
 export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,20 +39,35 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
+      const baseUrl = import.meta.env['VITE_APP_URL'] || window.location.origin
+      const callbackUrl = `${baseUrl}/auth/callback`
+
+      console.log('Reset password callback URL:', callbackUrl)
+
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: callbackUrl,
       })
-      if (error) throw error
+      if (error) {
+        if (error.message === 'over_email_send_rate_limit') {
+          toast({
+            title: t('auth.forgot_password.error'),
+            description: t('auth.forgot_password.rate_limit_error'),
+            variant: "destructive",
+          })
+          return
+        }
+        throw error
+      }
       toast({
-        title: "Success",
-        description: "Password reset email sent. Please check your inbox.",
+        title: t('auth.forgot_password.success'),
+        description: t('auth.forgot_password.success_message'),
       })
       onSuccess(data.email)
     } catch (error) {
       console.error('Error during password reset:', error)
       toast({
-        title: "Error",
-        description: "There was a problem sending the password reset email. Please try again.",
+        title: t('auth.forgot_password.error'),
+        description: t('auth.forgot_password.error'),
         variant: "destructive",
       })
     } finally {
@@ -70,7 +87,7 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder='Email address**'
+                      placeholder={t('auth.forgot_password.email_placeholder')}
                       {...field}
                       className='h-12 border border-gray-300 rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600'
                     />
@@ -79,8 +96,12 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
                 </FormItem>
               )}
             />
-            <Button type="submit" className='w-full h-12 mt-2' disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+            <Button
+              type="submit"
+              className='w-full h-12 mt-2 rounded-none bg-white text-black hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:active:bg-gray-500'
+              disabled={isLoading}
+            >
+              {isLoading ? t('auth.forgot_password.sending') : t('auth.forgot_password.submit_button')}
             </Button>
           </div>
         </form>

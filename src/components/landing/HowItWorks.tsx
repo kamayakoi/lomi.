@@ -1,5 +1,5 @@
 import { MagicCard } from "../ui/magic-card";
-import { MedalIcon, MapIcon, PlaneIcon, ShieldIcon } from "./Icons";
+import { MedalIcon, MapIcon, PlaneIcon, BarChartIcon } from "./Icons";
 import { useTranslation } from 'react-i18next';
 
 interface ProductProps {
@@ -35,7 +35,7 @@ const products: ProductProps[] = [
   {
     icon: (
       <div style={{ width: '40px', height: '40px' }}>
-        <ShieldIcon />
+        <BarChartIcon />
       </div>
     ),
     title: "Security",

@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import Tracker from "@/components/custom/Tracker";
 import { AnimatedSubscribeButton } from "@/components/ui/animated-subscribe-button";
-import Icon from "/icon.webp";
+import Icon from "/lomi-icon.webp";
 
 const components = [
     { name: "API Gateway", uptime: 29.82 },

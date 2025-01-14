@@ -46,7 +46,7 @@ export function BentoDemo() {
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute inset-0 bg-white/20 dark:bg-gray-800/40"></div>
                     <img
-                        src="/portal.webp"
+                        src="/portal2.png"
                         alt="Portal background"
                         className="object-cover w-full h-5%  opacity-35"
                         width="1280"

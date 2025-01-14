@@ -10,6 +10,7 @@ import { supabase } from '@/utils/supabase/client'
 import { toast } from '@/components/ui/use-toast'
 import { AlertCircle } from "lucide-react"
 import Spinner from '@/components/portal/spinner'
+import { useTranslation } from 'react-i18next'
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
 
@@ -19,6 +20,7 @@ const formSchema = z.object({
 })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
@@ -51,17 +53,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         })
 
         if (error) {
-          let message = 'An error occurred while signing in. Please try again.'
+          let message = t('auth.sign_in.error.default')
           if (error.message.includes('Invalid login credentials')) {
-            message = "Invalid email or password. Please try again or sign up if you don't have an account."
+            message = t('auth.sign_in.error.invalid_credentials')
           } else if (error.message.includes('Email not confirmed')) {
-            message = "Please confirm your email address before signing in."
+            message = t('auth.sign_in.error.email_not_confirmed')
           }
           setErrorMessage(message)
         } else if (signInData.user) {
           toast({
-            title: "Success",
-            description: "You have successfully signed in.",
+            title: t('auth.sign_in.success'),
+            description: t('auth.sign_in.success_message'),
           })
 
           // Refresh the page to update the authentication state
@@ -69,7 +71,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         }
       } catch (error) {
         console.error('Error during sign in:', error)
-        setErrorMessage('An unexpected error occurred. Please try again later.')
+        setErrorMessage(t('auth.sign_in.error.unexpected'))
       } finally {
         setIsLoading(false)
       }
@@ -93,7 +95,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       window.location.href = data.url
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
-      setErrorMessage(`There was a problem signing in with ${provider}. Please try again.`)
+      setErrorMessage(t('auth.sign_in.error.oauth', { provider }))
       if (provider === 'google') setIsGoogleLoading(false)
       if (provider === 'github') setIsGithubLoading(false)
     }
@@ -106,7 +108,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <Input
             id="email"
             type="email"
-            placeholder='Email address**'
+            placeholder={t('auth.sign_in.email_placeholder')}
             value={email}
             onChange={handleEmailChange}
             className={cn(
@@ -124,12 +126,12 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               to='/forgot-password'
               className='text-sm font-medium text-blue-600 hover:text-blue-600 whitespace-nowrap'
             >
-              Forgot password?
+              {t('auth.sign_in.forgot_password')}
             </Link>
           </div>
           <PasswordInput
             id="password"
-            placeholder='Password**'
+            placeholder={t('auth.sign_in.password_placeholder')}
             value={password}
             onChange={handlePasswordChange}
             className={cn(
@@ -154,9 +156,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             disabled={isLoading || !isValidEmail || !isValidPassword}
           >
             {isLoading ? (
-              <span className="text-sm">Processing...</span>
+              <span className="text-sm">{t('auth.sign_in.processing')}</span>
             ) : (
-              <span className="text-base font-semibold">Connect</span>
+              <span className="text-base font-semibold">{t('auth.sign_in.connect_button')}</span>
             )}
           </Button>
         </div>
@@ -167,7 +169,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         </div>
         <div className='relative flex justify-center text-xs uppercase'>
           <span className='bg-background px-2 text-gray-500'>
-            Or continue with
+            {t('auth.sign_in.or_continue')}
           </span>
         </div>
       </div>
@@ -206,7 +208,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 />
               </svg>
             )}
-            <span>&nbsp;{isGoogleLoading ? 'Google' : 'Google'}</span>
+            <span>&nbsp;{t('auth.sign_in.google')}</span>
           </div>
         </Button>
 
@@ -223,17 +225,17 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
             ) : (
               <IconBrandGithub className='h-6 w-6 mr-2' />
             )}
-            <span>&nbsp;{isGithubLoading ? 'Github' : 'GitHub'}</span>
+            <span>&nbsp;{t('auth.sign_in.github')}</span>
           </div>
         </Button>
       </div>
       <p className='px-8 text-center text-sm text-muted-foreground'>
-        Don&apos;t have an account?{' '}
+        {t('auth.sign_in.no_account')}{' '}
         <Link
           to='/sign-up'
           className='underline underline-offset-4 text-blue-600 hover:text-blue-600'
         >
-          Sign up
+          {t('auth.sign_in.sign_up_link')}
         </Link>
       </p>
     </div>
