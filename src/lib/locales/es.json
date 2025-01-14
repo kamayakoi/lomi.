@@ -29,7 +29,7 @@
             "openSource": "Open Source"
         },
         "subscribe": {
-            "placeholder": "Dirección de correo**",
+            "placeholder": "Correo electrónico**",
             "button": "Suscribirse"
         },
         "status": "Sistemas operativos",
@@ -56,8 +56,8 @@
         "talk": "Háblanos",
         "connect": "Conectar"
     },
-"auth": {
-        "sign_in": {
+    "auth": {
+    "sign_in": {
             "title": "Bienvenido de nuevo",
             "subtitle": "Inicia sesión para explorar lomi.",
             "email_placeholder": "Correo electrónico**",
@@ -262,6 +262,55 @@
             "sign_in_button": "Iniciar sesión",
             "signing_in": "Iniciando sesión..."
         }
+    }
+    },
+    "dashboard": {
+        "getting_started": {
+            "title": "Empezando",
+            "api_keys": {
+                "title": "Gestionar claves de API",
+                "description": "Ver y gestionar sus claves de API.",
+                "technical": "Técnico"
+            },
+            "webhooks": {
+                "title": "Configurar URL de devolución de llamada",
+                "description": "Configura tu URL de devolución de llamada para que podamos notificarte cuando un pago sea exitoso.",
+                "technical": "Técnico"
+            },
+            "payment_links": {
+                "title": "Crear enlaces de pago",
+                "description": "Genera enlaces de pago para recaudar fondos."
+            },
+            "integrations": {
+                "title": "Configurar integraciones",
+                "description": "Conecta con diferentes proveedores de pago y servicios."
+            }
+        },
+    "developer_resources": {
+            "title": "Recursos para desarrolladores",
+            "resources": {
+                "documentation": {
+                    "title": "Documentación",
+                    "description": "Familiarízate con los productos de lomi. con nuestra documentación."
+                },
+                "api_reference": {
+                    "title": "API reference",
+                    "description": "Descubre cómo funcionan nuestras APIs y cómo puedes implementarlas."
+                },
+                "product_catalog": {
+                    "title": "Catálogo de productos",
+                    "description": "Descubre los productos de lomi. y cómo usarlos."
+                },
+                "sample_projects": {
+                    "title": "Boilerplates",
+                    "description": "Explora boilerplates para iniciar tu integración."
+                },
+                "support": {
+                    "title": "Soporte",
+                    "description": "Obtén ayuda y soporte en llamadas."
+                }
+            }
+        }
     },
     "activation": {
         "title": "Activación de cuenta",
@@ -291,7 +340,7 @@
             "legal_name": {
                 "label": "Nombre legal de la empresa",
                 "placeholder": "ej. Ashanti Enterprises",
-                "error": "El nombre legal de la empresa es requerido"
+                "error": "El nombre legal de la empresa es obligatorio"
             },
             "tax_number": {
                 "label": "Número fiscal (opcional)",
@@ -299,51 +348,51 @@
             },
             "business_description": {
                 "label": "Descripción del negocio",
-                "placeholder": "ej. Vendemos smartphones de segunda mano a través de Instagram.",
-                "helper": "Describe tus productos y canales de venta.",
+                "placeholder": "ej. Vendemos smartphones usados a través de Instagram.",
+                "helper": "Describa sus productos y canales de venta.",
                 "error": "La descripción debe tener al menos 40 caracteres"
             },
             "country": {
                 "label": "País",
-                "placeholder": "Selecciona tu país",
-                "error": "El país es requerido"
+                "placeholder": "Seleccione su país",
+                "error": "El país es obligatorio"
             },
             "region": {
                 "label": "Región",
                 "placeholder": "ej. Lagunes",
-                "error": "La región es requerida"
+                "error": "La región es obligatoria"
             },
             "city": {
                 "label": "Ciudad",
                 "placeholder": "ej. Abidjan",
-                "error": "La ciudad es requerida"
+                "error": "La ciudad es obligatoria"
             },
             "postal_code": {
                 "label": "Código postal",
                 "placeholder": "ej. 01012",
-                "error": "El código postal es requerido"
+                "error": "El código postal es obligatorio"
             },
             "street": {
                 "label": "Calle",
                 "placeholder": "ej. 123 Rue des Perles",
-                "error": "La dirección es requerida"
+                "error": "La dirección es obligatoria"
             },
             "proof_of_business": {
-                "label": "Prueba de negocio",
-                "placeholder": "Selecciona tu prueba de negocio",
-                "error": "La prueba de negocio es requerida",
+                "label": "Comprobante de negocio",
+                "placeholder": "Seleccione su comprobante de negocio",
+                "error": "El comprobante de negocio es obligatorio",
                 "options": {
-                    "website": "Sitio Web | Aplicación",
+                    "website": "Sitio web | Aplicación",
                     "social": "Facebook | Instagram",
                     "marketplace": "E-Commerce | Marketplace"
                 }
             },
             "business_url": {
-                "label": "Enlace a tu página de negocio",
+                "label": "Enlace a su página de negocio",
                 "placeholder": "ej. https://www.ashantishoes.ci",
                 "error": "Debe ser una URL válida"
             },
-            "legal_notice": "Por favor, asegúrate de que la información proporcionada coincida con tus documentos legales."
+            "legal_notice": "Por favor, asegúrese de que la información proporcionada coincida con sus documentos legales."
         },
         "step3": {
             "title": "Firmante autorizado",
@@ -404,5 +453,261 @@
         "submit": "Enviar",
         "cancel": "Cancelar",
         "save": "Guardar"
+    },
+    "onboarding": {
+        "steps": {
+            "step1": "Conocénos",
+            "step2": "Registrá tu empresa",
+            "step3": "Personalizá tu experiencia",
+            "step4": "Más detalles, listo!"
+        },     
+        "verification": {
+            "title": "Verificación de correo electrónico",
+            "description": "Por favor, verifica tu correo electrónico para continuar con el registro.",
+            "resend_button": "Reenviar correo de verificación"
+        },
+        "step1": {
+            "first_name": {
+                "label": "Nombre",
+                "placeholder": "Ingresa tu nombre",
+                "error": "El nombre es requerido"
+            },
+            "last_name": {
+                "label": "Apellido",
+                "placeholder": "Ingresa tu apellido",
+                "error": "El apellido es requerido"
+            },
+            "country_code": {
+                "label": "Código de país",
+                "placeholder": "+225",
+                "error": "El código de país debe comenzar con + seguido de números"
+            },
+            "phone": {
+                "label": "Número de teléfono",
+                "placeholder": "Ingresa tu número de teléfono",
+                "error": "Formato de número de teléfono inválido"
+            },
+            "profile_picture": {
+                "label": "Foto de perfil"
+            },
+            "country": {
+                "label": "¿En qué país te encuentras?",
+                "error": "El país es requerido"
+            },
+            "position": {
+                "label": "Tu cargo",
+                "error": "El cargo es requerido"
+            }
+        },
+        "step2": {
+            "title": "Detalles del negocio",
+            "legal_name": {
+                "label": "Nombre legal de la empresa",
+                "placeholder": "ej. Ashanti Enterprises",
+                "error": "El nombre legal de la empresa es requerido"
+            },
+            "tax_number": {
+                "label": "Número fiscal (opcional)",
+                "placeholder": "ej. CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "Descripción del negocio",
+                "placeholder": "ej. Vendemos smartphones de segunda mano a través de Instagram.",
+                "helper": "Describe tus productos y canales de venta.",
+                "error": "La descripción debe tener al menos 40 caracteres"
+            },
+            "country": {
+                "label": "País",
+                "placeholder": "Selecciona tu país",
+                "error": "El país es requerido"
+            },
+            "region": {
+                "label": "Región",
+                "placeholder": "ej. Lagunes",
+                "error": "La región es requerida"
+            },
+            "city": {
+                "label": "Ciudad",
+                "placeholder": "ej. Abidjan",
+                "error": "La ciudad es requerida"
+            },
+            "postal_code": {
+                "label": "Código postal",
+                "placeholder": "ej. 01012",
+                "error": "El código postal es requerido"
+            },
+            "street": {
+                "label": "Calle",
+                "placeholder": "ej. 123 Rue des Perles",
+                "error": "La dirección es requerida"
+            },
+            "proof_of_business": {
+                "label": "Comprobante de negocio",
+                "placeholder": "Selecciona tu comprobante de negocio",
+                "error": "El comprobante de negocio es requerido",
+                "options": {
+                    "website": "Sitio web | App",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "E-commerce | Marketplace"
+                }
+            },
+            "org_name": {
+                "label": "Nombre de la empresa",
+                "placeholder": "ej. Ashanti Shoes Inc.",
+                "required": "El nombre de la empresa es obligatorio"
+            },
+            "org_email": {
+                "label": "Correo electrónico de la empresa",
+                "placeholder": "ej. contact@ashantishoes.com",
+                "invalid": "Formato de correo electrónico inválido",
+                "required": "El correo electrónico de la empresa es obligatorio"
+            },
+            "org_employees": {
+                "label": "Número de empleados",
+                "placeholder": "Número de empleados",
+                "required": "El número de empleados es obligatorio"
+            },
+            "org_country": {
+                "label": "País de operación",
+                "placeholder": "Selecciona un país",
+                "required": "El país de operación es obligatorio"
+            },
+            "org_region": {
+                "label": "Región",
+                "placeholder": "Selecciona una región",
+                "required": "La región es obligatoria"
+            },
+            "workspace_handle": {
+                "label": "Identificador del espacio de trabajo",
+                "placeholder": "mi-espacio",
+                "required": "El identificador del espacio de trabajo es obligatorio"
+            },
+            "logo": {
+                "label": "Logo de la empresa"
+            }
+        },
+        "step3": {
+            "title": "Firmante autorizado",
+            "first_name": {
+                "label": "Nombre",
+                "placeholder": "Ingresa el nombre del firmante",
+                "error": "El nombre es requerido"
+            },
+            "last_name": {
+                "label": "Apellido",
+                "placeholder": "Ingresa el apellido del firmante",
+                "error": "El apellido es requerido"
+            },
+            "email": {
+                "label": "Correo electrónico",
+                "placeholder": "Ingresa el correo electrónico del firmante",
+                "error": "El correo electrónico es requerido"
+            },
+            "phone": {
+                "label": "Número de teléfono",
+                "placeholder": "Ingresa el número de teléfono del firmante",
+                "error": "El número de teléfono es requerido"
+            },
+            "id_type": {
+                "label": "Tipo de documento de identidad",
+                "placeholder": "Selecciona el tipo de documento de identidad",
+                "error": "El tipo de documento de identidad es requerido",
+                "options": {
+                    "passport": "Pasaporte",
+                    "national_id": "Documento nacional de identidad",
+                    "drivers_license": "Licencia de conducir"
+                }
+            },
+            "id_number": {
+                "label": "Número de documento de identidad",
+                "placeholder": "Ingresa el número de documento de identidad",
+                "error": "El número de documento de identidad es requerido"
+            },
+            "org_city": {
+                "label": "Ciudad",
+                "placeholder": "Seleccione una ciudad",
+                "required": "La ciudad es obligatoria"
+            },
+            "org_district": {
+                "label": "Distrito",
+                "placeholder": "Seleccione un distrito",
+                "required": "El distrito es obligatorio"
+            },
+            "org_postal_code": {
+                "label": "Código postal",
+                "placeholder": "Ingrese su código postal",
+                "required": "El código postal es obligatorio"
+            },
+            "org_street": {
+                "label": "Calle",
+                "placeholder": "Ingrese su dirección",
+                "required": "La dirección es obligatoria"
+            }
+        },
+        "step4": {
+            "title": "Documentos",
+            "business_registration": {
+                "label": "Registro comercial",
+                "placeholder": "Sube el registro comercial",
+                "error": "El registro comercial es requerido"
+            },
+            "tax_id": {
+                "label": "Identificación fiscal",
+                "placeholder": "Sube la identificación fiscal",
+                "error": "La identificación fiscal es requerida"
+            },
+            "proof_of_address": {
+                "label": "Comprobante de domicilio",
+                "placeholder": "Sube el comprobante de domicilio",
+                "error": "El comprobante de domicilio es requerido"
+            },
+            "authorized_signatory_id": {
+                "label": "Documento de identidad del firmante autorizado",
+                "placeholder": "Sube el documento de identidad del firmante autorizado",
+                "error": "El documento de identidad del firmante autorizado es requerido"
+            },
+            "org_website": {
+                "label": "Sitio web",
+                "placeholder": "ejemplo.com",
+                "required": "El sitio web es obligatorio",
+                "invalid": "URL del sitio web inválida"
+            },
+            "org_industry": {
+                "label": "Industria",
+                "placeholder": "Seleccione su industria",
+                "required": "La industria es obligatoria",
+                "options": {
+                    "retail": "Comercio minorista",
+                    "technology": "Tecnología",
+                    "manufacturing": "Fabricación",
+                    "healthcare": "Salud",
+                    "education": "Educación",
+                    "finance": "Finanzas",
+                    "other": "Otro"
+                }
+            },
+            "org_default_language": {
+                "label": "Idioma predeterminado",
+                "placeholder": "Seleccione su idioma",
+                "required": "El idioma predeterminado es obligatorio",
+                "options": {
+                    "english": "Inglés",
+                    "french": "Francés"
+                }
+            },
+            "how_did_you_hear_about_us": {
+                "label": "¿Cómo se enteró de nosotros?",
+                "placeholder": "Cuéntenos cómo nos conoció...",
+                "required": "Por favor, díganos cómo se enteró de nosotros"
+            }
+        },
+        "welcome_screen": {
+            "title": "¡Bienvenido a lomi. !",
+            "description": {
+                "line1": "Estamos muy contentos de que te hayas unido a nosotros.",
+                "line2": "Hagamos que tus clientes puedan pagar fácilmente a ti."
+            },
+            "get_started": "Empezar"
+        }
     }
-}   }
+}

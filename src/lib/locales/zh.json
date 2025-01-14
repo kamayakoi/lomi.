@@ -264,6 +264,54 @@
             }
         }
     },
+    "dashboard": {
+        "getting_started": {
+            "title": "开始使用",
+            "api_keys": {
+                "title": "管理 API 密钥",
+                "description": "查看和管理您的 API 密钥。",
+                "technical": "技术"
+            },
+            "webhooks": {
+                "title": "设置回调 URL",
+                "description": "设置您的回调 URL，以便我们通知您支付成功。",
+                "technical": "技术"
+            },
+            "payment_links": {
+                "title": "创建支付链接",
+                "description": "轻松生成支付链接以收集资金。"
+            },
+            "integrations": {
+                "title": "设置集成",
+                "description": "与各种支付提供商和服务连接。"
+            }
+        },
+    "developer_resources": {
+            "title": "开发者资源",
+            "resources": {
+                "documentation": {
+                    "title": "文档",
+                    "description": "Familiarize yourself with lomi. products with our docs."
+                },
+                "api_reference": {
+                    "title": "API reference",
+                    "description": "Find out how our APIs work and how you can deploy them."
+                },
+                "product_catalog": {
+                    "title": "Product catalog",
+                    "description": "Discover lomi. products and how to use them."
+                },
+                "sample_projects": {
+                    "title": "Boilerplates",
+                    "description": "Explore boilerplates to kickstart your integration."
+                },
+                "support": {
+                    "title": "Support",
+                    "description": "Get on call help and support from our team."
+                }
+            }
+        }
+    },
     "activation": {
         "title": "账户激活",
         "step_indicator": "第 {step} 步，共 {total} 步",
@@ -272,7 +320,7 @@
             "business_details": "企业详情",
             "authorized_signatory": "授权签字人",
             "documents": "文件",
-            "verification": "验证进行中",
+            "verification": "正在进行验证",
             "activated": "账户已激活"
         },
         "step1": {
@@ -290,23 +338,23 @@
         "step2": {
             "title": "企业详情",
             "legal_name": {
-                "label": "企业法定名称",
+                "label": "公司法定名称",
                 "placeholder": "例如：Ashanti Enterprises",
-                "error": "企业法定名称为必填项"
+                "error": "公司法定名称为必填项"
             },
             "tax_number": {
-                "label": "税号（可选）",
+                "label": "税号（选填）",
                 "placeholder": "例如：CI-ABJ-03-2024-B12-07612"
             },
             "business_description": {
-                "label": "企业描述",
+                "label": "业务描述",
                 "placeholder": "例如：我们通过Instagram销售二手智能手机。",
-                "helper": "描述您的产品和销售渠道。",
-                "error": "描述必须至少包含40个字符"
+                "helper": "请描述您的产品和销售渠道。",
+                "error": "描述至少需要40个字符"
             },
             "country": {
                 "label": "国家",
-                "placeholder": "选择您的国家",
+                "placeholder": "请选择您的国家",
                 "error": "国家为必填项"
             },
             "region": {
@@ -325,24 +373,24 @@
                 "error": "邮政编码为必填项"
             },
             "street": {
-                "label": "街道",
+                "label": "街道地址",
                 "placeholder": "例如：123 Rue des Perles",
-                "error": "地址为必填项"
+                "error": "街道地址为必填项"
             },
             "proof_of_business": {
                 "label": "企业证明",
-                "placeholder": "选择您的企业证明",
+                "placeholder": "请选择您的企业证明",
                 "error": "企业证明为必填项",
                 "options": {
                     "website": "网站 | 应用",
                     "social": "Facebook | Instagram",
-                    "marketplace": "电子商务 | 市场"
+                    "marketplace": "电子商务 | 商城"
                 }
             },
             "business_url": {
-                "label": "企业页面链接",
+                "label": "企业网页链接",
                 "placeholder": "例如：https://www.ashantishoes.ci",
-                "error": "必须是有效的URL"
+                "error": "请输入有效的网址"
             },
             "legal_notice": "请确保提供的信息与您的法律文件相符。"
         },
@@ -405,5 +453,261 @@
         "submit": "提交",
         "cancel": "取消",
         "save": "保存"
+    },
+    "onboarding": {
+        "steps": {
+            "step1": "让我们认识你",
+            "step2": "注册您的公司",
+            "step3": "帮助我们定制您的体验",
+            "step4": "更多细节，您就绪了！"
+        },     
+        "verification": {
+            "title": "邮箱验证",
+            "description": "请验证您的邮箱以继续注册。",
+            "resend_button": "重新发送验证邮件"
+        },
+        "step1": {
+            "first_name": {
+                "label": "名字",
+                "placeholder": "输入您的名字",
+                "error": "名字是必填项"
+            },
+            "last_name": {
+                "label": "姓氏",
+                "placeholder": "输入您的姓氏",
+                "error": "姓氏是必填项"
+            },
+            "country_code": {
+                "label": "国家代码",
+                "placeholder": "+225",
+                "error": "国家代码必须以+开头，后跟数字"
+            },
+            "phone": {
+                "label": "电话号码",
+                "placeholder": "输入您的电话号码",
+                "error": "无效的电话号码格式"
+            },
+            "profile_picture": {
+                "label": "个人资料图片"
+            },
+            "country": {
+                "label": "您位于哪个国家？",
+                "error": "国家是必填项"
+            },
+            "position": {
+                "label": "您的职位",
+                "error": "职位是必填项"
+            }
+        },
+        "step2": {
+            "title": "企业详情",
+            "legal_name": {
+                "label": "企业法定名称",
+                "placeholder": "例如：Ashanti Enterprises",
+                "error": "企业法定名称为必填项"
+            },
+            "tax_number": {
+                "label": "税号（可选）",
+                "placeholder": "例如：CI-ABJ-03-2024-B12-07612"
+            },
+            "business_description": {
+                "label": "企业描述",
+                "placeholder": "例如：我们通过Instagram销售二手智能手机。",
+                "helper": "描述您的产品和销售渠道。",
+                "error": "描述必须至少包含40个字符"
+            },
+            "country": {
+                "label": "国家",
+                "placeholder": "选择您的国家",
+                "error": "国家为必填项"
+            },
+            "region": {
+                "label": "地区",
+                "placeholder": "例如：Lagunes",
+                "error": "地区为必填项"
+            },
+            "city": {
+                "label": "城市",
+                "placeholder": "例如：Abidjan",
+                "error": "城市为必填项"
+            },
+            "postal_code": {
+                "label": "邮政编码",
+                "placeholder": "例如：01012",
+                "error": "邮政编码为必填项"
+            },
+            "street": {
+                "label": "街道",
+                "placeholder": "例如：123 Rue des Perles",
+                "error": "地址为必填项"
+            },
+            "proof_of_business": {
+                "label": "企业证明",
+                "placeholder": "选择您的企业证明",
+                "error": "企业证明为必填项",
+                "options": {
+                    "website": "网站 | 应用",
+                    "social": "Facebook | Instagram",
+                    "marketplace": "电子商务 | 市场"
+                }
+            },
+            "org_name": {
+                "label": "公司名称",
+                "placeholder": "例如：Ashanti Shoes Inc.",
+                "required": "公司名称为必填项"
+            },
+            "org_email": {
+                "label": "公司电子邮箱",
+                "placeholder": "例如：contact@ashantishoes.com",
+                "invalid": "邮箱格式无效",
+                "required": "公司电子邮箱为必填项"
+            },
+            "org_employees": {
+                "label": "员工人数",
+                "placeholder": "请选择员工人数",
+                "required": "员工人数为必填项"
+            },
+            "org_country": {
+                "label": "运营所在国家",
+                "placeholder": "请选择国家",
+                "required": "运营所在国家为必填项"
+            },
+            "org_region": {
+                "label": "地区",
+                "placeholder": "请选择地区",
+                "required": "地区为必填项"
+            },
+            "workspace_handle": {
+                "label": "工作空间标识",
+                "placeholder": "my-workspace",
+                "required": "工作空间标识为必填项"
+            },
+            "logo": {
+                "label": "公司标志"
+            }
+        },
+        "step3": {
+            "title": "授权签字人",
+            "first_name": {
+                "label": "名字",
+                "placeholder": "输入签字人的名字",
+                "error": "名字为必填项"
+            },
+            "last_name": {
+                "label": "姓氏",
+                "placeholder": "输入签字人的姓氏",
+                "error": "姓氏为必填项"
+            },
+            "email": {
+                "label": "电子邮件",
+                "placeholder": "输入签字人的电子邮件",
+                "error": "电子邮件为必填项"
+            },
+            "phone": {
+                "label": "电话号码",
+                "placeholder": "输入签字人的电话号码",
+                "error": "电话号码为必填项"
+            },
+            "id_type": {
+                "label": "身份证件类型",
+                "placeholder": "选择身份证件类型",
+                "error": "身份证件类型为必填项",
+                "options": {
+                    "passport": "护照",
+                    "national_id": "国民身份证",
+                    "drivers_license": "驾驶执照"
+                }
+            },
+            "id_number": {
+                "label": "身份证件号码",
+                "placeholder": "输入身份证件号码",
+                "error": "身份证件号码为必填项"
+            },
+            "org_city": {
+                "label": "城市",
+                "placeholder": "选择城市",
+                "required": "城市为必填项"
+            },
+            "org_district": {
+                "label": "区域",
+                "placeholder": "选择区域",
+                "required": "区域为必填项"
+            },
+            "org_postal_code": {
+                "label": "邮政编码",
+                "placeholder": "输入邮政编码",
+                "required": "邮政编码为必填项"
+            },
+            "org_street": {
+                "label": "街道地址",
+                "placeholder": "输入街道地址",
+                "required": "街道地址为必填项"
+            }
+        },
+        "step4": {
+            "title": "文件",
+            "business_registration": {
+                "label": "企业注册证明",
+                "placeholder": "上传企业注册证明",
+                "error": "企业注册证明为必填项"
+            },
+            "tax_id": {
+                "label": "税务登记证",
+                "placeholder": "上传税务登记证",
+                "error": "税务登记证为必填项"
+            },
+            "proof_of_address": {
+                "label": "地址证明",
+                "placeholder": "上传地址证明",
+                "error": "地址证明为必填项"
+            },
+            "authorized_signatory_id": {
+                "label": "授权签字人身份证件",
+                "placeholder": "上传授权签字人身份证件",
+                "error": "授权签字人身份证件为必填项"
+            },
+            "org_website": {
+                "label": "网站",
+                "placeholder": "example.com",
+                "required": "网站为必填项",
+                "invalid": "无效的网站URL"
+            },
+            "org_industry": {
+                "label": "行业",
+                "placeholder": "选择您的行业",
+                "required": "行业为必填项",
+                "options": {
+                    "retail": "零售",
+                    "technology": "科技",
+                    "manufacturing": "制造",
+                    "healthcare": "医疗保健",
+                    "education": "教育",
+                    "finance": "金融",
+                    "other": "其他"
+                }
+            },
+            "org_default_language": {
+                "label": "默认语言",
+                "placeholder": "选择您的语言",
+                "required": "默认语言为必填项",
+                "options": {
+                    "english": "英语",
+                    "french": "法语"
+                }
+            },
+            "how_did_you_hear_about_us": {
+                "label": "您是如何了解到我们的？",
+                "placeholder": "请告诉我们您是如何了解到我们的...",
+                "required": "请告诉我们您是如何了解到我们的"
+            }
+        },
+        "welcome_screen": {
+            "title": "欢迎使用 lomi. !",
+            "description": {
+                "line1": "我们非常高兴您加入我们。",
+                "line2": "让我们让您的客户轻松支付给您。"
+            },
+            "get_started": "开始使用"
+        }
     }
 }

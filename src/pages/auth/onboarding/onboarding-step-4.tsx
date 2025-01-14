@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type OnboardingData } from './onboarding';
 import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
 
 const onboardingStep4Schema = z.object({
     orgWebsite: z.string().min(1, 'onboarding.step4.org_website.required').refine((value) => {
@@ -52,6 +53,9 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-6">
+            <div className="absolute top-4 right-4">
+                <LanguageSwitcher />
+            </div>
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">

@@ -9,6 +9,7 @@ import * as z from 'zod';
 import { countryCodes, countries, organizationPositions } from '@/utils/data/onboarding';
 import ProfilePictureUploader from '@/components/auth/avatar-uploader';
 import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
@@ -73,6 +74,9 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="absolute top-4 right-4">
+                <LanguageSwitcher />
+            </div>
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="w-1/2">
@@ -108,12 +112,12 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="w-1/3">
-                        <Label htmlFor="countryCode" className="block mb-2">Country code</Label>
+                        <Label htmlFor="countryCode" className="block mb-2">{t('onboarding.step1.country_code.label')}</Label>
                         <div className="relative w-full">
                             <Input
                                 id="countryCode"
                                 type="text"
-                                placeholder="+225"
+                                placeholder={t('onboarding.step1.country_code.placeholder')}
                                 value={countryCodeSearch}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -152,10 +156,10 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                         </div>
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="phoneNumber" className="block mb-2">Phone number</Label>
+                        <Label htmlFor="phoneNumber" className="block mb-2">{t('onboarding.step1.phone.label')}</Label>
                         <Input
                             id="phoneNumber"
-                            placeholder="Enter your phone number"
+                            placeholder={t('onboarding.step1.phone.placeholder')}
                             {...onboardingForm.register("phoneNumber", {
                                 setValueAs: (value) => value.replace(/\s/g, ''),
                             })}
@@ -171,7 +175,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             </div>
             <div className="mb-6 flex space-x-8">
                 <div className="w-1/2 space-y-4">
-                    <Label htmlFor="profilePicture" className="block mb-2">Profile picture</Label>
+                    <Label htmlFor="profilePicture" className="block mb-2">{t('onboarding.step1.profile_picture.label')}</Label>
                     <div className="ml-8">
                         <ProfilePictureUploader
                             currentAvatar={avatarUrl}
@@ -182,7 +186,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                 </div>
                 <div className="w-1/2 space-y-4">
                     <div>
-                        <Label htmlFor="country" className="block mb-2">Where are you based ?</Label>
+                        <Label htmlFor="country" className="block mb-2">{t('onboarding.step1.country.label')}</Label>
                         <select
                             id="country"
                             {...onboardingForm.register("country")}
@@ -199,10 +203,10 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                                 </option>
                             ))}
                         </select>
-                        {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.country.message}</p>}
+                        {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{t('onboarding.step1.country.error')}</p>}
                     </div>
                     <div>
-                        <Label htmlFor="position" className="block mb-2">Your Position</Label>
+                        <Label htmlFor="position" className="block mb-2">{t('onboarding.step1.position.label')}</Label>
                         <select
                             id="position"
                             {...onboardingForm.register("position")}
@@ -219,7 +223,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                                 </option>
                             ))}
                         </select>
-                        {onboardingForm.formState.errors.position && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.position.message}</p>}
+                        {onboardingForm.formState.errors.position && <p className="text-red-500 text-sm">{t('onboarding.step1.position.error')}</p>}
                     </div>
                 </div>
             </div>

@@ -495,10 +495,12 @@
                 "label": "Photo de profil"
             },
             "country": {
-                "label": "Où êtes-vous basé ?"
+                "label": "Où êtes-vous basé ?",
+                "error": "Le pays est requis"
             },
             "position": {
-                "label": "Votre poste"
+                "label": "Votre poste",
+                "error": "Le poste est requis"
             }
         },
         "step2": {
@@ -515,7 +517,7 @@
             },
             "org_employees": {
                 "label": "Nombre de collaborateurs",
-                "placeholder": "Sélectionnez le nombre d'employés",
+                "placeholder": "Nombre d'employés",
                 "required": "Le nombre d'employés est requis"
             },
             "org_country": {

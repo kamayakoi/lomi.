@@ -263,6 +263,53 @@
                 "sign_in_button": "Entrar",
                 "signing_in": "Entrando..."
             }
+    }},  
+    "dashboard": {
+        "getting_started": {
+            "title": "Empezando",
+            "api_keys": {
+                "title": "Gestionar claves de API",
+                "description": "Ver y gestionar sus claves de API.",
+                "technical": "Técnico"
+            },
+            "webhooks": {
+                "title": "Configurar URLs de devolução de chamadas",
+                "description": "Configure seu URL de devolução de chamadas para que possamos notificá-lo de pagamentos bem-sucedidos.",
+                "technical": "Técnico"
+            },
+            "payment_links": {
+                "title": "Criar links de pagamento",
+                "description": "Gere links de pagamento para coletar dinheiro facilmente."
+            },
+            "integrations": {
+                "title": "Configurar integrações",
+                "description": "Conecte-se com diferentes provedores de pagamento e serviços."
+            }
+        },
+        "developer_resources": {
+            "title": "Recursos do desenvolvedor",
+            "resources": {
+                "documentation": {
+                    "title": "Documentação",
+                    "description": "Familiarize-se com os produtos lomi. com nossa documentação."
+                },
+                "api_reference": {
+                    "title": "Referência da API",
+                    "description": "Descubra como nossas APIs funcionam e como você pode implantar."
+                },
+                "product_catalog": {
+                    "title": "Catálogo de produtos",
+                    "description": "Descubra os produtos lomi. e como usá-los."
+                },
+                "sample_projects": {
+                    "title": "Boilerplates",
+                    "description": "Explore boilerplates para iniciar sua integração."
+                },
+                "support": {
+                    "title": "Suporte",
+                    "description": "Obtenha ajuda e suporte por telefone."
+                }
+            }
         }
     },
     "activation": {
@@ -406,5 +453,170 @@
         "submit": "Enviar",
         "cancel": "Cancelar",
         "save": "Salvar"
+    },
+    "onboarding": {
+        "steps": {
+            "step1": "Vamos conhecer você",
+            "step2": "Registre sua empresa",
+            "step3": "Ajude-nos a personalizar sua experiência",
+            "step4": "Mais alguns detalhes e você está pronto!"
+        },
+        "verification": {
+            "title": "Verificação de e-mail obrigatória",
+            "description": "Por favor, verifique seu e-mail para continuar com o onboarding.",
+            "resend_button": "Reenviar e-mail de verificação"
+        },
+        "auth": {
+            "title": "Autenticação obrigatória",
+            "description": "Por favor, entre para completar seu onboarding.",
+            "sign_in_button": "Entrar"
+        },
+        "step1": {
+            "first_name": {
+                "label": "Nome",
+                "placeholder": "Digite seu nome",
+                "error": "Nome é obrigatório"
+            },
+            "last_name": {
+                "label": "Sobrenome",
+                "placeholder": "Digite seu sobrenome",
+                "error": "Sobrenome é obrigatório"
+            },
+            "country_code": {
+                "label": "Código do país",
+                "placeholder": "+225",
+                "error": "Código do país inválido"
+            },
+            "phone": {
+                "label": "Número de telefone",
+                "placeholder": "Digite seu número de telefone",
+                "error": "Formato de número de telefone inválido"
+            },
+            "profile_picture": {
+                "label": "Foto de perfil",
+                "upload": "Carregar imagem",
+                "remove": "Remover",
+                "requirements": "*png, *jpeg arquivos até 1MB com pelo menos 200px por 200px"
+            },
+            "country": {
+                "label": "Onde você está localizado?",
+                "placeholder": "Selecione seu país",
+                "error": "País é obrigatório"
+            },
+            "position": {
+                "label": "Sua posição",
+                "placeholder": "Selecione sua posição",
+                "error": "Posição é obrigatória"
+            },
+            "labels": {
+                "phone_number": "Número de telefone",
+                "country_code": "Código do país",
+                "profile_picture": "Foto de perfil",
+                "where_based": "Onde você está localizado?",
+                "your_position": "Sua posição"
+            }
+        },
+        "step2": {
+            "org_name": {
+                "label": "Nome da empresa",
+                "placeholder": "e.g. Ashanti Shoes Inc.",
+                "required": "Nome da empresa é obrigatório"
+            },
+            "org_email": {
+                "label": "Email da empresa",
+                "placeholder": "e.g. contact@ashantishoes.com",
+                "invalid": "Formato de email inválido",
+                "required": "Email da empresa é obrigatório"
+            },
+            "org_employees": {
+                "label": "Número de colaboradores",
+                "placeholder": "Número de colaboradores",
+                "required": "Número de colaboradores é obrigatório"
+            },
+            "org_country": {
+                "label": "País de operação",
+                "placeholder": "Selecione um país",
+                "required": "País de operação é obrigatório"
+            },
+            "org_region": {
+                "label": "Região",
+                "placeholder": "Selecione uma região",
+                "required": "Região é obrigatória"
+            },
+            "workspace_handle": {
+                "label": "Handle do workspace",
+                "placeholder": "my-workspace",
+                "required": "Handle do workspace é obrigatório"
+            },
+            "logo": {
+                "label": "Company logo"
+            }
+        },
+        "step3": {
+            "org_city": {
+                "label": "Cidade",
+                "placeholder": "Selecione uma cidade",
+                "required": "Cidade é obrigatória"
+            },
+            "org_district": {
+                "label": "Bairro",
+                "placeholder": "Selecione um bairro",
+                "required": "Bairro é obrigatório"
+            },
+            "org_postal_code": {
+                "label": "Código postal",
+                "placeholder": "Digite seu código postal",
+                "required": "Código postal é obrigatório"
+            },
+            "org_street": {
+                "label": "Rua",
+                "placeholder": "Digite seu endereço",
+                "required": "Endereço é obrigatório"
+            }
+        },
+        "step4": {
+            "org_website": {
+                "label": "Site",
+                "placeholder": "example.com",
+                "required": "Site é obrigatório",
+                "invalid": "URL do site inválida"
+            },
+            "org_industry": {
+                "label": "Indústria",
+                "placeholder": "Selecione sua indústria",
+                "required": "Indústria é obrigatória",
+                "options": {
+                    "retail": "Varejo",
+                    "technology": "Tecnologia",
+                    "manufacturing": "Fabricação",
+                    "healthcare": "Saúde",
+                    "education": "Educação",
+                    "finance": "Finanças",
+                    "other": "Outro"
+                }
+            },
+            "org_default_language": {
+                "label": "Língua padrão",
+                "placeholder": "Selecione sua língua",
+                "required": "Língua padrão é obrigatória",
+                "options": {
+                    "english": "Inglês",
+                    "french": "Francês"
+                }
+            },
+            "how_did_you_hear_about_us": {
+                "label": "Como você nos conheceu?",
+                "placeholder": "Compartilhe como você nos conheceu...",
+                "required": "Por favor, nos informe como você nos conheceu"
+            }
+        },
+        "welcome_screen": {
+            "title": "Bem-vindo ao lomi. !",
+            "description": {
+                "line1": "Estamos muito animados em ter você a bordo.",
+                "line2": "Let's make it effortless for your customers to pay you."
+            },
+            "get_started": "Começar"
+        }
     }
 }

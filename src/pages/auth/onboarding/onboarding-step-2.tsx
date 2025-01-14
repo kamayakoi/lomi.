@@ -22,6 +22,7 @@ import {
     maliRegions,
     burkinaFasoRegions,
 } from '@/utils/data/onboarding';
+import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
 
 const onboardingStep2Schema = z.object({
     orgName: z.string().min(1, 'onboarding.step2.org_name.required'),
@@ -104,6 +105,9 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="absolute top-4 right-4">
+                <LanguageSwitcher />
+            </div>
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">

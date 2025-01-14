@@ -483,7 +483,8 @@
             },
             "country_code": {
                 "label": "Country code",
-                "placeholder": "+225"
+                "placeholder": "+225",
+                "error": "Country code must start with + followed by numbers"
             },
             "phone": {
                 "label": "Phone number",
@@ -494,10 +495,12 @@
                 "label": "Profile picture"
             },
             "country": {
-                "label": "Where are you based?"
+                "label": "Where are you based?",
+                "error": "Country is required"
             },
             "position": {
-                "label": "Your Position"
+                "label": "Your Position",
+                "error": "Position is required"
             }
         },
         "step2": {
