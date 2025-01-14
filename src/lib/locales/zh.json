@@ -73,7 +73,7 @@
             "success": "成功",
             "success_message": "登录成功。",
             "home_link": "首页",
-            "quote": "为艺术家和企业提供领先的3D解决方案。",
+            "quote": "",
             "company": "lomi.",
             "error": {
                 "default": "登录时出现错误。请重试。",

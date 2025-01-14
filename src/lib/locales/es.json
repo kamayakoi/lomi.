@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "Conectando África con el mundo, una transacción a la vez.",
+        "tagline": "Connecting Africa to the World, one transaction at a time.",
         "features": {
             "title": "Características",
             "overview": "Overview",
@@ -72,7 +72,7 @@
       "sign_up_link": "Regístrate",
       "success": "Éxito",
       "success_message": "Has iniciado sesión correctamente.",
-      "quote": "Soluciones 3D de vanguardia para artistas y empresas.",
+      "quote": "We're just getting started.",
       "company": "lomi.",
       "error": {
         "default": "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo.",

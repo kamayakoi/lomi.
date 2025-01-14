@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "Conectando a África ao mundo, uma transação de cada vez.",
+        "tagline": "Connecting Africa to the World, one transaction at a time.",
         "features": {
             "title": "Soluções",
             "overview": "Visão geral",
@@ -73,7 +73,7 @@
             "success": "Sucesso",
             "success_message": "Login realizado com sucesso.",
             "home_link": "Início",
-            "quote": "Soluções 3D de ponta para artistas e empresas.",
+            "quote": "We're just getting started.",
             "company": "lomi.",
             "error": {
                 "default": "Ocorreu um erro ao fazer login. Por favor, tente novamente.",

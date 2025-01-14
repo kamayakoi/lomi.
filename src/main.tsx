@@ -7,31 +7,11 @@ import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
 import AppRouter from "./router";
-import { useRoutePreload } from "@/lib/hooks/useRoutePreload";
 import "./index.css";
 import './i18n';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-})
+const queryClient = new QueryClient()
 
-function AppContent() {
-  // Use the route preloading hook
-  useRoutePreload();
-
-  return (
-    <>
-      <AppRouter />
-      <Toaster />
-    </>
-  );
-}
 
 export function App() {
   return (
@@ -45,7 +25,8 @@ export function App() {
                 v7_relativeSplatPath: true
               }}
             >
-              <AppContent />
+              <AppRouter />
+              <Toaster />
             </BrowserRouter>
             <Analytics />
           </UserProvider>
