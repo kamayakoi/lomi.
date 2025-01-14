@@ -57,25 +57,55 @@ export function Footer() {
 
     useEffect(() => {
         const fetchStarCount = async () => {
-            setIsLoading(true)
+            // Check cache first
             try {
+                const cached = localStorage.getItem('github_stars_cache');
+                if (cached) {
+                    const { stars, timestamp } = JSON.parse(cached);
+                    // Cache for 12 hours
+                    if (Date.now() - timestamp < 12 * 60 * 60 * 1000) {
+                        setStarCount(stars);
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+
                 const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
                     headers: {
                         'Accept': 'application/vnd.github.v3+json',
-                        'User-Agent': 'LomiFooter'
+                        'User-Agent': 'Lomi-Website',
                     },
-                    cache: 'no-store'
+                    cache: 'force-cache'
                 });
 
                 if (!response.ok) {
-                    throw new Error(`GitHub API error: ${response.status}`)
+                    throw new Error(`GitHub API error: ${response.status}`);
                 }
 
                 const data = await response.json();
-                setStarCount(data.stargazers_count || 0);
+                const stars = data.stargazers_count || 0;
+
+                // Cache the result
+                localStorage.setItem('github_stars_cache', JSON.stringify({
+                    stars,
+                    timestamp: Date.now()
+                }));
+
+                setStarCount(stars);
             } catch (err) {
                 console.error('Error fetching star count:', err);
-                setStarCount(0);
+                // Try to use cached value even if expired
+                try {
+                    const cached = localStorage.getItem('github_stars_cache');
+                    if (cached) {
+                        const { stars } = JSON.parse(cached);
+                        setStarCount(stars);
+                    } else {
+                        setStarCount(0);
+                    }
+                } catch {
+                    setStarCount(0);
+                }
             } finally {
                 setIsLoading(false);
             }

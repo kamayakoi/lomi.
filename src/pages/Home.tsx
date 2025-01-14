@@ -1,11 +1,9 @@
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
 import { Footer } from '@/components/landing/Footer'
-
-// Lazy load the 3D image component
-const ThreeDImage = lazy(() => import('@/components/landing/3d-image'))
+import ThreeDImage from '@/components/landing/3d-image'
 
 export default function Page() {
   return (
