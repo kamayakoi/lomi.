@@ -8,17 +8,34 @@ import { cn } from '@/lib/actions/utils'
 import OnboardingStep1 from './onboarding-step-1';
 import OnboardingStep2 from './onboarding-step-2';
 import OnboardingStep3 from './onboarding-step-3';
-import OnboardingStep4, { type OnboardingStep4Data } from './onboarding-step-4';
+import OnboardingStep4 from './onboarding-step-4';
 import { Button } from '@/components/ui/button';
 import LoadingButton from '@/components/portal/loader';
 import WelcomeScreen from './welcome-screen';
+import { useTranslation } from 'react-i18next';
+
+// Import types from each step
+import type { OnboardingStep1Data } from './onboarding-step-1';
+import type { OnboardingStep2Data } from './onboarding-step-2';
+import type { OnboardingStep3Data } from './onboarding-step-3';
+import type { OnboardingStep4Data } from './onboarding-step-4';
+
+type StepData = OnboardingStep1Data | OnboardingStep2Data | OnboardingStep3Data | OnboardingStep4Data;
+
+type StepProps = {
+    onNext?: (data: StepData) => void;
+    onSubmit?: (data: StepData) => void;
+    onPrevious?: () => void;
+    initialData?: OnboardingData;
+    data?: OnboardingData;
+};
 
 const steps = [
-    { title: 'Let\'s get to know you', component: OnboardingStep1 },
-    { title: 'Register your company', component: OnboardingStep2 },
-    { title: 'Help us customize your experience', component: OnboardingStep3 },
-    { title: 'A few more details and you\'re all set!', component: OnboardingStep4 },
-];
+    { title: 'onboarding.steps.step1', component: OnboardingStep1 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step2', component: OnboardingStep2 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step3', component: OnboardingStep3 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step4', component: OnboardingStep4 as React.ComponentType<StepProps> },
+] as const;
 
 const initialOnboardingData = {
     firstName: '',
@@ -48,6 +65,7 @@ const initialOnboardingData = {
 export type OnboardingData = typeof initialOnboardingData;
 
 const Onboarding: React.FC = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -145,103 +163,35 @@ const Onboarding: React.FC = () => {
         }
     };
 
-    const onNext = (stepData: Partial<OnboardingData>) => {
-        setOnboardingData((prevData) => ({ ...prevData, ...stepData }));
+    const handleNext = (stepData: StepData) => {
+        const updatedData = { ...onboardingData, ...stepData };
+        setOnboardingData(updatedData);
         setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     };
 
-    const onPrevious = () => {
+    const handlePrevious = () => {
         setCurrentStep((prev) => Math.max(prev - 1, 0));
     };
 
-    const onSubmit = async (stepData: OnboardingStep4Data) => {
-        try {
-            setOnboardingData((prevData) => ({ ...prevData, ...stepData }));
-            setLoading(true);
-
-            if (!user) {
-                throw new Error("User not found");
-            }
-
-            const formData = { ...onboardingData, ...stepData };
-
-            // Normalize the website URL
-            const websiteUrl = formData.orgWebsite ? formData.orgWebsite.replace(/^(https?:\/\/)?(www\.)?/i, '') : '';
-
-            // Prepend "portal.lomi.africa/" to the workspace handle
-            const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
-
-            // Call the complete_onboarding function
-            const { error } = await supabase.rpc('complete_onboarding', {
-                p_merchant_id: user.id,
-                p_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
-                p_country: formData.country,
-                p_org_name: formData.orgName,
-                p_org_email: formData.orgEmail,
-                p_org_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
-                p_org_country: formData.orgCountry,
-                p_org_region: formData.orgRegion,
-                p_org_city: formData.orgCity,
-                p_org_street: formData.orgStreet,
-                p_org_district: formData.orgDistrict,
-                p_org_postal_code: formData.orgPostalCode,
-                p_org_industry: formData.orgIndustry,
-                p_org_website_url: `https://${websiteUrl}`,
-                p_org_employee_number: formData.orgEmployees,
-                p_preferred_language: formData.orgDefaultLanguage,
-                p_workspace_handle: completeWorkspaceHandle,
-                p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
-                p_avatar_url: formData.avatarUrl,
-                p_logo_url: formData.logoUrl,
-                p_organization_position: formData.position,
-            });
-
-            if (error) {
-                if (error.message.includes('already taken')) {
-                    toast({
-                        title: "Workspace handle Unavailable",
-                        description: "This workspace handle is already taken. Please choose a different one.",
-                        variant: "destructive",
-                    });
-                    setLoading(false);
-                    return;
-                }
-                throw error;
-            }
-
-            // Update the local session to reflect the onboarded status
-            await supabase.auth.refreshSession();
-
-            toast({
-                title: "Onboarding Complete",
-                description: "Your account has been set up successfully.",
-            });
-            navigate('/portal');
-        } catch (error) {
-            console.error('Error completing onboarding:', error);
-            toast({
-                title: "Error",
-                description: "There was a problem completing your onboarding. Please try again.",
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
+    const handleSubmit = async (stepData: StepData) => {
+        const finalData = { ...onboardingData, ...stepData };
+        // Handle final submission
+        console.log('Final data:', finalData);
     };
 
     const renderStep = () => {
-        switch (currentStep) {
-            case 0:
-                return <OnboardingStep1 onNext={onNext} data={onboardingData} />;
-            case 1:
-                return <OnboardingStep2 onNext={onNext} onPrevious={onPrevious} data={onboardingData} />;
-            case 2:
-                return <OnboardingStep3 onNext={onNext} onPrevious={onPrevious} data={onboardingData} />;
-            case 3:
-                return <OnboardingStep4 onSubmit={onSubmit} onPrevious={onPrevious} data={onboardingData} />;
-            default:
-                return null;
-        }
+        const StepComponent = steps[currentStep]?.component;
+        if (!StepComponent) return null;
+
+        const commonProps = {
+            data: onboardingData,
+            initialData: onboardingData,
+            onPrevious: handlePrevious,
+            onNext: handleNext,
+            onSubmit: handleSubmit,
+        };
+
+        return <StepComponent {...commonProps} />;
     };
 
     if (loading) {
@@ -252,9 +202,11 @@ const Onboarding: React.FC = () => {
         return (
             <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
                 <Card className={cn('p-6', 'dark:bg-gray-800')}>
-                    <h1 className='text-2xl font-semibold tracking-tight'>Email Verification Required</h1>
-                    <p>Please verify your email to continue with onboarding.</p>
-                    <Button onClick={handleResendVerification} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">Resend Verification Email</Button>
+                    <h1 className='text-2xl font-semibold tracking-tight'>{t('onboarding.verification.title')}</h1>
+                    <p>{t('onboarding.verification.description')}</p>
+                    <Button onClick={handleResendVerification} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        {t('onboarding.verification.resend_button')}
+                    </Button>
                 </Card>
             </div>
         );
@@ -264,9 +216,11 @@ const Onboarding: React.FC = () => {
         return (
             <div className={cn('container grid h-svh flex-col items-center justify-center bg-background lg:max-w-none lg:px-0', 'dark:bg-gray-900')}>
                 <Card className={cn('p-6', 'dark:bg-gray-800')}>
-                    <h1 className='text-2xl font-semibold tracking-tight'>Authentication Required</h1>
-                    <p>Please sign in to complete your onboarding.</p>
-                    <Button onClick={() => navigate('/sign-in')} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">Sign In</Button>
+                    <h1 className='text-2xl font-semibold tracking-tight'>{t('onboarding.auth.title')}</h1>
+                    <p>{t('onboarding.auth.description')}</p>
+                    <Button onClick={() => navigate('/sign-in')} className="mt-4 dark:bg-primary-600 dark:hover:bg-primary-700">
+                        {t('onboarding.auth.sign_in_button')}
+                    </Button>
                 </Card>
             </div>
         );
@@ -280,7 +234,7 @@ const Onboarding: React.FC = () => {
                 <Card className="w-full max-w-4xl bg-white dark:bg-background shadow-xl rounded-none border dark:border-gray-800">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-center">
-                            {steps[currentStep]?.title}
+                            {currentStep >= 0 && currentStep < steps.length && steps[currentStep] ? t(steps[currentStep].title) : ''}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -297,15 +251,15 @@ const Onboarding: React.FC = () => {
                                 ))}
                             </div>
                             <div className="flex justify-between mt-2">
-                                {steps.map((step, index) => (
+                                {steps.map((step) => (
                                     <div
-                                        key={index}
-                                        className={`text-xs ${index <= currentStep
+                                        key={step.title}
+                                        className={`text-xs ${steps.indexOf(step) <= currentStep
                                             ? 'text-blue-500 dark:text-blue-600 font-bold'
                                             : 'text-gray-400 dark:text-gray-500'
                                             }`}
                                     >
-                                        {step.title}
+                                        {t(step.title)}
                                     </div>
                                 ))}
                             </div>

@@ -262,7 +262,7 @@
             "sign_in_button": "Sign in",
             "signing_in": "Signing in..."
         }
-    },
+    } },
     "dashboard": {
         "getting_started": {
             "title": "Getting Started",
@@ -452,5 +452,155 @@
         "submit": "Submit",
         "cancel": "Cancel",
         "save": "Save"
+    },
+    "onboarding": {
+        "steps": {
+            "step1": "Let's get to know you",
+            "step2": "Register your company",
+            "step3": "Help us customize your experience",
+            "step4": "A few more details and you're all set!"
+        },
+        "verification": {
+            "title": "Email Verification Required",
+            "description": "Please verify your email to continue with onboarding.",
+            "resend_button": "Resend Verification Email"
+        },
+        "auth": {
+            "title": "Authentication Required",
+            "description": "Please sign in to complete your onboarding.",
+            "sign_in_button": "Sign In"
+        },
+        "step1": {
+            "first_name": {
+                "label": "First name",
+                "placeholder": "Enter your first name",
+                "error": "First name is required"
+            },
+            "last_name": {
+                "label": "Last name",
+                "placeholder": "Enter your last name",
+                "error": "Last name is required"
+            },
+            "country_code": {
+                "label": "Country code",
+                "placeholder": "+225"
+            },
+            "phone": {
+                "label": "Phone number",
+                "placeholder": "Enter your phone number",
+                "error": "Invalid phone number format"
+            },
+            "profile_picture": {
+                "label": "Profile picture"
+            },
+            "country": {
+                "label": "Where are you based?"
+            },
+            "position": {
+                "label": "Your Position"
+            }
+        },
+        "step2": {
+            "org_name": {
+                "label": "Company name",
+                "placeholder": "e.g. Ashanti Shoes Inc.",
+                "required": "Company name is required"
+            },
+            "org_email": {
+                "label": "Company email",
+                "placeholder": "e.g. contact@ashantishoes.com",
+                "invalid": "Invalid email format",
+                "required": "Company email is required"
+            },
+            "org_employees": {
+                "label": "Number of collaborators",
+                "placeholder": "Select number of employees",
+                "required": "Number of employees is required"
+            },
+            "org_country": {
+                "label": "Operating country",
+                "placeholder": "Select a country",
+                "required": "Operating country is required"
+            },
+            "org_region": {
+                "label": "Region",
+                "placeholder": "Select a region",
+                "required": "Region is required"
+            },
+            "workspace_handle": {
+                "label": "Workspace handle",
+                "placeholder": "my-workspace",
+                "required": "Workspace handle is required"
+            },
+            "logo": {
+                "label": "Company logo"
+            }
+        },
+        "step3": {
+            "org_city": {
+                "label": "City",
+                "placeholder": "Select a city",
+                "required": "City is required"
+            },
+            "org_district": {
+                "label": "District",
+                "placeholder": "Select a district",
+                "required": "District is required"
+            },
+            "org_postal_code": {
+                "label": "Postal code",
+                "placeholder": "Enter your postal code",
+                "required": "Postal code is required"
+            },
+            "org_street": {
+                "label": "Street",
+                "placeholder": "Enter your street address",
+                "required": "Street address is required"
+            }
+        },
+        "step4": {
+            "org_website": {
+                "label": "Website",
+                "placeholder": "example.com",
+                "required": "Website is required",
+                "invalid": "Invalid website URL"
+            },
+            "org_industry": {
+                "label": "Industry",
+                "placeholder": "Select your industry",
+                "required": "Industry is required",
+                "options": {
+                    "retail": "Retail",
+                    "technology": "Technology",
+                    "manufacturing": "Manufacturing",
+                    "healthcare": "Healthcare",
+                    "education": "Education",
+                    "finance": "Finance",
+                    "other": "Other"
+                }
+            },
+            "org_default_language": {
+                "label": "Default language",
+                "placeholder": "Select your language",
+                "required": "Default language is required",
+                "options": {
+                    "english": "English",
+                    "french": "French"
+                }
+            },
+            "how_did_you_hear_about_us": {
+                "label": "How did you hear about us?",
+                "placeholder": "Share how you heard about us...",
+                "required": "Please let us know how you heard about us"
+            }
+        },
+        "welcome_screen": {
+        "title": "Welcome to lomi. !",
+        "description": {
+                "line1": "We're very excited to have you on board.",
+                "line2": "Let's make it effortless for your customers to pay you."
+            },
+            "get_started": "Get Started"
+        }
     }
-}}
+    }

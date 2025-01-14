@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type OnboardingData } from './onboarding';
+import { useTranslation } from 'react-i18next';
 import {
     senegalCities,
     cotedIvoireCities,
@@ -29,13 +30,13 @@ import {
 } from '@/utils/data/onboarding';
 
 const onboardingStep3Schema = z.object({
-    orgCity: z.string().min(1, 'City is required'),
-    orgDistrict: z.string().min(1, 'District is required'),
-    orgPostalCode: z.string().min(1, 'Postal code is required'),
-    orgStreet: z.string().min(1, 'Street is required'),
+    orgCity: z.string().min(1, 'onboarding.step3.org_city.required'),
+    orgDistrict: z.string().min(1, 'onboarding.step3.org_district.required'),
+    orgPostalCode: z.string().min(1, 'onboarding.step3.org_postal_code.required'),
+    orgStreet: z.string().min(1, 'onboarding.step3.org_street.required'),
 });
 
-type OnboardingStep3Data = z.infer<typeof onboardingStep3Schema>;
+export type OnboardingStep3Data = z.infer<typeof onboardingStep3Schema>;
 
 interface OnboardingStep3Props {
     onNext: (data: OnboardingStep3Data) => void;
@@ -44,6 +45,7 @@ interface OnboardingStep3Props {
 }
 
 const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, data }) => {
+    const { t } = useTranslation();
     const onboardingForm = useForm<OnboardingStep3Data>({
         resolver: zodResolver(onboardingStep3Schema),
         mode: 'onChange',
@@ -55,8 +57,8 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
         },
     });
 
-    const onSubmit = (data: OnboardingStep3Data) => {
-        onNext(data);
+    const onSubmit = (formData: OnboardingStep3Data) => {
+        onNext(formData);
     };
 
     const selectedCountry = data.orgCountry;
@@ -105,7 +107,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                 <div className="flex space-x-2">
                     {showCityField ? (
                         <div className="flex-1">
-                            <Label htmlFor="orgCity" className="block mb-2">City</Label>
+                            <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
                             <select
                                 id="orgCity"
                                 {...onboardingForm.register("orgCity")}
@@ -116,21 +118,23 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     "appearance-none"
                                 )}
                             >
-                                <option value="">Select a city</option>
+                                <option value="">{t('onboarding.step3.org_city.placeholder')}</option>
                                 {cities.map((city) => (
                                     <option key={city} value={city}>
                                         {city}
                                     </option>
                                 ))}
                             </select>
-                            {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
+                            {onboardingForm.formState.errors.orgCity &&
+                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
+                            }
                         </div>
                     ) : (
                         <div className="flex-1">
-                            <Label htmlFor="orgCity" className="block mb-2">City</Label>
+                            <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
                             <Input
                                 id="orgCity"
-                                placeholder="Enter your city"
+                                placeholder={t('onboarding.step3.org_city.placeholder')}
                                 {...onboardingForm.register("orgCity")}
                                 className={cn(
                                     "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -138,12 +142,14 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
-                            {onboardingForm.formState.errors.orgCity && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgCity.message}</p>}
+                            {onboardingForm.formState.errors.orgCity &&
+                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
+                            }
                         </div>
                     )}
                     {showDistrictField ? (
                         <div className="flex-1">
-                            <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
+                            <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
                             <select
                                 id="orgDistrict"
                                 {...onboardingForm.register("orgDistrict")}
@@ -154,21 +160,23 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     "appearance-none"
                                 )}
                             >
-                                <option value="">Select a district</option>
+                                <option value="">{t('onboarding.step3.org_district.placeholder')}</option>
                                 {districts.map((district) => (
                                     <option key={district} value={district}>
                                         {district}
                                     </option>
                                 ))}
                             </select>
-                            {onboardingForm.formState.errors.orgDistrict && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDistrict.message}</p>}
+                            {onboardingForm.formState.errors.orgDistrict &&
+                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
+                            }
                         </div>
                     ) : (
                         <div className="flex-1">
-                            <Label htmlFor="orgDistrict" className="block mb-2">District</Label>
+                            <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
                             <Input
                                 id="orgDistrict"
-                                placeholder="Enter your district"
+                                placeholder={t('onboarding.step3.org_district.placeholder')}
                                 {...onboardingForm.register("orgDistrict")}
                                 className={cn(
                                     "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -176,7 +184,9 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 )}
                             />
-                            {onboardingForm.formState.errors.orgDistrict && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDistrict.message}</p>}
+                            {onboardingForm.formState.errors.orgDistrict &&
+                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
+                            }
                         </div>
                     )}
                 </div>
@@ -184,10 +194,10 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgPostalCode" className="block mb-2">Postal code</Label>
+                        <Label htmlFor="orgPostalCode" className="block mb-2">{t('onboarding.step3.org_postal_code.label')}</Label>
                         <Input
                             id="orgPostalCode"
-                            placeholder="Enter your postal code"
+                            placeholder={t('onboarding.step3.org_postal_code.placeholder')}
                             {...onboardingForm.register("orgPostalCode")}
                             className={cn(
                                 "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -195,13 +205,15 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
-                        {onboardingForm.formState.errors.orgPostalCode && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgPostalCode.message}</p>}
+                        {onboardingForm.formState.errors.orgPostalCode &&
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgPostalCode.message || '')}</p>
+                        }
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgStreet" className="block mb-2">Street</Label>
+                        <Label htmlFor="orgStreet" className="block mb-2">{t('onboarding.step3.org_street.label')}</Label>
                         <Input
                             id="orgStreet"
-                            placeholder="Enter your street"
+                            placeholder={t('onboarding.step3.org_street.placeholder')}
                             {...onboardingForm.register("orgStreet")}
                             className={cn(
                                 "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -209,7 +221,9 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
-                        {onboardingForm.formState.errors.orgStreet && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgStreet.message}</p>}
+                        {onboardingForm.formState.errors.orgStreet &&
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgStreet.message || '')}</p>
+                        }
                     </div>
                 </div>
             </div>
@@ -219,13 +233,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                     onClick={onPrevious}
                     className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
                 >
-                    Back
+                    {t('common.back')}
                 </Button>
                 <Button
                     type="submit"
                     className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
                 >
-                    Next
+                    {t('common.next')}
                 </Button>
             </div>
         </form>
@@ -233,4 +247,3 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
 };
 
 export default OnboardingStep3;
-export type { OnboardingStep3Data };

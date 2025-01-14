@@ -174,9 +174,6 @@ We will notify you as soon as the review is complete, usually within 24 hours. I
 
 If we need any additional information to process your application, we will reach out to you directly.
 
-Best regards,
-Babacar
-
 ---
 
 This email is a service from lomi. Support Team. To add more comments, please reply to this email. ',
@@ -265,7 +262,7 @@ Congratulations! Your lomi. account has been approved.
 
 You now have full access to all the features of our platform. Feel free to explore the portal, connect your payment providers, and start accepting payments.
 
-If you have any questions or need assistance to set up lomi. API, our support team is here to help. You can reach us anytime at [hello@lomi.africa](mailto:hello@lomi.africa).
+If you have any questions or need assistance to set up lomi. API, our support team is here to help. You can reach us anytime by replying to this email.
 
 Best regards, 
 Babacar',

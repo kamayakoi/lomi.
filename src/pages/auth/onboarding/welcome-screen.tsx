@@ -6,12 +6,15 @@ import { motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/actions/utils'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '@/components/design/LanguageSwitcher'
 
 interface WelcomeScreenProps {
     onGetStarted: () => void;
 }
 
 export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
+    const { t } = useTranslation()
     const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
     const [showConfetti, setShowConfetti] = useState(false)
 
@@ -50,6 +53,9 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                     "flex flex-col items-center justify-between"
                 )}
             >
+                <div className="absolute top-4 right-4">
+                    <LanguageSwitcher />
+                </div>
                 <div className="flex-1 flex flex-col items-center justify-center">
                     <motion.div
                         initial={{ y: -20, opacity: 0 }}
@@ -67,7 +73,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                             "text-gray-900 dark:text-white"
                         )}
                     >
-                        Welcome to lomi. !
+                        {t('onboarding.welcome_screen.title')}
                     </motion.h1>
                     <motion.p
                         initial={{ y: 20, opacity: 0 }}
@@ -78,9 +84,9 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                             "text-gray-600 dark:text-gray-300"
                         )}
                     >
-                        We&apos;re very excited to have you on board.
+                        {t('onboarding.welcome_screen.description.line1')}
                         <br />
-                        Let&apos;s make it effortless for your customers to pay you.
+                        {t('onboarding.welcome_screen.description.line2')}
                     </motion.p>
                 </div>
                 <motion.div
@@ -92,7 +98,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                         onClick={onGetStarted}
                         className="w-[200px] h-12 rounded-none bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
                     >
-                        Get Started
+                        {t('onboarding.welcome_screen.get_started')}
                     </Button>
                 </motion.div>
             </motion.div>

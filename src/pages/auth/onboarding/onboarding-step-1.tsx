@@ -8,44 +8,51 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { countryCodes, countries, organizationPositions } from '@/utils/data/onboarding';
 import ProfilePictureUploader from '@/components/auth/avatar-uploader';
+import { useTranslation } from 'react-i18next';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
-const onboardingStep1Schema = z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    countryCode: z.string().regex(/^\+\d+$/, 'Country code must start with + followed by numbers'),
-    phoneNumber: z.string().regex(phoneRegex, 'Invalid phone number format'),
-    country: z.string().min(1, 'Country is required'),
-    position: z.string().min(1, 'Position is required'),
-});
-
-type OnboardingStep1Data = z.infer<typeof onboardingStep1Schema> & {
-    avatarUrl: string;
+const createOnboardingStep1Schema = (t: (key: string) => string) => {
+    return z.object({
+        firstName: z.string().min(1, t('onboarding.step1.first_name.error')),
+        lastName: z.string().min(1, t('onboarding.step1.last_name.error')),
+        countryCode: z.string().regex(/^\+\d+$/, t('onboarding.step1.country_code.error')),
+        phoneNumber: z.string().regex(phoneRegex, t('onboarding.step1.phone.error')),
+        country: z.string().min(1, t('onboarding.step1.country.error')),
+        position: z.string().min(1, t('onboarding.step1.position.error')),
+        avatarUrl: z.string().optional()
+    });
 };
 
+type OnboardingStep1Schema = ReturnType<typeof createOnboardingStep1Schema>;
+type OnboardingStep1Data = z.infer<OnboardingStep1Schema>;
+
 interface OnboardingStep1Props {
-    onNext: (data: OnboardingStep1Data & { avatarUrl: string }) => void;
-    data: OnboardingStep1Data & { avatarUrl: string };
+    onNext: (data: OnboardingStep1Data) => void;
+    data: Partial<OnboardingStep1Data>;
 }
 
 const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
+    const { t } = useTranslation();
+    const schema = createOnboardingStep1Schema(t);
+
     const onboardingForm = useForm<OnboardingStep1Data>({
-        resolver: zodResolver(onboardingStep1Schema),
+        resolver: zodResolver(schema),
         mode: 'onChange',
         defaultValues: {
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
             countryCode: data.countryCode || '+225',
-            phoneNumber: data.phoneNumber,
-            country: data.country,
-            position: data.position,
+            phoneNumber: data.phoneNumber || '',
+            country: data.country || '',
+            position: data.position || '',
+            avatarUrl: data.avatarUrl || ''
         },
     });
 
     const [countryCodeSearch, setCountryCodeSearch] = useState('');
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState('');
+    const [avatarUrl, setAvatarUrl] = useState(data.avatarUrl || '');
 
     const filteredCountryCodes = useMemo(() => {
         const lowercaseSearch = countryCodeSearch.toLowerCase();
@@ -61,7 +68,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
     };
 
     const onSubmit = (data: OnboardingStep1Data) => {
-        onNext({ ...data, avatarUrl });
+        onNext(data);
     };
 
     return (
@@ -69,10 +76,10 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="w-1/2">
-                        <Label htmlFor="firstName" className="block mb-2">First name</Label>
+                        <Label htmlFor="firstName" className="block mb-2">{t('onboarding.step1.first_name.label')}</Label>
                         <Input
                             id="firstName"
-                            placeholder="Enter your first name"
+                            placeholder={t('onboarding.step1.first_name.placeholder')}
                             {...onboardingForm.register("firstName")}
                             className={cn(
                                 "w-full mb-2 h-[48px]",
@@ -83,10 +90,10 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                         {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
                     </div>
                     <div className="w-1/2">
-                        <Label htmlFor="lastName" className="block mb-2">Last name</Label>
+                        <Label htmlFor="lastName" className="block mb-2">{t('onboarding.step1.last_name.label')}</Label>
                         <Input
                             id="lastName"
-                            placeholder="Enter your last name"
+                            placeholder={t('onboarding.step1.last_name.placeholder')}
                             {...onboardingForm.register("lastName")}
                             className={cn(
                                 "w-full mb-2 h-[48px]",
@@ -217,7 +224,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
                 </div>
             </div>
             <Button type="submit" className="w-full mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
-                Next
+                {t('common.next')}
             </Button>
         </form>
     );

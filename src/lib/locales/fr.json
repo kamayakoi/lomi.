@@ -453,5 +453,152 @@
         "submit": "Soumettre",
         "cancel": "Annuler",
         "save": "Enregistrer"
+    },
+    "onboarding": {
+        "steps": {
+            "step1": "Faisons connaissance",
+            "step2": "Enregistrez votre entreprise",
+            "step3": "Aidez-nous à personnaliser votre expérience",
+            "step4": "Encore quelques détails et c'est tout !"
+        },
+        "verification": {
+            "title": "Vérification de l'e-mail requise",
+            "description": "Veuillez vérifier votre e-mail pour continuer l'inscription.",
+            "resend_button": "Renvoyer l'e-mail de vérification"
+        },
+        "auth": {
+            "title": "Authentification requise",
+            "description": "Veuillez vous connecter pour compléter votre inscription.",
+            "sign_in_button": "Se connecter"
+        },
+        "step1": {
+            "first_name": {
+                "label": "Prénom",
+                "placeholder": "Entrez votre prénom",
+                "error": "Le prénom est requis"
+            },
+            "last_name": {
+                "label": "Nom",
+                "placeholder": "Entrez votre nom",
+                "error": "Le nom est requis"
+            },
+            "country_code": {
+                "label": "Code pays",
+                "placeholder": "+225"
+            },
+            "phone": {
+                "label": "Numéro de téléphone",
+                "placeholder": "Entrez votre numéro de téléphone",
+                "error": "Format de numéro de téléphone invalide"
+            },
+            "profile_picture": {
+                "label": "Photo de profil"
+            },
+            "country": {
+                "label": "Où êtes-vous basé ?"
+            },
+            "position": {
+                "label": "Votre poste"
+            }
+        },
+        "step2": {
+            "org_name": {
+                "label": "Nom de l'entreprise",
+                "placeholder": "ex. Ashanti Shoes Inc.",
+                "required": "Le nom de l'entreprise est requis"
+            },
+            "org_email": {
+                "label": "Email de l'entreprise",
+                "placeholder": "ex. contact@ashantishoes.com",
+                "invalid": "Format d'email invalide",
+                "required": "L'email de l'entreprise est requis"
+            },
+            "org_employees": {
+                "label": "Nombre de collaborateurs",
+                "placeholder": "Sélectionnez le nombre d'employés",
+                "required": "Le nombre d'employés est requis"
+            },
+            "org_country": {
+                "label": "Pays d'opération",
+                "placeholder": "Sélectionnez un pays",
+                "required": "Le pays d'opération est requis"
+            },
+            "org_region": {
+                "label": "Région",
+                "placeholder": "Sélectionnez une région",
+                "required": "La région est requise"
+            },
+            "workspace_handle": {
+                "label": "Identifiant de l'espace de travail",
+                "placeholder": "mon-espace",
+                "required": "L'identifiant de l'espace de travail est requis"
+            }
+        },
+        "step3": {
+            "org_city": {
+                "label": "Ville",
+                "placeholder": "Sélectionnez une ville",
+                "required": "La ville est requise"
+            },
+            "org_district": {
+                "label": "Quartier",
+                "placeholder": "Sélectionnez un quartier",
+                "required": "Le quartier est requis"
+            },
+            "org_postal_code": {
+                "label": "Code postal",
+                "placeholder": "Entrez votre code postal",
+                "required": "Le code postal est requis"
+            },
+            "org_street": {
+                "label": "Rue",
+                "placeholder": "Entrez votre adresse",
+                "required": "L'adresse est requise"
+            }
+        },
+        "step4": {
+            "org_website": {
+                "label": "Site web",
+                "placeholder": "exemple.com",
+                "required": "Le site web est requis",
+                "invalid": "URL du site web invalide"
+            },
+            "org_industry": {
+                "label": "Secteur d'activité",
+                "placeholder": "Sélectionnez votre secteur",
+                "required": "Le secteur d'activité est requis",
+                "options": {
+                    "retail": "Commerce de détail",
+                    "technology": "Technologie",
+                    "manufacturing": "Industrie",
+                    "healthcare": "Santé",
+                    "education": "Éducation",
+                    "finance": "Finance",
+                    "other": "Autre"
+                }
+            },
+            "org_default_language": {
+                "label": "Langue par défaut",
+                "placeholder": "Sélectionnez votre langue",
+                "required": "La langue par défaut est requise",
+                "options": {
+                    "english": "Anglais",
+                    "french": "Français"
+                }
+            },
+            "how_did_you_hear_about_us": {
+                "label": "Comment avez-vous entendu parler de nous ?",
+                "placeholder": "Dites-nous comment vous nous avez connu...",
+                "required": "Veuillez nous dire comment vous avez entendu parler de nous"
+            }
+        },
+        "welcome_screen": {
+            "title": "Bienvenue sur lomi. !",
+            "description": {
+                "line1": "Nous sommes ravis de vous avoir parmi nous.",
+                "line2": "Facilitons ensemble les paiements de vos clients."
+            },
+            "get_started": "Commencer"
+        }
     }
 }

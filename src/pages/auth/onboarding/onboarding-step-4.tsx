@@ -7,9 +7,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type OnboardingData } from './onboarding';
+import { useTranslation } from 'react-i18next';
 
 const onboardingStep4Schema = z.object({
-    orgWebsite: z.string().min(1, 'Website is required').refine((value) => {
+    orgWebsite: z.string().min(1, 'onboarding.step4.org_website.required').refine((value) => {
         if (!value) return false;
         const normalizedValue = value.replace(/^(https?:\/\/)?(www\.)?/i, '');
         try {
@@ -18,13 +19,13 @@ const onboardingStep4Schema = z.object({
         } catch {
             return false;
         }
-    }, 'Invalid website URL'),
-    orgIndustry: z.string().min(1, 'Industry is required'),
-    orgDefaultLanguage: z.string().min(1, 'Default language is required'),
-    howDidYouHearAboutUs: z.string().min(1, 'Please let us know how you heard about us')
+    }, 'onboarding.step4.org_website.invalid'),
+    orgIndustry: z.string().min(1, 'onboarding.step4.org_industry.required'),
+    orgDefaultLanguage: z.string().min(1, 'onboarding.step4.org_default_language.required'),
+    howDidYouHearAboutUs: z.string().min(1, 'onboarding.step4.how_did_you_hear_about_us.required')
 });
 
-type OnboardingStep4Data = z.infer<typeof onboardingStep4Schema>;
+export type OnboardingStep4Data = z.infer<typeof onboardingStep4Schema>;
 
 interface OnboardingStep4Props {
     onSubmit: (data: OnboardingStep4Data) => void;
@@ -33,6 +34,7 @@ interface OnboardingStep4Props {
 }
 
 const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious, data }) => {
+    const { t } = useTranslation();
     const onboardingForm = useForm<OnboardingStep4Data>({
         resolver: zodResolver(onboardingStep4Schema),
         mode: 'onChange',
@@ -44,8 +46,8 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
         },
     });
 
-    const handleSubmit = (data: OnboardingStep4Data) => {
-        onSubmit(data);
+    const handleSubmit = (formData: OnboardingStep4Data) => {
+        onSubmit(formData);
     };
 
     return (
@@ -53,10 +55,10 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
             <div className="mb-6">
                 <div className="flex space-x-2">
                     <div className="flex-1">
-                        <Label htmlFor="orgWebsite" className="block mb-2">Website</Label>
+                        <Label htmlFor="orgWebsite" className="block mb-2">{t('onboarding.step4.org_website.label')}</Label>
                         <Input
                             id="orgWebsite"
-                            placeholder="example.com"
+                            placeholder={t('onboarding.step4.org_website.placeholder')}
                             {...onboardingForm.register("orgWebsite")}
                             className={cn(
                                 "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -65,11 +67,11 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             )}
                         />
                         {onboardingForm.formState.errors.orgWebsite && (
-                            <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgWebsite.message}</p>
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgWebsite.message || '')}</p>
                         )}
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgIndustry" className="block mb-2">Industry</Label>
+                        <Label htmlFor="orgIndustry" className="block mb-2">{t('onboarding.step4.org_industry.label')}</Label>
                         <select
                             id="orgIndustry"
                             {...onboardingForm.register("orgIndustry")}
@@ -80,16 +82,19 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                 "appearance-none"
                             )}
                         >
+                            <option value="">{t('onboarding.step4.org_industry.placeholder')}</option>
                             {industries.map((industry) => (
                                 <option key={industry} value={industry}>
-                                    {industry}
+                                    {t(`onboarding.step4.org_industry.options.${industry.toLowerCase()}`)}
                                 </option>
                             ))}
                         </select>
-                        {onboardingForm.formState.errors.orgIndustry && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgIndustry.message}</p>}
+                        {onboardingForm.formState.errors.orgIndustry &&
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgIndustry.message || '')}</p>
+                        }
                     </div>
                     <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">Language</Label>
+                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">{t('onboarding.step4.org_default_language.label')}</Label>
                         <select
                             id="orgDefaultLanguage"
                             {...onboardingForm.register("orgDefaultLanguage")}
@@ -100,21 +105,24 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                 "appearance-none"
                             )}
                         >
+                            <option value="">{t('onboarding.step4.org_default_language.placeholder')}</option>
                             {languages.map((language) => (
                                 <option key={language} value={language}>
-                                    {language}
+                                    {t(`onboarding.step4.org_default_language.options.${language.toLowerCase()}`)}
                                 </option>
                             ))}
                         </select>
-                        {onboardingForm.formState.errors.orgDefaultLanguage && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.orgDefaultLanguage.message}</p>}
+                        {onboardingForm.formState.errors.orgDefaultLanguage &&
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDefaultLanguage.message || '')}</p>
+                        }
                     </div>
                 </div>
             </div>
             <div className="mb-6">
-                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">How did you hear about us ?</Label>
+                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">{t('onboarding.step4.how_did_you_hear_about_us.label')}</Label>
                 <Input
                     id="howDidYouHearAboutUs"
-                    placeholder="Share how you heard about us..."
+                    placeholder={t('onboarding.step4.how_did_you_hear_about_us.placeholder')}
                     {...onboardingForm.register("howDidYouHearAboutUs")}
                     className={cn(
                         "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -123,7 +131,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     )}
                 />
                 {onboardingForm.formState.errors.howDidYouHearAboutUs && (
-                    <p className="text-red-500 text-sm">{onboardingForm.formState.errors.howDidYouHearAboutUs.message}</p>
+                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.howDidYouHearAboutUs.message || '')}</p>
                 )}
             </div>
             <div className="flex justify-between">
@@ -132,10 +140,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     onClick={onPrevious}
                     className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
                 >
-                    Back
+                    {t('common.back')}
                 </Button>
-                <Button type="submit" className="mt-6 h-[48px] bg-black hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
-                    Submit
+                <Button
+                    type="submit"
+                    className="mt-6 h-[48px] bg-black hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                >
+                    {t('common.submit')}
                 </Button>
             </div>
         </form>
@@ -143,4 +154,3 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
 };
 
 export default OnboardingStep4;
-export type { OnboardingStep4Data };
