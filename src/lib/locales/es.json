@@ -43,10 +43,10 @@
         },
         "title": {
             "prefix": "Una",
-            "rotatingWords": ["integración", "infraestructura", "API", "pasarela", "solución"],
+            "rotatingWords": ["integración", "solución", "API", "pasarela", "infraestructura", "interfaz", "marketplace"],
             "suffix": "para todas tus necesidades de pago."
         },
-        "description": "Ofrecemos una plataforma de orquestación de pagos amigable para desarrolladores que conecta con bancos y redes en África Occidental — haciendo simple para tu negocio manejar transacciones y crecer más rápido."
+        "description": "Potenciamos el procesamiento de pagos en línea y las soluciones financieras para empresas de África Occidental. Acepta pagos, envía desembolsos y automatiza flujos financieros con facilidad."
     },
     "topBanner": {
         "text": "Estamos en vivo en Product Hunt",
@@ -59,7 +59,7 @@
 "auth": {
         "sign_in": {
             "title": "Bienvenido de nuevo",
-            "subtitle": "Inicia sesión para explorar psychoroid.com",
+            "subtitle": "Inicia sesión para explorar lomi.",
             "email_placeholder": "Correo electrónico**",
             "password_placeholder": "Contraseña**",
       "forgot_password": "¿Olvidaste tu contraseña?",
@@ -72,6 +72,8 @@
       "sign_up_link": "Regístrate",
       "success": "Éxito",
       "success_message": "Has iniciado sesión correctamente.",
+      "quote": "Soluciones 3D de vanguardia para artistas y empresas.",
+      "company": "lomi.",
       "error": {
         "default": "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo.",
         "invalid_credentials": "Correo o contraseña inválidos. Por favor, inténtalo de nuevo o regístrate si no tienes una cuenta.",
@@ -124,8 +126,8 @@
       "resend_link": "reenviar correo"
     },
     "modal": {
-      "title": "Iniciar sesión en psychoroid.com",
-      "description": "Inicia sesión para continuar en psychoroid.com y acceder a tu cuenta"
+      "title": "Iniciar sesión en lomi.",
+      "description": "Inicia sesión para continuar en lomi. y acceder a tu cuenta"
     },
     "otp": {
       "title": "Ingresa el código de verificación",
@@ -144,7 +146,7 @@
         "subtitle": "Ingresa tu correo electrónico para iniciar sesión en tu cuenta.",
         "home_link": "Inicio",
         "quote": "Soluciones 3D de vanguardia para artistas y empresas.",
-        "company": "psychoroid.com"
+        "company": "lomi."
       },
       "sign_up": {
         "title": "Crear cuenta",

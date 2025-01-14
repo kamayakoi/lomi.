@@ -43,7 +43,7 @@
         },
         "title": {
             "prefix": "One",
-            "rotatingWords": ["integration", "infrastructure", "API", "gateway", "solution"],
+            "rotatingWords": ["integration", "solution", "API", "gateway", "infrastructure", "interface", "marketplace" ],
             "suffix": "for all your payment needs."
         },
         "description": "We empowers online payment processing and financial solutions for franconphone West African businesses of all sizes. Accept payments, send payouts, and automate financial workflows with ease."
@@ -71,6 +71,9 @@
       "no_account": "Don't have an account?",
       "sign_up_link": "Sign up",
       "success": "Success",
+      "home_link": "Home",
+      "company": "lomi.",
+      "quote": "Industry-leading 3D solutions for artists and enterprises.",
       "success_message": "You have successfully signed in.",
       "error": {
         "default": "An error occurred while signing in. Please try again.",
@@ -141,9 +144,6 @@
     "pages": {
       "sign_in": {
         "title": "Welcome back",
-        "subtitle": "Enter your email below to sign in to your account.",
-        "home_link": "Home",
-        "quote": "Industry-leading 3D solutions for artists and enterprises.",
         "company": "lomi."
       },
       "sign_up": {
