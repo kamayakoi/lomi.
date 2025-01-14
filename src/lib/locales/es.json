@@ -704,8 +704,8 @@
         "welcome_screen": {
             "title": "¡Bienvenido a lomi. !",
             "description": {
-                "line1": "Estamos muy contentos de que te hayas unido a nosotros.",
-                "line2": "Hagamos que tus clientes puedan pagar fácilmente a ti."
+                "line1": "Gracias por unirte a nosotros.",
+                "line2": "Simplifiquemos los pagos de tus clientes."
             },
             "get_started": "Empezar"
         }
