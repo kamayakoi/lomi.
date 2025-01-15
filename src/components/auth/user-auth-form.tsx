@@ -83,14 +83,19 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       if (provider === 'google') setIsGoogleLoading(true)
       if (provider === 'github') setIsGithubLoading(true)
 
+      // Get the current URL's origin for the redirect
+      const redirectUrl = `${window.location.origin}/auth/callback`
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
+          // Ensure site URL matches the redirect domain
+          scopes: 'email profile',
         },
       })
       if (error) throw error

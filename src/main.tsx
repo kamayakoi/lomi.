@@ -12,33 +12,37 @@ import './i18n';
 
 const queryClient = new QueryClient()
 
-
 export function App() {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <UserProvider>
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true
-              }}
-            >
-              <AppRouter />
-              <Toaster />
-            </BrowserRouter>
-            <Analytics />
-          </UserProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <UserProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <AppRouter />
+            <Toaster />
+          </BrowserRouter>
+          <Analytics />
+        </UserProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
+let root: ReactDOM.Root | null = null;
 const rootElement = document.getElementById("root");
-if (rootElement) {
-  ReactDOM.createRoot(rootElement).render(<App />);
-} else {
+
+if (!root && rootElement) {
+  root = ReactDOM.createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} else if (!rootElement) {
   console.error("Root element not found");
 }

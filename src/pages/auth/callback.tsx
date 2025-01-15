@@ -12,8 +12,20 @@ const AuthCallback = () => {
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                const { data: { session }, error } = await supabase.auth.getSession();
-                if (error) throw error;
+                // Get the hash fragment from the URL if present
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const queryParams = new URLSearchParams(window.location.search);
+
+                // Check for error in hash or query parameters
+                const error = hashParams.get('error') || queryParams.get('error');
+                const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
+
+                if (error) {
+                    throw new Error(errorDescription || 'Authentication error');
+                }
+
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError) throw sessionError;
 
                 // Wait for session to be established
                 if (!session) {
@@ -34,7 +46,7 @@ const AuthCallback = () => {
                 console.error('Error in auth callback:', error);
                 toast({
                     title: "Authentication Error",
-                    description: "There was a problem signing you in. Please try again.",
+                    description: error instanceof Error ? error.message : "There was a problem signing you in. Please try again.",
                     variant: "destructive",
                 });
                 navigate('/sign-in', { replace: true });
