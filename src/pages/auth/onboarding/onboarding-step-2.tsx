@@ -22,7 +22,7 @@ import {
     maliRegions,
     burkinaFasoRegions,
 } from '@/utils/data/onboarding';
-import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
+import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 
 const noop = () => undefined;
 
@@ -108,7 +108,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="absolute top-4 right-4">
-                <LanguageSwitcher onLanguageChange={noop} />
+                <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">

@@ -7,7 +7,7 @@ import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/actions/utils'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
-import { LanguageSwitcher } from '@/components/design/LanguageSwitcher'
+import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher'
 
 interface WelcomeScreenProps {
     onGetStarted: () => void;
@@ -72,7 +72,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                 )}
             >
                 <div className="absolute top-4 right-4">
-                    <LanguageSwitcher />
+                    <OnboardingLanguageSwitcher />
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center">
                     <motion.div

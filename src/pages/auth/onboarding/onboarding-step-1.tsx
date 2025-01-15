@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { countryCodes, countries, organizationPositions } from '@/utils/data/onboarding';
 import ProfilePictureUploader from '@/components/auth/avatar-uploader';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
+import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
@@ -77,7 +77,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="absolute top-4 right-4">
-                <LanguageSwitcher onLanguageChange={noop} />
+                <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">

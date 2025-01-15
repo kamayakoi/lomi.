@@ -1,4 +1,4 @@
-import { industries, languages } from '@/utils/data/onboarding';
+import { industries } from '@/utils/data/onboarding';
 import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,7 +8,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type OnboardingData } from './onboarding';
 import { useTranslation } from 'react-i18next';
-import { LanguageSwitcher } from '@/components/design/LanguageSwitcher';
+import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
+import { languages as i18nLanguages } from '@/lib/i18n/config';
+
+
+interface FormData {
+    orgWebsite: string;
+    orgIndustry: string;
+    orgDefaultLanguage: {
+        code: string;
+        name: string;
+    };
+    howDidYouHearAboutUs: string;
+}
 
 const onboardingStep4Schema = z.object({
     orgWebsite: z.string().min(1, 'onboarding.step4.org_website.required').refine((value) => {
@@ -22,11 +34,19 @@ const onboardingStep4Schema = z.object({
         }
     }, 'onboarding.step4.org_website.invalid'),
     orgIndustry: z.string().min(1, 'onboarding.step4.org_industry.required'),
-    orgDefaultLanguage: z.string().min(1, 'onboarding.step4.org_default_language.required'),
+    orgDefaultLanguage: z.object({
+        code: z.string().min(1, 'onboarding.step4.org_default_language.required'),
+        name: z.string().min(1, 'onboarding.step4.org_default_language.required')
+    }),
     howDidYouHearAboutUs: z.string().min(1, 'onboarding.step4.how_did_you_hear_about_us.required')
 });
 
-export type OnboardingStep4Data = z.infer<typeof onboardingStep4Schema>;
+export type OnboardingStep4Data = {
+    orgWebsite: string;
+    orgIndustry: string;
+    orgDefaultLanguage: string;
+    howDidYouHearAboutUs: string;
+};
 
 interface OnboardingStep4Props {
     onSubmit: (data: OnboardingStep4Data) => void;
@@ -35,33 +55,51 @@ interface OnboardingStep4Props {
 }
 
 const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious, data }) => {
-    const { t } = useTranslation();
-    const onboardingForm = useForm<OnboardingStep4Data>({
+    const { t, i18n } = useTranslation();
+    const currentLanguage = i18nLanguages.find(l => l.code === i18n.language) || i18nLanguages[0];
+
+    const onboardingForm = useForm<FormData>({
         resolver: zodResolver(onboardingStep4Schema),
         mode: 'onChange',
         defaultValues: {
             orgWebsite: data.orgWebsite,
             orgIndustry: data.orgIndustry,
-            orgDefaultLanguage: data.orgDefaultLanguage || 'English',
+            orgDefaultLanguage: data.orgDefaultLanguage
+                ? {
+                    code: data.orgDefaultLanguage,
+                    name: i18nLanguages.find(l => l.code === data.orgDefaultLanguage)?.name || 'English'
+                }
+                : currentLanguage,
             howDidYouHearAboutUs: data.howDidYouHearAboutUs,
         },
     });
 
-    const handleLanguageChange = (language: string) => {
+    const handleLanguageChange = (language: { code: string; name: string }) => {
         onboardingForm.setValue('orgDefaultLanguage', language, {
             shouldValidate: true,
             shouldDirty: true,
         });
     };
 
-    const handleSubmit = (formData: OnboardingStep4Data) => {
-        onSubmit(formData);
+    const handleSubmit = (formData: FormData) => {
+        // Update i18n and localStorage
+        i18n.changeLanguage(formData.orgDefaultLanguage.code);
+        localStorage.setItem('language', formData.orgDefaultLanguage.code);
+
+        // Submit with the language code for the database
+        onSubmit({
+            ...formData,
+            orgDefaultLanguage: formData.orgDefaultLanguage.code
+        });
     };
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-6">
             <div className="absolute top-4 right-4">
-                <LanguageSwitcher onLanguageChange={handleLanguageChange} />
+                <OnboardingLanguageSwitcher
+                    onLanguageChange={handleLanguageChange}
+                    value={onboardingForm.watch('orgDefaultLanguage.name')}
+                />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">
@@ -108,7 +146,11 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                         <Label htmlFor="orgDefaultLanguage" className="block mb-2">{t('onboarding.step4.org_default_language.label')}</Label>
                         <select
                             id="orgDefaultLanguage"
-                            {...onboardingForm.register("orgDefaultLanguage")}
+                            value={onboardingForm.watch('orgDefaultLanguage.code')}
+                            onChange={(e) => {
+                                const lang = i18nLanguages.find(l => l.code === e.target.value) || i18nLanguages[0];
+                                handleLanguageChange(lang);
+                            }}
                             className={cn(
                                 "w-full mb-2 px-3 py-2 border h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -117,14 +159,14 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             )}
                         >
                             <option value="">{t('onboarding.step4.org_default_language.placeholder')}</option>
-                            {languages.map((language) => (
-                                <option key={language} value={language}>
-                                    {t(`onboarding.step4.org_default_language.options.${language.toLowerCase()}`)}
+                            {i18nLanguages.map((language) => (
+                                <option key={language.code} value={language.code}>
+                                    {t(`onboarding.step4.org_default_language.options.${language.name.toLowerCase()}`)}
                                 </option>
                             ))}
                         </select>
                         {onboardingForm.formState.errors.orgDefaultLanguage &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDefaultLanguage.message || '')}</p>
+                            <p className="text-red-500 text-sm">{t('onboarding.step4.org_default_language.required')}</p>
                         }
                     </div>
                 </div>

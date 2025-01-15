@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { XIcon } from '@/components/icons/XIcon'
 import { PHIcon } from '@/components/icons/PHIcon'
 import { GitHubIcon } from '@/components/icons/GitHubIcon'
@@ -291,7 +289,7 @@ export function Footer() {
                                     </div>
                                 </div>
 
-                                {/* Email subscribe - Hidden on mobile */}
+                                {/* Email subscribe - Hidden on mobile
                                 <div className="hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-0">
                                     <Input
                                         type="email"
@@ -301,7 +299,7 @@ export function Footer() {
                                     <Button variant="default" className="text-sm font-medium rounded-none h-10">
                                         {t('footer.subscribe.button')}
                                     </Button>
-                                </div>
+                                </div> */}
 
                                 {/* Product Hunt Badge */}
                                 <div className="hidden sm:block">
@@ -319,7 +317,7 @@ export function Footer() {
 
 
                                 {/* System Status - Hidden on mobile */}
-                                <div className="hidden sm:flex items-center justify-between px-3 py-2 text-sm w-[180px] h-10 mt-[150px] ml-auto transform translate-y-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
+                                <div className="hidden sm:flex items-center justify-between px-3 py-2 text-sm w-[196px] h-10 mt-[150px] ml-auto transform translate-y-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
                                     <Link to="/#" className="text-blue-700 dark:text-blue-300 font-medium">
                                         {t('footer.status')}
                                     </Link>
