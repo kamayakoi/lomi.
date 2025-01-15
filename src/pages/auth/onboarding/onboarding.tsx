@@ -65,7 +65,7 @@ const initialOnboardingData = {
 export type OnboardingData = typeof initialOnboardingData;
 
 const Onboarding: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -73,6 +73,19 @@ const Onboarding: React.FC = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [onboardingData, setOnboardingData] = useState<OnboardingData>(initialOnboardingData);
     const [showWelcome, setShowWelcome] = useState(true);
+    const [languageInitialized, setLanguageInitialized] = useState(false);
+
+    // Initialize language from localStorage
+    useEffect(() => {
+        const initializeLanguage = async () => {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage && i18n.language !== savedLanguage) {
+                await i18n.changeLanguage(savedLanguage);
+            }
+            setLanguageInitialized(true);
+        };
+        initializeLanguage();
+    }, [i18n]);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -194,7 +207,8 @@ const Onboarding: React.FC = () => {
         return <StepComponent {...commonProps} />;
     };
 
-    if (loading) {
+    // Don't render until language is initialized
+    if (!languageInitialized || loading) {
         return <LoadingButton />;
     }
 

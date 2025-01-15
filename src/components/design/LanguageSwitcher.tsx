@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/lib/i18n/config';
 import { motion, AnimatePresence } from 'framer-motion';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const LanguageSwitcher = memo(function LanguageSwitcher() {
@@ -10,15 +10,30 @@ export const LanguageSwitcher = memo(function LanguageSwitcher() {
     const currentLangName = languages.find(l => l.code === i18n.language)?.name;
     const isPortalRoute = location.pathname.startsWith('/portal');
 
+    // Sync with localStorage on mount
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem('language');
+        if (savedLanguage && i18n.language !== savedLanguage) {
+            i18n.changeLanguage(savedLanguage);
+        }
+    }, [i18n]);
+
     const toggleLanguage = useCallback(() => {
         if (isPortalRoute) return; // Disable language switching in portal routes
 
         const currentIndex = languages.findIndex(l => l.code === i18n.language);
         const nextIndex = (currentIndex + 1) % languages.length;
         const nextLang = languages[nextIndex]?.code || 'en';
+
+        // Update both i18n and localStorage
         i18n.changeLanguage(nextLang);
         localStorage.setItem('language', nextLang);
-    }, [i18n, isPortalRoute]);
+
+        // Force a page reload to ensure all components update
+        if (location.pathname.includes('/auth/onboarding')) {
+            window.location.reload();
+        }
+    }, [i18n, isPortalRoute, location.pathname]);
 
     // Don't render the switcher in portal routes
     if (isPortalRoute) return null;

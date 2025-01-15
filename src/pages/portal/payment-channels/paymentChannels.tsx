@@ -193,23 +193,23 @@ export default function PaymentChannels() {
                 <div className="mb-6">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{category}</h2>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {paymentMethods
                     .filter(method => method.category === category)
                     .map((method) => (
                       <div
                         key={method.code}
                         className={cn(
-                          "border p-6 rounded-sm transition-shadow relative overflow-hidden",
+                          "border p-6 rounded-none transition-shadow relative overflow-hidden",
                           method.status !== 'coming_soon' && "hover:shadow-md",
                           method.isViewMore && "md:col-span-2 lg:col-span-2 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900",
-                          !method.isViewMore && "bg-white dark:bg-gray-900"
+                          !method.isViewMore && "bg-background"
                         )}
                       >
                         <div className='mb-6 flex items-center justify-between'>
                           <div className={cn(
                             'flex items-center justify-center rounded-lg overflow-hidden',
-                            !method.isViewMore && 'size-12 bg-black'
+                            !method.isViewMore && 'size-12 bg-white'
                           )}>
                             <div className={cn(
                               "w-full h-full flex items-center justify-center",
@@ -242,7 +242,7 @@ export default function PaymentChannels() {
                               >
                                 {organizationProviders.some(op =>
                                   op.provider_code === method.provider_code && op.is_connected
-                                ) ? 'Connected' : 'Connect All'}
+                                ) ? 'Connected' : 'Connect'}
                               </Button>
                             ) : null
                           ) : (
@@ -289,8 +289,8 @@ export default function PaymentChannels() {
 
             {/* Coming Soon panel */}
             <section className="rounded-none border p-6 relative overflow-hidden hover:shadow-md bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-full -mr-20 -mt-20 opacity-50"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-full -ml-16 -mb-16 opacity-50"></div>
+              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-none -mr-20 -mt-20 opacity-50"></div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-none -ml-16 -mb-16 opacity-50"></div>
 
               <div className="relative z-10 flex flex-col h-full justify-center">
                 <div>

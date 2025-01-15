@@ -14,9 +14,22 @@ interface WelcomeScreenProps {
 }
 
 export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
     const [showConfetti, setShowConfetti] = useState(false)
+    const [mounted, setMounted] = useState(false)
+
+    // Initialize language
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem('language');
+        if (savedLanguage && i18n.language !== savedLanguage) {
+            i18n.changeLanguage(savedLanguage).then(() => {
+                setMounted(true);
+            });
+        } else {
+            setMounted(true);
+        }
+    }, [i18n]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -32,6 +45,11 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
             clearTimeout(timer)
         }
     }, [])
+
+    // Don't render until language is initialized
+    if (!mounted) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center p-4">

@@ -415,7 +415,7 @@ function Profile() {
             setIsEditing(false);
             toast({
                 title: "Success",
-                description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
+                description: `${field === 'preferred_language' ? 'Language' : field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
             });
         } catch (error) {
             console.error('Error updating field:', error);

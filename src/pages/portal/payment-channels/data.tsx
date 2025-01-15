@@ -65,8 +65,8 @@ export const paymentMethods: PaymentMethod[] = [
   // Mobile Money Section
   {
     code: 'MTN',
-    name: 'MTN Mobile Money',
-    description: 'Leverage MTN Mobile Money "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
+    name: 'MTN',
+    description: 'Leverage MTN "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
     logo: <img src="/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
     provider_code: 'MTN',
     type: 'Mobile Money',
@@ -82,12 +82,13 @@ export const paymentMethods: PaymentMethod[] = [
     category: 'Mobile Money'
   },
   {
-    code: 'MOOVE',
-    name: 'Moove Money',
-    description: 'Enable Moove Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
-    logo: <img src="/moove.webp" alt="Moove Money" className="w-full h-full object-contain" />,
-    provider_code: 'MOOVE',
+    code: 'MOOV',
+    name: 'Moov Money',
+    description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+    logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
+    provider_code: 'MOOV',
     type: 'Mobile Money',
+    status: 'coming_soon',
     category: 'Mobile Money'
   },
   {
@@ -146,21 +147,21 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'BTC',
     name: 'Bitcoin',
-    description: 'Accept cryptocurrency payments including Bitcoin and all major cryptocurrencies. Enable borderless transactions with instant confirmations and competitive fees.',
+    description: 'Accept Bitcoin payments and enable your business to receive instant, secure, and borderless transactions with the world\'s leading cryptocurrency.',
     logo: <img src="/btc.webp" alt="BTC" className="w-8 h-8" />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
-    category: 'Cryptocurrency',
+    category: 'Crypto',
     parentCrypto: 'BTC'
   },
   {
     code: 'USDC',
-    name: 'USD Coin (Ethereum)',
+    name: 'USDC',
     description: 'Accept USDC stablecoin payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
-    logo: <img src="/usdc.webp" alt="USDC" className="w-8 h-8" />,
+    logo: <img src="/usdc.webp" alt="USDC" className="w-8 h-8 " />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
-    category: 'Cryptocurrency',
+    category: 'Crypto',
     parentCrypto: 'BTC'
   },
   {
@@ -170,49 +171,49 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/bnb.webp" alt="BNB" className="w-8 h-8" />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
-    category: 'Cryptocurrency',
+    category: 'Crypto',
     parentCrypto: 'BTC'
   },
   {
     code: 'CRYPTO_MORE',
-    name: 'More Cryptocurrencies',
+    name: 'More cryptocurrencies',
     description: 'We support a wide range of cryptocurrencies including stablecoins and major tokens. Connect once to enable all supported cryptocurrencies on your platform.',
     logo: <div className="relative w-full">
       <div className="flex items-center -space-x-3">
         <div className="relative">
-          <img src="/usdt.webp" alt="USDT" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/usdt.webp" alt="USDT" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/dai.webp" alt="DAI" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/eth.webp" alt="ETH" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/eth.webp" alt="ETH" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/dai.webp" alt="DAI" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/xrp.webp" alt="XRP" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/tron.webp" alt="TRON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/ltc.webp" alt="LTC" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/xrp.webp" alt="XRP" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/link.webp" alt="LINK" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/zcash.webp" alt="LTC" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/bnb.webp" alt="BNB" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/doge.webp" alt="DOGE" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/btc.webp" alt="BTC" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+          <img src="/solana.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-center">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-300">+5</span>
+          <div className="w-12 h-12 rounded-full border-2 border-white bg-white flex items-center justify-center">
+            <span className="text-sm font-medium text-blue-600">+30</span>
           </div>
         </div>
       </div>
     </div>,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
-    category: 'Cryptocurrency',
+    category: 'Crypto',
     parentCrypto: 'BTC',
     isViewMore: true,
     isMainCrypto: true
@@ -225,7 +226,7 @@ export const categoryIcons: Record<string, React.ReactNode> = {
   'Mobile Money': <IconDeviceMobile className="w-5 h-5" />,
   'e-Wallets': <IconWallet className="w-5 h-5" />,
   'Banks': <IconBan className="w-5 h-5" />,
-  'Cryptocurrency': <IconCurrencyBitcoin className="w-5 h-5" />
+  'Crypto': <IconCurrencyBitcoin className="w-5 h-5" />
 };
 
 
