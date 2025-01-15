@@ -461,6 +461,36 @@
             "step3": "Ajude-nos a personalizar sua experiência",
             "step4": "Mais alguns detalhes e você está pronto!"
         },
+        "error": {
+            "workspace_taken": {
+                "title": "Workspace Indisponível",
+                "description": "Este identificador de workspace já está em uso. Por favor, escolha outro."
+            },
+            "email_taken": {
+                "title": "Email Já Registrado",
+                "description": "Este endereço de email já está associado a outra organização."
+            },
+            "phone_taken": {
+                "title": "Número de Telefone Já Registrado",
+                "description": "Este número de telefone já está associado a outra organização."
+            },
+            "duplicate": {
+                "title": "Entrada Duplicada",
+                "description": "Algumas das informações fornecidas já estão em uso. Por favor, verifique e tente novamente."
+            },
+            "database": {
+                "title": "Erro de Banco de Dados",
+                "description": "Houve um problema ao salvar suas informações. Por favor, tente novamente."
+            },
+            "network": {
+                "title": "Erro de Conexão",
+                "description": "Por favor, verifique sua conexão com a internet e tente novamente."
+            },
+            "generic": {
+                "title": "Erro",
+                "description": "Houve um problema ao completar seu onboarding. Por favor, tente novamente."
+            }
+        },
         "verification": {
             "title": "Verificação de e-mail obrigatória",
             "description": "Por favor, verifique seu e-mail para continuar com o onboarding.",
@@ -592,6 +622,26 @@
                     "healthcare": "Saúde",
                     "education": "Educação",
                     "finance": "Finanças",
+                    "agriculture": "Agricultura",
+                    "entertainment": "Entretenimento",
+                    "transportation": "Transporte",
+                    "hospitality": "Hospedagem",
+                    "real_estate": "Imobiliário",
+                    "construction": "Construção",
+                    "energy": "Energia",
+                    "telecommunications": "Telecomunicações",
+                    "media_and_television": "Mídia e televisão",
+                    "advertising": "Publicidade",
+                    "consulting": "Consultoria",
+                    "legal_services": "Serviços jurídicos",
+                    "accounting": "Contabilidade",
+                    "insurance": "Seguros",
+                    "pharmaceuticals": "Farmacêuticos",
+                    "biotechnology": "Biotecnologia",
+                    "aerospace": "Aerospacial",
+                    "defense": "Defesa",
+                    "nonprofit": "Sem lucro",
+                    "government": "Governo",
                     "other": "Outro"
                 }
             },
@@ -601,7 +651,10 @@
                 "required": "Língua padrão é obrigatória",
                 "options": {
                     "english": "Inglês",
-                    "french": "Francês"
+                    "français": "Francês",
+                    "español": "Espanhol",
+                    "português": "Português",
+                    "中文": "Chinês"
                 }
             },
             "how_did_you_hear_about_us": {

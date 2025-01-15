@@ -33,6 +33,8 @@ interface OnboardingStep1Props {
     data: Partial<OnboardingStep1Data>;
 }
 
+const noop = () => undefined;
+
 const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
     const { t } = useTranslation();
     const schema = createOnboardingStep1Schema(t);
@@ -75,7 +77,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="absolute top-4 right-4">
-                <LanguageSwitcher />
+                <LanguageSwitcher onLanguageChange={noop} />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">

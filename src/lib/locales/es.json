@@ -456,11 +456,41 @@
     },
     "onboarding": {
         "steps": {
-            "step1": "Conocénos",
-            "step2": "Registrá tu empresa",
-            "step3": "Personalizá tu experiencia",
-            "step4": "Más detalles, listo!"
-        },     
+            "step1": "Conozcámonos",
+            "step2": "Registre su empresa",
+            "step3": "Ayúdenos a personalizar su experiencia",
+            "step4": "¡Unos detalles más y estará listo!"
+        },
+        "error": {
+            "workspace_taken": {
+                "title": "Espacio de Trabajo No Disponible",
+                "description": "Este identificador de espacio de trabajo ya está en uso. Por favor, elija otro."
+            },
+            "email_taken": {
+                "title": "Correo Electrónico Ya Registrado",
+                "description": "Esta dirección de correo electrónico ya está asociada a otra organización."
+            },
+            "phone_taken": {
+                "title": "Número de Teléfono Ya Registrado",
+                "description": "Este número de teléfono ya está asociado a otra organización."
+            },
+            "duplicate": {
+                "title": "Entrada Duplicada",
+                "description": "Parte de la información proporcionada ya está en uso. Por favor, verifique e intente nuevamente."
+            },
+            "database": {
+                "title": "Error de Base de Datos",
+                "description": "Hubo un problema al guardar su información. Por favor, intente nuevamente."
+            },
+            "network": {
+                "title": "Error de Conexión",
+                "description": "Por favor, verifique su conexión a internet e intente nuevamente."
+            },
+            "generic": {
+                "title": "Error",
+                "description": "Hubo un problema al completar su registro. Por favor, intente nuevamente."
+            }
+        },
         "verification": {
             "title": "Verificación de correo electrónico",
             "description": "Por favor, verifica tu correo electrónico para continuar con el registro.",
@@ -683,16 +713,38 @@
                     "healthcare": "Salud",
                     "education": "Educación",
                     "finance": "Finanzas",
-                    "other": "Otro"
+                    "other": "Otro",
+                    "agriculture": "Agricultura",
+                    "transportation": "Transporte",
+                    "hospitality": "Hospedaje",
+                    "real_estate": "Bienes raíces",
+                    "construction": "Construcción",
+                    "energy": "Energía",
+                    "telecommunications": "Telecomunicaciones",
+                    "media_and_television": "Medios y televisión",
+                    "advertising": "Publicidad",
+                    "consulting": "Consultoría",
+                    "legal_services": "Servicios legales",
+                    "accounting": "Contabilidad",
+                    "insurance": "Seguros",
+                    "pharmaceuticals": "Farmacéuticos",
+                    "biotechnology": "Biotecnología",
+                    "aerospace": "Aeroespacial",
+                    "defense": "Defensa",
+                    "nonprofit": "Sin ánimo de lucro",
+                    "government": "Gobierno"
                 }
             },
             "org_default_language": {
-                "label": "Idioma predeterminado",
+                "label": "Idioma",
                 "placeholder": "Seleccione su idioma",
                 "required": "El idioma predeterminado es obligatorio",
                 "options": {
                     "english": "Inglés",
-                    "french": "Francés"
+                    "français": "Francés",
+                    "español": "Español",
+                    "Português": "Portugués",
+                    "中文": "Chino"
                 }
             },
             "how_did_you_hear_about_us": {

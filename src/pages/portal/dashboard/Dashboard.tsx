@@ -56,7 +56,7 @@ export default function Dashboard() {
 
   return (
     <Layout fixed>
-      <Layout.Header className="flex items-center justify-between">
+      <Layout.Header className="flex items-center justify-between bg-background">
         <div className='hidden md:block'>
           <TopNav links={topNav} />
         </div>
@@ -77,12 +77,12 @@ export default function Dashboard() {
       <Separator className='my-0' />
 
       {/* ===== Main ===== */}
-      <Layout.Body>
+      <Layout.Body className="bg-background">
         <div className='mb-8'>
           <h1 className='text-2xl font-bold mb-6'>{t('dashboard.getting_started.title')}</h1>
           <div className="grid md:grid-cols-2 gap-6">
             <Link to="/portal/settings/developers/api-keys" className="block">
-              <Card className="rounded-none bg-amber-100 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200">
+              <Card className="rounded-none bg-amber-100/90 dark:bg-amber-800 hover:bg-amber-200 dark:hover:bg-amber-700 transition-colors duration-200">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-medium">{t('dashboard.getting_started.api_keys.title')}</CardTitle>
                   <Settings2 className="h-6 w-6" />
@@ -136,7 +136,7 @@ export default function Dashboard() {
 
         <div className='mb-8'>
           <h2 className="text-xl font-semibold mb-6">{t('dashboard.developer_resources.title')}</h2>
-          <div className="overflow-x-auto pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="overflow-x-auto pb-4 bg-background" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex space-x-6" style={{ minWidth: 'max-content' }}>
               <ApiKeysSection />
               {developerResources.map((item, index) => (

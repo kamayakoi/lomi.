@@ -4,7 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { memo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export const LanguageSwitcher = memo(function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+    onLanguageChange?: (language: string) => void;
+}
+
+export const LanguageSwitcher = memo(function LanguageSwitcher({ onLanguageChange }: LanguageSwitcherProps) {
     const { i18n } = useTranslation();
     const location = useLocation();
     const currentLangName = languages.find(l => l.code === i18n.language)?.name;
@@ -18,22 +22,27 @@ export const LanguageSwitcher = memo(function LanguageSwitcher() {
         }
     }, [i18n]);
 
-    const toggleLanguage = useCallback(() => {
-        if (isPortalRoute) return; // Disable language switching in portal routes
+    const toggleLanguage = useCallback((e: React.MouseEvent) => {
+        // Prevent the event from bubbling up to any parent forms
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isPortalRoute) return;
 
         const currentIndex = languages.findIndex(l => l.code === i18n.language);
         const nextIndex = (currentIndex + 1) % languages.length;
         const nextLang = languages[nextIndex]?.code || 'en';
+        const nextLangName = languages[nextIndex]?.name || 'English';
 
         // Update both i18n and localStorage
         i18n.changeLanguage(nextLang);
         localStorage.setItem('language', nextLang);
 
-        // Force a page reload to ensure all components update
-        if (location.pathname.includes('/auth/onboarding')) {
-            window.location.reload();
+        // Call the callback if provided (for onboarding step 4)
+        if (onLanguageChange) {
+            onLanguageChange(nextLangName);
         }
-    }, [i18n, isPortalRoute, location.pathname]);
+    }, [i18n, isPortalRoute, onLanguageChange]);
 
     // Don't render the switcher in portal routes
     if (isPortalRoute) return null;
@@ -41,6 +50,7 @@ export const LanguageSwitcher = memo(function LanguageSwitcher() {
     return (
         <button
             onClick={toggleLanguage}
+            type="button" // Explicitly set type to prevent form submission
             className="relative overflow-visible text-xs text-zinc-500 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors pl-10 mt-1 sm:pr-0"
             aria-label="Switch language"
         >

@@ -461,6 +461,36 @@
             "step3": "Aidez-nous à personnaliser votre expérience",
             "step4": "Encore quelques détails et c'est tout !"
         },
+        "error": {
+            "workspace_taken": {
+                "title": "Espace de travail indisponible",
+                "description": "Cet identifiant d'espace de travail est déjà pris. Veuillez en choisir un autre."
+            },
+            "email_taken": {
+                "title": "Email déjà enregistré",
+                "description": "Cette adresse email est déjà associée à une autre organisation."
+            },
+            "phone_taken": {
+                "title": "Numéro de téléphone déjà enregistré",
+                "description": "Ce numéro de téléphone est déjà associé à une autre organisation."
+            },
+            "duplicate": {
+                "title": "Entrée en double",
+                "description": "Certaines des informations que vous avez fournies sont déjà utilisées. Veuillez vérifier et réessayer."
+            },
+            "database": {
+                "title": "Erreur de base de données",
+                "description": "Un problème est survenu lors de l'enregistrement de vos informations. Veuillez réessayer."
+            },
+            "network": {
+                "title": "Erreur de connexion",
+                "description": "Veuillez vérifier votre connexion internet et réessayer."
+            },
+            "generic": {
+                "title": "Erreur",
+                "description": "Un problème est survenu lors de la finalisation de votre inscription. Veuillez réessayer."
+            }
+        },
         "verification": {
             "title": "Vérification de l'e-mail requise",
             "description": "Veuillez vérifier votre e-mail pour continuer l'inscription.",
@@ -531,9 +561,9 @@
                 "required": "La région est requise"
             },
             "workspace_handle": {
-                "label": "Identifiant de l'espace de travail",
+                "label": "URL de l'espace de travail",
                 "placeholder": "mon-espace",
-                "required": "L'identifiant de l'espace de travail est requis"
+                "required": "L'URL de l'espace de travail est requise"
             }
         },
         "step3": {
@@ -576,16 +606,38 @@
                     "healthcare": "Santé",
                     "education": "Éducation",
                     "finance": "Finance",
+                    "agriculture": "Agriculture",
+                    "transportation": "Transport",
+                    "hospitality": "Hôtellerie",
+                    "real_estate": "Immobilier",
+                    "construction": "Construction",
+                    "energy": "Énergie",
+                    "telecommunications": "Télécommunications",
+                    "media_and_television": "Médias et télévision",
+                    "advertising": "Publicité",
+                    "consulting": "Conseil",
+                    "legal_services": "Services juridiques",
+                    "accounting": "Comptabilité",
+                    "insurance": "Assurances",
+                    "pharmaceuticals": "Pharmaceutiques",
+                    "biotechnology": "Biotechnologie",
+                    "aerospace": "Aérospatiale",
+                    "defense": "Défense",
+                    "nonprofit": "Non-profit",
+                    "government": "Gouvernement",
                     "other": "Autre"
                 }
             },
             "org_default_language": {
-                "label": "Langue par défaut",
+                "label": "Langue",
                 "placeholder": "Sélectionnez votre langue",
                 "required": "La langue par défaut est requise",
                 "options": {
                     "english": "Anglais",
-                    "french": "Français"
+                    "français": "Français",
+                    "español": "Espagnol",
+                    "português": "Portugais",
+                    "中文": "Chinois"
                 }
             },
             "how_did_you_hear_about_us": {

@@ -18,7 +18,7 @@
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%; /* Light theme */
+    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
@@ -28,7 +28,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 240 7.7% 7.1%;
     --radius: 0.5rem;
-    --toast-border-radius: 0px; /* Add this for square toasts */
+    --toast-border-radius: 0px;
   }
 
   .dark {

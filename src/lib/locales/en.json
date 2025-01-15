@@ -460,6 +460,40 @@
             "step3": "Help us customize your experience",
             "step4": "A few more details and you're all set!"
         },
+        "error": {
+            "workspace_taken": {
+                "title": "Workspace Unavailable",
+                "description": "This workspace handle is already taken. Please choose a different one."
+            },
+            "email_taken": {
+                "title": "Email Already Registered",
+                "description": "This email address is already associated with another organization."
+            },
+            "phone_taken": {
+                "title": "Phone Number Already Registered",
+                "description": "This phone number is already associated with another organization."
+            },
+            "duplicate": {
+                "title": "Duplicate Entry",
+                "description": "Some of the information you provided is already in use. Please check and try again."
+            },
+            "database": {
+                "title": "Database Error",
+                "description": "There was a problem saving your information. Please try again."
+            },
+            "network": {
+                "title": "Connection Error",
+                "description": "Please check your internet connection and try again."
+            },
+            "generic": {
+                "title": "Error",
+                "description": "There was a problem completing your onboarding. Please try again."
+            }
+        },
+        "success": {
+            "title": "Welcome to Lomi!",
+            "description": "Your account has been set up successfully."
+        },
         "verification": {
             "title": "Email Verification Required",
             "description": "Please verify your email to continue with onboarding.",
@@ -579,16 +613,39 @@
                     "healthcare": "Healthcare",
                     "education": "Education",
                     "finance": "Finance",
+                    "agriculture": "Agriculture",
+                    "entertainment": "Entertainment",
+                    "transportation": "Transportation",
+                    "hospitality": "Hospitality",
+                    "real_estate": "Real Estate",
+                    "construction": "Construction",
+                    "energy": "Energy",
+                    "telecommunications": "Telecommunications",
+                    "media_and_television": "Media and Television",
+                    "advertising": "Advertising",
+                    "consulting": "Consulting",
+                    "legal_services": "Legal Services",
+                    "accounting": "Accounting",
+                    "insurance": "Insurance",
+                    "pharmaceuticals": "Pharmaceuticals",
+                    "biotechnology": "Biotechnology",
+                    "aerospace": "Aerospace",
+                    "defense": "Defense",
+                    "nonprofit": "Nonprofit",
+                    "government": "Government",
                     "other": "Other"
                 }
             },
             "org_default_language": {
-                "label": "Default language",
+                "label": "Language",
                 "placeholder": "Select your language",
                 "required": "Default language is required",
                 "options": {
                     "english": "English",
-                    "french": "French"
+                    "français": "French",
+                    "español": "Spanish",
+                    "português": "Portuguese",
+                    "中文": "Chinese"
                 }
             },
             "how_did_you_hear_about_us": {

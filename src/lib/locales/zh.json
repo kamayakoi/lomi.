@@ -456,11 +456,41 @@
     },
     "onboarding": {
         "steps": {
-            "step1": "让我们认识你",
+            "step1": "让我们了解您",
             "step2": "注册您的公司",
             "step3": "帮助我们定制您的体验",
-            "step4": "更多细节，您就绪了！"
-        },     
+            "step4": "还有一些细节就完成了！"
+        },
+        "error": {
+            "workspace_taken": {
+                "title": "工作空间不可用",
+                "description": "此工作空间标识已被占用。请选择其他标识。"
+            },
+            "email_taken": {
+                "title": "邮箱已注册",
+                "description": "此邮箱地址已与其他组织关联。"
+            },
+            "phone_taken": {
+                "title": "电话号码已注册",
+                "description": "此电话号码已与其他组织关联。"
+            },
+            "duplicate": {
+                "title": "重复输入",
+                "description": "您提供的某些信息已被使用。请检查并重试。"
+            },
+            "database": {
+                "title": "数据库错误",
+                "description": "保存您的信息时出现问题。请重试。"
+            },
+            "network": {
+                "title": "连接错误",
+                "description": "请检查您的网络连接并重试。"
+            },
+            "generic": {
+                "title": "错误",
+                "description": "完成注册时出现问题。请重试。"
+            }
+        },
         "verification": {
             "title": "邮箱验证",
             "description": "请验证您的邮箱以继续注册。",
@@ -683,6 +713,25 @@
                     "healthcare": "医疗保健",
                     "education": "教育",
                     "finance": "金融",
+                    "agriculture": "农业",
+                    "transportation": "运输",
+                    "hospitality": "酒店",
+                    "real_estate": "房地产",
+                    "construction": "建筑",
+                    "energy": "能源",
+                    "telecommunications": "电信",
+                    "media_and_television": "媒体和电视",
+                    "advertising": "广告",
+                    "consulting": "咨询",
+                    "legal_services": "法律服务",
+                    "accounting": "会计",
+                    "insurance": "保险",
+                    "pharmaceuticals": "制药",
+                    "biotechnology": "生物技术",
+                    "aerospace": "航空航天",
+                    "defense": "国防",
+                    "nonprofit": "非营利",
+                    "government": "政府",
                     "other": "其他"
                 }
             },
@@ -692,7 +741,10 @@
                 "required": "默认语言为必填项",
                 "options": {
                     "english": "英语",
-                    "french": "法语"
+                    "français": "法语",
+                    "español": "西班牙语",
+                    "português": "葡萄牙语",
+                    "中文": "中文"
                 }
             },
             "how_did_you_hear_about_us": {

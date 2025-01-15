@@ -187,9 +187,127 @@ const Onboarding: React.FC = () => {
     };
 
     const handleSubmit = async (stepData: StepData) => {
-        const finalData = { ...onboardingData, ...stepData };
-        // Handle final submission
-        console.log('Final data:', finalData);
+        try {
+            setOnboardingData((prevData) => ({ ...prevData, ...stepData }));
+            setLoading(true);
+
+            if (!user) {
+                throw new Error("User not found");
+            }
+
+            const formData = { ...onboardingData, ...stepData };
+
+            // Normalize the website URL
+            const websiteUrl = formData.orgWebsite ? formData.orgWebsite.replace(/^(https?:\/\/)?(www\.)?/i, '') : '';
+
+            // Prepend "portal.lomi.africa/" to the workspace handle
+            const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
+
+            // Call the complete_onboarding function
+            const { error } = await supabase.rpc('complete_onboarding', {
+                p_merchant_id: user.id,
+                p_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
+                p_country: formData.country,
+                p_org_name: formData.orgName,
+                p_org_email: formData.orgEmail,
+                p_org_phone_number: `${formData.countryCode}${formData.phoneNumber.replace(/\s/g, '')}`,
+                p_org_country: formData.orgCountry,
+                p_org_region: formData.orgRegion,
+                p_org_city: formData.orgCity,
+                p_org_street: formData.orgStreet,
+                p_org_district: formData.orgDistrict,
+                p_org_postal_code: formData.orgPostalCode,
+                p_org_industry: formData.orgIndustry,
+                p_org_website_url: `https://${websiteUrl}`,
+                p_org_employee_number: formData.orgEmployees,
+                p_preferred_language: formData.orgDefaultLanguage,
+                p_workspace_handle: completeWorkspaceHandle,
+                p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
+                p_avatar_url: formData.avatarUrl || '',
+                p_logo_url: formData.logoUrl || '',
+                p_organization_position: formData.position,
+            });
+
+            if (error) {
+                // Handle specific error cases
+                if (error.message.includes('already taken')) {
+                    if (error.message.includes('workspace_handle')) {
+                        toast({
+                            title: t('onboarding.error.workspace_taken.title'),
+                            description: t('onboarding.error.workspace_taken.description'),
+                            variant: "destructive",
+                        });
+                    } else if (error.message.includes('org_email')) {
+                        toast({
+                            title: t('onboarding.error.email_taken.title'),
+                            description: t('onboarding.error.email_taken.description'),
+                            variant: "destructive",
+                        });
+                    } else if (error.message.includes('phone_number')) {
+                        toast({
+                            title: t('onboarding.error.phone_taken.title'),
+                            description: t('onboarding.error.phone_taken.description'),
+                            variant: "destructive",
+                        });
+                    }
+                    return;
+                }
+
+                // Handle database constraint violations
+                if (error.code === '23505') { // Unique violation
+                    toast({
+                        title: t('onboarding.error.duplicate.title'),
+                        description: t('onboarding.error.duplicate.description'),
+                        variant: "destructive",
+                    });
+                    return;
+                }
+
+                // Handle other database errors
+                if (error.code?.startsWith('23')) {
+                    toast({
+                        title: t('onboarding.error.database.title'),
+                        description: t('onboarding.error.database.description'),
+                        variant: "destructive",
+                    });
+                    return;
+                }
+
+                throw error;
+            }
+
+            // Update the local session to reflect the onboarded status
+            await supabase.auth.refreshSession();
+
+            toast({
+                title: t('onboarding.success.title'),
+                description: t('onboarding.success.description'),
+            });
+
+            // Redirect to portal after successful onboarding
+            navigate('/portal');
+        } catch (error) {
+            console.error('Error during onboarding:', error);
+
+            // Handle network errors
+            if (error instanceof Error && error.message.includes('network')) {
+                toast({
+                    title: t('onboarding.error.network.title'),
+                    description: t('onboarding.error.network.description'),
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            // Generic error message
+            toast({
+                title: t('onboarding.error.generic.title'),
+                description: t('onboarding.error.generic.description'),
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     const renderStep = () => {

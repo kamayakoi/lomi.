@@ -47,6 +47,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
         },
     });
 
+    const handleLanguageChange = (language: string) => {
+        onboardingForm.setValue('orgDefaultLanguage', language, {
+            shouldValidate: true,
+            shouldDirty: true,
+        });
+    };
+
     const handleSubmit = (formData: OnboardingStep4Data) => {
         onSubmit(formData);
     };
@@ -54,7 +61,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
     return (
         <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-6">
             <div className="absolute top-4 right-4">
-                <LanguageSwitcher />
+                <LanguageSwitcher onLanguageChange={handleLanguageChange} />
             </div>
             <div className="mb-6">
                 <div className="flex space-x-2">

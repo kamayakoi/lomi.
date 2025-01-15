@@ -190,7 +190,7 @@ export const paymentMethods: PaymentMethod[] = [
           <img src="/dai.webp" alt="DAI" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/tron.webp" alt="TRON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/solana.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
           <img src="/xrp.webp" alt="XRP" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
@@ -202,12 +202,7 @@ export const paymentMethods: PaymentMethod[] = [
           <img src="/doge.webp" alt="DOGE" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/solana.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
-        </div>
-        <div className="relative">
-          <div className="w-12 h-12 rounded-full border-2 border-white bg-white flex items-center justify-center">
-            <span className="text-sm font-medium text-blue-600">+30</span>
-          </div>
+          <img src="/tron.webp" alt="TRON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
       </div>
     </div>,
