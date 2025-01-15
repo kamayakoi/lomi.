@@ -1,27 +1,26 @@
 import { useState, useEffect } from 'react'
-import {
-  IconPlus,
-} from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/portal/notifications'
 import { UserNav } from '@/components/portal/user-nav'
 import { Button } from '@/components/custom/button'
-import { providers, type Provider } from './data'
+import { paymentMethods } from './data'
 import { supabase } from '@/utils/supabase/client'
 import { Database } from '@/../database.types'
 import { TopNav } from '@/components/portal/top-nav'
 import { useUser } from '@/lib/hooks/useUser'
 import { useSidebarData } from '@/lib/hooks/useSidebarData'
-import { motion, AnimatePresence } from 'framer-motion'
 import Loader from '@/components/portal/loader'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
+import { useToast } from '@/components/ui/use-toast'
+import { cn } from '@/lib/utils'
 
 export default function PaymentChannels() {
-  const [showMessage, setShowMessage] = useState<Record<string, boolean>>({})
+  const { toast } = useToast()
   const [disconnectingProvider, setDisconnectingProvider] = useState<string | null>(null)
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false)
   const [phoneDialogOpen, setPhoneDialogOpen] = useState(false)
@@ -59,8 +58,9 @@ export default function PaymentChannels() {
       return
     }
 
-    const provider = providers.find(p => p.provider_code === providerCode) as Provider
-    if (provider && (provider.type === 'Mobile Money' || provider.type === 'E-Wallet')) {
+    const method = paymentMethods.find(m => m.provider_code === providerCode)
+
+    if (method && (method.type === 'Mobile Money' || method.type === 'e-Wallets')) {
       setConnectingProvider(providerCode)
       setPhoneDialogOpen(true)
       return
@@ -80,12 +80,18 @@ export default function PaymentChannels() {
 
       if (error) {
         console.error('Error updating provider connection:', error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to connect to provider. Please try again.",
+        })
       } else {
         fetchOrganizationProviders(sidebarData.organization_id)
-        setShowMessage((prevState) => ({
-          ...prevState,
-          [providerCode]: true,
-        }))
+        const method = paymentMethods.find(m => m.provider_code === providerCode)
+        toast({
+          title: "Success",
+          description: `Successfully connected to ${method?.name}`,
+        })
       }
     }
   }
@@ -93,13 +99,12 @@ export default function PaymentChannels() {
   const handlePhoneSubmit = async () => {
     if (!connectingProvider || !sidebarData?.organization_id || !phoneNumber) return
 
-    // First update the phone number
     const { error: phoneError } = await supabase
       .rpc('update_organization_provider_phone', {
         p_organization_id: sidebarData.organization_id,
         p_provider_code: connectingProvider,
         p_phone_number: phoneNumber,
-        p_is_phone_verified: false // Initially set as unverified
+        p_is_phone_verified: false
       })
 
     if (phoneError) {
@@ -107,10 +112,7 @@ export default function PaymentChannels() {
       return
     }
 
-    // Then connect the provider
     await connectProvider(connectingProvider)
-
-    // Close dialog and reset states
     setPhoneDialogOpen(false)
     setConnectingProvider(null)
     setPhoneNumber("")
@@ -127,20 +129,25 @@ export default function PaymentChannels() {
 
       if (error) {
         console.error('Error disconnecting provider:', error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to disconnect provider. Please try again.",
+        })
       } else {
+        const method = paymentMethods.find(m => m.provider_code === disconnectingProvider)
         fetchOrganizationProviders(sidebarData.organization_id)
+        toast({
+          title: "Success",
+          description: `Successfully disconnected from ${method?.name}`,
+        })
       }
       setDisconnectingProvider(null)
       setDisconnectDialogOpen(false)
     }
   }
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowMessage({})
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [showMessage])
+  const categories = Array.from(new Set(paymentMethods.map(m => m.category)))
 
   if (isUserLoading || isSidebarLoading) {
     return <Loader />
@@ -180,60 +187,108 @@ export default function PaymentChannels() {
         </div>
 
         <div className='flex-grow overflow-auto' style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-          <ul className='grid gap-6 pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
-            {providers.map((provider) => {
-              const isConnected = organizationProviders.some(op => op.provider_code === provider.provider_code && op.is_connected)
-              return (
-                <li
-                  key={provider.provider_code}
-                  className='rounded-none border p-6 hover:shadow-md flex flex-col'
-                >
-                  <div className='mb-6 flex items-center justify-between'>
-                    <div className='flex size-12 items-center justify-center rounded-lg overflow-hidden bg-black'>
-                      <div className="w-full h-full flex items-center justify-center">
-                        {provider.logo}
-                      </div>
-                    </div>
-                    <Button
-                      variant={isConnected ? 'default' : 'outline'}
-                      size='sm'
-                      className={`flex items-center px-4 py-2 text-sm font-medium rounded-none ${isConnected ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''
-                        }`}
-                      onClick={() => {
-                        if (isConnected) {
-                          setDisconnectingProvider(provider.provider_code)
-                          setDisconnectDialogOpen(true)
-                        } else {
-                          updateProviderConnection(provider.provider_code, true)
-                        }
-                      }}
-                    >
-                      {isConnected ? 'Connected' : 'Connect'}
-                    </Button>
-                  </div>
-                  <div className="flex-grow">
-                    <h2 className='mb-2 text-lg font-semibold'>{provider.name}</h2>
-                    <p className='text-gray-500'>{provider.description}</p>
-                  </div>
-                  <AnimatePresence>
-                    {showMessage[provider.provider_code] && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className='mt-4 p-2 bg-[#00A0FF] bg-opacity-10 text-[#00A0FF] rounded-lg text-sm'
+          <div className="space-y-8 pb-16 pt-4">
+            {categories.map((category) => (
+              <section key={category}>
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{category}</h2>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {paymentMethods
+                    .filter(method => method.category === category)
+                    .map((method) => (
+                      <div
+                        key={method.code}
+                        className={cn(
+                          "border p-6 rounded-sm transition-shadow relative overflow-hidden",
+                          method.status !== 'coming_soon' && "hover:shadow-md",
+                          method.isViewMore && "md:col-span-2 lg:col-span-2 bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900",
+                          !method.isViewMore && "bg-white dark:bg-gray-900"
+                        )}
                       >
-                        Successfully connected to {provider.name}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </li>
-              )
-            })}
+                        <div className='mb-6 flex items-center justify-between'>
+                          <div className={cn(
+                            'flex items-center justify-center rounded-lg overflow-hidden',
+                            !method.isViewMore && 'size-12 bg-black'
+                          )}>
+                            <div className={cn(
+                              "w-full h-full flex items-center justify-center",
+                              method.isViewMore && "w-auto h-auto"
+                            )}>
+                              {method.logo}
+                            </div>
+                          </div>
+                          {method.type === 'Crypto' ? (
+                            method.isMainCrypto ? (
+                              <Button
+                                variant={organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) ? 'default' : 'outline'}
+                                size='sm'
+                                className={cn(
+                                  'flex items-center px-6 py-2 text-sm font-medium rounded-none',
+                                  organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) &&
+                                  'bg-blue-500 hover:bg-blue-600 text-white'
+                                )}
+                                onClick={() => {
+                                  const isConnected = organizationProviders.some(op =>
+                                    op.provider_code === method.provider_code && op.is_connected
+                                  )
+                                  if (isConnected) {
+                                    setDisconnectingProvider(method.provider_code)
+                                    setDisconnectDialogOpen(true)
+                                  } else {
+                                    updateProviderConnection(method.provider_code, true)
+                                  }
+                                }}
+                              >
+                                {organizationProviders.some(op =>
+                                  op.provider_code === method.provider_code && op.is_connected
+                                ) ? 'Connected' : 'Connect All'}
+                              </Button>
+                            ) : null
+                          ) : (
+                            <Button
+                              variant={organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) ? 'default' : 'outline'}
+                              size='sm'
+                              disabled={method.status === 'coming_soon'}
+                              className={cn(
+                                'flex items-center px-4 py-2 text-sm font-medium rounded-none',
+                                organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) &&
+                                'bg-blue-500 hover:bg-blue-600 text-white',
+                                method.status === 'coming_soon' && 'opacity-50 cursor-not-allowed'
+                              )}
+                              onClick={() => {
+                                const isConnected = organizationProviders.some(op =>
+                                  op.provider_code === method.provider_code && op.is_connected
+                                )
+                                if (isConnected) {
+                                  setDisconnectingProvider(method.provider_code)
+                                  setDisconnectDialogOpen(true)
+                                } else {
+                                  updateProviderConnection(method.provider_code, true)
+                                }
+                              }}
+                            >
+                              {method.status === 'coming_soon'
+                                ? 'Coming Soon'
+                                : organizationProviders.some(op =>
+                                  op.provider_code === method.provider_code && op.is_connected
+                                ) ? 'Connected' : 'Connect'
+                              }
+                            </Button>
+                          )}
+                        </div>
+                        <div className="flex-grow">
+                          <h2 className='text-lg font-semibold mb-2'>{method.name}</h2>
+                          <p className='text-gray-500'>{method.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </section>
+            ))}
 
-            {/* Coming Soon panel as a grid item */}
-            <li className="rounded-none border p-6 relative overflow-hidden hover:shadow-md md:col-span-2 lg:col-span-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
+            {/* Coming Soon panel */}
+            <section className="rounded-none border p-6 relative overflow-hidden hover:shadow-md bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
               <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-full -mr-20 -mt-20 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-full -ml-16 -mb-16 opacity-50"></div>
 
@@ -254,18 +309,19 @@ export default function PaymentChannels() {
                   </a>
                 </div>
               </div>
-            </li>
-          </ul>
+            </section>
+          </div>
         </div>
       </Layout.Body>
+
       <Dialog open={phoneDialogOpen} onOpenChange={setPhoneDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Enter your {providers.find(p => p.provider_code === connectingProvider)?.name} phone number
+              Enter your {paymentMethods.find(m => m.provider_code === connectingProvider)?.name} phone number
             </DialogTitle>
             <DialogDescription>
-              Please enter the phone number associated with your {providers.find(p => p.provider_code === connectingProvider)?.name} account.
+              Please enter the phone number associated with your {paymentMethods.find(m => m.provider_code === connectingProvider)?.name} account.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -295,11 +351,12 @@ export default function PaymentChannels() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       <Dialog open={disconnectDialogOpen} onOpenChange={setDisconnectDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Disconnect {providers.find(p => p.provider_code === disconnectingProvider)?.name}?
+              Disconnect {paymentMethods.find(m => m.provider_code === disconnectingProvider)?.name}?
             </DialogTitle>
             <DialogDescription>
               Are you sure you want to disconnect this provider? This action will directly affect your customers&apos; checkout experience.

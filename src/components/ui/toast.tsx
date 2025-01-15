@@ -29,7 +29,7 @@ const toastVariants = cva(
       variant: {
         default: "border bg-background text-foreground",
         destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+          "border bg-background text-foreground border-red-200",
       },
     },
     defaultVariants: {
@@ -112,15 +112,18 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName
 
 const ToastProgressBar = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "destructive" }
+>(({ className, variant, ...props }, ref) => (
   <div
     ref={ref}
     className={cn("absolute bottom-0 left-0 right-0 h-[3px] w-full bg-transparent", className)}
     style={{ margin: 0, padding: 0 }}
     {...props}
   >
-    <div className="h-full bg-blue-500 progress-animation" style={{ margin: 0, padding: 0 }} />
+    <div className={cn(
+      "h-full progress-animation",
+      variant === "destructive" ? "bg-red-500" : "bg-blue-500"
+    )} style={{ margin: 0, padding: 0 }} />
   </div>
 ))
 ToastProgressBar.displayName = "ToastProgressBar"

@@ -1,41 +1,231 @@
 import React from 'react';
+import {
+  IconCurrencyBitcoin,
+  IconDeviceMobile,
+  IconCreditCard,
+  IconWallet,
+  IconBan
+} from '@tabler/icons-react';
 
-export type Provider = {
-  provider_code: string;
+export type PaymentMethod = {
+  code: string;
   name: string;
   description: string;
   logo: React.ReactNode;
-  includedPayments?: Array<{ name: string; icon: React.ReactNode }>;
-  type: 'Card' | 'Mobile Money' | 'E-Wallet' | 'Bank Transfer';
+  provider_code: string;
+  type: 'Digital Payments' | 'Mobile Money' | 'e-Wallets' | 'Banks' | 'Crypto';
+  status?: 'active' | 'coming_soon';
+  category: string;
+  isMainCrypto?: boolean;
+  parentCrypto?: string;
+  isViewMore?: boolean;
 }
 
-export const providers: Provider[] = [
+export const paymentMethods: PaymentMethod[] = [
+  // Digital Payments Section
   {
-    provider_code: 'ORANGE',
-    name: 'Orange',
-    logo: <img src="/orange.webp" alt="Orange Money" className="w-full h-full object-contain" />,
-    description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
-    type: 'Mobile Money',
+    code: 'VISA',
+    name: 'Visa',
+    description: 'Enable Visa card payments for your customers. Widely accepted worldwide, it is the perfect payment method for businesses serving international customers.',
+    logo: <img src="/visa.webp" alt="Visa" className="w-full h-full object-contain" />,
+    provider_code: 'ECOBANK',
+    type: 'Digital Payments',
+    category: 'Cards & Digital Wallets'
   },
   {
-    provider_code: 'WAVE',
-    name: 'Wave',
-    logo: <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
-    description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
-    type: 'Mobile Money',
+    code: 'MASTERCARD',
+    name: 'Mastercard',
+    description: 'Accept Mastercard payments globally via lomi.. Ideal for businesses looking to expand internationally with reliable card processing and fraud protection.',
+    logo: <img src="/mastercard.webp" alt="Mastercard" className="w-full h-full object-contain" />,
+    provider_code: 'ECOBANK',
+    type: 'Digital Payments',
+    category: 'Cards & Digital Wallets'
   },
-  // {
-  //   provider_code: 'ECOBANK',
-  //   name: 'Ecobank',
-  //   logo: <img src="/ecobank.webp" alt="Ecobank" className="w-full h-full object-cover" />,
-  //   description: 'Connect with Ecobank to enable pay-by-bank payments for your customers. Ideal for businesses operating across multiple African countries.',
-  //   type: 'Bank Transfer',
-  // },
   {
-    provider_code: 'MTN',
-    name: 'MTN',
-    logo: <img src="/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
+    code: 'APPLE_PAY',
+    name: 'Apple Pay',
+    description: 'Enable seamless one-touch payments with Apple Pay. Offer your iOS users a fast, secure checkout experience with biometric authentication and industry-leading security features.',
+    logo: <img src="/apple-pay.webp" alt="Apple Pay" className="w-full h-full object-contain" />,
+    provider_code: 'APPLE',
+    type: 'Digital Payments',
+    status: 'coming_soon',
+    category: 'Cards & Digital Wallets'
+  },
+  {
+    code: 'GOOGLE_PAY',
+    name: 'Google Pay',
+    description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
+    logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
+    provider_code: 'GOOGLE',
+    type: 'Digital Payments',
+    status: 'coming_soon',
+    category: 'Cards & Digital Wallets'
+  },
+
+  // Mobile Money Section
+  {
+    code: 'MTN',
+    name: 'MTN Mobile Money',
     description: 'Leverage MTN Mobile Money "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
+    logo: <img src="/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
+    provider_code: 'MTN',
     type: 'Mobile Money',
+    category: 'Mobile Money'
   },
-]
+  {
+    code: 'ORANGE',
+    name: 'Orange Money',
+    description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+    logo: <img src="/orange.webp" alt="Orange Money" className="w-full h-full object-contain" />,
+    provider_code: 'ORANGE',
+    type: 'Mobile Money',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'MOOVE',
+    name: 'Moove Money',
+    description: 'Enable Moove Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+    logo: <img src="/moove.webp" alt="Moove Money" className="w-full h-full object-contain" />,
+    provider_code: 'MOOVE',
+    type: 'Mobile Money',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'AIRTEL',
+    name: 'Airtel Money',
+    description: 'Accept Airtel Money payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
+    provider_code: 'AIRTEL',
+    type: 'Mobile Money',
+    status: 'coming_soon',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'MPESA',
+    name: 'M-Pesa',
+    description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
+    provider_code: 'MPESA',
+    type: 'Mobile Money',
+    status: 'coming_soon',
+    category: 'Mobile Money'
+  },
+
+  // E-Wallet Section
+  {
+    code: 'WAVE',
+    name: 'Wave',
+    description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
+    logo: <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
+    provider_code: 'WAVE',
+    type: 'e-Wallets',
+    category: 'E-Wallet'
+  },
+  {
+    code: 'WIZALL',
+    name: 'Wizall',
+    description: 'Accept Wizall payments to tap into a vast network of users in Senegal.',
+    logo: <img src="/wizall.webp" alt="Wizall" className="w-full h-full object-contain" />,
+    provider_code: 'WIZALL',
+    type: 'e-Wallets',
+    status: 'coming_soon',
+    category: 'E-Wallet'
+  },
+  {
+    code: 'OPAY',
+    name: 'OPay',
+    description: 'Enable OPay payments, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
+    logo: <img src="/opay.webp" alt="OPay" className="w-full h-full object-contain" />,
+    provider_code: 'OPAY',
+    type: 'e-Wallets',
+    status: 'coming_soon',
+    category: 'E-Wallet'
+  },
+
+  // Crypto Section
+  {
+    code: 'BTC',
+    name: 'Bitcoin',
+    description: 'Accept cryptocurrency payments including Bitcoin and all major cryptocurrencies. Enable borderless transactions with instant confirmations and competitive fees.',
+    logo: <img src="/btc.webp" alt="BTC" className="w-8 h-8" />,
+    provider_code: 'NOWPAYMENTS',
+    type: 'Crypto',
+    category: 'Cryptocurrency',
+    parentCrypto: 'BTC'
+  },
+  {
+    code: 'USDC',
+    name: 'USD Coin (Ethereum)',
+    description: 'Accept USDC stablecoin payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
+    logo: <img src="/usdc.webp" alt="USDC" className="w-8 h-8" />,
+    provider_code: 'NOWPAYMENTS',
+    type: 'Crypto',
+    category: 'Cryptocurrency',
+    parentCrypto: 'BTC'
+  },
+  {
+    code: 'BNB',
+    name: 'BNB',
+    description: 'Accept BNB payments on the BNB Smart Chain. Benefit from fast transactions and low fees in the Binance ecosystem.',
+    logo: <img src="/bnb.webp" alt="BNB" className="w-8 h-8" />,
+    provider_code: 'NOWPAYMENTS',
+    type: 'Crypto',
+    category: 'Cryptocurrency',
+    parentCrypto: 'BTC'
+  },
+  {
+    code: 'CRYPTO_MORE',
+    name: 'More Cryptocurrencies',
+    description: 'We support a wide range of cryptocurrencies including stablecoins and major tokens. Connect once to enable all supported cryptocurrencies on your platform.',
+    logo: <div className="relative w-full">
+      <div className="flex items-center -space-x-3">
+        <div className="relative">
+          <img src="/usdt.webp" alt="USDT" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/dai.webp" alt="DAI" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/eth.webp" alt="ETH" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/xrp.webp" alt="XRP" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/ltc.webp" alt="LTC" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/link.webp" alt="LINK" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/bnb.webp" alt="BNB" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <img src="/btc.webp" alt="BTC" className="relative w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900" />
+        </div>
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full border-2 border-white dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-center">
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-300">+5</span>
+          </div>
+        </div>
+      </div>
+    </div>,
+    provider_code: 'NOWPAYMENTS',
+    type: 'Crypto',
+    category: 'Cryptocurrency',
+    parentCrypto: 'BTC',
+    isViewMore: true,
+    isMainCrypto: true
+  }
+
+];
+
+export const categoryIcons: Record<string, React.ReactNode> = {
+  'Cards & Digital Wallets': <IconCreditCard className="w-5 h-5" />,
+  'Mobile Money': <IconDeviceMobile className="w-5 h-5" />,
+  'e-Wallets': <IconWallet className="w-5 h-5" />,
+  'Banks': <IconBan className="w-5 h-5" />,
+  'Cryptocurrency': <IconCurrencyBitcoin className="w-5 h-5" />
+};
+
+
