@@ -83,26 +83,24 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       if (provider === 'google') setIsGoogleLoading(true)
       if (provider === 'github') setIsGithubLoading(true)
 
-      // Get the current URL's origin for the redirect
-      const redirectUrl = `${window.location.origin}/auth/callback`
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
-          // Ensure site URL matches the redirect domain
-          scopes: 'email profile',
         },
       })
-      if (error) throw error
+      if (error) {
+        console.error(`OAuth error:`, error);
+        throw error;
+      }
       if (!data.url) throw new Error('No URL returned from Supabase')
 
-      // Use replace instead of assigning to href to prevent history issues
-      window.location.replace(data.url)
+      // Use window.location.href to ensure a full page reload
+      window.location.href = data.url;
     } catch (error) {
       console.error(`Error signing in with ${provider}:`, error)
       setErrorMessage(t('auth.sign_in.error.oauth', { provider }))

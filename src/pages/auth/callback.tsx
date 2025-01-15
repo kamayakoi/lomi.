@@ -10,32 +10,32 @@ const AuthCallback = () => {
     const { isLoading, isOnboarded } = useAuthStatus();
 
     useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        let retryCount = 0;
+        const MAX_RETRIES = 5;
+
         const handleCallback = async () => {
             try {
-                // Get the hash fragment from the URL if present
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-                const queryParams = new URLSearchParams(window.location.search);
+                const { data: { session }, error } = await supabase.auth.getSession();
+                if (error) throw error;
 
-                // Check for error in hash or query parameters
-                const error = hashParams.get('error') || queryParams.get('error');
-                const errorDescription = hashParams.get('error_description') || queryParams.get('error_description');
-
-                if (error) {
-                    throw new Error(errorDescription || 'Authentication error');
-                }
-
-                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-                if (sessionError) throw sessionError;
-
-                // Wait for session to be established
+                // If no session, retry a few times before giving up
                 if (!session) {
-                    console.log('No session found, waiting...');
-                    return;
+                    retryCount++;
+                    if (retryCount < MAX_RETRIES) {
+                        timeoutId = setTimeout(handleCallback, 1000);
+                        return;
+                    }
+                    throw new Error('Failed to establish session after multiple attempts');
                 }
 
                 // Only proceed with navigation when we have both session and loading state
                 if (!isLoading && session) {
-                    console.log('Session established, navigating...');
+                    // Clear any existing hash from the URL
+                    if (window.location.hash) {
+                        window.history.replaceState(null, '', window.location.pathname);
+                    }
+
                     if (!isOnboarded) {
                         navigate('/onboarding', { replace: true });
                     } else {
@@ -46,7 +46,7 @@ const AuthCallback = () => {
                 console.error('Error in auth callback:', error);
                 toast({
                     title: "Authentication Error",
-                    description: error instanceof Error ? error.message : "There was a problem signing you in. Please try again.",
+                    description: "There was a problem signing you in. Please try again.",
                     variant: "destructive",
                 });
                 navigate('/sign-in', { replace: true });
@@ -54,6 +54,10 @@ const AuthCallback = () => {
         };
 
         handleCallback();
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [isLoading, isOnboarded, navigate]);
 
     return <LoadingButton />;
