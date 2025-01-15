@@ -2,18 +2,26 @@ import { useTranslation } from 'react-i18next';
 import { languages } from '@/lib/i18n/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import { memo, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const LanguageSwitcher = memo(function LanguageSwitcher() {
     const { i18n } = useTranslation();
+    const location = useLocation();
     const currentLangName = languages.find(l => l.code === i18n.language)?.name;
+    const isPortalRoute = location.pathname.startsWith('/portal');
 
     const toggleLanguage = useCallback(() => {
+        if (isPortalRoute) return; // Disable language switching in portal routes
+
         const currentIndex = languages.findIndex(l => l.code === i18n.language);
         const nextIndex = (currentIndex + 1) % languages.length;
         const nextLang = languages[nextIndex]?.code || 'en';
         i18n.changeLanguage(nextLang);
         localStorage.setItem('language', nextLang);
-    }, [i18n]);
+    }, [i18n, isPortalRoute]);
+
+    // Don't render the switcher in portal routes
+    if (isPortalRoute) return null;
 
     return (
         <button

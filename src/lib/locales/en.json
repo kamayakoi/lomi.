@@ -195,8 +195,8 @@
         }
     },
     "avatar_uploader": {
-        "replace_image": "Replace image",
-        "upload_image": "Upload image",
+        "replace_image": "Replace",
+        "upload_image": "Add",
         "remove": "Remove",
         "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
         "error": {
@@ -226,8 +226,8 @@
         "try_again": "Try Again"
     },
     "logo_uploader": {
-        "replace_image": "Replace image",
-        "upload_image": "Upload image",
+        "replace_image": "Replace",
+        "upload_image": "Add",
         "remove": "Remove",
         "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
         "error": {
@@ -297,7 +297,7 @@
                     "description": "Find out how our APIs work and how you can deploy them."
                 },
                 "product_catalog": {
-                    "title": "Product catalog",
+                    "title": "Tools",
                     "description": "Discover lomi. products and how to use them."
                 },
                 "sample_projects": {

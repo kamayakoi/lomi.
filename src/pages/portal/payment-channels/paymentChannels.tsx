@@ -17,7 +17,7 @@ import SupportForm from '@/components/portal/support-form'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
 import { useToast } from '@/components/ui/use-toast'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/actions/utils'
 
 export default function PaymentChannels() {
   const { toast } = useToast()

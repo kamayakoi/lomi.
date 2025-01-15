@@ -110,7 +110,7 @@ CREATE TABLE merchants (
   onboarded BOOLEAN NOT NULL DEFAULT false,
   country VARCHAR,
   avatar_url TEXT,
-  preferred_language VARCHAR(10),
+  preferred_language VARCHAR(10) NOT NULL DEFAULT 'en',
   timezone VARCHAR NOT NULL DEFAULT 'UTC',
   referral_code VARCHAR,
   pin_code VARCHAR(4),

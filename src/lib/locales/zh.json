@@ -291,23 +291,23 @@
             "resources": {
                 "documentation": {
                     "title": "文档",
-                    "description": "Familiarize yourself with lomi. products with our docs."
+                    "description": "熟悉 lomi. 产品与我们的文档。"
                 },
                 "api_reference": {
-                    "title": "API reference",
-                    "description": "Find out how our APIs work and how you can deploy them."
+                    "title": "API 参考",
+                    "description": "了解我们的 API 如何工作以及如何部署它们。"
                 },
                 "product_catalog": {
-                    "title": "Product catalog",
-                    "description": "Discover lomi. products and how to use them."
+                    "title": "工具",
+                    "description": "发现 lomi. 产品并了解如何使用它们。"
                 },
                 "sample_projects": {
                     "title": "Boilerplates",
-                    "description": "Explore boilerplates to kickstart your integration."
+                    "description": "探索 boilerplates 以启动您的集成。"
                 },
                 "support": {
-                    "title": "Support",
-                    "description": "Get on call help and support from our team."
+                    "title": "支持",
+                    "description": "从我们的团队获得电话帮助和支持。"
                 }
             }
         }

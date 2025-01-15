@@ -226,8 +226,8 @@
             "try_again": "Réessayer"
         },
         "logo_uploader": {
-            "replace_image": "Remplacer le logo",
-            "upload_image": "Télécharger le logo",
+            "replace_image": "Remplacer",
+            "upload_image": "Ajouter",
             "remove": "Supprimer",
             "file_requirements": "*png, *jpeg fichiers jusqu'à 1MB d'au moins 200px par 200px",
             "error": {
@@ -298,7 +298,7 @@
                     "description": "Découvrez comment fonctionnent nos APIs et comment les déployer."
                 },
                 "product_catalog": {
-                    "title": "Catalogue de produits",
+                    "title": "Outils",
                     "description": "Découvrez les produits lomi. et comment les intégrer dans votre application."
                 },
                 "sample_projects": {

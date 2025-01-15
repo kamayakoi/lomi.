@@ -683,7 +683,10 @@ function Profile() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="en">English</SelectItem>
-                                                    <SelectItem value="fr">French</SelectItem>
+                                                    <SelectItem value="fr">Français</SelectItem>
+                                                    <SelectItem value="es">Español</SelectItem>
+                                                    <SelectItem value="pt">Português</SelectItem>
+                                                    <SelectItem value="zh">中文</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <button
@@ -697,7 +700,16 @@ function Profile() {
                                         <div className="relative">
                                             <Input
                                                 id="language"
-                                                value={editedMerchant?.preferred_language === 'en' ? 'English' : 'French'}
+                                                value={(() => {
+                                                    switch (editedMerchant?.preferred_language) {
+                                                        case 'en': return 'English';
+                                                        case 'fr': return 'Français';
+                                                        case 'es': return 'Español';
+                                                        case 'pt': return 'Português';
+                                                        case 'zh': return '中文';
+                                                        default: return 'English';
+                                                    }
+                                                })()}
                                                 className="bg-muted rounded-none pr-8"
                                                 readOnly
                                             />
