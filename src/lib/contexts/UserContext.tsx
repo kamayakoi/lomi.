@@ -20,15 +20,27 @@ const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             setUser(data.session?.user ?? null);
         };
 
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (_, session) => {
+        // Listen for auth state changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
         });
+
+        // Listen for merchant profile updates
+        const handleProfileUpdate = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUser(user);
+            }
+        };
+
+        window.addEventListener('merchant-profile-updated', handleProfileUpdate);
 
         setData();
 
         return () => {
             authListener?.subscription.unsubscribe();
+            window.removeEventListener('merchant-profile-updated', handleProfileUpdate);
         };
     }, []);
 

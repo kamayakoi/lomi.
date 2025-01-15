@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { toast } from "@/components/ui/use-toast"
 import ContentSection from '@/components/portal/content-section'
-import { supabase } from '@/utils/supabase/client'
+import { supabase, updateUserEmail } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle, PencilIcon, CheckIcon, X } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import ProfilePictureUploader from '@/components/auth/avatar-uploader'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from '@/components/custom/button';
+import { cn } from '@/lib/actions/utils';
 
 interface MerchantDetails {
     merchant_id: string;
@@ -39,6 +40,7 @@ function Profile() {
     const [isPasswordAuth, setIsPasswordAuth] = useState(false)
     const [editedMerchant, setEditedMerchant] = useState<MerchantDetails | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [authProvider, setAuthProvider] = useState<string>('');
 
     useEffect(() => {
         if (merchant) {
@@ -84,7 +86,12 @@ function Profile() {
         const checkAuthMethod = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                setIsPasswordAuth(user.app_metadata.provider === 'email');
+                const provider = user.app_metadata.provider;
+                setIsPasswordAuth(provider === 'email');
+                // Set the provider name with proper capitalization
+                if (provider && provider !== 'email') {
+                    setAuthProvider(provider.charAt(0).toUpperCase() + provider.slice(1));
+                }
             }
         };
         checkAuthMethod();
@@ -400,7 +407,28 @@ function Profile() {
         if (!editedMerchant) return;
 
         try {
-            // Update merchant details in custom table
+            // First update auth metadata if name or email is being changed
+            if (field === 'name' || field === 'email') {
+                if (field === 'name') {
+                    const { error: authError } = await supabase.auth.updateUser({
+                        data: { full_name: editedMerchant.name }
+                    });
+                    if (authError) throw authError;
+                }
+                if (field === 'email') {
+                    const { error, message } = await updateUserEmail(editedMerchant.email);
+                    if (error) throw error;
+
+                    toast({
+                        title: "Verification Required",
+                        description: message || "Please check your email to verify the email change.",
+                    });
+                    setIsEditing(false);
+                    return; // Don't proceed with merchant table update until email is verified
+                }
+            }
+
+            // Then update merchant details in custom table
             const { error: merchantError } = await supabase.rpc('update_merchant_details', {
                 p_merchant_id: editedMerchant.merchant_id,
                 p_name: editedMerchant.name,
@@ -412,26 +440,25 @@ function Profile() {
 
             if (merchantError) throw merchantError;
 
-            // If updating name, also update auth user metadata
-            if (field === 'name') {
-                const { error: authError } = await supabase.auth.updateUser({
-                    data: { full_name: editedMerchant.name }
-                });
-
-                if (authError) throw authError;
-            }
-
+            // Update local state
             setMerchant(editedMerchant);
             setIsEditing(false);
+
+            // Show success message
             toast({
                 title: "Success",
                 description: `${field === 'preferred_language' ? 'Language' : field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
             });
+
+            // Trigger a refresh of the sidebar data if name was changed
+            if (field === 'name' && window.dispatchEvent) {
+                window.dispatchEvent(new Event('merchant-profile-updated'));
+            }
         } catch (error) {
             console.error('Error updating field:', error);
             toast({
                 title: "Error",
-                description: "Failed to update field",
+                description: error instanceof Error ? error.message : "Failed to update field",
                 variant: "destructive",
             });
         }
@@ -443,6 +470,15 @@ function Profile() {
     };
 
     const handleFieldEdit = (field: string) => {
+        // Don't allow editing email if user is using OAuth
+        if (field === 'email' && !isPasswordAuth) {
+            toast({
+                title: "Cannot Edit Email",
+                description: `Email is managed by ${authProvider} and cannot be changed.`,
+                variant: "destructive",
+            });
+            return;
+        }
         setIsEditing(true);
         // Focus the field that was clicked
         setTimeout(() => {
@@ -631,25 +667,40 @@ function Profile() {
                                         id="email"
                                         value={editedMerchant?.email || ''}
                                         onChange={(e) => handleInputChange('email', e.target.value)}
-                                        className={`${!isEditing ? "bg-muted" : ""} rounded-none pr-8`}
-                                        readOnly={!isEditing}
+                                        className={cn(
+                                            "rounded-none pr-8",
+                                            !isEditing ? "bg-muted" : "",
+                                            !isPasswordAuth ? "cursor-not-allowed opacity-60" : ""
+                                        )}
+                                        readOnly={!isEditing || !isPasswordAuth}
                                     />
-                                    {!isEditing ? (
-                                        <button
-                                            onClick={() => handleFieldEdit('email')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
-                                        >
-                                            <PencilIcon className="h-3 w-3" />
-                                        </button>
+                                    {isPasswordAuth ? (
+                                        !isEditing ? (
+                                            <button
+                                                onClick={() => handleFieldEdit('email')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-600 transition-colors"
+                                            >
+                                                <PencilIcon className="h-3 w-3" />
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleFieldValidate('email')}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
+                                            >
+                                                <CheckIcon className="h-4 w-4" />
+                                            </button>
+                                        )
                                     ) : (
-                                        <button
-                                            onClick={() => handleFieldValidate('email')}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500 hover:text-green-600 transition-colors"
-                                        >
-                                            <CheckIcon className="h-4 w-4" />
-                                        </button>
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                            <AlertCircle className="h-4 w-4" />
+                                        </div>
                                     )}
                                 </div>
+                                {!isPasswordAuth && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Email is managed by {authProvider}.
+                                    </p>
+                                )}
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="phone">Phone number</Label>

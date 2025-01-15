@@ -23,6 +23,17 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     useEffect(() => {
         fetchSidebarData(setSidebarData, setIsLoading, setError);
+
+        // Listen for merchant profile updates
+        const handleProfileUpdate = () => {
+            fetchSidebarData(setSidebarData, setIsLoading, setError);
+        };
+
+        window.addEventListener('merchant-profile-updated', handleProfileUpdate);
+
+        return () => {
+            window.removeEventListener('merchant-profile-updated', handleProfileUpdate);
+        };
     }, []);
 
     const contextValue: SidebarContextValue = {
