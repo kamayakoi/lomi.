@@ -15,7 +15,7 @@ import {
   IconFlag,
   IconBuildingStore
 } from '@tabler/icons-react'
-
+import { useTranslation } from 'react-i18next'
 
 export interface NavLink {
   title: string
@@ -40,107 +40,89 @@ export interface SectionTitle {
 
 export type SidebarItem = SideLink | SectionTitle
 
-export const sidelinks: SidebarItem[] = [
-  {
-    title: 'Activation',
-    href: '/portal/activation',
-    icon: <IconFlag className="text-red-500" size={18} />,
-    condition: 'isActivationRequired',
-  },
-  { type: 'section', title: 'MAIN MENU' },
-  {
-    title: 'Home',
-    href: '/portal',
-    icon: <IconLayoutDashboard className="text-blue-600" size={18} />,
-  },
-  {
-    title: 'Balance',
-    href: '/portal/balance',
-    icon: <IconCurrencyDollar className="text-green-500" size={18} />,
-  },
-  {
-    title: 'Transactions',
-    href: '/portal/transactions',
-    icon: <IconExchange className="text-purple-500" size={18} />,
-  },
-  {
-    title: 'Reporting',
-    href: '/portal/reporting',
-    icon: <IconChartHistogram className="text-yellow-500" size={18} />,
-  },
-  { type: 'section', title: 'PAYMENTS' },
-  // {
-  //   title: 'Accept Payments',
-  //   href: '',
-  //   icon: <IconCreditCardPay className="text-pink-500" size={18} />,
-  //   sub: [
-  //     {
-  //       title: 'Credit | Debit Cards',
-  //       href: '/portal/cards',
-  //       icon: <IconCreditCard className="text-red-400" size={18} />,
-  //     },
-  //     {
-  //       title: 'eWallets',
-  //       href: '/portal/e-wallets',
-  //       icon: <IconWallet className="text-green-400" size={18} />,
-  //     },
-  //   ],
-  // },
-  {
-    title: 'Payment Links',
-    href: '/portal/payment-links',
-    icon: <IconLinkPlus className="text-indigo-500" size={18} />,
-  },
-  {
-    title: 'Storefront',
-    href: '/portal/storefront',
-    icon: <IconBuildingStore className="text-orange-500" size={18} />,
-  },
-  // {
-  //   title: 'Payout Links',
-  //   href: '/portal/payout-links',
-  //   icon: <IconSend className="text-orange-500" size={18} />,
-  // },
-  {
-    title: 'Products',
-    href: '/portal/product',
-    icon: <IconPackage className="text-blue-400" size={18} />,
-  },
-  {
-    title: 'Subscriptions',
-    href: '/portal/subscription',
-    icon: <IconRepeat className="text-teal-500" size={18} />,
-  },
-  {
-    title: 'Customers',
-    href: '/portal/customers',
-    icon: <IconUsers className="text-cyan-500" size={18} />,
-  },
-  { type: 'section', title: 'DEVELOPERS' },
-  {
-    title: 'Webhooks',
-    href: '/portal/webhooks',
-    icon: <IconWebhook className="text-rose-500" size={18} />,
-  },
-  { type: 'section', title: 'CONFIGURATION' },
-  {
-    title: 'Integrations',
-    href: '/portal/integrations',
-    icon: <IconApps className="text-fuchsia-500" size={18} />,
-  },
-  {
-    title: 'Payment Channels',
-    href: '/portal/payment-channels',
-    icon: <IconRouteAltLeft className="text-emerald-500" size={18} />,
-  },
-  {
-    title: 'Activity Logs',
-    href: '/portal/logs',
-    icon: <IconActivity className="text-amber-500" size={18} />,
-  },
-  {
-    title: 'Settings',
-    href: '/portal/settings/profile',
-    icon: <IconSettings className="text-gray-500" size={18} />,
-  },
-]
+export function useSidelinks(): SidebarItem[] {
+  const { t } = useTranslation()
+
+  return [
+    {
+      title: t('sidebar.links.activation'),
+      href: '/portal/activation',
+      icon: <IconFlag className="text-red-500" size={18} />,
+      condition: 'isActivationRequired',
+    },
+    { type: 'section', title: t('sidebar.sections.main_menu') },
+    {
+      title: t('sidebar.links.home'),
+      href: '/portal',
+      icon: <IconLayoutDashboard className="text-blue-600" size={18} />,
+    },
+    {
+      title: t('sidebar.links.balance'),
+      href: '/portal/balance',
+      icon: <IconCurrencyDollar className="text-green-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.transactions'),
+      href: '/portal/transactions',
+      icon: <IconExchange className="text-purple-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.reporting'),
+      href: '/portal/reporting',
+      icon: <IconChartHistogram className="text-yellow-500" size={18} />,
+    },
+    { type: 'section', title: t('sidebar.sections.payments') },
+    {
+      title: t('sidebar.links.payment_links'),
+      href: '/portal/payment-links',
+      icon: <IconLinkPlus className="text-indigo-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.storefront'),
+      href: '/portal/storefront',
+      icon: <IconBuildingStore className="text-orange-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.products'),
+      href: '/portal/product',
+      icon: <IconPackage className="text-blue-400" size={18} />,
+    },
+    {
+      title: t('sidebar.links.subscriptions'),
+      href: '/portal/subscription',
+      icon: <IconRepeat className="text-teal-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.customers'),
+      href: '/portal/customers',
+      icon: <IconUsers className="text-cyan-500" size={18} />,
+    },
+    { type: 'section', title: t('sidebar.sections.developers') },
+    {
+      title: t('sidebar.links.webhooks'),
+      href: '/portal/webhooks',
+      icon: <IconWebhook className="text-rose-500" size={18} />,
+    },
+    { type: 'section', title: t('sidebar.sections.configuration') },
+    {
+      title: t('sidebar.links.integrations'),
+      href: '/portal/integrations',
+      icon: <IconApps className="text-fuchsia-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.payment_channels'),
+      href: '/portal/payment-channels',
+      icon: <IconRouteAltLeft className="text-emerald-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.activity_logs'),
+      href: '/portal/logs',
+      icon: <IconActivity className="text-amber-500" size={18} />,
+    },
+    {
+      title: t('sidebar.links.settings'),
+      href: '/portal/settings/profile',
+      icon: <IconSettings className="text-gray-500" size={18} />,
+    },
+  ]
+}

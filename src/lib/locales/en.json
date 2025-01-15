@@ -662,5 +662,77 @@
             },
             "get_started": "Get Started"
         }
+    },
+    "sidebar": {
+        "sections": {
+            "main_menu": "MAIN MENU",
+            "payments": "PAYMENTS",
+            "developers": "DEVELOPERS",
+            "configuration": "CONFIGURATION"
+        },
+        "links": {
+            "activation": "Activation",
+            "home": "Home",
+            "balance": "Balance",
+            "transactions": "Transactions",
+            "reporting": "Reporting",
+            "payment_links": "Payment Links",
+            "storefront": "Storefront",
+            "products": "Products",
+            "subscriptions": "Subscriptions",
+            "customers": "Customers",
+            "webhooks": "Webhooks",
+            "integrations": "Integrations",
+            "payment_channels": "Payment Channels",
+            "activity_logs": "Activity Logs",
+            "settings": "Settings"
+        }
+    },
+    "portal": {
+        "user_nav": {
+            "settings": "Settings",
+            "billing": "Billing",
+            "support": "Support",
+            "developers": "Developers",
+            "log_out": "Log out"
+        },
+        "top_nav": {
+            "home": "Home",
+            "settings": "Settings"
+        },
+        "support_form": {
+            "title": "Contact support",
+            "category": {
+                "label": "Select a category",
+                "account": "Account Issues",
+                "billing": "Billing Questions",
+                "technical": "Technical Support",
+                "other": "Other"
+            },
+            "message": {
+                "placeholder": "How can we help you?"
+            },
+            "success": {
+                "title": "Thank you for your message!",
+                "description": "A member of our team will reach out to you soon."
+            },
+            "submit": "Submit"
+        },
+        "feedback_form": {
+            "button": "Feedback",
+            "placeholder": "Ideas on how to improve our products. Contact support for technical issues.",
+            "clear": "Clear text",
+            "submit": "Submit",
+            "footer": "Have a technical issue? Contact support via the form below or browse our docs."
+        },
+        "notifications": {
+            "title": "Notifications",
+            "clear_all": "Clear all",
+            "empty": "All caught up!"
+        },
+        "brand": {
+            "name": "lomi.",
+            "control_portal": "Control Portal"
+        }
     }
-    }
+}

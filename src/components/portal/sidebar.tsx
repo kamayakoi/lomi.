@@ -4,13 +4,14 @@ import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/actions/utils'
-import { sidelinks } from '../../utils/data/sidelinks'
+import { useSidelinks, type SidebarItem } from '../../utils/data/sidelinks'
 import { useTheme } from '@/lib/hooks/useTheme'
 import iconLight from "/transparent2.webp"
 import iconDark from "/transparent.webp"
 import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
 import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useTranslation } from 'react-i18next'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -19,6 +20,8 @@ export default function Sidebar({ className }: SidebarProps) {
   const { theme, setTheme } = useTheme()
   const { isActivated } = useActivationStatus()
   const { sidebarData } = useSidebar()
+  const sidelinks = useSidelinks()
+  const { t } = useTranslation()
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -26,13 +29,13 @@ export default function Sidebar({ className }: SidebarProps) {
   };
 
   const filteredLinks = useMemo(() => {
-    return sidelinks.filter((link) => {
+    return sidelinks.filter((link: SidebarItem) => {
       if ('condition' in link) {
         return link.condition === 'isActivationRequired' ? !isActivated : true;
       }
       return true;
     });
-  }, [isActivated]);
+  }, [isActivated, sidelinks]);
 
   return (
     <>
@@ -42,14 +45,14 @@ export default function Sidebar({ className }: SidebarProps) {
           <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50">
             <img
               src={theme === 'dark' ? iconDark : iconLight}
-              alt="lomi. Logo"
+              alt={t('portal.brand.name')}
               className="h-6 w-6 object-contain transition-opacity duration-200 group-hover:opacity-80"
               onClick={toggleTheme}
             />
           </div>
           <div className="flex flex-col justify-center truncate">
-            <span className='font-semibold tracking-tight'>lomi.</span>
-            <span className='text-xs font-medium text-muted-foreground'>Control Portal</span>
+            <span className='font-semibold tracking-tight'>{t('portal.brand.name')}</span>
+            <span className='text-xs font-medium text-muted-foreground'>{t('portal.brand.control_portal')}</span>
           </div>
         </a>
 
@@ -97,14 +100,14 @@ export default function Sidebar({ className }: SidebarProps) {
               <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50">
                 <img
                   src={theme === 'dark' ? iconDark : iconLight}
-                  alt="lomi. Logo"
+                  alt={t('portal.brand.name')}
                   className="h-6 w-6 object-contain transition-opacity duration-200 group-hover:opacity-80"
                   onClick={toggleTheme}
                 />
               </div>
               <div className="flex flex-col justify-center truncate">
-                <span className='font-semibold tracking-tight'>lomi.</span>
-                <span className='text-xs font-medium text-muted-foreground'>Control Portal</span>
+                <span className='font-semibold tracking-tight'>{t('portal.brand.name')}</span>
+                <span className='text-xs font-medium text-muted-foreground'>{t('portal.brand.control_portal')}</span>
               </div>
             </a>
           </Layout.Header>

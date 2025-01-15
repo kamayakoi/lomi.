@@ -761,5 +761,77 @@
             },
             "get_started": "开始使用"
         }
+    },
+    "sidebar": {
+        "sections": {
+            "main_menu": "主菜单",
+            "payments": "支付",
+            "developers": "开发者",
+            "configuration": "配置"
+        },
+        "links": {
+            "activation": "激活",
+            "home": "首页",
+            "balance": "余额",
+            "transactions": "交易",
+            "reporting": "报告",
+            "payment_links": "支付链接",
+            "storefront": "店铺",
+            "products": "产品",
+            "subscriptions": "订阅",
+            "customers": "客户",
+            "webhooks": "Webhooks",
+            "integrations": "集成",
+            "payment_channels": "支付渠道",
+            "activity_logs": "活动日志",
+            "settings": "设置"
+        }
+    },
+    "portal": {
+        "user_nav": {
+            "settings": "设置",
+            "billing": "账单",
+            "support": "支持",
+            "developers": "开发者",
+            "log_out": "退出登录"
+        },
+        "top_nav": {
+            "home": "首页",
+            "settings": "设置"
+        },
+        "support_form": {
+            "title": "联系支持",
+            "category": {
+                "label": "选择类别",
+                "account": "账户问题",
+                "billing": "账单问题",
+                "technical": "技术支持",
+                "other": "其他"
+            },
+            "message": {
+                "placeholder": "我们如何帮助您？"
+            },
+            "success": {
+                "title": "感谢您的留言！",
+                "description": "我们的团队成员将尽快与您联系。"
+            },
+            "submit": "提交"
+        },
+        "feedback_form": {
+            "button": "反馈",
+            "placeholder": "改进产品的想法。技术问题请联系支持。",
+            "clear": "清除",
+            "submit": "提交",
+            "footer": "遇到技术问题？通过下方表单联系支持或浏览我们的文档。"
+        },
+        "notifications": {
+            "title": "通知",
+            "clear_all": "全部清除",
+            "empty": "已全部更新！"
+        },
+        "brand": {
+            "name": "lomi.",
+            "control_portal": "控制门户"
+        }
     }
 }

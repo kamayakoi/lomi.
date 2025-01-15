@@ -400,7 +400,8 @@ function Profile() {
         if (!editedMerchant) return;
 
         try {
-            const { error } = await supabase.rpc('update_merchant_details', {
+            // Update merchant details in custom table
+            const { error: merchantError } = await supabase.rpc('update_merchant_details', {
                 p_merchant_id: editedMerchant.merchant_id,
                 p_name: editedMerchant.name,
                 p_email: editedMerchant.email,
@@ -409,7 +410,16 @@ function Profile() {
                 p_preferred_language: editedMerchant.preferred_language
             });
 
-            if (error) throw error;
+            if (merchantError) throw merchantError;
+
+            // If updating name, also update auth user metadata
+            if (field === 'name') {
+                const { error: authError } = await supabase.auth.updateUser({
+                    data: { full_name: editedMerchant.name }
+                });
+
+                if (authError) throw authError;
+            }
 
             setMerchant(editedMerchant);
             setIsEditing(false);

@@ -671,5 +671,77 @@
             },
             "get_started": "Começar"
         }
+    },
+    "sidebar": {
+        "sections": {
+            "main_menu": "MENU PRINCIPAL",
+            "payments": "PAGAMENTOS",
+            "developers": "DESENVOLVEDORES",
+            "configuration": "CONFIGURAÇÃO"
+        },
+        "links": {
+            "activation": "Ativação",
+            "home": "Início",
+            "balance": "Balance",
+            "transactions": "Transações",
+            "reporting": "Relatórios",
+            "payment_links": "Links de pagamento",
+            "storefront": "Loja",
+            "products": "Produtos",
+            "subscriptions": "Assinaturas",
+            "customers": "Clientes",
+            "webhooks": "Webhooks",
+            "integrations": "Integrações",
+            "payment_channels": "Canais de pagamento",
+            "activity_logs": "Registros de atividade",
+            "settings": "Configurações"
+        }
+    },
+    "portal": {
+        "user_nav": {
+            "settings": "Configurações",
+            "billing": "Faturamento",
+            "support": "Suporte",
+            "developers": "Desenvolvedores",
+            "log_out": "Sair"
+        },
+        "top_nav": {
+            "home": "Início",
+            "settings": "Configurações"
+        },
+        "support_form": {
+            "title": "Contatar suporte",
+            "category": {
+                "label": "Selecione uma categoria",
+                "account": "Problemas de conta",
+                "billing": "Questões de faturamento",
+                "technical": "Suporte técnico",
+                "other": "Outro"
+            },
+            "message": {
+                "placeholder": "Como podemos ajudar?"
+            },
+            "success": {
+                "title": "Obrigado pela sua mensagem!",
+                "description": "Um membro da nossa equipe entrará em contato em breve."
+            },
+            "submit": "Enviar"
+        },
+        "feedback_form": {
+            "button": "Feedback",
+            "placeholder": "Ideias para melhorar nossos produtos. Contate o suporte para problemas técnicos.",
+            "clear": "Limpar",
+            "submit": "Enviar",
+            "footer": "Tem um problema técnico? Entre em contato com o suporte através do formulário abaixo ou consulte nossa documentação."
+        },
+        "notifications": {
+            "title": "Notificações",
+            "clear_all": "Limpar tudo",
+            "empty": "Tudo em dia!"
+        },
+        "brand": {
+            "name": "lomi.",
+            "control_portal": "Portal de Controle"
+        }
     }
 }

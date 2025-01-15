@@ -5,6 +5,7 @@ import { Eraser } from "lucide-react"
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 
 type Sentiment = 'very_positive' | 'positive' | 'negative' | 'very_negative' | 'null'
 
@@ -22,6 +23,7 @@ export default function FeedbackForm() {
     const [feedback, setFeedback] = useState('')
     const [sentiment, setSentiment] = useState<Sentiment>('null')
     const formRef = useRef<HTMLDivElement>(null)
+    const { t } = useTranslation()
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -68,7 +70,7 @@ export default function FeedbackForm() {
                 onClick={() => setIsOpen(!isOpen)}
                 className="border-gray-300 dark:border-gray-700 rounded-none"
             >
-                Feedback
+                {t('portal.feedback_form.button')}
             </Button>
             <AnimatePresence>
                 {isOpen && (
@@ -81,7 +83,7 @@ export default function FeedbackForm() {
                     >
                         <div className="p-4">
                             <Textarea
-                                placeholder="Ideas on how to improve our products. Contact support for technical issues."
+                                placeholder={t('portal.feedback_form.placeholder')}
                                 value={feedback}
                                 onChange={(e) => setFeedback(e.target.value)}
                                 className="min-h-[100px] mb-4 text-sm placeholder:text-sm bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 rounded-none"
@@ -99,20 +101,20 @@ export default function FeedbackForm() {
                                     ))}
                                 </div>
                                 <div className="flex space-x-2">
-                                    <Button variant="outline" size="default" onClick={handleClear} title="Clear text" className="px-3 rounded-none">
+                                    <Button variant="outline" size="default" onClick={handleClear} title={t('portal.feedback_form.clear')} className="px-3 rounded-none">
                                         <Eraser className="h-4 w-4" />
                                     </Button>
                                     <Button
                                         onClick={handleSubmit}
                                         className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 rounded-none"
                                     >
-                                        Submit
+                                        {t('portal.feedback_form.submit')}
                                     </Button>
                                 </div>
                             </div>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 p-2 border-t border-gray-200 dark:border-gray-700">
-                            Have a technical issue? Contact support via the form below or browse our docs.
+                            {t('portal.feedback_form.footer')}
                         </div>
                     </motion.div>
                 )}

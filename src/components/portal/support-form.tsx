@@ -5,12 +5,13 @@ import { MessageCircle, ImagePlus, CheckCircle, FileIcon, X } from "lucide-react
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
+import { useTranslation } from 'react-i18next'
 
 const categories = [
-    { value: 'account', label: 'Account Issues' },
-    { value: 'billing', label: 'Billing Questions' },
-    { value: 'technical', label: 'Technical Support' },
-    { value: 'other', label: 'Other' },
+    { value: 'account', label: 'portal.support_form.category.account' },
+    { value: 'billing', label: 'portal.support_form.category.billing' },
+    { value: 'technical', label: 'portal.support_form.category.technical' },
+    { value: 'other', label: 'portal.support_form.category.other' },
 ]
 
 interface SelectOption {
@@ -27,6 +28,7 @@ interface CustomSelectProps {
 const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const selectRef = useRef<HTMLDivElement>(null)
+    const { t } = useTranslation()
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -47,7 +49,7 @@ const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
                 className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 cursor-pointer border border-gray-300 dark:border-gray-700 text-sm"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {value ? options.find((opt: SelectOption) => opt.value === value)?.label : 'Select a category'}
+                {value ? t(options.find((opt: SelectOption) => opt.value === value)?.label || '') : t('portal.support_form.category.label')}
             </div>
             {isOpen && (
                 <div className="absolute top-full left-0 w-full bg-white dark:bg-[#121317] border border-gray-300 dark:border-gray-700 mt-1 z-10 text-sm">
@@ -60,7 +62,7 @@ const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
                                 setIsOpen(false)
                             }}
                         >
-                            {option.label}
+                            {t(option.label)}
                         </div>
                     ))}
                 </div>
@@ -80,6 +82,7 @@ export default function SupportForm() {
     const formRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const { user } = useUser()
+    const { t } = useTranslation()
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -199,7 +202,7 @@ export default function SupportForm() {
                         className="absolute bottom-16 right-0 w-80 bg-white dark:bg-[#121317] rounded-none shadow-lg z-50"
                     >
                         <div className="p-4 space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Contact support</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('portal.support_form.title')}</h3>
                             {isSubmitted ? (
                                 <motion.div
                                     initial={{ opacity: 0, scale: 0.9 }}
@@ -208,10 +211,10 @@ export default function SupportForm() {
                                 >
                                     <CheckCircle className="h-12 w-12 text-green-500" />
                                     <p className="text-center text-sm font-medium text-green-600">
-                                        Thank you for your message!
+                                        {t('portal.support_form.success.title')}
                                     </p>
                                     <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-                                        A member of our team will reach out to you soon.
+                                        {t('portal.support_form.success.description')}
                                     </p>
                                 </motion.div>
                             ) : (
@@ -223,7 +226,7 @@ export default function SupportForm() {
                                     />
                                     <div className="relative">
                                         <Textarea
-                                            placeholder="How can we help you?"
+                                            placeholder={t('portal.support_form.message.placeholder')}
                                             value={message}
                                             onChange={(e) => setMessage(e.target.value)}
                                             onDrop={handleDrop}
@@ -282,7 +285,7 @@ export default function SupportForm() {
                                         </div>
                                     )}
                                     <Button onClick={handleSubmit} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 rounded-none">
-                                        Submit
+                                        {t('portal.support_form.submit')}
                                     </Button>
                                 </>
                             )}

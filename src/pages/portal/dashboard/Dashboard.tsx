@@ -17,8 +17,8 @@ export default function Dashboard() {
   const { t } = useTranslation()
 
   const topNav = [
-    { title: 'Home', href: '/portal', isActive: true },
-    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
+    { title: 'home', href: '/portal', isActive: true },
+    { title: 'settings', href: '/portal/settings/profile', isActive: false },
   ]
 
   const developerResources = [

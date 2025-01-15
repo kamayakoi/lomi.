@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { formatDistanceToNow } from 'date-fns'
 import { useNotifications } from '@/lib/hooks/useNotifications'
+import { useTranslation } from 'react-i18next'
 
 const NotificationIcon = ({ type }: { type: string }) => {
     return (
@@ -52,6 +53,7 @@ const NotificationIcon = ({ type }: { type: string }) => {
 
 export default function Notifications() {
     const { notifications, markNotificationAsRead, markAllNotificationsAsRead } = useNotifications();
+    const { t } = useTranslation();
 
     return (
         <Popover>
@@ -70,18 +72,18 @@ export default function Notifications() {
                 sideOffset={14}
             >
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-foreground">Notifications</h3>
+                    <h3 className="font-semibold text-foreground">{t('portal.notifications.title')}</h3>
                     <button
                         onClick={markAllNotificationsAsRead}
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
                     >
-                        Clear all
+                        {t('portal.notifications.clear_all')}
                     </button>
                 </div>
                 {notifications.length === 0 || notifications.every(notif => notif.is_read) ? (
                     <div className="text-center py-4">
                         <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                        <p className="text-muted-foreground">All caught up!</p>
+                        <p className="text-muted-foreground">{t('portal.notifications.empty')}</p>
                     </div>
                 ) : (
                     <ul className="space-y-2 max-h-[60vh] overflow-auto">
