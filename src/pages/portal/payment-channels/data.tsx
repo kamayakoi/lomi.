@@ -30,37 +30,37 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/visa.webp" alt="Visa" className="w-full h-full object-contain" />,
     provider_code: 'ECOBANK',
     type: 'Digital Payments',
-    category: 'Cards & Digital Wallets'
+    category: 'Cards'
   },
   {
     code: 'MASTERCARD',
     name: 'Mastercard',
-    description: 'Accept Mastercard payments globally via lomi.. Ideal for businesses looking to expand internationally with reliable card processing and fraud protection.',
+    description: 'Accept Mastercard payments globally. Ideal for businesses looking to expand internationally with reliable card processing and fraud protection.',
     logo: <img src="/mastercard.webp" alt="Mastercard" className="w-full h-full object-contain" />,
     provider_code: 'ECOBANK',
     type: 'Digital Payments',
-    category: 'Cards & Digital Wallets'
+    category: 'Cards'
   },
   {
     code: 'APPLE_PAY',
     name: 'Apple Pay',
-    description: 'Enable seamless one-touch payments with Apple Pay. Offer your iOS users a fast, secure checkout experience with biometric authentication and industry-leading security features.',
+    description: 'Enable seamless one-touch payments with Apple Pay. Offer your iOS users a fast, secure checkout experience with built-in biometric authentication.',
     logo: <img src="/apple-pay.webp" alt="Apple Pay" className="w-full h-full object-contain" />,
     provider_code: 'APPLE',
     type: 'Digital Payments',
     status: 'coming_soon',
-    category: 'Cards & Digital Wallets'
+    category: 'Cards'
   },
-  {
-    code: 'GOOGLE_PAY',
-    name: 'Google Pay',
-    description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
-    logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
-    provider_code: 'GOOGLE',
-    type: 'Digital Payments',
-    status: 'coming_soon',
-    category: 'Cards & Digital Wallets'
-  },
+  // {
+  //   code: 'GOOGLE_PAY',
+  //   name: 'Google Pay',
+  //   description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
+  //   logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
+  //   provider_code: 'GOOGLE',
+  //   type: 'Digital Payments',
+  //   status: 'coming_soon',
+  //   category: 'Cards'
+  // },
 
   // Mobile Money Section
   {
@@ -80,47 +80,47 @@ export const paymentMethods: PaymentMethod[] = [
     provider_code: 'ORANGE',
     type: 'Mobile Money',
     category: 'Mobile Money'
-  },
-  {
-    code: 'MOOV',
-    name: 'Moov Money',
-    description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
-    logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
-    provider_code: 'MOOV',
-    type: 'Mobile Money',
-    status: 'coming_soon',
-    category: 'Mobile Money'
-  },
-  {
-    code: 'AIRTEL',
-    name: 'Airtel Money',
-    description: 'Accept Airtel Money payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
-    logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
-    provider_code: 'AIRTEL',
-    type: 'Mobile Money',
-    status: 'coming_soon',
-    category: 'Mobile Money'
-  },
-  {
-    code: 'MPESA',
-    name: 'M-Pesa',
-    description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
-    logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
-    provider_code: 'MPESA',
-    type: 'Mobile Money',
-    status: 'coming_soon',
-    category: 'Mobile Money'
-  },
+  }
+  // {
+  //   code: 'MOOV',
+  //   name: 'Moov Money',
+  //   description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+  //   logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
+  //   provider_code: 'MOOV',
+  //   type: 'Mobile Money',
+  //   status: 'coming_soon',
+  //   category: 'Mobile Money'
+  // },
+  // {
+  //   code: 'AIRTEL',
+  //   name: 'Airtel Money',
+  //   description: 'Accept Airtel Money payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+  //   logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
+  //   provider_code: 'AIRTEL',
+  //   type: 'Mobile Money',
+  //   status: 'coming_soon',
+  //   category: 'Mobile Money'
+  // },
+  // {
+  //   code: 'MPESA',
+  //   name: 'M-Pesa',
+  //   description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+  //   logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
+  //   provider_code: 'MPESA',
+  //   type: 'Mobile Money',
+  //   status: 'coming_soon',
+  //   category: 'Mobile Money'
+  // },
 
   // E-Wallet Section
-  {
+  , {
     code: 'WAVE',
     name: 'Wave',
     description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
     logo: <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
     provider_code: 'WAVE',
     type: 'e-Wallets',
-    category: 'E-Wallet'
+    category: 'Mobile Money'
   },
   {
     code: 'WIZALL',
@@ -130,7 +130,7 @@ export const paymentMethods: PaymentMethod[] = [
     provider_code: 'WIZALL',
     type: 'e-Wallets',
     status: 'coming_soon',
-    category: 'E-Wallet'
+    category: 'E-Wallets'
   },
   {
     code: 'OPAY',
@@ -140,7 +140,7 @@ export const paymentMethods: PaymentMethod[] = [
     provider_code: 'OPAY',
     type: 'e-Wallets',
     status: 'coming_soon',
-    category: 'E-Wallet'
+    category: 'E-Wallets'
   },
 
   // Crypto Section
@@ -217,7 +217,7 @@ export const paymentMethods: PaymentMethod[] = [
 ];
 
 export const categoryIcons: Record<string, React.ReactNode> = {
-  'Cards & Digital Wallets': <IconCreditCard className="w-5 h-5" />,
+  'Cards': <IconCreditCard className="w-5 h-5" />,
   'Mobile Money': <IconDeviceMobile className="w-5 h-5" />,
   'e-Wallets': <IconWallet className="w-5 h-5" />,
   'Banks': <IconBan className="w-5 h-5" />,

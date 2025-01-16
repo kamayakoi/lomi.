@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { MessageCircle, ImagePlus, CheckCircle, FileIcon, X } from "lucide-react"
+import { ImagePlus, CheckCircle, FileIcon, X, HelpCircle, Sparkles } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
@@ -46,27 +46,45 @@ const CustomSelect = ({ value, onChange, options }: CustomSelectProps) => {
     return (
         <div ref={selectRef} className="relative">
             <div
-                className="bg-white dark:bg-[#121317] text-gray-900 dark:text-gray-100 p-2 cursor-pointer border border-gray-300 dark:border-gray-700 text-sm"
+                className={`bg-background dark:bg-[#121317] text-foreground p-3 cursor-pointer border border-border hover:border-foreground/20 transition-colors duration-200 flex items-center justify-between ${isOpen ? 'border-foreground/20' : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {value ? t(options.find((opt: SelectOption) => opt.value === value)?.label || '') : t('portal.support_form.category.label')}
+                <span className="text-sm font-medium">
+                    {value ? t(options.find((opt: SelectOption) => opt.value === value)?.label || '') : t('portal.support_form.category.label')}
+                </span>
+                <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
             </div>
-            {isOpen && (
-                <div className="absolute top-full left-0 w-full bg-white dark:bg-[#121317] border border-gray-300 dark:border-gray-700 mt-1 z-10 text-sm">
-                    {options.map((option: SelectOption) => (
-                        <div
-                            key={option.value}
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                            onClick={() => {
-                                onChange(option.value)
-                                setIsOpen(false)
-                            }}
-                        >
-                            {t(option.label)}
-                        </div>
-                    ))}
-                </div>
-            )}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full left-0 w-full bg-background dark:bg-[#121317] border border-border mt-1 z-10 shadow-lg"
+                    >
+                        {options.map((option: SelectOption) => (
+                            <div
+                                key={option.value}
+                                className="p-3 hover:bg-accent dark:hover:bg-accent/10 cursor-pointer text-sm font-medium transition-colors duration-150"
+                                onClick={() => {
+                                    onChange(option.value)
+                                    setIsOpen(false)
+                                }}
+                            >
+                                {t(option.label)}
+                            </div>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
@@ -180,16 +198,21 @@ export default function SupportForm() {
     return (
         <div className="fixed bottom-4 right-[calc(1rem+18px)] z-50" ref={formRef}>
             <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
             >
                 <Button
                     variant="default"
                     size="icon"
                     onClick={() => setIsOpen(!isOpen)}
-                    className="h-[40px] w-[40px] rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-all duration-300 ease-in-out"
+                    className="h-12 w-12 rounded-full shadow-lg focus:outline-none focus:ring-0 bg-gradient-to-br from-background via-accent to-muted hover:from-accent hover:via-muted hover:to-background dark:from-[#121317] dark:via-accent dark:to-muted dark:hover:from-accent dark:hover:via-background dark:hover:to-muted text-foreground dark:text-white transition-all duration-500 ease-in-out group relative overflow-hidden backdrop-blur-sm border-0"
                 >
-                    <MessageCircle className="h-5 w-5" />
+                    <div className="absolute inset-0 flex items-center justify-center transition-transform duration-500 group-hover:translate-y-[-100%] group-hover:rotate-180">
+                        <HelpCircle className="h-6 w-6" strokeWidth={1.5} />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center transition-transform duration-500 translate-y-[100%] group-hover:translate-y-0 group-hover:rotate-180">
+                        <Sparkles className="h-6 w-6" strokeWidth={1.5} />
+                    </div>
                 </Button>
             </motion.div>
             <AnimatePresence>

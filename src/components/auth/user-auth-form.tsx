@@ -110,7 +110,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   }
 
   return (
-    <div className={cn('grid gap-6', className)} {...props}>
+    <div className={cn('grid gap-6 w-[300px] sm:w-full', className)} {...props}>
       <form onSubmit={onSubmit}>
         <div className='grid gap-2'>
           <Input

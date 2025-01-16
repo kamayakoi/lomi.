@@ -1,0 +1,30 @@
+import { ThemeProvider } from "@/components/landing/theme-provider";
+import { UserProvider } from '@/lib/contexts/UserContext';
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { Analytics } from "@vercel/analytics/react";
+import { BrowserRouter } from 'react-router-dom';
+import { Toaster } from "@/components/ui/toaster";
+import AppRouter from "./router";
+
+const queryClient = new QueryClient()
+
+export function App() {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider>
+                <UserProvider>
+                    <BrowserRouter
+                        future={{
+                            v7_startTransition: true,
+                            v7_relativeSplatPath: true
+                        }}
+                    >
+                        <AppRouter />
+                        <Toaster />
+                    </BrowserRouter>
+                    <Analytics />
+                </UserProvider>
+            </ThemeProvider>
+        </QueryClientProvider>
+    );
+} 

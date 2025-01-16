@@ -69,11 +69,11 @@ function ButtonExpandBack({ onClick, text }: { onClick?: () => void, text: strin
             text={text}
             icon={ArrowLeft}
             iconPlacement="left"
-            bgColor="bg-black/50"
-            textColor="text-sage-100"
-            hoverTextColor="hover:text-sage-200"
-            hoverBgColor=""
-            className="relative z-20 inline-flex items-center transition-colors px-4 py-2 rounded-none border border-sage-500/30 w-fit shadow-none"
+            bgColor="bg-zinc-900/90 dark:bg-black/50"
+            textColor="text-zinc-100 dark:text-sage-100"
+            hoverTextColor="hover:text-white dark:hover:text-sage-200"
+            hoverBgColor="hover:bg-zinc-900"
+            className="relative z-20 inline-flex items-center transition-colors px-4 py-2 rounded-none border w-fit shadow-none backdrop-blur-sm"
             onClick={onClick}
         />
     )

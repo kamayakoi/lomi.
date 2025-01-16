@@ -698,7 +698,20 @@
         },
         "top_nav": {
             "home": "Home",
-            "settings": "Settings"
+            "settings": "Settings",
+            "logs": "Logs",
+            "payment_channels": "Payment Channels",
+            "integrations": "Integrations",
+            "webhooks": "Webhooks",
+            "customers": "Customers",
+            "products": "Products",
+            "subscriptions": "Subscriptions",
+            "reporting": "Reporting",
+            "payment_links": "Payment Links",
+            "storefront": "Storefront",
+            "balance": "Balance",
+            "transactions": "Transactions",
+            "documentation": "Documentation"
         },
         "support_form": {
             "title": "Contact support",

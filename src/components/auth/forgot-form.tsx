@@ -76,7 +76,7 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
   }
 
   return (
-    <div className={cn('grid gap-6', className)} {...props}>
+    <div className={cn('grid gap-6 w-[300px] sm:w-full', className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className='grid gap-2'>

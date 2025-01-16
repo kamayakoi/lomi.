@@ -1,3 +1,7 @@
+-- Drop existing triggers if they exist
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
+
 -- Function to create a merchant record
 CREATE OR REPLACE FUNCTION public.create_merchant_record()
 RETURNS TRIGGER AS $$
@@ -22,20 +26,29 @@ CREATE TRIGGER on_auth_user_created
 CREATE OR REPLACE FUNCTION public.update_merchant_record()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE public.merchants
-  SET 
-    name = NEW.raw_user_meta_data->>'full_name',
-    email = NEW.email,
-    updated_at = NOW()
-  WHERE merchant_id = NEW.id;
-  RETURN NEW;
+    -- Only update email and name if the merchant doesn't exist or if name is NULL
+    UPDATE merchants 
+    SET 
+        email = COALESCE(NEW.email, merchants.email),
+        name = CASE 
+            WHEN merchants.name IS NULL THEN 
+                COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', merchants.name)
+            ELSE 
+                merchants.name -- Keep existing name if it's set
+            END,
+        updated_at = NOW()
+    WHERE merchant_id = NEW.id;
+    
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Trigger to call the update function on user update
+-- Create the update trigger
 CREATE TRIGGER on_auth_user_updated
-  AFTER UPDATE ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.update_merchant_record();
+    AFTER UPDATE ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.update_merchant_record();
+
 -- Function to create initial organization and link to merchant
 CREATE OR REPLACE FUNCTION public.create_initial_organization(new_merchant_id UUID)
 RETURNS void AS $$

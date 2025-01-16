@@ -31,7 +31,7 @@ export default function PaymentChannels() {
   const [organizationProviders, setOrganizationProviders] = useState<Pick<Database['public']['Tables']['organization_providers_settings']['Row'], 'provider_code' | 'is_connected'>[]>([])
 
   const topNav = [
-    { title: 'Payment Channels', href: '/portal/payment-channels', isActive: true },
+    { title: 'payment_channels', href: '/portal/payment-channels', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
@@ -224,9 +224,10 @@ export default function PaymentChannels() {
                                 variant={organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) ? 'default' : 'outline'}
                                 size='sm'
                                 className={cn(
-                                  'flex items-center px-6 py-2 text-sm font-medium rounded-none',
-                                  organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) &&
-                                  'bg-blue-500 hover:bg-blue-600 text-white'
+                                  'flex items-center px-3 py-2 text-sm font-medium rounded-sm transition-all duration-200',
+                                  organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected)
+                                    ? 'bg-blue-500/90 hover:bg-blue-600 text-white border-blue-500'
+                                    : 'hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950'
                                 )}
                                 onClick={() => {
                                   const isConnected = organizationProviders.some(op =>
@@ -251,10 +252,11 @@ export default function PaymentChannels() {
                               size='sm'
                               disabled={method.status === 'coming_soon'}
                               className={cn(
-                                'flex items-center px-4 py-2 text-sm font-medium rounded-none',
-                                organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected) &&
-                                'bg-blue-500 hover:bg-blue-600 text-white',
-                                method.status === 'coming_soon' && 'opacity-50 cursor-not-allowed'
+                                'flex items-center px-3 py-2 text-sm font-medium rounded-sm transition-all duration-200',
+                                organizationProviders.some(op => op.provider_code === method.provider_code && op.is_connected)
+                                  ? 'bg-blue-500/90 hover:bg-blue-600 text-white border-blue-500'
+                                  : 'hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950',
+                                method.status === 'coming_soon' && 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                               )}
                               onClick={() => {
                                 const isConnected = organizationProviders.some(op =>
@@ -288,7 +290,7 @@ export default function PaymentChannels() {
             ))}
 
             {/* Coming Soon panel */}
-            <section className="rounded-none border p-6 relative overflow-hidden hover:shadow-md bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
+            <section className="rounded-[2px] border-2 border-blue-100 dark:border-blue-900 p-6 relative overflow-hidden hover:shadow-md bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-indigo-900 flex flex-col justify-center min-h-[255px]">
               <div className="absolute top-0 right-0 w-40 h-40 bg-blue-200 dark:bg-blue-700 rounded-none -mr-20 -mt-20 opacity-50"></div>
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-200 dark:bg-indigo-700 rounded-none -ml-16 -mb-16 opacity-50"></div>
 
@@ -302,7 +304,7 @@ export default function PaymentChannels() {
                 <div className="flex space-x-4">
                   <a
                     href="mailto:hello@lomi.africa?subject=New Payment Channel Request"
-                    className="bg-blue-500 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg hover:bg-blue-600"
+                    className="bg-blue-500/90 hover:bg-blue-600 text-white px-3 py-2 rounded-sm inline-flex items-center transition-all duration-200"
                   >
                     <IconPlus className="mr-2 h-4 w-4" />
                     Request a new channel

@@ -90,8 +90,10 @@ export default function ThreeDImage({
                             before:absolute
                             before:inset-0
                             before:bg-gradient-to-b
-                            before:from-black/5
+                            before:from-transparent
                             before:to-transparent
+                            dark:before:from-black/5
+                            dark:before:to-transparent
                             before:z-10
                         `}
                         initial={{ opacity: 0 }}

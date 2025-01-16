@@ -633,7 +633,7 @@
                 "placeholder": "Sélectionnez votre langue",
                 "required": "La langue par défaut est requise",
                 "options": {
-                    "english": "Anglais",
+                    "english": "English",
                     "français": "Français",
                     "español": "Espagnol",
                     "português": "Portugais",
@@ -669,7 +669,7 @@
             "transactions": "Transactions",
             "reporting": "Rapports",
             "payment_links": "Liens de paiement",
-            "storefront": "Pages",
+            "storefront": "Vitrine",
             "products": "Produits",
             "subscriptions": "Abonnements",
             "customers": "Clients",
@@ -690,7 +690,20 @@
         },
         "top_nav": {
             "home": "Accueil",
-            "settings": "Paramètres"
+            "settings": "Paramètres",
+            "logs": "Logs",
+            "payment_channels": "Canaux de paiement",
+            "integrations": "Intégrations",
+            "webhooks": "Webhooks",
+            "customers": "Clients",
+            "products": "Produits",
+            "subscriptions": "Abonnements",
+            "reporting": "Rapports",
+            "payment_links": "Liens de paiement",
+            "storefront": "Vitrine",
+            "balance": "Balance",
+            "transactions": "Transactions",
+            "documentation": "Documentation"
         },
         "support_form": {
             "title": "Contacter le support",

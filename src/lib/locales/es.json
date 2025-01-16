@@ -797,7 +797,21 @@
         },
         "top_nav": {
             "home": "Inicio",
-            "settings": "Configuración"
+            "settings": "Configuración",
+            "payment_channels": "Canales de pago",
+            "payment_links": "Enlaces de pago",
+            "integrations": "Integraciones",
+            "webhooks": "Webhooks",
+            "customers": "Clientes",
+            "products": "Productos",
+            "subscriptions": "Suscripciones",
+            "reporting": "Informes",
+            "activity_logs": "Registros de actividad",
+            "logs": "Registros",
+            "documentation": "Documentación",
+            "storefront": "Tienda",
+            "balance": "Balance",
+            "transactions": "Transacciones"
         },
         "support_form": {
             "title": "Contactar soporte",

@@ -82,7 +82,7 @@ function Hero() {
               <span>{t('hero.title.suffix')}</span>
             </h1>
 
-            <p className="text-zinc-400 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl text-left">
+            <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl text-left">
               {t('hero.description')}
             </p>
           </div>

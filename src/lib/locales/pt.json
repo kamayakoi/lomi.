@@ -707,7 +707,20 @@
         },
         "top_nav": {
             "home": "Início",
-            "settings": "Configurações"
+            "settings": "Configurações",
+            "logs": "Logs",
+            "payment_channels": "Canais de pagamento",
+            "integrations": "Integrações",
+            "webhooks": "Webhooks",
+            "customers": "Clientes",
+            "products": "Produtos",
+            "subscriptions": "Assinaturas",
+            "reporting": "Relatórios",
+            "payment_links": "Links de pagamento",
+            "storefront": "Loja",
+            "balance": "Balance",
+            "transactions": "Transações",
+            "documentation": "Documentação"
         },
         "support_form": {
             "title": "Contatar suporte",

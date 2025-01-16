@@ -797,7 +797,20 @@
         },
         "top_nav": {
             "home": "首页",
-            "settings": "设置"
+            "settings": "设置",
+            "logs": "日志",
+            "payment_channels": "支付渠道",
+            "integrations": "集成",
+            "webhooks": "Webhooks",
+            "customers": "客户",
+            "products": "产品",
+            "subscriptions": "订阅",
+            "reporting": "报告",
+            "payment_links": "支付链接",
+            "storefront": "店铺",
+            "balance": "余额",
+            "transactions": "交易",
+            "documentation": "文档"
         },
         "support_form": {
             "title": "联系支持",

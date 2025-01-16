@@ -122,7 +122,7 @@ function PaymentLinksPage() {
   const [isEditLinkOpen, setIsEditLinkOpen] = useState(false)
 
   const topNav = [
-    { title: 'Payment Links', href: 'payment-links', isActive: true },
+    { title: 'payment_links', href: 'payment-links', isActive: true },
     { title: 'Settings', href: 'settings', isActive: false },
   ]
 

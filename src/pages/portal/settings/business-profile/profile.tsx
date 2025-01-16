@@ -407,28 +407,7 @@ function Profile() {
         if (!editedMerchant) return;
 
         try {
-            // First update auth metadata if name or email is being changed
-            if (field === 'name' || field === 'email') {
-                if (field === 'name') {
-                    const { error: authError } = await supabase.auth.updateUser({
-                        data: { full_name: editedMerchant.name }
-                    });
-                    if (authError) throw authError;
-                }
-                if (field === 'email') {
-                    const { error, message } = await updateUserEmail(editedMerchant.email);
-                    if (error) throw error;
-
-                    toast({
-                        title: "Verification Required",
-                        description: message || "Please check your email to verify the email change.",
-                    });
-                    setIsEditing(false);
-                    return; // Don't proceed with merchant table update until email is verified
-                }
-            }
-
-            // Then update merchant details in custom table
+            // First update merchant details in custom table
             const { error: merchantError } = await supabase.rpc('update_merchant_details', {
                 p_merchant_id: editedMerchant.merchant_id,
                 p_name: editedMerchant.name,
@@ -439,6 +418,32 @@ function Profile() {
             });
 
             if (merchantError) throw merchantError;
+
+            // Then update auth metadata if name or email is being changed
+            if (field === 'name' || field === 'email') {
+                if (field === 'name') {
+                    const { error: authError } = await supabase.auth.updateUser({
+                        data: { full_name: editedMerchant.name }
+                    });
+                    if (authError) {
+                        console.warn('Failed to update auth metadata, but merchant details were updated:', authError);
+                        // Don't throw here, as the merchant table update succeeded
+                    }
+                }
+                if (field === 'email') {
+                    const { error, message } = await updateUserEmail(editedMerchant.email);
+                    if (error) {
+                        console.warn('Failed to update email, but merchant details were updated:', error);
+                        // Don't throw here, as the merchant table update succeeded
+                    }
+                    toast({
+                        title: "Verification Required",
+                        description: message || "Please check your email to verify the email change.",
+                    });
+                    setIsEditing(false);
+                    return;
+                }
+            }
 
             // Update local state
             setMerchant(editedMerchant);

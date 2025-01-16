@@ -16,27 +16,42 @@ import { useUserAvatar } from '@/lib/hooks/useUserAvatar';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+interface PostgresChangePayload {
+  new: {
+    name?: string;
+  };
+}
+
 export function UserNav() {
   const { user } = useUser();
   const navigate = useNavigate();
   const { avatarUrl, fetchUserAvatar } = useUserAvatar();
   const { t } = useTranslation();
-  const [userName, setUserName] = useState<string>(user?.user_metadata['full_name'] || '');
+  const [userName, setUserName] = useState<string>('');
+
+  // Function to fetch merchant name using RPC
+  const fetchMerchantName = async (userId: string) => {
+    const { data, error } = await supabase
+      .rpc('fetch_merchant_details', {
+        p_user_id: userId
+      });
+
+    if (!error && data?.[0]?.name) {
+      setUserName(data[0].name);
+    }
+  };
+
+  // Initial fetch of merchant name
+  useEffect(() => {
+    if (user?.id) {
+      fetchMerchantName(user.id);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
-    // Update userName when user metadata changes
-    setUserName(user?.user_metadata['full_name'] || '');
-  }, [user?.user_metadata]);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'USER_UPDATED') {
-        setUserName(session?.user?.user_metadata['full_name'] || '');
-      }
-    });
-
+    // Listen for merchant name updates
     const merchantsChannel = supabase
-      .channel('merchants')
+      .channel('merchant_updates')
       .on(
         'postgres_changes',
         {
@@ -45,17 +60,27 @@ export function UserNav() {
           table: 'merchants',
           filter: `merchant_id=eq.${user?.id}`,
         },
-        () => {
+        (payload: PostgresChangePayload) => {
+          if (payload.new?.name) {
+            setUserName(payload.new.name);
+          }
           fetchUserAvatar();
         }
       )
       .subscribe();
 
+    // Listen for auth state changes to refetch merchant name
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.id) {
+        fetchMerchantName(session.user.id);
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
       supabase.removeChannel(merchantsChannel);
     };
-  }, [user, fetchUserAvatar]);
+  }, [user?.id, fetchUserAvatar]);
 
   const handleLogout = async () => {
     window.location.href = '/';
