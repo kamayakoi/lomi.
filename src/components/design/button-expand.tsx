@@ -1,4 +1,4 @@
-import { ArrowRight, LucideIcon, Phone } from "lucide-react"
+import { ArrowRight, LucideIcon, Phone, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface ButtonExpandProps {
@@ -9,6 +9,8 @@ interface ButtonExpandProps {
     hoverBgColor?: string;
     hoverTextColor?: string;
     onClick?: () => void;
+    className?: string;
+    iconPlacement?: 'left' | 'right';
 }
 
 function ButtonExpand({
@@ -18,14 +20,16 @@ function ButtonExpand({
     textColor = "text-green-700 dark:text-green-300",
     hoverBgColor = "hover:bg-green-100 dark:hover:bg-green-900/40",
     hoverTextColor = "hover:text-green-800 dark:hover:text-green-200",
-    onClick
+    onClick,
+    className,
+    iconPlacement = 'right'
 }: ButtonExpandProps) {
     return (
         <Button
             variant="expandIcon"
             Icon={() => <Icon className="h-4 w-4" />}
-            iconPlacement="right"
-            className={`text-sm sm:text-base font-medium ${textColor} ${hoverTextColor} ${bgColor} ${hoverBgColor} shadow-lg transition-all duration-300 h-11 sm:h-10 px-4 sm:px-4`}
+            iconPlacement={iconPlacement}
+            className={`text-sm sm:text-base font-medium ${textColor} ${hoverTextColor} ${bgColor} ${hoverBgColor} shadow-lg transition-all duration-300 h-11 sm:h-10 px-4 sm:px-4 ${className}`}
             onClick={onClick}
         >
             {text}
@@ -58,8 +62,26 @@ function ButtonExpandTalkToUs() {
     )
 }
 
+// Back button with specific styling
+function ButtonExpandBack({ onClick, text }: { onClick?: () => void, text: string }) {
+    return (
+        <ButtonExpand
+            text={text}
+            icon={ArrowLeft}
+            iconPlacement="left"
+            bgColor="bg-black/50"
+            textColor="text-sage-100"
+            hoverTextColor="hover:text-sage-200"
+            hoverBgColor=""
+            className="relative z-20 inline-flex items-center transition-colors px-4 py-2 rounded-none border border-sage-500/30 w-fit shadow-none"
+            onClick={onClick}
+        />
+    )
+}
+
 export {
     ButtonExpand,
     ButtonExpandIconRight,
-    ButtonExpandTalkToUs
+    ButtonExpandTalkToUs,
+    ButtonExpandBack
 } 

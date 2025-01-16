@@ -1,8 +1,8 @@
 import { UserAuthForm } from '@/components/auth/user-auth-form'
 import { Link } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { AnimatedBeamMultipleOutputDemo } from '@/components/landing/AnimatedBeamMultipleOutputs'
+import { ButtonExpandBack } from '@/components/design/button-expand'
 
 export default function SignIn() {
   const { t } = useTranslation()
@@ -12,12 +12,10 @@ export default function SignIn() {
       <div className='container relative grid h-svh flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0'>
         <div className='relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex'>
           <div className='absolute inset-0 bg-black' />
-          <Link
-            to="/"
-            className="relative z-20 w-1/6 flex items-center text-sage-100 hover:text-sage-200 transition-colors bg-black px-4 py-2 rounded-md border border-transparent"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="text-lg font-medium">{t('auth.sign_in.home_link')}</span>
+          <Link to="/">
+            <ButtonExpandBack
+              text={t('auth.sign_in.home_link')}
+            />
           </Link>
           <div className='relative z-20 flex items-center justify-center flex-grow'>
             <AnimatedBeamMultipleOutputDemo />
