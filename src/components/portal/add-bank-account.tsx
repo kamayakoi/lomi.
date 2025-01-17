@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
-import { BankAccount } from '@/pages/portal/settings/withdrawals/types'
+import { BankAccount } from '@/pages/portal/settings/withdrawals/Withdrawal_types'
 import { countries } from '@/utils/data/onboarding'
 
 interface AddBankButtonProps {

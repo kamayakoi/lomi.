@@ -69,6 +69,29 @@ export enum FirstPaymentType {
   non_initial = 'non_initial',
 }
 
+export enum PaymentLinkType {
+  product = 'product',
+  plan = 'plan',
+  instant = 'instant',
+}
+
+export enum WebhookEvent {
+  TRANSACTION_CREATED = 'TRANSACTION_CREATED',
+  TRANSACTION_COMPLETED = 'TRANSACTION_COMPLETED',
+  TRANSACTION_FAILED = 'TRANSACTION_FAILED',
+  REFUND_CREATED = 'REFUND_CREATED',
+  REFUND_COMPLETED = 'REFUND_COMPLETED',
+  REFUND_FAILED = 'REFUND_FAILED',
+  SUBSCRIPTION_CREATED = 'SUBSCRIPTION_CREATED',
+  SUBSCRIPTION_RENEWED = 'SUBSCRIPTION_RENEWED',
+  SUBSCRIPTION_FAILED = 'SUBSCRIPTION_FAILED',
+  SUBSCRIPTION_CANCELLED = 'SUBSCRIPTION_CANCELLED',
+  PAYMENT_LINK_CREATED = 'PAYMENT_LINK_CREATED',
+  PAYMENT_LINK_USED = 'PAYMENT_LINK_USED',
+  PROVIDER_CONNECTED = 'PROVIDER_CONNECTED',
+  PROVIDER_DISCONNECTED = 'PROVIDER_DISCONNECTED',
+}
+
 export interface Error extends Record<string, unknown> {
   code?: string;
   message?: string;
@@ -207,6 +230,104 @@ export interface Provider extends Record<string, unknown> {
   code?: ProviderCode;
   name?: string;
   description?: string;
+  [key: string]: unknown;
+}
+
+export interface Refund extends Record<string, unknown> {
+  refund_id: string;
+  transaction_id: string;
+  amount: number;
+  currency_code: CurrencyCode;
+  status: 'pending' | 'completed' | 'failed';
+  reason?: string;
+  metadata?: Record<string, unknown>;
+  created_at?: Date;
+  updated_at?: Date;
+  [key: string]: unknown;
+}
+
+export interface CreateRefund extends Record<string, unknown> {
+  transaction_id: string;
+  amount: number;
+  reason?: string;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface Customer extends Record<string, unknown> {
+  customer_id: string;
+  merchant_id: string;
+  email?: string;
+  phone_number?: string;
+  first_name?: string;
+  last_name?: string;
+  address?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  created_at?: Date;
+  updated_at?: Date;
+  [key: string]: unknown;
+}
+
+export interface CreateCustomer extends Record<string, unknown> {
+  merchant_id: string;
+  email?: string;
+  phone_number?: string;
+  first_name?: string;
+  last_name?: string;
+  address?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface CreatePaymentLink extends Record<string, unknown> {
+  merchant_id: string;
+  link_type: PaymentLinkType;
+  product_id?: string;
+  plan_id?: string;
+  title: string;
+  public_description?: string;
+  private_description?: string;
+  price?: number;
+  currency_code: CurrencyCode;
+  allowed_providers: Array<ProviderCode>;
+  allow_coupon_code?: boolean;
+  is_active?: boolean;
+  expires_at?: Date;
+  success_url?: string;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface PaymentLink extends Record<string, unknown> {
+  // Extends CreatePaymentLink
+  link_id?: string;
+  organization_id?: string;
+  url?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  [key: string]: unknown;
+}
+
+export interface CreateWebhook extends Record<string, unknown> {
+  merchant_id: string;
+  url: string;
+  authorized_events: Array<WebhookEvent>;
+  is_active?: boolean;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface Webhook extends Record<string, unknown> {
+  // Extends CreateWebhook
+  webhook_id?: string;
+  verification_token?: string;
+  last_triggered_at?: Date;
+  last_payload?: Record<string, unknown>;
+  last_response_status?: number;
+  last_response_body?: string;
+  retry_count?: number;
+  created_at?: Date;
+  updated_at?: Date;
   [key: string]: unknown;
 }
 

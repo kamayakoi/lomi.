@@ -6,6 +6,7 @@ export class CheckoutSessionsClient extends BaseClient {
 
   /**
  * Create a checkout session
+ * Create a new checkout session for collecting payments
  */
   public async create(data: Types.CreateCheckoutSession): Promise<ApiResult<Types.CheckoutSession>> {
     return this.request({
@@ -16,9 +17,10 @@ export class CheckoutSessionsClient extends BaseClient {
   }
 
   /**
- * Get checkout session details
+ * List checkout sessions
+ * List all checkout sessions for a merchant
  */
-  public async list(params?: { checkout_session_id: string }): Promise<ApiResult<Types.CheckoutSession>> {
+  public async list(params?: { merchant_id: string, checkout_session_id?: string, status?: string }): Promise<ApiResult<Types.CheckoutSession[]>> {
     return this.request({
       method: 'GET',
       path: '/checkout-sessions',

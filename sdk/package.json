@@ -1,7 +1,7 @@
 {
   "name": "@lomi/sdk",
   "version": "1.0.0",
-  "description": "Lomi Payment SDK",
+  "description": "Lomi SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

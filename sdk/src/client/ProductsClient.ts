@@ -25,4 +25,41 @@ export class ProductsClient extends BaseClient {
       params
     });
   }
+
+  /**
+ * Get product details
+ * Get details of a specific product
+ */
+  public async get(product_id: string): Promise<ApiResult<Types.Product>> {
+    return this.request({
+      method: 'GET',
+      path: '/products/{product_id}',
+      params: { product_id: product_id }
+    });
+  }
+
+  /**
+ * Update product
+ * Update product details
+ */
+  public async patch(product_id: string, data: Record<string, unknown>): Promise<ApiResult<Types.Product>> {
+    return this.request({
+      method: 'PATCH',
+      path: '/products/{product_id}',
+      params: { product_id: product_id },
+      data
+    });
+  }
+
+  /**
+ * Delete product
+ * Delete a product
+ */
+  public async delete(product_id: string): Promise<ApiResult<void>> {
+    return this.request({
+      method: 'DELETE',
+      path: '/products/{product_id}',
+      params: { product_id: product_id }
+    });
+  }
 }

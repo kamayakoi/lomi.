@@ -120,14 +120,29 @@ export class BaseClient {
   protected async request<T>(options: ApiRequestOptions): Promise<ApiResult<T>> {
     const { method, path, params, data } = options;
     
-    const url = new URL(path, this.baseUrl);
+    // First replace path parameters
+    let resolvedPath = path;
+    const queryParams: Record<string, string> = {};
+    
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
-          url.searchParams.append(key, String(value));
+          const placeholder = \`{\${key}}\`;
+          if (resolvedPath.includes(placeholder)) {
+            resolvedPath = resolvedPath.replace(placeholder, String(value));
+          } else {
+            queryParams[key] = String(value);
+          }
         }
       });
     }
+
+    const url = new URL(resolvedPath, this.baseUrl);
+    
+    // Add remaining params as query parameters
+    Object.entries(queryParams).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
+    });
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -146,6 +161,10 @@ export class BaseClient {
 
       if (!response.ok) {
         throw new ApiError(response.status, await response.json());
+      }
+
+      if (response.status === 204) {
+        return new ApiResult<T>(response.status, undefined as T);
       }
 
       const responseData = await response.json() as T;
@@ -217,10 +236,8 @@ function isOperationObject(obj: unknown): obj is OperationObject {
 }
 
 function getClientClassName(resource: string): string {
-  // Convert kebab-case to PascalCase and append Client
-  return `${resource.split('-')
-    .map(part => capitalize(part))
-    .join('')}Client`;
+  // Already in PascalCase, just append Client
+  return `${resource}Client`;
 }
 
 function generateResourceClient(
@@ -271,7 +288,11 @@ ${methods.join('\n')}
 
 function generateIndex(resources: string[]): string {
   const content = `${resources
-    .map((resource) => `export * from './${capitalize(resource)}Client';`)
+    .map((resource) => {
+      // Convert kebab-case to PascalCase for the client class name
+      const clientName = getClientClassName(resource);
+      return `export * from './${clientName}';`;
+    })
     .join('\n')}
 export * from './BaseClient';
 export * from './core/ApiError';
@@ -319,7 +340,10 @@ export class ApiError extends Error {
 
 function getResourceFromPath(path: string): string {
   const parts = path.split('/').filter(Boolean);
-  return parts[0] || 'default';
+  // Convert kebab-case to PascalCase
+  return parts[0].split('-')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
 }
 
 function capitalize(str: string): string {

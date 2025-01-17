@@ -1,6 +1,6 @@
-# Lomi Payment SDK
+# Lomi SDK
 
-The Lomi Payment SDK provides a simple way to integrate Lomi's payment services into your application.
+The Lomi SDK provides a simple way to integrate Lomi's payment services into your application.
 
 ## Features
 
