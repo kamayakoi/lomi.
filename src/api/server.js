@@ -2,6 +2,8 @@ import express from "express";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import apiRouter from './routes';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,10 +11,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.use(express.json());
+
+// API routes
+app.use('/api', apiRouter);
+
 // Serve static files from the 'dist' directory
 app.use(express.static(path.join(__dirname, "..", "..", "dist")));
-
-app.use(express.json());
 
 // Handle all other routes by serving the index.html file
 app.get("*", (_req, res) => {

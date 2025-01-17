@@ -323,7 +323,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     {displayMode === 'desktop' && (
                         <div className="mt-8 text-left">
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
-                                Powered by <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
+                                Powered by <img src="/transparent2.webp" alt="lomi." className="h-8 w-8 ml-1" />
                             </span>
                             <div className="mt-2 text-xs flex items-center justify-between">
                                 <div className="space-x-2">

@@ -69,7 +69,7 @@ class NotificationService {
       const emailOptions: EmailOptions = {
         from: 'notifications@lomi.africa',
         to: payload.to,
-        subject: payload.subject || 'Notification from Lomi',
+        subject: payload.subject || 'Notification from lomi.',
         text: payload.message,
         html: payload.message,
       };

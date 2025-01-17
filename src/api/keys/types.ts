@@ -5,6 +5,7 @@ export interface ApiKey {
   name: string;
   is_active: boolean;
   expiration_date: string | null;
+  environment: 'test' | 'live';
   created_at: string;
   updated_at: string;
 }

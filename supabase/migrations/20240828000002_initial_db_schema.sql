@@ -637,6 +637,7 @@ CREATE TABLE api_keys (
     name VARCHAR(100) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT true,
     expiration_date TIMESTAMPTZ,
+    environment VARCHAR NOT NULL DEFAULT 'live' CHECK (environment IN ('test', 'live')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (organization_id, api_key)

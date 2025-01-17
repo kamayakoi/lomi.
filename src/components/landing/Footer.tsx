@@ -71,7 +71,7 @@ export function Footer() {
                 const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
                     headers: {
                         'Accept': 'application/vnd.github.v3+json',
-                        'User-Agent': 'Lomi-Website',
+                        'User-Agent': 'lomi-website',
                     },
                     cache: 'force-cache'
                 });

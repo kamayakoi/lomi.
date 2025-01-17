@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import { handleWaveCheckoutWebhook } from '@/api/services/waveService';
+import { validateApiKey } from './middleware/auth';
 
 const router = Router();
+
+// Apply API key validation middleware to all webhook routes
+router.use(validateApiKey);
 
 router.post('/wave/checkout', async (req, res) => {
   try {

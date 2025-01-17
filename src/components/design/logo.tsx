@@ -4,7 +4,7 @@ export function Logo() {
             <div className="relative w-[50px] h-[50px] rounded-sm overflow-hidden bg-zinc-900">
                 <img
                     src="/transparent.webp"
-                    alt="Lomi Logo"
+                    alt="lomi. Logo"
                     className="object-cover"
                     fetchPriority="high"
                 />

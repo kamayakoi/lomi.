@@ -1,36 +1,62 @@
 -- Enable the pgcrypto extension
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- Function to generate a new API key
+-- Function to generate an API key
 CREATE OR REPLACE FUNCTION public.generate_api_key(
     p_merchant_id UUID,
     p_organization_id UUID,
     p_name VARCHAR,
-    p_expiration_date TIMESTAMPTZ DEFAULT NULL
-)
-RETURNS TABLE (api_key VARCHAR) AS $$
+    p_expiration_date TIMESTAMPTZ DEFAULT NULL,
+    p_environment VARCHAR DEFAULT 'live'
+) RETURNS TABLE (
+    api_key VARCHAR
+) AS $$
 DECLARE
     v_api_key VARCHAR;
+    v_prefix VARCHAR;
 BEGIN
-    v_api_key := 'lomi_sk_' || md5(random()::text || clock_timestamp()::text);
+    -- Set the environment prefix
+    v_prefix := CASE 
+        WHEN p_environment = 'test' THEN 'lomi_sk_test_'
+        ELSE 'lomi_sk_'
+    END;
+
+    -- Generate a secure API key using the original method
+    v_api_key := v_prefix || md5(random()::text || clock_timestamp()::text);
     v_api_key := v_api_key || substring(md5(random()::text), 1, 88 - length(v_api_key));
 
-    INSERT INTO api_keys (merchant_id, organization_id, api_key, name, expiration_date)
-    VALUES (p_merchant_id, p_organization_id, v_api_key, p_name, p_expiration_date);
+    -- Insert the new API key
+    INSERT INTO api_keys (
+        merchant_id,
+        organization_id,
+        api_key,
+        name,
+        is_active,
+        expiration_date,
+        environment
+    ) VALUES (
+        p_merchant_id,
+        p_organization_id,
+        v_api_key,
+        p_name,
+        TRUE,
+        p_expiration_date,
+        p_environment
+    );
 
-    -- Log the API key creation
+    -- Log the API key generation
     PERFORM public.log_event(
         p_merchant_id := p_merchant_id,
         p_event := 'create_api_key'::event_type,
         p_details := jsonb_build_object(
-            'api_key_name', p_name,
-            'expiration_date', p_expiration_date,
-            'organization_id', p_organization_id
+            'api_key', substring(v_api_key, 1, 8) || '****',
+            'name', p_name,
+            'environment', p_environment
         ),
-        p_severity := 'CRITICAL'
+        p_severity := 'INFO'
     );
 
-    RETURN QUERY SELECT v_api_key AS api_key;
+    RETURN QUERY SELECT v_api_key;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -103,5 +129,52 @@ BEGIN
         ),
         p_severity := 'CRITICAL'
     );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to validate an API key
+CREATE OR REPLACE FUNCTION public.validate_api_key(p_api_key VARCHAR)
+RETURNS TABLE (
+    merchant_id UUID,
+    organization_id UUID,
+    is_active BOOLEAN,
+    expiration_date TIMESTAMPTZ,
+    environment VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        ak.merchant_id,
+        ak.organization_id,
+        ak.is_active,
+        ak.expiration_date,
+        ak.environment
+    FROM api_keys ak
+    WHERE ak.api_key = p_api_key;
+
+    -- Log the API key validation attempt
+    IF FOUND THEN
+        PERFORM public.log_event(
+            p_merchant_id := merchant_id,
+            p_event := 'validate_api_key'::event_type,
+            p_details := jsonb_build_object(
+                'api_key', substring(p_api_key, 1, 8) || '****',
+                'success', true,
+                'environment', environment
+            ),
+            p_severity := 'INFO'
+        );
+    ELSE
+        -- Log failed validation attempt with null merchant_id
+        PERFORM public.log_event(
+            p_merchant_id := NULL,
+            p_event := 'validate_api_key'::event_type,
+            p_details := jsonb_build_object(
+                'api_key', substring(p_api_key, 1, 8) || '****',
+                'success', false
+            ),
+            p_severity := 'WARNING'
+        );
+    END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

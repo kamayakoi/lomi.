@@ -38,7 +38,7 @@ export default function TwoFactorAuth({ merchantId, initialStatus = false }: Two
 
     const generateQRCode = async (secret: string) => {
         try {
-            const otpAuthUrl = authenticator.keyuri(merchantId, 'Lomi', secret);
+            const otpAuthUrl = authenticator.keyuri(merchantId, 'lomi.', secret);
             const qrCode = await QRCode.toDataURL(otpAuthUrl);
             setQrCodeUrl(qrCode);
         } catch (error) {

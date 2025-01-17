@@ -422,7 +422,7 @@ export default function CheckoutPage() {
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
                                 Powered by{' '}
                                 <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer">
-                                    <img src="/transparent2.webp" alt="Lomi" className="h-8 w-8 ml-1" />
+                                    <img src="/transparent2.webp" alt="lomi." className="h-8 w-8 ml-1" />
                                 </a>
                             </span>
                         </div>
