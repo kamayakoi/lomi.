@@ -280,7 +280,7 @@ export function Footer() {
                                             <GitHubIcon className="h-[20px] w-[20px]" />
                                         </Link>
 
-                                        <Link to="https://lomi.slack.com" target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link to="https://lomi.slack.com" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                                             <SlackIcon className="h-[20px] w-[20px]" />
                                         </Link>
                                         <Link to="https://www.linkedin.com/company/lomiafri" target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">

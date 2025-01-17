@@ -7,12 +7,12 @@ import { Separator } from '@/components/ui/separator';
 import FeedbackForm from '@/components/portal/feedback-form'
 import Notifications from '@/components/portal/notifications'
 import { UserNav } from '@/components/portal/user-nav'
-import { StorefrontPreview } from './storefront/storefront-preview'
-import { OrganizationSettings } from './storefront/settings'
-import { CheckoutPreview } from './storefront/checkout-preview'
-import { ConfirmationPreview } from './storefront/confirmation-preview'
-import { PortalPreview } from './storefront/portal-preview'
-import { PreviewSwitcher } from './storefront/preview-switcher'
+import { StorefrontPreview } from './components/storefront-preview'
+import { OrganizationSettings } from './components/settings'
+import { CheckoutPreview } from './components/checkout-preview'
+import { ConfirmationPreview } from './components/confirmation-preview'
+import { PortalPreview } from './components/portal-preview'
+import { PreviewSwitcher } from './components/preview-switcher'
 import SupportForm from '@/components/portal/support-form'
 
 interface StorefrontSettings {

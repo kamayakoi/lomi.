@@ -24,8 +24,8 @@ import { supabase } from '@/utils/supabase/client'
 import { Skeleton } from '@/components/ui/skeleton'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
-import { Customer } from './dev_customers/types'
-import CustomerActions from './dev_customers/actions_customers'
+import { Customer } from './components/Customers_types'
+import CustomerActions from './components/actions_customers'
 import { cn } from '@/lib/actions/utils'
 import {
     Table,
@@ -36,8 +36,8 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { countries } from '@/utils/data/onboarding'
-import { CustomerFilters } from './dev_customers/filters_customers'
-import { EditCustomerForm } from './dev_customers/edit_customer'
+import { CustomerFilters } from './components/filters_customers'
+import { EditCustomerForm } from './components/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"

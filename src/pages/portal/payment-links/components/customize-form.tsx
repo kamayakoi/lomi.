@@ -10,13 +10,13 @@ import { SegmentedControl } from "@/components/ui/segmented-control"
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { useNavigate } from 'react-router-dom'
-import { fetchProducts } from '@/pages/portal/product/dev_product/support_product'
-import { fetchSubscriptionPlans } from '@/pages/portal/subscription/dev_subscription/support_subscriptions'
-import { Product } from '@/pages/portal/product/dev_product/types'
-import { SubscriptionPlan } from '@/pages/portal/subscription/dev_subscription/types'
+import { fetchProducts } from '@/pages/portal/product/components/support_product'
+import { fetchSubscriptionPlans } from '@/pages/portal/subscription/components/support_subscriptions'
+import { Product } from '@/pages/portal/product/components/Products_types'
+import { SubscriptionPlan } from '@/pages/portal/subscription/components/types'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
-import { provider_code } from './types'
+import { provider_code } from './PaymentLinks_types'
 
 interface PaymentMethod {
     id: string

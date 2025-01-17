@@ -8,14 +8,14 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { fetchSubscriptionPlans, fetchSubscriptions } from './dev_subscription/support_subscriptions'
-import { SubscriptionPlan, Subscription, frequencyColors } from './dev_subscription/types'
+import { fetchSubscriptionPlans, fetchSubscriptions } from './components/support_subscriptions'
+import { SubscriptionPlan, Subscription, frequencyColors } from './components/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInfiniteQuery } from 'react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
-import { CreatePlanForm } from './dev_subscription/form_subscriptions'
-import { SubscriptionFilters } from './dev_subscription/filters_subscriptions'
-import { SubscriptionStatus } from './dev_subscription/filters_subscriptions'
+import { CreatePlanForm } from './components/form_subscriptions'
+import { SubscriptionFilters } from './components/filters_subscriptions'
+import { SubscriptionStatus } from './components/filters_subscriptions'
 import SupportForm from '@/components/portal/support-form'
 import {
   Dialog,
@@ -23,8 +23,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { PlusCircle, Edit, ArrowUpDown } from 'lucide-react'
-import SubscriptionActions from './dev_subscription/actions_subscriptions'
-import { EditPlanForm } from './dev_subscription/edit_plan_subscriptions'
+import SubscriptionActions from './components/actions_subscriptions'
+import { EditPlanForm } from './components/edit_plan_subscriptions'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"

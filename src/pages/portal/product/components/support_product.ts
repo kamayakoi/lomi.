@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { Product, Transaction, ProductsResponse } from './types'
+import { Product, Transaction, ProductsResponse } from './Products_types'
 
 export async function uploadProductImage(file: File, merchantId: string): Promise<string | null> {
     const fileExt = file.name.split('.').pop()

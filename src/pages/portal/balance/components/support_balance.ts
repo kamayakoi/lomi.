@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
-import { Payout, payout_status, BankAccount, BalanceBreakdown } from './types'
+import { Payout, payout_status, BankAccount, BalanceBreakdown } from './Balance_types'
 import { DateRange } from 'react-day-picker'
 import { subDays, subMonths, startOfYear, format, parse } from 'date-fns'
 import { fr } from 'date-fns/locale'

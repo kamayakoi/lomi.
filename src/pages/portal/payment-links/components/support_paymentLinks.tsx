@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { PaymentLink } from './types'
+import { PaymentLink } from './PaymentLinks_types'
 // import { config } from '@/utils/config'
 
 export const fetchPaymentLinks = async (

@@ -7,10 +7,10 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/useUser'
-import { Product } from './dev_product/types'
+import { Product } from './components/Products_types'
 import { Skeleton } from '@/components/ui/skeleton'
-import { CreateProductForm } from './dev_product/form_product'
-import { ProductFilters } from './dev_product/filters_product'
+import { CreateProductForm } from './components/form_product'
+import { ProductFilters } from './components/filters_product'
 import SupportForm from '@/components/portal/support-form'
 import {
     Dialog,
@@ -22,11 +22,11 @@ import {
 } from "@/components/ui/dialog"
 import { PlusCircle, Edit, ImageIcon, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useQuery } from 'react-query'
-import ProductActions from './dev_product/actions_product'
-import { EditProductForm } from './dev_product/edit_product'
+import ProductActions from './components/actions_product'
+import { EditProductForm } from './components/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Card, CardContent } from "@/components/ui/card"
-import { fetchProducts } from './dev_product/support_product'
+import { fetchProducts } from './components/support_product'
 import { cn } from '@/lib/actions/utils'
 
 function ProductCard({ product, onEditClick, onClick }: {

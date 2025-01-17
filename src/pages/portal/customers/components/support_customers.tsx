@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { Customer } from './types'
+import { Customer } from './Customers_types'
 
 export const fetchTransactions = async (customerId: string) => {
     const { data, error } = await supabase

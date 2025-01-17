@@ -41,7 +41,8 @@
     "include": [
         "src/**/*.ts",
         "src/**/*.tsx",
-        "api/routes/server.js"
+        "api/routes/server.js",
+        "src/pages/portal/transactions/components"
     ],
     "references": [
         {

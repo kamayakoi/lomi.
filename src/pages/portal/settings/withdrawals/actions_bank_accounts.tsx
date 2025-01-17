@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { BankAccount } from './types'
+import { BankAccount } from './Withdrawal_types'
 import { LifeBuoy } from 'lucide-react'
 
 type BankAccountActionsProps = {

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PaymentLink, provider_code, link_type } from './types'
+import { PaymentLink, provider_code, link_type } from './PaymentLinks_types'
 import { LifeBuoy, X } from 'lucide-react'
 import { toast } from "@/components/ui/use-toast"
 import { Separator } from "@/components/ui/separator"

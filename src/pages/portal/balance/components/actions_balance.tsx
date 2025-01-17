@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Payout, payout_status, BankAccount } from './types'
+import { Payout, payout_status, BankAccount } from './Balance_types'
 import { Separator } from "@/components/ui/separator"
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'

@@ -73,7 +73,7 @@ function ButtonExpandBack({ onClick, text }: { onClick?: () => void, text: strin
             textColor="text-zinc-100 dark:text-sage-100"
             hoverTextColor="hover:text-white dark:hover:text-sage-200"
             hoverBgColor="hover:bg-zinc-900"
-            className="relative z-20 inline-flex items-center transition-colors px-4 py-2 rounded-none border w-fit shadow-none backdrop-blur-sm"
+            className="relative z-20 inline-flex items-center transition-colors px-4 py-2 rounded-none border-zinc-800 border w-fit shadow-none backdrop-blur-sm"
             onClick={onClick}
         />
     )

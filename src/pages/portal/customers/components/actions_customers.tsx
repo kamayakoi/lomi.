@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Customer, Transaction } from './types'
+import { Customer, Transaction } from './Customers_types'
 import { Separator } from "@/components/ui/separator"
 import { LifeBuoy, CalendarDays, Check, X } from 'lucide-react'
 import { useState, useEffect } from 'react'

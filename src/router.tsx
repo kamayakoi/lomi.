@@ -12,7 +12,7 @@ import Signup from './pages/auth/sign-up';
 import Forgot from './pages/auth/forgot-password';
 import OTP from './pages/auth/otp';
 import ResetPassword from './pages/auth/reset-password';
-import Onboarding from './pages/auth/onboarding/onboarding';
+import Onboarding from './pages/auth/onboarding/onboarding.tsx';
 import AuthCallback from './pages/auth/callback';
 // Error pages
 import GeneralError from './pages/errors/general-error.tsx';
@@ -20,20 +20,20 @@ import NotFoundError from './pages/errors/not-found-error.tsx';
 import MaintenanceError from './pages/errors/maintenance-error.tsx';
 // Dashboard
 import AppShell from './components/portal/app-shell';
-import Dashboard from '@/pages/portal/dashboard/Dashboard';
+import Dashboard from '@/pages/portal/portal.tsx';
 import Integrators from '@/pages/portal/Integrate/Integrate.tsx';
 import PaymentChannels from './pages/portal/payment-channels/paymentChannels.tsx';
-import Logs from './pages/portal/logs-page/Logs.tsx';
+import Logs from './pages/portal/logs/logs.tsx';
 import Balance from './pages/portal/balance/Balance.tsx';
 import Transactions from './pages/portal/transactions/Transactions.tsx';
-import Reporting from './pages/portal/reporting/Reporting.tsx';
+import Reporting from './pages/portal/reporting/reporting.tsx';
 import Webhooks from './pages/portal/webhooks/Webhooks.tsx';
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks.tsx';
 import Customers from './pages/portal/customers/Customers.tsx';
 import Subscription from "./pages/portal/subscription/subscription.tsx";
-import Product from "./pages/portal/product/Product.tsx";
+import Product from "./pages/portal/product/product.tsx";
 import Storefront from "./pages/portal/storefront/Storefront.tsx";
-import Activation from './pages/auth/activation/activation';
+import Activation from './pages/auth/activation/activation.tsx';
 // Checkout pages
 import CheckoutPage from '@/api/checkout/Checkout.tsx';
 // Website routes

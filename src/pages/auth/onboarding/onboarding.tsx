@@ -5,20 +5,20 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { cn } from '@/lib/actions/utils'
-import OnboardingStep1 from './onboarding-step-1';
-import OnboardingStep2 from './onboarding-step-2';
-import OnboardingStep3 from './onboarding-step-3';
-import OnboardingStep4 from './onboarding-step-4';
+import OnboardingStep1 from './components/onboarding-step-1';
+import OnboardingStep2 from './components/onboarding-step-2';
+import OnboardingStep3 from './components/onboarding-step-3';
+import OnboardingStep4 from './components/onboarding-step-4';
 import { Button } from '@/components/ui/button';
 import LoadingButton from '@/components/portal/loader';
-import WelcomeScreen from './welcome-screen';
+import WelcomeScreen from './components/welcome-screen';
 import { useTranslation } from 'react-i18next';
 
 // Import types from each step
-import type { OnboardingStep1Data } from './onboarding-step-1';
-import type { OnboardingStep2Data } from './onboarding-step-2';
-import type { OnboardingStep3Data } from './onboarding-step-3';
-import type { OnboardingStep4Data } from './onboarding-step-4';
+import type { OnboardingStep1Data } from './components/onboarding-step-1';
+import type { OnboardingStep2Data } from './components/onboarding-step-2';
+import type { OnboardingStep3Data } from './components/onboarding-step-3';
+import type { OnboardingStep4Data } from './components/onboarding-step-4';
 
 type StepData = OnboardingStep1Data | OnboardingStep2Data | OnboardingStep3Data | OnboardingStep4Data;
 

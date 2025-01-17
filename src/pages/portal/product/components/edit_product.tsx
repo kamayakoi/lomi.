@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { updateProduct, deleteProduct, uploadProductImage, deleteProductImage } from './support_product'
-import { Product } from './types'
+import { Product } from './Products_types'
 import InputRightAddon from "@/components/ui/input-right-addon"
 import { Loader2, X, Upload } from 'lucide-react'
 import { Button } from "@/components/ui/button"

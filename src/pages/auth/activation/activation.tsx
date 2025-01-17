@@ -1,10 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Check, ChevronLeft } from 'lucide-react'
-import ActivationStep1 from './activation-step-1'
-import ActivationStep2 from './activation-step-2'
-import ActivationStep3 from './activation-step-3'
-import ActivationStep4 from './activation-step-4'
-import ActivationStep5 from './activation-step-5'
+import ActivationStep1 from './components/activation-step-1'
+import ActivationStep2 from './components/activation-step-2'
+import ActivationStep3 from './components/activation-step-3'
+import ActivationStep4 from './components/activation-step-4'
+import ActivationStep5 from './components/activation-step-5'
 import { useToast } from '@/components/ui/use-toast';
 import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
 import LoadingButton from '@/components/portal/loader';

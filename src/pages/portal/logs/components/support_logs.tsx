@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client'
-import { Log } from './types'
+import { Log } from './Logs_types'
 
 interface FetchLogsParams {
     userId: string

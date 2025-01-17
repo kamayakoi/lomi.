@@ -2,7 +2,7 @@ import { Search, RefreshCw } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { link_type, currency_code } from './types'
+import { link_type, currency_code } from './PaymentLinks_types'
 import { useState } from 'react'
 
 interface PaymentLinkFiltersProps {
