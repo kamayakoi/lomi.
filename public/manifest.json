@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
-  "description": "Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and eWallets, send payouts and automate invoicing for your business. Create an account, explore our docs and starting selling today.",
+  "description": "Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and crypto, send payouts and automate financial workflows with ease.",
   "icons": [
     {
       "src": "/icon-L.png",
@@ -28,12 +28,32 @@
     {
       "name": "Portal",
       "url": "/portal",
-      "description": "Get started in minutes"
+      "description": "Access your lomi dashboard"
+    },
+    {
+      "name": "Products",
+      "url": "/products",
+      "description": "Explore our payment solutions"
     },
     {
       "name": "Integrations",
-      "url": "/products",
-      "description": "Learn more about our payment partners"
+      "url": "/integrations",
+      "description": "Learn about our payment partners"
+    },
+    {
+      "name": "Sign Up",
+      "url": "/auth/sign-up",
+      "description": "Create your lomi. account"
+    }
+  ],
+  "related_applications": [],
+  "screenshots": [
+    {
+      "src": "https://res.cloudinary.com/dzrdlevfn/image/upload/v1730056466/icon-L_wmrgiq.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "lomi Dashboard"
     }
   ]
 }
