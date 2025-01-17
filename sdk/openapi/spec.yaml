@@ -1,0 +1,651 @@
+openapi: 3.0.0
+info:
+  title: lomi.africa Payments API
+  version: 1.0.0
+  description: API for the lomi.africa payment orchestration platform
+servers:
+  - url: https://api.lomi.africa/v1
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+      
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    
+    ValidationError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            
+    NotFoundError:
+      description: The requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+            
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          
+    Merchant:
+      type: object
+      properties:
+        merchant_id:
+          type: string
+          format: uuid
+        name: 
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        onboarded:
+          type: boolean
+        country:
+          type: string
+        avatar_url:
+          type: string
+        preferred_language:
+          type: string
+        timezone:
+          type: string
+        metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+          
+    ConnectedProvider:
+      type: object
+      properties:
+        provider_code:
+          $ref: '#/components/schemas/ProviderCode'
+        is_connected:
+          type: boolean
+        phone_number:
+          type: string
+        is_phone_verified:
+          type: boolean
+        metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+            
+    CreateProduct:
+      type: object  
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        currency_code:
+          $ref: '#/components/schemas/CurrencyCode'
+        image_url:
+          type: string
+        is_active:
+          type: boolean
+        display_on_storefront:
+          type: boolean
+      required:
+        - name
+        - price
+        - currency_code
+        
+    Product:
+      allOf:
+        - $ref: '#/components/schemas/CreateProduct'
+        - type: object
+          properties:
+            product_id:
+              type: string
+              format: uuid
+            merchant_id:
+              type: string
+              format: uuid
+            organization_id:
+              type: string
+              format: uuid
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+            
+    CreateSubscriptionPlan:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        currency_code:
+          $ref: '#/components/schemas/CurrencyCode'
+        billing_frequency:
+          $ref: '#/components/schemas/BillingFrequency'
+        failed_payment_action:
+          $ref: '#/components/schemas/FailedPaymentAction'
+        charge_day:
+          type: integer
+        metadata:
+          type: object
+        display_on_storefront:
+          type: boolean
+        image_url:
+          type: string
+        first_payment_type:
+          $ref: '#/components/schemas/FirstPaymentType'
+      required:
+        - name
+        - amount
+        - currency_code
+        - billing_frequency
+        
+    SubscriptionPlan:
+      allOf:
+        - $ref: '#/components/schemas/CreateSubscriptionPlan'
+        - type: object
+          properties:
+            plan_id:
+              type: string
+              format: uuid
+            merchant_id:
+              type: string
+              format: uuid
+            organization_id:
+              type: string
+              format: uuid
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+            
+    CreateTransaction:
+      type: object
+      properties:
+        merchant_id:
+          type: string
+          format: uuid
+        organization_id:
+          type: string
+          format: uuid
+        customer_id:
+          type: string
+          format: uuid  
+        product_id:
+          type: string
+          format: uuid
+        subscription_id:
+          type: string
+          format: uuid
+        transaction_type:
+          $ref: '#/components/schemas/TransactionType'
+        description:
+          type: string
+        reference_id:
+          type: string
+        metadata:
+          type: object
+        gross_amount:
+          type: number
+        fee_amount:
+          type: number
+        net_amount:
+          type: number
+        fee_reference:
+          type: string
+        currency_code:
+          $ref: '#/components/schemas/CurrencyCode'
+        provider_code:
+          $ref: '#/components/schemas/ProviderCode'
+        payment_method_code:
+          $ref: '#/components/schemas/PaymentMethodCode'
+        additional_fees:
+          type: array
+          items:
+            type: object
+      required:
+        - merchant_id
+        - organization_id
+        - customer_id
+        - transaction_type
+        - reference_id
+        - gross_amount
+        - fee_amount
+        - net_amount
+        - fee_reference
+        - currency_code
+        - provider_code
+        - payment_method_code
+        
+    Transaction:
+      allOf:
+        - $ref: '#/components/schemas/CreateTransaction'
+        - type: object
+          properties:
+            transaction_id:
+              type: string
+              format: uuid
+            status:
+              $ref: '#/components/schemas/TransactionStatus'
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+            
+    CreateCheckoutSession:
+      type: object
+      properties:
+        merchant_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        subscription_id:
+          type: string
+          format: uuid
+        success_url:
+          type: string
+          format: uri
+        cancel_url:
+          type: string
+          format: uri
+        provider_codes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProviderCode'
+          description: Specific payment providers to enable for this checkout session
+        customer_email:
+          type: string
+          format: email
+        customer_phone:
+          type: string
+        customer_name:
+          type: string
+        metadata:
+          type: object
+      required:
+        - merchant_id
+        - success_url
+        - cancel_url
+        - provider_codes
+        
+    CheckoutSession:
+      allOf:
+        - $ref: '#/components/schemas/CreateCheckoutSession'
+        - type: object
+          properties:
+            checkout_session_id:
+              type: string
+            url:
+              type: string
+              format: uri
+            status:
+              type: string
+              enum:
+                - open
+                - completed
+                - expired
+            created_at:
+              type: string
+              format: date-time
+            expires_at:
+              type: string
+              format: date-time
+            
+    Provider:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ProviderCode'
+        name:
+          type: string
+        description:
+          type: string
+            
+    CurrencyCode:
+      type: string
+      enum:
+        - XOF
+        - USD
+        - EUR
+        
+    TransactionType:
+      type: string
+      enum:
+        - payment
+        - instalment
+        
+    TransactionStatus:
+      type: string
+      enum:
+        - pending
+        - completed
+        - failed
+        - refunded
+        
+    ProviderCode:
+      type: string
+      enum:
+        - ORANGE
+        - WAVE
+        - ECOBANK
+        - MTN
+        - NOWPAYMENTS
+        - APPLE
+        - GOOGLE
+        - MOOV
+        - AIRTEL
+        - MPESA
+        - WIZALL
+        - OPAY
+        - OTHER
+        
+    PaymentMethodCode:
+      type: string
+      enum:
+        - CARDS
+        - MOBILE_MONEY
+        - E_WALLET
+        - APPLE_PAY
+        - GOOGLE_PAY
+        - USSD
+        - QR_CODE
+        - BANK_TRANSFER
+        - CRYPTO
+        - OTHER
+        
+    BillingFrequency:
+      type: string
+      enum:
+        - weekly
+        - bi-weekly
+        - monthly
+        - bi-monthly
+        - quarterly
+        - semi-annual
+        - yearly
+        - one-time
+        
+    FailedPaymentAction:
+      type: string
+      enum:
+        - cancel
+        - pause
+        - continue
+        
+    FirstPaymentType:
+      type: string
+      enum:
+        - initial
+        - non_initial
+        
+security:
+  - ApiKeyAuth: []
+  
+paths:
+  /ping:
+    get:
+      summary: Ping the API
+      security: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:    
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: pong
+                    
+  /merchants/{merchant_id}:
+    get:
+      summary: Get merchant details
+      parameters:
+        - name: merchant_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+                
+  /merchants/{merchant_id}/providers:
+    get:
+      summary: List connected payment providers for a merchant
+      parameters:
+        - name: merchant_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConnectedProvider'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+                
+  /products:
+    post:
+      summary: Create a new product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProduct'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+                
+    get:
+      summary: List products for a merchant
+      parameters:
+        - name: merchant_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+                  
+  /subscriptions:
+    post:
+      summary: Create a subscription plan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionPlan'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionPlan'
+                
+    get:
+      summary: List subscription plans for a merchant  
+      parameters:
+        - name: merchant_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionPlan'
+                  
+  /transactions:
+    post:
+      summary: Create a transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransaction'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+                
+    get:
+      summary: List transactions for a merchant
+      parameters:
+        - name: merchant_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+                  
+  /checkout-sessions:
+    post:
+      summary: Create a checkout session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCheckoutSession'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSession'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+                
+    get:
+      summary: Get checkout session details
+      parameters:
+        - name: checkout_session_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSession'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+                
+  /providers:
+    get:
+      summary: List available payment providers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Provider'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError' 

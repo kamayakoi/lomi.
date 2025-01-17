@@ -993,6 +993,10 @@ CREATE TABLE organization_checkout_settings (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX idx_organization_checkout_settings_organization_id ON organization_checkout_settings(organization_id);
+
+COMMENT ON TABLE organization_checkout_settings IS 'Stores checkout settings for organizations';
+
 -- Organization Fees table
 CREATE TABLE organization_fees (
     fee_type_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -1005,7 +1009,6 @@ CREATE TABLE organization_fees (
     UNIQUE (organization_id, name)
 );
 
--- Indexes
 CREATE INDEX idx_organization_fees_org_id ON organization_fees(organization_id);
 
 COMMENT ON TABLE organization_fees IS 'Stores custom fees defined by organizations';
