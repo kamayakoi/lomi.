@@ -29,7 +29,7 @@ function ButtonExpand({
             variant="expandIcon"
             Icon={() => <Icon className="h-4 w-4" />}
             iconPlacement={iconPlacement}
-            className={`text-sm sm:text-base font-medium ${textColor} ${hoverTextColor} ${bgColor} ${hoverBgColor} shadow-lg transition-all duration-300 h-11 sm:h-10 px-4 sm:px-4 ${className}`}
+            className={`text-sm sm:text-base font-medium ${textColor} ${hoverTextColor} ${bgColor} ${hoverBgColor} shadow-lg transition-all duration-300 h-11 sm:h-10 px-4 sm:px-4 focus:outline-none focus-visible:outline-none ${className}`}
             onClick={onClick}
         >
             {text}

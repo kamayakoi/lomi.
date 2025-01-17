@@ -4,6 +4,7 @@ import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design
 import { TopBanner } from '@/components/landing/top-banner'
 import { Footer } from '@/components/landing/Footer'
 import ThreeDImage from '@/components/landing/3d-image'
+import { ButtonCta } from "@/components/landing/button-cta"
 
 export default function Page() {
   return (
@@ -15,12 +16,15 @@ export default function Page() {
           <div className="container mx-auto px-4 sm:px-6 flex flex-col min-h-[calc(80vh-40px)] sm:min-h-[calc(100vh-40px)] pt-8 sm:pt-16">
             {/* Hero Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 -mt-24 sm:-mt-24">
-              <div className="text-zinc-900 dark:text-white w-full sm:max-w-2xl relative z-20">
+              <div className="text-zinc-900 dark:text-white w-full sm:max-w-3xl relative z-20">
                 <Hero />
                 {/* Custom Buttons */}
                 <div className="flex flex-row items-start gap-3 mt-6 sm:mt-8 relative z-20 pl-4 sm:pl-2">
                   <ButtonExpandTalkToUs />
                   <ButtonExpandIconRight />
+                </div>
+                <div className="mt-2 pl-4 sm:pl-2 hidden sm:block">
+                  <ButtonCta />
                 </div>
               </div>
 
