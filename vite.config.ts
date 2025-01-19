@@ -107,6 +107,10 @@ export default defineConfig({
         sourcemap: false,
       },
     },
+    assetsDir: 'assets',
+    manifest: true,
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
   },
   resolve: {
     alias: {
@@ -120,6 +124,9 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
+    },
+    headers: {
+      'Cache-Control': 'public, max-age=31536000', // 1 year for static assets
     },
   },
 });
