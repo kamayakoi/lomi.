@@ -12,9 +12,6 @@ interface ThreeDImageProps {
     width: number
     height: number
     className?: string
-    loading?: "lazy" | "eager"
-    fetchPriority?: "high" | "low" | "auto"
-    sizes?: string
 }
 
 export default function ThreeDImage({
@@ -22,14 +19,11 @@ export default function ThreeDImage({
     alt,
     width,
     height,
-    className = "",
-    loading = "lazy",
-    fetchPriority = "auto",
-    sizes
+    className
 }: ThreeDImageProps) {
     const { theme } = useTheme()
+    const isDark = theme === 'dark'
     const borderRadius = 'rounded-[4px]' // Subtle border radius
-    const imageSrc = theme === 'light' ? src.light : src.dark
 
     return (
         <motion.div
@@ -107,13 +101,10 @@ export default function ThreeDImage({
                         transition={{ duration: 0.5, delay: 0.4 }}
                     >
                         <img
-                            src={imageSrc}
+                            src={isDark ? src.dark : src.light}
                             alt={alt}
                             width={width}
                             height={height}
-                            loading={loading}
-                            fetchPriority={fetchPriority}
-                            sizes={sizes}
                             className={`w-auto h-auto object-cover ${className}`}
                             style={{
                                 imageRendering: 'crisp-edges',
@@ -154,4 +145,3 @@ export default function ThreeDImage({
         </motion.div>
     )
 }
-

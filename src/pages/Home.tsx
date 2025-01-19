@@ -1,32 +1,10 @@
-import { Suspense, lazy } from 'react'
+import { Suspense } from 'react'
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
 import { Footer } from '@/components/landing/Footer'
+import ThreeDImage from '@/components/landing/3d-image'
 import { ButtonCta } from "@/components/landing/button-cta"
-
-// Lazy load the 3D image component
-const ThreeDImage = lazy(() => import('@/components/landing/3d-image'));
-
-// Preload images
-const preloadImages = () => {
-  const images = [
-    { path: '/portal.webp', type: 'image/webp' },
-    { path: '/portal2.webp', type: 'image/webp' }
-  ];
-
-  images.forEach(img => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.type = img.type;
-    link.href = img.path;
-    document.head.appendChild(link);
-  });
-};
-
-// Call preload on module load
-preloadImages();
 
 export default function Page() {
   return (
@@ -50,11 +28,9 @@ export default function Page() {
                 </div>
               </div>
 
-              {/* 3D Image with optimized loading */}
+              {/* 3D Image */}
               <div className="hidden sm:block mt-12 sm:mt-0 absolute right-0 z-0 translate-x-[36%] translate-y-[30%] scale-150 lg:scale-[1.6] origin-center">
-                <Suspense fallback={
-                  <div className="w-[700px] h-[500px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />
-                }>
+                <Suspense fallback={<div className="w-[700px] h-[500px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />}>
                   <ThreeDImage
                     src={{
                       light: "/portal.webp",
@@ -63,10 +39,7 @@ export default function Page() {
                     alt="Dashboard Preview"
                     width={700}
                     height={500}
-                    loading="eager"
-                    fetchPriority="high"
                     className="w-full max-w-[900px]"
-                    sizes="(max-width: 768px) 100vw, 900px"
                   />
                 </Suspense>
               </div>

@@ -1,36 +1,9 @@
-import { useEffect, useMemo, useState, lazy, Suspense } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Code, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from 'react-i18next';
 import { ButtonExpand } from "@/components/design/button-expand";
-import type { Variants, Transition } from "framer-motion";
-
-// Lazy load components
-const MotionText = lazy(() => import('./motion-text'));
-
-// Animation configurations
-const variants: Variants = {
-  initial: (custom: boolean) => ({
-    opacity: 0,
-    y: custom ? -50 : 50
-  }),
-  animate: {
-    opacity: 1,
-    y: 0
-  },
-  exit: (custom: boolean) => ({
-    opacity: 0,
-    y: custom ? 50 : -50
-  })
-};
-
-const transition: Transition = {
-  type: "spring",
-  stiffness: 50,
-  duration: 1,
-  exit: { duration: 0.8 }
-};
 
 function Hero() {
   const { t } = useTranslation();
@@ -40,26 +13,21 @@ function Hero() {
       t('hero.title.rotatingWords.1'),
       t('hero.title.rotatingWords.2'),
       t('hero.title.rotatingWords.3')
-    ] as const,
+    ],
     [t]
   );
-
   const [titleNumber, setTitleNumber] = useState(0);
-  const currentTitle = titles[titleNumber] || titles[0] || "for all your payment needs";
 
   useEffect(() => {
-    let mounted = true;
     const timeoutId = setTimeout(() => {
-      if (mounted) {
-        setTitleNumber(prev => (prev === titles.length - 1 ? 0 : prev + 1));
+      if (titleNumber === titles.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
       }
     }, 2500);
-
-    return () => {
-      mounted = false;
-      clearTimeout(timeoutId);
-    };
-  }, [titleNumber, titles.length]);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, titles]);
 
   return (
     <div className="w-full select-none mt-[200px] sm:mt-0">
@@ -88,37 +56,27 @@ function Hero() {
 
           {/* Hero content */}
           <div className="flex gap-4 sm:gap-4 flex-col pl-0 sm:pl-2">
-            <h1
-              className="flex flex-col text-4xl sm:text-5xl md:text-7xl max-w-4xl tracking-tighter text-left font-regular text-zinc-800 dark:text-white"
-              aria-label={`${t('hero.title.prefix')} ${currentTitle} ${t('hero.title.suffix')}`}
-            >
+            <h1 className="flex flex-col text-4xl sm:text-5xl md:text-7xl max-w-4xl tracking-tighter text-left font-regular text-zinc-800 dark:text-white">
               <div className="flex items-center h-14 sm:h-20">
                 <span>{t('hero.title.prefix')}</span>
                 <div className="relative flex items-center min-w-[280px] ml-4">
-                  {/* Static fallback for immediate LCP */}
-                  <span
-                    className="absolute text-zinc-800 dark:text-white font-semibold opacity-0 transition-opacity"
-                    aria-hidden="true"
-                  >
-                    {currentTitle}
-                  </span>
-                  <Suspense
-                    fallback={
-                      <span className="absolute text-zinc-800 dark:text-white font-semibold">
-                        {currentTitle}
-                      </span>
-                    }
-                  >
-                    <AnimatePresence mode="wait">
-                      <MotionText
-                        key={titleNumber}
-                        text={currentTitle}
-                        variants={variants}
-                        custom={titleNumber === 0}
-                        transition={transition}
-                      />
-                    </AnimatePresence>
-                  </Suspense>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={titleNumber}
+                      className="absolute text-zinc-800 dark:text-white font-semibold"
+                      initial={{ opacity: 0, y: titleNumber === 0 ? -50 : 50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: titleNumber === 0 ? 50 : -50 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 50,
+                        duration: 1,
+                        exit: { duration: 0.8 }
+                      }}
+                    >
+                      {titles[titleNumber]}
+                    </motion.span>
+                  </AnimatePresence>
                 </div>
               </div>
               <span>{t('hero.title.suffix')}</span>
