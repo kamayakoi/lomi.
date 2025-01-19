@@ -12,7 +12,7 @@ export default function GitHubStars() {
     useEffect(() => {
         async function fetchStars() {
             try {
-                const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
+                const response = await fetch('https://api.github.com/repos/lomiafrica/developers.lomi.africa', {
                     headers: {
                         'Accept': 'application/vnd.github.v3+json',
                         'User-Agent': 'GitHubStars'
@@ -38,7 +38,7 @@ export default function GitHubStars() {
     }, [])
 
     const handleClick = () => {
-        window.open('https://github.com/lomiafrica/lomi-docs', '_blank', 'noopener,noreferrer')
+        window.open('https://github.com/lomiafrica/developers.lomi.africa', '_blank', 'noopener,noreferrer')
     }
 
     return (

@@ -68,7 +68,7 @@ export function Footer() {
                     }
                 }
 
-                const response = await fetch('https://api.github.com/repos/lomiafrica/lomi-docs', {
+                const response = await fetch('https://api.github.com/repos/lomiafrica/developers.lomi.africa', {
                     headers: {
                         'Accept': 'application/vnd.github.v3+json',
                         'User-Agent': 'lomi-website',
@@ -249,7 +249,7 @@ export function Footer() {
                             <div className="space-y-4 lg:-ml-20 pl-4 sm:pl-8">
                                 <div className="flex flex-row items-center gap-2 w-full max-w-[600px]">
                                     <Link
-                                        to="https://github.com/lomiafrica/lomi-docs"
+                                        to="https://github.com/lomiafrica/developers.lomi.africa"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center h-10 shrink-0"
