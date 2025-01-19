@@ -41,4 +41,4 @@ Disallow: /portal/subscription
 Disallow: /portal/transactions
 
 # Sitemap
-Sitemap: https://lomi.africa/sitemap.xml 
+Sitemap: https://lomi.africa/sitemap.xml

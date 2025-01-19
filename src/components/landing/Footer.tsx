@@ -168,18 +168,18 @@ export function Footer() {
                             <div className="w-[3px] h-[3px] bg-current ml-[2px] mb-[2px]"></div>
                         </span>
                     </div>
-                    <div className="hidden sm:block text-zinc-900 dark:text-white text-lg select-none mt-[5px]">
+                    <div className="hidden sm:block text-zinc-800 dark:text-zinc-200 text-lg select-none mt-[5px]">
                         {t('footer.tagline')}
                     </div>
                 </div>
 
                 {/* Footer content */}
-                <div className="w-full text-zinc-600 dark:text-zinc-400 pt-10 pb-16 select-none relative z-10">
+                <div className="w-full text-zinc-700 dark:text-zinc-300 pt-10 pb-16 select-none relative z-10">
                     <div className="container max-w-7xl mx-auto px-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {/* Features Column */}
                             <div className="space-y-4 pl-4">
-                                <h3 className="text-zinc-900 dark:text-white font-medium">{t('footer.features.title')}</h3>
+                                <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.features.title')}</h2>
                                 <ul className="space-y-3 relative z-20">
                                     {[
                                         { name: t('footer.features.overview'), link: '/overview' },
@@ -196,7 +196,7 @@ export function Footer() {
                                                 to={item.link}
                                                 target={item.isExternal ? "_blank" : undefined}
                                                 rel={item.isExternal ? "noopener noreferrer" : undefined}
-                                                className="hover:text-zinc-900 dark:hover:text-white transition-colors"
+                                                className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors"
                                             >
                                                 {item.name}
                                             </Link>
@@ -207,7 +207,7 @@ export function Footer() {
 
                             {/* Resources Column */}
                             <div className="space-y-4 pl-4">
-                                <h3 className="text-zinc-900 dark:text-white font-medium">{t('footer.resources.title')}</h3>
+                                <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.resources.title')}</h2>
                                 <ul className="space-y-3">
                                     {[
                                         { name: t('footer.resources.github'), link: 'https://github.com/lomiafrica/lomi.' },
@@ -219,7 +219,7 @@ export function Footer() {
                                         { name: t('footer.resources.review'), link: 'https://www.producthunt.com/products/lomi/reviews/new' }
                                     ].map((item) => (
                                         <li key={item.name}>
-                                            <Link to={item.link} className="hover:text-zinc-900 dark:hover:text-white transition-colors">
+                                            <Link to={item.link} className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors">
                                                 {item.name}
                                             </Link>
                                         </li>
@@ -229,7 +229,7 @@ export function Footer() {
 
                             {/* Company Column */}
                             <div className="space-y-4 pl-4">
-                                <h3 className="text-zinc-900 dark:text-white font-medium">{t('footer.company.title')}</h3>
+                                <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.company.title')}</h2>
                                 <ul className="space-y-3">
                                     {[
                                         { name: t('footer.company.story'), link: '/story', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
@@ -270,21 +270,55 @@ export function Footer() {
                                         </div>
                                     </Link>
                                     <div className="flex items-center gap-4 flex-wrap ml-8 sm:ml-4">
-                                        <Link to="https://twitter.com/lomiafrica" target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link
+                                            to="https://twitter.com/lomiafrica"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            aria-label="Suivez-nous sur Twitter"
+                                        >
                                             <XIcon className="h-[20px] w-[20px]" />
+                                            <span className="sr-only">Suivez-nous sur Twitter</span>
                                         </Link>
-                                        <Link to="https://www.producthunt.com/products/lomi" target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link
+                                            to="https://www.producthunt.com/products/lomi"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            aria-label="Découvrez-nous sur Product Hunt"
+                                        >
                                             <PHIcon className="h-[22px] w-[22px]" />
+                                            <span className="sr-only">Découvrez-nous sur Product Hunt</span>
                                         </Link>
-                                        <Link to="https://github.com/lomiafrica/lomi." target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link
+                                            to="https://github.com/lomiafrica/lomi."
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            aria-label="Consultez notre code sur GitHub"
+                                        >
                                             <GitHubIcon className="h-[20px] w-[20px]" />
+                                            <span className="sr-only">Consultez notre code sur GitHub</span>
                                         </Link>
-
-                                        <Link to="https://lomi.slack.com" target="_blank" rel="noopener noreferrer" className="hidden sm:block text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link
+                                            to="https://lomi.slack.com"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white items-center"
+                                            aria-label="Rejoignez notre communauté Slack"
+                                        >
                                             <SlackIcon className="h-[20px] w-[20px]" />
+                                            <span className="sr-only">Rejoignez notre communauté Slack</span>
                                         </Link>
-                                        <Link to="https://www.linkedin.com/company/lomiafri" target="_blank" rel="noopener noreferrer" className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
+                                        <Link
+                                            to="https://www.linkedin.com/company/lomiafri"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            aria-label="Suivez-nous sur LinkedIn"
+                                        >
                                             <LinkedInIcon className="h-[20px] w-[20px]" />
+                                            <span className="sr-only">Suivez-nous sur LinkedIn</span>
                                         </Link>
                                     </div>
                                 </div>
@@ -307,7 +341,7 @@ export function Footer() {
                                 </div>
 
                                 {/* Copyright and Language - Better mobile alignment */}
-                                <div className="flex flex-row items-center justify-between text-xs text-zinc-500 dark:text-zinc-500 mt-4 w-full">
+                                <div className="flex flex-row items-center justify-between text-xs text-zinc-700 dark:text-zinc-300 mt-4 w-full">
                                     <span>{t('footer.copyright')}</span>
                                     <div>
                                         <LanguageSwitcher />
