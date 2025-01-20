@@ -22,7 +22,7 @@ export function ButtonCta({ className, ...props }: ButtonCtaProps) {
   return (
     <button
       className={cn(
-        "group relative flex items-center justify-center h-11 sm:h-10 w-fit px-4 sm:px-4 overflow-hidden rounded-none border border-zinc-200 bg-orange-50 text-orange-700 transition-all duration-300 hover:pl-10 hover:bg-orange-100 dark:border-zinc-800 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/40 dark:hover:text-orange-200 shadow-lg backdrop-blur-sm focus:outline-none focus-visible:outline-none",
+        "group relative flex items-center justify-center h-11 sm:h-10 w-fit px-[26px] sm:px-[26px] overflow-hidden rounded-none border border-zinc-200 bg-orange-50 text-orange-700 transition-all duration-300 hover:pl-[48px] hover:bg-orange-100 dark:border-zinc-800 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/40 dark:hover:text-orange-200 shadow-lg backdrop-blur-sm focus:outline-none focus-visible:outline-none",
         className
       )}
       onClick={handleClick}

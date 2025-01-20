@@ -56,7 +56,7 @@ export default function Otp() {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed top-6 left-6 z-50"
+          className="absolute top-10 left-10 z-50"
           onClick={() => navigate(-1)}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -84,9 +84,6 @@ export default function Otp() {
                 {isResending ? t('auth.sign_up.processing') : t('auth.check_email.resend_link')}
               </button>
             </p>
-            {errorMessage && (
-              <p className="text-center text-sm mt-2 text-red-500 dark:text-red-400">{errorMessage}</p>
-            )}
           </Card>
         </div>
       </div>

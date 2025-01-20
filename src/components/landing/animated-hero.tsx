@@ -41,7 +41,7 @@ function Hero() {
             >
               {t('hero.buttons.launch')} <MoveRight className="w-4 h-4" />
             </Button>
-            <div className="[&>button]:shadow-none [&>button]:text-sm [&>button]:sm:text-base [&>button]:whitespace-nowrap">
+            <div className="[&>button]:shadow-none [&>button]:whitespace-nowrap [&>button]:h-11 [&>button]:sm:h-10 [&>button]:px-4 [&>button]:text-sm [&>button]:sm:text-base w-full sm:w-auto">
               <ButtonExpand
                 text={t('hero.buttons.developers')}
                 icon={Code}

@@ -86,7 +86,7 @@ export default function SignUp() {
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-6 left-6 z-50"
+        className="absolute top-10 left-10"
         onClick={() => navigate(-1)}
       >
         <ChevronLeft className="h-6 w-6" />

@@ -1,5 +1,7 @@
 import { cn } from '@/lib/actions/utils';
 import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface NavItem {
     id: string;
@@ -13,9 +15,22 @@ interface SideNavProps {
 }
 
 export default function SideNav({ items, activeSection, onSectionClick }: SideNavProps) {
+    const navigate = useNavigate();
+
     return (
         <div className="fixed left-0 bottom-25 hidden h-screen w-80 lg:block">
             <div className="flex h-full flex-col overflow-hidden">
+                {/* Back button */}
+                <div className="absolute top-10 left-10">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(-1)}
+                    >
+                        <ChevronLeft className="h-6 w-6" />
+                    </Button>
+                </div>
+
                 {/* Top padding for header space */}
                 <div className="h-24" />
 

@@ -3,12 +3,8 @@ import SideNav from '@/components/design/side-nav';
 import { motion } from 'framer-motion';
 import { ScrollToTop } from '@/components/landing/ScrollToTop';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const Privacy = () => {
-    const navigate = useNavigate();
     const [mounted, setMounted] = useState(false);
     const [activeSection, setActiveSection] = useState('introduction');
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -97,16 +93,6 @@ const Privacy = () => {
 
     return (
         <div className="relative min-h-screen bg-background">
-            {/* Back button */}
-            <Button
-                variant="ghost"
-                size="icon"
-                className="fixed top-6 left-6 z-50"
-                onClick={() => navigate(-1)}
-            >
-                <ChevronLeft className="h-6 w-6" />
-            </Button>
-
             {/* Progress bar */}
             <div
                 className="fixed top-0 left-0 h-1 bg-blue-500 z-50 transition-all duration-300"
