@@ -11,6 +11,7 @@ import { LanguageSwitcher } from '@/components/design/LanguageSwitcher'
 import { useTranslation } from 'react-i18next'
 import { ProductHuntBadge } from '@/components/design/product-hunt-badge'
 import { cn } from "@/lib/actions/utils"
+import { BackgroundText } from './background-text'
 
 export function Footer() {
     const { t } = useTranslation()
@@ -117,6 +118,7 @@ export function Footer() {
     }
 
     const logoSrc = theme === 'light' ? "/transparent2.webp" : "/transparent.webp"
+
 
     // Return a simpler version during SSR
     if (!mounted) {
@@ -274,7 +276,7 @@ export function Footer() {
                                             to="https://twitter.com/lomiafrica"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-[#000000] dark:hover:text-[#FFFFFF] inline-flex items-center transition-colors"
                                             aria-label="Suivez-nous sur Twitter"
                                         >
                                             <XIcon className="h-[20px] w-[20px]" />
@@ -284,7 +286,7 @@ export function Footer() {
                                             to="https://www.producthunt.com/products/lomi"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-[#DA552F] dark:hover:text-[#DA552F] inline-flex items-center transition-colors"
                                             aria-label="Découvrez-nous sur Product Hunt"
                                         >
                                             <PHIcon className="h-[22px] w-[22px]" />
@@ -294,7 +296,7 @@ export function Footer() {
                                             to="https://github.com/lomiafrica/lomi."
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-[#6e5494] dark:hover:text-[#6e5494] inline-flex items-center transition-colors"
                                             aria-label="Consultez notre code sur GitHub"
                                         >
                                             <GitHubIcon className="h-[20px] w-[20px]" />
@@ -304,7 +306,7 @@ export function Footer() {
                                             to="https://lomi.slack.com"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white items-center"
+                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#36C5F0] dark:hover:text-[#36C5F0] items-center transition-colors"
                                             aria-label="Rejoignez notre communauté Slack"
                                         >
                                             <SlackIcon className="h-[20px] w-[20px]" />
@@ -314,7 +316,7 @@ export function Footer() {
                                             to="https://www.linkedin.com/company/lomiafri"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white inline-flex items-center"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-[#0A66C2] dark:hover:text-[#0A66C2] inline-flex items-center transition-colors"
                                             aria-label="Suivez-nous sur LinkedIn"
                                         >
                                             <LinkedInIcon className="h-[20px] w-[20px]" />
@@ -366,18 +368,13 @@ export function Footer() {
                 </div>
 
                 {mounted && (
-                    <div className="w-full overflow-hidden mt-[-100px] py-[-100px] h-[380px] relative z-0">
-                        <div
-                            className="text-[#161616] dark:text-blue-100 text-[500px] leading-none text-center font-bold select-none opacity-10 flex items-baseline justify-center"
-                            onClick={() => {
-                                const newTheme = theme === 'dark' ? 'light' : 'dark';
-                                setTheme(newTheme);
-                            }}
-                        >
-                            <span>lomi</span>
-                            <div className="w-[100px] h-[100px] bg-current ml-4"></div>
-                        </div>
-                    </div>
+                    <BackgroundText
+                        text="lomi"
+                        onClick={() => {
+                            const newTheme = theme === 'dark' ? 'light' : 'dark';
+                            setTheme(newTheme);
+                        }}
+                    />
                 )}
             </div>
         </div>

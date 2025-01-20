@@ -20,6 +20,10 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Link",
+          "value": "<https://lomi.africa>; rel=\"canonical\""
         }
       ]
     },
