@@ -7,7 +7,7 @@ import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checko
 import { CheckoutData } from './checkoutTypes.ts'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ImageIcon } from 'lucide-react'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
@@ -231,22 +231,70 @@ export default function CheckoutPage() {
                             {checkoutData?.subscriptionPlan && (
                                 <>
                                     <h2 className="text-xl text-gray-300 mb-4">Subscribe to {checkoutData.subscriptionPlan.name}</h2>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
-                                        <span className="text-4xl">{checkoutData.subscriptionPlan.currencyCode}</span>
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <div className="flex items-center">
+                                            <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
+                                            <span className="text-4xl ml-2">{checkoutData.subscriptionPlan.currencyCode}</span>
+                                        </div>
+                                        <div className="text-gray-400 text-lg ml-2 h-[2.2rem] flex flex-col justify-between leading-none">
+                                            <span>per</span>
+                                            <span>{checkoutData.subscriptionPlan.billingFrequency.toLowerCase()
+                                                .replace('weekly', 'week')
+                                                .replace('bi-weekly', 'two weeks')
+                                                .replace('monthly', 'month')
+                                                .replace('bi-monthly', 'two months')
+                                                .replace('quarterly', 'quarter')
+                                                .replace('semi-annual', 'six months')
+                                                .replace('yearly', 'year')
+                                                .replace('one-time', 'payment')}</span>
+                                        </div>
                                     </div>
-                                    <div className="mt-1 text-gray-400 text-sm leading-tight">
-                                        <div>per</div>
-                                        <div>{checkoutData.subscriptionPlan.billingFrequency.toLowerCase()}</div>
+                                    <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                        <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                            {checkoutData.subscriptionPlan.image_url ? (
+                                                <img
+                                                    src={checkoutData.subscriptionPlan.image_url}
+                                                    alt={checkoutData.subscriptionPlan.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <ImageIcon className="h-6 w-6 text-gray-400" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-white font-medium">{checkoutData.subscriptionPlan.name}</div>
+                                            <div className="text-sm text-gray-400">{checkoutData.subscriptionPlan.description}</div>
+                                        </div>
                                     </div>
                                 </>
                             )}
                             {checkoutData?.merchantProduct && (
                                 <>
                                     <h2 className="text-xl text-gray-300 mb-4">Pay for {checkoutData.merchantProduct.name}</h2>
-                                    <div className="flex items-baseline gap-2">
+                                    <div className="flex items-baseline gap-2 mb-4">
                                         <span className="text-4xl font-bold">{formatNumber(checkoutData.merchantProduct.price)}</span>
                                         <span className="text-4xl">{checkoutData.merchantProduct.currencyCode}</span>
+                                    </div>
+                                    <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                        <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                            {checkoutData.merchantProduct.image_url ? (
+                                                <img
+                                                    src={checkoutData.merchantProduct.image_url}
+                                                    alt={checkoutData.merchantProduct.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <ImageIcon className="h-6 w-6 text-gray-400" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-white font-medium">{checkoutData.merchantProduct.name}</div>
+                                            <div className="text-sm text-gray-400">{checkoutData.merchantProduct.description}</div>
+                                        </div>
                                     </div>
                                 </>
                             )}

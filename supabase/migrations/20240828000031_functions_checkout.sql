@@ -18,11 +18,13 @@ RETURNS TABLE (
     product_name VARCHAR,
     product_description TEXT,
     product_price NUMERIC,
+    product_image_url TEXT,
     plan_id UUID,
     plan_name VARCHAR,
     plan_description TEXT,
     plan_amount NUMERIC,
     plan_billing_frequency frequency,
+    plan_image_url TEXT,
     organization_logo_url VARCHAR
 ) AS $$
 BEGIN
@@ -43,11 +45,13 @@ BEGIN
         mp.name AS product_name,
         mp.description AS product_description,
         mp.price AS product_price,
+        mp.image_url AS product_image_url,
         pl.plan_id,
         sp.name AS plan_name,
         sp.description AS plan_description,
         sp.amount AS plan_amount,
         sp.billing_frequency AS plan_billing_frequency,
+        sp.image_url AS plan_image_url,
         CAST(REGEXP_REPLACE(o.logo_url, '^.*\/logos\/', '') AS VARCHAR) AS organization_logo_url
     FROM
         payment_links pl

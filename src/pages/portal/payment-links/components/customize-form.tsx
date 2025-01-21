@@ -262,8 +262,8 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     useEffect(() => {
         const fetchData = async () => {
             if (user?.id) {
-                const fetchedProducts = await fetchProducts(user.id, null)
-                setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : [])
+                const fetchedProducts = await fetchProducts(user.id, null, 50, 0)
+                setProducts(Array.isArray(fetchedProducts.products) ? fetchedProducts.products : [])
 
                 const fetchedPlans = await fetchSubscriptionPlans(user.id, 1, 50)
                 setPlans(Array.isArray(fetchedPlans) ? fetchedPlans : [])

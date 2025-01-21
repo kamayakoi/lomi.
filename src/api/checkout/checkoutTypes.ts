@@ -31,6 +31,7 @@ export interface MerchantProduct {
     price: number;
     currencyCode: string;
     isActive: boolean;
+    image_url: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -47,6 +48,7 @@ export interface SubscriptionPlan {
     failedPaymentAction: string;
     chargeDay: number | null;
     metadata: Record<string, unknown>;
+    image_url: string | null;
     createdAt: string;
     updatedAt: string;
     firstPaymentType: string;
