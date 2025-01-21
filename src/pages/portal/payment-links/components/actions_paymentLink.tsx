@@ -27,7 +27,15 @@ const providerColors: Record<provider_code, string> = {
     'WAVE': 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white',
     'ECOBANK': 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white',
     'MTN': 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black',
-    'STRIPE': 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white',
+    'NOWPAYMENTS': 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white',
+    'APPLE': 'bg-[#000000] text-white dark:bg-[#000000] dark:text-white',
+    'GOOGLE': 'bg-[#4285F4] text-white dark:bg-[#4285F4] dark:text-white',
+    'MOOV': 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white',
+    'AIRTEL': 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white',
+    'MPESA': 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white',
+    'WIZALL': 'bg-[#FF6B00] text-white dark:bg-[#FF6B00] dark:text-white',
+    'OPAY': 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white',
+    'PAYPAL': 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white',
     'OTHER': 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
 }
 
@@ -195,8 +203,24 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Ecobank'
         case 'MTN':
             return 'MTN'
-        case 'STRIPE':
-            return 'Stripe'
+        case 'NOWPAYMENTS':
+            return 'NowPayments'
+        case 'PAYPAL':
+            return 'Paypal'
+        case 'APPLE':
+            return 'Apple'
+        case 'GOOGLE':
+            return 'Google'
+        case 'MOOV':
+            return 'Moov'
+        case 'AIRTEL':
+            return 'Airtel'
+        case 'MPESA':
+            return 'Mpesa'
+        case 'WIZALL':
+            return 'Wizall'
+        case 'OPAY':
+            return 'Opay'
         case 'OTHER':
             return 'Other'
         default:

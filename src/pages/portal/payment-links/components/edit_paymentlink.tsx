@@ -31,9 +31,9 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     const [isActive, setIsActive] = useState(paymentLink.is_active)
     const [expirationDate, setExpirationDate] = useState<Date | null>(paymentLink.expires_at ? new Date(paymentLink.expires_at) : null)
     const [successUrl, setSuccessUrl] = useState(paymentLink.success_url || '')
-    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState<(provider_code | 'CARDS' | 'APPLE_PAY')[]>(
-        paymentLink.allowed_providers.includes('STRIPE')
-            ? [...paymentLink.allowed_providers.filter(p => p !== 'STRIPE'), 'CARDS', 'APPLE_PAY']
+    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState<(provider_code | 'CARDS')[]>(
+        paymentLink.allowed_providers.includes('ECOBANK')
+            ? [...paymentLink.allowed_providers.filter(p => p !== 'ECOBANK'), 'CARDS']
             : paymentLink.allowed_providers
     );
     const [connectedProviders, setConnectedProviders] = useState<string[]>([])
@@ -41,7 +41,6 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
-        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.webp' },
         { id: 'WAVE', name: 'Wave', icon: '/wave.webp' },
         { id: 'MTN', name: 'MTN', icon: '/mtn.webp' },
         { id: 'ORANGE', name: 'Orange', icon: '/orange.webp' },
@@ -57,8 +56,8 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                     console.error('Error fetching connected providers:', connectedProvidersError)
                 } else {
                     const mappedProviders = connectedProvidersData.reduce((acc: string[], provider: { code: string }) => {
-                        if (provider.code === 'STRIPE') {
-                            acc.push('CARDS', 'APPLE_PAY')
+                        if (provider.code === 'ECOBANK') {
+                            acc.push('CARDS')
                         } else {
                             acc.push(provider.code)
                         }
@@ -77,10 +76,8 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
 
         try {
             const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
-                if (method === 'CARDS' || method === 'APPLE_PAY') {
-                    if (!acc.includes('STRIPE')) {
-                        acc.push('STRIPE')
-                    }
+                if (method === 'CARDS') {
+                    acc.push('ECOBANK')
                 } else {
                     acc.push(method as provider_code)
                 }
@@ -133,7 +130,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
 
     const togglePaymentMethod = (methodId: string | provider_code) => {
         setAllowedPaymentMethods(prev => {
-            if (methodId === 'CARDS' || methodId === 'APPLE_PAY') {
+            if (methodId === 'CARDS') {
                 if (prev.includes(methodId)) {
                     return prev.filter(m => m !== methodId)
                 } else {
@@ -155,10 +152,8 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                 return 'bg-[#FC6307] hover:bg-[#FC6307] text-white';
             case 'MTN':
                 return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
-            case 'APPLE_PAY':
-                return 'bg-[#000000] hover:bg-[#1a1a1a] text-white dark:bg-[#ffffff] dark:hover:bg-[#f0f0f0] dark:text-black';
             case 'CARDS':
-                return 'bg-[#625BF6] hover:bg-[#625BF6] text-white';
+                return 'bg-[#074367] hover:bg-[#074367] text-white';
             default:
                 return '';
         }
@@ -204,7 +199,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                     {paymentMethods
                         .filter((method) => connectedProviders.includes(method.id))
                         .map((method) => {
-                            const isSelected = allowedPaymentMethods.includes(method.id as provider_code | 'CARDS' | 'APPLE_PAY')
+                            const isSelected = allowedPaymentMethods.includes(method.id as provider_code | 'CARDS')
 
                             return (
                                 <Badge

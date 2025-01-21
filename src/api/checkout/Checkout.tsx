@@ -1,13 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checkout.tsx'
 import { CheckoutData } from './checkoutTypes.ts'
 import { supabase } from '@/utils/supabase/client'
+import PhoneNumberInput from '@/components/ui/phone-number-input'
+import { ArrowLeft } from 'lucide-react'
+
+// Helper function to format numbers with separators
+const formatNumber = (num: number | string) => {
+    if (typeof num === 'string') num = parseFloat(num);
+    return num.toLocaleString('fr-FR');
+};
 
 export default function CheckoutPage() {
+    const navigate = useNavigate()
     const { linkId } = useParams<{ linkId?: string }>()
     const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null })
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
@@ -15,14 +24,20 @@ export default function CheckoutPage() {
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [customerDetails, setCustomerDetails] = useState({
         email: '',
-        name: '',
-        countryCode: '',
+        firstName: '',
+        lastName: '',
         phoneNumber: '',
+        whatsappNumber: '',
         country: '',
         city: '',
         postalCode: '',
         address: '',
     });
+    const [isHovered, setIsHovered] = useState(false)
+    const [isPromoCodeOpen, setIsPromoCodeOpen] = useState(false)
+    const [promoCode, setPromoCode] = useState('')
+    const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null)
+    const promoInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         const fetchOrganization = async () => {
@@ -59,7 +74,7 @@ export default function CheckoutPage() {
     }, [linkId, checkoutData?.paymentLink?.organizationId]);
 
     const handleProviderClick = (provider: string) => {
-        setSelectedProvider(provider)
+        setSelectedProvider(prev => prev === provider ? null : provider)
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,39 +105,6 @@ export default function CheckoutPage() {
         setCustomerDetails((prev) => ({ ...prev, [name]: value }));
     };
 
-    const renderProviderImages = () => {
-        if (checkoutData?.paymentLink?.allowed_providers) {
-            // Always place the "STRIPE" provider first if it exists
-            const stripeIndex = checkoutData.paymentLink.allowed_providers.indexOf('STRIPE');
-            if (stripeIndex !== -1) {
-                checkoutData.paymentLink.allowed_providers.splice(stripeIndex, 1);
-                checkoutData.paymentLink.allowed_providers.unshift('STRIPE');
-            }
-
-            return checkoutData.paymentLink.allowed_providers.map((provider) => (
-                <motion.div
-                    key={provider}
-                    onClick={() => handleProviderClick(provider)}
-                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'}`}
-                    style={{ width: '100px', height: '100px', padding: '0' }}
-                >
-                    {provider === 'STRIPE' ? (
-                        <img src="/cards.webp" alt="Credit Cards" className="w-full h-full object-contain rounded-lg" />
-                    ) : provider === 'ORANGE' ? (
-                        <img src="/orange.webp" alt="Orange" className="w-full h-full object-contain rounded-lg" />
-                    ) : provider === 'WAVE' ? (
-                        <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain rounded-lg" />
-                    ) : provider === 'MTN' ? (
-                        <img src="/mtn.webp" alt="Momo" className="w-full h-full object-contain rounded-lg" />
-                    ) : (
-                        <span>{provider}</span>
-                    )}
-                </motion.div>
-            ));
-        }
-        return null;
-    };
-
     const isPaymentFormValid = () => {
         return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
     }
@@ -132,299 +114,434 @@ export default function CheckoutPage() {
 
         if (checkoutData) {
             try {
-                const response = await fetch('/api/create-customer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        merchantId: checkoutData.paymentLink.merchantId,
-                        organizationId: checkoutData.paymentLink.organizationId,
-                        customerDetails,
-                    }),
+                const { data, error } = await supabase.rpc('create_or_update_customer', {
+                    p_merchant_id: checkoutData.paymentLink.merchantId,
+                    p_organization_id: checkoutData.paymentLink.organizationId,
+                    p_name: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+                    p_email: customerDetails.email,
+                    p_phone_number: customerDetails.phoneNumber,
+                    p_country: customerDetails.country,
+                    p_city: customerDetails.city,
+                    p_address: customerDetails.address,
+                    p_postal_code: customerDetails.postalCode
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const customerId = data.customerId;
+                if (error) {
+                    console.error('Error creating/updating customer:', error);
+                    return;
+                }
 
-                    if (customerId) {
-                        // Process the payment with the customerId
-                        // ...
-                    }
-                } else {
-                    console.error('Error creating customer:', response.statusText);
+                const customerId = data;
+                if (customerId) {
+                    // Process the payment with the customerId
+                    // ...
                 }
             } catch (error) {
-                console.error('Error creating customer:', error);
+                console.error('Error creating/updating customer:', error);
             }
         }
     };
 
+    const handleGoBack = () => {
+        navigate(-1)
+    }
+
+    const handlePromoCodeSubmit = () => {
+        if (promoCode.trim()) {
+            setAppliedPromoCode(promoCode)
+            setPromoCode('')
+            setIsPromoCodeOpen(false)
+        }
+    }
+
+    const handlePromoCodeBlur = () => {
+        if (!promoCode.trim()) {
+            setIsPromoCodeOpen(false)
+        }
+    }
+
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-            <div className="w-full max-w-6xl bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                <div className="flex flex-col lg:flex-row">
-                    {/* Left side - Product details */}
-                    <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-center mb-4">
-                                {organization.logoUrl && (
-                                    <img
-                                        src={organization.logoUrl}
-                                        alt="Organization Logo"
-                                        width={100}
-                                        height={100}
-                                        className="rounded-md mr-4"
-                                    />
-                                )}
-                                <div className="flex-1">
-                                    {checkoutData?.merchantProduct && (
-                                        <>
-                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.merchantProduct.name}</h2>
-                                            <p className="text-lg text-gray-600">{checkoutData.merchantProduct.description}</p>
-                                            <p className="text-xl text-gray-800 font-semibold mt-2">{checkoutData.merchantProduct.price} {checkoutData.merchantProduct.currencyCode}</p>
-                                        </>
+        <div className="min-h-screen flex flex-col lg:flex-row">
+            {/* Left side - Product details */}
+            <div className="w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col">
+                <div className="max-w-[488px] ml-auto pr-8 w-full">
+                    <div className="flex mb-8">
+                        <div
+                            className="group flex items-center gap-2 cursor-pointer"
+                            onMouseEnter={() => setIsHovered(true)}
+                            onMouseLeave={() => setIsHovered(false)}
+                            onClick={handleGoBack}
+                        >
+                            <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
+                            <div className="relative w-[40px] h-[40px]">
+                                <AnimatePresence mode="wait">
+                                    {!isHovered && organization.logoUrl && (
+                                        <motion.img
+                                            key="logo"
+                                            src={organization.logoUrl}
+                                            alt="Organization Logo"
+                                            className="rounded-md absolute inset-0 w-full h-full object-cover"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.1 }}
+                                        />
                                     )}
-                                    {checkoutData?.subscriptionPlan && (
-                                        <>
-                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData.subscriptionPlan.name}</h2>
-                                            <p className="text-lg text-gray-600">{checkoutData.subscriptionPlan.description}</p>
-                                            <div className="flex items-center space-x-2 mt-2">
-                                                <p className="text-xl text-gray-800 font-semibold">{checkoutData.subscriptionPlan.amount} {checkoutData.subscriptionPlan.currencyCode}</p>
-                                                <span className="text-gray-400">|</span>
-                                                <p className="text-lg text-gray-600">Billed {checkoutData.subscriptionPlan.billingFrequency}</p>
-                                            </div>
-                                        </>
+                                    {isHovered && (
+                                        <motion.div
+                                            key="text"
+                                            className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.1 }}
+                                        >
+                                            Back
+                                        </motion.div>
                                     )}
-                                    {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
-                                        <div>
-                                            <h2 className="text-2xl font-semibold text-gray-900">{checkoutData?.paymentLink?.title}</h2>
-                                            <p className="text-lg text-gray-600">{checkoutData?.paymentLink?.public_description}</p>
-                                        </div>
-                                    )}
-                                </div>
+                                </AnimatePresence>
                             </div>
-                        </div>
-                        <div>
-                            <div className="border-t border-gray-200 pt-4 mb-4">
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-gray-700">Subtotal</span>
-                                    <span className="text-gray-900">
-                                        {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between font-semibold">
-                                    <span className="text-gray-900">Total</span>
-                                    <span className="text-gray-900">
-                                        {checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price} {checkoutData?.paymentLink?.currency_code}
-                                    </span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-500 text-center">
-                                By completing this purchase, you agree to our <a href="/terms" className="text-blue-600 hover:underline">Terms</a> and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
-                            </p>
                         </div>
                     </div>
 
-                    {/* Right side - Checkout component */}
-                    <div className="w-full lg:w-1/2 p-4 lg:p-8">
-                        <div className="space-y-6">
-                            {/* Render the "Pay" button with Apple icon */}
-                            <Button
-                                onClick={() => handleProviderClick('APPLE_PAY')}
-                                className="w-full bg-black text-white font-semibold py-7 px-6 rounded-md hover:bg-gray-900 transition duration-300 shadow-md flex items-center justify-center"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    x="0px"
-                                    y="0px"
-                                    width="28"
-                                    height="28"
-                                    viewBox="0 0 50 50"
-                                    style={{ fill: '#FFFFFF' }}
-                                    className="mr-1"
-                                >
-                                    <path d="M 44.527344 34.75 C 43.449219 37.144531 42.929688 38.214844 41.542969 40.328125 C 39.601563 43.28125 36.863281 46.96875 33.480469 46.992188 C 30.46875 47.019531 29.691406 45.027344 25.601563 45.0625 C 21.515625 45.082031 20.664063 47.03125 17.648438 47 C 14.261719 46.96875 11.671875 43.648438 9.730469 40.699219 C 4.300781 32.429688 3.726563 22.734375 7.082031 17.578125 C 9.457031 13.921875 13.210938 11.773438 16.738281 11.773438 C 20.332031 11.773438 22.589844 13.746094 25.558594 13.746094 C 28.441406 13.746094 30.195313 11.769531 34.351563 11.769531 C 37.492188 11.769531 40.8125 13.480469 43.1875 16.433594 C 35.421875 20.691406 36.683594 31.78125 44.527344 34.75 Z M 31.195313 8.46875 C 32.707031 6.527344 33.855469 3.789063 33.4375 1 C 30.972656 1.167969 28.089844 2.742188 26.40625 4.78125 C 24.878906 6.640625 23.613281 9.398438 24.105469 12.066406 C 26.796875 12.152344 29.582031 10.546875 31.195313 8.46875 Z"></path>
-                                </svg>
-                                <span className="text-2xl">Pay</span>
-                            </Button>
+                    <div className="pl-[28px]">
+                        <div className="mb-12">
+                            {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
+                                <>
+                                    <h2 className="text-xl text-gray-300 mb-4">Complete your payment</h2>
+                                    <div className="flex items-baseline gap-2 mb-4">
+                                        <span className="text-4xl font-bold">{formatNumber(checkoutData?.paymentLink?.price || 0)}</span>
+                                        <span className="text-4xl">{checkoutData?.paymentLink?.currency_code}</span>
+                                    </div>
+                                    {organization.logoUrl && (
+                                        <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                            <img
+                                                src={organization.logoUrl}
+                                                alt="Organization Logo"
+                                                className="w-12 h-12 rounded-md"
+                                            />
+                                            <div className="flex-1">
+                                                <div className="text-white font-medium">{checkoutData?.paymentLink?.title}</div>
+                                                <div className="text-sm text-gray-400">{checkoutData?.paymentLink?.public_description}</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                            {checkoutData?.subscriptionPlan && (
+                                <>
+                                    <h2 className="text-xl text-gray-300 mb-4">Subscribe to {checkoutData.subscriptionPlan.name}</h2>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
+                                        <span className="text-4xl">{checkoutData.subscriptionPlan.currencyCode}</span>
+                                    </div>
+                                    <div className="mt-1 text-gray-400 text-sm leading-tight">
+                                        <div>per</div>
+                                        <div>{checkoutData.subscriptionPlan.billingFrequency.toLowerCase()}</div>
+                                    </div>
+                                </>
+                            )}
+                            {checkoutData?.merchantProduct && (
+                                <>
+                                    <h2 className="text-xl text-gray-300 mb-4">Pay for {checkoutData.merchantProduct.name}</h2>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-bold">{formatNumber(checkoutData.merchantProduct.price)}</span>
+                                        <span className="text-4xl">{checkoutData.merchantProduct.currencyCode}</span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
-                            <div className="relative flex items-center">
-                                <div className="flex-grow border-t border-gray-300"></div>
-                                <span className="flex-shrink mx-4 text-gray-400">Or pay another way</span>
-                                <div className="flex-grow border-t border-gray-300"></div>
+                        <div className="pl-[60px] space-y-4">
+                            <div className="border-t border-gray-800 pt-4">
+                                <div className="flex justify-between items-baseline">
+                                    <span className="text-gray-400">Subtotal</span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                        <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Customer Details Form */}
-                            <div className="space-y-4">
+                            <div className="relative flex justify-start">
+                                {!isPromoCodeOpen ? (
+                                    <button
+                                        onClick={() => {
+                                            setIsPromoCodeOpen(true)
+                                            setTimeout(() => promoInputRef.current?.focus(), 0)
+                                        }}
+                                        className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
+                                    >
+                                        Add promotion code
+                                    </button>
+                                ) : (
+                                    <motion.div
+                                        className="w-full"
+                                        initial={{ width: "auto" }}
+                                        animate={{ width: "100%" }}
+                                        transition={{ duration: 0.3 }}
+                                    >
+                                        <div className="relative h-[42px]">
+                                            <Input
+                                                ref={promoInputRef}
+                                                value={promoCode}
+                                                onChange={(e) => setPromoCode(e.target.value)}
+                                                onBlur={handlePromoCodeBlur}
+                                                placeholder="Enter promotion code"
+                                                className="w-full h-full bg-[#1A1D23] border-gray-800 text-white placeholder:text-gray-500 rounded-md px-4"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        handlePromoCodeSubmit()
+                                                    }
+                                                }}
+                                            />
+                                            {promoCode && (
+                                                <button
+                                                    onClick={handlePromoCodeSubmit}
+                                                    className="absolute right-0 top-0 h-full px-4 text-red-500 hover:text-red-400 transition-colors bg-transparent"
+                                                >
+                                                    Apply
+                                                </button>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </div>
+
+                            {appliedPromoCode && (
+                                <div className="flex items-center justify-end">
+                                    <div className="relative flex items-center bg-red-100/10 text-red-400 px-3 py-2 text-sm rounded-md">
+                                        <span className="font-medium">{appliedPromoCode}</span>
+                                        <button
+                                            onClick={() => setAppliedPromoCode(null)}
+                                            className="ml-3 text-red-400 hover:text-red-300 transition-colors"
+                                        >
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="border-t border-gray-800 pt-4">
+                                <div className="flex justify-between items-baseline">
+                                    <span className="text-white font-medium">Total due today</span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-lg font-medium">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                        <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Right side - Checkout form */}
+            <div className="w-full lg:w-1/2 bg-white p-4 lg:p-8">
+                <div className="max-w-[488px] pl-8 w-full">
+                    {/* Mobile Money Options */}
+                    <div className="flex overflow-x-auto pb-4 space-x-4">
+                        {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
+                            provider !== 'ECOBANK' && (
+                                <div
+                                    key={provider}
+                                    onClick={() => handleProviderClick(provider)}
+                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'
+                                        }`}
+                                    style={{ width: '100px', height: '100px', padding: '0' }}
+                                >
+                                    <img
+                                        src={`/${provider.toLowerCase()}.webp`}
+                                        alt={provider}
+                                        className="w-full h-full object-contain rounded-lg"
+                                    />
+                                </div>
+                            )
+                        ))}
+                    </div>
+
+                    {/* Continue with provider button */}
+                    {selectedProvider && selectedProvider !== 'ECOBANK' && (
+                        <div className="mt-2 mb-6 flex justify-center">
+                            <Button
+                                onClick={() => {/* handle provider payment */ }}
+                                className={`
+                                    w-full h-12 text-white font-semibold rounded-none transition duration-300 shadow-md text-lg
+                                    ${selectedProvider === 'ORANGE' ? 'bg-[#FC6307] hover:bg-[#E35A06]' : ''}
+                                    ${selectedProvider === 'WAVE' ? 'bg-[#25BBF9] text-black hover:bg-[#60B8D8]' : ''}
+                                    ${selectedProvider === 'MTN' ? 'bg-[#F7CE46] text-black hover:bg-[#E0B83D]' : ''}
+                                `}
+                            >
+                                Continue with {selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}
+                            </Button>
+                        </div>
+                    )}
+
+                    <div className="relative flex items-center mb-6">
+                        <div className="flex-grow border-t border-gray-300"></div>
+                        <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
+                        <div className="flex-grow border-t border-gray-300"></div>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                        {/* Email */}
+                        <div>
+                            <Input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={customerDetails.email}
+                                onChange={handleCustomerInputChange}
+                                placeholder="Email address**"
+                                className="w-full"
+                                required
+                            />
+                        </div>
+
+                        {/* Card Information */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Card information</label>
+                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
                                 <Input
-                                    type="email"
-                                    name="email"
-                                    value={customerDetails.email}
+                                    id="number"
+                                    name="number"
+                                    value={cardDetails.number}
+                                    onChange={handleInputChange}
+                                    placeholder="1234 1234 1234 1234"
+                                    className="rounded-b-none"
+                                    required
+                                />
+                                <div className="flex -mt-px">
+                                    <Input
+                                        id="expiry"
+                                        name="expiry"
+                                        value={cardDetails.expiry}
+                                        onChange={handleInputChange}
+                                        placeholder="MM / YY"
+                                        className="rounded-none rounded-bl-lg w-1/2"
+                                        required
+                                    />
+                                    <Input
+                                        id="cvc"
+                                        name="cvc"
+                                        value={cardDetails.cvc}
+                                        onChange={handleInputChange}
+                                        placeholder="CVC"
+                                        className="rounded-none rounded-br-lg w-1/2"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Cardholder Name */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Cardholder name</label>
+                            <div className="flex space-x-3">
+                                <Input
+                                    name="firstName"
+                                    value={customerDetails.firstName}
                                     onChange={handleCustomerInputChange}
-                                    placeholder="Email address**"
-                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="First name"
+                                    className="w-1/2"
                                     required
                                 />
                                 <Input
-                                    type="text"
-                                    name="name"
-                                    value={customerDetails.name}
+                                    name="lastName"
+                                    value={customerDetails.lastName}
                                     onChange={handleCustomerInputChange}
-                                    placeholder="Full name*"
-                                    className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Last name"
+                                    className="w-1/2"
                                     required
                                 />
+                            </div>
+                        </div>
+
+                        {/* Billing Address */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Billing address</label>
+                            <div className="space-y-3">
                                 <div className="flex space-x-3">
                                     <Input
-                                        type="text"
                                         name="country"
                                         value={customerDetails.country}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Country*"
-                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Country**"
+                                        className="w-1/2"
                                         required
                                     />
                                     <Input
-                                        type="text"
                                         name="city"
                                         value={customerDetails.city}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="City*"
-                                        className="w-1/2 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="City**"
+                                        className="w-1/2"
                                         required
                                     />
                                 </div>
-                                <div className="flex space-x-3">
+                                <div className="flex space-x-2">
                                     <Input
-                                        type="text"
-                                        name="countryCode"
-                                        value={customerDetails.countryCode}
+                                        name="address"
+                                        value={customerDetails.address}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="+225"
-                                        className="w-24 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Address line**"
+                                        className="w-[70%]"
+                                        required
                                     />
                                     <Input
-                                        type="tel"
-                                        value={customerDetails.phoneNumber}
+                                        name="postalCode"
+                                        value={customerDetails.postalCode}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Phone Number*"
-                                        className="w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Postal code**"
+                                        className="w-[30%]"
                                         required
                                     />
                                 </div>
-                                <p className="text-gray-500 text-sm">
-                                    <span className="text-red-500">*</span> Required fields
-                                </p>
                             </div>
-
-                            <div className="relative">
-                                <div
-                                    className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
-                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                                >
-                                    {renderProviderImages()}
-                                </div>
-                            </div>
-                            <AnimatePresence mode="wait">
-                                {selectedProvider === 'STRIPE' && (
-                                    <motion.form
-                                        key="card-form"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="space-y-4 bg-white rounded-md"
-                                        onSubmit={handleSubmit}
-                                    >
-                                        <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                            <div className="relative focus-within:z-10">
-                                                <Input
-                                                    id="number"
-                                                    name="number"
-                                                    value={cardDetails.number}
-                                                    onChange={handleInputChange}
-                                                    placeholder="1234 1234 1234 1234"
-                                                    className="peer rounded-b-none pe-12 shadow-none [direction:inherit] mt-1 block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                                    required
-                                                    maxLength={19}
-                                                />
-                                                <div className="pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-4 text-muted-foreground/80 peer-disabled:opacity-50">
-                                                    <div className="flex space-x-1">
-                                                        <img src="/checkout-visa.webp" alt="Visa" className="h-4 w-auto" />
-                                                        <img src="/checkout-mastercard.webp" alt="Mastercard" className="h-4 w-auto" />
-                                                        <img src="/checkout-amer.webp" alt="American Express" className="h-4 w-auto" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="-mt-px flex">
-                                                <div className="w-1/2 min-w-0 flex-1 focus-within:z-10">
-                                                    <Input
-                                                        id="expiry"
-                                                        name="expiry"
-                                                        value={cardDetails.expiry}
-                                                        onChange={handleInputChange}
-                                                        placeholder="MM/YY"
-                                                        className="rounded-e-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                                        required
-                                                        maxLength={5}
-                                                    />
-                                                </div>
-                                                <div className="-ms-px w-1/2 min-w-0 flex-1 focus-within:z-10">
-                                                    <Input
-                                                        id="cvc"
-                                                        name="cvc"
-                                                        value={cardDetails.cvc}
-                                                        onChange={handleInputChange}
-                                                        placeholder="CVC"
-                                                        className="rounded-s-none rounded-t-none shadow-none [direction:inherit] block w-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
-                                                        required
-                                                        maxLength={4}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            className="w-full bg-gray-800 text-white font-semibold py-7 px-4 rounded-md hover:bg-gray-900 transition duration-300 shadow-md text-xl"
-                                            disabled={!isPaymentFormValid()}
-                                        >
-                                            Pay
-                                        </Button>
-                                    </motion.form>
-                                )}
-                                {selectedProvider && selectedProvider !== 'STRIPE' && selectedProvider !== 'APPLE_PAY' && (
-                                    <motion.div
-                                        key="other-method"
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="text-center"
-                                    >
-                                        <Button
-                                            className={`
-                                                w-full text-white font-semibold py-7 px-4 rounded-md transition duration-300 shadow-md text-xl
-                                                ${selectedProvider === 'ORANGE' ? 'bg-[#FC6307] hover:bg-[#E35A06]' : ''}
-                                                ${selectedProvider === 'WAVE' ? 'bg-[#25BBF9] text-black hover:bg-[#60B8D8]' : ''}
-                                                ${selectedProvider === 'MTN' ? 'bg-[#F7CE46] text-black hover:bg-[#E0B83D]' : ''}
-                                            `}
-                                        >
-                                            Continue with {selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}
-                                        </Button>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
                         </div>
-                        <div className="mt-8 text-center">
-                            <div className="border-t border-gray-200 pt-4 mb-4"></div>
-                            <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
+
+                        {/* Phone Numbers - Show both for subscription plans */}
+                        {checkoutData?.subscriptionPlan ? (
+                            <div className="space-y-3">
+                                <PhoneNumberInput
+                                    value={customerDetails.phoneNumber}
+                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, phoneNumber: value || '' }))}
+                                />
+                                <PhoneNumberInput
+                                    value={customerDetails.whatsappNumber}
+                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
+                                />
+                            </div>
+                        ) : null}
+
+                        {/* Submit Button */}
+                        <div className="flex justify-center pt-2">
+                            <Button
+                                type="submit"
+                                className="w-full h-12 bg-[#074367] text-white font-semibold rounded-none hover:bg-[#063352] transition duration-300 shadow-md text-lg"
+                                disabled={!isPaymentFormValid()}
+                            >
+                                {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
+                            </Button>
+                        </div>
+                    </form>
+
+                    <div className="mt-8 select-none">
+                        <div className="border-t border-gray-200 pt-4"></div>
+                        <div className="flex items-center justify-center gap-3 text-xs text-gray-400">
+                            <span className="inline-flex items-center">
                                 Powered by{' '}
-                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer">
-                                    <img src="/transparent2.webp" alt="lomi." className="h-8 w-8 ml-1" />
+                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer" className="text-gray-400 text-xs font-bold flex items-baseline ml-1">
+                                    lomi
+                                    <div className="w-[2px] h-[2px] bg-current ml-[1px] mb-[1px]"></div>
                                 </a>
                             </span>
+                            <div className="text-gray-300 h-4 w-[1px] bg-gray-300"></div>
+                            <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Terms</a>
+                            <span className="text-gray-300">|</span>
+                            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Privacy</a>
                         </div>
                     </div>
                 </div>

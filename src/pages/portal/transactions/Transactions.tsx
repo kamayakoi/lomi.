@@ -706,7 +706,12 @@ function TransactionsPage() {
                                                                         ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
                                                                         ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
-                                                                        ${transaction.provider_code === 'STRIPE' ? 'bg-[#625BF6] text-white dark:bg-[#625BF6] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'NOWPAYMENTS' ? 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'WIZALL' ? 'bg-[#FF6B00] text-white dark:bg-[#FF6B00] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
                                                                     `}>
                                                                         {formatProviderCode(transaction.provider_code)}
@@ -783,8 +788,24 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Ecobank'
         case 'MTN':
             return 'MTN'
-        case 'STRIPE':
-            return 'Stripe'
+        case 'NOWPAYMENTS':
+            return 'Nowpayments'
+        case 'PAYPAL':
+            return 'Paypal'
+        case 'APPLE':
+            return 'Apple'
+        case 'GOOGLE':
+            return 'Google'
+        case 'MOOV':
+            return 'Moov'
+        case 'AIRTEL':
+            return 'Airtel'
+        case 'MPESA':
+            return 'M-Pesa'
+        case 'WIZALL':
+            return 'Wizall'
+        case 'OPAY':
+            return 'OPay'
         case 'OTHER':
             return 'Other'
         default:

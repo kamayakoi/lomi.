@@ -9,7 +9,15 @@ const COLORS = {
     WAVE: '#71CDF4',
     ECOBANK: '#074367',
     MTN: '#F7CE46',
-    STRIPE: '#625BF6',
+    NOWPAYMENTS: '#037BFE',
+    PAYPAL: '#000000',
+    APPLE: '#000000',
+    GOOGLE: '#4285F4',
+    MOOV: '#0093DD',
+    AIRTEL: '#FF0000',
+    MPESA: '#4CAF50',
+    WIZALL: '#FF6B00',
+    OPAY: '#14B55A',
     OTHER: '#E5E7EB',
 }
 
@@ -50,8 +58,24 @@ export default function ProviderDistribution({
                 return 'Ecobank'
             case 'MTN':
                 return 'MTN'
-            case 'STRIPE':
-                return 'Stripe'
+            case 'NOWPAYMENTS':
+                return 'Nowpayments'
+            case 'PAYPAL':
+                return 'Paypal'
+            case 'APPLE':
+                return 'Apple'
+            case 'GOOGLE':
+                return 'Google'
+            case 'MOOV':
+                return 'Moov'
+            case 'AIRTEL':
+                return 'Airtel'
+            case 'MPESA':
+                return 'M-Pesa'
+            case 'WIZALL':
+                return 'Wizall'
+            case 'OPAY':
+                return 'OPay'
             default:
                 return 'Other'
         }

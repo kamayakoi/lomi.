@@ -1,6 +1,6 @@
 export type link_type = 'product' | 'plan' | 'instant';
 export type currency_code = 'XOF' | 'USD' | 'EUR';
-export type provider_code = 'ORANGE' | 'WAVE' | 'ECOBANK' | 'MTN' | 'STRIPE' | 'OTHER';
+export type provider_code = 'ORANGE' | 'WAVE' | 'ECOBANK' | 'MTN' | 'NOWPAYMENTS' | 'APPLE' | 'GOOGLE' | 'MOOV' | 'AIRTEL' | 'MPESA' | 'WIZALL' | 'OPAY' | 'PAYPAL' | 'OTHER';
 
 export type PaymentLink = {
   link_id: string

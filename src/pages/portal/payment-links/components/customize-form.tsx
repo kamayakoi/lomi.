@@ -123,8 +123,11 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
     };
 
     const handleCurrencyChange = (value: string) => {
-        setLocalCurrency(value);
-        onCurrencyChange(index, value);
+        // Only allow XOF to be selected
+        if (value === 'XOF') {
+            setLocalCurrency(value);
+            onCurrencyChange(index, value);
+        }
     };
 
     return (
@@ -153,8 +156,8 @@ const PriceInput: React.FC<PriceInputProps> = ({ index, price, onAmountChange, o
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="XOF">XOF</SelectItem>
-                        <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="EUR">EUR</SelectItem>
+                        <SelectItem value="USD" className="opacity-50 cursor-not-allowed" disabled>USD</SelectItem>
+                        <SelectItem value="EUR" className="opacity-50 cursor-not-allowed" disabled>EUR</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -175,14 +178,48 @@ const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChan
     return (
         <div>
             <Label htmlFor="expirationDate" className="mb-2 block">Expiration date</Label>
-            <DatePicker
-                id="expirationDate"
-                selected={value}
-                onChange={handleChange}
-                className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300"
-                minDate={new Date()}
-                dateFormat="dd/MM/yyyy"
-            />
+            <div className="relative">
+                <DatePicker
+                    id="expirationDate"
+                    selected={value}
+                    onChange={handleChange}
+                    minDate={new Date()}
+                    dateFormat="dd/MM/yyyy"
+                    className="w-full rounded-none bg-background text-foreground px-3 py-2 text-sm
+                        border border-input hover:bg-accent hover:text-accent-foreground
+                        focus:outline-none focus:ring-0 focus:border-input focus:border-black dark:focus:border-white
+                        disabled:cursor-not-allowed disabled:opacity-50"
+                    wrapperClassName="w-full"
+                    popperClassName="shadow-lg rounded-none border border-border bg-background text-foreground z-50"
+                    calendarClassName="!bg-background !border-none !rounded-none !font-sans"
+                    dayClassName={date =>
+                        `!rounded-none hover:!bg-accent hover:!text-accent-foreground 
+                        ${date?.toDateString() === value?.toDateString() ? '!bg-primary !text-primary-foreground' : '!bg-background'}`
+                    }
+                    monthClassName={() => "!text-foreground"}
+                    weekDayClassName={() => "!text-muted-foreground"}
+                    showPopperArrow={false}
+                    popperPlacement="bottom-start"
+                    placeholderText="Select expiration date"
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 15 15"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-foreground opacity-50"
+                    >
+                        <path
+                            d="M4.5 1C4.77614 1 5 1.22386 5 1.5V2H10V1.5C10 1.22386 10.2239 1 10.5 1C10.7761 1 11 1.22386 11 1.5V2H12.5C13.3284 2 14 2.67157 14 3.5V12.5C14 13.3284 13.3284 14 12.5 14H2.5C1.67157 14 1 13.3284 1 12.5V3.5C1 2.67157 1.67157 2 2.5 2H4V1.5C4 1.22386 4.22386 1 4.5 1ZM10 3V3.5C10 3.77614 10.2239 4 10.5 4C10.7761 4 11 3.77614 11 3.5V3H12.5C12.7761 3 13 3.22386 13 3.5V5H2V3.5C2 3.22386 2.22386 3 2.5 3H4V3.5C4 3.77614 4.22386 4 4.5 4C4.77614 4 5 3.77614 5 3.5V3H10ZM2 6V12.5C2 12.7761 2.22386 13 2.5 13H12.5C12.7761 13 13 12.7761 13 12.5V6H2Z"
+                            fill="currentColor"
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                </div>
+            </div>
         </div>
     );
 };
@@ -217,7 +254,6 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
-        { id: 'APPLE_PAY', name: 'Apple Pay', icon: '/apple-pay.webp' },
         { id: 'WAVE', name: 'Wave', icon: '/wave.webp' },
         { id: 'MTN', name: 'MTN', icon: '/mtn.webp' },
         { id: 'ORANGE', name: 'Orange', icon: '/orange.webp' },
@@ -239,8 +275,8 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     console.error('Error fetching connected providers:', connectedProvidersError)
                 } else {
                     const mappedProviders = connectedProvidersData.reduce((acc: string[], provider: { code: string }) => {
-                        if (provider.code === 'STRIPE') {
-                            acc.push('CARDS', 'APPLE_PAY')
+                        if (provider.code === 'ECOBANK') {
+                            acc.push('CARDS')
                         } else {
                             acc.push(provider.code)
                         }
@@ -578,10 +614,8 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 return 'bg-[#FC6307] hover:bg-[#FC6307] text-white';
             case 'MTN':
                 return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
-            case 'APPLE_PAY':
-                return 'bg-[#000000] hover:bg-[#1a1a1a] text-white dark:bg-[#ffffff] dark:hover:bg-[#f0f0f0] dark:text-black';
             case 'CARDS':
-                return 'bg-[#625BF6] hover:bg-[#625BF6] text-white';
+                return 'bg-[#074367] hover:bg-[#074367] text-white';
             default:
                 return '';
         }
@@ -699,10 +733,8 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
             // Map the selected payment methods to their corresponding provider codes
             const mappedProviders = allowedPaymentMethods.reduce((acc, method) => {
-                if (method === 'CARDS' || method === 'APPLE_PAY') {
-                    if (!acc.includes('STRIPE')) {
-                        acc.push('STRIPE')
-                    }
+                if (method === 'CARDS') {
+                    acc.push('ECOBANK')
                 } else {
                     acc.push(method as provider_code)
                 }

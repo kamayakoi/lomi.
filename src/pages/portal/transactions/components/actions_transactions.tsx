@@ -332,8 +332,24 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Ecobank'
         case 'MTN':
             return 'MTN'
-        case 'STRIPE':
-            return 'Stripe'
+        case 'NOWPAYMENTS':
+            return 'Nowpayments'
+        case 'PAYPAL':
+            return 'Paypal'
+        case 'APPLE':
+            return 'Apple'
+        case 'GOOGLE':
+            return 'Google'
+        case 'MOOV':
+            return 'Moov'
+        case 'AIRTEL':
+            return 'Airtel'
+        case 'MPESA':
+            return 'M-Pesa'
+        case 'WIZALL':
+            return 'Wizall'
+        case 'OPAY':
+            return 'OPay'
         case 'OTHER':
             return 'Other'
         default:

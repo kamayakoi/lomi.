@@ -3,13 +3,13 @@
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 CREATE TYPE transaction_type AS ENUM ('payment', 'instalment');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'OTHER');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'PAYPAL', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE kyc_status AS ENUM ('not_submitted', 'pending', 'not_authorized', 'approved', 'rejected');
-CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE', 'BANK_TRANSFER', 'CRYPTO', 'OTHER');
+CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE', 'BANK_TRANSFER', 'CRYPTO', 'PAYPAL', 'OTHER');
 CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 CREATE TYPE dispute_status AS ENUM ('pending', 'resolved', 'closed');
@@ -245,7 +245,7 @@ CREATE TABLE providers (
 
 CREATE INDEX idx_providers_code ON providers(code);
 
-COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, STRIPE, PAYPAL';
+COMMENT ON TABLE providers IS 'Examples: MTN, WAVE, ORANGE, PAYPAL';
 
 
 -- Payment methods table

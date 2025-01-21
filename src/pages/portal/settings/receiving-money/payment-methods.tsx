@@ -25,8 +25,8 @@ interface ProviderSetting {
 }
 
 const paymentMethods: PaymentMethod[] = [
-    { channel: 'Visa', type: 'Card', number: null, logo: '/checkout-visa.webp', provider_code: 'STRIPE' },
-    { channel: 'Mastercard', type: 'Card', number: null, logo: '/checkout-mastercard.webp', provider_code: 'STRIPE' },
+    { channel: 'Visa', type: 'Card', number: null, logo: '/checkout-visa.webp', provider_code: 'ECOBANK' },
+    { channel: 'Mastercard', type: 'Card', number: null, logo: '/checkout-mastercard.webp', provider_code: 'ECOBANK' },
     { channel: 'Orange', type: 'Mobile Money', number: null, logo: '/orange.webp', provider_code: 'ORANGE' },
     { channel: 'MTN', type: 'Mobile Money', number: null, logo: '/mtn.webp', provider_code: 'MTN' },
     { channel: 'Wave', type: 'E-Wallet', number: null, logo: '/wave.webp', provider_code: 'WAVE' },

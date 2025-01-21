@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CreditCard, Smartphone, Building, Apple } from 'lucide-react'
+import { CreditCard, Smartphone, Building } from 'lucide-react'
 import { useCheckoutContext } from './useCheckoutContext'
 import { supabase } from '@/utils/supabase/client'
 
@@ -48,13 +48,12 @@ export default function PaymentMethodSelector() {
         switch (code) {
             case 'CREDIT_CARD':
             case 'DEBIT_CARD':
+            case 'ECOBANK':
                 return 'Card'
             case 'MOBILE_MONEY':
                 return 'Mobile Money'
             case 'BANK_TRANSFER':
                 return 'Bank Transfer'
-            case 'APPLE_PAY':
-                return 'Apple Pay'
             default:
                 return code
         }
@@ -64,15 +63,14 @@ export default function PaymentMethodSelector() {
         switch (code) {
             case 'CREDIT_CARD':
             case 'DEBIT_CARD':
+            case 'ECOBANK':
                 return CreditCard
             case 'MOBILE_MONEY':
                 return Smartphone
             case 'BANK_TRANSFER':
                 return Building
-            case 'APPLE_PAY':
-                return Apple
             default:
-                return CreditCard // Return a default icon instead of null
+                return CreditCard
         }
     }
 
@@ -80,13 +78,12 @@ export default function PaymentMethodSelector() {
         switch (code) {
             case 'CREDIT_CARD':
             case 'DEBIT_CARD':
-                return 'bg-indigo-100 text-indigo-600'
+            case 'ECOBANK':
+                return 'bg-[#074367] text-white'
             case 'MOBILE_MONEY':
                 return 'bg-yellow-100 text-yellow-600'
             case 'BANK_TRANSFER':
                 return 'bg-green-100 text-green-600'
-            case 'APPLE_PAY':
-                return 'bg-gray-100 text-gray-600'
             default:
                 return 'bg-blue-100 text-blue-600'
         }
