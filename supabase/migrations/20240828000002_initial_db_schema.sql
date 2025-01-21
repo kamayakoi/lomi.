@@ -302,6 +302,7 @@ CREATE TABLE customers (
     name VARCHAR NOT NULL,
     email VARCHAR,
     phone_number VARCHAR,
+    whatsapp_number VARCHAR,
     country VARCHAR,
     city VARCHAR,
     address VARCHAR,

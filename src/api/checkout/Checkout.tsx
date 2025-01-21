@@ -7,7 +7,8 @@ import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checko
 import { CheckoutData } from './checkoutTypes.ts'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
-import { ArrowLeft, ImageIcon, Loader2 } from 'lucide-react'
+import WhatsAppNumberInput from '@/components/ui/whatsapp-number-input'
+import { ArrowLeft, ImageIcon, Loader2, ChevronDown } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -16,6 +17,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
+import { countries } from '@/utils/data/onboarding'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
@@ -48,6 +50,7 @@ export default function CheckoutPage() {
     const promoInputRef = useRef<HTMLInputElement>(null)
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
+    const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
 
     useEffect(() => {
         const fetchOrganization = async () => {
@@ -111,7 +114,7 @@ export default function CheckoutPage() {
         }
     };
 
-    const handleCustomerInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCustomerInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setCustomerDetails((prev) => ({ ...prev, [name]: value }));
     };
@@ -480,18 +483,39 @@ export default function CheckoutPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-3">
-                        {/* Email */}
-                        <div>
-                            <Input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value={customerDetails.email}
-                                onChange={handleCustomerInputChange}
-                                placeholder="Email address**"
-                                className="w-full"
-                                required
-                            />
+                        {/* Cardholder Information */}
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">Cardholder information</label>
+                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                <Input
+                                    name="fullName"
+                                    value={`${customerDetails.firstName} ${customerDetails.lastName}`.trim()}
+                                    onChange={(e) => {
+                                        const fullName = e.target.value;
+                                        const [firstName = '', lastName = ''] = fullName.split(' ');
+                                        setCustomerDetails(prev => ({
+                                            ...prev,
+                                            firstName,
+                                            lastName
+                                        }));
+                                    }}
+                                    placeholder="Full name on card**"
+                                    className="rounded-b-none w-full"
+                                    required
+                                />
+                                <div className="flex -mt-px">
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        value={customerDetails.email}
+                                        onChange={handleCustomerInputChange}
+                                        placeholder="Email address**"
+                                        className="rounded-none rounded-b-lg w-full"
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         {/* Card Information */}
@@ -530,58 +554,44 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        {/* Cardholder Name */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Cardholder name</label>
-                            <div className="flex space-x-3">
-                                <Input
-                                    name="firstName"
-                                    value={customerDetails.firstName}
-                                    onChange={handleCustomerInputChange}
-                                    placeholder="First name"
-                                    className="w-1/2"
-                                    required
-                                />
-                                <Input
-                                    name="lastName"
-                                    value={customerDetails.lastName}
-                                    onChange={handleCustomerInputChange}
-                                    placeholder="Last name"
-                                    className="w-1/2"
-                                    required
-                                />
-                            </div>
-                        </div>
-
                         {/* Billing Address */}
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">Billing address</label>
-                            <div className="space-y-3">
-                                <div className="flex space-x-3">
-                                    <Input
+                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                <div className="relative">
+                                    <select
                                         name="country"
                                         value={customerDetails.country}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Country**"
-                                        className="w-1/2"
+                                        className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none"
                                         required
-                                    />
+                                    >
+                                        <option value="" className="text-muted-foreground">Country**</option>
+                                        {countries.map((country) => (
+                                            <option key={country} value={country}>
+                                                {country}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                                </div>
+                                <div className="flex -mt-px">
                                     <Input
                                         name="city"
                                         value={customerDetails.city}
                                         onChange={handleCustomerInputChange}
                                         placeholder="City**"
-                                        className="w-1/2"
+                                        className="rounded-none w-full border-x"
                                         required
                                     />
                                 </div>
-                                <div className="flex space-x-2">
+                                <div className="flex -mt-px">
                                     <Input
                                         name="address"
                                         value={customerDetails.address}
                                         onChange={handleCustomerInputChange}
                                         placeholder="Address line**"
-                                        className="w-[70%]"
+                                        className="rounded-none rounded-bl-lg w-[70%]"
                                         required
                                     />
                                     <Input
@@ -589,7 +599,7 @@ export default function CheckoutPage() {
                                         value={customerDetails.postalCode}
                                         onChange={handleCustomerInputChange}
                                         placeholder="Postal code**"
-                                        className="w-[30%]"
+                                        className="rounded-none rounded-br-lg w-[30%]"
                                         required
                                     />
                                 </div>
@@ -598,15 +608,56 @@ export default function CheckoutPage() {
 
                         {/* Phone Numbers - Show both for subscription plans */}
                         {checkoutData?.subscriptionPlan ? (
-                            <div className="space-y-3">
-                                <PhoneNumberInput
-                                    value={customerDetails.phoneNumber}
-                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, phoneNumber: value || '' }))}
-                                />
-                                <PhoneNumberInput
-                                    value={customerDetails.whatsappNumber}
-                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
-                                />
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Contact information</label>
+                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                    <div className="rounded-t-lg">
+                                        <PhoneNumberInput
+                                            value={customerDetails.phoneNumber}
+                                            onChange={(value) => {
+                                                setCustomerDetails(prev => ({
+                                                    ...prev,
+                                                    phoneNumber: value || '',
+                                                    whatsappNumber: isDifferentWhatsApp ? prev.whatsappNumber : value || ''
+                                                }));
+                                            }}
+                                        />
+                                    </div>
+                                    <AnimatePresence mode="wait">
+                                        {!isDifferentWhatsApp ? (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="border-t border-gray-200 mt-2"
+                                            >
+                                                <div
+                                                    onClick={() => setIsDifferentWhatsApp(true)}
+                                                    className="px-3 py-2 flex items-center space-x-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                                                >
+                                                    <div className="w-4 h-4 rounded border border-gray-300 flex items-center justify-center">
+                                                        <div className="w-2 h-2 rounded-sm bg-transparent"></div>
+                                                    </div>
+                                                    <span className="text-sm text-gray-600">Add WhatsApp number</span>
+                                                </div>
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="border-t border-gray-200 mt-2"
+                                            >
+                                                <WhatsAppNumberInput
+                                                    value={customerDetails.whatsappNumber}
+                                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                         ) : null}
 

@@ -9,31 +9,31 @@ export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData
     }
     const paymentLink = data[0];
 
-    // // Download product image if exists
-    // let productImageUrl = null;
-    // if (paymentLink?.product_image_url) {
-    //     const { data: imageData, error: imageError } = await supabase
-    //         .storage
-    //         .from('product_images')
-    //         .download(paymentLink.product_image_url.replace(/^.*\/product_images\//, ''))
+    // Download product image if exists
+    let productImageUrl = null;
+    if (paymentLink?.product_image_url) {
+        const { data: imageData, error: imageError } = await supabase
+            .storage
+            .from('product_images')
+            .download(paymentLink.product_image_url.replace(/^.*\/product_images\//, ''))
 
-    //     if (!imageError) {
-    //         productImageUrl = URL.createObjectURL(imageData)
-    //     }
-    // }
+        if (!imageError) {
+            productImageUrl = URL.createObjectURL(imageData)
+        }
+    }
 
-    // // Download plan image if exists
-    // let planImageUrl = null;
-    // if (paymentLink?.plan_image_url) {
-    //     const { data: imageData, error: imageError } = await supabase
-    //         .storage
-    //         .from('subscription_plans')
-    //         .download(paymentLink.plan_image_url.replace(/^.*\/subscription_plans\//, ''))
+    // Download plan image if exists
+    let planImageUrl = null;
+    if (paymentLink?.plan_image_url) {
+        const { data: imageData, error: imageError } = await supabase
+            .storage
+            .from('subscription_plans')
+            .download(paymentLink.plan_image_url.replace(/^.*\/subscription_plans\//, ''))
 
-    //     if (!imageError) {
-    //         planImageUrl = URL.createObjectURL(imageData)
-    //     }
-    // }
+        if (!imageError) {
+            planImageUrl = URL.createObjectURL(imageData)
+        }
+    }
 
     const merchantProduct = paymentLink && paymentLink.product_id ? {
         productId: paymentLink.product_id,
@@ -43,7 +43,7 @@ export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData
         description: paymentLink.product_description,
         price: paymentLink.product_price,
         currencyCode: paymentLink.currency_code,
-        image_url: paymentLink.product_image_url,
+        image_url: productImageUrl || paymentLink.product_image_url,
         isActive: true,
         createdAt: '',
         updatedAt: '',
@@ -57,7 +57,7 @@ export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData
         billingFrequency: paymentLink.plan_billing_frequency,
         amount: paymentLink.plan_amount,
         currencyCode: paymentLink.currency_code,
-        image_url: paymentLink.plan_image_url,
+        image_url: planImageUrl || paymentLink.plan_image_url,
         failedPaymentAction: '',
         chargeDay: null,
         metadata: {},
