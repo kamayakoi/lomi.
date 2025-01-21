@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
+import compressPlugin from 'vite-plugin-compression';
 
 export default defineConfig({
   plugins: [
@@ -19,7 +20,10 @@ export default defineConfig({
     visualizer({
       filename: 'bundle-analysis.html',
       open: true,
+      gzipSize: true,
+      brotliSize: true,
     }),
+    compressPlugin({ algorithm: 'gzip', ext: '.gz' }),
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [/node_modules/, /\.d\.ts$/],
@@ -84,6 +88,7 @@ export default defineConfig({
   ],
   base: '/',
   build: {
+    target: 'esnext',
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
@@ -100,11 +105,33 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Specific vendor bundles for core dependencies
+          if (id.includes('react/') || id.includes('react-dom/')) {
+            return 'vendor-react';
+          }
+          if (id.includes('react-router-dom/')) {
+            return 'vendor-router';
+          }
+          if (id.includes('react-query')) {
+            return 'vendor-query';
+          }
+          if (id.includes('@radix-ui/') || id.includes('@shadcn/')) {
+            return 'vendor-ui';
+          }
+          // Dynamic chunking for remaining node_modules
           if (id.includes('node_modules')) {
             return id.toString().split('node_modules/')[1].split('/')[0].toString();
           }
         },
-        sourcemap: false,
+        assetFileNames: (assetInfo) => {
+          let extType = assetInfo.name.split('.').at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            extType = 'img';
+          }
+          return `assets/${extType}/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
       },
     },
     assetsDir: 'assets',

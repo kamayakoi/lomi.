@@ -52,7 +52,7 @@ export default function GitHubStars() {
             >
                 <Star className="h-4 w-4" />
                 <span className="text-sm">
-                    {isLoading ? 'Loading...' : error ? 'Error' : `Star ${stars ?? 0}`}
+                    {isLoading ? '—' : error ? 'Error' : `Star ${stars ?? 0}`}
                 </span>
             </Button>
         </div>
