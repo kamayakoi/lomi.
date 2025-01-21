@@ -1,4 +1,4 @@
-import React from 'react';
+import { Suspense, memo, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './sidebar';
 import { useMetaTags } from '@/lib/contexts/useMetaTags';
@@ -8,6 +8,25 @@ import { UserAvatarProvider } from '@/lib/contexts/userAvatarContext';
 import { NotificationsProvider } from '@/lib/contexts/notificationsContext';
 import { ActivationProvider } from '@/lib/contexts/ActivationContext';
 import { OrganizationProvider } from '@/lib/contexts/OrganizationContext';
+import AnimatedLogoLoader from './loader';
+
+const MemoizedSidebar = memo(Sidebar);
+
+// Memoize the providers to prevent unnecessary re-renders
+const ProviderComposer = memo(({ children }: { children: React.ReactNode }) => (
+  <OrganizationProvider>
+    <SidebarProvider>
+      <ActivationProvider>
+        <UserAvatarProvider>
+          <NotificationsProvider>
+            {children}
+          </NotificationsProvider>
+        </UserAvatarProvider>
+      </ActivationProvider>
+    </SidebarProvider>
+  </OrganizationProvider>
+));
+ProviderComposer.displayName = 'ProviderComposer';
 
 export default function AppShell() {
   const { sidebarData, isLoading } = useSidebarData();
@@ -19,29 +38,23 @@ export default function AppShell() {
     favicon: '/favicon.ico',
   });
 
-  const MemoizedSidebar = React.memo(Sidebar);
+  const mainContent = useMemo(() => (
+    <div className="relative h-full overflow-hidden bg-background">
+      {!isLoading && <MemoizedSidebar />}
+      <main
+        id="content"
+        className="overflow-x-hidden pt-16 transition-[margin] md:overflow-y-hidden md:pt-0 md:ml-64 h-full"
+      >
+        <Suspense fallback={<AnimatedLogoLoader />}>
+          <Outlet />
+        </Suspense>
+      </main>
+    </div>
+  ), [isLoading]);
 
   return (
-    <OrganizationProvider>
-      <SidebarProvider>
-        <ActivationProvider>
-          <UserAvatarProvider>
-            <NotificationsProvider>
-              <div className="relative h-full overflow-hidden bg-background">
-                {!isLoading && <MemoizedSidebar />}
-                <main
-                  id="content"
-                  className="overflow-x-hidden pt-16 transition-[margin] md:overflow-y-hidden md:pt-0 md:ml-64 h-full"
-                >
-                  <React.Suspense>
-                    <Outlet />
-                  </React.Suspense>
-                </main>
-              </div>
-            </NotificationsProvider>
-          </UserAvatarProvider>
-        </ActivationProvider>
-      </SidebarProvider>
-    </OrganizationProvider>
+    <ProviderComposer>
+      {mainContent}
+    </ProviderComposer>
   );
 }

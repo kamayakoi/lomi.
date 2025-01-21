@@ -1,68 +1,66 @@
 import { Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
-import AnimatedLogoLoader from './components/portal/loader';
 
-// Core routes that should load immediately
+// Routes pages
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
 import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
 import { ActivationRoute } from '@/lib/routes/ActivationRoute';
 import { SessionCheck } from '@/lib/routes/SessionCheck';
+// Auth pages
+import Signin from './pages/auth/sign-in';
+import Login from './pages/auth/log-in';
+import Signup from './pages/auth/sign-up';
+import Forgot from './pages/auth/forgot-password';
+import OTP from './pages/auth/otp';
+import ResetPassword from './pages/auth/reset-password';
+import Onboarding from './pages/auth/onboarding/onboarding';
+import AuthCallback from './pages/auth/callback';
+// Error pages
+import GeneralError from './pages/errors/general-error';
+import NotFoundError from './pages/errors/not-found-error';
+import MaintenanceError from './pages/errors/maintenance-error';
+// Dashboard
 import AppShell from './components/portal/app-shell';
+import Dashboard from '@/pages/portal/portal';
+import Integrators from '@/pages/portal/Integrate/Integrate';
+import PaymentChannels from './pages/portal/payment-channels/paymentChannels';
+import Logs from './pages/portal/logs/logs';
+import Balance from './pages/portal/balance/Balance';
+import Transactions from './pages/portal/transactions/Transactions';
+import Webhooks from './pages/portal/webhooks/Webhooks';
+import PaymentLinks from './pages/portal/payment-links/PaymentLinks';
+import Customers from './pages/portal/customers/Customers';
+import Subscription from "./pages/portal/subscription/subscription";
+import Storefront from "./pages/portal/storefront/Storefront";
+import Activation from './pages/auth/activation/activation';
+import CheckoutPage from '@/api/checkout/Checkout';
 
-// Lazy load auth pages
-const Signin = lazy(() => import('./pages/auth/sign-in'));
-const Login = lazy(() => import('./pages/auth/log-in'));
-const Signup = lazy(() => import('./pages/auth/sign-up'));
-const Forgot = lazy(() => import('./pages/auth/forgot-password'));
-const OTP = lazy(() => import('./pages/auth/otp'));
-const ResetPassword = lazy(() => import('./pages/auth/reset-password'));
-const Onboarding = lazy(() => import('./pages/auth/onboarding/onboarding'));
-const AuthCallback = lazy(() => import('./pages/auth/callback'));
-
-// Lazy load error pages
-const GeneralError = lazy(() => import('./pages/errors/general-error'));
-const NotFoundError = lazy(() => import('./pages/errors/not-found-error'));
-const MaintenanceError = lazy(() => import('./pages/errors/maintenance-error'));
-
-// Lazy load dashboard pages
-const Dashboard = lazy(() => import('@/pages/portal/portal'));
-const Integrators = lazy(() => import('@/pages/portal/Integrate/Integrate'));
-const PaymentChannels = lazy(() => import('./pages/portal/payment-channels/paymentChannels'));
-const Logs = lazy(() => import('./pages/portal/logs/logs'));
-const Balance = lazy(() => import('./pages/portal/balance/Balance'));
-const Transactions = lazy(() => import('./pages/portal/transactions/Transactions'));
-const Webhooks = lazy(() => import('./pages/portal/webhooks/Webhooks'));
-const PaymentLinks = lazy(() => import('./pages/portal/payment-links/PaymentLinks'));
-const Customers = lazy(() => import('./pages/portal/customers/Customers'));
-const Subscription = lazy(() => import("./pages/portal/subscription/subscription"));
-const Storefront = lazy(() => import("./pages/portal/storefront/Storefront"));
-const Activation = lazy(() => import('./pages/auth/activation/activation'));
+// Dynamically imported pages
 const Product = lazy(() => import('./pages/portal/product/Product'));
-const Reporting = lazy(() => import('./pages/portal/reporting/Reporting'));
-const CheckoutPage = lazy(() => import('@/api/checkout/Checkout'));
+const Reporting = lazy(() => import('./pages/portal/reporting/reporting'));
 
-// Lazy load website pages
-const Home = lazy(() => import('./pages/Home'));
-const About = lazy(() => import('./pages/About'));
-const Products = lazy(() => import('./pages/Products'));
-const Integrations = lazy(() => import('./pages/Integrations'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Status = lazy(() => import('./pages/Status'));
-
-// Lazy load settings pages
-const Settings = lazy(() => import('./pages/portal/settings/settings'));
-const PaymentMethods = lazy(() => import('./pages/portal/settings/receiving-money/payment-methods'));
-const CheckoutSettings = lazy(() => import('./pages/portal/settings/receiving-money/checkout/checkout-settings'));
-const Disbursements = lazy(() => import('./pages/portal/settings/sending-money/disbursements'));
-const DisbursementNotifications = lazy(() => import('./pages/portal/settings/sending-money/notifications'));
-const Business = lazy(() => import('./pages/portal/settings/business-profile/business'));
-const Profile = lazy(() => import('./pages/portal/settings/business-profile/profile'));
-const BillingStatements = lazy(() => import('./pages/portal/settings/billing/statements'));
-const FeeStructure = lazy(() => import('./pages/portal/settings/billing/fee-structure'));
-const ApiKeys = lazy(() => import('./pages/portal/settings/developers/api-keys'));
-const BankAccounts = lazy(() => import('./pages/portal/settings/withdrawals/bank-accounts'));
-const WithdrawalNotifications = lazy(() => import('./pages/portal/settings/withdrawals/email-notifications'));
+// Website routes
+import Home from './pages/Home';
+import About from './pages/About';
+import Products from './pages/Products';
+import Integrations from './pages/Integrations';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Status from './pages/Status';
+// Settings routes
+import Settings from './pages/portal/settings/settings';
+import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods';
+import CheckoutSettings from './pages/portal/settings/receiving-money/checkout/checkout-settings';
+import Disbursements from './pages/portal/settings/sending-money/disbursements';
+import DisbursementNotifications from './pages/portal/settings/sending-money/notifications';
+import Business from './pages/portal/settings/business-profile/business';
+import Profile from './pages/portal/settings/business-profile/profile';
+import BillingStatements from './pages/portal/settings/billing/statements';
+import FeeStructure from './pages/portal/settings/billing/fee-structure';
+import ApiKeys from './pages/portal/settings/developers/api-keys';
+import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts';
+import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications';
+import AnimatedLogoLoader from './components/portal/loader';
 
 const AppRouter = () => (
     <Routes>

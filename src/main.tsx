@@ -1,15 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./index.css";
 import './i18n';
 
+// Enable React concurrent features
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-ReactDOM.createRoot(rootElement).render(
+// Use createRoot for concurrent features
+createRoot(rootElement).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
