@@ -38,7 +38,7 @@ const Subscription = lazy(() => import("./pages/portal/subscription/subscription
 const Storefront = lazy(() => import("./pages/portal/storefront/Storefront"));
 const Activation = lazy(() => import('./pages/auth/activation/activation'));
 const Product = lazy(() => import('./pages/portal/product/Product'));
-const Reporting = lazy(() => import('./pages/portal/reporting/reporting'));
+const Reporting = lazy(() => import('./pages/portal/reporting/Reporting'));
 const CheckoutPage = lazy(() => import('@/api/checkout/Checkout'));
 
 // Lazy load website pages
