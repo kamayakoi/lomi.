@@ -251,6 +251,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     const { user } = useUser()
     const navigate = useNavigate()
     const [connectedProviders, setConnectedProviders] = useState<string[]>([])
+    const [customCancelUrl, setCustomCancelUrl] = useState('')
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
@@ -624,9 +625,11 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     interface CustomUrlInputProps {
         value: string;
         onChange: (value: string) => void;
+        label: string;
+        placeholder: string;
     }
 
-    const CustomUrlInput: React.FC<CustomUrlInputProps> = ({ value, onChange }) => {
+    const CustomUrlInput: React.FC<CustomUrlInputProps> = ({ value, onChange, label, placeholder }) => {
         const [localValue, setLocalValue] = useState(value);
 
         useEffect(() => {
@@ -643,17 +646,19 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
         return (
             <div>
-                <Label htmlFor="customSuccessUrl" className="mb-2 block text-sm sm:text-base">Custom success page URL</Label>
+                <Label htmlFor={label} className="mb-2 block text-sm sm:text-base">
+                    {label}
+                </Label>
                 <div className="mt-1 flex flex-row rounded-none shadow-sm">
                     <span className="inline-flex items-center px-3 py-2 text-xs sm:text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 w-[72px] sm:w-[85px] justify-center">
                         https://
                     </span>
                     <Input
                         type="text"
-                        name="customSuccessUrl"
-                        id="customSuccessUrl"
+                        name={label}
+                        id={label}
                         className="block w-full flex-1 rounded-none text-sm sm:text-base border-l-0"
-                        placeholder="example.com/success"
+                        placeholder={placeholder}
                         value={localValue}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -677,10 +682,20 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 />
             </div>
             {redirectToCustomPage && (
-                <CustomUrlInput
-                    value={customSuccessUrl}
-                    onChange={(value) => setCustomSuccessUrl(value)}
-                />
+                <>
+                    <CustomUrlInput
+                        value={customSuccessUrl}
+                        onChange={(value) => setCustomSuccessUrl(value)}
+                        label="Custom success page URL"
+                        placeholder="example.com/success"
+                    />
+                    <CustomUrlInput
+                        value={customCancelUrl}
+                        onChange={(value) => setCustomCancelUrl(value)}
+                        label="Custom cancel page URL"
+                        placeholder="example.com/cancel"
+                    />
+                </>
             )}
         </div>
     )
@@ -754,6 +769,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 p_allow_coupon_code: paymentType === 'instant' ? allowCouponCode : false,
                 p_expires_at: expirationDate ? expirationDate.toISOString() : null,
                 p_success_url: redirectToCustomPage ? customSuccessUrl : null,
+                p_cancel_url: redirectToCustomPage ? customCancelUrl : null,
                 p_plan_id: paymentType === 'plan' && selectedPlan?.plan_id ? selectedPlan.plan_id : null,
                 p_product_id: paymentType === 'product' && selectedProduct?.product_id ? selectedProduct.product_id : null,
             })

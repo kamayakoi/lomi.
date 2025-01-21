@@ -90,6 +90,7 @@ CREATE OR REPLACE FUNCTION public.create_payment_link(
     p_allow_coupon_code BOOLEAN DEFAULT false,
     p_expires_at TIMESTAMPTZ DEFAULT NULL,
     p_success_url VARCHAR(2048) DEFAULT NULL,
+    p_cancel_url VARCHAR(2048) DEFAULT NULL,
     p_plan_id UUID DEFAULT NULL,
     p_product_id UUID DEFAULT NULL
 )
@@ -100,7 +101,13 @@ DECLARE
     v_product_price NUMERIC(10,2);
     v_plan_currency_code currency_code;
     v_product_currency_code currency_code;
+    v_website_url VARCHAR(2048);
 BEGIN
+    -- Get the organization's website_url
+    SELECT website_url INTO v_website_url
+    FROM organizations
+    WHERE organization_id = p_organization_id;
+
     -- Get the plan amount and currency code if a plan ID is provided
     IF p_plan_id IS NOT NULL THEN
         SELECT amount, currency_code INTO v_plan_amount, v_plan_currency_code
@@ -130,6 +137,7 @@ BEGIN
         allow_coupon_code,
         expires_at,
         success_url,
+        cancel_url,
         metadata
     )
     VALUES (
@@ -155,6 +163,7 @@ BEGIN
         p_allow_coupon_code,
         p_expires_at,
         p_success_url,
+        COALESCE(p_cancel_url, v_website_url, 'https://lomi.africa'),
         NULL
     )
     RETURNING link_id INTO v_link_id;
@@ -173,6 +182,7 @@ CREATE OR REPLACE FUNCTION public.update_payment_link(
     p_is_active BOOLEAN DEFAULT NULL,
     p_expires_at TIMESTAMPTZ DEFAULT NULL,
     p_success_url VARCHAR(2048) DEFAULT NULL,
+    p_cancel_url VARCHAR(2048) DEFAULT NULL,
     p_allowed_providers provider_code[] DEFAULT NULL
 )
 RETURNS payment_links AS $$
@@ -195,6 +205,7 @@ BEGIN
             is_active = COALESCE(p_is_active, is_active),
             expires_at = COALESCE(p_expires_at, expires_at),
             success_url = COALESCE(p_success_url, success_url),
+            cancel_url = COALESCE(p_cancel_url, cancel_url),
             allowed_providers = COALESCE(p_allowed_providers, allowed_providers),
             updated_at = NOW()
         WHERE link_id = p_link_id
@@ -209,6 +220,7 @@ BEGIN
             is_active = COALESCE(p_is_active, is_active),
             expires_at = COALESCE(p_expires_at, expires_at),
             success_url = COALESCE(p_success_url, success_url),
+            cancel_url = COALESCE(p_cancel_url, cancel_url),
             allowed_providers = COALESCE(p_allowed_providers, allowed_providers),
             updated_at = NOW()
         WHERE link_id = p_link_id

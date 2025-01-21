@@ -16,6 +16,7 @@ export interface PaymentLink {
     isActive: boolean;
     expiresAt: string | null;
     success_url: string | null;
+    cancel_url: string;
     metadata: Record<string, unknown> | null;
     createdAt: string;
     updatedAt: string;

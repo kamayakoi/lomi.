@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checkout.tsx'
 import { CheckoutData } from './checkoutTypes.ts'
 import { supabase } from '@/utils/supabase/client'
@@ -26,7 +26,6 @@ const formatNumber = (num: number | string) => {
 };
 
 export default function CheckoutPage() {
-    const navigate = useNavigate()
     const { linkId } = useParams<{ linkId?: string }>()
     const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null })
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
@@ -228,7 +227,11 @@ export default function CheckoutPage() {
     };
 
     const handleGoBack = () => {
-        navigate(-1)
+        if (checkoutData?.paymentLink?.cancel_url) {
+            window.location.href = checkoutData.paymentLink.cancel_url;
+        } else {
+            window.location.href = 'https://lomi.africa';
+        }
     }
 
     const handlePromoCodeSubmit = () => {
@@ -255,9 +258,9 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row">
+        <div className="min-h-screen flex flex-col lg:flex-row bg-white">
             {/* Left side - Product details */}
-            <div className="w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col">
+            <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col`}>
                 <div className="max-w-[488px] ml-auto pr-8 w-full">
                     <div className="flex mb-8">
                         <div
@@ -571,7 +574,7 @@ export default function CheckoutPage() {
                                         }));
                                     }}
                                     placeholder="Full name on card"
-                                    className="rounded-b-none w-full"
+                                    className="rounded-b-none w-full bg-white text-gray-900 border-gray-300"
                                     required
                                 />
                                 <div className="flex -mt-px">
@@ -582,7 +585,7 @@ export default function CheckoutPage() {
                                         value={customerDetails.email}
                                         onChange={handleCustomerInputChange}
                                         placeholder="Email address"
-                                        className="rounded-none rounded-b-lg w-full"
+                                        className="rounded-none rounded-b-lg w-full bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                 </div>
@@ -599,7 +602,7 @@ export default function CheckoutPage() {
                                     value={cardDetails.number}
                                     onChange={handleInputChange}
                                     placeholder="1234 1234 1234 1234"
-                                    className="rounded-b-none"
+                                    className="rounded-b-none bg-white text-gray-900 border-gray-300"
                                     required
                                 />
                                 <div className="flex -mt-px">
@@ -609,7 +612,7 @@ export default function CheckoutPage() {
                                         value={cardDetails.expiry}
                                         onChange={handleInputChange}
                                         placeholder="MM / YY"
-                                        className="rounded-none rounded-bl-lg w-1/2"
+                                        className="rounded-none rounded-bl-lg w-1/2 bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                     <Input
@@ -618,7 +621,7 @@ export default function CheckoutPage() {
                                         value={cardDetails.cvc}
                                         onChange={handleInputChange}
                                         placeholder="CVC"
-                                        className="rounded-none rounded-br-lg w-1/2"
+                                        className="rounded-none rounded-br-lg w-1/2 bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                 </div>
@@ -634,7 +637,7 @@ export default function CheckoutPage() {
                                         name="country"
                                         value={customerDetails.country}
                                         onChange={handleCustomerInputChange}
-                                        className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none"
+                                        className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none bg-white text-gray-900 border-gray-300"
                                         required
                                     >
                                         <option value="" className="text-gray-400">Select country</option>
@@ -652,7 +655,7 @@ export default function CheckoutPage() {
                                         value={customerDetails.city}
                                         onChange={handleCustomerInputChange}
                                         placeholder="City"
-                                        className="rounded-none w-full border-x"
+                                        className="rounded-none w-full border-x bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                 </div>
@@ -662,7 +665,7 @@ export default function CheckoutPage() {
                                         value={customerDetails.address}
                                         onChange={handleCustomerInputChange}
                                         placeholder="Address"
-                                        className="rounded-none rounded-bl-lg w-[70%]"
+                                        className="rounded-none rounded-bl-lg w-[70%] bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                     <Input
@@ -670,7 +673,7 @@ export default function CheckoutPage() {
                                         value={customerDetails.postalCode}
                                         onChange={handleCustomerInputChange}
                                         placeholder="Postal code"
-                                        className="rounded-none rounded-br-lg w-[30%]"
+                                        className="rounded-none rounded-br-lg w-[30%] bg-white text-gray-900 border-gray-300"
                                         required
                                     />
                                 </div>

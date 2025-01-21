@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
@@ -7,6 +7,17 @@ import ThreeDImage from '@/components/landing/3d-image'
 import { ButtonCta } from "@/components/landing/button-cta"
 
 export default function Page() {
+  useEffect(() => {
+    // Check if user has explicitly set a theme preference
+    const storedTheme = localStorage.getItem('theme')
+
+    if (!storedTheme) {
+      // If no explicit preference, force dark mode
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    }
+  }, [])
+
   return (
     <div className="overflow-hidden">
       <main className="relative bg-background">

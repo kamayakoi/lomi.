@@ -938,7 +938,7 @@ CREATE TABLE payment_links (
     is_active BOOLEAN NOT NULL DEFAULT true,
     expires_at TIMESTAMPTZ,
     success_url VARCHAR(2048),
-    cancel_url VARCHAR(2048) DEFAULT 'https://lomi.africa',
+    cancel_url VARCHAR(2048),
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
