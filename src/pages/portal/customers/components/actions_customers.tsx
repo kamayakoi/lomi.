@@ -133,73 +133,103 @@ export default function CustomerActions({ customer, isOpen, onClose, onUpdate }:
 
                                 <Separator />
 
-                                <div className="space-y-4">
-                                    <div>
-                                        <span className="text-sm text-muted-foreground block">Name</span>
-                                        {editingField === 'name' ? (
-                                            <div className="flex items-center space-x-2 mt-1">
-                                                <Input
-                                                    value={editValue}
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    className="h-8 rounded-none text-sm bg-transparent border-none focus:outline-none focus:ring-0 p-0"
-                                                    autoFocus
-                                                    onBlur={handleSave}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            handleSave()
-                                                        } else if (e.key === 'Escape') {
-                                                            handleCancel()
-                                                        }
-                                                    }}
-                                                />
-                                                <button onClick={handleSave} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none">
-                                                    <Check className="h-4 w-4 text-green-500" />
-                                                </button>
+                                <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Name</span>
+                                            {editingField === 'name' ? (
+                                                <div className="flex items-center space-x-2 mt-1">
+                                                    <Input
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        className="h-8 rounded-none text-sm bg-transparent border-none focus:outline-none focus:ring-0 p-0"
+                                                        autoFocus
+                                                        onBlur={handleSave}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                handleSave()
+                                                            } else if (e.key === 'Escape') {
+                                                                handleCancel()
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button onClick={handleSave} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none">
+                                                        <Check className="h-4 w-4 text-green-500" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm font-medium line-clamp-1 cursor-pointer hover:text-blue-500 mt-1" onClick={() => handleEdit('name')}>
+                                                    {customerData.name}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Email</span>
+                                            {editingField === 'email' ? (
+                                                <div className="flex items-center space-x-2 mt-1">
+                                                    <Input
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        className="h-8 rounded-none text-sm bg-transparent border-none focus:outline-none focus:ring-0 p-0"
+                                                        autoFocus
+                                                        onBlur={handleSave}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                handleSave()
+                                                            } else if (e.key === 'Escape') {
+                                                                handleCancel()
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button onClick={handleSave} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none">
+                                                        <Check className="h-4 w-4 text-green-500" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm line-clamp-1 cursor-pointer hover:text-blue-500 mt-1" onClick={() => handleEdit('email')}>
+                                                    {customerData.email}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Phone</span>
+                                            <p className="text-sm mt-1">{customerData.phone_number}</p>
+                                        </div>
+
+                                        {customerData.whatsapp_number && (
+                                            <div>
+                                                <span className="text-sm text-muted-foreground block">WhatsApp</span>
+                                                <p className="text-sm mt-1">{customerData.whatsapp_number}</p>
                                             </div>
-                                        ) : (
-                                            <p className="text-sm font-medium line-clamp-1 cursor-pointer hover:text-blue-500 mt-1" onClick={() => handleEdit('name')}>
-                                                {customerData.name}
-                                            </p>
                                         )}
                                     </div>
 
-                                    <div>
-                                        <span className="text-sm text-muted-foreground block">Email</span>
-                                        {editingField === 'email' ? (
-                                            <div className="flex items-center space-x-2 mt-1">
-                                                <Input
-                                                    value={editValue}
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    className="h-8 rounded-none text-sm bg-transparent border-none focus:outline-none focus:ring-0 p-0"
-                                                    autoFocus
-                                                    onBlur={handleSave}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            handleSave()
-                                                        } else if (e.key === 'Escape') {
-                                                            handleCancel()
-                                                        }
-                                                    }}
-                                                />
-                                                <button onClick={handleSave} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none">
-                                                    <Check className="h-4 w-4 text-green-500" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm line-clamp-1 cursor-pointer hover:text-blue-500 mt-1" onClick={() => handleEdit('email')}>
-                                                {customerData.email}
-                                            </p>
-                                        )}
+                                    <Separator className="my-2" />
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Country</span>
+                                            <p className="text-sm mt-1">{customerData.country}</p>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">City</span>
+                                            <p className="text-sm mt-1">{customerData.city || '—'}</p>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <span className="text-sm text-muted-foreground block">Phone</span>
-                                        <p className="text-sm mt-1">{customerData.phone_number}</p>
-                                    </div>
-
-                                    <div>
-                                        <span className="text-sm text-muted-foreground block">Country</span>
-                                        <p className="text-sm mt-1">{customerData.country}</p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Postal Code</span>
+                                            <p className="text-sm mt-1">{customerData.postal_code || '—'}</p>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-muted-foreground block">Address</span>
+                                            <p className="text-sm mt-1 line-clamp-2">{customerData.address || '—'}</p>
+                                        </div>
                                     </div>
                                 </div>
 

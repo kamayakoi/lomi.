@@ -32,6 +32,7 @@ export const updateCustomer = async (customerId: string, data: Partial<Customer>
         p_name: data.name,
         p_email: data.email,
         p_phone_number: data.phone_number,
+        p_whatsapp_number: data.whatsapp_number,
         p_country: data.country,
         p_city: data.city,
         p_address: data.address,

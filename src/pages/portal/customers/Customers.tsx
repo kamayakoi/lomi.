@@ -72,6 +72,14 @@ function CustomerCard({ customer, onEditClick, onClick }: {
                         <span>{customer.phone_number}</span>
                         <span>{customer.country}</span>
                     </div>
+                    {customer.whatsapp_number && (
+                        <div className="flex items-center gap-2">
+                            <span className="flex items-center">
+                                <img src="/whatsapp.svg" alt="WhatsApp" className="w-4 h-4 mr-1" />
+                                {customer.whatsapp_number}
+                            </span>
+                        </div>
+                    )}
                     <div>
                         <span className={`
                             inline-block px-2 py-1 rounded-none text-xs font-normal
@@ -94,6 +102,7 @@ function CustomersPage() {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
     const [isActionsOpen, setIsActionsOpen] = useState(false)
     const [phoneNumber, setPhoneNumber] = useState("")
+    const [whatsappNumber, setWhatsappNumber] = useState("")
     const [searchTerm, setSearchTerm] = useState('')
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [isEditCustomerOpen, setIsEditCustomerOpen] = useState(false)
@@ -160,6 +169,7 @@ function CustomersPage() {
             p_name: formData.get('name') as string,
             p_email: formData.get('email') as string,
             p_phone_number: phoneNumber,
+            p_whatsapp_number: whatsappNumber,
             p_country: selectedCountry,
             p_city: formData.get('city') as string,
             p_address: formData.get('address') as string,
@@ -303,6 +313,13 @@ function CustomersPage() {
                                         <PhoneNumberInput
                                             value={phoneNumber}
                                             onChange={(value) => setPhoneNumber(value || "")}
+                                        />
+                                    </div>
+                                    <div className="space-y-1 sm:space-y-2">
+                                        <Label htmlFor="whatsapp" className="text-sm">WhatsApp</Label>
+                                        <PhoneNumberInput
+                                            value={whatsappNumber}
+                                            onChange={(value) => setWhatsappNumber(value || "")}
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-3 sm:gap-4">

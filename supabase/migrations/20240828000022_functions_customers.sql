@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION public.create_customer(
     p_name VARCHAR,
     p_email VARCHAR,
     p_phone_number VARCHAR,
+    p_whatsapp_number VARCHAR,
     p_country VARCHAR,
     p_city VARCHAR,
     p_address VARCHAR,
@@ -15,8 +16,32 @@ RETURNS UUID AS $$
 DECLARE
     v_customer_id UUID;
 BEGIN
-    INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city, address, postal_code, is_business)
-    VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_country, p_city, p_address, p_postal_code, p_is_business)
+    INSERT INTO customers (
+        merchant_id, 
+        organization_id, 
+        name, 
+        email, 
+        phone_number,
+        whatsapp_number,
+        country, 
+        city, 
+        address, 
+        postal_code, 
+        is_business
+    )
+    VALUES (
+        p_merchant_id, 
+        p_organization_id, 
+        p_name, 
+        p_email, 
+        p_phone_number,
+        p_whatsapp_number,
+        p_country, 
+        p_city, 
+        p_address, 
+        p_postal_code, 
+        p_is_business
+    )
     RETURNING customer_id INTO v_customer_id;
 
     RETURN v_customer_id;
@@ -36,6 +61,7 @@ RETURNS TABLE (
     name VARCHAR,
     email VARCHAR,
     phone_number VARCHAR,
+    whatsapp_number VARCHAR,
     country VARCHAR,
     city VARCHAR,
     address VARCHAR,
@@ -51,6 +77,7 @@ BEGIN
         c.name,
         c.email,
         c.phone_number,
+        c.whatsapp_number,
         c.country,
         c.city,
         c.address,
@@ -124,6 +151,7 @@ CREATE OR REPLACE FUNCTION public.update_customer(
     p_name VARCHAR,
     p_email VARCHAR,
     p_phone_number VARCHAR,
+    p_whatsapp_number VARCHAR,
     p_country VARCHAR,
     p_city VARCHAR,
     p_address VARCHAR,
@@ -137,6 +165,7 @@ BEGIN
         name = p_name,
         email = p_email,
         phone_number = p_phone_number,
+        whatsapp_number = p_whatsapp_number,
         country = p_country,
         city = p_city,
         address = p_address,
@@ -156,6 +185,7 @@ RETURNS TABLE (
     name VARCHAR,
     email VARCHAR,
     phone_number VARCHAR,
+    whatsapp_number VARCHAR,
     country VARCHAR,
     city VARCHAR,
     address VARCHAR,
@@ -169,6 +199,7 @@ BEGIN
         c.name,
         c.email,
         c.phone_number,
+        c.whatsapp_number,
         c.country,
         c.city,
         c.address,

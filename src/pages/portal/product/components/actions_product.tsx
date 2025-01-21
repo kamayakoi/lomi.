@@ -164,8 +164,8 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
                         </CardHeader>
                         <CardContent className="p-4 space-y-4 overflow-auto">
                             <div className="space-y-3 text-sm">
-                                <div className="flex gap-4">
-                                    <div className="flex-shrink-0 self-stretch min-h-[140px] w-[140px]">
+                                <div className="flex gap-4 h-[140px]">
+                                    <div className="flex-shrink-0 w-[140px] h-[140px]">
                                         {product.image_url ? (
                                             <img
                                                 src={product.image_url}
