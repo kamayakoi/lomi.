@@ -312,15 +312,16 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                 <div className="space-y-4">
                     <Label>Additional Fees</Label>
                     {availableFees.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 gap-2">
                             {availableFees.map(fee => (
                                 <Badge
                                     key={fee.fee_type_id}
                                     variant={selectedFees.includes(fee.fee_type_id) ? "default" : "outline"}
-                                    className="cursor-pointer rounded-none"
+                                    className="cursor-pointer rounded-none w-full flex items-center justify-between px-4 py-2"
                                     onClick={() => toggleFee(fee.fee_type_id)}
                                 >
-                                    {fee.name} ({fee.percentage}%)
+                                    <span>{fee.name}</span>
+                                    <span>({fee.percentage}%)</span>
                                 </Badge>
                             ))}
                         </div>

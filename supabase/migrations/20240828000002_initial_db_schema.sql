@@ -1041,18 +1041,12 @@ CREATE TABLE organization_fee_links (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     fee_type_id UUID NOT NULL REFERENCES organization_fees(fee_type_id),
     product_id UUID REFERENCES merchant_products(product_id),
-    plan_id UUID REFERENCES subscription_plans(plan_id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT check_product_or_plan CHECK (
-        (product_id IS NOT NULL AND plan_id IS NULL) OR
-        (product_id IS NULL AND plan_id IS NOT NULL)
-    )
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_organization_fee_links_org ON organization_fee_links(organization_id);
 CREATE INDEX idx_organization_fee_links_fee ON organization_fee_links(fee_type_id);
 CREATE INDEX idx_organization_fee_links_product ON organization_fee_links(product_id);
-CREATE INDEX idx_organization_fee_links_plan ON organization_fee_links(plan_id);
 
-COMMENT ON TABLE organization_fee_links IS 'Links organization fees to specific products or subscription plans';
+COMMENT ON TABLE organization_fee_links IS 'Links organization fees to specific products';

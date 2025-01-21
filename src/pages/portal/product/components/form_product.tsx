@@ -32,6 +32,7 @@ interface ProductFormData {
     price: number
     image: FileList
     image_url: string | null
+    currency_code: string
 }
 
 export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, onSuccess }) => {
@@ -41,6 +42,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
     const { register, handleSubmit, setValue, watch } = useForm<ProductFormData>()
     const [availableFees, setAvailableFees] = useState<Fee[]>([])
     const [selectedFees, setSelectedFees] = useState<string[]>([])
+    const [selectedCurrency, setSelectedCurrency] = useState('XOF')
 
     // Fetch available fees
     useEffect(() => {
@@ -96,7 +98,8 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                 price: data.price,
                 image_url: data.image_url,
                 display_on_storefront: true,
-                fee_type_ids: selectedFees
+                fee_type_ids: selectedFees,
+                currency_code: selectedCurrency
             })
 
             onSuccess()
@@ -199,20 +202,23 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                     placeholder="Enter amount"
                     value={formatAmount(watch("price"))}
                     onChange={(value) => setValue("price", parseAmount(value))}
+                    currency={selectedCurrency}
+                    onCurrencyChange={setSelectedCurrency}
                 />
             </div>
             <div className="space-y-4">
                 <Label>Additional Fees</Label>
                 {availableFees.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                         {availableFees.map(fee => (
                             <Badge
                                 key={fee.fee_type_id}
                                 variant={selectedFees.includes(fee.fee_type_id) ? "default" : "outline"}
-                                className="cursor-pointer rounded-none"
+                                className="cursor-pointer rounded-none w-full flex items-center justify-between px-4 py-2"
                                 onClick={() => toggleFee(fee.fee_type_id)}
                             >
-                                {fee.name} ({fee.percentage}%)
+                                <span>{fee.name}</span>
+                                <span>({fee.percentage}%)</span>
                             </Badge>
                         ))}
                     </div>

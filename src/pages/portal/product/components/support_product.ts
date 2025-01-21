@@ -69,6 +69,7 @@ export async function createProduct(data: {
     image_url?: string | null
     display_on_storefront?: boolean
     fee_type_ids?: string[]
+    currency_code: string
 }): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('No user found')
@@ -85,7 +86,7 @@ export async function createProduct(data: {
         p_name: data.name,
         p_description: data.description,
         p_price: data.price,
-        p_currency_code: 'XOF',
+        p_currency_code: data.currency_code,
         p_image_url: data.image_url,
         p_is_active: true,
         p_display_on_storefront: data.display_on_storefront ?? true,

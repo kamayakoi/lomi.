@@ -28,6 +28,7 @@ import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Card, CardContent } from "@/components/ui/card"
 import { fetchProducts } from './components/support_product'
 import { cn } from '@/lib/actions/utils'
+import React from 'react'
 
 function ProductCard({ product, onEditClick, onClick }: {
     product: Product,
@@ -129,12 +130,44 @@ function ProductsPage() {
         ),
         {
             enabled: !!user?.id,
+            staleTime: 30000,
+            cacheTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnMount: true
         }
     )
 
-    const products = productsData?.products || []
+    // Memoize the products array
+    const products = React.useMemo(() => productsData?.products || [], [productsData?.products])
     const totalProducts = productsData?.totalCount || 0
     const totalPages = Math.ceil(totalProducts / itemsPerPage)
+
+    // Memoize the sorted products
+    const sortedProducts = React.useMemo(() => {
+        if (!products.length) return []
+
+        // Move sortProducts logic inside useMemo to avoid dependency issues
+        const sortProductsInner = (items: Product[]) => {
+            if (!sortColumn) return items
+
+            return items.sort((a, b) => {
+                const aValue = a[sortColumn]
+                const bValue = b[sortColumn]
+
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+                } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+                } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+                    return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
+                } else {
+                    return 0
+                }
+            })
+        }
+
+        return sortProductsInner([...products])
+    }, [products, sortColumn, sortDirection])
 
     const handleCreateProductSuccess = () => {
         refetch()
@@ -160,24 +193,16 @@ function ProductsPage() {
         setCurrentPage(newPage)
     }
 
-    const sortProducts = (products: Product[]) => {
-        if (!sortColumn) return products
+    const getFormattedTotalPrice = React.useCallback((product: Product): string | null => {
+        if (!product.fees || product.fees.length === 0) return null
+        const totalPrice = calculateTotalPrice(product)
+        if (totalPrice === product.price) return null
 
-        return products.sort((a, b) => {
-            const aValue = a[sortColumn]
-            const bValue = b[sortColumn]
-
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
-            } else if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
-                return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
-            } else {
-                return 0
-            }
-        })
-    }
+        return `${totalPrice.toLocaleString('en-US', {
+            minimumFractionDigits: totalPrice % 1 !== 0 ? 2 : 0,
+            maximumFractionDigits: totalPrice % 1 !== 0 ? 2 : 0,
+        })} ${product.currency_code} incl. tax`
+    }, [])
 
     return (
         <Layout fixed>
@@ -212,14 +237,14 @@ function ProductsPage() {
                                     Create
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="rounded-none [&::backdrop]:bg-black/30 p-0 border border-border">
-                                <DialogHeader className="p-6 pb-0">
+                            <DialogContent className="rounded-none [&::backdrop]:bg-black/30 p-0 border border-border max-h-[85vh] overflow-hidden flex flex-col">
+                                <DialogHeader className="p-6 pb-0 flex-shrink-0">
                                     <DialogTitle>Create a product</DialogTitle>
                                     <DialogDescription>
                                         Fill in the details to create a new product.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="p-6 pt-4">
+                                <div className="p-6 pt-4 overflow-y-auto flex-grow">
                                     <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />
                                 </div>
                             </DialogContent>
@@ -266,7 +291,7 @@ function ProductsPage() {
                                 <>
                                     {/* Desktop View */}
                                     <div className="hidden md:block space-y-4">
-                                        {sortProducts(products).map((product: Product) => (
+                                        {sortedProducts.map((product: Product) => (
                                             <div
                                                 key={product.product_id}
                                                 className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
@@ -337,12 +362,9 @@ function ProductsPage() {
                                                                             {product.currency_code}
                                                                         </span>
                                                                     </span>
-                                                                    {product.fees && product.fees.length > 0 && (
+                                                                    {getFormattedTotalPrice(product) && (
                                                                         <span className="text-xs text-muted-foreground">
-                                                                            {calculateTotalPrice(product).toLocaleString('en-US', {
-                                                                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                            })} {product.currency_code} incl. tax
+                                                                            {getFormattedTotalPrice(product)}
                                                                         </span>
                                                                     )}
                                                                 </div>
@@ -356,7 +378,7 @@ function ProductsPage() {
 
                                     {/* Mobile View */}
                                     <div className="md:hidden border rounded-none">
-                                        {sortProducts(products).map((product: Product) => (
+                                        {sortedProducts.map((product: Product) => (
                                             <ProductCard
                                                 key={product.product_id}
                                                 product={product}
@@ -449,23 +471,25 @@ function ProductsPage() {
             />
 
             <Dialog open={isEditProductOpen} onOpenChange={setIsEditProductOpen}>
-                <DialogContent>
-                    <DialogHeader>
+                <DialogContent className="rounded-none max-h-[85vh] overflow-hidden flex flex-col p-0 border border-border">
+                    <DialogHeader className="p-6 pb-0 flex-shrink-0">
                         <DialogTitle>Edit Product</DialogTitle>
                         <DialogDescription>
                             Modify the details of the selected product.
                         </DialogDescription>
                     </DialogHeader>
-                    {selectedProduct && (
-                        <EditProductForm
-                            product={selectedProduct}
-                            onClose={() => setIsEditProductOpen(false)}
-                            onSuccess={() => {
-                                refetch()
-                                setIsEditProductOpen(false)
-                            }}
-                        />
-                    )}
+                    <div className="p-6 pt-4 overflow-y-auto flex-grow">
+                        {selectedProduct && (
+                            <EditProductForm
+                                product={selectedProduct}
+                                onClose={() => setIsEditProductOpen(false)}
+                                onSuccess={() => {
+                                    refetch()
+                                    setIsEditProductOpen(false)
+                                }}
+                            />
+                        )}
+                    </div>
                 </DialogContent>
             </Dialog>
         </Layout>
