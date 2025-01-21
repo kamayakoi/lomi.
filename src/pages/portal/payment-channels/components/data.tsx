@@ -51,16 +51,16 @@ export const paymentMethods: PaymentMethod[] = [
     status: 'coming_soon',
     category: 'Cards'
   },
-  // {
-  //   code: 'GOOGLE_PAY',
-  //   name: 'Google Pay',
-  //   description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
-  //   logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
-  //   provider_code: 'GOOGLE',
-  //   type: 'Digital Payments',
-  //   status: 'coming_soon',
-  //   category: 'Cards'
-  // },
+  {
+    code: 'GOOGLE_PAY',
+    name: 'Google Pay',
+    description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
+    logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
+    provider_code: 'GOOGLE',
+    type: 'Digital Payments',
+    status: 'coming_soon',
+    category: 'Cards'
+  },
 
   // Mobile Money Section
   {
@@ -80,47 +80,47 @@ export const paymentMethods: PaymentMethod[] = [
     provider_code: 'ORANGE',
     type: 'Mobile Money',
     category: 'Mobile Money'
-  }
-  // {
-  //   code: 'MOOV',
-  //   name: 'Moov Money',
-  //   description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
-  //   logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
-  //   provider_code: 'MOOV',
-  //   type: 'Mobile Money',
-  //   status: 'coming_soon',
-  //   category: 'Mobile Money'
-  // },
-  // {
-  //   code: 'AIRTEL',
-  //   name: 'Airtel Money',
-  //   description: 'Accept Airtel Money payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
-  //   logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
-  //   provider_code: 'AIRTEL',
-  //   type: 'Mobile Money',
-  //   status: 'coming_soon',
-  //   category: 'Mobile Money'
-  // },
-  // {
-  //   code: 'MPESA',
-  //   name: 'M-Pesa',
-  //   description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
-  //   logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
-  //   provider_code: 'MPESA',
-  //   type: 'Mobile Money',
-  //   status: 'coming_soon',
-  //   category: 'Mobile Money'
-  // },
+  },
+  {
+    code: 'MOOV',
+    name: 'Moov Money',
+    description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+    logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
+    provider_code: 'MOOV',
+    type: 'Mobile Money',
+    status: 'coming_soon',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'AIRTEL',
+    name: 'Airtel Money',
+    description: 'Accept Airtel payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
+    provider_code: 'AIRTEL',
+    type: 'Mobile Money',
+    status: 'coming_soon',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'MPESA',
+    name: 'M-Pesa',
+    description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
+    provider_code: 'MPESA',
+    type: 'Mobile Money',
+    status: 'coming_soon',
+    category: 'Mobile Money'
+  },
 
   // E-Wallet Section
-  , {
+  {
     code: 'WAVE',
     name: 'Wave',
     description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
     logo: <img src="/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
     provider_code: 'WAVE',
     type: 'e-Wallets',
-    category: 'Mobile Money'
+    category: 'E-Wallets'
   },
   {
     code: 'WIZALL',
@@ -135,7 +135,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'OPAY',
     name: 'OPay',
-    description: 'Enable OPay payments, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
+    description: 'Enable OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
     logo: <img src="/opay.webp" alt="OPay" className="w-full h-full object-contain" />,
     provider_code: 'OPAY',
     type: 'e-Wallets',
@@ -147,7 +147,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'BTC',
     name: 'Bitcoin',
-    description: 'Accept Bitcoin payments and enable your business to receive instant, secure, and borderless transactions with the world\'s leading cryptocurrency.',
+    description: 'Accept Bitcoin and enable your business to receive instant, secure, and borderless transactions with the world\'s leading cryptocurrency.',
     logo: <img src="/btc.webp" alt="BTC" className="w-8 h-8" />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
@@ -157,7 +157,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'USDC',
     name: 'USDC',
-    description: 'Accept USDC stablecoin payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
+    description: 'Accept USDC payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
     logo: <img src="/usdc.webp" alt="USDC" className="w-8 h-8 " />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',

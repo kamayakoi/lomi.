@@ -7,12 +7,20 @@ import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checko
 import { CheckoutData } from './checkoutTypes.ts'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
-import { ArrowLeft, ImageIcon } from 'lucide-react'
+import { ArrowLeft, ImageIcon, Loader2 } from 'lucide-react'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { ShieldIcon } from '@/components/icons/ShieldIcon'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
     if (typeof num === 'string') num = parseFloat(num);
-    return num.toLocaleString('fr-FR');
+    return num.toLocaleString('fr-FR').replace(/\s/g, '.');
 };
 
 export default function CheckoutPage() {
@@ -20,7 +28,7 @@ export default function CheckoutPage() {
     const { linkId } = useParams<{ linkId?: string }>()
     const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null })
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
-    const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
+    const [selectedProvider, setSelectedProvider] = useState<string | undefined>()
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
     const [customerDetails, setCustomerDetails] = useState({
         email: '',
@@ -38,6 +46,8 @@ export default function CheckoutPage() {
     const [promoCode, setPromoCode] = useState('')
     const [appliedPromoCode, setAppliedPromoCode] = useState<string | null>(null)
     const promoInputRef = useRef<HTMLInputElement>(null)
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
+    const [isProcessing, setIsProcessing] = useState(false)
 
     useEffect(() => {
         const fetchOrganization = async () => {
@@ -73,8 +83,9 @@ export default function CheckoutPage() {
         fetchOrganization();
     }, [linkId, checkoutData?.paymentLink?.organizationId]);
 
-    const handleProviderClick = (provider: string) => {
-        setSelectedProvider(prev => prev === provider ? null : provider)
+    const handleProviderClick = async (provider: string) => {
+        setSelectedProvider(provider)
+        setIsCheckoutModalOpen(true)
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,6 +169,15 @@ export default function CheckoutPage() {
         if (!promoCode.trim()) {
             setIsPromoCodeOpen(false)
         }
+    }
+
+    const handleCheckoutSubmit = async () => {
+        setIsProcessing(true)
+        // TODO: Integrate with provider's API
+        // For now, just simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        setIsProcessing(false)
+        // Handle success/error
     }
 
     return (
@@ -396,8 +416,7 @@ export default function CheckoutPage() {
                                 <div
                                     key={provider}
                                     onClick={() => handleProviderClick(provider)}
-                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'
-                                        }`}
+                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'}`}
                                     style={{ width: '100px', height: '100px', padding: '0' }}
                                 >
                                     <img
@@ -410,22 +429,49 @@ export default function CheckoutPage() {
                         ))}
                     </div>
 
-                    {/* Continue with provider button */}
-                    {selectedProvider && selectedProvider !== 'ECOBANK' && (
-                        <div className="mt-2 mb-6 flex justify-center">
-                            <Button
-                                onClick={() => {/* handle provider payment */ }}
-                                className={`
-                                    w-full h-12 text-white font-semibold rounded-none transition duration-300 shadow-md text-lg
-                                    ${selectedProvider === 'ORANGE' ? 'bg-[#FC6307] hover:bg-[#E35A06]' : ''}
-                                    ${selectedProvider === 'WAVE' ? 'bg-[#25BBF9] text-black hover:bg-[#60B8D8]' : ''}
-                                    ${selectedProvider === 'MTN' ? 'bg-[#F7CE46] text-black hover:bg-[#E0B83D]' : ''}
-                                `}
-                            >
-                                Continue with {selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}
-                            </Button>
-                        </div>
-                    )}
+                    <Dialog open={isCheckoutModalOpen} onOpenChange={setIsCheckoutModalOpen}>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Secure Checkout</DialogTitle>
+                                <DialogDescription>
+                                    Complete your payment securely with {selectedProvider}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between py-4">
+                                    <div className="flex items-center space-x-4">
+                                        {selectedProvider && (
+                                            <img
+                                                src={`/${selectedProvider.toLowerCase()}.webp`}
+                                                alt={selectedProvider}
+                                                className="w-12 h-12 object-contain"
+                                            />
+                                        )}
+                                        <div>
+                                            <p className="font-medium">Amount</p>
+                                            <p className="text-2xl font-bold">
+                                                {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)} {checkoutData?.paymentLink?.currency_code}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={handleCheckoutSubmit}
+                                    className="w-full"
+                                    disabled={isProcessing}
+                                >
+                                    {isProcessing ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        `Pay with ${selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange Money' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}`
+                                    )}
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
 
                     <div className="relative flex items-center mb-6">
                         <div className="flex-grow border-t border-gray-300"></div>
@@ -580,9 +626,10 @@ export default function CheckoutPage() {
                         <div className="border-t border-gray-200 pt-4"></div>
                         <div className="flex items-center justify-center gap-3 text-xs text-gray-400">
                             <span className="inline-flex items-center">
+                                <ShieldIcon className="w-4 h-4 mr-1" />
                                 Powered by{' '}
-                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer" className="text-gray-400 text-xs font-bold flex items-baseline ml-1">
-                                    lomi
+                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer" className="text-gray-400 font-bold flex items-baseline ml-1">
+                                    <span className="text-sm">lomi</span>
                                     <div className="w-[2px] h-[2px] bg-current ml-[1px] mb-[1px]"></div>
                                 </a>
                             </span>
