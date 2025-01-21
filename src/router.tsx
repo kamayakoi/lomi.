@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 
 // Routes pages
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
@@ -34,10 +34,8 @@ import Subscription from "./pages/portal/subscription/subscription";
 import Storefront from "./pages/portal/storefront/Storefront";
 import Activation from './pages/auth/activation/activation';
 import CheckoutPage from '@/api/checkout/Checkout';
-
-// Dynamically imported pages
-const Product = lazy(() => import('./pages/portal/product/Product'));
-const Reporting = lazy(() => import('./pages/portal/reporting/Reporting'));
+import Reporting from './pages/portal/reporting/reporting';
+import Product from './pages/portal/product/Product';
 
 // Website routes
 import Home from './pages/Home';
