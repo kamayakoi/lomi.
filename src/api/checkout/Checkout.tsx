@@ -53,6 +53,29 @@ export default function CheckoutPage() {
     const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
 
     useEffect(() => {
+        // Get user's country using their IP
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                // Find the country name from our countries list
+                const countryName = countries.find(country =>
+                    country.toLowerCase() === data.country_name.toLowerCase()
+                );
+                setCustomerDetails(prev => ({
+                    ...prev,
+                    country: countryName || 'Côte d\'Ivoire'
+                }));
+            })
+            .catch(() => {
+                // Fallback to Côte d'Ivoire if geolocation fails
+                setCustomerDetails(prev => ({
+                    ...prev,
+                    country: 'Côte d\'Ivoire'
+                }));
+            });
+    }, []);
+
+    useEffect(() => {
         const fetchOrganization = async () => {
             if (checkoutData?.paymentLink?.organizationId) {
                 const orgDetails = await fetchOrganizationDetails(checkoutData.paymentLink.organizationId);
@@ -77,6 +100,40 @@ export default function CheckoutPage() {
                     } else {
                         const logoUrl = URL.createObjectURL(logoData)
                         setOrganization(prevOrg => ({ ...prevOrg, logoUrl }))
+
+                        // Update favicons
+                        let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+                        let appleTouchIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
+
+                        // Create favicon link if it doesn't exist
+                        if (!favicon) {
+                            favicon = document.createElement('link');
+                            favicon.rel = 'icon';
+                            document.head.appendChild(favicon);
+                        }
+
+                        // Create apple touch icon link if it doesn't exist
+                        if (!appleTouchIcon) {
+                            appleTouchIcon = document.createElement('link');
+                            appleTouchIcon.rel = 'apple-touch-icon';
+                            document.head.appendChild(appleTouchIcon);
+                        }
+
+                        // Remove any existing lomi favicon
+                        const existingFavicons = document.querySelectorAll("link[rel*='icon']");
+                        existingFavicons.forEach(icon => icon.remove());
+
+                        // Set new favicon
+                        favicon = document.createElement('link');
+                        favicon.rel = 'icon';
+                        favicon.href = logoUrl;
+                        document.head.appendChild(favicon);
+
+                        // Set new apple touch icon
+                        appleTouchIcon = document.createElement('link');
+                        appleTouchIcon.rel = 'apple-touch-icon';
+                        appleTouchIcon.href = logoUrl;
+                        document.head.appendChild(appleTouchIcon);
                     }
                 }
             }
@@ -85,6 +142,19 @@ export default function CheckoutPage() {
         fetchData();
         fetchOrganization();
     }, [linkId, checkoutData?.paymentLink?.organizationId]);
+
+    useEffect(() => {
+        if (checkoutData?.paymentLink?.organizationName) {
+            // Update page title
+            document.title = `${checkoutData.paymentLink.organizationName} | Checkout`;
+
+            // Update meta description
+            const metaDescription = document.querySelector("meta[name='description']") as HTMLMetaElement;
+            if (metaDescription) {
+                metaDescription.content = `Secure checkout page for ${checkoutData.paymentLink.organizationName}`;
+            }
+        }
+    }, [checkoutData?.paymentLink?.organizationName]);
 
     const handleProviderClick = async (provider: string) => {
         setSelectedProvider(provider)
@@ -134,6 +204,7 @@ export default function CheckoutPage() {
                     p_name: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
                     p_email: customerDetails.email,
                     p_phone_number: customerDetails.phoneNumber,
+                    p_whatsapp_number: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
                     p_country: customerDetails.country,
                     p_city: customerDetails.city,
                     p_address: customerDetails.address,
@@ -411,7 +482,7 @@ export default function CheckoutPage() {
 
             {/* Right side - Checkout form */}
             <div className="w-full lg:w-1/2 bg-white p-4 lg:p-8">
-                <div className="max-w-[488px] pl-8 w-full">
+                <div className="max-w-[448px] pl-8 w-full">
                     {/* Mobile Money Options */}
                     <div className="flex overflow-x-auto pb-4 space-x-4">
                         {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
@@ -476,7 +547,7 @@ export default function CheckoutPage() {
                         </DialogContent>
                     </Dialog>
 
-                    <div className="relative flex items-center mb-6">
+                    <div className="relative flex items-center mb-4">
                         <div className="flex-grow border-t border-gray-300"></div>
                         <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
                         <div className="flex-grow border-t border-gray-300"></div>
@@ -566,7 +637,7 @@ export default function CheckoutPage() {
                                         className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none"
                                         required
                                     >
-                                        <option value="" className="text-muted-foreground">Country**</option>
+                                        <option value="" className="text-gray-400">Select country</option>
                                         {countries.map((country) => (
                                             <option key={country} value={country}>
                                                 {country}
@@ -634,12 +705,11 @@ export default function CheckoutPage() {
                                             >
                                                 <div
                                                     onClick={() => setIsDifferentWhatsApp(true)}
-                                                    className="px-3 py-2 flex items-center space-x-2 cursor-pointer hover:bg-gray-50 transition-colors"
+                                                    className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
                                                 >
-                                                    <div className="w-4 h-4 rounded border border-gray-300 flex items-center justify-center">
-                                                        <div className="w-2 h-2 rounded-sm bg-transparent"></div>
-                                                    </div>
-                                                    <span className="text-sm text-gray-600">Add WhatsApp number</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
+                                                        My WhatsApp number is different
+                                                    </span>
                                                 </div>
                                             </motion.div>
                                         ) : (
@@ -671,11 +741,20 @@ export default function CheckoutPage() {
                                 {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
                             </Button>
                         </div>
+
+                        {/* Subscription Confirmation Text */}
+                        {checkoutData?.subscriptionPlan && (
+                            <div className="w-full text-sm text-center text-gray-600 mt-4 mb-2">
+                                <p>
+                                    By confirming your subscription, you authorize {checkoutData.paymentLink?.organizationName || 'the merchant'} to charge you for future payments in accordance with their terms. You can always cancel your subscription.
+                                </p>
+                            </div>
+                        )}
                     </form>
 
-                    <div className="mt-8 select-none">
+                    <div className="mt-6 select-none">
                         <div className="border-t border-gray-200 pt-4"></div>
-                        <div className="flex items-center justify-center gap-3 text-xs text-gray-400">
+                        <div className="flex items-center justify-center gap-3 text-xs text-gray-400 mt-2">
                             <span className="inline-flex items-center">
                                 <ShieldIcon className="w-4 h-4 mr-1" />
                                 Powered by{' '}

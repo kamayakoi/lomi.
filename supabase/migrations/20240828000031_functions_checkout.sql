@@ -25,7 +25,8 @@ RETURNS TABLE (
     plan_amount NUMERIC,
     plan_billing_frequency frequency,
     plan_image_url TEXT,
-    organization_logo_url VARCHAR
+    organization_logo_url VARCHAR,
+    organization_name VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -52,7 +53,8 @@ BEGIN
         sp.amount AS plan_amount,
         sp.billing_frequency AS plan_billing_frequency,
         sp.image_url AS plan_image_url,
-        CAST(REGEXP_REPLACE(o.logo_url, '^.*\/logos\/', '') AS VARCHAR) AS organization_logo_url
+        CAST(REGEXP_REPLACE(o.logo_url, '^.*\/logos\/', '') AS VARCHAR) AS organization_logo_url,
+        o.name AS organization_name
     FROM
         payment_links pl
         LEFT JOIN merchant_products mp ON pl.product_id = mp.product_id
@@ -86,6 +88,7 @@ CREATE OR REPLACE FUNCTION public.create_or_update_customer(
     p_name VARCHAR,
     p_email VARCHAR,
     p_phone_number VARCHAR,
+    p_whatsapp_number VARCHAR,
     p_country VARCHAR,
     p_city VARCHAR,
     p_address VARCHAR,
@@ -102,14 +105,15 @@ BEGIN
 
     IF v_customer_id IS NULL THEN
         -- Customer doesn't exist, create a new one
-        INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city, address, postal_code)
-        VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_country, p_city, p_address, p_postal_code)
+        INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, whatsapp_number, country, city, address, postal_code)
+        VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_whatsapp_number, p_country, p_city, p_address, p_postal_code)
         RETURNING customer_id INTO v_customer_id;
     ELSE
         -- Customer exists, update their details
         UPDATE customers
         SET name = p_name,
             phone_number = p_phone_number,
+            whatsapp_number = p_whatsapp_number,
             country = p_country,
             city = p_city,
             address = p_address,

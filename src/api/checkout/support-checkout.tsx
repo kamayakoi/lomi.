@@ -27,8 +27,8 @@ export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData
     if (paymentLink?.plan_image_url) {
         const { data: imageData, error: imageError } = await supabase
             .storage
-            .from('subscription_plans')
-            .download(paymentLink.plan_image_url.replace(/^.*\/subscription_plans\//, ''))
+            .from('plan_images')
+            .download(paymentLink.plan_image_url.replace(/^.*\/plan_images\//, ''))
 
         if (!imageError) {
             planImageUrl = URL.createObjectURL(imageData)
@@ -69,6 +69,7 @@ export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData
         paymentLink: paymentLink ? {
             ...paymentLink,
             organizationLogoUrl: paymentLink.organization_logo_url,
+            organizationName: paymentLink.organization_name,
         } : null,
         merchantProduct,
         subscriptionPlan,
@@ -104,6 +105,7 @@ export const createOrUpdateCustomer = async (
         p_name: customerDetails.name,
         p_email: customerDetails.email,
         p_phone_number: customerDetails.countryCode + customerDetails.phoneNumber,
+        p_whatsapp_number: customerDetails.whatsappNumber,
         p_country: customerDetails.country,
         p_city: customerDetails.city,
         p_address: customerDetails.address,

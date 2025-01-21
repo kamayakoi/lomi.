@@ -20,6 +20,7 @@ export interface PaymentLink {
     createdAt: string;
     updatedAt: string;
     organizationLogoUrl: string | null;
+    organizationName: string;
 }
 
 export interface MerchantProduct {
@@ -59,6 +60,7 @@ export interface CustomerDetails {
     name: string;
     countryCode: string;
     phoneNumber: string;
+    whatsappNumber: string;
     country: string;
     city: string;
     postalCode: string;

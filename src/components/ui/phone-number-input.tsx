@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Phone } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 
@@ -10,18 +10,36 @@ interface PhoneNumberInputProps {
 }
 
 export default function PhoneNumberInput({ value, onChange }: PhoneNumberInputProps) {
+    const [defaultCountry, setDefaultCountry] = useState<RPNInput.Country>();
+
+    useEffect(() => {
+        // Get user's country using their IP
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                setDefaultCountry(data.country_code as RPNInput.Country);
+            })
+            .catch(() => {
+                // Fallback to SN if geolocation fails
+                setDefaultCountry('CI');
+            });
+    }, []);
+
     return (
         <div className="space-y-2">
-            <RPNInput.default
-                className="flex gap-[1px] border border-black/20"
-                international
-                flagComponent={FlagComponent}
-                countrySelectComponent={CountrySelect}
-                inputComponent={PhoneInput}
-                placeholder="Enter phone number"
-                value={value}
-                onChange={onChange}
-            />
+            <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                <RPNInput.default
+                    className="flex rounded-lg"
+                    international
+                    defaultCountry={defaultCountry}
+                    flagComponent={FlagComponent}
+                    countrySelectComponent={CountrySelect}
+                    inputComponent={PhoneInput}
+                    placeholder="Phone number**"
+                    value={value}
+                    onChange={onChange}
+                />
+            </div>
         </div>
     );
 }
@@ -32,7 +50,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
     ({ ...props }, ref) => {
         return (
             <Input
-                className="border-l border-black/20 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="border-l border-input shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-none"
                 ref={ref}
                 {...props}
             />
@@ -55,7 +73,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
     };
 
     return (
-        <div className="relative inline-flex items-center self-stretch bg-background py-2 pe-2 ps-3 text-muted-foreground transition-colors hover:bg-accent/50 has-[:disabled]:pointer-events-none has-[:disabled]:opacity-50">
+        <div className="relative inline-flex items-center self-stretch bg-transparent py-2 pe-2 ps-3 text-foreground transition-colors border-y border-l border-input">
             <div className="inline-flex items-center gap-1" aria-hidden="true">
                 <FlagComponent country={value} countryName={value} aria-hidden="true" />
                 <span className="text-muted-foreground/80">
@@ -69,9 +87,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
                 className="absolute inset-0 text-sm opacity-0"
                 aria-label="Select country"
             >
-                <option key="default" value="">
-                    Select a country
-                </option>
+                <option value="" className="text-gray-400">Select country</option>
                 {options
                     .filter((x) => x.value)
                     .map((option) => (
