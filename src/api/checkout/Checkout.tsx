@@ -570,7 +570,7 @@ export default function CheckoutPage() {
                                             lastName
                                         }));
                                     }}
-                                    placeholder="Full name on card**"
+                                    placeholder="Full name on card"
                                     className="rounded-b-none w-full"
                                     required
                                 />
@@ -581,7 +581,7 @@ export default function CheckoutPage() {
                                         name="email"
                                         value={customerDetails.email}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Email address**"
+                                        placeholder="Email address"
                                         className="rounded-none rounded-b-lg w-full"
                                         required
                                     />
@@ -651,7 +651,7 @@ export default function CheckoutPage() {
                                         name="city"
                                         value={customerDetails.city}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="City**"
+                                        placeholder="City"
                                         className="rounded-none w-full border-x"
                                         required
                                     />
@@ -661,7 +661,7 @@ export default function CheckoutPage() {
                                         name="address"
                                         value={customerDetails.address}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Address line**"
+                                        placeholder="Address"
                                         className="rounded-none rounded-bl-lg w-[70%]"
                                         required
                                     />
@@ -669,7 +669,7 @@ export default function CheckoutPage() {
                                         name="postalCode"
                                         value={customerDetails.postalCode}
                                         onChange={handleCustomerInputChange}
-                                        placeholder="Postal code**"
+                                        placeholder="Postal code"
                                         className="rounded-none rounded-br-lg w-[30%]"
                                         required
                                     />
