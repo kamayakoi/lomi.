@@ -157,8 +157,50 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to update customer notifications
+CREATE OR REPLACE FUNCTION public.update_customer_notifications(
+    p_organization_id UUID,
+    p_notifications JSONB
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO organization_checkout_settings (
+        organization_id,
+        customer_notifications
+    ) VALUES (
+        p_organization_id,
+        p_notifications
+    )
+    ON CONFLICT (organization_id) 
+    DO UPDATE SET 
+        customer_notifications = p_notifications,
+        updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to update merchant recipients
+CREATE OR REPLACE FUNCTION public.update_merchant_recipients(
+    p_organization_id UUID,
+    p_recipients JSONB
+) RETURNS void AS $$
+BEGIN
+    INSERT INTO organization_checkout_settings (
+        organization_id,
+        merchant_recipients
+    ) VALUES (
+        p_organization_id,
+        p_recipients
+    )
+    ON CONFLICT (organization_id) 
+    DO UPDATE SET 
+        merchant_recipients = p_recipients,
+        updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_organization_checkout_settings(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.update_organization_checkout_settings(UUID, JSONB) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.manage_organization_fee_type(UUID, UUID, VARCHAR, NUMERIC, BOOLEAN) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.delete_organization_fee_type(UUID, UUID) TO authenticated; 
+GRANT EXECUTE ON FUNCTION public.delete_organization_fee_type(UUID, UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_customer_notifications(UUID, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_merchant_recipients(UUID, JSONB) TO authenticated; 

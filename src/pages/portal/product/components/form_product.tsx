@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,10 +9,21 @@ import InputRightAddon from "@/components/ui/input-right-addon"
 import { useUser } from '@/lib/hooks/useUser'
 import { Loader2, X, Upload } from 'lucide-react'
 import { toast } from "@/components/ui/use-toast"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { supabase } from '@/utils/supabase/client'
 
 interface CreateProductFormProps {
     onClose: () => void
     onSuccess: () => void
+}
+
+interface Fee {
+    fee_type_id: string;
+    name: string;
+    percentage: number;
+    is_enabled: boolean;
 }
 
 interface ProductFormData {
@@ -28,6 +39,51 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
     const [isUploading, setIsUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const { register, handleSubmit, setValue, watch } = useForm<ProductFormData>()
+    const [availableFees, setAvailableFees] = useState<Fee[]>([])
+    const [selectedFees, setSelectedFees] = useState<string[]>([])
+
+    // Fetch available fees
+    useEffect(() => {
+        const fetchFees = async () => {
+            if (!user?.id) return;
+
+            const { data, error } = await supabase
+                .rpc('fetch_organization_fees', {
+                    p_merchant_id: user.id
+                });
+
+            if (error) {
+                console.error('Error fetching fees:', error);
+                return;
+            }
+
+            setAvailableFees(data || []);
+        };
+
+        fetchFees();
+    }, [user?.id]);
+
+    // Calculate total price with fees
+    const calculateTotalPrice = (price: number) => {
+        const selectedFeesList = availableFees.filter(fee =>
+            selectedFees.includes(fee.fee_type_id)
+        );
+
+        const feeAmount = selectedFeesList.reduce((total, fee) => {
+            return total + (price * (fee.percentage / 100));
+        }, 0);
+
+        return price + feeAmount;
+    };
+
+    // Handle fee selection
+    const toggleFee = (feeId: string) => {
+        setSelectedFees(prev =>
+            prev.includes(feeId)
+                ? prev.filter(id => id !== feeId)
+                : [...prev, feeId]
+        );
+    };
 
     const onSubmit = async (data: ProductFormData) => {
         if (!user?.id) return
@@ -39,13 +95,19 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                 description: data.description,
                 price: data.price,
                 image_url: data.image_url,
+                display_on_storefront: true,
+                fee_type_ids: selectedFees
             })
 
             onSuccess()
             onClose()
         } catch (error) {
             console.error('Error creating product:', error)
-            toast({ title: "Error", description: "Failed to create product", variant: "destructive" })
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Failed to create product",
+                variant: "destructive"
+            })
         } finally {
             setIsUploading(false)
         }
@@ -105,6 +167,10 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
         return parseFloat(amount.replace(/,/g, ""));
     };
 
+    // Calculate display price including fees
+    const basePrice = watch("price") || 0;
+    const finalPrice = calculateTotalPrice(basePrice);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -135,6 +201,54 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                     onChange={(value) => setValue("price", parseAmount(value))}
                 />
             </div>
+            <div className="space-y-4">
+                <Label>Additional Fees</Label>
+                {availableFees.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                        {availableFees.map(fee => (
+                            <Badge
+                                key={fee.fee_type_id}
+                                variant={selectedFees.includes(fee.fee_type_id) ? "default" : "outline"}
+                                className="cursor-pointer rounded-none"
+                                onClick={() => toggleFee(fee.fee_type_id)}
+                            >
+                                {fee.name} ({fee.percentage}%)
+                            </Badge>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground">No fees available. Create fees in the checkout settings.</p>
+                )}
+            </div>
+
+            {basePrice > 0 && selectedFees.length > 0 && (
+                <Card className="p-4 space-y-3 rounded-none">
+                    <h3 className="font-medium">Price Breakdown</h3>
+                    <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <span>Base Price:</span>
+                            <span>{formatAmount(basePrice)} XOF</span>
+                        </div>
+                        {availableFees
+                            .filter(fee => selectedFees.includes(fee.fee_type_id))
+                            .map(fee => {
+                                const feeAmount = basePrice * (fee.percentage / 100);
+                                return (
+                                    <div key={fee.fee_type_id} className="flex justify-between text-muted-foreground">
+                                        <span>{fee.name} ({fee.percentage}%):</span>
+                                        <span>+ {formatAmount(feeAmount)} XOF</span>
+                                    </div>
+                                );
+                            })
+                        }
+                        <Separator className="my-2" />
+                        <div className="flex justify-between font-medium">
+                            <span>Final Price:</span>
+                            <span>{formatAmount(finalPrice)} XOF</span>
+                        </div>
+                    </div>
+                </Card>
+            )}
             <div className="space-y-2">
                 <Label htmlFor="image">Image</Label>
                 <div className="mt-1.5">

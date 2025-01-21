@@ -91,6 +91,16 @@ function ProductCard({ product, onEditClick, onClick }: {
     );
 }
 
+function calculateTotalPrice(product: Product): number {
+    if (!product.fees) return product.price;
+
+    const feeAmount = product.fees.reduce((total, fee) => {
+        return total + (product.price * (fee.percentage / 100));
+    }, 0);
+
+    return product.price + feeAmount;
+}
+
 function ProductsPage() {
     const { user } = useUser()
     const [isCreateProductOpen, setIsCreateProductOpen] = useState(false)
@@ -317,15 +327,25 @@ function ProductsPage() {
                                                             )}
 
                                                             <div className="flex items-center gap-2 mt-auto pt-2">
-                                                                <span className="text-lg font-semibold tracking-tight">
-                                                                    {product.price.toLocaleString('en-US', {
-                                                                        minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                        maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                    })}
-                                                                    <span className="text-sm text-muted-foreground ml-1">
-                                                                        {product.currency_code}
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-lg font-semibold tracking-tight">
+                                                                        {product.price.toLocaleString('en-US', {
+                                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                        })}
+                                                                        <span className="text-sm text-muted-foreground ml-1">
+                                                                            {product.currency_code}
+                                                                        </span>
                                                                     </span>
-                                                                </span>
+                                                                    {product.fees && product.fees.length > 0 && (
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            {calculateTotalPrice(product).toLocaleString('en-US', {
+                                                                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                            })} {product.currency_code} incl. tax
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

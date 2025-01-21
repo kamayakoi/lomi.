@@ -5,17 +5,25 @@ import { Product, Transaction } from './Products_types'
 import { Separator } from "@/components/ui/separator"
 import { LifeBuoy, ImageIcon, X } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
-import { fetchProductTransactions } from './support_product'
+import { fetchProductTransactions, fetchProductFees } from './support_product'
 import { updateProduct } from './support_product'
 import { cn } from '@/lib/actions/utils'
 import { toast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { Badge } from "@/components/ui/badge"
 
 type ProductActionsProps = {
     product: Product | null
     isOpen: boolean
     onClose: () => void
     onUpdate?: () => void
+}
+
+interface Fee {
+    fee_type_id: string;
+    name: string;
+    percentage: number;
+    is_enabled: boolean;
 }
 
 export default function ProductActions({ product, isOpen, onClose, onUpdate }: ProductActionsProps) {
@@ -38,8 +46,17 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
             fetchProductTransactions(product.product_id).then(setTransactions)
             setEditedName(product.name || '')
             setEditedDescription(product.description || '')
+
+            // Fetch product fees
+            fetchProductFees(product.product_id).then(fees => {
+                if (product) {
+                    product.fees = fees;
+                    // Force re-render using functional update
+                    setTransactions(t => [...t]);
+                }
+            });
         }
-    }, [product?.product_id, product?.name, product?.description])
+    }, [product])
 
     const handleNameChange = async (newName: string) => {
         if (!product) return
@@ -146,6 +163,17 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
             console.error('Failed to toggle storefront status:', error)
         }
     }
+
+    // Calculate total price with fees
+    const calculateTotalPrice = (basePrice: number) => {
+        if (!product?.fees) return basePrice;
+
+        const feeAmount = product.fees.reduce((total, fee) => {
+            return total + (basePrice * (fee.percentage / 100));
+        }, 0);
+
+        return basePrice + feeAmount;
+    };
 
     if (!product) return null
 
@@ -274,7 +302,14 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
 
                                 <div className="flex items-center justify-between">
                                     <span className="text-muted-foreground">Price</span>
-                                    <span>{formatCurrency(product.price, product.currency_code)}</span>
+                                    <div className="flex flex-col items-end">
+                                        <span>{formatCurrency(product.price, product.currency_code)}</span>
+                                        {product.fees && product.fees.length > 0 && (
+                                            <span className="text-xs text-muted-foreground">
+                                                {formatCurrency(calculateTotalPrice(product.price), product.currency_code)} incl. tax
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center justify-between">
@@ -291,6 +326,26 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
                                         {product.display_on_storefront ? 'Yes' : 'No'}
                                     </button>
                                 </div>
+
+                                {product.fees && product.fees.length > 0 && (
+                                    <>
+                                        <Separator />
+                                        <div className="space-y-2">
+                                            <h3 className="text-sm font-medium">Additional Fees</h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {product.fees.map((fee: Fee) => (
+                                                    <Badge
+                                                        key={fee.fee_type_id}
+                                                        variant="secondary"
+                                                        className="rounded-none bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                                                    >
+                                                        {fee.name} ({fee.percentage}%)
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
                                 <Separator />
 

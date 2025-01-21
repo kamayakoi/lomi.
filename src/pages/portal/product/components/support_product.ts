@@ -68,6 +68,7 @@ export async function createProduct(data: {
     price: number
     image_url?: string | null
     display_on_storefront?: boolean
+    fee_type_ids?: string[]
 }): Promise<void> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('No user found')
@@ -87,7 +88,8 @@ export async function createProduct(data: {
         p_currency_code: 'XOF',
         p_image_url: data.image_url,
         p_is_active: true,
-        p_display_on_storefront: data.display_on_storefront ?? true
+        p_display_on_storefront: data.display_on_storefront ?? true,
+        p_fee_type_ids: data.fee_type_ids
     })
 
     if (error) throw error
@@ -100,6 +102,7 @@ export async function updateProduct(productId: string, data: {
     image_url?: string | null
     is_active: boolean
     display_on_storefront?: boolean
+    fee_type_ids?: string[]
 }): Promise<void> {
     const { error } = await supabase.rpc('update_product', {
         p_product_id: productId,
@@ -108,7 +111,8 @@ export async function updateProduct(productId: string, data: {
         p_price: data.price,
         p_image_url: data.image_url,
         p_is_active: data.is_active,
-        p_display_on_storefront: data.display_on_storefront ?? true
+        p_display_on_storefront: data.display_on_storefront ?? true,
+        p_fee_type_ids: data.fee_type_ids
     })
 
     if (error) throw error
@@ -133,4 +137,17 @@ export async function fetchProductTransactions(productId: string): Promise<Trans
     }
 
     return data as Transaction[]
+}
+
+export async function fetchProductFees(productId: string) {
+    const { data, error } = await supabase.rpc('fetch_product_fees', {
+        p_product_id: productId
+    })
+
+    if (error) {
+        console.error('Error fetching product fees:', error)
+        return []
+    }
+
+    return data
 }

@@ -8,12 +8,14 @@ CREATE OR REPLACE FUNCTION public.create_product(
     p_currency_code currency_code,
     p_image_url TEXT DEFAULT NULL,
     p_is_active BOOLEAN DEFAULT true,
-    p_display_on_storefront BOOLEAN DEFAULT true
+    p_display_on_storefront BOOLEAN DEFAULT true,
+    p_fee_type_ids UUID[] DEFAULT NULL
 )
 RETURNS UUID AS $$
 DECLARE
     v_product_id UUID;
 BEGIN
+    -- Create the product
     INSERT INTO merchant_products (
         merchant_id, 
         organization_id, 
@@ -38,6 +40,20 @@ BEGIN
     )
     RETURNING product_id INTO v_product_id;
 
+    -- Create fee links if fees are provided
+    IF p_fee_type_ids IS NOT NULL AND array_length(p_fee_type_ids, 1) > 0 THEN
+        INSERT INTO organization_fee_links (
+            organization_id,
+            fee_type_id,
+            product_id
+        )
+        SELECT 
+            p_organization_id,
+            fee_id,
+            v_product_id
+        FROM unnest(p_fee_type_ids) AS fee_id;
+    END IF;
+
     -- Log product creation
     PERFORM public.log_event(
         p_merchant_id := p_merchant_id,
@@ -48,7 +64,8 @@ BEGIN
             'price', p_price,
             'currency', p_currency_code,
             'has_image', p_image_url IS NOT NULL,
-            'display_on_storefront', p_display_on_storefront
+            'display_on_storefront', p_display_on_storefront,
+            'fee_count', array_length(p_fee_type_ids, 1)
         ),
         p_severity := 'NOTICE'
     );
@@ -173,6 +190,32 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to fetch product fees
+CREATE OR REPLACE FUNCTION public.fetch_product_fees(
+    p_product_id UUID
+)
+RETURNS TABLE (
+    fee_type_id UUID,
+    name VARCHAR(255),
+    percentage NUMERIC(5,2),
+    is_enabled BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        f.fee_type_id,
+        f.name,
+        f.percentage,
+        f.is_enabled
+    FROM 
+        organization_fees f
+        INNER JOIN organization_fee_links fl ON f.fee_type_id = fl.fee_type_id
+    WHERE 
+        fl.product_id = p_product_id
+        AND f.is_enabled = true;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Function to update a product
 CREATE OR REPLACE FUNCTION public.update_product(
     p_product_id UUID,
@@ -181,21 +224,34 @@ CREATE OR REPLACE FUNCTION public.update_product(
     p_price NUMERIC(10,2),
     p_image_url TEXT,
     p_is_active BOOLEAN,
-    p_display_on_storefront BOOLEAN
+    p_display_on_storefront BOOLEAN,
+    p_fee_type_ids UUID[] DEFAULT NULL
 )
 RETURNS VOID AS $$
 DECLARE
     v_merchant_id UUID;
+    v_organization_id UUID;
     v_old_price NUMERIC;
     v_currency currency_code;
     v_old_image_url TEXT;
 BEGIN
     -- Get current product details
-    SELECT merchant_id, price, currency_code, image_url
-    INTO v_merchant_id, v_old_price, v_currency, v_old_image_url
+    SELECT 
+        merchant_id, 
+        organization_id,
+        price, 
+        currency_code, 
+        image_url
+    INTO 
+        v_merchant_id, 
+        v_organization_id,
+        v_old_price, 
+        v_currency, 
+        v_old_image_url
     FROM merchant_products
     WHERE product_id = p_product_id;
 
+    -- Update product details
     UPDATE merchant_products
     SET
         name = COALESCE(p_name, name),
@@ -207,7 +263,28 @@ BEGIN
         updated_at = NOW()
     WHERE product_id = p_product_id;
 
-    -- Log product update with image change info
+    -- Update fees if provided
+    IF p_fee_type_ids IS NOT NULL THEN
+        -- Delete existing fee links
+        DELETE FROM organization_fee_links
+        WHERE product_id = p_product_id;
+
+        -- Insert new fee links
+        IF array_length(p_fee_type_ids, 1) > 0 THEN
+            INSERT INTO organization_fee_links (
+                organization_id,
+                fee_type_id,
+                product_id
+            )
+            SELECT 
+                v_organization_id,
+                fee_id,
+                p_product_id
+            FROM unnest(p_fee_type_ids) AS fee_id;
+        END IF;
+    END IF;
+
+    -- Log product update
     PERFORM public.log_event(
         p_merchant_id := v_merchant_id,
         p_event := 'update_product'::event_type,
@@ -221,16 +298,45 @@ BEGIN
             'old_image_url', v_old_image_url,
             'new_image_url', p_image_url,
             'image_changed', (v_old_image_url IS DISTINCT FROM p_image_url),
-            'display_on_storefront', p_display_on_storefront
+            'display_on_storefront', p_display_on_storefront,
+            'fee_count', array_length(p_fee_type_ids, 1)
         ),
         p_severity := 'NOTICE'
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
+-- Function to fetch organization fees
+CREATE OR REPLACE FUNCTION public.fetch_organization_fees(
+    p_merchant_id UUID
+)
+RETURNS TABLE (
+    fee_type_id UUID,
+    name VARCHAR(255),
+    percentage NUMERIC(5,2),
+    is_enabled BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        f.fee_type_id,
+        f.name,
+        f.percentage,
+        f.is_enabled
+    FROM 
+        organization_fees f
+        INNER JOIN merchant_organization_links mo ON f.organization_id = mo.organization_id
+    WHERE 
+        mo.merchant_id = p_merchant_id
+        AND f.is_enabled = true;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
 -- Grant execute permission to authenticated users
 GRANT EXECUTE ON FUNCTION public.fetch_product_transactions(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fetch_products(UUID, BOOLEAN, INTEGER, INTEGER) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, TEXT, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.create_product(UUID, UUID, VARCHAR, TEXT, NUMERIC, currency_code, TEXT, BOOLEAN, BOOLEAN, UUID[]) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_product(UUID, VARCHAR, TEXT, NUMERIC, TEXT, BOOLEAN, BOOLEAN, UUID[]) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_product(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_product_fees(UUID) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.fetch_organization_fees(UUID) TO authenticated;
