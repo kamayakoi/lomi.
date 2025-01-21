@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
-import AnimatedLogoLoader from '@/components/portal/loader';
 
 // Auth routes that should redirect to /portal if user is already authenticated
 const authRoutes = ['/sign-in', '/sign-up', '/log-in', '/sign-in-test', '/forgot-password', '/otp', '/auth/reset-password'];
@@ -26,10 +25,6 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
             }
         }
     }, [isLoading, isAuthenticated, location, navigate]);
-
-    if (isLoading) {
-        return <AnimatedLogoLoader />;
-    }
 
     return <>{children}</>;
 }

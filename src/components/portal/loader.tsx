@@ -62,7 +62,6 @@ export default function AnimatedLogoLoader() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 1 }}
       >
-        Loading...
       </motion.span>
     </div>
   )

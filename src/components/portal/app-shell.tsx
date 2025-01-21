@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './sidebar';
 import { useMetaTags } from '@/lib/contexts/useMetaTags';
-import Loader from '@/components/portal/loader';
 import { useSidebarData } from '@/lib/hooks/useSidebarData';
 import { SidebarProvider } from '@/lib/contexts/sidebarContext';
 import { UserAvatarProvider } from '@/lib/contexts/userAvatarContext';
@@ -21,9 +20,6 @@ export default function AppShell() {
   });
 
   const MemoizedSidebar = React.memo(Sidebar);
-  if (isLoading) {
-    return <Loader />;
-  }
 
   return (
     <OrganizationProvider>
@@ -32,12 +28,12 @@ export default function AppShell() {
           <UserAvatarProvider>
             <NotificationsProvider>
               <div className="relative h-full overflow-hidden bg-background">
-                <MemoizedSidebar />
+                {!isLoading && <MemoizedSidebar />}
                 <main
                   id="content"
                   className="overflow-x-hidden pt-16 transition-[margin] md:overflow-y-hidden md:pt-0 md:ml-64 h-full"
                 >
-                  <React.Suspense fallback={<Loader />}>
+                  <React.Suspense>
                     <Outlet />
                   </React.Suspense>
                 </main>
