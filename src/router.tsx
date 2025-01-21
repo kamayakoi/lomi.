@@ -37,7 +37,7 @@ import CheckoutPage from '@/api/checkout/Checkout';
 
 // Dynamically imported pages
 const Product = lazy(() => import('./pages/portal/product/Product'));
-const Reporting = lazy(() => import('./pages/portal/reporting/reporting'));
+const Reporting = lazy(() => import('./pages/portal/reporting/Reporting'));
 
 // Website routes
 import Home from './pages/Home';
