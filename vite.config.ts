@@ -4,17 +4,30 @@ import { defineConfig } from "vite";
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
+import compression from 'vite-plugin-compression';
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      // Optimize React refresh for Bun
+      babel: {
+        compact: true,
+        minified: true,
+      }
+    }),
     terser({
       compress: {
         drop_console: true,
+        passes: 2,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+        pure_getters: true,
+        unsafe: true,
+        unsafe_comps: true,
       },
       format: {
         comments: false,
       },
+      module: true,
     }),
     visualizer({
       filename: 'bundle-analysis.html',
@@ -81,17 +94,32 @@ export default defineConfig({
         unicodeEscapeSequence: false
       },
     }),
+    // Add Brotli compression
+    compression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+      threshold: 512,
+    }),
   ],
   base: '/',
   build: {
     sourcemap: false,
     minify: 'terser',
+    target: 'esnext', // Optimize for modern browsers
+    modulePreload: {
+      polyfill: false, // Modern browsers support module preload
+    },
     terserOptions: {
       mangle: {
         keep_fnames: /^[A-Z]|use[A-Z]|^on[A-Z]/,
+        module: true,
       },
       compress: {
         drop_console: true,
+        pure_getters: true,
+        unsafe: true,
+        unsafe_comps: true,
+        passes: 2,
       },
       format: {
         comments: false,
@@ -105,12 +133,16 @@ export default defineConfig({
           }
         },
         sourcemap: false,
+        compact: true,
+        freeze: false, // Optimize property access
+        hoistTransitiveImports: true,
       },
     },
     assetsDir: 'assets',
     manifest: true,
     cssCodeSplit: true,
     chunkSizeWarningLimit: 1000,
+    reportCompressedSize: false, // Speed up build
   },
   resolve: {
     alias: {
@@ -128,5 +160,11 @@ export default defineConfig({
     headers: {
       'Cache-Control': 'public, max-age=31536000', // 1 year for static assets
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom'], // Pre-bundle major dependencies
+    esbuildOptions: {
+      target: 'esnext',
+    }
   },
 });

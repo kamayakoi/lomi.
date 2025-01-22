@@ -40,6 +40,7 @@ export type Database = {
         Row: {
           api_key: string
           created_at: string
+          environment: string
           expiration_date: string | null
           is_active: boolean
           merchant_id: string
@@ -50,6 +51,7 @@ export type Database = {
         Insert: {
           api_key: string
           created_at?: string
+          environment?: string
           expiration_date?: string | null
           is_active?: boolean
           merchant_id: string
@@ -60,6 +62,7 @@ export type Database = {
         Update: {
           api_key?: string
           created_at?: string
+          environment?: string
           expiration_date?: string | null
           is_active?: boolean
           merchant_id?: string
@@ -1155,7 +1158,6 @@ export type Database = {
           fee_link_id: string
           fee_type_id: string
           organization_id: string
-          plan_id: string | null
           product_id: string | null
           updated_at: string
         }
@@ -1164,7 +1166,6 @@ export type Database = {
           fee_link_id?: string
           fee_type_id: string
           organization_id: string
-          plan_id?: string | null
           product_id?: string | null
           updated_at?: string
         }
@@ -1173,7 +1174,6 @@ export type Database = {
           fee_link_id?: string
           fee_type_id?: string
           organization_id?: string
-          plan_id?: string | null
           product_id?: string | null
           updated_at?: string
         }
@@ -1191,13 +1191,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizations"
             referencedColumns: ["organization_id"]
-          },
-          {
-            foreignKeyName: "organization_fee_links_plan_id_fkey"
-            columns: ["plan_id"]
-            isOneToOne: false
-            referencedRelation: "subscription_plans"
-            referencedColumns: ["plan_id"]
           },
           {
             foreignKeyName: "organization_fee_links_product_id_fkey"
@@ -1457,6 +1450,7 @@ export type Database = {
         Row: {
           allow_coupon_code: boolean
           allowed_providers: Database["public"]["Enums"]["provider_code"][]
+          cancel_url: string | null
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           expires_at: string | null
@@ -1479,6 +1473,7 @@ export type Database = {
         Insert: {
           allow_coupon_code?: boolean
           allowed_providers?: Database["public"]["Enums"]["provider_code"][]
+          cancel_url?: string | null
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           expires_at?: string | null
@@ -1501,6 +1496,7 @@ export type Database = {
         Update: {
           allow_coupon_code?: boolean
           allowed_providers?: Database["public"]["Enums"]["provider_code"][]
+          cancel_url?: string | null
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           expires_at?: string | null
@@ -2403,38 +2399,22 @@ export type Database = {
         }
         Returns: string
       }
-      create_customer:
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-              p_is_business: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_whatsapp_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-              p_is_business: boolean
-            }
-            Returns: string
-          }
+      create_customer: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+          p_name: string
+          p_email: string
+          p_phone_number: string
+          p_whatsapp_number: string
+          p_country: string
+          p_city: string
+          p_address: string
+          p_postal_code: string
+          p_is_business: boolean
+        }
+        Returns: string
+      }
       create_feedback: {
         Args: {
           p_merchant_id: string
@@ -2449,36 +2429,21 @@ export type Database = {
         }
         Returns: undefined
       }
-      create_or_update_customer:
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_whatsapp_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-            }
-            Returns: string
-          }
+      create_or_update_customer: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+          p_name: string
+          p_email: string
+          p_phone_number: string
+          p_whatsapp_number: string
+          p_country: string
+          p_city: string
+          p_address: string
+          p_postal_code: string
+        }
+        Returns: string
+      }
       create_organization_webhook: {
         Args: {
           p_merchant_id: string
@@ -2518,41 +2483,27 @@ export type Database = {
           p_allow_coupon_code?: boolean
           p_expires_at?: string
           p_success_url?: string
+          p_cancel_url?: string
           p_plan_id?: string
           p_product_id?: string
         }
         Returns: string
       }
-      create_product:
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_description: string
-              p_price: number
-              p_currency_code: Database["public"]["Enums"]["currency_code"]
-              p_image_url?: string
-              p_is_active?: boolean
-              p_display_on_storefront?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_description: string
-              p_price: number
-              p_currency_code: Database["public"]["Enums"]["currency_code"]
-              p_image_url?: string
-              p_is_active?: boolean
-              p_display_on_storefront?: boolean
-              p_fee_type_ids?: string[]
-            }
-            Returns: string
-          }
+      create_product: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+          p_name: string
+          p_description: string
+          p_price: number
+          p_currency_code: Database["public"]["Enums"]["currency_code"]
+          p_image_url?: string
+          p_is_active?: boolean
+          p_display_on_storefront?: boolean
+          p_fee_type_ids?: string[]
+        }
+        Returns: string
+      }
       create_refund: {
         Args: {
           p_merchant_id: string
@@ -2716,13 +2667,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      delete_organization_fee: {
-        Args: {
-          p_organization_id: string
-          p_fee_type_id: string
-        }
-        Returns: boolean
-      }
       delete_organization_fee_type: {
         Args: {
           p_organization_id: string
@@ -2882,17 +2826,6 @@ export type Database = {
           metadata: Json
         }[]
       }
-      fetch_checkout_fees: {
-        Args: {
-          p_organization_id: string
-        }
-        Returns: {
-          fee_type_id: string
-          name: string
-          percentage: number
-          is_enabled: boolean
-        }[]
-      }
       fetch_completion_rate: {
         Args: {
           p_merchant_id: string
@@ -2972,6 +2905,7 @@ export type Database = {
           allowed_providers: Database["public"]["Enums"]["provider_code"][]
           allow_coupon_code: boolean
           success_url: string
+          cancel_url: string
           metadata: Json
           product_id: string
           product_name: string
@@ -3591,6 +3525,7 @@ export type Database = {
           p_organization_id: string
           p_name: string
           p_expiration_date?: string
+          p_environment?: string
         }
         Returns: {
           api_key: string
@@ -3781,16 +3716,6 @@ export type Database = {
         }
         Returns: string
       }
-      manage_organization_fee: {
-        Args: {
-          p_organization_id: string
-          p_fee_type_id?: string
-          p_name?: string
-          p_percentage?: number
-          p_is_enabled?: boolean
-        }
-        Returns: string
-      }
       manage_organization_fee_type: {
         Args: {
           p_organization_id: string
@@ -3911,36 +3836,21 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_customer:
-        | {
-            Args: {
-              p_customer_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-              p_is_business: boolean
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_customer_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_whatsapp_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
-              p_is_business: boolean
-            }
-            Returns: undefined
-          }
+      update_customer: {
+        Args: {
+          p_customer_id: string
+          p_name: string
+          p_email: string
+          p_phone_number: string
+          p_whatsapp_number: string
+          p_country: string
+          p_city: string
+          p_address: string
+          p_postal_code: string
+          p_is_business: boolean
+        }
+        Returns: undefined
+      }
       update_customer_notifications: {
         Args: {
           p_organization_id: string
@@ -4059,11 +3969,13 @@ export type Database = {
           p_is_active?: boolean
           p_expires_at?: string
           p_success_url?: string
+          p_cancel_url?: string
           p_allowed_providers?: Database["public"]["Enums"]["provider_code"][]
         }
         Returns: {
           allow_coupon_code: boolean
           allowed_providers: Database["public"]["Enums"]["provider_code"][]
+          cancel_url: string | null
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           expires_at: string | null
@@ -4084,32 +3996,19 @@ export type Database = {
           url: string
         }
       }
-      update_product:
-        | {
-            Args: {
-              p_product_id: string
-              p_name: string
-              p_description: string
-              p_price: number
-              p_image_url: string
-              p_is_active: boolean
-              p_display_on_storefront: boolean
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_product_id: string
-              p_name: string
-              p_description: string
-              p_price: number
-              p_image_url: string
-              p_is_active: boolean
-              p_display_on_storefront: boolean
-              p_fee_type_ids?: string[]
-            }
-            Returns: undefined
-          }
+      update_product: {
+        Args: {
+          p_product_id: string
+          p_name: string
+          p_description: string
+          p_price: number
+          p_image_url: string
+          p_is_active: boolean
+          p_display_on_storefront: boolean
+          p_fee_type_ids?: string[]
+        }
+        Returns: undefined
+      }
       update_subscription_plan: {
         Args: {
           p_plan_id: string
@@ -4162,6 +4061,18 @@ export type Database = {
           p_last_payload: Json
         }
         Returns: undefined
+      }
+      validate_api_key: {
+        Args: {
+          p_api_key: string
+        }
+        Returns: {
+          merchant_id: string
+          organization_id: string
+          is_active: boolean
+          expiration_date: string
+          environment: string
+        }[]
       }
       verify_2fa_login: {
         Args: {
@@ -4273,6 +4184,7 @@ export type Database = {
         | "QR_CODE"
         | "BANK_TRANSFER"
         | "CRYPTO"
+        | "PAYPAL"
         | "OTHER"
       payout_status: "pending" | "processing" | "completed" | "failed"
       provider_code:
@@ -4288,6 +4200,7 @@ export type Database = {
         | "MPESA"
         | "WIZALL"
         | "OPAY"
+        | "PAYPAL"
         | "OTHER"
       refund_status: "pending" | "completed" | "failed"
       subscription_status:

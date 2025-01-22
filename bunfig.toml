@@ -1,0 +1,16 @@
+[install]
+# Use exact versions for dependencies
+exact = true
+
+[env]
+# Load environment variables from .env files
+DOT_ENV = true
+
+[http]
+# Optimize HTTP requests
+keepalive = true
+https-only = true
+
+[runtime]
+# Enable fetch streaming for better performance
+streaming = true 
