@@ -26,7 +26,7 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-  project_url TEXT := 'https://injlwsgidvxehdmwdoov.supabase.co';
+  project_url TEXT := 'https://mdswvokxrnfggrujsfjd.supabase.co';
   service_role_key TEXT := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imluamx3c2dpZHZ4ZWhkbXdkb292Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMDM5NTE5MCwiZXhwIjoyMDM1OTcxMTkwfQ.s_7csVRfgC_kzke1oqgeiIzAuEA4Ag33fPmGxhLavNo';
   url TEXT := project_url || '/storage/v1/object/' || bucket || '/' || object;
 BEGIN

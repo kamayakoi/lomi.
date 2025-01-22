@@ -51,16 +51,16 @@ export const paymentMethods: PaymentMethod[] = [
     status: 'coming_soon',
     category: 'Cards'
   },
-  {
-    code: 'GOOGLE_PAY',
-    name: 'Google Pay',
-    description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
-    logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
-    provider_code: 'GOOGLE',
-    type: 'Digital Payments',
-    status: 'coming_soon',
-    category: 'Cards'
-  },
+  // {
+  //   code: 'GOOGLE_PAY',
+  //   name: 'Google Pay',
+  //   description: 'Integrate Google Pay to provide Android and Google users with a seamless checkout experience. Enable fast, secure payments with advanced fraud protection.',
+  //   logo: <img src="/google-pay.webp" alt="Google Pay" className="w-full h-full object-contain" />,
+  //   provider_code: 'GOOGLE',
+  //   type: 'Digital Payments',
+  //   status: 'coming_soon',
+  //   category: 'Cards'
+  // },
 
   // Mobile Money Section
   {
@@ -74,7 +74,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     code: 'ORANGE',
-    name: 'Orange Money',
+    name: 'Orange',
     description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
     logo: <img src="/orange.webp" alt="Orange Money" className="w-full h-full object-contain" />,
     provider_code: 'ORANGE',
@@ -84,7 +84,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'MOOV',
     name: 'Moov Money',
-    description: 'Enable Moov Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
+    description: 'Expand your payment options with Moov a trusted mobile money service across francophone West Africa. Ideal for secure, hassle-free transactions in the region.',
     logo: <img src="/moov.webp" alt="Moov Money" className="w-full h-full object-contain" />,
     provider_code: 'MOOV',
     type: 'Mobile Money',
@@ -93,8 +93,8 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     code: 'AIRTEL',
-    name: 'Airtel Money',
-    description: 'Accept Airtel payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    name: 'Airtel',
+    description: 'Enable payments through Airtel. Benefit from instant transactions and a broad mobile money user base with extensive regional coverage.',
     logo: <img src="/airtel.webp" alt="Airtel" className="w-full h-full object-contain" />,
     provider_code: 'AIRTEL',
     type: 'Mobile Money',
@@ -104,7 +104,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'MPESA',
     name: 'M-Pesa',
-    description: 'Accept M-Pesa payments across multiple African countries. Tap into a vast network of mobile money users with reliable, instant transactions and comprehensive coverage.',
+    description: 'Offer M-Pesa as a payment option for your customers. Access a large network of users in Kenya with fast, reliable transactions and wide-ranging reach.',
     logo: <img src="/mpesa.webp" alt="M-Pesa" className="w-full h-full object-contain" />,
     provider_code: 'MPESA',
     type: 'Mobile Money',
@@ -135,7 +135,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'OPAY',
     name: 'OPay',
-    description: 'Enable OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
+    description: 'Unlock OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
     logo: <img src="/opay.webp" alt="OPay" className="w-full h-full object-contain" />,
     provider_code: 'OPAY',
     type: 'e-Wallets',
@@ -157,7 +157,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'USDC',
     name: 'USDC',
-    description: 'Accept USDC payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
+    description: 'Enable USDC payments on Ethereum. Ideal for businesses seeking price stability with the benefits of blockchain technology.',
     logo: <img src="/usdc.webp" alt="USDC" className="w-8 h-8 " />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
@@ -167,7 +167,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'BNB',
     name: 'BNB',
-    description: 'Accept BNB payments on the BNB Smart Chain. Benefit from fast transactions and low fees in the Binance ecosystem.',
+    description: 'Support BNB transactions via the BNB Smart Chain, ensuring lightning-fast payments with minimal fees within the Binance ecosystem',
     logo: <img src="/bnb.webp" alt="BNB" className="w-8 h-8" />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',

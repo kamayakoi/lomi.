@@ -10,7 +10,7 @@ export interface MerchantRecipient {
 }
 
 export interface FeeType {
-    id: string;
+    id: string | null;
     name: string;
     enabled: boolean;
     percentage: number;

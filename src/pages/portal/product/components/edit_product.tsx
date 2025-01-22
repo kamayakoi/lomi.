@@ -158,7 +158,7 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
 
     const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
-        if (!file) return
+        if (!file || !user?.id) return
 
         // Validate file size
         if (file.size > 3 * 1024 * 1024) {
@@ -191,11 +191,13 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
             }
 
             setPreviewUrl(uploadedUrl)
+            setValue('image_url', uploadedUrl) // Set the image_url in the form data
             product.image_url = uploadedUrl // Update the product reference
         } catch (error) {
             console.error('Error handling image:', error)
             toast({ title: "Error", description: "Failed to upload image", variant: "destructive" })
             setPreviewUrl(product.image_url) // Revert to original image
+            setValue('image_url', product.image_url) // Reset the form data
         } finally {
             setIsUploading(false)
         }
@@ -208,16 +210,19 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                 setIsUploading(true)
                 await deleteProductImage(product.image_url)
                 setPreviewUrl(null)
+                setValue('image_url', null) // Set the image_url to null in form data
                 product.image_url = null // Update the product reference
             } catch (error) {
                 console.error('Error removing image:', error)
                 toast({ title: "Error", description: "Failed to remove image", variant: "destructive" })
                 setPreviewUrl(product.image_url) // Revert on error
+                setValue('image_url', product.image_url) // Reset the form data
             } finally {
                 setIsUploading(false)
             }
         } else {
             setPreviewUrl(null)
+            setValue('image_url', null) // Set the image_url to null in form data
         }
     }
 

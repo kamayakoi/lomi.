@@ -79,7 +79,7 @@ BEGIN
             p_country,
             true,
             p_preferred_language,
-            REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', '')
+            REPLACE(p_avatar_url, 'https://mdswvokxrnfggrujsfjd.supabase.co/storage/v1/object/public/avatars/', '')
         );
 
         -- Log merchant creation
@@ -103,7 +103,7 @@ BEGIN
             country = p_country,
             onboarded = true,
             preferred_language = p_preferred_language,
-            avatar_url = REPLACE(p_avatar_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/avatars/', ''),
+            avatar_url = REPLACE(p_avatar_url, 'https://mdswvokxrnfggrujsfjd.supabase.co/storage/v1/object/public/avatars/', ''),
             updated_at = NOW()
         WHERE merchant_id = p_merchant_id;
 
@@ -154,7 +154,7 @@ BEGIN
         p_org_industry,
         p_org_employee_number,
         'XOF',
-        REPLACE(p_logo_url, 'https://injlwsgidvxehdmwdoov.supabase.co/storage/v1/object/public/logos/', '')
+        REPLACE(p_logo_url, 'https://mdswvokxrnfggrujsfjd.supabase.co/storage/v1/object/public/logos/', '')
     )
     RETURNING organization_id INTO v_organization_id;
 

@@ -71,7 +71,7 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
         }
 
         const newFee = {
-            id: crypto.randomUUID(),
+            id: null, // Set to null for new fees
             name: newFeeType.trim(),
             enabled: false,
             percentage: 5
@@ -80,13 +80,15 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
         setNewFeeType('')
     }
 
-    const handleToggleFeeType = (id: string) => {
+    const handleToggleFeeType = (id: string | null) => {
+        if (id === null) return; // Don't toggle new fees
         setFeeTypes(feeTypes.map(fee =>
             fee.id === id ? { ...fee, enabled: !fee.enabled } : fee
         ))
     }
 
-    const handlePercentageChange = (id: string, value: string) => {
+    const handlePercentageChange = (id: string | null, value: string) => {
+        if (id === null) return; // Don't change new fees
         const numValue = value === '' ? '' : parseInt(value)
         setFeeTypes(feeTypes.map(fee => {
             if (fee.id !== id) return fee
@@ -102,7 +104,8 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
         }))
     }
 
-    const handlePercentageBlur = (id: string) => {
+    const handlePercentageBlur = (id: string | null) => {
+        if (id === null) return; // Don't handle blur for new fees
         setFeeTypes(feeTypes.map(fee => {
             if (fee.id === id && fee.percentage < 1) {
                 return { ...fee, percentage: 1 }
@@ -130,16 +133,28 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                     p_fee_type_id: fee.id,
                     p_name: fee.name,
                     p_percentage: Number(fee.percentage),
-                    p_is_enabled: Boolean(fee.enabled)
+                    p_is_enabled: fee.enabled
                 })
 
                 if (error) throw error
             }
 
-            // Update parent component
+            // Refresh fee types after saving
+            const { data, error } = await supabase
+                .rpc('fetch_organization_checkout_settings', {
+                    p_organization_id: settings.organization_id
+                })
+
+            if (error) throw error
+
+            if (data && data[0]?.fee_types) {
+                setFeeTypes(data[0].fee_types)
+            }
+
+            // Update parent component with refreshed data
             await onUpdate({
                 organization_id: settings.organization_id,
-                fee_types: feeTypes
+                fee_types: data[0]?.fee_types || []
             })
 
             toast({
@@ -171,7 +186,7 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
             <CardContent className="space-y-4">
                 <div className="flex space-x-2">
                     <Input
-                        placeholder="New fee type"
+                        placeholder="Admin fee"
                         value={newFeeType}
                         onChange={(e) => setNewFeeType(e.target.value)}
                         className="flex-grow rounded-none"
