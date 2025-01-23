@@ -161,7 +161,7 @@ BEGIN
   -- Set notification emails based on provider
   notification_emails := CASE p_provider_code
     WHEN 'WAVE'::provider_code THEN ARRAY[
-      'ci-payment-admins@wave.com',
+      -- 'ci-payment-admins@wave.com',
       'hello@lomi.africa'
     ]
     WHEN 'ORANGE'::provider_code THEN ARRAY['hello@lomi.africa']

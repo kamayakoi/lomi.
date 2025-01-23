@@ -108,6 +108,18 @@
           "title": "Error",
           "description": "Hubo un problema al reenviar el correo. Por favor, inténtalo de nuevo."
         }
+      },
+      "password_requirements": {
+        "title": "Requisitos de contraseña",
+        "min_length": "La contraseña debe tener al menos 8 caracteres",
+        "uppercase": "La contraseña debe contener al menos una letra mayúscula",
+        "lowercase": "La contraseña debe contener al menos una letra minúscula",
+        "number": "La contraseña debe contener al menos un número",
+        "special": "La contraseña debe contener al menos un carácter especial"
+      },
+      "success": {
+        "title": "Registro realizado",
+        "message": "Un correo de confirmación ha sido enviado a tu dirección. Por favor, revisa tu bandeja de entrada."
       }
     },
     "forgot_password": {

@@ -108,6 +108,18 @@
                     "title": "Erreur",
                     "description": "Un problème est survenu lors du renvoi de l'e-mail. Veuillez réessayer."
                 }
+            },
+            "password_requirements": {
+                "title": "Exigences du mot de passe",
+                "min_length": "Le mot de passe doit contenir au moins 8 caractères",
+                "uppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+                "lowercase": "Le mot de passe doit contenir au moins une lettre minuscule",
+                "number": "Le mot de passe doit contenir au moins un chiffre",
+                "special": "Le mot de passe doit contenir au moins un caractère spécial"
+            },
+            "success": {
+                "title": "Inscription réussie",
+                "message": "Un e-mail de confirmation a été envoyé à votre adresse. Veuillez vérifier votre boîte de réception."
             }
         },
         "forgot_password": {

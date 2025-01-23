@@ -108,6 +108,18 @@
                     "title": "错误",
                     "description": "重发验证邮件时出现问题。请重试。"
                 }
+            },
+            "password_requirements": {
+                "title": "密码要求",
+                "min_length": "密码必须至少包含8个字符",
+                "uppercase": "密码必须包含至少一个大写字母",
+                "lowercase": "密码必须包含至少一个小写字母",
+                "number": "密码必须包含至少一个数字",
+                "special": "密码必须包含至少一个特殊字符"
+            },
+            "success": {
+                "title": "注册成功",
+                "message": "确认邮件已发送到您的邮箱。请检查您的收件箱。"
             }
         },
         "forgot_password": {

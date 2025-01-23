@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { IconBrandGithub } from '@tabler/icons-react'
 import { z } from 'zod'
 import { Button } from '@/components/custom/button'
@@ -8,6 +8,8 @@ import { PasswordInput } from '@/components/custom/password-input'
 import { supabase } from '@/utils/supabase/client'
 import { useTranslation } from 'react-i18next'
 import Spinner from '@/components/portal/spinner'
+import { MagicCard } from '@/components/ui/magic-card'
+import { Check, X } from 'lucide-react'
 
 interface SignUpFormProps {
   className?: string
@@ -16,6 +18,82 @@ interface SignUpFormProps {
   isConfirmationSent: boolean
   onResendEmail: () => Promise<void>
   errorMessage: string
+}
+
+interface PasswordRequirement {
+  text: string
+  isMet: boolean
+}
+
+function PasswordRequirements({ password, isVisible }: { password: string, isVisible: boolean }) {
+  const { t } = useTranslation()
+  const [shouldShow, setShouldShow] = useState(true)
+  const requirements: PasswordRequirement[] = [
+    {
+      text: t('auth.sign_up.password_requirements.min_length'),
+      isMet: password.length >= 8,
+    },
+    {
+      text: t('auth.sign_up.password_requirements.uppercase'),
+      isMet: /[A-Z]/.test(password),
+    },
+    {
+      text: t('auth.sign_up.password_requirements.lowercase'),
+      isMet: /[a-z]/.test(password),
+    },
+    {
+      text: t('auth.sign_up.password_requirements.number'),
+      isMet: /[0-9]/.test(password),
+    },
+    {
+      text: t('auth.sign_up.password_requirements.special'),
+      isMet: /[^A-Za-z0-9]/.test(password),
+    },
+  ]
+
+  const allRequirementsMet = requirements.every(req => req.isMet)
+
+  useEffect(() => {
+    let timer: number | undefined;
+
+    if (allRequirementsMet) {
+      timer = window.setTimeout(() => {
+        setShouldShow(false)
+      }, 2000)
+    } else {
+      setShouldShow(true)
+    }
+
+    return () => {
+      if (timer) window.clearTimeout(timer)
+    }
+  }, [allRequirementsMet])
+
+  if (!isVisible || !shouldShow) return null
+
+  return (
+    <div className="absolute lg:right-full lg:mr-4 lg:top-0 top-full left-0 z-50 w-full lg:w-80 transform transition-all duration-200 ease-in-out mt-2 lg:mt-0">
+      <MagicCard className="p-4" gradientColor="#3b82f6" gradientOpacity={0.2}>
+        <div className="space-y-2">
+          {requirements.map((requirement, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              {requirement.isMet ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <X className="h-4 w-4 text-red-500" />
+              )}
+              <span className={cn(
+                "text-sm",
+                requirement.isMet ? "text-green-500" : "text-red-500"
+              )}>
+                {requirement.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </MagicCard>
+    </div>
+  )
 }
 
 const formSchema = z.object({
@@ -39,7 +117,8 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
   const [isValidFullName, setIsValidFullName] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false)
+  const [hasResent, setHasResent] = useState(false)
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -50,15 +129,14 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
     const newPassword = e.target.value
     setPassword(newPassword)
 
-    const result = formSchema.shape.password.safeParse(newPassword)
-    setIsValidPassword(result.success)
+    // Check if all requirements are met
+    const hasMinLength = newPassword.length >= 8
+    const hasUppercase = /[A-Z]/.test(newPassword)
+    const hasLowercase = /[a-z]/.test(newPassword)
+    const hasNumber = /[0-9]/.test(newPassword)
+    const hasSpecial = /[^A-Za-z0-9]/.test(newPassword)
 
-    if (!result.success) {
-      const errors = result.error.errors.map(err => err.message)
-      setPasswordErrors(errors)
-    } else {
-      setPasswordErrors([])
-    }
+    setIsValidPassword(hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecial)
   }
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,20 +174,43 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
     }
   }
 
+  const handleResendClick = async () => {
+    await onResendEmail()
+    setHasResent(true)
+  }
+
   if (isConfirmationSent) {
     return (
-      <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md transition-all duration-300 hover:scale-105">
-        <h2 className="text-2xl font-semibold mb-4">{t('auth.check_email.title')}</h2>
-        <p className="mb-4">{t('auth.check_email.message').replace('<email>', email)}</p>
-        <p className="text-sm text-muted-foreground">
-          {t('auth.check_email.resend')}{' '}
-          <button
-            className="text-primary hover:underline"
-            onClick={onResendEmail}
-          >
-            {t('auth.check_email.resend_link')}
-          </button>
-        </p>
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-background border rounded-lg shadow-lg p-8">
+          <div className="text-center space-y-4">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full mx-auto flex items-center justify-center">
+              <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+            </div>
+
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {t('auth.check_email.title')}
+            </h2>
+
+            <p className="text-muted-foreground">
+              {t('auth.check_email.message').replace('<email>', email)}
+            </p>
+
+            {!hasResent && (
+              <div className="pt-4">
+                <p className="text-sm text-muted-foreground">
+                  {t('auth.check_email.resend')}{' '}
+                  <button
+                    className="text-primary hover:underline font-medium"
+                    onClick={handleResendClick}
+                  >
+                    {t('auth.check_email.resend_link')}
+                  </button>
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     )
   }
@@ -151,28 +252,29 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
             )}
           />
           <div className="space-y-2">
-            <PasswordInput
-              id="password"
-              placeholder={t('auth.sign_up.password_placeholder')}
-              value={password}
-              onChange={handlePasswordChange}
-              autoComplete="new-password"
-              className={cn(
-                'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
-                {
-                  'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
-                  'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
-                  'border-green-500 dark:border-green-500': isValidPassword,
-                }
-              )}
-            />
-            {passwordErrors.length > 0 && (
-              <ul className="text-sm text-red-500 dark:text-red-400 space-y-1 mt-1">
-                {passwordErrors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            )}
+            <div className="relative">
+              <PasswordInput
+                id="password"
+                placeholder={t('auth.sign_up.password_placeholder')}
+                value={password}
+                onChange={handlePasswordChange}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
+                autoComplete="new-password"
+                className={cn(
+                  'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+                  {
+                    'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
+                    'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
+                    'border-green-500 dark:border-green-500': isValidPassword,
+                  }
+                )}
+              />
+              <PasswordRequirements
+                password={password}
+                isVisible={isPasswordFocused || (!!password && !isValidPassword)}
+              />
+            </div>
           </div>
           <Button
             className="w-full h-12"

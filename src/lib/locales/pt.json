@@ -108,6 +108,18 @@
                     "title": "Erro",
                     "description": "Houve um problema ao reenviar o e-mail. Por favor, tente novamente."
                 }
+            },
+            "password_requirements": {
+                "title": "Requisitos da senha",
+                "min_length": "A senha deve ter pelo menos 8 caracteres",
+                "uppercase": "A senha deve conter pelo menos uma letra maiúscula",
+                "lowercase": "A senha deve conter pelo menos uma letra minúscula",
+                "number": "A senha deve conter pelo menos um número",
+                "special": "A senha deve conter pelo menos um caractere especial"
+            },
+            "success": {
+                "title": "Cadastro realizado",
+                "message": "Um e-mail de confirmação foi enviado para o seu endereço. Por favor, verifique sua caixa de entrada."
             }
         },
         "forgot_password": {
@@ -263,7 +275,8 @@
                 "sign_in_button": "Entrar",
                 "signing_in": "Entrando..."
             }
-    }},  
+        }
+    },
     "dashboard": {
         "getting_started": {
             "title": "Empezando",

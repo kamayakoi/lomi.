@@ -99,7 +99,8 @@
         "email_in_use": "This email is already in use. Please try another or sign in.",
         "invalid_email": "Please enter a valid email address.",
         "invalid_password": "Password must be at least 8 characters long.",
-        "invalid_name": "Please enter both first and last name."
+        "invalid_name": "Please enter both first and last name.",
+        "weak_password": "Password must be at least 8 characters long."
       },
       "resend_email": {
         "title": "Email Resent",
@@ -108,6 +109,14 @@
           "title": "Error",
           "description": "There was a problem resending the verification email. Please try again."
         }
+      },
+      "password_requirements": {
+        "title": "Password Requirements",
+        "min_length": "Password must be at least 8 characters",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "number": "Password must contain at least one number",
+        "special": "Password must contain at least one special character"
       }
     },
     "forgot_password": {
