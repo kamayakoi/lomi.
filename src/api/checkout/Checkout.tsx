@@ -50,6 +50,7 @@ export default function CheckoutPage() {
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
     const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
+    const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
     useEffect(() => {
         // Get user's country using their IP
@@ -260,8 +261,50 @@ export default function CheckoutPage() {
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-white">
             {/* Left side - Product details */}
-            <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col`}>
-                <div className="max-w-[488px] ml-auto pr-8 w-full">
+            <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col relative`}>
+                {/* Mobile Header - Fixed */}
+                <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#121317]">
+                    <div className="flex items-center justify-between w-full h-14 px-4">
+                        <div className="flex items-center gap-1.5">
+                            <AnimatePresence mode="wait">
+                                {!isDetailsOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, width: 0, marginRight: 0 }}
+                                        animate={{ opacity: 1, width: "auto", marginRight: 4 }}
+                                        exit={{ opacity: 0, width: 0, marginRight: 0 }}
+                                        transition={{ duration: 0.15, ease: "easeInOut" }}
+                                        onClick={handleGoBack}
+                                        className="cursor-pointer"
+                                    >
+                                        <ArrowLeft className="h-4 w-4 text-gray-500 hover:text-gray-300 transition-colors" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                            <motion.div
+                                animate={{ x: isDetailsOpen ? "-4px" : 0 }}
+                                transition={{ duration: 0.15, ease: "easeInOut" }}
+                            >
+                                {organization.logoUrl && (
+                                    <img
+                                        src={organization.logoUrl}
+                                        alt="Organization Logo"
+                                        className="w-7 h-7 rounded-md"
+                                    />
+                                )}
+                            </motion.div>
+                        </div>
+                        <button
+                            onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                            className="flex items-center gap-0.5 text-gray-500 hover:text-gray-300 transition-colors text-[13px] font-medium tracking-wide"
+                        >
+                            Details
+                            <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isDetailsOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Desktop View */}
+                <div className="hidden lg:block max-w-[488px] ml-auto pr-8 w-full">
                     <div className="flex mb-8">
                         <div
                             className="group flex items-center gap-2 cursor-pointer"
@@ -300,7 +343,6 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                     </div>
-
                     <div className="pl-[28px]">
                         <div className="mb-12">
                             {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
@@ -493,8 +535,9 @@ export default function CheckoutPage() {
                                     <div className="flex items-baseline gap-2">
                                         <span className="text-lg font-medium">
                                             {(() => {
-                                                const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
-                                                const fees = checkoutData?.merchantProduct?.fees || [];
+                                                if (!checkoutData) return formatNumber(0);
+                                                const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
+                                                const fees = checkoutData.merchantProduct?.fees || [];
                                                 const feeAmount = fees.reduce((total, fee) => {
                                                     return total + (basePrice * (fee.percentage / 100));
                                                 }, 0);
@@ -508,6 +551,196 @@ export default function CheckoutPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile View - Add top padding to account for fixed header */}
+                <div className="lg:hidden flex flex-col items-center px-2 mt-14">
+                    {/* Product Image */}
+                    <div className="w-36 h-36 mb-5 rounded-lg overflow-hidden bg-gray-800">
+                        {((checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || '') ? (
+                            <img
+                                src={(checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || ''}
+                                alt="Product"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon className="h-12 w-12 text-gray-600" />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Product Title & Price */}
+                    <div className="text-center mb-5">
+                        <h2 className="text-base text-gray-400 mb-1.5">
+                            {checkoutData?.subscriptionPlan ? 'Subscribe to ' : 'Pay for '}
+                            {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
+                        </h2>
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="text-3xl font-bold">
+                                {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}
+                            </span>
+                            <span className="text-3xl">{checkoutData?.paymentLink?.currency_code}</span>
+                        </div>
+                    </div>
+
+                    {/* Add Code Button */}
+                    <button
+                        onClick={() => {
+                            setIsDetailsOpen(true);
+                            setIsPromoCodeOpen(true);
+                            setTimeout(() => promoInputRef.current?.focus(), 100);
+                        }}
+                        className="flex items-center gap-1.5 px-4 py-2.5 bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md text-sm mb-8"
+                    >
+                        Add code
+                        <ChevronDown className="h-4 w-4 opacity-70" />
+                    </button>
+                </div>
+
+                {/* Mobile Details Dropdown */}
+                <AnimatePresence>
+                    {isDetailsOpen && (
+                        <>
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsDetailsOpen(false)}
+                                className="lg:hidden fixed inset-0 bg-black/20 z-30"
+                            />
+                            {/* Content */}
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-[#121317] overflow-hidden"
+                            >
+                                <div className="p-4 space-y-4">
+                                    {/* Product Info */}
+                                    <div className="flex items-start gap-3 border-b border-gray-800 pb-4">
+                                        <div className="w-16 h-16 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                            {((checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || '') ? (
+                                                <img
+                                                    src={(checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || ''}
+                                                    alt="Product"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <ImageIcon className="h-6 w-6 text-gray-600" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="text-white font-medium">
+                                                {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
+                                            </div>
+                                            <div className="text-sm text-gray-400">
+                                                {checkoutData?.merchantProduct?.description || checkoutData?.subscriptionPlan?.description || checkoutData?.paymentLink?.public_description}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price Breakdown */}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-gray-400">Subtotal</span>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                                <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Fees */}
+                                        {checkoutData?.merchantProduct?.fees?.map((fee) => {
+                                            const basePrice = checkoutData.merchantProduct?.price || 0;
+                                            const feeAmount = basePrice * (fee.percentage / 100);
+                                            return (
+                                                <div key={fee.fee_type_id} className="flex justify-between items-baseline">
+                                                    <div className="flex items-baseline gap-1.5">
+                                                        <span className="text-gray-400">{fee.name}</span>
+                                                        <span className="text-xs text-gray-500">({fee.percentage}%)</span>
+                                                    </div>
+                                                    <div className="flex items-baseline gap-2">
+                                                        <span className="text-gray-400">{formatNumber(feeAmount)}</span>
+                                                        <span className="text-gray-500">{checkoutData?.paymentLink?.currency_code}</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+
+                                        {/* Promo Code */}
+                                        <div className="relative flex justify-start pt-3">
+                                            {!isPromoCodeOpen ? (
+                                                <button
+                                                    onClick={() => {
+                                                        setIsPromoCodeOpen(true)
+                                                        setTimeout(() => promoInputRef.current?.focus(), 0)
+                                                    }}
+                                                    className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
+                                                >
+                                                    Add promotion code
+                                                </button>
+                                            ) : (
+                                                <motion.div
+                                                    className="w-full"
+                                                    initial={{ width: "auto" }}
+                                                    animate={{ width: "100%" }}
+                                                    transition={{ duration: 0.3 }}
+                                                >
+                                                    <div className="relative h-[42px]">
+                                                        <Input
+                                                            ref={promoInputRef}
+                                                            value={promoCode}
+                                                            onChange={(e) => setPromoCode(e.target.value)}
+                                                            onBlur={handlePromoCodeBlur}
+                                                            placeholder="Enter promotion code"
+                                                            className="w-full h-full bg-[#1A1D23] border-gray-800 text-white placeholder:text-gray-500 rounded-md px-4"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    handlePromoCodeSubmit()
+                                                                }
+                                                            }}
+                                                        />
+                                                        {promoCode && (
+                                                            <button
+                                                                onClick={handlePromoCodeSubmit}
+                                                                className="absolute right-0 top-0 h-full px-4 text-red-500 hover:text-red-400 transition-colors bg-transparent"
+                                                            >
+                                                                Apply
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </div>
+
+                                        {/* Total */}
+                                        <div className="flex justify-between items-baseline pt-3 border-t border-gray-800">
+                                            <span className="text-white font-medium">Total due today</span>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-lg font-medium">
+                                                    {(() => {
+                                                        if (!checkoutData) return formatNumber(0);
+                                                        const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
+                                                        const fees = checkoutData.merchantProduct?.fees || [];
+                                                        const feeAmount = fees.reduce((total, fee) => {
+                                                            return total + (basePrice * (fee.percentage / 100));
+                                                        }, 0);
+                                                        return formatNumber(basePrice + feeAmount);
+                                                    })()}
+                                                </span>
+                                                <span className="text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Right side - Checkout form */}
@@ -541,7 +774,7 @@ export default function CheckoutPage() {
                             <DialogHeader>
                                 <DialogTitle>Secure Checkout</DialogTitle>
                                 <DialogDescription>
-                                    Complete your payment securely with {selectedProvider}
+                                    Complete your payment securely with {selectedProvider || 'selected provider'}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4">
@@ -564,7 +797,7 @@ export default function CheckoutPage() {
                                 </div>
                                 <Button
                                     onClick={handleCheckoutSubmit}
-                                    className="w-full"
+                                    className="w-full rounded-md"
                                     disabled={isProcessing}
                                 >
                                     {isProcessing ? (
@@ -768,7 +1001,7 @@ export default function CheckoutPage() {
                         <div className="flex justify-center pt-2">
                             <Button
                                 type="submit"
-                                className="w-full h-12 bg-[#074367] text-white font-semibold rounded-none hover:bg-[#063352] transition duration-300 shadow-md text-lg"
+                                className="w-full h-12 bg-[#074367] text-white font-semibold rounded-md hover:bg-[#063352] transition duration-300 shadow-md text-lg"
                                 disabled={!isPaymentFormValid()}
                             >
                                 {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
