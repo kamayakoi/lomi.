@@ -4,15 +4,15 @@ export const config = {
   isLocalhost: window.location.hostname === 'localhost',
   supabaseUrl: import.meta.env['VITE_SUPABASE_URL'],
   supabaseAnonKey: import.meta.env['VITE_SUPABASE_ANON_KEY'],
-  baseUrl: import.meta.env.PROD ? 'https://lomi.africa' : 'http://localhost:5173',
-  portalBaseUrl: import.meta.env.PROD ? 'https://portal.lomi.africa' : 'http://localhost:5173',
-  mainSiteBaseUrl: import.meta.env.PROD ? 'https://lomi.africa' : 'http://localhost:5173',
-  paymentBaseUrl: import.meta.env.PROD ? 'https://pay.lomi.africa' : 'http://localhost:5173',
-  apiUrl: import.meta.env['NODE_ENV'] === 'production' 
+  baseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://lomi.africa' : 'http://localhost:5173',
+  portalBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://portal.lomi.africa' : 'http://localhost:5173',
+  mainSiteBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://lomi.africa' : 'http://localhost:5173',
+  paymentBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://pay.lomi.africa' : 'http://localhost:5173',
+  apiUrl: import.meta.env['BUN_ENV'] === 'production' 
     ? 'https://api.lomi.africa'
-    : import.meta.env['NODE_ENV'] === 'development'
+    : import.meta.env['BUN_ENV'] === 'development'
       ? 'https://sandbox.api.lomi.africa'
       : 'http://localhost:4242',
   apiVersion: 'v1',
-  storeBaseUrl: import.meta.env.PROD ? 'https://store.lomi.africa' : 'http://localhost:5173',
+  storeBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://store.lomi.africa' : 'http://localhost:5173',
 };

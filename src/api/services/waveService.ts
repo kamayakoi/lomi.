@@ -3,7 +3,7 @@ import { updateTransactionStatus } from './transactionService';
 import { supabase } from '@/utils/supabase/client';
 
 const WAVE_API_URL = 'https://api.wave.com/v1';
-const WAVE_API_KEY = import.meta.env['VITE_WAVE_API_KEY']
+const WAVE_API_KEY = Bun.env['VITE_WAVE_API_KEY']
 
 // ... existing functions ...
 
@@ -17,7 +17,7 @@ export async function createWaveCheckoutSession(
     const response = await axios.post(`${WAVE_API_URL}/checkout/sessions`, {
       amount,
       currency,
-      aggregated_merchant_id: import.meta.env['VITE_WAVE_MERCHANT_ID'],
+      aggregated_merchant_id: Bun.env['VITE_WAVE_MERCHANT_ID'],
       error_url: errorUrl,
       success_url: successUrl,
     }, {

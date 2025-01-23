@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Use import.meta.env for client-side code
 const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
 const supabaseAnonKey = import.meta.env['VITE_SUPABASE_ANON_KEY']
 const siteUrl = import.meta.env['VITE_SITE_URL'] || (typeof window !== 'undefined' ? window.location.origin : '')
@@ -33,6 +34,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       },
     },
   },
+  // Add client-side fetch options
+  global: {
+    fetch: (url, init) => {
+      return fetch(url, {
+        ...init,
+        keepalive: true, // Better connection reuse
+        cache: 'force-cache', // Leverage browser caching
+      })
+    }
+  }
 })
 
 // Helper function for email updates
@@ -64,7 +75,7 @@ export const updateUserEmail = async (newEmail: string) => {
 // Helper to get the correct redirect URL based on environment
 const getRedirectUrl = () => {
   // In production, always use the site URL
-  if (import.meta.env.PROD) {
+  if (import.meta.env['BUN_ENV'] === 'production') {
     return `${siteUrl}/auth/callback`;
   }
   // In development, use localhost

@@ -12,7 +12,7 @@ const AuthCallback = () => {
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
+        let timeoutId: ReturnType<typeof setTimeout>;
         let retryCount = 0;
         const MAX_RETRIES = 5;
 

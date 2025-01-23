@@ -29,7 +29,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        let timer: NodeJS.Timeout;
+        let timer: ReturnType<typeof setTimeout>;
         if (file && status === "uploading") {
             timer = setInterval(() => {
                 setProgress((oldProgress) => {
