@@ -18,10 +18,23 @@ export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData
             const { data: imageData, error: imageError } = await supabase
                 .storage
                 .from('product_images')
-                .download(paymentLink.product_image_url)
+                .download(paymentLink.product_image_url.replace(/^.*\/product_images\//, ''))
 
             if (!imageError && imageData) {
                 productImageUrl = URL.createObjectURL(imageData)
+            }
+        }
+
+        // Download plan image if exists
+        let planImageUrl = null;
+        if (paymentLink?.plan_image_url) {
+            const { data: imageData, error: imageError } = await supabase
+                .storage
+                .from('plan_images')
+                .download(paymentLink.plan_image_url.replace(/^.*\/plan_images\//, ''))
+
+            if (!imageError && imageData) {
+                planImageUrl = URL.createObjectURL(imageData)
             }
         }
 
@@ -48,6 +61,24 @@ export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData
             fees: productFees
         } : null;
 
+        const subscriptionPlan = paymentLink?.plan_id ? {
+            planId: paymentLink.plan_id,
+            merchantId: paymentLink.merchant_id,
+            organizationId: paymentLink.organization_id,
+            name: paymentLink.plan_name,
+            description: paymentLink.plan_description,
+            billingFrequency: paymentLink.plan_billing_frequency,
+            amount: paymentLink.plan_amount,
+            currency_code: paymentLink.currency_code,
+            image_url: planImageUrl || paymentLink.plan_image_url,
+            failedPaymentAction: '',
+            chargeDay: null,
+            metadata: {},
+            createdAt: '',
+            updatedAt: '',
+            firstPaymentType: '',
+        } : null;
+
         return {
             paymentLink: {
                 ...paymentLink,
@@ -55,7 +86,7 @@ export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData
                 organizationName: paymentLink.organization_name
             },
             merchantProduct,
-            subscriptionPlan: null
+            subscriptionPlan
         };
     } catch (error) {
         console.error('Error fetching checkout data:', error);

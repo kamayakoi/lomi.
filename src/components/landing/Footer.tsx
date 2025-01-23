@@ -354,7 +354,7 @@ export function Footer() {
 
                                 {/* System Status - Hidden on mobile */}
                                 <div className="hidden sm:flex items-center justify-between px-3 py-2 text-sm w-[196px] h-10 mt-[150px] ml-auto transform translate-y-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
-                                    <Link to="/#" className="text-blue-700 dark:text-blue-300 font-medium">
+                                    <Link to="https://status.lomi.africa" className="text-blue-700 dark:text-blue-300 font-medium">
                                         {t('footer.status')}
                                     </Link>
                                     <span className="relative flex h-2 w-2">
