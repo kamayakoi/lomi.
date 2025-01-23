@@ -637,7 +637,7 @@ export default function CheckoutPage() {
                                         name="country"
                                         value={customerDetails.country}
                                         onChange={handleCustomerInputChange}
-                                        className="flex h-10 w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none bg-white text-gray-900 border-gray-300"
+                                        className="flex h-10 w-full border border-gray-300 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none bg-white text-gray-900"
                                         required
                                     >
                                         <option value="" className="text-gray-400">Select country</option>

@@ -26,9 +26,20 @@ import ProductActions from './components/actions_product'
 import { EditProductForm } from './components/edit_product'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'
 import { Card, CardContent } from "@/components/ui/card"
-import { fetchProducts } from './components/support_product'
+import { fetchProducts, fetchProductFees } from './components/support_product'
 import { cn } from '@/lib/actions/utils'
 import React from 'react'
+
+// Utility functions
+function calculateTotalPrice(product: Product): number {
+    if (!product.fees) return product.price;
+
+    const feeAmount = product.fees.reduce((total, fee) => {
+        return total + (product.price * (fee.percentage / 100));
+    }, 0);
+
+    return product.price + feeAmount;
+}
 
 function ProductCard({ product, onEditClick, onClick }: {
     product: Product,
@@ -76,30 +87,30 @@ function ProductCard({ product, onEditClick, onClick }: {
                         </p>
                     )}
                     <div className="pt-1">
-                        <span className="text-lg font-semibold tracking-tight">
-                            {product.price.toLocaleString('en-US', {
-                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                            })}
-                            <span className="text-sm text-muted-foreground ml-1">
-                                {product.currency_code}
+                        <div className="flex flex-col">
+                            <span className="text-lg font-semibold tracking-tight">
+                                {product.price.toLocaleString('en-US', {
+                                    minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                    maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                })}
+                                <span className="text-sm text-muted-foreground ml-1">
+                                    {product.currency_code}
+                                </span>
                             </span>
-                        </span>
+                            {product.fees && product.fees.length > 0 && (
+                                <span className="text-xs text-muted-foreground">
+                                    {calculateTotalPrice(product).toLocaleString('en-US', {
+                                        minimumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                        maximumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                    })} {product.currency_code} incl. tax
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
-}
-
-function calculateTotalPrice(product: Product): number {
-    if (!product.fees) return product.price;
-
-    const feeAmount = product.fees.reduce((total, fee) => {
-        return total + (product.price * (fee.percentage / 100));
-    }, 0);
-
-    return product.price + feeAmount;
 }
 
 function ProductsPage() {
@@ -122,12 +133,27 @@ function ProductsPage() {
 
     const { data: productsData, isLoading: isProductsLoading, refetch } = useQuery(
         ['products', user?.id || '', selectedStatus, currentPage],
-        () => fetchProducts(
-            user?.id || '',
-            selectedStatus === 'active' ? true : selectedStatus === 'inactive' ? false : null,
-            itemsPerPage,
-            (currentPage - 1) * itemsPerPage
-        ),
+        async () => {
+            const productsResponse = await fetchProducts(
+                user?.id || '',
+                selectedStatus === 'active' ? true : selectedStatus === 'inactive' ? false : null,
+                itemsPerPage,
+                (currentPage - 1) * itemsPerPage
+            );
+
+            // Fetch fees for each product
+            const productsWithFees = await Promise.all(
+                productsResponse.products.map(async (product) => {
+                    const fees = await fetchProductFees(product.product_id);
+                    return { ...product, fees };
+                })
+            );
+
+            return {
+                ...productsResponse,
+                products: productsWithFees
+            };
+        },
         {
             enabled: !!user?.id,
             staleTime: 30000,
@@ -192,17 +218,6 @@ function ProductsPage() {
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage)
     }
-
-    const getFormattedTotalPrice = React.useCallback((product: Product): string | null => {
-        if (!product.fees || product.fees.length === 0) return null
-        const totalPrice = calculateTotalPrice(product)
-        if (totalPrice === product.price) return null
-
-        return `${totalPrice.toLocaleString('en-US', {
-            minimumFractionDigits: totalPrice % 1 !== 0 ? 2 : 0,
-            maximumFractionDigits: totalPrice % 1 !== 0 ? 2 : 0,
-        })} ${product.currency_code} incl. tax`
-    }, [])
 
     return (
         <Layout fixed>
@@ -362,9 +377,12 @@ function ProductsPage() {
                                                                             {product.currency_code}
                                                                         </span>
                                                                     </span>
-                                                                    {getFormattedTotalPrice(product) && (
+                                                                    {product.fees && product.fees.length > 0 && (
                                                                         <span className="text-xs text-muted-foreground">
-                                                                            {getFormattedTotalPrice(product)}
+                                                                            {calculateTotalPrice(product).toLocaleString('en-US', {
+                                                                                minimumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                                                                maximumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                                                            })} {product.currency_code} incl. tax
                                                                         </span>
                                                                     )}
                                                                 </div>

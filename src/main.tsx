@@ -10,9 +10,16 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-// Use createRoot for concurrent features
-createRoot(rootElement).render(
+const root = createRoot(rootElement);
+
+// Render app
+root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
 );
+
+// Enable HMR
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
