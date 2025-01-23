@@ -34,7 +34,7 @@ import Subscription from "./pages/portal/subscription/subscription";
 import Storefront from "./pages/portal/storefront/Storefront";
 import Activation from './pages/auth/activation/activation';
 import CheckoutPage from '@/api/checkout/Checkout';
-import Reporting from './pages/portal/reporting/Reporting';
+import Reporting from './pages/portal/reporting/reporting';
 import Product from './pages/portal/product/Product';
 
 // Website routes
