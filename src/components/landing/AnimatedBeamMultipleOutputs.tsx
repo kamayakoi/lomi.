@@ -51,15 +51,21 @@ export function AnimatedBeamMultipleOutputDemo({
     const div2Ref = useRef<HTMLDivElement>(null);
     const div3Ref = useRef<HTMLDivElement>(null);
     const div4Ref = useRef<HTMLDivElement>(null);
+    const div5Ref = useRef<HTMLDivElement>(null);
     const div6Ref = useRef<HTMLDivElement>(null);
     const div7Ref = useRef<HTMLDivElement>(null);
     const div8Ref = useRef<HTMLDivElement>(null);
     const div9Ref = useRef<HTMLDivElement>(null);
+    const div10Ref = useRef<HTMLDivElement>(null);
+    const div11Ref = useRef<HTMLDivElement>(null);
+    const div12Ref = useRef<HTMLDivElement>(null);
+    const div13Ref = useRef<HTMLDivElement>(null);
+    const div14Ref = useRef<HTMLDivElement>(null);
 
     return (
         <div
             className={cn(
-                "relative flex h-[500px] w-full items-center justify-center overflow-hidden p-10",
+                "relative flex h-[600px] w-full items-center justify-center overflow-hidden p-10",
                 className,
             )}
             ref={containerRef}
@@ -77,22 +83,42 @@ export function AnimatedBeamMultipleOutputDemo({
                     </UserIconCircle>
                 </div>
                 <div className="flex flex-col justify-center">
-                    <Square ref={div6Ref} className="size-20">
-                        <img src="/lomi-icon.webp" alt="lomi." className="object-cover w-full h-full rounded-sm" />
+                    <Square ref={div6Ref} className="size-20 relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 rounded-lg" />
+                        <img
+                            src="/lomi-icon.webp"
+                            alt="lomi."
+                            className="relative z-10 object-contain w-14 h-14 transition-all duration-300 hover:scale-110"
+                        />
                     </Square>
                 </div>
                 <div className="flex flex-col justify-center gap-1">
                     <Square ref={div1Ref} className="size-14">
-                        <img src="/wave.webp" alt="Wave" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/visa.webp" alt="Visa" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div2Ref} className="size-14">
-                        <img src="/orange.webp" alt="Orange" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/mastercard.webp" alt="Mastercard" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div3Ref} className="size-14">
-                        <img src="/mtn.webp" alt="MTN" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/paypal.webp" alt="PayPal" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                     <Square ref={div4Ref} className="size-14">
-                        <img src="/cards.webp" alt="Cards" className="object-cover w-full h-full rounded-sm" />
+                        <img src="/orange.webp" alt="Orange Money" className="object-cover w-full h-full rounded-sm" />
+                    </Square>
+                    <Square ref={div5Ref} className="size-14">
+                        <img src="/mtn.webp" alt="MTN" className="object-cover w-full h-full rounded-sm" />
+                    </Square>
+                    <Square ref={div10Ref} className="size-14">
+                        <img src="/wave.webp" alt="Wave" className="object-cover w-full h-full rounded-sm" />
+                    </Square>
+                    <Square ref={div11Ref} className="size-14">
+                        <img src="/airtel.webp" alt="Airtel" className="object-cover w-full h-full rounded-sm" />
+                    </Square>
+                    <Square ref={div12Ref} className="size-14">
+                        <img src="/wizall.webp" alt="Wizall" className="object-cover w-full h-full rounded-sm" />
+                    </Square>
+                    <Square ref={div13Ref} className="size-14">
+                        <img src="/moov.webp" alt="Moov" className="object-cover w-full h-full rounded-sm" />
                     </Square>
                 </div>
             </div>
@@ -119,6 +145,42 @@ export function AnimatedBeamMultipleOutputDemo({
             <AnimatedBeam
                 containerRef={containerRef}
                 fromRef={div4Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div5Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div10Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div11Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div12Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div13Ref}
+                toRef={div6Ref}
+                duration={3}
+            />
+            <AnimatedBeam
+                containerRef={containerRef}
+                fromRef={div14Ref}
                 toRef={div6Ref}
                 duration={3}
             />

@@ -42,6 +42,15 @@ export const paymentMethods: PaymentMethod[] = [
     category: 'Cards'
   },
   {
+    code: 'PAYPAL',
+    name: 'PayPal',
+    description: 'Enable secure PayPal payments for global reach. Trusted worldwide for easy, protected transactions with built-in buyer and seller protection.',
+    logo: <img src="/paypal.webp" alt="PayPal" className="w-full h-full object-contain" />,
+    provider_code: 'PAYPAL',
+    type: 'Digital Payments',
+    category: 'Cards'
+  },
+  {
     code: 'APPLE_PAY',
     name: 'Apple Pay',
     description: 'Enable seamless one-touch payments with Apple Pay. Offer your iOS users a fast, secure checkout experience with built-in biometric authentication.',

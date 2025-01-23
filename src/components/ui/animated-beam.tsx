@@ -29,14 +29,13 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   fromRef,
   toRef,
   curvature = 0,
-  reverse = false, // Include the reverse prop
-  duration = Math.random() * 3 + 4,
+  duration = Math.random() * 4 + 6,
   delay = 0,
   pathColor = "gray",
-  pathWidth = 2,
-  pathOpacity = 0.2,
-  gradientStartColor = "#ffaa40",
-  gradientStopColor = "#9c40ff",
+  pathWidth = 3,
+  pathOpacity = 0.18,
+  gradientStartColor = "#818CF8", // Forward animation start color (cyan)
+  gradientStopColor = "#22D3EE", // Forward animation end color (light indigo)
   startXOffset = 0,
   startYOffset = 0,
   endXOffset = 0,
@@ -46,20 +45,17 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
   const [pathD, setPathD] = useState("");
   const [svgDimensions, setSvgDimensions] = useState({ width: 0, height: 0 });
 
-  // Calculate the gradient coordinates based on the reverse prop
-  const gradientCoordinates = reverse
-    ? {
-      x1: ["90%", "-10%"],
-      x2: ["100%", "0%"],
-      y1: ["0%", "0%"],
-      y2: ["0%", "0%"],
-    }
-    : {
-      x1: ["10%", "110%"],
-      x2: ["0%", "100%"],
-      y1: ["0%", "0%"],
-      y2: ["0%", "0%"],
-    };
+  // Colors for reverse animation
+  const reverseStartColor = "#F472B6"; // Pink
+  const reverseStopColor = "#FB923C"; // Orange
+
+  // Calculate the gradient coordinates for forward and reverse animation
+  const gradientCoordinates = {
+    x1: ["10%", "110%", "90%", "-10%", "10%"],
+    x2: ["0%", "100%", "100%", "0%", "0%"],
+    y1: ["0%", "0%", "0%", "0%", "0%"],
+    y2: ["0%", "0%", "0%", "0%", "0%"],
+  };
 
   useEffect(() => {
     const updatePath = () => {
@@ -162,20 +158,84 @@ export const AnimatedBeam: React.FC<AnimatedBeamProps> = ({
           }}
           transition={{
             delay,
-            duration,
-            ease: [0.16, 1, 0.3, 1], // https://easings.net/#easeOutExpo
+            duration: duration * 2,
+            ease: "linear",
             repeat: Infinity,
             repeatDelay: 0,
           }}
         >
-          <stop stopColor={gradientStartColor} stopOpacity="0"></stop>
-          <stop stopColor={gradientStartColor}></stop>
-          <stop offset="32.5%" stopColor={gradientStopColor}></stop>
-          <stop
-            offset="100%"
-            stopColor={gradientStopColor}
+          <motion.stop
             stopOpacity="0"
-          ></stop>
+            animate={{
+              stopColor: [
+                gradientStartColor,
+                gradientStartColor,
+                reverseStartColor,
+                reverseStartColor,
+                gradientStartColor
+              ]
+            }}
+            transition={{
+              duration: duration * 2,
+              ease: "linear",
+              repeat: Infinity,
+              repeatDelay: 0,
+            }}
+          />
+          <motion.stop
+            animate={{
+              stopColor: [
+                gradientStartColor,
+                gradientStartColor,
+                reverseStartColor,
+                reverseStartColor,
+                gradientStartColor
+              ]
+            }}
+            transition={{
+              duration: duration * 2,
+              ease: "linear",
+              repeat: Infinity,
+              repeatDelay: 0,
+            }}
+          />
+          <motion.stop
+            offset="32.5%"
+            animate={{
+              stopColor: [
+                gradientStopColor,
+                gradientStopColor,
+                reverseStopColor,
+                reverseStopColor,
+                gradientStopColor
+              ]
+            }}
+            transition={{
+              duration: duration * 2,
+              ease: "linear",
+              repeat: Infinity,
+              repeatDelay: 0,
+            }}
+          />
+          <motion.stop
+            offset="100%"
+            stopOpacity="0"
+            animate={{
+              stopColor: [
+                gradientStopColor,
+                gradientStopColor,
+                reverseStopColor,
+                reverseStopColor,
+                gradientStopColor
+              ]
+            }}
+            transition={{
+              duration: duration * 2,
+              ease: "linear",
+              repeat: Infinity,
+              repeatDelay: 0,
+            }}
+          />
         </motion.linearGradient>
       </defs>
     </svg>
