@@ -17,19 +17,33 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     flowType: 'pkce',
     storage: {
       getItem: (key: string) => {
-        if (typeof window !== 'undefined') {
-          return window.localStorage.getItem(key);
+        try {
+          if (typeof window !== 'undefined') {
+            const item = window.localStorage.getItem(key);
+            return item ? JSON.parse(item) : null;
+          }
+          return null;
+        } catch (error) {
+          console.error('Error reading from storage:', error);
+          return null;
         }
-        return null;
       },
       setItem: (key: string, value: string) => {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(key, value);
+        try {
+          if (typeof window !== 'undefined') {
+            window.localStorage.setItem(key, JSON.stringify(value));
+          }
+        } catch (error) {
+          console.error('Error writing to storage:', error);
         }
       },
       removeItem: (key: string) => {
-        if (typeof window !== 'undefined') {
-          window.localStorage.removeItem(key);
+        try {
+          if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(key);
+          }
+        } catch (error) {
+          console.error('Error removing from storage:', error);
         }
       },
     },
@@ -39,8 +53,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     fetch: (url, init) => {
       return fetch(url, {
         ...init,
-        keepalive: true, // Better connection reuse
-        cache: 'force-cache', // Leverage browser caching
+        keepalive: true,
+        cache: 'no-store', // Prevent caching of auth requests
+        credentials: 'same-origin'
       })
     }
   }
@@ -74,19 +89,30 @@ export const updateUserEmail = async (newEmail: string) => {
 
 // Helper to get the correct redirect URL based on environment
 const getRedirectUrl = () => {
-  // In production, always use the site URL
-  if (import.meta.env['BUN_ENV'] === 'production') {
-    return `${siteUrl}/auth/callback`;
+  // Get the current origin
+  const origin = typeof window !== 'undefined' ? window.location.origin : siteUrl;
+  
+  // Always use the full URL with /auth/callback
+  const redirectUrl = `${origin}/auth/callback`;
+  
+  // Log the redirect URL in development
+  if (import.meta.env.DEV) {
+    console.log('OAuth redirect URL:', redirectUrl);
   }
-  // In development, use localhost
-  return `${window.location.origin}/auth/callback`;
+  
+  return redirectUrl;
 };
 
 export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getRedirectUrl()
+      redirectTo: getRedirectUrl(),
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent'
+      },
+      scopes: 'email profile'
     }
   })
   return { data, error }
@@ -96,22 +122,13 @@ export const signInWithGithub = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: getRedirectUrl()
+      redirectTo: getRedirectUrl(),
+      scopes: 'user:email'
     }
   })
   return { data, error }
 }
 
-export const signInWithAzure = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'azure',
-    options: {
-      scopes: 'email',
-      redirectTo: getRedirectUrl()
-    }
-  })
-  return { data, error }
-}
 
 export const checkSession = async () => {
   const { data, error } = await supabase.auth.getSession()

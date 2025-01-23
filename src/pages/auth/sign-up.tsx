@@ -39,22 +39,43 @@ export default function SignUp() {
       if (error) {
         console.error('Error during sign-up:', error);
         let message = t('auth.sign_up.error.default');
-        if (error.message.includes('Password should be at least 6 characters')) {
+        let title = t('auth.sign_up.error.title');
+
+        if (error.message.includes('weak') || error.message.includes('easy to guess')) {
+          message = t('auth.sign_up.error.weak_password') || 'Password is too weak. Please choose a stronger password with a mix of letters, numbers, and special characters.';
+          title = 'Weak Password';
+        } else if (error.message.includes('Password should be')) {
           message = t('auth.sign_up.error.invalid_password');
+          title = 'Invalid Password';
         }
+
+        toast({
+          title: title,
+          description: message,
+          variant: "destructive",
+          duration: 5000,
+        });
+
         setErrorMessage(message);
         setIsLoading(false);
       } else {
         setIsConfirmationSent(true);
         toast({
-          title: t('auth.sign_up.resend_email.title'),
-          description: t('auth.sign_up.resend_email.success'),
+          title: t('auth.sign_up.success.title'),
+          description: t('auth.sign_up.success.message'),
+          duration: 4000,
         });
         await new Promise((resolve) => setTimeout(resolve, 4000));
         setIsLoading(false);
       }
     } catch (error) {
       console.error('Unexpected error during sign-up:', error);
+      toast({
+        title: t('auth.sign_up.error.title'),
+        description: t('auth.sign_up.error.default'),
+        variant: "destructive",
+        duration: 5000,
+      });
       setErrorMessage(t('auth.sign_up.error.default'));
       setIsLoading(false);
     }
@@ -70,13 +91,15 @@ export default function SignUp() {
       toast({
         title: t('auth.sign_up.resend_email.title'),
         description: t('auth.sign_up.resend_email.success'),
+        duration: 4000,
       })
     } catch (error) {
       console.error('Error resending email:', error)
       toast({
-        title: t('auth.pages.forgot_password.error.title'),
-        description: t('auth.pages.forgot_password.error.description'),
+        title: t('auth.sign_up.error.title'),
+        description: t('auth.sign_up.error.resend_failed'),
         variant: "destructive",
+        duration: 5000,
       })
     }
   }

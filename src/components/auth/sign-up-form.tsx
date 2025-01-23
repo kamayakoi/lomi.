@@ -20,7 +20,12 @@ interface SignUpFormProps {
 
 const formSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
   fullName: z.string().regex(/^[\p{L}']+ [\p{L}']+/u, 'Please enter both first and last name'),
 })
 
@@ -34,6 +39,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
   const [isValidFullName, setIsValidFullName] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
@@ -41,8 +47,18 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
   }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value)
-    setIsValidPassword(formSchema.shape.password.safeParse(e.target.value).success)
+    const newPassword = e.target.value
+    setPassword(newPassword)
+
+    const result = formSchema.shape.password.safeParse(newPassword)
+    setIsValidPassword(result.success)
+
+    if (!result.success) {
+      const errors = result.error.errors.map(err => err.message)
+      setPasswordErrors(errors)
+    } else {
+      setPasswordErrors([])
+    }
   }
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,21 +150,30 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
               }
             )}
           />
-          <PasswordInput
-            id="password"
-            placeholder={t('auth.sign_up.password_placeholder')}
-            value={password}
-            onChange={handlePasswordChange}
-            autoComplete="new-password"
-            className={cn(
-              'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
-              {
-                'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
-                'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
-                'border-green-500 dark:border-green-500': isValidPassword,
-              }
+          <div className="space-y-2">
+            <PasswordInput
+              id="password"
+              placeholder={t('auth.sign_up.password_placeholder')}
+              value={password}
+              onChange={handlePasswordChange}
+              autoComplete="new-password"
+              className={cn(
+                'h-12 border rounded-none focus:border-blue-500 focus:ring-blue-500 bg-white text-black dark:bg-gray-800 dark:text-white',
+                {
+                  'border-gray-300 dark:border-gray-600': !isValidPassword && password === '',
+                  'border-red-500 dark:border-red-500': !isValidPassword && password !== '',
+                  'border-green-500 dark:border-green-500': isValidPassword,
+                }
+              )}
+            />
+            {passwordErrors.length > 0 && (
+              <ul className="text-sm text-red-500 dark:text-red-400 space-y-1 mt-1">
+                {passwordErrors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
             )}
-          />
+          </div>
           <Button
             className="w-full h-12"
             type="submit"
