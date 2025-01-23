@@ -331,7 +331,7 @@ export default function CheckoutPage() {
                                     <div className="flex items-center gap-2 mb-4">
                                         <div className="flex items-center">
                                             <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
-                                            <span className="text-4xl ml-2">{checkoutData.subscriptionPlan.currencyCode}</span>
+                                            <span className="text-4xl ml-2">{checkoutData.subscriptionPlan.currency_code}</span>
                                         </div>
                                         <div className="text-gray-400 text-lg ml-2 h-[2.2rem] flex flex-col justify-between leading-none">
                                             <span>per</span>
@@ -372,7 +372,7 @@ export default function CheckoutPage() {
                                     <h2 className="text-xl text-gray-300 mb-4">Pay for {checkoutData.merchantProduct.name}</h2>
                                     <div className="flex items-baseline gap-2 mb-4">
                                         <span className="text-4xl font-bold">{formatNumber(checkoutData.merchantProduct.price)}</span>
-                                        <span className="text-4xl">{checkoutData.merchantProduct.currencyCode}</span>
+                                        <span className="text-4xl">{checkoutData.merchantProduct.currency_code}</span>
                                     </div>
                                     <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
                                         <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
@@ -406,6 +406,24 @@ export default function CheckoutPage() {
                                         <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
                                     </div>
                                 </div>
+
+                                {/* Fees Section */}
+                                {checkoutData?.merchantProduct?.fees?.map((fee) => {
+                                    const basePrice = checkoutData.merchantProduct?.price || 0;
+                                    const feeAmount = basePrice * (fee.percentage / 100);
+                                    return (
+                                        <div key={fee.fee_type_id} className="flex justify-between items-baseline pt-2">
+                                            <div className="flex items-baseline gap-1.5">
+                                                <span className="text-gray-400">{fee.name}</span>
+                                                <span className="text-xs text-gray-500">({fee.percentage}%)</span>
+                                            </div>
+                                            <div className="flex items-baseline gap-2">
+                                                <span className="text-gray-400">{formatNumber(feeAmount)}</span>
+                                                <span className="text-gray-500">{checkoutData.paymentLink.currency_code}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <div className="relative flex justify-start">
@@ -473,7 +491,16 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between items-baseline">
                                     <span className="text-white font-medium">Total due today</span>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-lg font-medium">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                        <span className="text-lg font-medium">
+                                            {(() => {
+                                                const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
+                                                const fees = checkoutData?.merchantProduct?.fees || [];
+                                                const feeAmount = fees.reduce((total, fee) => {
+                                                    return total + (basePrice * (fee.percentage / 100));
+                                                }, 0);
+                                                return formatNumber(basePrice + feeAmount);
+                                            })()}
+                                        </span>
                                         <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
                                     </div>
                                 </div>
@@ -485,7 +512,7 @@ export default function CheckoutPage() {
 
             {/* Right side - Checkout form */}
             <div className="w-full lg:w-1/2 bg-white p-4 lg:p-8">
-                <div className="max-w-[448px] pl-8 w-full">
+                <div className="max-w-[448px] lg:pl-8 w-full mx-auto px-4">
                     {/* Mobile Money Options */}
                     <div className="flex overflow-x-auto pb-4 space-x-4">
                         {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
@@ -493,7 +520,10 @@ export default function CheckoutPage() {
                                 <div
                                     key={provider}
                                     onClick={() => handleProviderClick(provider)}
-                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 border ${selectedProvider === provider ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-100'}`}
+                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 ${selectedProvider === provider
+                                        ? 'bg-gray-50/80'
+                                        : 'hover:bg-gray-50/50'
+                                        }`}
                                     style={{ width: '100px', height: '100px', padding: '0' }}
                                 >
                                     <img

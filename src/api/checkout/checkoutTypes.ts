@@ -24,18 +24,21 @@ export interface PaymentLink {
     organizationName: string;
 }
 
-export interface MerchantProduct {
-    productId: string;
-    merchantId: string;
-    organizationId: string;
+export interface Fee {
+    fee_type_id: string;
     name: string;
-    description: string;
+    percentage: number;
+    is_enabled: boolean;
+}
+
+export interface MerchantProduct {
+    product_id: string;
+    name: string;
+    description: string | null;
     price: number;
-    currencyCode: string;
-    isActive: boolean;
+    currency_code: string;
     image_url: string | null;
-    createdAt: string;
-    updatedAt: string;
+    fees?: Fee[];
 }
 
 export interface SubscriptionPlan {
@@ -46,7 +49,7 @@ export interface SubscriptionPlan {
     description: string;
     billingFrequency: string;
     amount: number;
-    currencyCode: string;
+    currency_code: string;
     failedPaymentAction: string;
     chargeDay: number | null;
     metadata: Record<string, unknown>;

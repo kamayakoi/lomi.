@@ -1,80 +1,67 @@
 import { supabase } from '@/utils/supabase/client';
 import { CheckoutData, CustomerDetails } from './checkoutTypes.ts';
 
-export const fetchDataForCheckout = async (linkId: string): Promise<CheckoutData | null> => {
-    const { data, error } = await supabase.rpc('fetch_data_for_checkout', { p_link_id: linkId });
-    if (error) {
+export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData | null> {
+    try {
+        // Fetch checkout data using RPC
+        const { data: checkoutData, error: checkoutError } = await supabase
+            .rpc('fetch_data_for_checkout', { p_link_id: linkId });
+
+        if (checkoutError) throw checkoutError;
+        if (!checkoutData || checkoutData.length === 0) return null;
+
+        const paymentLink = checkoutData[0];
+
+        // Download product image if exists
+        let productImageUrl = null;
+        if (paymentLink?.product_image_url) {
+            const { data: imageData, error: imageError } = await supabase
+                .storage
+                .from('product_images')
+                .download(paymentLink.product_image_url)
+
+            if (!imageError && imageData) {
+                productImageUrl = URL.createObjectURL(imageData)
+            }
+        }
+
+        // If there's a product, fetch its fees
+        let productFees = [];
+        if (paymentLink?.product_id) {
+            const { data: fees, error: feesError } = await supabase
+                .rpc('fetch_product_fees', {
+                    p_product_id: paymentLink.product_id
+                });
+
+            if (!feesError) {
+                productFees = fees || [];
+            }
+        }
+
+        const merchantProduct = paymentLink?.product_id ? {
+            product_id: paymentLink.product_id,
+            name: paymentLink.product_name,
+            description: paymentLink.product_description,
+            price: paymentLink.product_price,
+            currency_code: paymentLink.currency_code,
+            image_url: productImageUrl || paymentLink.product_image_url,
+            fees: productFees
+        } : null;
+
+        return {
+            paymentLink: {
+                ...paymentLink,
+                organizationLogoUrl: paymentLink.organization_logo_url,
+                organizationName: paymentLink.organization_name
+            },
+            merchantProduct,
+            subscriptionPlan: null
+        };
+    } catch (error) {
         console.error('Error fetching checkout data:', error);
         return null;
     }
-    const paymentLink = data[0];
-
-    // Download product image if exists
-    let productImageUrl = null;
-    if (paymentLink?.product_image_url) {
-        const { data: imageData, error: imageError } = await supabase
-            .storage
-            .from('product_images')
-            .download(paymentLink.product_image_url.replace(/^.*\/product_images\//, ''))
-
-        if (!imageError) {
-            productImageUrl = URL.createObjectURL(imageData)
-        }
-    }
-
-    // Download plan image if exists
-    let planImageUrl = null;
-    if (paymentLink?.plan_image_url) {
-        const { data: imageData, error: imageError } = await supabase
-            .storage
-            .from('plan_images')
-            .download(paymentLink.plan_image_url.replace(/^.*\/plan_images\//, ''))
-
-        if (!imageError) {
-            planImageUrl = URL.createObjectURL(imageData)
-        }
-    }
-
-    const merchantProduct = paymentLink && paymentLink.product_id ? {
-        productId: paymentLink.product_id,
-        merchantId: paymentLink.merchant_id,
-        organizationId: paymentLink.organization_id,
-        name: paymentLink.product_name,
-        description: paymentLink.product_description,
-        price: paymentLink.product_price,
-        currencyCode: paymentLink.currency_code,
-        image_url: productImageUrl || paymentLink.product_image_url,
-        isActive: true,
-        createdAt: '',
-        updatedAt: '',
-    } : null;
-    const subscriptionPlan = paymentLink && paymentLink.plan_id ? {
-        planId: paymentLink.plan_id,
-        merchantId: paymentLink.merchant_id,
-        organizationId: paymentLink.organization_id,
-        name: paymentLink.plan_name,
-        description: paymentLink.plan_description,
-        billingFrequency: paymentLink.plan_billing_frequency,
-        amount: paymentLink.plan_amount,
-        currencyCode: paymentLink.currency_code,
-        image_url: planImageUrl || paymentLink.plan_image_url,
-        failedPaymentAction: '',
-        chargeDay: null,
-        metadata: {},
-        createdAt: '',
-        updatedAt: '',
-        firstPaymentType: '',
-    } : null;
-    return {
-        paymentLink: paymentLink ? {
-            ...paymentLink,
-            organizationLogoUrl: paymentLink.organization_logo_url,
-            organizationName: paymentLink.organization_name,
-        } : null,
-        merchantProduct,
-        subscriptionPlan,
-    };
-};
+}
 
 export const fetchOrganizationDetails = async (organizationId: string) => {
     const { data, error } = await supabase
