@@ -32,7 +32,7 @@
             "placeholder": "Email address**",
             "button": "Subscribe"
         },
-        "status": "Systems Operational",
+        "status": "All services are online",
         "copyright": "Copyright © 2025 — lomi.africa",
         "star": "Star"
     },
@@ -72,7 +72,7 @@
       "sign_up_link": "Sign up",
       "success": "Success",
       "home_link": "Home",
-      "company": "lomi.",
+      "company": "— lomi.",
       "quote": "We're just getting started.",
       "success_message": "You have successfully signed in.",
       "error": {

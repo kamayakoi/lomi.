@@ -74,7 +74,7 @@
             "success_message": "Vous êtes maintenant connecté.",
             "home_link": "Accueil",
             "quote": "We're just getting started.",
-            "company": "lomi.",
+            "company": "— lomi.",
             "error": {
                 "default": "Une erreur s'est produite lors de votre connexion. Veuillez réessayer.",
                 "invalid_credentials": "E-mail ou mot de passe invalide. Veuillez réessayer ou créer un compte si vous n'en avez pas.",

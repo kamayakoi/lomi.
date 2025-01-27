@@ -74,7 +74,7 @@
       "success_message": "Has iniciado sesión correctamente.",
       "home_link": "Inicio",
       "quote": "Estamos empezando.",
-      "company": "lomi.",
+      "company": "— lomi.",
       "error": {
         "default": "Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo.",
         "invalid_credentials": "Correo o contraseña inválidos. Por favor, inténtalo de nuevo o regístrate si no tienes una cuenta.",

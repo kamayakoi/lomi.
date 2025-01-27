@@ -351,14 +351,27 @@ export function Footer() {
                                 </div>
 
                                 {/* System Status - Hidden on mobile */}
-                                <div className="hidden sm:flex items-center justify-between px-3 py-2 text-sm w-[250px] h-[30px] mt-[150px] ml-auto transform translate-y-4 translate-x-14">
-                                    <iframe
-                                        src="https://status.lomi.africa/badge?theme=dark"
-                                        width="250"
-                                        height="30"
-                                        style={{ colorScheme: 'normal' }}
-                                        title="lomi. System Status"
-                                    />
+                                <div className="hidden sm:flex items-center justify-between px-3 py-2 text-sm w-[196px] h-10 mt-[150px] ml-auto transform translate-y-4 bg-blue-100 dark:bg-blue-900/30 rounded-md">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                    </span>
+                                    <Link to="https://status.lomi.africa" className="text-blue-700 dark:text-blue-300 font-medium">
+                                        {t('footer.status')}
+                                    </Link>
+
+                                </div>
+
+                                {/* Certifications and System Status Container */}
+                                <div className="hidden sm:flex items-center justify-end gap-8 mt-[150px] px-3">
+                                    {/* Certifications */}
+                                    <div className="flex items-center gap-4">
+                                        <img
+                                            src="/PCIDSS.webp"
+                                            alt="PCI DSS Certified"
+                                            className="h-20 w-auto object-contain"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -73,8 +73,8 @@
             "success": "成功",
             "success_message": "登录成功。",
             "home_link": "首页",
-            "quote": "",
-            "company": "lomi.",
+            "quote": "我们刚刚起步。",
+            "company": "— lomi.",
             "error": {
                 "default": "登录时出现错误。请重试。",
                 "invalid_credentials": "邮箱或密码无效。请重试或注册新账号。",
