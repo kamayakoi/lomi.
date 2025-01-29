@@ -27,7 +27,7 @@ const formatNumber = (num: number | string) => {
 
 export default function CheckoutPage() {
     const { linkId } = useParams<{ linkId?: string }>()
-    const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | null }>({ organizationId: null, logoUrl: null })
+    const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | undefined }>({ organizationId: null, logoUrl: undefined })
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
     const [selectedProvider, setSelectedProvider] = useState<string | undefined>()
     const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '' })
@@ -79,7 +79,7 @@ export default function CheckoutPage() {
         const fetchOrganization = async () => {
             if (checkoutData?.paymentLink?.organizationId) {
                 const orgDetails = await fetchOrganizationDetails(checkoutData.paymentLink.organizationId);
-                setOrganization({ ...orgDetails, logoUrl: orgDetails.logoUrl || null });
+                setOrganization({ ...orgDetails, logoUrl: orgDetails.logoUrl || undefined });
             }
         };
 
@@ -556,17 +556,33 @@ export default function CheckoutPage() {
                 <div className="lg:hidden flex flex-col items-center px-2 mt-14">
                     {/* Product Image */}
                     <div className="w-36 h-36 mb-5 rounded-lg overflow-hidden bg-gray-800">
-                        {((checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || '') ? (
-                            <img
-                                src={(checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || ''}
-                                alt="Product"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <ImageIcon className="h-12 w-12 text-gray-600" />
-                            </div>
-                        )}
+                        {(() => {
+                            if (checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) {
+                                return (
+                                    <img
+                                        src={checkoutData.merchantProduct?.image_url || checkoutData.subscriptionPlan?.image_url || ''}
+                                        alt="Product"
+                                        className="w-full h-full object-cover"
+                                    />
+                                );
+                            }
+
+                            if (organization.logoUrl) {
+                                return (
+                                    <img
+                                        src={organization.logoUrl}
+                                        alt="Organization Logo"
+                                        className="w-full h-full object-cover"
+                                    />
+                                );
+                            }
+
+                            return (
+                                <div className="w-full h-full flex items-center justify-center">
+                                    <ImageIcon className="h-12 w-12 text-gray-600" />
+                                </div>
+                            );
+                        })()}
                     </div>
 
                     {/* Product Title & Price */}

@@ -1,0 +1,444 @@
+Aggregated Merchants API
+Endpoints:
+
+GET /v1/aggregated_merchants
+POST /v1/aggregated_merchants
+GET /v1/aggregated_merchants/:id
+PUT /v1/aggregated_merchants/:id
+DELETE /v1/aggregated_merchants/:id
+
+ Access to the Aggregated Merchant API is currently limited to selected partners.
+Wave's Aggregated Merchants API provides a programmatic way to create, update, delete, and list aggregated merchant identities that are associated with your merchant account. An aggregated merchant identity allows you to interact with customers under a different name than your official account, and potentially with different fee structures. Once created, aggregated merchant identities can be used with the Checkout API and the Payout API.
+
+See also:
+
+Checkout API to securely receive payments from customers.
+Payout API to send payouts to customers.
+Base URL
+All the endpoint paths referenced in the API document are relative to a base URL, https://api.wave.com.
+
+Authentication
+Authenticating to the API is done via API keys. These keys are bound to a single business wallet and can only interact with it.
+
+If you need to interact with more than one wallet in your network, then you will have to obtain one key per wallet.
+
+Since API keys can be used to perform any API request, including those which move money and access sensitive information, you must take care to keep your key secret. Your key should not be shared, stored anywhere but your own servers, or used from client-side code.
+
+Each request must be sent over HTTPS and contain an authorization header specifying the bearer scheme with the api key:
+
+Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6
+Note that the actual key is much longer but for documentation purposes most of the characters have been replaced by an ellipses.
+
+Obtaining your API key
+You can manage API keys in the developer's section in the Wave Business Portal. You can create, view, and revoke keys, and define which specific APIs each key has access to.
+
+Dev Portal
+
+When you create a new API key, you will only see the full key once. Make sure you copy it without missing any characters, since it will be masked afterwards for security reasons.
+
+Create API Key
+
+Wave doesn't know your full key, but if you contact API support we can identify them by the last 4 letters that you see displayed in the business portal.
+
+Only Admin users can access the Developer section in the Business Portal. If you are an Admin but still can't see it, contact API support to enable it.
+
+Error codes
+In the authentication phase, one of the following errors can cause your request to return early:
+
+Status	Code	Descriptions
+401	missing-auth-header	Your request should include an HTTP auth header.
+401	invalid-auth	Your HTTP auth header can't be processed.
+401	api-key-not-provided	Your request should include an API key.
+401	no-matching-api-key	The key you provided doesn't exist in our system.
+401	api-key-revoked	Your API key has been revoked.
+403	invalid-wallet	Your wallet can't be used in this particular API.
+403	disabled-wallet	Your wallet has been temporarily disabled. You should still be able to use the endpoint to check your balance.
+Rate limiting
+Wave APIs are rate limited to prevent abuse that would degrade performance for all users. If you send many requests in a short period of time, you may receive 429 error responses.
+
+Types
+Base types
+Timestamp
+An ISO 8601 date and time.
+
+The time zone is UTC.
+The precision is in seconds.
+The format is YYYY-MM-DDThh:mm:ssZ. Example: 2022-06-20T17:17:11Z.
+Business Type
+A string indicating the type of business an aggregated merchant engages in. This list may change. The following values are possible:
+
+Value	Description
+fintech	A financial technology (fintech) company, as defined in your contractual relationship with Wave.
+other	Any other type of company.
+Fee Structure
+A string naming a fee structure. This list may change. The following values are possible:
+
+Value	Description
+one_percent	1.00% fee.
+one_fifty_bps	1.50% fee.
+Aggregated Merchant API request objects
+Aggregated Merchant request
+When creating or updating an Aggregated Merchant, a JSON object with the following fields is used:
+
+Key	Type	Description
+name	String (up to 255 characters)	The name of this aggregated merchant. This is required to be unique. No two aggregated merchants can have the same name.
+business_registration_identifier	String (optional, up to 255 characters)	Business registration information.
+business_sector	String (optional, up to 255 characters)	Free-form text describing the business sector this aggregated merchant operates in. E.g., "agriculture", "finance", "education".
+business_type	Business Type (required)	The type of business this aggregated merchant is asserted to be. Possible values are fintech or other.
+website_url	String (optional, up to 2083 characters)	The website URL for this aggregated merchant.
+business_description	String (required)	A description of the business.
+manager_name	String (optional)	The name of the manager of the business.
+ You're required to provide name, business_description, business_type when creating an aggregated merchant.
+Aggregated Merchant API return objects
+Aggregated Merchant response
+After creating, or when retrieving an Aggregated Merchant, a JSON object with the following fields is returned:
+
+Key	Type	Description
+id	String	A unique identifier for the Aggregated Merchant. Up to 20 characters.
+name	String	The name of this aggregated merchant.
+business_registration_id	String (optional, up to 255 characters)	Optional business registration information.
+business_sector	String (optional, up to 255 characters)	Free-form text describing the business sector this aggregated merchant operates in. E.g., "agriculture", "finance", "education".
+business_type	Business Type	The type of business this aggregated merchant is asserted to be.
+website_url	String (optional, up to 2083 characters)	The website URL for this aggregated merchant.
+`payout_fee_structure_name	Fee Structure	The name of the fee structure this aggregated merchant uses for payouts.
+`checkout_fee_structure_name	Fee Structure	The name of the fee structure this aggregated merchant uses for checkouts.
+business_description	String	A description of the business.
+manager_name	String (optional)	The name of the manager of the business.
+is_locked	Boolean	A flag indicating whether this aggregated merchant's attributes have been locked from further updates. An aggregated merchant can still be deleted if locked.
+when_created	Timestamp	The time and date that this aggregated merchant was created.
+Paginated Aggregated Merchants response
+A Paginated Aggregated Merchants is a paginated response containing a paginated list of aggregated merchants associated with an account.
+
+Key	Type	Description
+page_info	Page Info	Pagination information.
+items	List of Aggregated Merchant	A list of aggregated merchants.
+Aggregated Merchants Error response
+Example
+
+{
+  "error_code": "not-found",
+  "error_message": "Aggregated merchant not found."
+}
+Aggregated Merchants Error response is an object. If you send an invalid request, or a request that cannot be satisfied for normal reasons, you will receive an error object as a response. For some server errors (where the HTTP response code is 5xx or above), you may not receive a JSON response body.
+
+Key	Type	Explanation
+error_code	String, an Error Code	One of a list of possible error codes.
+error_message	String (optional)	An English description of the error that occurred. This message is subject to change.
+API
+Retrieve a list of Aggregated Merchants
+GET /v1/aggregated_merchants
+
+curl -X GET \
+  --url https://api.wave.com/v1/aggregated_merchants \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6'
+shell
+Example response
+
+{
+    "page_info": {
+        "has_next_page": false,
+        "end_cursor": "YzE6YW0tMWFrbjhkeWcwMTAwOA"
+    },
+    "items": [
+        {
+            "id": "am-7lks22ap113t4",
+            "name": "Moustaphas Groceries",
+            "business_sector": null,
+            "business_type": "other",
+            "business_registration_identifier": null,
+            "website_url": "https://groceries.example.com",
+            "payout_fee_structure_name": "one_percent",
+            "checkout_fee_structure_name": "one_fifty_bps",
+            "business_description": "A grocery store in the heart of the city.",
+            "manager_name": "Moustapha",
+            "when_created": "2022-06-21T09:56:29Z",
+            "is_locked": true
+        },
+        {
+            "id": "am-2rtmi4j8973vq",
+            "name": "Fancy Fintech",
+            "business_sector": "b2b services/integrations",
+            "business_type": "fintech",
+            "business_registration_identifier": "A-12234-M",
+            "website_url": "https://fancy-fintech.example.com/",
+            "payout_fee_structure_name": "one_fifty_bps",
+            "checkout_fee_structure_name": "one_fifty_bps",
+            "business_description": "A fintech company that provides payment solutions.",
+            "manager_name": "Alice",
+            "when_created": "2022-08-11T13:31:42Z",
+            "is_locked": false
+        }
+    ]
+}
+Retrieves a paginated list of aggregated merchants available for use with the current account.
+
+Query parameters
+This endpoint accepts standard pagination query parameters.
+
+Create an Aggregated Merchant
+POST /v1/aggregated_merchants
+
+ Aggregated merchant names must be unique. Attempting to create an aggregated merchant with a name that already exists will result in an error.
+curl -X POST \
+  --url https://api.wave.com/v1/aggregated_merchants \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6' \
+  -H 'Content-Type: application/json' \
+  -d '{
+          "name": "Moustaphas Groceries",
+          "business_sector": null,
+          "business_type": "other",
+          "business_registration_identifier": null,
+          "website_url": "https://groceries.example.com",
+          "manager_name": "Moustapha",
+          "business_description": "A grocery store in the heart of the city.
+      }'
+shell
+Example response
+
+{
+    "id": "am-7lks22ap113t4",
+    "name": "Moustaphas Groceries",
+    "business_sector": null,
+    "business_type": "other",
+    "business_registration_identifier": null,
+    "website_url": "https://groceries.example.com",
+    "payout_fee_structure_name": "one_fity_bps",
+    "checkout_fee_structure_name": "one_fifty_bps"
+    "business_description": "A grocery store in the heart of the city.",
+    "manager_name": "Moustapha",
+    "when_created": "2022-06-21T09:56:29Z",
+    "is_locked": false
+}
+Creating an aggregated merchant makes it immediately available for use. The request body must be an Aggregated Merchant request object.
+
+When creating an aggregated merchant, supply the most accurate information you can about the aggregated merchant in all fields, including:
+
+The business name
+The correct business registration identifier
+The business's website, if any
+The business's sector of operation
+The business type (either "fintech" or "other")
+The business manager's name
+A description of the business
+When you provide correct and complete information, Wave can more effectively and quickly review aggregated merchants and choose appropriate fee structures.
+
+Retrieve an Aggregated Merchant
+GET /v1/aggregated_merchants/:id
+
+curl -X GET \
+  --url https://api.wave.com/v1/aggregated_merchants/am-7lks22ap113t4 \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6'
+shell
+Example response
+
+{
+    "id": "am-7lks22ap113t4",
+    "name": "Moustaphas Groceries",
+    "business_sector": null,
+    "business_type": "other",
+    "business_registration_identifier": null,
+    "website_url": "https://example.com",
+    "payout_fee_structure_name": "one_percent",
+    "checkout_fee_structure_name": "one_fifty_bps",
+    "manager_name": "Moustapha",
+    "business_description": "A grocery store in the heart of the city.",
+    "when_created": "2022-06-21T09:56:29Z",
+    "is_locked": true
+}
+Retrieves the details of a single aggregated merchant. The response body will be an Aggregated Merchant response.
+
+Update an Aggregated Merchant
+PUT /v1/aggregated_merchants/:id
+
+curl -X PUT \
+  --url https://api.wave.com/v1/aggregated_merchants/am-7lks22ap113t4 \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6' \
+  -H 'Content-Type: application/json' \
+  -d '{
+          "name": "Moustaphas Candle Shop",
+          "business_sector": null,
+          "business_type": "other",
+          "business_registration_identifier": null,
+          "website_url": "https://example.com",
+          "business_description": "A grocery store in the heart of the city.",
+      }'
+shell
+Example response
+
+{
+    "id": "am-7lks22ap113t4",
+    "name": "Moustaphas Candle Shop",
+    "business_sector": null,
+    "business_type": "other",
+    "business_registration_identifier": null,
+    "website_url": "https://example.com",
+    "payout_fee_structure_name": "one_percent",
+    "checkout_fee_structure_name": "one_fifty_bps",
+    "manager_name": "Moustapha",
+    "business_description": "A grocery store in the heart of the city.",
+    "when_created": "2022-06-21T09:56:29Z",
+    "is_locked": true
+}
+Updates the details of a single aggregated merchant. The response body will be an Aggregated Merchant response.
+
+After Wave has reviewed an aggregated merchant's details and set appropriate fee structures, an aggregated merchant will become locked from further updates. Attempting to update an aggregated merchant will fail with an HTTP 403 Forbidden response code. You may still delete a locked aggregated merchant.
+
+Delete an Aggregated Merchant
+DELETE /v1/aggregated_merchants/:id
+
+curl -X DELETE \
+  --url https://api.wave.com/v1/aggregated_merchants/am-7lks22ap113t4 \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6' \
+shell
+Example response
+
+Expect an HTTP 204 response, with no response body.
+
+Deletes a single aggregated merchant. You will no longer be able to use or update this aggregated merchant.
+
+When successful, the server will return a HTTP 204 ("OK, no content") response. There will be no response body.
+
+Pagination
+Many of Wave's listing endpoints support pagination. If you are using a paginated endpoint, you must be prepared to accept paginated responses and continue making requests until no items remain or you have retrieved all of the data your application needs.
+
+Paginated request
+Paginated endpoints currently only support forward pagination. Backward pagination is not yet supported.
+
+Example paginated request
+
+curl -X GET \
+  --url 'https://api.wave.com/v1/paginated-endpoint?first=10&after=YzE6YW0tMWFrbjhkeWcwMTAwOA'
+shell
+For pagination, you may use the following query parameters:
+
+Parameter	Type	Description
+first	Integer (optional)	The maximum number of items to retrieve. The server may respond with fewer items if your limit is too high, or if there aren't enough items remaining to fulfill the request.
+after	String (optional)	An opaque cursor indicating where pagination should continue from. Typically you will use the value of page_info.end_cursor from the previous response.
+Paginated response
+Example paginated response
+
+{
+    "page_info": {
+        "has_next_page": true,
+        "end_cursor": "YzE6YW0tMWFrbjhkeWcwMTAwOA"
+    },
+    "items": [
+        {
+            "id": "xyz-bm29dahzl",
+            "name": "Item 1"
+        }
+    ]
+}
+A paginated response contains pagination information and a list of items. The specific item type is endpoint-dependent.
+
+Key	Type	Description
+page_info	Page Info	Pagination information.
+items	List of objects	A list of items. Item type varies by endpoint.
+Page Info object
+The page info object contains information related to the current page of results, and a cursors that can be used to retrieve the next page.
+
+Key	Type	Description
+has_next_page	Boolean	true if there is a next page after this one, false otherwise.
+end_cursor	String	A cursor that can be used to fetch the next page of items.
+Example pagination request flow
+Example initial request
+
+curl -X GET \
+  --url 'https://api.wave.com/v1/paginated-endpoint?first=10' \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6'
+shell
+Example initial response
+
+{
+    "page_info": {
+        "has_next_page": true,
+        "end_cursor": "YzE6YW0tMWFrbjhkeWcwMTAwOA"
+    },
+    "items": [
+      ...
+    ]
+}
+As an example, we can retrieve items from an endpoint, ten items at a time.
+
+Note: The first query parameter is optional if we don't care about the precise number of items being retrieved. The server will choose a sensible default for the collection being retrieved.
+
+Example next-page request
+
+curl -X GET \
+  --url 'https://api.wave.com/v1/paginated-endpoint?first=10&after=YzE6YW0tMWFrbjhkeWcwMTAwOA' \
+  -H 'Authorization: Bearer wave_sn_prod_YhUNb9d...i4bA6'
+shell
+Example next-page response
+
+{
+    "page_info": {
+        "has_next_page": false,
+        "end_cursor": "YzE6YW0tMWFrbjhkeWc6iNNoqP"
+    },
+    "items": [
+      ...
+    ]
+}
+When the response's page_info.has_next_page is true, more items remain to be retrieved. We can request another page of items using the page_info.end_cursor as our after query parameter.
+
+Because this response has returned page_info.has_next_page as false, no items remain to be retrieved, and no further requests should be made. However, if page_info.has_next_page had been true, we could have again used the value of page_info.end_cursor as the value of our after query parameter to continue retrieving items.
+
+Errors
+Aggregated Merchants API errors
+Example errors returned by the API
+
+Permissions error
+
+{
+    "code": "no-permission",
+    "message": "No permission to access this endpoint"
+}
+Validation error
+
+{
+    "code": "request-validation-error",
+    "details": [
+        {
+            "ctx": { "limit_value": 255 },
+            "loc": ["name"],
+            "msg": "ensure this value has at most 255 characters",
+            "type": "value_error.any_str.max_length"
+        }
+    ],
+    "message": "Request invalid"
+}
+The following is the list of errors that can occur when using this API.
+
+error_code	explanation
+internal-server-error	A technical error has occurred in Wave's system. We work very hard to avoid this, so it is only reserved for unexpected cases. Please get in touch with your Wave partner representative if you encounter this. If the endpoint supports idempotency keys, you can still retry the request automatically with the same idempotency key. We suggest you wait a couple of seconds between retries.
+missing-auth-header	The request is missing a Bearer token in the Authorization header. See Authentication for instructions.
+no-permission	The provided API is invalid, or does not have access to the requested API endpoint.
+not-found	You requested an object that we can't find in our system, or that your account does not have access to. You should double-check that the ID corresponds to one that you've received in a response, and that the request came from the same business wallet.
+record-locked	The aggregated merchant has been locked and cannot be modified.
+request-not-json	Your request either doesn't have a JSON body, or is lacking the Content-Type header "application/json".
+request-parsing-error	The JSON body of this request is invalid, generally because of misplaced brackets, commas, or quotes. The error_message will help you with details.
+request-validation-error	Your request doesn't match the object type required. These are things like a missing field or an invalid type in a provided field like an invalid phone number. The error_message will help you with details.
+too-many-requests	You've sent more requests than we can process in a short timespan. Some APIs support batch operations to reduce the likelihood of this occurring.
+duplicate-aggregated-merchant-name	An aggregated merchant with the same name already exists. Aggregated merchant names must be unique.
+We suggest that you write code that can handle the errors above. We might occasionally add a new error type.
+
+The list above only covers known errors that are within Wave's control. There could be other technical issues like connection errors or timeouts if there are any network issues between your servers and Wave's. These are too numerous to list, but in any of those cases, requests can be safely retried, as long as the same idempotency key is used on those endpoints that support idempotent requests.
+
+HTTP Status Codes
+The general reason for the failure is reflected in the HTTP response status code. 4xx codes signal a problem with the request from the client and 5xx codes indicate a problem on the server end. Specific details of the problem are provided in the message body.
+
+Some of the status codes we return are listed below.
+
+Code	Title	Descriptions
+400	Bad Request	The server cannot process the request because it is badly formed.
+401	Unauthorized	The API key is invalid.
+403	Forbidden	The API key doesn't have appropriate permissions for the request.
+404	Not Found	You requested an object or page that could not be found.
+405	Method Not Allowed	The combination of URL path and REST method doesn't exist on this API.
+408	Request Timeout	The request took too long to process. Try again later.
+409	Conflict	The request could not be completed due to a conflict with the current state of the resource.
+422	Unprocessable Entity	The request was well-formed, but the server could not process it.
+429	Too Many Requests	The rate limit was exceeded i.e. the server received too many requests in a given period of time.
+500	Internal Server Error	The server encountered an error. Try again later, but the error may persist.
+503	Service Unavailable	The server is unable to handle the request due to a temporary overload or scheduled maintenance. Try again later.
+504	Gateway Timeout	A timeout occurred on the network while processing a request. Try again later.

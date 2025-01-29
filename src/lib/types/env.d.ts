@@ -24,29 +24,29 @@ declare module 'bun' {
     VITE_STORE_DOMAIN_BASE_URL: string;
 
     // Ecobank
-    VITE_ECOBANK_BASE_URL: string;
-    VITE_ECOBANK_USER_ID: string;
-    VITE_ECOBANK_LAB_KEY: string;
-    VITE_ECOBANK_SECRET: string;
+    ECOBANK_BASE_URL: string;
+    ECOBANK_USER_ID: string;
+    ECOBANK_LAB_KEY: string;
+    ECOBANK_SECRET: string;
 
     // Orange
-    VITE_ORANGE_BASE_URL: string;
-    VITE_ORANGE_BUSINESS_ID: string;
-    VITE_ORANGE_API_KEY: string;
+    ORANGE_BASE_URL: string;
+    ORANGE_BUSINESS_ID: string;
+    ORANGE_API_KEY: string;
 
     // MTN
-    VITE_MTN_BASE_URL: string;
-    VITE_MTN_BUSINESS_ID: string;
-    VITE_MTN_API_KEY: string;
+    MTN_BASE_URL: string;
+    MTN_BUSINESS_ID: string;
+    MTN_API_KEY: string;
 
     // Wave
-    VITE_WAVE_API_URL: string;
-    VITE_WAVE_MERCHANT_ID: string;
-    VITE_WAVE_API_KEY: string;
+    WAVE_API_URL: string;
+    WAVE_MERCHANT_ID: string;
+    WAVE_API_KEY: string;
 
     // NOWPayments
-    VITE_NOWPAYMENTS_API_KEY: string;
-    VITE_NOWPAYMENTS_PUBLIC_KEY: string;
+    NOWPAYMENTS_API_KEY: string;
+    NOWPAYMENTS_PUBLIC_KEY: string;
 
     // AI
     OPENAI_API_KEY: string;
@@ -66,8 +66,8 @@ declare module 'bun' {
     RESEND_API_KEY: string;
 
     // Product Hunt
-    VITE_PH_API_KEY: string;
-    VITE_PH_API_SECRET: string;
+    PH_API_KEY: string;
+    PH_API_SECRET: string;
 
     // GitHub
     GITHUB_API_TOKEN: string;

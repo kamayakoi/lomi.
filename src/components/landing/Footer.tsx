@@ -363,16 +363,16 @@ export function Footer() {
                                 </div>
 
                                 {/* Certifications and System Status Container */}
-                                <div className="hidden sm:flex items-center justify-end gap-8 mt-[150px] px-3">
+                                {/* <div className="hidden sm:flex items-center justify-end gap-8 mt-[150px] px-3">
                                     {/* Certifications */}
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src="/PCIDSS.webp"
-                                            alt="PCI DSS Certified"
-                                            className="h-20 w-auto object-contain"
-                                        />
-                                    </div>
-                                </div>
+                                {/* <div className="flex items-center gap-4">
+                                    <img
+                                        src="/PCIDSS.webp"
+                                        alt="PCI DSS Certified"
+                                        className="h-20 w-auto object-contain"
+                                    />
+                                </div> */}
+
                             </div>
                         </div>
                     </div>
@@ -388,6 +388,6 @@ export function Footer() {
                     />
                 )}
             </div>
-        </div>
+        </div >
     )
 } 
