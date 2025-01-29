@@ -184,23 +184,26 @@ export function Footer() {
                                 <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.features.title')}</h2>
                                 <ul className="space-y-3 relative z-20">
                                     {[
-                                        { name: t('footer.features.overview'), link: '/overview' },
-                                        { name: t('footer.features.sellProducts'), link: '/products' },
-                                        { name: t('footer.features.sellSubscriptions'), link: '/subscriptions' },
-                                        { name: t('footer.features.sellWhatsApp'), link: '/whatsapp' },
-                                        { name: t('footer.features.sellWebsite'), link: '/website' },
-                                        { name: t('footer.features.sendInvoices'), link: '/invoices' },
-                                        { name: t('footer.features.pricing'), link: '/pricing' },
-                                        { name: t('footer.features.faq'), link: '/faq', isExternal: true }
+                                        { name: t('footer.features.overview'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellProducts'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellSubscriptions'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellWhatsApp'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellWebsite'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sendInvoices'), link: '#', showBadge: false },
+                                        { name: t('footer.features.pricing'), link: '#', showBadge: false },
+                                        { name: t('footer.features.faq'), link: '#', showBadge: false }
                                     ].map((item) => (
                                         <li key={item.name} className="relative z-20">
                                             <Link
                                                 to={item.link}
-                                                target={item.isExternal ? "_blank" : undefined}
-                                                rel={item.isExternal ? "noopener noreferrer" : undefined}
-                                                className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors"
+                                                className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors inline-flex items-center gap-2"
                                             >
                                                 {item.name}
+                                                {item.showBadge && (
+                                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-100/50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/50">
+                                                        Soon
+                                                    </span>
+                                                )}
                                             </Link>
                                         </li>
                                     ))}
@@ -213,11 +216,11 @@ export function Footer() {
                                 <ul className="space-y-3">
                                     {[
                                         { name: t('footer.resources.github'), link: 'https://github.com/lomiafrica/lomi.' },
-                                        { name: t('footer.resources.support'), link: '/support' },
+                                        { name: t('footer.resources.support'), link: '#' },
                                         { name: t('footer.resources.privacy'), link: '/privacy' },
                                         { name: t('footer.resources.terms'), link: '/terms' },
-                                        { name: t('footer.resources.branding'), link: '/branding' },
-                                        { name: t('footer.resources.featureRequest'), link: '/feedback' },
+                                        { name: t('footer.resources.branding'), link: '#' },
+                                        { name: t('footer.resources.featureRequest'), link: '#' },
                                         { name: t('footer.resources.review'), link: 'https://www.producthunt.com/products/lomi/reviews/new' }
                                     ].map((item) => (
                                         <li key={item.name}>
@@ -234,9 +237,9 @@ export function Footer() {
                                 <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.company.title')}</h2>
                                 <ul className="space-y-3">
                                     {[
-                                        { name: t('footer.company.story'), link: '/story', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
-                                        { name: t('footer.company.blog'), link: '/blog', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
-                                        { name: t('footer.company.openSource'), link: 'https://www.developers.lomi.africa/open-source', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
+                                        { name: t('footer.company.story'), link: '#', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
+                                        { name: t('footer.company.blog'), link: '#', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
+                                        { name: t('footer.company.openSource'), link: 'https://developers.lomi.africa/git-integration/getting-started', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
                                     ].map((item) => (
                                         <li key={item.name}>
                                             <Link to={item.link} className={`${item.color} transition-colors`}>
