@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { supabase } from '@/utils/supabase/client'
 import { useUser } from '@/lib/hooks/useUser'
 import { BankAccount } from '@/pages/portal/settings/withdrawals/Withdrawal_types'
-import { countries } from '@/utils/data/onboarding'
+import { countries } from '@/lib/data/onboarding'
 
 interface AddBankButtonProps {
     onAddAccount: (account: BankAccount) => Promise<void>

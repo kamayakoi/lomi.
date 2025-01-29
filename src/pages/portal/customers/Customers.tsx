@@ -35,7 +35,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { countries } from '@/utils/data/onboarding'
+import { countries } from '@/lib/data/onboarding'
 import { CustomerFilters } from './components/filters_customers'
 import { EditCustomerForm } from './components/edit_customer'
 import { withActivationCheck } from '@/components/custom/withActivationCheck'

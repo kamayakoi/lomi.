@@ -51,7 +51,7 @@ __pycache__/
 .mypy_cache/
 
 # Scripts and prompts
-src/utils/scripts/
+src/lib/scripts/
 src/utils/prompts
 
 # Cursor rules

@@ -17,7 +17,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
-import { countries } from '@/utils/data/onboarding'
+import { countries } from '@/lib/data/onboarding.ts'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {

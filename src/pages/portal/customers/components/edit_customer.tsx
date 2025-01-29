@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from '@/lib/actions/utils'
 import { fetchCustomer, updateCustomer, deleteCustomer } from './support_customers'
-import { countries } from '@/utils/data/onboarding'
+import { countries } from '@/lib/data/onboarding'
 import PhoneNumberInput from "@/components/ui/phone-number-input"
 import {
     Dialog,

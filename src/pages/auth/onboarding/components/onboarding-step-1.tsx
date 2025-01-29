@@ -6,7 +6,7 @@ import { cn } from '@/lib/actions/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { countryCodes, countries, organizationPositions } from '@/utils/data/onboarding';
+import { countryCodes, countries, organizationPositions } from '@/lib/data/onboarding';
 import ProfilePictureUploader from '@/components/auth/avatar-uploader';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';

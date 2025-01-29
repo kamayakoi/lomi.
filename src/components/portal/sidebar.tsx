@@ -4,7 +4,7 @@ import { Layout } from '@/components/custom/layout'
 import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/actions/utils'
-import { useSidelinks, type SidebarItem } from '../../utils/data/sidelinks'
+import { useSidelinks, type SidebarItem } from '../../lib/data/sidelinks'
 import { useTheme } from '@/lib/hooks/useTheme'
 import iconLight from "/transparent2.webp"
 import iconDark from "/transparent.webp"

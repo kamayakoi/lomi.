@@ -27,7 +27,7 @@ import {
     bamakoDistricts,
     burkinaFasoCities,
     ouagadougouDistricts,
-} from '@/utils/data/onboarding';
+} from '@/lib/data/onboarding';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 
 const noop = () => undefined;

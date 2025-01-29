@@ -1,4 +1,4 @@
-import { employeeRanges } from '@/utils/data/onboarding';
+import { employeeRanges } from '@/lib/data/onboarding';
 import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +21,7 @@ import {
     nigerRegions,
     maliRegions,
     burkinaFasoRegions,
-} from '@/utils/data/onboarding';
+} from '@/lib/data/onboarding';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 
 const noop = () => undefined;
