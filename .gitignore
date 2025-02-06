@@ -45,7 +45,7 @@ __pycache__/
 *.py[cod]
 
 # Sitemap
-data/
+/data/
 __pycache__/
 *.py[cod]
 .mypy_cache/

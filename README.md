@@ -1,11 +1,24 @@
 ## License
 
-This project is licensed under a strict proprietary license exclusive to lomi.africa. The software is confidential and may not be distributed in any manner. Only individuals employed by or officially associated with lomi.africa are allowed to modify this software. See the LICENSE file for full details.
+This project is dual-licensed:
+
+1. The majority of the codebase is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means you can freely use, modify, and distribute this code while ensuring that any modifications you make are also open source.
+
+2. Certain files marked with `/* @proprietary license */` are under lomi.africa's Commercial License. These files require a valid commercial license from lomi.africa for production use.
+
+See the [LICENSE](LICENSE) file for the complete terms of both licenses.
 
 ## Contributing
 
-This is a closed-source project. External contributions are not accepted. If you are an employee or official associate of lomi.africa and wish to contribute, please contact the project maintainers directly through internal channels.
+We welcome contributions to the AGPL-licensed portions of this project! Before contributing, please:
+
+1. Read our [Code of Conduct](CODE_OF_CONDUCT.md)
+2. Review our [Security Policy](SECURITY.md)
+3. Ensure your contribution doesn't modify files marked with `/* @proprietary license */`
 
 ## Contact
 
-For any questions related to this project, please contact the project maintainer at babacar@lomi.africa. Note that no information about the project shall be shared with external parties.
+For questions or concerns:
+- Security issues: Follow our [Security Policy](SECURITY.md)
+- General inquiries: hello@lomi.africa
+- Community discussions: Open an issue in our GitHub repository
