@@ -35,7 +35,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
     ({ ...props }, ref) => {
         return (
             <Input
-                className="border-l border-input shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                className="!border-gray-300 !border-l border-input shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
                 ref={ref}
                 {...props}
             />
@@ -58,7 +58,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
     };
 
     return (
-        <div className="relative inline-flex items-center self-stretch bg-transparent py-2 pe-2 ps-3 text-foreground transition-colors border-y border-l border-input">
+        <div className="relative inline-flex items-center self-stretch bg-transparent py-2 pe-2 ps-3 text-foreground transition-colors !border-gray-300 border-y border-l border-input">
             <div className="inline-flex items-center gap-1" aria-hidden="true">
                 <FlagComponent country={value} countryName={value} aria-hidden="true" />
                 <span className="text-muted-foreground/80">
@@ -73,7 +73,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
                 aria-label="Select country"
             >
                 <option key="default" value="" className="text-muted-foreground">
-                    Country**
+                    Select country
                 </option>
                 {options
                     .filter((x) => x.value)
