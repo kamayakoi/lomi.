@@ -26,25 +26,25 @@ export default function Dashboard() {
       icon: <FileText className="h-10 w-10 text-blue-600 dark:text-blue-400 mb-4" />,
       title: t('dashboard.developer_resources.resources.documentation.title'),
       description: t('dashboard.developer_resources.resources.documentation.description'),
-      link: "https://developers.lomi.africa/docs"
+      link: "https://developers.lomi.africa/"
     },
     {
       icon: <Code className="h-10 w-10 text-emerald-600 dark:text-emerald-400 mb-4" />,
       title: t('dashboard.developer_resources.resources.api_reference.title'),
       description: t('dashboard.developer_resources.resources.api_reference.description'),
-      link: "https://developers.lomi.africa/api-reference"
+      link: "https://developers.lomi.africa/"
     },
     {
       icon: <Package className="h-10 w-10 text-amber-600 dark:text-amber-400 mb-4" />,
       title: t('dashboard.developer_resources.resources.product_catalog.title'),
       description: t('dashboard.developer_resources.resources.product_catalog.description'),
-      link: "https://developers.lomi.africa/catalog"
+      link: "https://developers.lomi.africa/"
     },
     {
       icon: <FileCode className="h-10 w-10 text-purple-600 dark:text-purple-400 mb-4" />,
       title: t('dashboard.developer_resources.resources.sample_projects.title'),
       description: t('dashboard.developer_resources.resources.sample_projects.description'),
-      link: "https://github.com/lomiafrica"
+      link: "https://github.com/lomiafrica/"
     },
     {
       icon: <HelpCircle className="h-10 w-10 text-cyan-600 dark:text-cyan-400 mb-4" />,

@@ -69,7 +69,7 @@ export function Footer() {
                     }
                 }
 
-                const response = await fetch('https://api.github.com/repos/lomiafrica/developers.lomi.africa', {
+                const response = await fetch('https://api.github.com/repos/lomiafrica/lomi%2E', {
                     headers: {
                         'Accept': 'application/vnd.github.v3+json',
                         'User-Agent': 'lomi-website',
@@ -286,7 +286,7 @@ export function Footer() {
                                             <span className="sr-only">Suivez-nous sur Twitter</span>
                                         </Link>
                                         <Link
-                                            to="https://www.producthunt.com/products/lomi"
+                                            to="https://github.com/lomiafrica/lomi%2E"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-zinc-700 dark:text-zinc-300 hover:text-[#DA552F] dark:hover:text-[#DA552F] inline-flex items-center transition-colors"
@@ -296,7 +296,7 @@ export function Footer() {
                                             <span className="sr-only">Découvrez-nous sur Product Hunt</span>
                                         </Link>
                                         <Link
-                                            to="https://github.com/lomiafrica/lomi."
+                                            to='https://github.com/lomiafrica/lomi'
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-zinc-700 dark:text-zinc-300 hover:text-[#6e5494] dark:hover:text-[#6e5494] inline-flex items-center transition-colors"

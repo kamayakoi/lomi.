@@ -98,6 +98,7 @@ CREATE TYPE webhook_event AS ENUM (
 );
 CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
+CREATE TYPE provider_payment_status AS ENUM ('processing', 'cancelled', 'succeeded');
 
 --------------- TABLES ---------------
 
@@ -538,24 +539,27 @@ CREATE TABLE providers_transactions (
     transaction_id UUID PRIMARY KEY REFERENCES transactions(transaction_id),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
     provider_code provider_code NOT NULL REFERENCES providers(code),
-    wave_checkout_id VARCHAR(255),
-    wave_payment_status VARCHAR(50),
-    wave_transaction_id VARCHAR(255),
-    orange_transaction_id VARCHAR(255),
-    orange_payment_status VARCHAR(50),
-    mtn_transaction_id VARCHAR(255),
-    mtn_payment_status VARCHAR(50),
-    ecobank_transaction_id VARCHAR(255),
-    ecobank_payment_status VARCHAR(50),
+    provider_checkout_id VARCHAR(255),
+    provider_payment_status provider_payment_status NOT NULL DEFAULT 'processing',
+    provider_transaction_id VARCHAR(255),
+    checkout_url TEXT,
+    error_url TEXT,
+    success_url TEXT,
+    error_code VARCHAR(100),
+    error_message TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (transaction_id, provider_code)
+    UNIQUE (provider_code, provider_checkout_id),
+    UNIQUE (provider_code, provider_transaction_id)
 );
 
 CREATE INDEX idx_providers_transactions_merchant_id ON providers_transactions(merchant_id);
 CREATE INDEX idx_providers_transactions_provider_code ON providers_transactions(provider_code);
+CREATE INDEX idx_providers_transactions_provider_status ON providers_transactions(provider_payment_status);
+CREATE INDEX idx_providers_transactions_checkout_id ON providers_transactions(provider_checkout_id);
+CREATE INDEX idx_providers_transactions_transaction_id ON providers_transactions(provider_transaction_id);
 
-COMMENT ON TABLE providers_transactions IS 'Stores detailed transaction information specific to each payment provider';
+COMMENT ON TABLE providers_transactions IS 'Stores provider-specific transaction data including Wave checkout sessions';
 
 
 -- Refunds table
@@ -903,7 +907,7 @@ CREATE INDEX idx_api_rate_limits_api_key ON api_rate_limits(api_key);
 COMMENT ON TABLE api_rate_limits IS 'Stores rate limiting information for API endpoints per organization and API key';
 
 
--- Error Logs table
+-- API Error Logs table
 CREATE TABLE api_error_logs (
     error_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     error_type VARCHAR(50) NOT NULL,
@@ -1051,3 +1055,118 @@ CREATE INDEX idx_organization_fee_links_fee ON organization_fee_links(fee_type_i
 CREATE INDEX idx_organization_fee_links_product ON organization_fee_links(product_id);
 
 COMMENT ON TABLE organization_fee_links IS 'Links organization fees to specific products';
+
+-- Shopify Stores Table
+CREATE TABLE shopify_stores (
+    store_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    shop_domain VARCHAR NOT NULL,
+    access_token VARCHAR NOT NULL,
+    scope VARCHAR[] NOT NULL,
+    installed_at TIMESTAMPTZ DEFAULT NOW(),
+    uninstalled_at TIMESTAMPTZ,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(organization_id, shop_domain)
+);
+
+CREATE INDEX idx_shopify_stores_organization ON shopify_stores(organization_id);
+CREATE INDEX idx_shopify_stores_domain ON shopify_stores(shop_domain);
+
+-- Shopify Webhooks Table
+CREATE TABLE shopify_webhooks (
+    webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
+    topic VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
+    shopify_webhook_id VARCHAR NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(store_id, topic)
+);
+
+CREATE INDEX idx_shopify_webhooks_store ON shopify_webhooks(store_id);
+
+-- Shopify Products Table
+CREATE TABLE shopify_products (
+    product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
+    shopify_product_id VARCHAR NOT NULL,
+    title VARCHAR NOT NULL,
+    price NUMERIC(10,2) NOT NULL,
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(store_id, shopify_product_id)
+);
+
+CREATE INDEX idx_shopify_products_store ON shopify_products(store_id);
+
+-- Shopify Orders Table
+CREATE TABLE shopify_orders (
+    order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
+    shopify_order_id VARCHAR NOT NULL,
+    transaction_id UUID REFERENCES transactions(transaction_id),
+    total_price NUMERIC(10,2) NOT NULL,
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    status VARCHAR NOT NULL,
+    metadata JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(store_id, shopify_order_id)
+);
+
+CREATE INDEX idx_shopify_orders_store ON shopify_orders(store_id);
+CREATE INDEX idx_shopify_orders_transaction ON shopify_orders(transaction_id);
+
+-- Shopify Shop Settings table
+CREATE TABLE IF NOT EXISTS shopify_shop_settings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    shop VARCHAR NOT NULL UNIQUE,
+    api_key VARCHAR NOT NULL,
+    api_secret VARCHAR NOT NULL,
+    merchant_id VARCHAR NOT NULL,
+    webhook_url VARCHAR,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_shopify_shop_settings_shop ON shopify_shop_settings(shop);
+
+-- Add comment for documentation
+COMMENT ON TABLE shopify_shop_settings IS 'Stores Shopify shop integration settings and credentials'; 
+
+
+-- Create shopify_sessions table
+CREATE TABLE IF NOT EXISTS shopify_sessions (
+    id TEXT PRIMARY KEY,
+    shop TEXT NOT NULL,
+    state TEXT NOT NULL,
+    isOnline BOOLEAN NOT NULL DEFAULT false,
+    scope TEXT,
+    expires TIMESTAMPTZ,
+    accessToken TEXT NOT NULL,
+    userId BIGINT,
+    firstName TEXT,
+    lastName TEXT,
+    email TEXT,
+    accountOwner BOOLEAN NOT NULL DEFAULT false,
+    locale TEXT,
+    collaborator BOOLEAN DEFAULT false,
+    emailVerified BOOLEAN DEFAULT false,
+    expires_in INTEGER,
+    associated_user_scope TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create indexes for faster lookups
+CREATE INDEX IF NOT EXISTS idx_shopify_sessions_shop ON shopify_sessions(shop);
+CREATE INDEX IF NOT EXISTS idx_shopify_sessions_state ON shopify_sessions(state);
+
+-- Add comment for documentation
+COMMENT ON TABLE shopify_sessions IS 'Stores Shopify session data for authentication'; 
