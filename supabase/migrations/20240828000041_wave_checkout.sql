@@ -346,3 +346,26 @@ BEGIN
     AND pt.provider_code = 'WAVE';
 END;
 $$;
+
+-- Function to update provider settings metadata
+CREATE OR REPLACE FUNCTION update_provider_settings_metadata(
+    p_organization_id UUID,
+    p_provider_code provider_code,
+    p_provider_merchant_id VARCHAR,
+    p_metadata JSONB
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    UPDATE organization_providers_settings
+    SET 
+        provider_merchant_id = p_provider_merchant_id,
+        metadata = p_metadata,
+        updated_at = NOW()
+    WHERE 
+        organization_id = p_organization_id 
+        AND provider_code = p_provider_code;
+END;
+$$;

@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dialog"
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
 import { countries } from '@/lib/data/onboarding.ts'
+import WaveService from '@/utils/wave/service'
+import { toast } from "@/components/ui/use-toast"
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
@@ -51,6 +53,7 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
     const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+    const [customerId, setCustomerId] = useState<string | null>(null);
 
     useEffect(() => {
         // Get user's country using their IP
@@ -158,7 +161,59 @@ export default function CheckoutPage() {
 
     const handleProviderClick = async (provider: string) => {
         setSelectedProvider(provider)
-        setIsCheckoutModalOpen(true)
+
+        if (provider === 'WAVE') {
+            try {
+                setIsProcessing(true);
+
+                if (!customerId || !checkoutData) {
+                    throw new Error('Missing required data for checkout');
+                }
+
+                // Calculate total amount including fees
+                const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
+                const fees = checkoutData?.merchantProduct?.fees || [];
+                const feeAmount = fees.reduce((total, fee) => {
+                    return total + (basePrice * (fee.percentage / 100));
+                }, 0);
+                const totalAmount = basePrice + feeAmount;
+
+                // Use the WaveCheckout component
+                const { checkoutUrl } = await WaveService.createCheckoutSession({
+                    merchantId: checkoutData.paymentLink.merchantId,
+                    organizationId: checkoutData.paymentLink.organizationId,
+                    customerId,
+                    amount: totalAmount,
+                    currency: checkoutData.paymentLink.currency_code,
+                    successUrl: checkoutData.paymentLink.success_url || window.location.origin + '/success',
+                    errorUrl: checkoutData.paymentLink.cancel_url || window.location.origin + '/error',
+                    productId: checkoutData.merchantProduct?.product_id,
+                    subscriptionId: checkoutData.subscriptionPlan?.planId,
+                    description: checkoutData.paymentLink.title,
+                    metadata: {
+                        linkId: checkoutData.paymentLink.linkId,
+                        customerEmail: customerDetails.email,
+                        customerPhone: customerDetails.phoneNumber,
+                        customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber
+                    }
+                });
+
+                // Redirect to Wave payment page
+                window.location.href = checkoutUrl;
+            } catch (error) {
+                console.error('Error creating Wave checkout session:', error);
+                toast({
+                    variant: "destructive",
+                    title: "Payment Error",
+                    description: "Failed to initiate Wave payment. Please try again."
+                });
+            } finally {
+                setIsProcessing(false);
+            }
+        } else {
+            setIsCheckoutModalOpen(true);
+        }
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,7 +253,7 @@ export default function CheckoutPage() {
 
         if (checkoutData) {
             try {
-                const { data, error } = await supabase.rpc('create_or_update_customer', {
+                const { data: newCustomerId, error } = await supabase.rpc('create_or_update_customer', {
                     p_merchant_id: checkoutData.paymentLink.merchantId,
                     p_organization_id: checkoutData.paymentLink.organizationId,
                     p_name: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
@@ -216,11 +271,7 @@ export default function CheckoutPage() {
                     return;
                 }
 
-                const customerId = data;
-                if (customerId) {
-                    // Process the payment with the customerId
-                    // ...
-                }
+                setCustomerId(newCustomerId);
             } catch (error) {
                 console.error('Error creating/updating customer:', error);
             }

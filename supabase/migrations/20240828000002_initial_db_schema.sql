@@ -265,6 +265,7 @@ COMMENT ON TABLE payment_methods IS 'Examples: CARD, MOBILE_MONEY, CASH, BANK_TR
 CREATE TABLE organization_providers_settings (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(code),
+    provider_merchant_id VARCHAR(255),
     is_connected BOOLEAN NOT NULL DEFAULT false,
     phone_number VARCHAR,
     is_phone_verified BOOLEAN NOT NULL DEFAULT false,
@@ -279,6 +280,7 @@ CREATE TABLE organization_providers_settings (
 CREATE INDEX idx_org_providers_provider_code ON organization_providers_settings(provider_code);
 CREATE INDEX idx_org_providers_phone ON organization_providers_settings(phone_number) WHERE phone_number IS NOT NULL;
 CREATE INDEX idx_org_providers_verified ON organization_providers_settings(is_phone_verified) WHERE is_phone_verified = true;
+CREATE INDEX idx_org_providers_provider_merchant_id ON organization_providers_settings(provider_merchant_id) WHERE provider_merchant_id IS NOT NULL;
 
 COMMENT ON TABLE organization_providers_settings IS 'Links organizations to their chosen payment providers';
 COMMENT ON COLUMN organization_providers_settings.is_connected IS 'Indicates if the organization has successfully connected and set up the provider';

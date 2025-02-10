@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { IconPlus } from '@tabler/icons-react'
+import { Loader2 } from 'lucide-react'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import Notifications from '@/components/portal/notifications'
@@ -29,6 +30,7 @@ export default function PaymentChannels() {
   const { user, isLoading: isUserLoading } = useUser()
   const { sidebarData, isLoading: isSidebarLoading } = useSidebarData()
   const [organizationProviders, setOrganizationProviders] = useState<Pick<Database['public']['Tables']['organization_providers_settings']['Row'], 'provider_code' | 'is_connected'>[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const topNav = [
     { title: 'payment_channels', href: '/portal/payment-channels', isActive: true },
@@ -59,6 +61,76 @@ export default function PaymentChannels() {
     }
 
     const method = paymentMethods.find(m => m.provider_code === providerCode)
+
+    // Special handling for Wave provider
+    if (providerCode === 'WAVE' && sidebarData?.organization_id) {
+      try {
+        setIsProcessing(true);
+        setConnectingProvider(providerCode);
+
+        // 1. Get merchant details for Wave
+        const { data: merchantDetails, error: detailsError } = await supabase
+          .rpc('get_merchant_details_for_wave', {
+            p_merchant_id: user?.id,
+            p_organization_id: sidebarData.organization_id
+          });
+
+        if (detailsError || !merchantDetails?.[0]) {
+          throw new Error('Failed to get merchant details');
+        }
+
+        const details = merchantDetails[0];
+
+        // 2. Create Wave aggregated merchant
+        const { WaveAggregator } = await import('@/utils/wave/aggregator');
+        const waveAggregatedMerchant = await WaveAggregator.createAggregatedMerchant({
+          name: details.merchant_name || details.organization_name,
+          business_type: 'other',
+          business_description: details.merchant_name
+            ? `${details.merchant_name} - A merchant on Lomi platform`
+            : 'A merchant on Lomi platform',
+          business_sector: 'retail',
+          website_url: `https://lomi.africa`,
+          manager_name: details.merchant_name,
+          business_registration_identifier: user?.id
+        });
+
+        // 3. Update provider connection with merchant ID
+        const { error: connectionError } = await supabase
+          .rpc('update_organization_provider_connection', {
+            p_organization_id: sidebarData.organization_id,
+            p_provider_code: providerCode,
+            p_is_connected: true,
+            p_provider_merchant_id: waveAggregatedMerchant.id,
+            p_metadata: {
+              wave_merchant: waveAggregatedMerchant
+            }
+          });
+
+        if (connectionError) {
+          throw new Error('Failed to connect Wave provider');
+        }
+
+        const method = paymentMethods.find(m => m.provider_code === providerCode);
+        toast({
+          title: "Success",
+          description: `Successfully connected to ${method?.name}`,
+        });
+
+        fetchOrganizationProviders(sidebarData.organization_id);
+      } catch (error) {
+        console.error('Error connecting Wave:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to connect to Wave. Please try again.",
+        });
+      } finally {
+        setIsProcessing(false);
+        setConnectingProvider(null);
+      }
+      return;
+    }
 
     if (method && (method.type === 'Mobile Money' || method.type === 'e-Wallets')) {
       setConnectingProvider(providerCode)
@@ -274,7 +346,12 @@ export default function PaymentChannels() {
                                 ? 'Coming Soon'
                                 : organizationProviders.some(op =>
                                   op.provider_code === method.provider_code && op.is_connected
-                                ) ? 'Connected' : 'Connect'
+                                ) ? 'Connected' : isProcessing && connectingProvider === method.provider_code ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Connecting...
+                                  </>
+                                ) : 'Connect'
                               }
                             </Button>
                           )}
