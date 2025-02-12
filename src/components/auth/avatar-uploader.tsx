@@ -40,6 +40,16 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 toast({ title: "Error", description: t('auth.avatar_uploader.error.file_size') })
                 return
             }
+            // Check file type
+            const fileType = file.type.toLowerCase();
+            if (!fileType.match(/^image\/(jpeg|jpg|png)$/)) {
+                toast({
+                    title: "Error",
+                    description: "Only JPEG and PNG files are allowed",
+                    variant: "destructive"
+                });
+                return;
+            }
             setSelectedFile(file)
             setIsDialogOpen(true)
         }
@@ -84,7 +94,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
         return new Promise((resolve) => {
             canvas.toBlob((blob) => {
                 resolve(blob)
-            }, 'image/png')
+            }, 'image/jpeg', 0.95) // Changed to JPEG with high quality
         })
     }
 
@@ -97,27 +107,45 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 );
 
                 if (croppedImage) {
-                    // For preview purposes
                     setPreviewUrl(URL.createObjectURL(croppedImage));
 
-                    // Upload to Supabase
                     const { data: { user } } = await supabase.auth.getUser();
                     if (!user) throw new Error('No user found');
 
-                    const fileExt = selectedFile.name.split('.').pop();
-                    const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
-                    const filePath = `${fileName}`;
+                    // Always use jpg extension since we're converting to JPEG
+                    const fileName = `${user.id}/avatar-${Date.now()}.jpg`;
 
                     const { data, error } = await supabase.storage
                         .from('avatars')
-                        .upload(filePath, croppedImage, { contentType: 'image/png' });
+                        .upload(fileName, croppedImage, {
+                            contentType: 'image/jpeg', // Changed to match JPEG format
+                            cacheControl: '3600',
+                            upsert: true
+                        });
 
                     if (error) {
                         throw error;
                     }
 
                     if (data) {
-                        const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(data.path);
+                        // Get the relative path from the upload response
+                        const relativePath = data.path;
+
+                        // Update merchant avatar with relative path
+                        const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
+                            p_merchant_id: user.id,
+                            p_avatar_url: relativePath
+                        });
+
+                        if (updateError) {
+                            throw updateError;
+                        }
+
+                        // Get public URL for display
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('avatars')
+                            .getPublicUrl(relativePath);
+
                         onAvatarUpdate(publicUrl);
                         toast({
                             title: "Success",
