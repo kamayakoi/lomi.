@@ -1,70 +1,28 @@
 import type { WaveCheckoutSession, WaveAggregatedMerchant, CreateWaveAggregatedMerchantParams, WaveAggregatedMerchantResponse } from './types';
+import { supabase } from '../supabase/client';
 
 export class WaveClient {
-    private apiKey: string;
-    private baseUrl: string;
-
-    constructor() {
-        this.apiKey = import.meta.env['VITE_WAVE_API_KEY'];
-        this.baseUrl = 'https://api.wave.com';
-    }
-
     /**
-     * Makes a request to the Wave API
+     * Makes a request to our Wave API Edge Function
      */
     async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-        const url = `${this.baseUrl}${path}`;
-        const headers = {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Origin': window.location.origin,
-            ...options.headers
-        };
-
         try {
-            console.log(`Making Wave API request to ${url}`, {
-                method: options.method || 'GET',
-                headers,
-                body: options.body
+            const { data, error } = await supabase.functions.invoke('wave-api', {
+                body: {
+                    path,
+                    method: options.method || 'GET',
+                    body: options.body ? JSON.parse(options.body as string) : undefined
+                }
             });
 
-            const response = await fetch(url, {
-                ...options,
-                headers,
-                mode: 'cors',
-                credentials: 'omit'
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Wave API error response:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    body: errorText,
-                    headers: Object.fromEntries(response.headers.entries())
-                });
-
-                if (response.status === 401) {
-                    throw new Error('Wave API authentication failed. Please check your API key.');
-                }
-                if (response.status === 403) {
-                    throw new Error('Access denied. Your account may not have permission for this operation.');
-                }
-
-                throw new Error(`Wave API request failed: ${response.status} ${response.statusText}`);
+            if (error) {
+                console.error('Wave API Request Failed:', error);
+                throw error;
             }
 
-            const data = await response.json();
-            console.log('Wave API response:', data);
             return data;
         } catch (error) {
-            console.error('Wave API Request Failed:', {
-                url,
-                method: options.method || 'GET',
-                error: error instanceof Error ? error.message : 'Unknown error',
-                apiKey: this.apiKey ? 'Present' : 'Missing'
-            });
+            console.error('Wave API Request Failed:', error);
             throw error;
         }
     }
