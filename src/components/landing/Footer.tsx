@@ -254,7 +254,7 @@ export function Footer() {
                             <div className="space-y-4 lg:-ml-20 pl-4 sm:pl-8">
                                 <div className="flex flex-row items-center gap-2 w-full max-w-[600px]">
                                     <Link
-                                        to="https://github.com/lomiafrica/developers.lomi.africa"
+                                        to="https://github.com/lomiafrica/lomi%2E"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center h-10 shrink-0"

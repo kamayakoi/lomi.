@@ -38,7 +38,7 @@ export default function GitHubStars() {
     }, [])
 
     const handleClick = () => {
-        window.open('https://github.com/lomiafrica/developers.lomi.africa', '_blank', 'noopener,noreferrer')
+        window.open('https://github.com/lomiafrica/lomi%2E', '_blank', 'noopener,noreferrer')
     }
 
     return (

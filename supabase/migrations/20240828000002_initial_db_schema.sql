@@ -3,7 +3,7 @@
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 CREATE TYPE transaction_type AS ENUM ('payment', 'instalment');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'PAYPAL', 'OTHER');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'PAYPAL', 'OZOW', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time');
@@ -21,6 +21,7 @@ CREATE TYPE notification_type AS ENUM ('onboarding', 'tip', 'transaction', 'payo
 CREATE TYPE support_category AS ENUM ('account', 'billing', 'technical', 'feature', 'other');
 CREATE TYPE support_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
 CREATE TYPE support_priority AS ENUM ('low', 'normal', 'high', 'urgent');
+CREATE TYPE fee_type AS ENUM ('platform', 'processing', 'conversion', 'payout', 'refund');
 CREATE TYPE event_type AS ENUM (
     -- Authentication & Security
     'create_api_key',
@@ -99,6 +100,7 @@ CREATE TYPE webhook_event AS ENUM (
 CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
 CREATE TYPE provider_payment_status AS ENUM ('processing', 'cancelled', 'succeeded');
+CREATE TYPE provider_business_type AS ENUM ('fintech', 'other');
 
 --------------- TABLES ---------------
 
@@ -266,6 +268,7 @@ CREATE TABLE organization_providers_settings (
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     provider_code provider_code NOT NULL REFERENCES providers(code),
     provider_merchant_id VARCHAR(255),
+    provider_business_type provider_business_type DEFAULT 'other',
     is_connected BOOLEAN NOT NULL DEFAULT false,
     phone_number VARCHAR,
     is_phone_verified BOOLEAN NOT NULL DEFAULT false,
@@ -337,6 +340,7 @@ CREATE TABLE merchant_accounts (
     balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (merchant_id, currency_code)
 );
 
@@ -350,9 +354,10 @@ CREATE TABLE platform_main_account (
     balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     total_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
     available_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
-    pending_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
     currency_code currency_code NOT NULL,
-    last_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (currency_code)
 );
 
 CREATE INDEX idx_platform_main_account_currency_code ON platform_main_account(currency_code);
@@ -362,15 +367,41 @@ COMMENT ON TABLE platform_main_account IS 'Tracks the overall platform balance a
 -- Platform Provider Balance table
 CREATE TABLE platform_provider_balance (
     provider_code provider_code NOT NULL,
-    balance NUMERIC(15,2) NOT NULL DEFAULT 0,
+    total_transactions_amount NUMERIC(15,2) NOT NULL DEFAULT 0,
+    current_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
     currency_code currency_code NOT NULL,
-    last_updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (provider_code, currency_code)
+    provider_fees NUMERIC(15,2) NOT NULL DEFAULT 0,
+    platform_revenue NUMERIC(15,2) NOT NULL DEFAULT 0,
+    quarter_start_date DATE NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (provider_code, currency_code, quarter_start_date)
 );
 
 CREATE INDEX idx_platform_provider_balance_currency_code ON platform_provider_balance(currency_code);
-
+CREATE INDEX idx_platform_provider_balance_provider_code ON platform_provider_balance(provider_code);
 COMMENT ON TABLE platform_provider_balance IS 'Tracks the balance for each provider in each currency';
+
+-- Table to keep historical data
+CREATE TABLE platform_provider_balance_history (
+    history_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    provider_code provider_code NOT NULL,
+    total_transactions_amount NUMERIC(15,2) NOT NULL,
+    final_balance NUMERIC(15,2) NOT NULL,
+    currency_code currency_code NOT NULL,
+    provider_fees NUMERIC(15,2) NOT NULL,
+    platform_revenue NUMERIC(15,2) NOT NULL,
+    quarter_start_date DATE NOT NULL,
+    quarter_end_date DATE NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_platform_provider_balance_history_provider_code ON platform_provider_balance_history(provider_code);
+CREATE INDEX idx_platform_provider_balance_history_currency_code ON platform_provider_balance_history(currency_code);
+CREATE INDEX idx_platform_provider_balance_history_quarter_start_date ON platform_provider_balance_history(quarter_start_date);
+
+COMMENT ON TABLE platform_provider_balance_history IS 'Tracks historical balance changes for each provider';
+
 
 -- Merchant Products table
 CREATE TABLE merchant_products (
@@ -463,7 +494,7 @@ CREATE TABLE fees (
     fee_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR NOT NULL UNIQUE,
     transaction_type transaction_type NOT NULL,
-    fee_type VARCHAR NOT NULL,
+    fee_type fee_type NOT NULL,
     percentage NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (percentage >= -100 AND percentage <= 100),
     fixed_amount NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (fixed_amount >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
@@ -495,7 +526,6 @@ CREATE TABLE transactions (
     transaction_type transaction_type NOT NULL,
     status transaction_status NOT NULL DEFAULT 'pending',
     description TEXT,
-    reference_id VARCHAR(8) NOT NULL,
     metadata JSONB,
     gross_amount NUMERIC(10,2) NOT NULL CHECK (gross_amount > 0),
     fee_amount NUMERIC(15,2) NOT NULL,
@@ -1057,118 +1087,3 @@ CREATE INDEX idx_organization_fee_links_fee ON organization_fee_links(fee_type_i
 CREATE INDEX idx_organization_fee_links_product ON organization_fee_links(product_id);
 
 COMMENT ON TABLE organization_fee_links IS 'Links organization fees to specific products';
-
--- Shopify Stores Table
-CREATE TABLE shopify_stores (
-    store_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    shop_domain VARCHAR NOT NULL,
-    access_token VARCHAR NOT NULL,
-    scope VARCHAR[] NOT NULL,
-    installed_at TIMESTAMPTZ DEFAULT NOW(),
-    uninstalled_at TIMESTAMPTZ,
-    metadata JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(organization_id, shop_domain)
-);
-
-CREATE INDEX idx_shopify_stores_organization ON shopify_stores(organization_id);
-CREATE INDEX idx_shopify_stores_domain ON shopify_stores(shop_domain);
-
--- Shopify Webhooks Table
-CREATE TABLE shopify_webhooks (
-    webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
-    topic VARCHAR NOT NULL,
-    address VARCHAR NOT NULL,
-    shopify_webhook_id VARCHAR NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(store_id, topic)
-);
-
-CREATE INDEX idx_shopify_webhooks_store ON shopify_webhooks(store_id);
-
--- Shopify Products Table
-CREATE TABLE shopify_products (
-    product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
-    shopify_product_id VARCHAR NOT NULL,
-    title VARCHAR NOT NULL,
-    price NUMERIC(10,2) NOT NULL,
-    currency_code currency_code NOT NULL REFERENCES currencies(code),
-    metadata JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(store_id, shopify_product_id)
-);
-
-CREATE INDEX idx_shopify_products_store ON shopify_products(store_id);
-
--- Shopify Orders Table
-CREATE TABLE shopify_orders (
-    order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    store_id UUID NOT NULL REFERENCES shopify_stores(store_id),
-    shopify_order_id VARCHAR NOT NULL,
-    transaction_id UUID REFERENCES transactions(transaction_id),
-    total_price NUMERIC(10,2) NOT NULL,
-    currency_code currency_code NOT NULL REFERENCES currencies(code),
-    status VARCHAR NOT NULL,
-    metadata JSONB,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE(store_id, shopify_order_id)
-);
-
-CREATE INDEX idx_shopify_orders_store ON shopify_orders(store_id);
-CREATE INDEX idx_shopify_orders_transaction ON shopify_orders(transaction_id);
-
--- Shopify Shop Settings table
-CREATE TABLE IF NOT EXISTS shopify_shop_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    shop VARCHAR NOT NULL UNIQUE,
-    api_key VARCHAR NOT NULL,
-    api_secret VARCHAR NOT NULL,
-    merchant_id VARCHAR NOT NULL,
-    webhook_url VARCHAR,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Create index for faster lookups
-CREATE INDEX IF NOT EXISTS idx_shopify_shop_settings_shop ON shopify_shop_settings(shop);
-
--- Add comment for documentation
-COMMENT ON TABLE shopify_shop_settings IS 'Stores Shopify shop integration settings and credentials'; 
-
-
--- Create shopify_sessions table
-CREATE TABLE IF NOT EXISTS shopify_sessions (
-    id TEXT PRIMARY KEY,
-    shop TEXT NOT NULL,
-    state TEXT NOT NULL,
-    isOnline BOOLEAN NOT NULL DEFAULT false,
-    scope TEXT,
-    expires TIMESTAMPTZ,
-    accessToken TEXT NOT NULL,
-    userId BIGINT,
-    firstName TEXT,
-    lastName TEXT,
-    email TEXT,
-    accountOwner BOOLEAN NOT NULL DEFAULT false,
-    locale TEXT,
-    collaborator BOOLEAN DEFAULT false,
-    emailVerified BOOLEAN DEFAULT false,
-    expires_in INTEGER,
-    associated_user_scope TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Create indexes for faster lookups
-CREATE INDEX IF NOT EXISTS idx_shopify_sessions_shop ON shopify_sessions(shop);
-CREATE INDEX IF NOT EXISTS idx_shopify_sessions_state ON shopify_sessions(state);
-
--- Add comment for documentation
-COMMENT ON TABLE shopify_sessions IS 'Stores Shopify session data for authentication'; 
