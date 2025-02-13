@@ -80,7 +80,7 @@ BEGIN
         is_phone_verified = EXCLUDED.is_phone_verified,
         updated_at = NOW();
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to get merchant details for Wave integration
 CREATE OR REPLACE FUNCTION public.get_merchant_details_for_wave(

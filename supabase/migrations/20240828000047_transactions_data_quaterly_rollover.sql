@@ -55,7 +55,7 @@ BEGIN
     DELETE FROM platform_provider_balance 
     WHERE quarter_start_date < v_quarter_start;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create a trigger to automatically check for rollover on each transaction
 CREATE OR REPLACE FUNCTION check_quarterly_rollover() RETURNS trigger AS $$
@@ -71,7 +71,7 @@ BEGIN
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 CREATE TRIGGER check_quarterly_rollover_trigger
     BEFORE INSERT OR UPDATE ON platform_provider_balance

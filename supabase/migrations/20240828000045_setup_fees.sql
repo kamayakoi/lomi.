@@ -50,7 +50,11 @@ RETURNS TABLE (
     name VARCHAR,
     percentage NUMERIC(5,2),
     fixed_amount NUMERIC(10,2)
-) AS $$
+) 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 BEGIN
     -- First try to get provider-specific fee
     RETURN QUERY
@@ -74,4 +78,4 @@ BEGIN
         LIMIT 1;
     END IF;
 END;
-$$ LANGUAGE plpgsql; 
+$$;

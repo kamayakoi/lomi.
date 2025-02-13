@@ -113,6 +113,84 @@ ALTER TABLE shopify.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shopify.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shopify.sessions ENABLE ROW LEVEL SECURITY;
 
+-- Add RLS policies for stores
+CREATE POLICY "Organizations can manage their own stores"
+    ON shopify.stores
+    FOR ALL
+    TO authenticated
+    USING (organization_id IN (
+        SELECT mol.organization_id 
+        FROM merchant_organization_links mol 
+        WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
+    ));
+
+-- Add RLS policies for webhooks
+CREATE POLICY "Organizations can manage their store webhooks"
+    ON shopify.webhooks
+    FOR ALL
+    TO authenticated
+    USING (store_id IN (
+        SELECT s.store_id 
+        FROM shopify.stores s 
+        WHERE s.organization_id IN (
+            SELECT mol.organization_id 
+            FROM merchant_organization_links mol 
+            WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
+        )
+    ));
+
+-- Add RLS policies for products
+CREATE POLICY "Organizations can manage their store products"
+    ON shopify.products
+    FOR ALL
+    TO authenticated
+    USING (store_id IN (
+        SELECT s.store_id 
+        FROM shopify.stores s 
+        WHERE s.organization_id IN (
+            SELECT mol.organization_id 
+            FROM merchant_organization_links mol 
+            WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
+        )
+    ));
+
+-- Add RLS policies for orders
+CREATE POLICY "Organizations can manage their store orders"
+    ON shopify.orders
+    FOR ALL
+    TO authenticated
+    USING (store_id IN (
+        SELECT s.store_id 
+        FROM shopify.stores s 
+        WHERE s.organization_id IN (
+            SELECT mol.organization_id 
+            FROM merchant_organization_links mol 
+            WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
+        )
+    ));
+
+-- Add RLS policies for sessions
+CREATE POLICY "Organizations can manage their store sessions"
+    ON shopify.sessions
+    FOR ALL
+    TO authenticated
+    USING (shop IN (
+        SELECT s.shop_domain 
+        FROM shopify.stores s 
+        WHERE s.organization_id IN (
+            SELECT mol.organization_id 
+            FROM merchant_organization_links mol 
+            WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
+        )
+    ));
+
+-- Allow service role to bypass RLS
+ALTER TABLE shopify.stores FORCE ROW LEVEL SECURITY;
+ALTER TABLE shopify.webhooks FORCE ROW LEVEL SECURITY;
+ALTER TABLE shopify.products FORCE ROW LEVEL SECURITY;
+ALTER TABLE shopify.orders FORCE ROW LEVEL SECURITY;
+ALTER TABLE shopify.sessions FORCE ROW LEVEL SECURITY;
+
 -- Create RPC functions in the shopify schema
 CREATE OR REPLACE FUNCTION shopify.install_store(
     p_organization_id UUID,
@@ -138,7 +216,7 @@ BEGIN
     
     RETURN v_store_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.manage_session(
     p_id TEXT,
@@ -219,28 +297,28 @@ BEGIN
     
     RETURN p_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.delete_session(p_id TEXT) RETURNS BOOLEAN AS $$
 BEGIN
     DELETE FROM shopify.sessions WHERE id = p_id;
     RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.delete_sessions(p_ids TEXT[]) RETURNS BOOLEAN AS $$
 BEGIN
     DELETE FROM shopify.sessions WHERE id = ANY(p_ids);
     RETURN FOUND;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.find_sessions_by_shop(p_shop TEXT) RETURNS SETOF shopify.sessions AS $$
 BEGIN
     RETURN QUERY
     SELECT * FROM shopify.sessions WHERE shop = p_shop;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.register_webhook(
     p_store_id UUID,
@@ -266,7 +344,7 @@ BEGIN
     
     RETURN v_webhook_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 CREATE OR REPLACE FUNCTION shopify.sync_order(
     p_store_id UUID,
@@ -308,7 +386,7 @@ BEGIN
     
     RETURN v_order_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = shopify, public, pg_temp;
 
 -- Grant necessary permissions
 GRANT USAGE ON SCHEMA shopify TO service_role;

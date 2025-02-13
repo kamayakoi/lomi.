@@ -13,4 +13,12 @@ https-only = true
 
 [runtime]
 # Enable fetch streaming for better performance
-streaming = true 
+streaming = true
+
+[websocket]
+# Enable WebSocket compression
+compression = true
+# Increase max payload size
+max_payload_size = "16mb"
+# Set ping interval for connection health checks
+ping_interval = 30000 

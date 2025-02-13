@@ -17,6 +17,7 @@ CREATE OR REPLACE FUNCTION create_wave_checkout_transaction(
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
     v_transaction_id UUID;
@@ -126,6 +127,7 @@ CREATE OR REPLACE FUNCTION update_wave_checkout_status(
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
     v_transaction_id UUID;
@@ -197,6 +199,7 @@ CREATE OR REPLACE FUNCTION update_merchant_account_after_transaction()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
     v_merchant_id UUID;
@@ -260,6 +263,7 @@ CREATE OR REPLACE FUNCTION create_or_update_customer(
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 DECLARE
     v_customer_id UUID;
@@ -332,6 +336,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
     RETURN QUERY
@@ -357,6 +362,7 @@ CREATE OR REPLACE FUNCTION update_provider_settings_metadata(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, pg_temp
 AS $$
 BEGIN
     UPDATE organization_providers_settings

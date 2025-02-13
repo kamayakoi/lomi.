@@ -126,11 +126,13 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: true,
+    strictPort: false,
     hmr: {
       protocol: 'ws',
       host: 'localhost',
-      port: 5173
+      port: 24678,
+      timeout: 5000,
+      overlay: true
     },
     proxy: {
       "/api": {
@@ -140,7 +142,7 @@ export default defineConfig({
       },
     },
     headers: {
-      'Cache-Control': 'public, max-age=31536000', // 1 year for static assets
+      'Cache-Control': 'public, max-age=31536000',
     },
   },
   optimizeDeps: {
