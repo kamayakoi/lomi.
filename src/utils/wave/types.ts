@@ -51,14 +51,13 @@ export type WavePaymentStatus = 'processing' | 'cancelled' | 'succeeded';
 
 // Wave API Types
 
-export type WaveBusinessType = 'individual' | 'company' | 'other';
-export type WaveBusinessSector = 'retail' | 'services' | 'manufacturing' | 'other';
+export type WaveBusinessType = 'fintech' | 'other';
 
 export interface CreateWaveAggregatedMerchantParams {
     name: string;
     business_type: WaveBusinessType;
     business_description: string;
-    business_sector: WaveBusinessSector;
+    business_sector: string;
     website_url?: string;
     business_registration_identifier?: string;
     manager_name?: string;
@@ -69,12 +68,14 @@ export interface WaveAggregatedMerchant {
     name: string;
     business_type: WaveBusinessType;
     business_description: string;
-    business_sector: WaveBusinessSector;
+    business_sector: string;
     website_url?: string;
-    business_registration_identifier?: string;
     manager_name?: string;
-    created_at: string;
-    updated_at: string;
+    business_registration_identifier?: string;
+    when_created: string;
+    is_locked: boolean;
+    checkout_fee_structure_name: string;
+    payout_fee_structure_name: string;
 }
 
 export interface WaveAggregatedMerchantResponse {

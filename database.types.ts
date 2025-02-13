@@ -470,7 +470,7 @@ export type Database = {
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           fee_id: string
-          fee_type: string
+          fee_type: Database["public"]["Enums"]["fee_type"]
           fixed_amount: number
           name: string
           payment_method_code:
@@ -485,7 +485,7 @@ export type Database = {
           created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           fee_id?: string
-          fee_type: string
+          fee_type: Database["public"]["Enums"]["fee_type"]
           fixed_amount?: number
           name: string
           payment_method_code?:
@@ -500,7 +500,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           fee_id?: string
-          fee_type?: string
+          fee_type?: Database["public"]["Enums"]["fee_type"]
           fixed_amount?: number
           name?: string
           payment_method_code?:
@@ -588,6 +588,7 @@ export type Database = {
           created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
           merchant_id: string
+          updated_at: string
         }
         Insert: {
           account_id?: string
@@ -595,6 +596,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           merchant_id: string
+          updated_at?: string
         }
         Update: {
           account_id?: string
@@ -602,6 +604,7 @@ export type Database = {
           created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
           merchant_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1726,28 +1729,36 @@ export type Database = {
         Row: {
           available_balance: number
           balance_id: string
+          created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_updated_at: string
-          pending_balance: number
           total_balance: number
+          updated_at: string
         }
         Insert: {
           available_balance?: number
           balance_id?: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
-          pending_balance?: number
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
           total_balance?: number
+          updated_at?: string
         }
         Update: {
           available_balance?: number
           balance_id?: string
+          created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
-          pending_balance?: number
           total_balance?: number
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "platform_main_account_currency_code_fkey"
+            columns: ["currency_code"]
+            isOneToOne: true
+            referencedRelation: "currencies"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       platform_metrics: {
         Row: {
@@ -1784,22 +1795,76 @@ export type Database = {
       }
       platform_provider_balance: {
         Row: {
-          balance: number
+          created_at: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_updated_at: string
+          current_balance: number
+          platform_revenue: number
           provider_code: Database["public"]["Enums"]["provider_code"]
+          provider_fees: number
+          quarter_start_date: string
+          total_transactions_amount: number
+          updated_at: string
         }
         Insert: {
-          balance?: number
+          created_at?: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
+          current_balance?: number
+          platform_revenue?: number
           provider_code: Database["public"]["Enums"]["provider_code"]
+          provider_fees?: number
+          quarter_start_date: string
+          total_transactions_amount?: number
+          updated_at?: string
         }
         Update: {
-          balance?: number
+          created_at?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
+          current_balance?: number
+          platform_revenue?: number
           provider_code?: Database["public"]["Enums"]["provider_code"]
+          provider_fees?: number
+          quarter_start_date?: string
+          total_transactions_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      platform_provider_balance_history: {
+        Row: {
+          created_at: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          final_balance: number
+          history_id: string
+          platform_revenue: number
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          provider_fees: number
+          quarter_end_date: string
+          quarter_start_date: string
+          total_transactions_amount: number
+        }
+        Insert: {
+          created_at?: string
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          final_balance: number
+          history_id?: string
+          platform_revenue: number
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          provider_fees: number
+          quarter_end_date: string
+          quarter_start_date: string
+          total_transactions_amount: number
+        }
+        Update: {
+          created_at?: string
+          currency_code?: Database["public"]["Enums"]["currency_code"]
+          final_balance?: number
+          history_id?: string
+          platform_revenue?: number
+          provider_code?: Database["public"]["Enums"]["provider_code"]
+          provider_fees?: number
+          quarter_end_date?: string
+          quarter_start_date?: string
+          total_transactions_amount?: number
         }
         Relationships: []
       }
@@ -2434,7 +2499,6 @@ export type Database = {
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           product_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
           status: Database["public"]["Enums"]["transaction_status"]
           subscription_id: string | null
           transaction_id: string
@@ -2457,7 +2521,6 @@ export type Database = {
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           product_id?: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
           status?: Database["public"]["Enums"]["transaction_status"]
           subscription_id?: string | null
           transaction_id?: string
@@ -2480,7 +2543,6 @@ export type Database = {
           payment_method_code?: Database["public"]["Enums"]["payment_method_code"]
           product_id?: string | null
           provider_code?: Database["public"]["Enums"]["provider_code"]
-          reference_id?: string
           status?: Database["public"]["Enums"]["transaction_status"]
           subscription_id?: string | null
           transaction_id?: string
@@ -2873,49 +2935,65 @@ export type Database = {
         }
         Returns: string
       }
-      create_transaction: {
-        Args: {
-          merchant_id: string
-          organization_id: string
-          customer_id: string
-          product_id: string
-          subscription_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          description: string
-          reference_id: string
-          metadata: Json
-          gross_amount: number
-          fee_amount: number
-          net_amount: number
-          fee_reference: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-        }
-        Returns: {
-          additional_fees: Json | null
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id: string
-          description: string | null
-          fee_amount: number
-          fee_reference: string
-          gross_amount: number
-          merchant_id: string
-          metadata: Json | null
-          net_amount: number
-          organization_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          product_id: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
-          status: Database["public"]["Enums"]["transaction_status"]
-          subscription_id: string | null
-          transaction_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          updated_at: string
-        }
-      }
+      create_transaction:
+        | {
+            Args: {
+              merchant_id: string
+              organization_id: string
+              customer_id: string
+              product_id: string
+              subscription_id: string
+              transaction_type: Database["public"]["Enums"]["transaction_type"]
+              description: string
+              reference_id: string
+              metadata: Json
+              gross_amount: number
+              fee_amount: number
+              net_amount: number
+              fee_reference: string
+              currency_code: Database["public"]["Enums"]["currency_code"]
+              provider_code: Database["public"]["Enums"]["provider_code"]
+              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+            }
+            Returns: {
+              additional_fees: Json | null
+              created_at: string
+              currency_code: Database["public"]["Enums"]["currency_code"]
+              customer_id: string
+              description: string | null
+              fee_amount: number
+              fee_reference: string
+              gross_amount: number
+              merchant_id: string
+              metadata: Json | null
+              net_amount: number
+              organization_id: string
+              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+              product_id: string | null
+              provider_code: Database["public"]["Enums"]["provider_code"]
+              status: Database["public"]["Enums"]["transaction_status"]
+              subscription_id: string | null
+              transaction_id: string
+              transaction_type: Database["public"]["Enums"]["transaction_type"]
+              updated_at: string
+            }
+          }
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id: string
+              p_customer_id: string
+              p_amount: number
+              p_currency_code: Database["public"]["Enums"]["currency_code"]
+              p_provider_code: Database["public"]["Enums"]["provider_code"]
+              p_payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+              p_description?: string
+              p_product_id?: string
+              p_subscription_id?: string
+              p_metadata?: Json
+            }
+            Returns: string
+          }
       create_transaction_with_provider: {
         Args: {
           merchant_id: string
@@ -2953,7 +3031,6 @@ export type Database = {
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           product_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
           status: Database["public"]["Enums"]["transaction_status"]
           subscription_id: string | null
           transaction_id: string
@@ -3941,9 +4018,17 @@ export type Database = {
           p_organization_id: string
         }
         Returns: {
+          merchant_id: string
           merchant_name: string
-          merchant_email: string
+          organization_id: string
           organization_name: string
+          business_type: string
+          description: string
+          website_url: string
+          registration_number: string
+          country: string
+          email: string
+          phone_number: string
         }[]
       }
       get_merchant_organization_id: {
@@ -4064,7 +4149,6 @@ export type Database = {
           payment_method_code: Database["public"]["Enums"]["payment_method_code"]
           product_id: string | null
           provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
           status: Database["public"]["Enums"]["transaction_status"]
           subscription_id: string | null
           transaction_id: string
@@ -4072,14 +4156,17 @@ export type Database = {
           updated_at: string
         }
       }
-      get_wave_merchant_details: {
+      get_transaction_fee: {
         Args: {
-          p_organization_id: string
+          p_transaction_type: Database["public"]["Enums"]["transaction_type"]
+          p_provider_code: Database["public"]["Enums"]["provider_code"]
+          p_payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          p_currency_code: Database["public"]["Enums"]["currency_code"]
         }
         Returns: {
-          provider_merchant_id: string
-          is_connected: boolean
-          metadata: Json
+          name: string
+          percentage: number
+          fixed_amount: number
         }[]
       }
       get_wave_payment_status: {
@@ -4187,6 +4274,10 @@ export type Database = {
           p_shopify_webhook_id: string
         }
         Returns: string
+      }
+      rollover_provider_balance_quarterly: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       send_activation_request_notification: {
         Args: {
@@ -4496,35 +4587,43 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_transaction_status: {
-        Args: {
-          transaction_id: string
-          new_status: Database["public"]["Enums"]["transaction_status"]
-        }
-        Returns: {
-          additional_fees: Json | null
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id: string
-          description: string | null
-          fee_amount: number
-          fee_reference: string
-          gross_amount: number
-          merchant_id: string
-          metadata: Json | null
-          net_amount: number
-          organization_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          product_id: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          reference_id: string
-          status: Database["public"]["Enums"]["transaction_status"]
-          subscription_id: string | null
-          transaction_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          updated_at: string
-        }
-      }
+      update_transaction_status:
+        | {
+            Args: {
+              p_transaction_id: string
+              p_status: Database["public"]["Enums"]["transaction_status"]
+              p_metadata?: Json
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              transaction_id: string
+              new_status: Database["public"]["Enums"]["transaction_status"]
+            }
+            Returns: {
+              additional_fees: Json | null
+              created_at: string
+              currency_code: Database["public"]["Enums"]["currency_code"]
+              customer_id: string
+              description: string | null
+              fee_amount: number
+              fee_reference: string
+              gross_amount: number
+              merchant_id: string
+              metadata: Json | null
+              net_amount: number
+              organization_id: string
+              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+              product_id: string | null
+              provider_code: Database["public"]["Enums"]["provider_code"]
+              status: Database["public"]["Enums"]["transaction_status"]
+              subscription_id: string | null
+              transaction_id: string
+              transaction_type: Database["public"]["Enums"]["transaction_type"]
+              updated_at: string
+            }
+          }
       update_wave_checkout_status: {
         Args: {
           p_provider_checkout_id: string
@@ -4570,16 +4669,6 @@ export type Database = {
           token: string
         }
         Returns: boolean
-      }
-      verify_wave_merchant_registration: {
-        Args: {
-          p_organization_id: string
-        }
-        Returns: {
-          is_registered: boolean
-          provider_merchant_id: string
-          registration_details: Json
-        }[]
       }
     }
     Enums: {
@@ -4629,6 +4718,7 @@ export type Database = {
         | "customer_verification_success"
         | "customer_verification_failed"
       failed_payment_action: "cancel" | "pause" | "continue"
+      fee_type: "platform" | "processing" | "conversion" | "payout" | "refund"
       feedback_status: "open" | "reviewed" | "implemented" | "closed"
       first_payment_type: "initial" | "non_initial"
       frequency:
@@ -4694,6 +4784,7 @@ export type Database = {
         | "WIZALL"
         | "OPAY"
         | "PAYPAL"
+        | "OZOW"
         | "OTHER"
       provider_payment_status: "processing" | "cancelled" | "succeeded"
       refund_status: "pending" | "completed" | "failed"

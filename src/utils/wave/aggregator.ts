@@ -106,14 +106,15 @@ export class WaveAggregator {
 
             const details = merchantDetails[0];
 
-            // 2. Create Wave aggregated merchant
+            // 2. Create Wave aggregated merchant with required fields
             const waveAggregatedMerchant = await this.createAggregatedMerchant({
-                name: details.merchant_name,
-                business_type: 'other',
-                business_description: `${details.merchant_name} - Business on lomi. platform`,
-                business_sector: 'retail',
-                website_url: `https://lomi.africa/${details.merchant_name.toLowerCase().replace(/\s+/g, '-')}`,
-                business_registration_identifier: merchantId
+                name: details.organization_name || details.merchant_name,
+                business_type: 'other', // Wave only accepts 'fintech' or 'other'
+                business_description: details.business_description || `${details.merchant_name} - A merchant on lomi.`,
+                business_sector: details.industry?.toLowerCase() || 'retail',
+                website_url: details.website_url,
+                manager_name: details.merchant_name,
+                business_registration_identifier: details.registration_number
             });
 
             // 3. Connect provider and save Wave merchant details using RPC
@@ -125,7 +126,16 @@ export class WaveAggregator {
                     p_is_connected: true,
                     p_provider_merchant_id: waveAggregatedMerchant.id,
                     p_metadata: {
-                        wave_merchant: waveAggregatedMerchant
+                        // Store Wave-assigned values
+                        wave_fees: {
+                            checkout: waveAggregatedMerchant.checkout_fee_structure_name,
+                            payout: waveAggregatedMerchant.payout_fee_structure_name
+                        },
+                        wave_status: {
+                            business_type: waveAggregatedMerchant.business_type,
+                            is_locked: waveAggregatedMerchant.is_locked, 
+                            created_at: waveAggregatedMerchant.when_created
+                        }
                     }
                 }
             );

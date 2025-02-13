@@ -63,53 +63,17 @@ export default function PaymentChannels() {
     const method = paymentMethods.find(m => m.provider_code === providerCode)
 
     // Special handling for Wave provider
-    if (providerCode === 'WAVE' && sidebarData?.organization_id) {
+    if (providerCode === 'WAVE' && sidebarData?.organization_id && user?.id) {
       try {
         setIsProcessing(true);
         setConnectingProvider(providerCode);
 
-        // 1. Get merchant details for Wave
-        const { data: merchantDetails, error: detailsError } = await supabase
-          .rpc('get_merchant_details_for_wave', {
-            p_merchant_id: user?.id,
-            p_organization_id: sidebarData.organization_id
-          });
-
-        if (detailsError || !merchantDetails?.[0]) {
-          throw new Error('Failed to get merchant details');
-        }
-
-        const details = merchantDetails[0];
-
-        // 2. Create Wave aggregated merchant
+        // Use WaveAggregator to register merchant
         const { WaveAggregator } = await import('@/utils/wave/aggregator');
-        const waveAggregatedMerchant = await WaveAggregator.createAggregatedMerchant({
-          name: details.merchant_name || details.organization_name,
-          business_type: 'other',
-          business_description: details.merchant_name
-            ? `${details.merchant_name} - A merchant on Lomi platform`
-            : 'A merchant on Lomi platform',
-          business_sector: 'retail',
-          website_url: `https://lomi.africa`,
-          manager_name: details.merchant_name,
-          business_registration_identifier: user?.id
-        });
-
-        // 3. Update provider connection with merchant ID
-        const { error: connectionError } = await supabase
-          .rpc('update_organization_provider_connection', {
-            p_organization_id: sidebarData.organization_id,
-            p_provider_code: providerCode,
-            p_is_connected: true,
-            p_provider_merchant_id: waveAggregatedMerchant.id,
-            p_metadata: {
-              wave_merchant: waveAggregatedMerchant
-            }
-          });
-
-        if (connectionError) {
-          throw new Error('Failed to connect Wave provider');
-        }
+        await WaveAggregator.registerMerchant(
+          user.id,
+          sidebarData.organization_id
+        );
 
         const method = paymentMethods.find(m => m.provider_code === providerCode);
         toast({

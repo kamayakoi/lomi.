@@ -30,19 +30,6 @@ CREATE OR REPLACE FUNCTION public.update_organization_provider_connection(
 )
 RETURNS VOID AS $$
 BEGIN
-    -- Log the incoming request
-    PERFORM log_event(
-        p_organization_id,
-        'provider_connection_update'::event_type,
-        jsonb_build_object(
-            'provider_code', p_provider_code,
-            'is_connected', p_is_connected,
-            'provider_merchant_id', p_provider_merchant_id,
-            'metadata', p_metadata
-        ),
-        'NOTICE'
-    );
-
     INSERT INTO organization_providers_settings (
         organization_id, 
         provider_code, 
@@ -60,38 +47,9 @@ BEGIN
     ON CONFLICT (organization_id, provider_code) DO UPDATE 
     SET 
         is_connected = EXCLUDED.is_connected,
-        provider_merchant_id = COALESCE(EXCLUDED.provider_merchant_id, organization_providers_settings.provider_merchant_id),
-        metadata = COALESCE(EXCLUDED.metadata, organization_providers_settings.metadata),
+        provider_merchant_id = EXCLUDED.provider_merchant_id,
+        metadata = EXCLUDED.metadata,
         updated_at = NOW();
-
-    -- Log the successful update
-    PERFORM log_event(
-        p_organization_id,
-        CASE 
-            WHEN p_is_connected THEN 'provider_connected'::event_type
-            ELSE 'provider_disconnected'::event_type
-        END,
-        jsonb_build_object(
-            'provider_code', p_provider_code,
-            'provider_merchant_id', COALESCE(p_provider_merchant_id, 'none'),
-            'metadata', p_metadata
-        ),
-        'NOTICE'
-    );
-
-    -- Special handling for Wave provider
-    IF p_provider_code = 'WAVE' AND p_is_connected THEN
-        -- Log Wave merchant registration
-        PERFORM log_event(
-            p_organization_id,
-            'wave_merchant_registered'::event_type,
-            jsonb_build_object(
-                'provider_merchant_id', p_provider_merchant_id,
-                'merchant_details', p_metadata->'wave_merchant'
-            ),
-            'NOTICE'
-        );
-    END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
@@ -124,92 +82,53 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
--- Add a function to fetch Wave merchant details
-CREATE OR REPLACE FUNCTION public.get_wave_merchant_details(
-    p_organization_id UUID
-)
-RETURNS TABLE (
-    provider_merchant_id VARCHAR,
-    is_connected BOOLEAN,
-    metadata JSONB
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        ops.provider_merchant_id,
-        ops.is_connected,
-        ops.metadata
-    FROM 
-        organization_providers_settings ops
-    WHERE 
-        ops.organization_id = p_organization_id
-        AND ops.provider_code = 'WAVE';
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-
--- Function to verify Wave merchant registration
-CREATE OR REPLACE FUNCTION public.verify_wave_merchant_registration(
-    p_organization_id UUID
-)
-RETURNS TABLE (
-    is_registered BOOLEAN,
-    provider_merchant_id VARCHAR,
-    registration_details JSONB
-) AS $$
-BEGIN
-    -- Log verification attempt
-    PERFORM log_event(
-        p_organization_id,
-        'wave_merchant_verification'::event_type,
-        jsonb_build_object(
-            'organization_id', p_organization_id
-        ),
-        'NOTICE'
-    );
-
-    RETURN QUERY
-    SELECT 
-        ops.is_connected,
-        ops.provider_merchant_id,
-        ops.metadata->'wave_merchant' as registration_details
-    FROM 
-        organization_providers_settings ops
-    WHERE 
-        ops.organization_id = p_organization_id
-        AND ops.provider_code = 'WAVE';
-
-    -- Log verification result
-    PERFORM log_event(
-        p_organization_id,
-        'wave_merchant_verification_complete'::event_type,
-        jsonb_build_object(
-            'organization_id', p_organization_id,
-            'found', FOUND
-        ),
-        'NOTICE'
-    );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
-
--- Function to fetch merchant details for Wave registration
+-- Function to get merchant details for Wave integration
 CREATE OR REPLACE FUNCTION public.get_merchant_details_for_wave(
     p_merchant_id UUID,
     p_organization_id UUID
 )
 RETURNS TABLE (
+    merchant_id UUID,
     merchant_name VARCHAR,
-    merchant_email VARCHAR,
-    organization_name VARCHAR
+    organization_id UUID,
+    organization_name VARCHAR,
+    business_description TEXT,
+    website_url VARCHAR,
+    industry VARCHAR,
+    registration_number VARCHAR,
+    country VARCHAR,
+    email VARCHAR,
+    phone_number VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
-        m.name as merchant_name,
-        m.email as merchant_email,
-        o.name as organization_name
-    FROM merchants m
-    LEFT JOIN organizations o ON o.organization_id = p_organization_id
-    WHERE m.merchant_id = p_merchant_id
-    AND NOT m.is_deleted;
+        m.merchant_id,
+        m.name AS merchant_name,
+        o.organization_id,
+        o.name AS organization_name,
+        COALESCE(
+            kyc.business_description::TEXT, 
+            (o.name || ' - ' || COALESCE(o.industry, 'Retail business'))::TEXT
+        ) AS business_description,
+        COALESCE(o.website_url, kyc.business_platform_url) AS website_url,
+        o.industry,
+        COALESCE(o.organization_id::text, m.merchant_id::text)::VARCHAR AS registration_number,
+        COALESCE(kyc.legal_country, m.country) AS country,
+        o.email,
+        o.phone_number
+    FROM 
+        merchants m
+        INNER JOIN merchant_organization_links mol ON m.merchant_id = mol.merchant_id
+        INNER JOIN organizations o ON mol.organization_id = o.organization_id
+        LEFT JOIN organization_kyc kyc ON o.organization_id = kyc.organization_id 
+            AND m.merchant_id = kyc.merchant_id
+    WHERE 
+        m.merchant_id = p_merchant_id
+        AND o.organization_id = p_organization_id
+        AND m.is_deleted = false
+        AND o.is_deleted = false;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+COMMENT ON FUNCTION public.get_merchant_details_for_wave IS 'Retrieves merchant and organization details needed for Wave aggregated merchant creation';
