@@ -20,23 +20,6 @@ import type { OnboardingStep2Data } from './components/onboarding-step-2';
 import type { OnboardingStep3Data } from './components/onboarding-step-3';
 import type { OnboardingStep4Data } from './components/onboarding-step-4';
 
-type StepData = OnboardingStep1Data | OnboardingStep2Data | OnboardingStep3Data | OnboardingStep4Data;
-
-type StepProps = {
-    onNext?: (data: StepData) => void;
-    onSubmit?: (data: StepData) => void;
-    onPrevious?: () => void;
-    initialData?: OnboardingData;
-    data?: OnboardingData;
-};
-
-const steps = [
-    { title: 'onboarding.steps.step1', component: OnboardingStep1 as React.ComponentType<StepProps> },
-    { title: 'onboarding.steps.step2', component: OnboardingStep2 as React.ComponentType<StepProps> },
-    { title: 'onboarding.steps.step3', component: OnboardingStep3 as React.ComponentType<StepProps> },
-    { title: 'onboarding.steps.step4', component: OnboardingStep4 as React.ComponentType<StepProps> },
-] as const;
-
 const initialOnboardingData = {
     firstName: '',
     lastName: '',
@@ -62,7 +45,49 @@ const initialOnboardingData = {
     howDidYouHearAboutUs: '',
 };
 
-export type OnboardingData = typeof initialOnboardingData;
+export type OnboardingData = {
+    firstName: string;
+    lastName: string;
+    countryCode: string;
+    phoneNumber: string;
+    country: string;
+    position: string;
+    orgName: string;
+    orgEmail: string;
+    orgEmployees: string;
+    orgCountry: string;
+    orgRegion: string;
+    orgCity: string;
+    orgDistrict: string;
+    orgPostalCode: string;
+    orgStreet: string;
+    orgWebsite: string;
+    orgIndustry: string;
+    orgDefaultLanguage: string;
+    workspaceHandle: string;
+    avatarUrl: string;
+    logoUrl: string;
+    howDidYouHearAboutUs: string;
+};
+
+type StepData = OnboardingStep1Data | OnboardingStep2Data | OnboardingStep3Data | OnboardingStep4Data;
+
+type StepProps = {
+    onNext?: (data: StepData) => void;
+    onSubmit?: (data: StepData) => void;
+    onPrevious?: () => void;
+    initialData?: OnboardingData;
+    data?: OnboardingData;
+    onAvatarUpdate?: (avatarUrl: string) => void;
+    onLogoUpdate?: (logoUrl: string) => void;
+};
+
+const steps = [
+    { title: 'onboarding.steps.step1', component: OnboardingStep1 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step2', component: OnboardingStep2 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step3', component: OnboardingStep3 as React.ComponentType<StepProps> },
+    { title: 'onboarding.steps.step4', component: OnboardingStep4 as React.ComponentType<StepProps> },
+] as const;
 
 const Onboarding: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -176,8 +201,28 @@ const Onboarding: React.FC = () => {
         }
     };
 
+    const handleAvatarUpdate = (avatarUrl: string) => {
+        setOnboardingData(prev => ({
+            ...prev,
+            avatarUrl: avatarUrl // Store the full URL
+        }));
+    };
+
+    const handleLogoUpdate = (logoUrl: string) => {
+        setOnboardingData(prev => ({
+            ...prev,
+            logoUrl: logoUrl // Store the full URL
+        }));
+    };
+
     const handleNext = (stepData: StepData) => {
-        const updatedData = { ...onboardingData, ...stepData };
+        const updatedData = {
+            ...onboardingData,
+            ...stepData,
+            // Ensure we keep the existing URLs if not provided in the current step
+            avatarUrl: ('avatarUrl' in stepData && stepData.avatarUrl) || onboardingData.avatarUrl,
+            logoUrl: ('logoUrl' in stepData && stepData.logoUrl) || onboardingData.logoUrl
+        };
         setOnboardingData(updatedData);
         setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     };
@@ -320,6 +365,8 @@ const Onboarding: React.FC = () => {
             onPrevious: handlePrevious,
             onNext: handleNext,
             onSubmit: handleSubmit,
+            onAvatarUpdate: handleAvatarUpdate,
+            onLogoUpdate: handleLogoUpdate,
         };
 
         return <StepComponent {...commonProps} />;
@@ -371,14 +418,18 @@ const Onboarding: React.FC = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="mb-8">
-                            <div className="flex h-2 w-full bg-gray-200 dark:bg-gray-700">
+                            <div className="relative flex h-2 w-full bg-gray-200 dark:bg-gray-700">
+                                <div className={cn(
+                                    "absolute inset-0 transition-[width] duration-300 ease-out bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]",
+                                    "w-[25%]",
+                                    currentStep === 0 && "w-[25%]",
+                                    currentStep === 1 && "w-[50%]",
+                                    currentStep === 2 && "w-[75%]",
+                                    currentStep === 3 && "w-[100%]",
+                                )} />
                                 {steps.map((_, index) => (
                                     <div key={index} className="flex-1 flex">
-                                        <div
-                                            className={`flex-1 ${index <= currentStep ? 'bg-blue-500 dark:bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-                                                } transition-all duration-300 ease-out`}
-                                        />
-                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-background" />}
+                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-background relative z-10" />}
                                     </div>
                                 ))}
                             </div>
@@ -386,10 +437,12 @@ const Onboarding: React.FC = () => {
                                 {steps.map((step) => (
                                     <div
                                         key={step.title}
-                                        className={`text-xs ${steps.indexOf(step) <= currentStep
-                                            ? 'text-blue-500 dark:text-blue-600 font-bold'
-                                            : 'text-gray-400 dark:text-gray-500'
-                                            }`}
+                                        className={cn(
+                                            "text-xs",
+                                            steps.indexOf(step) <= currentStep
+                                                ? "text-[#894CEE] dark:text-[#FBC6F1] font-bold"
+                                                : "text-gray-400 dark:text-gray-500"
+                                        )}
                                     >
                                         {t(step.title)}
                                     </div>

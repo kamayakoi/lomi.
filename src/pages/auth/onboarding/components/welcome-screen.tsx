@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react'
 import Confetti from 'react-confetti'
 import { motion } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
 import { cn } from '@/lib/actions/utils'
-import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher'
+import { ButtonExpand } from '@/components/design/button-expand'
 
 interface WelcomeScreenProps {
     onGetStarted: () => void;
@@ -52,13 +51,14 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
     }
 
     return (
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-background dark:bg-background flex items-center justify-center">
             {showConfetti && (
                 <Confetti
                     width={windowSize.width}
                     height={windowSize.height}
                     recycle={false}
                     numberOfPieces={200}
+                    colors={['#894CEE', '#FBC6F1', '#E5F887']}
                 />
             )}
             <motion.div
@@ -66,59 +66,84 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className={cn(
-                    "shadow-lg p-10 w-[520px] rounded-none border dark:border-gray-800",
+                    "shadow-2xl p-12 w-[895px] rounded-none border dark:border-gray-800",
                     "bg-white dark:bg-background",
-                    "flex flex-col items-center justify-between"
+                    "relative"
                 )}
             >
-                <div className="absolute top-4 right-4">
+                {/* Background decoration */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]" />
+
+                <div className="absolute top-4 right-4 z-10">
                     <OnboardingLanguageSwitcher />
                 </div>
-                <div className="flex-1 flex flex-col items-center justify-center">
+
+                <div className="flex items-center gap-12">
+                    {/* Left side - Image */}
                     <motion.div
-                        initial={{ y: -20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.5 }}
+                        className="w-[380px] relative flex-shrink-0"
                     >
-                        <Sparkles className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                        <img
+                            src="/onboarding/onboarding.svg"
+                            alt="Welcome to lomi."
+                            className="w-full h-auto"
+                            loading="eager"
+                        />
                     </motion.div>
-                    <motion.h1
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.7 }}
-                        className={cn(
-                            "text-3xl font-bold mb-4",
-                            "text-gray-900 dark:text-white"
-                        )}
-                    >
-                        {t('onboarding.welcome_screen.title')}
-                    </motion.h1>
-                    <motion.p
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.9 }}
-                        className={cn(
-                            "text-lg mb-8 text-center",
-                            "text-gray-600 dark:text-gray-300"
-                        )}
-                    >
-                        {t('onboarding.welcome_screen.description.line1')}
-                        <br />
-                        {t('onboarding.welcome_screen.description.line2')}
-                    </motion.p>
+
+                    {/* Right side - Content */}
+                    <div className="flex flex-col flex-1">
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 0.7 }}
+                            className="flex items-center gap-2"
+                        >
+                            <h1 className={cn(
+                                "text-4xl font-bold mb-6",
+                                "text-gray-900 dark:text-white",
+                                "tracking-tight"
+                            )}>
+                                {t('onboarding.welcome_screen.title')}
+                            </h1>
+                        </motion.div>
+
+                        <motion.p
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 0.9 }}
+                            className={cn(
+                                "text-lg mb-10 text-left max-w-[440px]",
+                                "text-gray-600 dark:text-gray-300",
+                                "leading-relaxed"
+                            )}
+                        >
+                            {t('onboarding.welcome_screen.description.line1')}
+                            <br />
+                            {t('onboarding.welcome_screen.description.line2')}
+                        </motion.p>
+
+                        <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 1.1 }}
+                            className="flex justify-end"
+                        >
+                            <ButtonExpand
+                                text={t('onboarding.welcome_screen.get_started')}
+                                onClick={onGetStarted}
+                                bgColor="bg-black dark:bg-gray-800"
+                                textColor="text-white"
+                                hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                                hoverTextColor="hover:text-white"
+                                className="w-fit"
+                            />
+                        </motion.div>
+                    </div>
                 </div>
-                <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 1.1 }}
-                >
-                    <Button
-                        onClick={onGetStarted}
-                        className="w-[200px] h-12 rounded-none bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                    >
-                        {t('onboarding.welcome_screen.get_started')}
-                    </Button>
-                </motion.div>
             </motion.div>
         </div>
     )

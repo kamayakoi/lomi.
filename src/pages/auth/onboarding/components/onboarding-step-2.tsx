@@ -43,9 +43,10 @@ interface OnboardingStep2Props {
     onNext: (data: OnboardingStep2Data) => void;
     onPrevious: () => void;
     data: OnboardingData;
+    onLogoUpdate?: (logoUrl: string) => void;
 }
 
-const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, data }) => {
+const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, data, onLogoUpdate }) => {
     const { t } = useTranslation();
     const onboardingForm = useForm<OnboardingStep2Data>({
         resolver: zodResolver(onboardingStep2Schema),
@@ -64,12 +65,27 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
     const [logoUrl, setLogoUrl] = useState(data.logoUrl || '');
 
     const handleLogoUpdate = (newLogoUrl: string) => {
-        const relativeLogoPath = newLogoUrl.replace(/^.*\/logos\//, '');
-        setLogoUrl(relativeLogoPath);
+        // Keep the full URL path for the logo
+        const fullLogoUrl = newLogoUrl;
+
+        // Update local state with full URL
+        setLogoUrl(fullLogoUrl);
+
+        // Update parent state with full URL
+        if (onLogoUpdate) {
+            onLogoUpdate(fullLogoUrl);
+        }
+
+        // Pass the full URL to form
+        onboardingForm.setValue("logoUrl", fullLogoUrl);
     };
 
     const onSubmit = (formData: OnboardingStep2Data) => {
-        onNext({ ...formData, logoUrl });
+        // Include the full logo URL in the submission
+        onNext({
+            ...formData,
+            logoUrl: logoUrl || formData.logoUrl
+        });
     };
 
     const generateWorkspaceHandle = (orgName: string) => {

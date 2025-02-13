@@ -32,24 +32,29 @@ export const organizationPositions = [
 export const operatingCountries = [
   'Côte d\'Ivoire',
   'Senegal',
-  // 'Ghana',
-  // 'Nigeria',
   'Benin',
   'Togo',
   'Mali',
   'Niger',
-  // 'Burkina Faso',
-  // 'Cape Verde',
-  // 'Gambia',
+  'Burkina Faso',
+  'Sierra Leone',
+  'Guinea-Bissau',
+  'Ghana',
+  'Nigeria',
+  'Liberia',
+  'Cape Verde',
+  'Gambia',
   // 'Mauritania',
-  // 'Sierra Leone',
   // 'Guinea',
-  // 'Guinea-Bissau',
-  // 'Liberia',
+  // 'South Africa'
+  // 'Mozambique',
+  // 'Namibia',
+  // 'Zambia',
+  // 'Zimbabwe',
+  // 'Uganda',
 ];
 
 export const countries = [
-  'Ghana',
   'Côte d\'Ivoire',
   'Afghanistan',
   'Albania',
@@ -116,6 +121,7 @@ export const countries = [
   'Gambia',
   'Georgia',
   'Germany',
+  'Ghana',
   'Greece',
   'Grenada',
   'Guatemala',
@@ -249,7 +255,6 @@ export const countries = [
 ];
 
 export const countryCodes = [
-  '+233', // Ghana
   '+225', // Côte d'Ivoire
   '+93',  // Afghanistan
   '+355', // Albania
@@ -316,6 +321,7 @@ export const countryCodes = [
   '+220', // Gambia
   '+995', // Georgia
   '+49',  // Germany
+  '+233', // Ghana
   '+30',  // Greece
   '+1473',// Grenada
   '+502', // Guatemala

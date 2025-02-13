@@ -76,9 +76,19 @@ export function UserNav() {
       }
     });
 
+    // Listen for merchant profile updates from other components
+    const handleProfileUpdate = () => {
+      if (user?.id) {
+        fetchMerchantName(user.id);
+        fetchUserAvatar();
+      }
+    };
+    window.addEventListener('merchant-profile-updated', handleProfileUpdate);
+
     return () => {
       subscription.unsubscribe();
       supabase.removeChannel(merchantsChannel);
+      window.removeEventListener('merchant-profile-updated', handleProfileUpdate);
     };
   }, [user?.id, fetchUserAvatar]);
 

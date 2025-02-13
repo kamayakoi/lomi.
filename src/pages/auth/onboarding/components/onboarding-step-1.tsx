@@ -10,6 +10,8 @@ import { countryCodes, countries, organizationPositions } from '@/lib/data/onboa
 import ProfilePictureUploader from '@/components/auth/avatar-uploader';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
+import { supabase } from '@/utils/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
@@ -31,13 +33,18 @@ type OnboardingStep1Data = z.infer<OnboardingStep1Schema>;
 interface OnboardingStep1Props {
     onNext: (data: OnboardingStep1Data) => void;
     data: Partial<OnboardingStep1Data>;
+    onAvatarUpdate?: (avatarUrl: string) => void;
 }
 
 const noop = () => undefined;
 
-const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
+const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvatarUpdate }) => {
     const { t } = useTranslation();
     const schema = createOnboardingStep1Schema(t);
+
+    const [countryCodeSearch, setCountryCodeSearch] = useState(data.countryCode || '+225');
+    const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState(data.avatarUrl || '');
 
     const onboardingForm = useForm<OnboardingStep1Data>({
         resolver: zodResolver(schema),
@@ -53,9 +60,53 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
         },
     });
 
-    const [countryCodeSearch, setCountryCodeSearch] = useState('');
-    const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState(data.avatarUrl || '');
+    const handleAvatarUpdate = async (newAvatarUrl: string) => {
+        try {
+            // Get the current user
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            // Keep the full URL path for the avatar
+            const fullAvatarUrl = newAvatarUrl;
+
+            // Update merchant avatar
+            const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
+                p_merchant_id: user.id,
+                p_avatar_url: fullAvatarUrl
+            });
+
+            if (updateError) throw updateError;
+
+            // Update local state with full URL
+            setAvatarUrl(fullAvatarUrl);
+
+            // Update parent state with full URL
+            if (onAvatarUpdate) {
+                onAvatarUpdate(fullAvatarUrl);
+            }
+
+            // Pass the full URL to form
+            onboardingForm.setValue("avatarUrl", fullAvatarUrl);
+
+            // Trigger a refresh event for the UserNav component
+            window.dispatchEvent(new Event('merchant-profile-updated'));
+        } catch (error) {
+            console.error('Error updating avatar:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update avatar",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const onSubmit = (formData: OnboardingStep1Data) => {
+        // Include the full avatar URL in the submission
+        onNext({
+            ...formData,
+            avatarUrl: avatarUrl || formData.avatarUrl
+        });
+    };
 
     const filteredCountryCodes = useMemo(() => {
         const lowercaseSearch = countryCodeSearch.toLowerCase();
@@ -63,16 +114,6 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data }) => {
             code.toLowerCase().includes(lowercaseSearch)
         ))).slice(0, 5); // Limit to 5 results
     }, [countryCodeSearch]);
-
-    const handleAvatarUpdate = async (newAvatarUrl: string) => {
-        // Extract the relative path from the full URL
-        const relativeAvatarPath = newAvatarUrl.replace(/^.*\/avatars\//, '');
-        setAvatarUrl(relativeAvatarPath);
-    };
-
-    const onSubmit = (data: OnboardingStep1Data) => {
-        onNext(data);
-    };
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
