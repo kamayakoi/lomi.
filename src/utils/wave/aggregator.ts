@@ -89,9 +89,70 @@ export class WaveAggregator {
      */
     static async registerMerchant(
         merchantId: string,
-        organizationId: string
+        organizationId: string,
+        phoneNumber: string
     ): Promise<WaveAggregatedMerchant> {
         try {
+            // 0. Check if merchant already exists in Wave
+            const { data: existingProvider } = await supabase
+                .rpc('fetch_organization_providers_settings', { 
+                    p_organization_id: organizationId 
+                });
+
+            interface ProviderSettings {
+                provider_code: string;
+                provider_merchant_id?: string;
+            }
+
+            const waveProvider = existingProvider?.find((p: ProviderSettings) => 
+                p.provider_code === 'WAVE' && p.provider_merchant_id
+            );
+
+            // If we have an existing Wave merchant ID, try to fetch it
+            if (waveProvider?.provider_merchant_id) {
+                try {
+                    const existingMerchant = await this.getAggregatedMerchant(waveProvider.provider_merchant_id);
+                    
+                    // Update provider connection with existing merchant
+                    await supabase.rpc(
+                        'update_organization_provider_connection',
+                        {
+                            p_organization_id: organizationId,
+                            p_provider_code: 'WAVE',
+                            p_is_connected: true,
+                            p_provider_merchant_id: existingMerchant.id,
+                            p_metadata: {
+                                wave_fees: {
+                                    checkout: existingMerchant.checkout_fee_structure_name,
+                                    payout: existingMerchant.payout_fee_structure_name
+                                },
+                                wave_status: {
+                                    business_type: existingMerchant.business_type,
+                                    is_locked: existingMerchant.is_locked,
+                                    created_at: existingMerchant.when_created
+                                }
+                            }
+                        }
+                    );
+
+                    // Update phone number
+                    await supabase.rpc(
+                        'update_organization_provider_phone',
+                        {
+                            p_organization_id: organizationId,
+                            p_provider_code: 'WAVE',
+                            p_phone_number: phoneNumber,
+                            p_is_phone_verified: false
+                        }
+                    );
+
+                    return existingMerchant;
+                } catch (error) {
+                    // If merchant not found in Wave, proceed with creating new one
+                    console.log('Existing merchant not found in Wave, creating new one');
+                }
+            }
+
             // 1. Get merchant details using RPC
             const { data: merchantDetails, error: detailsError } = await supabase
                 .rpc('get_merchant_details_for_wave', {
@@ -109,7 +170,7 @@ export class WaveAggregator {
             // 2. Create Wave aggregated merchant with required fields
             const waveAggregatedMerchant = await this.createAggregatedMerchant({
                 name: details.organization_name || details.merchant_name,
-                business_type: 'other', // Wave only accepts 'fintech' or 'other'
+                business_type: 'other',
                 business_description: details.business_description || `${details.merchant_name} - A merchant on lomi.`,
                 business_sector: details.industry?.toLowerCase() || 'retail',
                 website_url: details.website_url,
@@ -126,14 +187,13 @@ export class WaveAggregator {
                     p_is_connected: true,
                     p_provider_merchant_id: waveAggregatedMerchant.id,
                     p_metadata: {
-                        // Store Wave-assigned values
                         wave_fees: {
                             checkout: waveAggregatedMerchant.checkout_fee_structure_name,
                             payout: waveAggregatedMerchant.payout_fee_structure_name
                         },
                         wave_status: {
                             business_type: waveAggregatedMerchant.business_type,
-                            is_locked: waveAggregatedMerchant.is_locked, 
+                            is_locked: waveAggregatedMerchant.is_locked,
                             created_at: waveAggregatedMerchant.when_created
                         }
                     }
@@ -143,6 +203,22 @@ export class WaveAggregator {
             if (connectionError) {
                 console.error('Error saving Wave connection:', connectionError);
                 throw new Error('Failed to connect Wave provider');
+            }
+
+            // 4. Save phone number
+            const { error: phoneError } = await supabase.rpc(
+                'update_organization_provider_phone',
+                {
+                    p_organization_id: organizationId,
+                    p_provider_code: 'WAVE',
+                    p_phone_number: phoneNumber,
+                    p_is_phone_verified: false
+                }
+            );
+
+            if (phoneError) {
+                console.error('Error saving phone number:', phoneError);
+                throw new Error('Failed to save phone number');
             }
 
             return waveAggregatedMerchant;

@@ -62,40 +62,7 @@ export default function PaymentChannels() {
 
     const method = paymentMethods.find(m => m.provider_code === providerCode)
 
-    // Special handling for Wave provider
-    if (providerCode === 'WAVE' && sidebarData?.organization_id && user?.id) {
-      try {
-        setIsProcessing(true);
-        setConnectingProvider(providerCode);
-
-        // Use WaveAggregator to register merchant
-        const { WaveAggregator } = await import('@/utils/wave/aggregator');
-        await WaveAggregator.registerMerchant(
-          user.id,
-          sidebarData.organization_id
-        );
-
-        const method = paymentMethods.find(m => m.provider_code === providerCode);
-        toast({
-          title: "Success",
-          description: `Successfully connected to ${method?.name}`,
-        });
-
-        fetchOrganizationProviders(sidebarData.organization_id);
-      } catch (error) {
-        console.error('Error connecting Wave:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to connect to Wave. Please try again.",
-        });
-      } finally {
-        setIsProcessing(false);
-        setConnectingProvider(null);
-      }
-      return;
-    }
-
+    // All mobile money and e-wallet providers need phone number
     if (method && (method.type === 'Mobile Money' || method.type === 'e-Wallets')) {
       setConnectingProvider(providerCode)
       setPhoneDialogOpen(true)
@@ -135,23 +102,64 @@ export default function PaymentChannels() {
   const handlePhoneSubmit = async () => {
     if (!connectingProvider || !sidebarData?.organization_id || !phoneNumber) return
 
-    const { error: phoneError } = await supabase
-      .rpc('update_organization_provider_phone', {
-        p_organization_id: sidebarData.organization_id,
-        p_provider_code: connectingProvider,
-        p_phone_number: phoneNumber,
-        p_is_phone_verified: false
-      })
+    try {
+      setIsProcessing(true);
 
-    if (phoneError) {
-      console.error('Error updating provider phone:', phoneError)
-      return
+      // Special handling for Wave provider
+      if (connectingProvider === 'WAVE' && user?.id) {
+        const { WaveAggregator } = await import('@/utils/wave/aggregator');
+        await WaveAggregator.registerMerchant(
+          user.id,
+          sidebarData.organization_id,
+          phoneNumber
+        );
+
+        const method = paymentMethods.find(m => m.provider_code === connectingProvider);
+        toast({
+          title: "Success",
+          description: `Successfully connected to ${method?.name}`,
+        });
+
+        fetchOrganizationProviders(sidebarData.organization_id);
+        setPhoneDialogOpen(false);
+        setConnectingProvider(null);
+        setPhoneNumber("");
+        return;
+      }
+
+      // Handle other providers
+      const { error: phoneError } = await supabase
+        .rpc('update_organization_provider_phone', {
+          p_organization_id: sidebarData.organization_id,
+          p_provider_code: connectingProvider,
+          p_phone_number: phoneNumber,
+          p_is_phone_verified: false
+        })
+
+      if (phoneError) {
+        console.error('Error updating provider phone:', phoneError)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update phone number. Please try again.",
+        })
+        return
+      }
+
+      await connectProvider(connectingProvider)
+      setPhoneDialogOpen(false)
+      setConnectingProvider(null)
+      setPhoneNumber("")
+    } catch (error) {
+      console.error('Error connecting provider:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to connect provider. Please try again.",
+      });
+    } finally {
+      setIsProcessing(false);
     }
-
-    await connectProvider(connectingProvider)
-    setPhoneDialogOpen(false)
-    setConnectingProvider(null)
-    setPhoneNumber("")
   }
 
   const confirmDisconnect = async () => {

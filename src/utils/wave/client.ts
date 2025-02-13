@@ -7,7 +7,7 @@ export class WaveClient {
      */
     async request<T>(path: string, options: RequestInit = {}): Promise<T> {
         try {
-            const { data, error } = await supabase.functions.invoke('wave-api', {
+            const { data, error } = await supabase.functions.invoke('wave', {
                 body: {
                     path,
                     method: options.method || 'GET',
