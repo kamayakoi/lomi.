@@ -98,12 +98,12 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.5 }}
-                        className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                        className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0 flex items-center"
                     >
                         <img
                             src="/onboarding/okra_onboarding.svg"
                             alt="Welcome to lomi."
-                            className="w-full h-auto"
+                            className="w-full h-auto object-contain"
                             loading="eager"
                         />
                     </motion.div>
@@ -122,7 +122,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                                 "tracking-tight"
                             )}>
                                 {t('onboarding.welcome_screen.title')}
-                                {firstName && <span className="text-[#894CEE]"> {firstName}</span>}!
+                                {firstName && <span className="text-white"> {firstName}</span>} !
                             </h1>
                         </motion.div>
 
@@ -154,7 +154,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                                 textColor="text-white"
                                 hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
                                 hoverTextColor="hover:text-white"
-                                className="w-full sm:w-fit"
+                                className="w-full mt-8 sm:w-fit"
                             />
                         </motion.div>
                     </div>

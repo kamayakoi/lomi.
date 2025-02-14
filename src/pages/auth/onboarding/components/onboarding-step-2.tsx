@@ -139,7 +139,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                     <img
                         src="/onboarding/okra_test_icon.svg"
                         alt="Organization Information"
-                        className="w-full h-auto"
+                        className="w-full h-auto object-contain"
                         loading="eager"
                     />
                 </motion.div>
@@ -291,8 +291,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             </div>
                         </div>
                         <div className="w-full space-y-8 sm:w-1/2 sm:space-y-8">
-                            <Label htmlFor="workspaceHandle" className="block mb-2 -ml-3 -mt-5">{t('onboarding.step2.workspace_handle.label')}</Label>
-                            <div className="relative flex items-center -ml-3 h-[48px]">
+                            <Label htmlFor="workspaceHandle" className="block mb-2 sm:-ml-3 sm:-mt-5">{t('onboarding.step2.workspace_handle.label')}</Label>
+                            <div className="relative flex items-center sm:-ml-3 h-[48px]">
                                 <Input
                                     id="workspaceHandle"
                                     placeholder={t('onboarding.step2.workspace_handle.placeholder')}

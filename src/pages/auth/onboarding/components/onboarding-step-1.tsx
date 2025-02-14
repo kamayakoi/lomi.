@@ -133,7 +133,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
                     <img
                         src="/onboarding/okra_test_your_app.svg"
                         alt="Personal Information"
-                        className="w-full h-auto"
+                        className="w-full h-auto object-contain"
                         loading="eager"
                     />
                 </motion.div>

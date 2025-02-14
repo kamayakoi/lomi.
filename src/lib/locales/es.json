@@ -766,7 +766,7 @@
             }
         },
         "welcome_screen": {
-            "title": "¡Bienvenido a lomi. !",
+            "title": "¡Bienvenido a lomi. ",
             "description": {
                 "line1": "Gracias por unirte a nosotros.",
                 "line2": "Simplifiquemos los pagos de tus clientes."

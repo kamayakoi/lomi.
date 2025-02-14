@@ -766,7 +766,7 @@
             }
         },
         "welcome_screen": {
-            "title": "欢迎使用 lomi. !",
+            "title": "欢迎使用 lomi. ",
             "description": {
                 "line1": "我们非常高兴您加入我们。",
                 "line2": "让我们让您的客户轻松支付给您。"

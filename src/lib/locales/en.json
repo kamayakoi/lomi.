@@ -207,7 +207,7 @@
         "replace_image": "Replace",
         "upload_image": "Add",
         "remove": "Remove",
-        "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
+        "file_requirements": "*png, *jpeg files up to 1MB and at least 200px by 200px",
         "error": {
             "file_size": "File size must be less than 1MB",
             "upload_failed": "Failed to upload profile picture"
@@ -238,7 +238,7 @@
         "replace_image": "Replace",
         "upload_image": "Add",
         "remove": "Remove",
-        "file_requirements": "*png, *jpeg files up to 1MB at least 200px by 200px",
+        "file_requirements": "*png, *jpeg files up to 1MB and at least 200px by 200px",
         "error": {
             "file_size": "File size must be less than 1MB",
             "upload_failed": "Failed to upload logo"
@@ -664,7 +664,7 @@
             }
         },
         "welcome_screen": {
-        "title": "Welcome to lomi. !",
+        "title": "Welcome to lomi. ",
         "description": {
                 "line1": "We're very excited to have you on board.",
                 "line2": "Let's make it effortless for your customers to pay you."

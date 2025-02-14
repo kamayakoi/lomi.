@@ -433,7 +433,7 @@ const Onboarding: React.FC = () => {
                                 {steps.map((_, index) => (
                                     <div key={index} className="flex-1 flex items-center">
                                         {index > 0 && (
-                                            <div className="w-1 h-full bg-white dark:bg-background" />
+                                            <div className="w-[5px] h-full bg-white dark:bg-background" />
                                         )}
                                     </div>
                                 ))}

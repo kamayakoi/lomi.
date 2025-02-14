@@ -107,7 +107,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
     }[selectedCity] || [];
 
     return (
-        <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-8">
             <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
@@ -122,13 +122,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                     <img
                         src="/onboarding/okra_home.svg"
                         alt="Address Information"
-                        className="w-full h-auto"
+                        className="w-full h-auto object-contain"
                         loading="eager"
                     />
                 </motion.div>
 
                 {/* Right side - Form Content */}
-                <div className="flex-1 w-full">
+                <div className="flex-1 w-full -mt-6">
                     <div className="mb-6">
                         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
                             {showCityField ? (
@@ -253,7 +253,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 flex items-end justify-between mt-8">
+                    <div className="flex-1 flex items-end justify-between mt-6 mb-2">
                         <ButtonExpand
                             text={t('common.back')}
                             icon={ArrowLeft}

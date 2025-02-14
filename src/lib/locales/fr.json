@@ -659,7 +659,7 @@
             }
         },
         "welcome_screen": {
-            "title": "Bienvenue sur lomi. !",
+            "title": "Bienvenue sur lomi. ",
             "description": {
                 "line1": "Nous sommes ravis de vous avoir parmi nous.",
                 "line2": "Facilitons ensemble les paiements de vos clients."

@@ -96,7 +96,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
     };
 
     return (
-        <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-6">
+        <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-0">
             <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher
                     onLanguageChange={handleLanguageChange}
@@ -114,13 +114,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     <img
                         src="/onboarding/okra_going_live.svg"
                         alt="Final Setup"
-                        className="w-full h-auto"
+                        className="w-full h-auto object-contain"
                         loading="eager"
                     />
                 </motion.div>
 
                 {/* Right side - Form Content */}
-                <div className="flex-1 w-full">
+                <div className="flex-1 w-full -mt-8">
                     <div className="mb-6">
                         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
                             <div className="w-full sm:w-1/3">
@@ -207,7 +207,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.howDidYouHearAboutUs.message || '')}</p>
                         )}
                     </div>
-                    <div className="flex-1 flex items-end justify-between mt-8">
+                    <div className="flex-1 flex items-end justify-between mt-8 sm:-mb-12">
                         <ButtonExpand
                             text={t('common.back')}
                             icon={ArrowLeft}
