@@ -7,6 +7,7 @@ import { cn } from '@/lib/actions/utils'
 import { useTranslation } from 'react-i18next'
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher'
 import { ButtonExpand } from '@/components/design/button-expand'
+import { supabase } from '@/utils/supabase/client'
 
 interface WelcomeScreenProps {
     onGetStarted: () => void;
@@ -17,17 +18,30 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
     const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
     const [showConfetti, setShowConfetti] = useState(false)
     const [mounted, setMounted] = useState(false)
+    const [firstName, setFirstName] = useState<string>('')
 
-    // Initialize language
+    // Initialize language and get user data
     useEffect(() => {
-        const savedLanguage = localStorage.getItem('language');
-        if (savedLanguage && i18n.language !== savedLanguage) {
-            i18n.changeLanguage(savedLanguage).then(() => {
-                setMounted(true);
-            });
-        } else {
+        const initializeData = async () => {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage && i18n.language !== savedLanguage) {
+                await i18n.changeLanguage(savedLanguage);
+            }
+
+            // Get user data
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user?.user_metadata?.['full_name']) {
+                const fullName = user.user_metadata['full_name'];
+                const firstName = fullName.split(' ')[0];
+                setFirstName(firstName);
+            } else if (user?.user_metadata?.['first_name']) {
+                setFirstName(user.user_metadata['first_name']);
+            }
+
             setMounted(true);
-        }
+        };
+
+        initializeData();
     }, [i18n]);
 
     useEffect(() => {
@@ -51,7 +65,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
     }
 
     return (
-        <div className="fixed inset-0 bg-background dark:bg-background flex items-center justify-center">
+        <div className="fixed inset-0 bg-background dark:bg-background flex items-center justify-center p-4 overflow-hidden">
             {showConfetti && (
                 <Confetti
                     width={windowSize.width}
@@ -66,9 +80,9 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className={cn(
-                    "shadow-2xl p-12 w-[895px] rounded-none border dark:border-gray-800",
+                    "shadow-2xl p-4 sm:p-8 lg:p-12 w-full max-w-[895px] rounded-none border dark:border-gray-800",
                     "bg-white dark:bg-background",
-                    "relative"
+                    "relative overflow-hidden"
                 )}
             >
                 {/* Background decoration */}
@@ -78,16 +92,16 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                     <OnboardingLanguageSwitcher />
                 </div>
 
-                <div className="flex items-center gap-12">
+                <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
                     {/* Left side - Image */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.5 }}
-                        className="w-[380px] relative flex-shrink-0"
+                        className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
                     >
                         <img
-                            src="/onboarding/onboarding.svg"
+                            src="/onboarding/okra_onboarding.svg"
                             alt="Welcome to lomi."
                             className="w-full h-auto"
                             loading="eager"
@@ -95,19 +109,20 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                     </motion.div>
 
                     {/* Right side - Content */}
-                    <div className="flex flex-col flex-1">
+                    <div className="flex flex-col flex-1 text-center lg:text-left">
                         <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.7 }}
-                            className="flex items-center gap-2"
+                            className="flex items-center justify-center lg:justify-start gap-2"
                         >
                             <h1 className={cn(
-                                "text-4xl font-bold mb-6",
+                                "text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 lg:mb-6",
                                 "text-gray-900 dark:text-white",
                                 "tracking-tight"
                             )}>
                                 {t('onboarding.welcome_screen.title')}
+                                {firstName && <span className="text-[#894CEE]"> {firstName}</span>}!
                             </h1>
                         </motion.div>
 
@@ -116,7 +131,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.9 }}
                             className={cn(
-                                "text-lg mb-10 text-left max-w-[440px]",
+                                "text-base sm:text-lg mb-6 lg:mb-10 max-w-[440px] mx-auto lg:mx-0",
                                 "text-gray-600 dark:text-gray-300",
                                 "leading-relaxed"
                             )}
@@ -130,7 +145,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 1.1 }}
-                            className="flex justify-end"
+                            className="flex justify-center lg:justify-end"
                         >
                             <ButtonExpand
                                 text={t('onboarding.welcome_screen.get_started')}
@@ -139,7 +154,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                                 textColor="text-white"
                                 hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
                                 hoverTextColor="hover:text-white"
-                                className="w-fit"
+                                className="w-full sm:w-fit"
                             />
                         </motion.div>
                     </div>

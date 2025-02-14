@@ -129,8 +129,6 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                                 });
                             }
                         }
-
-                        toast({ title: "Success", description: t('auth.logo_uploader.success') });
                     }
                 }
             } catch (error) {
@@ -200,11 +198,11 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
             </p>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>{t('auth.logo_uploader.crop.title')}</DialogTitle>
+                        <DialogTitle className="text-xl font-semibold">{t('auth.logo_uploader.crop.title')}</DialogTitle>
                     </DialogHeader>
-                    <div className="relative h-64 w-full">
+                    <div className="relative h-[50vh] sm:h-64 w-full">
                         {selectedFile && (
                             <Cropper
                                 image={URL.createObjectURL(selectedFile)}
@@ -217,11 +215,18 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                             />
                         )}
                     </div>
-                    <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-none">
+                    <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsDialogOpen(false)}
+                            className="w-full sm:w-auto h-[48px] text-base font-medium rounded-none"
+                        >
                             {t('auth.logo_uploader.crop.cancel')}
                         </Button>
-                        <Button onClick={handleSave} className="rounded-none">
+                        <Button
+                            onClick={handleSave}
+                            className="w-full sm:w-auto h-[48px] text-base font-medium rounded-none"
+                        >
                             {t('auth.logo_uploader.crop.save')}
                         </Button>
                     </div>

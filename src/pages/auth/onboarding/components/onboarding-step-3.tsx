@@ -1,4 +1,3 @@
-import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/actions/utils'
@@ -29,6 +28,9 @@ import {
     ouagadougouDistricts,
 } from '@/lib/data/onboarding';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
+import { motion } from 'framer-motion';
+import { ButtonExpand } from '@/components/design/button-expand';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const noop = () => undefined;
 
@@ -106,147 +108,176 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    {showCityField ? (
-                        <div className="flex-1">
-                            <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
-                            <select
-                                id="orgCity"
-                                {...onboardingForm.register("orgCity")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                    "appearance-none"
-                                )}
-                            >
-                                <option value="">{t('onboarding.step3.org_city.placeholder')}</option>
-                                {cities.map((city) => (
-                                    <option key={city} value={city}>
-                                        {city}
-                                    </option>
-                                ))}
-                            </select>
-                            {onboardingForm.formState.errors.orgCity &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
-                            }
-                        </div>
-                    ) : (
-                        <div className="flex-1">
-                            <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
-                            <Input
-                                id="orgCity"
-                                placeholder={t('onboarding.step3.org_city.placeholder')}
-                                {...onboardingForm.register("orgCity")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                )}
-                            />
-                            {onboardingForm.formState.errors.orgCity &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
-                            }
-                        </div>
-                    )}
-                    {showDistrictField ? (
-                        <div className="flex-1">
-                            <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
-                            <select
-                                id="orgDistrict"
-                                {...onboardingForm.register("orgDistrict")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                    "appearance-none"
-                                )}
-                            >
-                                <option value="">{t('onboarding.step3.org_district.placeholder')}</option>
-                                {districts.map((district) => (
-                                    <option key={district} value={district}>
-                                        {district}
-                                    </option>
-                                ))}
-                            </select>
-                            {onboardingForm.formState.errors.orgDistrict &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
-                            }
-                        </div>
-                    ) : (
-                        <div className="flex-1">
-                            <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
-                            <Input
-                                id="orgDistrict"
-                                placeholder={t('onboarding.step3.org_district.placeholder')}
-                                {...onboardingForm.register("orgDistrict")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                )}
-                            />
-                            {onboardingForm.formState.errors.orgDistrict &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
-                            }
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="flex-1">
-                        <Label htmlFor="orgPostalCode" className="block mb-2">{t('onboarding.step3.org_postal_code.label')}</Label>
-                        <Input
-                            id="orgPostalCode"
-                            placeholder={t('onboarding.step3.org_postal_code.placeholder')}
-                            {...onboardingForm.register("orgPostalCode")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgPostalCode &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgPostalCode.message || '')}</p>
-                        }
-                    </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgStreet" className="block mb-2">{t('onboarding.step3.org_street.label')}</Label>
-                        <Input
-                            id="orgStreet"
-                            placeholder={t('onboarding.step3.org_street.placeholder')}
-                            {...onboardingForm.register("orgStreet")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgStreet &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgStreet.message || '')}</p>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div className="flex justify-between">
-                <Button
-                    type="button"
-                    onClick={onPrevious}
-                    className="mt-6 h-[48px] dark:bg-primary-600 dark:hover:bg-primary-700"
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                {/* Left side - Image */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
                 >
-                    {t('common.back')}
-                </Button>
-                <Button
-                    type="submit"
-                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                >
-                    {t('common.next')}
-                </Button>
+                    <img
+                        src="/onboarding/okra_home.svg"
+                        alt="Address Information"
+                        className="w-full h-auto"
+                        loading="eager"
+                    />
+                </motion.div>
+
+                {/* Right side - Form Content */}
+                <div className="flex-1 w-full">
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            {showCityField ? (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
+                                    <select
+                                        id="orgCity"
+                                        {...onboardingForm.register("orgCity")}
+                                        className={cn(
+                                            "w-full mb-2 px-3 py-2 border h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                            "appearance-none rounded-none"
+                                        )}
+                                    >
+                                        <option value="">{t('onboarding.step3.org_city.placeholder')}</option>
+                                        {cities.map((city) => (
+                                            <option key={city} value={city}>
+                                                {city}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {onboardingForm.formState.errors.orgCity &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
+                                    }
+                                </div>
+                            ) : (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
+                                    <Input
+                                        id="orgCity"
+                                        placeholder={t('onboarding.step3.org_city.placeholder')}
+                                        {...onboardingForm.register("orgCity")}
+                                        className={cn(
+                                            "w-full mb-2 h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        )}
+                                    />
+                                    {onboardingForm.formState.errors.orgCity &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
+                                    }
+                                </div>
+                            )}
+                            {showDistrictField ? (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
+                                    <select
+                                        id="orgDistrict"
+                                        {...onboardingForm.register("orgDistrict")}
+                                        className={cn(
+                                            "w-full mb-2 px-3 py-2 border h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                            "appearance-none rounded-none"
+                                        )}
+                                    >
+                                        <option value="">{t('onboarding.step3.org_district.placeholder')}</option>
+                                        {districts.map((district) => (
+                                            <option key={district} value={district}>
+                                                {district}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {onboardingForm.formState.errors.orgDistrict &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
+                                    }
+                                </div>
+                            ) : (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
+                                    <Input
+                                        id="orgDistrict"
+                                        placeholder={t('onboarding.step3.org_district.placeholder')}
+                                        {...onboardingForm.register("orgDistrict")}
+                                        className={cn(
+                                            "w-full mb-2 h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        )}
+                                    />
+                                    {onboardingForm.formState.errors.orgDistrict &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
+                                    }
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/2">
+                                <Label htmlFor="orgPostalCode" className="block mb-2">{t('onboarding.step3.org_postal_code.label')}</Label>
+                                <Input
+                                    id="orgPostalCode"
+                                    placeholder={t('onboarding.step3.org_postal_code.placeholder')}
+                                    {...onboardingForm.register("orgPostalCode")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.orgPostalCode &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgPostalCode.message || '')}</p>
+                                }
+                            </div>
+                            <div className="w-full sm:w-1/2">
+                                <Label htmlFor="orgStreet" className="block mb-2">{t('onboarding.step3.org_street.label')}</Label>
+                                <Input
+                                    id="orgStreet"
+                                    placeholder={t('onboarding.step3.org_street.placeholder')}
+                                    {...onboardingForm.register("orgStreet")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.orgStreet &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgStreet.message || '')}</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex-1 flex items-end justify-between mt-8">
+                        <ButtonExpand
+                            text={t('common.back')}
+                            icon={ArrowLeft}
+                            iconPlacement="left"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={onPrevious}
+                        />
+                        <ButtonExpand
+                            text={t('common.next')}
+                            icon={ArrowRight}
+                            iconPlacement="right"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={() => onboardingForm.handleSubmit(onSubmit)()}
+                        />
+                    </div>
+                </div>
             </div>
         </form>
     );

@@ -1,5 +1,4 @@
 import { industries } from '@/lib/data/onboarding';
-import { Button } from '@/components/custom/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/actions/utils'
@@ -10,6 +9,9 @@ import { type OnboardingData } from '../onboarding';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 import { languages as i18nLanguages } from '@/lib/i18n/config';
+import { motion } from 'framer-motion';
+import { ButtonExpand } from '@/components/design/button-expand';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 
 interface FormData {
@@ -95,112 +97,147 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher
                     onLanguageChange={handleLanguageChange}
                     value={onboardingForm.watch('orgDefaultLanguage.name')}
                 />
             </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="flex-1">
-                        <Label htmlFor="orgWebsite" className="block mb-2">{t('onboarding.step4.org_website.label')}</Label>
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                {/* Left side - Image */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                >
+                    <img
+                        src="/onboarding/okra_going_live.svg"
+                        alt="Final Setup"
+                        className="w-full h-auto"
+                        loading="eager"
+                    />
+                </motion.div>
+
+                {/* Right side - Form Content */}
+                <div className="flex-1 w-full">
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgWebsite" className="block mb-2">{t('onboarding.step4.org_website.label')}</Label>
+                                <Input
+                                    id="orgWebsite"
+                                    placeholder={t('onboarding.step4.org_website.placeholder')}
+                                    {...onboardingForm.register("orgWebsite")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.orgWebsite && (
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgWebsite.message || '')}</p>
+                                )}
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgIndustry" className="block mb-2">{t('onboarding.step4.org_industry.label')}</Label>
+                                <select
+                                    id="orgIndustry"
+                                    {...onboardingForm.register("orgIndustry")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none px-3"
+                                    )}
+                                >
+                                    <option value="">{t('onboarding.step4.org_industry.placeholder')}</option>
+                                    {industries.map((industry) => (
+                                        <option key={industry} value={industry}>
+                                            {t(`onboarding.step4.org_industry.options.${industry.toLowerCase()}`)}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.orgIndustry &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgIndustry.message || '')}</p>
+                                }
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgDefaultLanguage" className="block mb-2">{t('onboarding.step4.org_default_language.label')}</Label>
+                                <select
+                                    id="orgDefaultLanguage"
+                                    value={onboardingForm.watch('orgDefaultLanguage.code')}
+                                    onChange={(e) => {
+                                        const lang = i18nLanguages.find(l => l.code === e.target.value) || i18nLanguages[0];
+                                        handleLanguageChange(lang);
+                                    }}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none px-3"
+                                    )}
+                                >
+                                    <option value="">{t('onboarding.step4.org_default_language.placeholder')}</option>
+                                    {i18nLanguages.map((language) => (
+                                        <option key={language.code} value={language.code}>
+                                            {t(`onboarding.step4.org_default_language.options.${language.name.toLowerCase()}`)}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.orgDefaultLanguage &&
+                                    <p className="text-red-500 text-sm">{t('onboarding.step4.org_default_language.required')}</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">{t('onboarding.step4.how_did_you_hear_about_us.label')}</Label>
                         <Input
-                            id="orgWebsite"
-                            placeholder={t('onboarding.step4.org_website.placeholder')}
-                            {...onboardingForm.register("orgWebsite")}
+                            id="howDidYouHearAboutUs"
+                            placeholder={t('onboarding.step4.how_did_you_hear_about_us.placeholder')}
+                            {...onboardingForm.register("howDidYouHearAboutUs")}
                             className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
+                                "w-full mb-2 h-[48px]",
                                 "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                 "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             )}
                         />
-                        {onboardingForm.formState.errors.orgWebsite && (
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgWebsite.message || '')}</p>
+                        {onboardingForm.formState.errors.howDidYouHearAboutUs && (
+                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.howDidYouHearAboutUs.message || '')}</p>
                         )}
                     </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgIndustry" className="block mb-2">{t('onboarding.step4.org_industry.label')}</Label>
-                        <select
-                            id="orgIndustry"
-                            {...onboardingForm.register("orgIndustry")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            <option value="">{t('onboarding.step4.org_industry.placeholder')}</option>
-                            {industries.map((industry) => (
-                                <option key={industry} value={industry}>
-                                    {t(`onboarding.step4.org_industry.options.${industry.toLowerCase()}`)}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.orgIndustry &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgIndustry.message || '')}</p>
-                        }
-                    </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgDefaultLanguage" className="block mb-2">{t('onboarding.step4.org_default_language.label')}</Label>
-                        <select
-                            id="orgDefaultLanguage"
-                            value={onboardingForm.watch('orgDefaultLanguage.code')}
-                            onChange={(e) => {
-                                const lang = i18nLanguages.find(l => l.code === e.target.value) || i18nLanguages[0];
-                                handleLanguageChange(lang);
+                    <div className="flex-1 flex items-end justify-between mt-8">
+                        <ButtonExpand
+                            text={t('common.back')}
+                            icon={ArrowLeft}
+                            iconPlacement="left"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={onPrevious}
+                        />
+                        <ButtonExpand
+                            text={t('common.submit')}
+                            icon={ArrowRight}
+                            iconPlacement="right"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={() => {
+                                const formData = onboardingForm.getValues();
+                                onSubmit({
+                                    ...formData,
+                                    orgDefaultLanguage: formData.orgDefaultLanguage.code
+                                });
                             }}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            <option value="">{t('onboarding.step4.org_default_language.placeholder')}</option>
-                            {i18nLanguages.map((language) => (
-                                <option key={language.code} value={language.code}>
-                                    {t(`onboarding.step4.org_default_language.options.${language.name.toLowerCase()}`)}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.orgDefaultLanguage &&
-                            <p className="text-red-500 text-sm">{t('onboarding.step4.org_default_language.required')}</p>
-                        }
+                        />
                     </div>
                 </div>
-            </div>
-            <div className="mb-6">
-                <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">{t('onboarding.step4.how_did_you_hear_about_us.label')}</Label>
-                <Input
-                    id="howDidYouHearAboutUs"
-                    placeholder={t('onboarding.step4.how_did_you_hear_about_us.placeholder')}
-                    {...onboardingForm.register("howDidYouHearAboutUs")}
-                    className={cn(
-                        "w-full mb-2 px-3 py-2 border h-[48px]",
-                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    )}
-                />
-                {onboardingForm.formState.errors.howDidYouHearAboutUs && (
-                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.howDidYouHearAboutUs.message || '')}</p>
-                )}
-            </div>
-            <div className="flex justify-between">
-                <Button
-                    type="button"
-                    onClick={onPrevious}
-                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                >
-                    {t('common.back')}
-                </Button>
-                <Button
-                    type="submit"
-                    className="mt-6 h-[48px] bg-black hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                >
-                    {t('common.submit')}
-                </Button>
             </div>
         </form>
     );

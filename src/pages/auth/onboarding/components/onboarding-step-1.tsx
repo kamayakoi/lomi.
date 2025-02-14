@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Button } from '@/components/custom/button';
+import { ButtonExpand } from '@/components/design/button-expand';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/actions/utils';
@@ -12,6 +12,8 @@ import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/;
 
@@ -28,7 +30,7 @@ const createOnboardingStep1Schema = (t: (key: string) => string) => {
 };
 
 type OnboardingStep1Schema = ReturnType<typeof createOnboardingStep1Schema>;
-type OnboardingStep1Data = z.infer<OnboardingStep1Schema>;
+export type OnboardingStep1Data = z.infer<OnboardingStep1Schema> & { avatarUrl?: string };
 
 interface OnboardingStep1Props {
     onNext: (data: OnboardingStep1Data) => void;
@@ -46,7 +48,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState(data.avatarUrl || '');
 
-    const onboardingForm = useForm<OnboardingStep1Data>({
+    const onboardingForm = useForm<z.infer<OnboardingStep1Schema>>({
         resolver: zodResolver(schema),
         mode: 'onChange',
         defaultValues: {
@@ -100,7 +102,7 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
         }
     };
 
-    const onSubmit = (formData: OnboardingStep1Data) => {
+    const onSubmit = (formData: z.infer<OnboardingStep1Schema>) => {
         // Include the full avatar URL in the submission
         onNext({
             ...formData,
@@ -117,165 +119,200 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
 
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="w-1/2">
-                        <Label htmlFor="firstName" className="block mb-2">{t('onboarding.step1.first_name.label')}</Label>
-                        <Input
-                            id="firstName"
-                            placeholder={t('onboarding.step1.first_name.placeholder')}
-                            {...onboardingForm.register("firstName")}
-                            className={cn(
-                                "w-full mb-2 h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
-                    </div>
-                    <div className="w-1/2">
-                        <Label htmlFor="lastName" className="block mb-2">{t('onboarding.step1.last_name.label')}</Label>
-                        <Input
-                            id="lastName"
-                            placeholder={t('onboarding.step1.last_name.placeholder')}
-                            {...onboardingForm.register("lastName")}
-                            className={cn(
-                                "w-full mb-2 h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.lastName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.lastName.message}</p>}
-                    </div>
-                </div>
-            </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="w-1/3">
-                        <Label htmlFor="countryCode" className="block mb-2">{t('onboarding.step1.country_code.label')}</Label>
-                        <div className="relative w-full">
-                            <Input
-                                id="countryCode"
-                                type="text"
-                                placeholder={t('onboarding.step1.country_code.placeholder')}
-                                value={countryCodeSearch}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    setCountryCodeSearch(value);
-                                    onboardingForm.setValue("countryCode", value, { shouldValidate: true });
-                                    setIsCountryCodeDropdownOpen(true);
-                                }}
-                                onFocus={() => setIsCountryCodeDropdownOpen(true)}
-                                onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                )}
-                            />
-                            {onboardingForm.formState.errors.countryCode && (
-                                <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>
-                            )}
-                            {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
-                                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 mt-1 max-h-60 overflow-auto">
-                                    {filteredCountryCodes.map((code: string) => (
-                                        <li
-                                            key={code}
-                                            className="px-3 py-2 h-[48px] flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                                            onClick={() => {
-                                                setCountryCodeSearch(code);
-                                                onboardingForm.setValue("countryCode", code, { shouldValidate: true });
-                                                setIsCountryCodeDropdownOpen(false);
-                                            }}
-                                        >
-                                            {code}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                {/* Left side - Image */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                >
+                    <img
+                        src="/onboarding/okra_test_your_app.svg"
+                        alt="Personal Information"
+                        className="w-full h-auto"
+                        loading="eager"
+                    />
+                </motion.div>
+
+                {/* Right side - Form Content */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-1 w-full"
+                >
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/2">
+                                <Label htmlFor="firstName" className="block mb-2">{t('onboarding.step1.first_name.label')}</Label>
+                                <Input
+                                    id="firstName"
+                                    placeholder={t('onboarding.step1.first_name.placeholder')}
+                                    {...onboardingForm.register("firstName")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.firstName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.firstName.message}</p>}
+                            </div>
+                            <div className="w-full sm:w-1/2">
+                                <Label htmlFor="lastName" className="block mb-2">{t('onboarding.step1.last_name.label')}</Label>
+                                <Input
+                                    id="lastName"
+                                    placeholder={t('onboarding.step1.last_name.placeholder')}
+                                    {...onboardingForm.register("lastName")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.lastName && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.lastName.message}</p>}
+                            </div>
                         </div>
                     </div>
-                    <div className="flex-1">
-                        <Label htmlFor="phoneNumber" className="block mb-2">{t('onboarding.step1.phone.label')}</Label>
-                        <Input
-                            id="phoneNumber"
-                            placeholder={t('onboarding.step1.phone.placeholder')}
-                            {...onboardingForm.register("phoneNumber", {
-                                setValueAs: (value) => value.replace(/\s/g, ''),
-                            })}
-                            className={cn(
-                                "w-full mb-2 h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="countryCode" className="block mb-2">{t('onboarding.step1.country_code.label')}</Label>
+                                <div className="relative w-full">
+                                    <Input
+                                        id="countryCode"
+                                        type="text"
+                                        placeholder={t('onboarding.step1.country_code.placeholder')}
+                                        value={countryCodeSearch}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setCountryCodeSearch(value);
+                                            onboardingForm.setValue("countryCode", value, { shouldValidate: true });
+                                            setIsCountryCodeDropdownOpen(true);
+                                        }}
+                                        onFocus={() => setIsCountryCodeDropdownOpen(true)}
+                                        onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
+                                        className={cn(
+                                            "w-full mb-2 px-3 py-2 border h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        )}
+                                    />
+                                    {onboardingForm.formState.errors.countryCode && (
+                                        <p className="text-red-500 text-sm">{onboardingForm.formState.errors.countryCode.message}</p>
+                                    )}
+                                    {isCountryCodeDropdownOpen && filteredCountryCodes.length > 0 && (
+                                        <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 mt-1 max-h-60 overflow-auto">
+                                            {filteredCountryCodes.map((code: string) => (
+                                                <li
+                                                    key={code}
+                                                    className="px-3 py-2 h-[48px] flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                    onClick={() => {
+                                                        setCountryCodeSearch(code);
+                                                        onboardingForm.setValue("countryCode", code, { shouldValidate: true });
+                                                        setIsCountryCodeDropdownOpen(false);
+                                                    }}
+                                                >
+                                                    {code}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="w-full sm:w-2/3">
+                                <Label htmlFor="phoneNumber" className="block mb-2">{t('onboarding.step1.phone.label')}</Label>
+                                <Input
+                                    id="phoneNumber"
+                                    placeholder={t('onboarding.step1.phone.placeholder')}
+                                    {...onboardingForm.register("phoneNumber", {
+                                        setValueAs: (value) => value.replace(/\s/g, ''),
+                                    })}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mb-6 flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-8">
+                        <div className="w-full sm:w-1/2 space-y-4">
+                            <Label htmlFor="profilePicture" className="block mb-2">{t('onboarding.step1.profile_picture.label')}</Label>
+                            <div className="ml-0 sm:ml-8">
+                                <ProfilePictureUploader
+                                    currentAvatar={avatarUrl}
+                                    onAvatarUpdate={handleAvatarUpdate}
+                                    name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
+                                />
+                            </div>
+                        </div>
+                        <div className="w-full sm:w-1/2 space-y-4">
+                            <div>
+                                <Label htmlFor="country" className="block mb-2">{t('onboarding.step1.country.label')}</Label>
+                                <select
+                                    id="country"
+                                    {...onboardingForm.register("country")}
+                                    className={cn(
+                                        "w-full mb-2 px-3 py-2 border h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none"
+                                    )}
+                                >
+                                    {countries.map((country) => (
+                                        <option key={country} value={country}>
+                                            {country}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{t('onboarding.step1.country.error')}</p>}
+                            </div>
+                            <div>
+                                <Label htmlFor="position" className="block mb-2">{t('onboarding.step1.position.label')}</Label>
+                                <select
+                                    id="position"
+                                    {...onboardingForm.register("position")}
+                                    className={cn(
+                                        "w-full mb-2 px-3 py-2 border h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none"
+                                    )}
+                                >
+                                    {organizationPositions.map((position) => (
+                                        <option key={position} value={position}>
+                                            {position}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.position && <p className="text-red-500 text-sm">{t('onboarding.step1.position.error')}</p>}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex-1 flex items-end">
+                        <ButtonExpand
+                            text={t('common.next')}
+                            icon={ArrowRight}
+                            iconPlacement="right"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg ml-auto"
+                            onClick={() => onboardingForm.handleSubmit(onSubmit)()}
                         />
-                        {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
                     </div>
-                </div>
+                </motion.div>
             </div>
-            <div className="mb-6 flex space-x-8">
-                <div className="w-1/2 space-y-4">
-                    <Label htmlFor="profilePicture" className="block mb-2">{t('onboarding.step1.profile_picture.label')}</Label>
-                    <div className="ml-8">
-                        <ProfilePictureUploader
-                            currentAvatar={avatarUrl}
-                            onAvatarUpdate={handleAvatarUpdate}
-                            name={onboardingForm.watch('firstName') + ' ' + onboardingForm.watch('lastName')}
-                        />
-                    </div>
-                </div>
-                <div className="w-1/2 space-y-4">
-                    <div>
-                        <Label htmlFor="country" className="block mb-2">{t('onboarding.step1.country.label')}</Label>
-                        <select
-                            id="country"
-                            {...onboardingForm.register("country")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            {countries.map((country) => (
-                                <option key={country} value={country}>
-                                    {country}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.country && <p className="text-red-500 text-sm">{t('onboarding.step1.country.error')}</p>}
-                    </div>
-                    <div>
-                        <Label htmlFor="position" className="block mb-2">{t('onboarding.step1.position.label')}</Label>
-                        <select
-                            id="position"
-                            {...onboardingForm.register("position")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            {organizationPositions.map((position) => (
-                                <option key={position} value={position}>
-                                    {position}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.position && <p className="text-red-500 text-sm">{t('onboarding.step1.position.error')}</p>}
-                    </div>
-                </div>
-            </div>
-            <Button type="submit" className="w-full mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg">
-                {t('common.next')}
-            </Button>
         </form>
     );
 };
 
 export default OnboardingStep1;
-export type { OnboardingStep1Data };
+export type { OnboardingStep1Schema };

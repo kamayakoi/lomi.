@@ -1,5 +1,5 @@
 import { employeeRanges } from '@/lib/data/onboarding';
-import { Button } from '@/components/custom/button';
+import { ButtonExpand } from '@/components/design/button-expand';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/actions/utils';
@@ -23,6 +23,8 @@ import {
     burkinaFasoRegions,
 } from '@/lib/data/onboarding';
 import { OnboardingLanguageSwitcher } from '@/components/design/OnboardingLanguageSwitcher';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const noop = () => undefined;
 
@@ -122,185 +124,219 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
     }, [onboardingForm]);
 
     return (
-        <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="absolute top-4 right-4">
+        <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-0">
+            <div className="absolute top-8 sm:top-4 right-4">
                 <OnboardingLanguageSwitcher onLanguageChange={noop} />
             </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="flex-1">
-                        <Label htmlFor="orgName" className="block mb-2">{t('onboarding.step2.org_name.label')}</Label>
-                        <Input
-                            id="orgName"
-                            placeholder={t('onboarding.step2.org_name.placeholder')}
-                            {...onboardingForm.register("orgName")}
-                            className={cn(
-                                "w-full mb-2 h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        {onboardingForm.formState.errors.orgName &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgName.message || '')}</p>
-                        }
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                {/* Left side - Image */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                >
+                    <img
+                        src="/onboarding/okra_test_icon.svg"
+                        alt="Organization Information"
+                        className="w-full h-auto"
+                        loading="eager"
+                    />
+                </motion.div>
+
+                {/* Right side - Form Content */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-1 w-full"
+                >
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgName" className="block mb-2">{t('onboarding.step2.org_name.label')}</Label>
+                                <Input
+                                    id="orgName"
+                                    placeholder={t('onboarding.step2.org_name.placeholder')}
+                                    {...onboardingForm.register("orgName")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.orgName &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgName.message || '')}</p>
+                                }
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgEmail" className="block mb-2">{t('onboarding.step2.org_email.label')}</Label>
+                                <Input
+                                    id="orgEmail"
+                                    placeholder={t('onboarding.step2.org_email.placeholder')}
+                                    {...onboardingForm.register("orgEmail")}
+                                    className={cn(
+                                        "w-full mb-2 h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                {onboardingForm.formState.errors.orgEmail &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgEmail.message || '')}</p>
+                                }
+                            </div>
+                            <div className="w-full sm:w-1/3">
+                                <Label htmlFor="orgEmployees" className="block mb-2">{t('onboarding.step2.org_employees.label')}</Label>
+                                <select
+                                    id="orgEmployees"
+                                    {...onboardingForm.register("orgEmployees")}
+                                    className={cn(
+                                        "w-full mb-2 px-3 py-2 border h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none"
+                                    )}
+                                >
+                                    <option value="">{t('onboarding.step2.org_employees.placeholder')}</option>
+                                    {employeeRanges.map((range) => (
+                                        <option key={range} value={range}>
+                                            {range}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.orgEmployees &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgEmployees.message || '')}</p>
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgEmail" className="block mb-2">{t('onboarding.step2.org_email.label')}</Label>
-                        <Input
-                            id="orgEmail"
-                            placeholder={t('onboarding.step2.org_email.placeholder')}
-                            {...onboardingForm.register("orgEmail")}
-                            className={cn(
-                                "w-full mb-2 h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    <div className="mb-6">
+                        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
+                            <div className="w-full sm:w-1/2">
+                                <Label htmlFor="orgCountry" className="block mb-2">{t('onboarding.step2.org_country.label')}</Label>
+                                <select
+                                    id="orgCountry"
+                                    {...onboardingForm.register("orgCountry")}
+                                    className={cn(
+                                        "w-full mb-2 px-3 py-2 border h-[48px]",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                        "appearance-none rounded-none"
+                                    )}
+                                >
+                                    <option value="">{t('onboarding.step2.org_country.placeholder')}</option>
+                                    {operatingCountries.map((country) => (
+                                        <option key={country} value={country}>
+                                            {country}
+                                        </option>
+                                    ))}
+                                </select>
+                                {onboardingForm.formState.errors.orgCountry &&
+                                    <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCountry.message || '')}</p>
+                                }
+                            </div>
+                            {showRegionField ? (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgRegion" className="block mb-2">{t('onboarding.step2.org_region.label')}</Label>
+                                    <select
+                                        id="orgRegion"
+                                        {...onboardingForm.register("orgRegion")}
+                                        className={cn(
+                                            "w-full mb-2 px-3 py-2 border h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
+                                            "appearance-none rounded-none"
+                                        )}
+                                    >
+                                        <option value="">{t('onboarding.step2.org_region.placeholder')}</option>
+                                        {regions.map((region) => (
+                                            <option key={region} value={region}>
+                                                {region}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {onboardingForm.formState.errors.orgRegion &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgRegion.message || '')}</p>
+                                    }
+                                </div>
+                            ) : (
+                                <div className="w-full sm:w-1/2">
+                                    <Label htmlFor="orgRegion" className="block mb-2">{t('onboarding.step2.org_region.label')}</Label>
+                                    <Input
+                                        id="orgRegion"
+                                        placeholder={t('onboarding.step2.org_region.placeholder')}
+                                        {...onboardingForm.register("orgRegion")}
+                                        className={cn(
+                                            "w-full mb-2 px-3 py-2 border h-[48px]",
+                                            "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                            "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                        )}
+                                    />
+                                    {onboardingForm.formState.errors.orgRegion &&
+                                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgRegion.message || '')}</p>
+                                    }
+                                </div>
                             )}
-                        />
-                        {onboardingForm.formState.errors.orgEmail &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgEmail.message || '')}</p>
-                        }
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <Label htmlFor="orgEmployees" className="block mb-2">{t('onboarding.step2.org_employees.label')}</Label>
-                        <select
-                            id="orgEmployees"
-                            {...onboardingForm.register("orgEmployees")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            <option value="">{t('onboarding.step2.org_employees.placeholder')}</option>
-                            {employeeRanges.map((range) => (
-                                <option key={range} value={range}>
-                                    {range}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.orgEmployees &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgEmployees.message || '')}</p>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div className="mb-6">
-                <div className="flex space-x-2">
-                    <div className="flex-1">
-                        <Label htmlFor="orgCountry" className="block mb-2">{t('onboarding.step2.org_country.label')}</Label>
-                        <select
-                            id="orgCountry"
-                            {...onboardingForm.register("orgCountry")}
-                            className={cn(
-                                "w-full mb-2 px-3 py-2 border h-[48px]",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                "appearance-none"
-                            )}
-                        >
-                            <option value="">{t('onboarding.step2.org_country.placeholder')}</option>
-                            {operatingCountries.map((country) => (
-                                <option key={country} value={country}>
-                                    {country}
-                                </option>
-                            ))}
-                        </select>
-                        {onboardingForm.formState.errors.orgCountry &&
-                            <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCountry.message || '')}</p>
-                        }
-                    </div>
-                    {showRegionField ? (
-                        <div className="flex-1">
-                            <Label htmlFor="orgRegion" className="block mb-2">{t('onboarding.step2.org_region.label')}</Label>
-                            <select
-                                id="orgRegion"
-                                {...onboardingForm.register("orgRegion")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white",
-                                    "appearance-none"
-                                )}
-                            >
-                                <option value="">{t('onboarding.step2.org_region.placeholder')}</option>
-                                {regions.map((region) => (
-                                    <option key={region} value={region}>
-                                        {region}
-                                    </option>
-                                ))}
-                            </select>
-                            {onboardingForm.formState.errors.orgRegion &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgRegion.message || '')}</p>
+                    <div className="mb-6 flex flex-col sm:flex-row space-y-6 sm:space-y-6 sm:space-x-8">
+                        <div className="w-full sm:w-1/2 space-y-6">
+                            <p className="text-sm font-medium">{t('onboarding.step2.logo.label')}</p>
+                            <div className="ml-0 sm:ml-8">
+                                <LogoUploader
+                                    currentLogo={logoUrl}
+                                    onLogoUpdate={handleLogoUpdate}
+                                    companyName={onboardingForm.watch('orgName')}
+                                />
+                            </div>
+                        </div>
+                        <div className="w-full space-y-8 sm:w-1/2 sm:space-y-8">
+                            <Label htmlFor="workspaceHandle" className="block mb-2 -ml-3 -mt-5">{t('onboarding.step2.workspace_handle.label')}</Label>
+                            <div className="relative flex items-center -ml-3 h-[48px]">
+                                <Input
+                                    id="workspaceHandle"
+                                    placeholder={t('onboarding.step2.workspace_handle.placeholder')}
+                                    {...onboardingForm.register("workspaceHandle")}
+                                    className={cn(
+                                        "w-full h-[48px] pl-[138.5px] text-base",
+                                        "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
+                                        "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                    )}
+                                />
+                                <div className="absolute left-3 text-base text-muted-foreground">
+                                    portal.lomi.africa/
+                                </div>
+                            </div>
+                            {onboardingForm.formState.errors.workspaceHandle &&
+                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.workspaceHandle.message || '')}</p>
                             }
                         </div>
-                    ) : (
-                        <div className="flex-1">
-                            <Label htmlFor="orgRegion" className="block mb-2">{t('onboarding.step2.org_region.label')}</Label>
-                            <Input
-                                id="orgRegion"
-                                placeholder={t('onboarding.step2.org_region.placeholder')}
-                                {...onboardingForm.register("orgRegion")}
-                                className={cn(
-                                    "w-full mb-2 px-3 py-2 border h-[48px]",
-                                    "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                    "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                                )}
-                            />
-                            {onboardingForm.formState.errors.orgRegion &&
-                                <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgRegion.message || '')}</p>
-                            }
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="mb-6 flex space-x-8">
-                <div className="w-1/2 space-y-6">
-                    <p className="text-sm font-medium">{t('onboarding.step2.logo.label')}</p>
-                    <div className="ml-8">
-                        <LogoUploader
-                            currentLogo={logoUrl}
-                            onLogoUpdate={handleLogoUpdate}
-                            companyName={onboardingForm.watch('orgName')}
+                    </div>
+                    <div className="flex-1 flex items-end justify-between mt-8">
+                        <ButtonExpand
+                            text={t('common.back')}
+                            icon={ArrowLeft}
+                            iconPlacement="left"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={onPrevious}
+                        />
+                        <ButtonExpand
+                            text={t('common.next')}
+                            icon={ArrowRight}
+                            iconPlacement="right"
+                            bgColor="bg-black dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                            className="h-[44px] sm:h-[48px] font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
+                            onClick={() => onboardingForm.handleSubmit(onSubmit)()}
                         />
                     </div>
-                </div>
-                <div className="w-1/2 space-y-10">
-                    <Label htmlFor="workspaceHandle" className="block mb-2">{t('onboarding.step2.workspace_handle.label')}</Label>
-                    <div className="relative flex items-center h-[48px]">
-                        <Input
-                            id="workspaceHandle"
-                            placeholder={t('onboarding.step2.workspace_handle.placeholder')}
-                            {...onboardingForm.register("workspaceHandle")}
-                            className={cn(
-                                "w-full h-[48px] pl-[138.5px] text-base",
-                                "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
-                                "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                            )}
-                        />
-                        <div className="absolute left-3 text-base text-muted-foreground">
-                            portal.lomi.africa/
-                        </div>
-                    </div>
-                    {onboardingForm.formState.errors.workspaceHandle &&
-                        <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.workspaceHandle.message || '')}</p>
-                    }
-                </div>
-            </div>
-            <div className="flex justify-between">
-                <Button
-                    type="button"
-                    onClick={onPrevious}
-                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                >
-                    {t('common.back')}
-                </Button>
-                <Button
-                    type="submit"
-                    className="mt-6 h-[48px] bg-black hover:bg-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 text-white font-semibold text-base transition-all duration-300 ease-in-out hover:shadow-lg"
-                >
-                    {t('common.next')}
-                </Button>
+                </motion.div>
             </div>
         </form>
     );

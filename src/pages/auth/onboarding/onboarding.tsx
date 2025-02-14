@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import LoadingButton from '@/components/portal/loader';
 import WelcomeScreen from './components/welcome-screen';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 // Import types from each step
 import type { OnboardingStep1Data } from './components/onboarding-step-1';
@@ -405,55 +406,88 @@ const Onboarding: React.FC = () => {
         );
     }
 
-    return (
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center p-4">
-            {showWelcome ? (
-                <WelcomeScreen onGetStarted={() => setShowWelcome(false)} />
-            ) : (
-                <Card className="w-full max-w-4xl bg-white dark:bg-background shadow-xl rounded-none border dark:border-gray-800">
-                    <CardHeader>
-                        <CardTitle className="text-2xl font-bold text-center">
-                            {currentStep >= 0 && currentStep < steps.length && steps[currentStep] ? t(steps[currentStep].title) : ''}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="mb-8">
-                            <div className="relative flex h-2 w-full bg-gray-200 dark:bg-gray-700">
-                                <div className={cn(
-                                    "absolute inset-0 transition-[width] duration-300 ease-out bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]",
-                                    "w-[25%]",
-                                    currentStep === 0 && "w-[25%]",
-                                    currentStep === 1 && "w-[50%]",
-                                    currentStep === 2 && "w-[75%]",
-                                    currentStep === 3 && "w-[100%]",
-                                )} />
+    return showWelcome ? (
+        <WelcomeScreen onGetStarted={() => setShowWelcome(false)} />
+    ) : (
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+            <Card className="w-full max-w-[1250px] bg-white dark:bg-background shadow-xl rounded-none border dark:border-gray-800 mx-auto my-4 sm:my-0">
+                <CardHeader className="px-4 sm:px-6 pt-8 sm:pt-6">
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-center">
+                        {currentStep >= 0 && currentStep < steps.length && steps[currentStep] ? t(steps[currentStep].title) : ''}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6">
+                    <div className="mb-6 sm:mb-8">
+                        <div className="relative flex h-2 w-full bg-gray-200 dark:bg-gray-700">
+                            <motion.div
+                                initial={{ width: "0%" }}
+                                animate={{
+                                    width: `${(currentStep + 1) * 25}%`
+                                }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                className={cn(
+                                    "absolute inset-0 bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]"
+                                )}
+                            />
+                            <div className="absolute inset-0 flex">
                                 {steps.map((_, index) => (
-                                    <div key={index} className="flex-1 flex">
-                                        {index < steps.length - 1 && <div className="w-1 bg-white dark:bg-background relative z-10" />}
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="flex justify-between mt-2">
-                                {steps.map((step) => (
-                                    <div
-                                        key={step.title}
-                                        className={cn(
-                                            "text-xs",
-                                            steps.indexOf(step) <= currentStep
-                                                ? "text-[#894CEE] dark:text-[#FBC6F1] font-bold"
-                                                : "text-gray-400 dark:text-gray-500"
+                                    <div key={index} className="flex-1 flex items-center">
+                                        {index > 0 && (
+                                            <div className="w-1 h-full bg-white dark:bg-background" />
                                         )}
-                                    >
-                                        {t(step.title)}
                                     </div>
                                 ))}
                             </div>
                         </div>
+                        <div className="flex justify-between mt-2">
+                            {steps.map((step) => (
+                                <div
+                                    key={step.title}
+                                    className={cn(
+                                        "text-[11px] leading-tight sm:text-xs sm:leading-normal",
+                                        "px-1 sm:px-0",
+                                        "text-center max-w-[80px] sm:max-w-none",
+                                        "mt-1 sm:mt-2",
+                                        steps.indexOf(step) <= currentStep
+                                            ? "text-[#894CEE] dark:text-[#FBC6F1] font-bold"
+                                            : "text-gray-400 dark:text-gray-500"
+                                    )}
+                                >
+                                    {t(step.title)}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                        {renderStep()}
-                    </CardContent>
-                </Card>
-            )}
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className={cn(
+                            "flex flex-col",
+                            // Steps 1 & 2 share same height
+                            (currentStep === 0 || currentStep === 1) && "min-h-[400px]",
+                            // Steps 3 & 4 share same height
+                            (currentStep === 2 || currentStep === 3) && "min-h-[260px]"
+                        )}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{
+                                duration: 0.3,
+                                opacity: { duration: 0.15 },
+                                x: { duration: 0.3 }
+                            }}
+                        >
+                            {renderStep()}
+                        </motion.div>
+                    </motion.div>
+                </CardContent>
+            </Card>
         </div>
     );
 };

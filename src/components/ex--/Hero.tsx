@@ -1,5 +1,5 @@
 import { Button } from "../ui/button";
-import { HeroCards } from "./HeroCards";
+import { HeroCards } from "../landing/HeroCards";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PulsatingButton from '@/components/ui/pulsating-button';
