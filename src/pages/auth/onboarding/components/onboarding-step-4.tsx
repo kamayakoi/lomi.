@@ -127,8 +127,15 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                 <Label htmlFor="orgWebsite" className="block mb-2">{t('onboarding.step4.org_website.label')}</Label>
                                 <Input
                                     id="orgWebsite"
+                                    type="url"
+                                    autoComplete="url"
                                     placeholder={t('onboarding.step4.org_website.placeholder')}
-                                    {...onboardingForm.register("orgWebsite")}
+                                    {...onboardingForm.register("orgWebsite", {
+                                        setValueAs: (value) => {
+                                            // Remove http://, https://, and www. from the start
+                                            return value.replace(/^(https?:\/\/)?(www\.)?/i, '');
+                                        }
+                                    })}
                                     className={cn(
                                         "w-full mb-2 h-[48px]",
                                         "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -143,6 +150,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                 <Label htmlFor="orgIndustry" className="block mb-2">{t('onboarding.step4.org_industry.label')}</Label>
                                 <select
                                     id="orgIndustry"
+                                    autoComplete="organization-title"
                                     {...onboardingForm.register("orgIndustry")}
                                     className={cn(
                                         "w-full mb-2 h-[48px]",
@@ -166,6 +174,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                 <Label htmlFor="orgDefaultLanguage" className="block mb-2">{t('onboarding.step4.org_default_language.label')}</Label>
                                 <select
                                     id="orgDefaultLanguage"
+                                    autoComplete="language"
                                     value={onboardingForm.watch('orgDefaultLanguage.code')}
                                     onChange={(e) => {
                                         const lang = i18nLanguages.find(l => l.code === e.target.value) || i18nLanguages[0];
@@ -195,6 +204,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                         <Label htmlFor="howDidYouHearAboutUs" className="block mb-2">{t('onboarding.step4.how_did_you_hear_about_us.label')}</Label>
                         <Input
                             id="howDidYouHearAboutUs"
+                            autoComplete="off"
                             placeholder={t('onboarding.step4.how_did_you_hear_about_us.placeholder')}
                             {...onboardingForm.register("howDidYouHearAboutUs")}
                             className={cn(

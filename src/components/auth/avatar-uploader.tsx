@@ -107,8 +107,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 );
 
                 if (croppedImage) {
-                    setPreviewUrl(URL.createObjectURL(croppedImage));
-
                     const { data: { user } } = await supabase.auth.getUser();
                     if (!user) throw new Error('No user found');
 
@@ -118,7 +116,7 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                     const { data, error } = await supabase.storage
                         .from('avatars')
                         .upload(fileName, croppedImage, {
-                            contentType: 'image/jpeg', // Changed to match JPEG format
+                            contentType: 'image/jpeg',
                             cacheControl: '3600',
                             upsert: true
                         });
@@ -128,25 +126,27 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                     }
 
                     if (data) {
-                        // Get the relative path from the upload response
-                        const relativePath = data.path;
+                        // Get public URL for the uploaded file
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('avatars')
+                            .getPublicUrl(data.path);
 
-                        // Update merchant avatar with relative path
+                        // Update merchant avatar with public URL
                         const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
                             p_merchant_id: user.id,
-                            p_avatar_url: relativePath
+                            p_avatar_url: publicUrl  // Store the full public URL like in logo-uploader
                         });
 
                         if (updateError) {
                             throw updateError;
                         }
 
-                        // Get public URL for display
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('avatars')
-                            .getPublicUrl(relativePath);
-
+                        // Update preview and parent component
+                        setPreviewUrl(publicUrl);
                         onAvatarUpdate(publicUrl);
+
+                        // Trigger a refresh event
+                        window.dispatchEvent(new Event('merchant-profile-updated'));
                     }
                 }
             } catch (error) {

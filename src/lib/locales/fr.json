@@ -326,7 +326,7 @@
     },
     "activation": {
         "title": "Activation du compte",
-        "step_indicator": "Étape {step} sur {total}",
+        "step_indicator": "Étape {{step}} sur {{total}}",
         "steps": {
             "create_account": "Créer votre compte",
             "business_details": "Détails de l'entreprise",
@@ -338,14 +338,14 @@
         "step1": {
             "success_message": "Votre compte a été créé avec succès !",
             "verification_intro": "Pour compléter votre inscription, nous devons vérifier les informations de votre entreprise.",
-            "process_title": "Veuillez procéder à notre processus de vérification d'entreprise pour :",
+            "process_title": "Veuillez procéder à notre processus de vérification pour :",
             "steps": [
                 "Confirmer les détails de votre entreprise",
                 "Soumettre les documents requis",
-                "Faire activer votre compte",
+                "Activer votre compte",
                 "Commencer à utiliser notre plateforme"
             ],
-            "compliance_notice": "Cette vérification assure la sécurité de notre plateforme et la conformité aux réglementations de votre pays et de la République de Côte d'Ivoire."
+            "compliance_notice": "Cette vérification assure la sécurité de notre plateforme et la conformité aux réglementations de votre pays, de l'UEMOA et de la République de Côte d'Ivoire."
         },
         "step2": {
             "title": "Détails de l'entreprise",
@@ -573,9 +573,9 @@
                 "required": "La région est requise"
             },
             "workspace_handle": {
-                "label": "URL de l'espace de travail",
-                "placeholder": "mon-espace",
-                "required": "L'URL de l'espace de travail est requise"
+                "label": "URL de votre boutique",
+                "placeholder": "ma-boutique",
+                "required": "L'URL de votre boutique est requise"
             }
         },
         "step3": {

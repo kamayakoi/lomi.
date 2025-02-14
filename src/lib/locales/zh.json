@@ -326,7 +326,7 @@
     },
     "activation": {
         "title": "账户激活",
-        "step_indicator": "第 {step} 步，共 {total} 步",
+        "step_indicator": "第 {{step}} 步，共 {{total}} 步",
         "steps": {
             "create_account": "创建账户",
             "business_details": "企业详情",
@@ -620,9 +620,9 @@
                 "required": "地区为必填项"
             },
             "workspace_handle": {
-                "label": "工作空间标识",
-                "placeholder": "my-workspace",
-                "required": "工作空间标识为必填项"
+                "label": "店铺标识",
+                "placeholder": "my-store",
+                "required": "店铺标识为必填项"
             },
             "logo": {
                 "label": "公司标志"

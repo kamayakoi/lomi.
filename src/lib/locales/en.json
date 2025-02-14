@@ -322,7 +322,7 @@
     },
     "activation": {
         "title": "Account Activation",
-        "step_indicator": "Step {step} of {total}",
+        "step_indicator": "Step {{step}} of {{total}}",
         "steps": {
             "create_account": "Create your account",
             "business_details": "Business details",
@@ -574,9 +574,9 @@
                 "required": "Region is required"
             },
             "workspace_handle": {
-                "label": "Workspace handle",
-                "placeholder": "my-workspace",
-                "required": "Workspace handle is required"
+                "label": "Store handle",
+                "placeholder": "my-store",
+                "required": "Store handle is required"
             },
             "logo": {
                 "label": "Company logo"

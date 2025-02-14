@@ -158,11 +158,11 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
     return (
         <div className="space-y-2">
             <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-blue-500 text-white rounded-lg flex items-center justify-center">
+                <div className="w-20 h-20 bg-blue-500 text-white rounded-lg flex items-center justify-center">
                     {previewUrl ? (
                         <img src={previewUrl} alt="Company logo" className="w-full h-full object-contain rounded-lg" />
                     ) : (
-                        <span className="text-2xl font-bold">{companyName ? getInitial(companyName) : ''}</span>
+                        <span className="text-3xl font-bold">{companyName ? getInitial(companyName) : ''}</span>
                     )}
                 </div>
                 <div className="space-x-2">

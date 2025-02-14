@@ -327,7 +327,7 @@
     },
     "activation": {
         "title": "Ativação da conta",
-        "step_indicator": "Etapa {step} de {total}",
+        "step_indicator": "Etapa {{step}} de {{total}}",
         "steps": {
             "create_account": "Criar conta",
             "business_details": "Detalhes do negócio",
@@ -587,9 +587,9 @@
                 "required": "Região é obrigatória"
             },
             "workspace_handle": {
-                "label": "Handle do workspace",
-                "placeholder": "my-workspace",
-                "required": "Handle do workspace é obrigatório"
+                "label": "URL da sua loja",
+                "placeholder": "my-store",
+                "required": "URL da sua loja é obrigatório"
             },
             "logo": {
                 "label": "Company logo"

@@ -72,7 +72,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                     height={windowSize.height}
                     recycle={false}
                     numberOfPieces={200}
-                    colors={['#894CEE', '#FBC6F1', '#E5F887']}
+                    colors={['#D73E57', '#12B881', '#3C82F6']}
                 />
             )}
             <motion.div
@@ -86,7 +86,8 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                 )}
             >
                 {/* Background decoration */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]" />
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D73E57] via-[#12B881] to-[#3C82F6]" />
+
 
                 <div className="absolute top-4 right-4 z-10">
                     <OnboardingLanguageSwitcher />
@@ -122,7 +123,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                                 "tracking-tight"
                             )}>
                                 {t('onboarding.welcome_screen.title')}
-                                {firstName && <span className="text-white"> {firstName}</span>} !
+                                {firstName && <span className="text-black dark:text-white"> {firstName}</span>} !
                             </h1>
                         </motion.div>
 
@@ -154,7 +155,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
                                 textColor="text-white"
                                 hoverBgColor="hover:bg-gray-900 dark:hover:bg-gray-700"
                                 hoverTextColor="hover:text-white"
-                                className="w-full mt-8 sm:w-fit"
+                                className="w-full mt-10 sm:w-fit"
                             />
                         </motion.div>
                     </div>

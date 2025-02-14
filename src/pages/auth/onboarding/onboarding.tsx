@@ -246,8 +246,8 @@ const Onboarding: React.FC = () => {
             // Normalize the website URL
             const websiteUrl = formData.orgWebsite ? formData.orgWebsite.replace(/^(https?:\/\/)?(www\.)?/i, '') : '';
 
-            // Prepend "portal.lomi.africa/" to the workspace handle
-            const completeWorkspaceHandle = `portal.lomi.africa/${formData.workspaceHandle}`;
+            // Prepend "store.lomi.africa/" to the workspace handle
+            const completeWorkspaceHandle = `store.lomi.africa/${formData.workspaceHandle}`;
 
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
@@ -426,7 +426,7 @@ const Onboarding: React.FC = () => {
                                 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
                                 className={cn(
-                                    "absolute inset-0 bg-gradient-to-r from-[#894CEE] via-[#FBC6F1] to-[#E5F887]"
+                                    "absolute inset-0 bg-gradient-to-r from-[#D73E57] via-[#12B881] to-[#3C82F6]"
                                 )}
                             />
                             <div className="absolute inset-0 flex">

@@ -134,12 +134,12 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                    className="w-full max-w-[280px] lg:w-[380px] h-[280px] lg:h-[380px] relative flex-shrink-0 flex items-center justify-center"
                 >
                     <img
                         src="/onboarding/okra_test_icon.svg"
                         alt="Organization Information"
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-contain"
                         loading="eager"
                     />
                 </motion.div>
@@ -157,6 +157,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgName" className="block mb-2">{t('onboarding.step2.org_name.label')}</Label>
                                 <Input
                                     id="orgName"
+                                    autoComplete="organization"
                                     placeholder={t('onboarding.step2.org_name.placeholder')}
                                     {...onboardingForm.register("orgName")}
                                     className={cn(
@@ -173,6 +174,8 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgEmail" className="block mb-2">{t('onboarding.step2.org_email.label')}</Label>
                                 <Input
                                     id="orgEmail"
+                                    type="email"
+                                    autoComplete="organization email"
                                     placeholder={t('onboarding.step2.org_email.placeholder')}
                                     {...onboardingForm.register("orgEmail")}
                                     className={cn(
@@ -189,6 +192,7 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgEmployees" className="block mb-2">{t('onboarding.step2.org_employees.label')}</Label>
                                 <select
                                     id="orgEmployees"
+                                    autoComplete="off"
                                     {...onboardingForm.register("orgEmployees")}
                                     className={cn(
                                         "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -216,7 +220,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgCountry" className="block mb-2">{t('onboarding.step2.org_country.label')}</Label>
                                 <select
                                     id="orgCountry"
-                                    {...onboardingForm.register("orgCountry")}
+                                    autoComplete="country"
+                                    {...onboardingForm.register("orgCountry", {
+                                        onChange: () => {
+                                            // Reset region when country changes
+                                            onboardingForm.setValue('orgRegion', '');
+                                        }
+                                    })}
                                     className={cn(
                                         "w-full mb-2 px-3 py-2 border h-[48px]",
                                         "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -295,16 +305,17 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                             <div className="relative flex items-center sm:-ml-3 h-[48px]">
                                 <Input
                                     id="workspaceHandle"
+                                    autoComplete="off"
                                     placeholder={t('onboarding.step2.workspace_handle.placeholder')}
                                     {...onboardingForm.register("workspaceHandle")}
                                     className={cn(
-                                        "w-full h-[48px] pl-[138.5px] text-base",
+                                        "w-full h-[48px] pl-[132.5px] text-base",
                                         "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
                                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     )}
                                 />
                                 <div className="absolute left-3 text-base text-muted-foreground">
-                                    portal.lomi.africa/
+                                    store.lomi.africa/
                                 </div>
                             </div>
                             {onboardingForm.formState.errors.workspaceHandle &&

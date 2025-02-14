@@ -40,6 +40,23 @@ interface OnboardingStep1Props {
 
 const noop = () => undefined;
 
+// Add this function before the OnboardingStep1 component
+const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const numbers = value.replace(/\D/g, '');
+
+    // Format based on length and potential patterns
+    if (numbers.length <= 2) {
+        return numbers;
+    } else if (numbers.length <= 4) {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2)}`;
+    } else if (numbers.length <= 7) {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4)}`;
+    } else {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7)}`;
+    }
+};
+
 const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvatarUpdate }) => {
     const { t } = useTranslation();
     const schema = createOnboardingStep1Schema(t);
@@ -117,6 +134,13 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
         ))).slice(0, 5); // Limit to 5 results
     }, [countryCodeSearch]);
 
+    // Add this inside the component before return
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formattedValue = formatPhoneNumber(e.target.value);
+        e.target.value = formattedValue;
+        onboardingForm.setValue("phoneNumber", formattedValue, { shouldValidate: true });
+    };
+
     return (
         <form onSubmit={onboardingForm.handleSubmit(onSubmit)} className="space-y-6">
             <div className="absolute top-8 sm:top-4 right-4">
@@ -128,12 +152,12 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full max-w-[280px] lg:w-[380px] relative flex-shrink-0"
+                    className="w-full max-w-[280px] lg:w-[380px] h-[280px] lg:h-[380px] relative flex-shrink-0 flex items-center justify-center lg:ml-8"
                 >
                     <img
                         src="/onboarding/okra_test_your_app.svg"
                         alt="Personal Information"
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-contain"
                         loading="eager"
                     />
                 </motion.div>
@@ -185,13 +209,17 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
                                     <Input
                                         id="countryCode"
                                         type="text"
+                                        autoComplete="tel-country-code"
                                         placeholder={t('onboarding.step1.country_code.placeholder')}
                                         value={countryCodeSearch}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setCountryCodeSearch(value);
-                                            onboardingForm.setValue("countryCode", value, { shouldValidate: true });
-                                            setIsCountryCodeDropdownOpen(true);
+                                            // Only update if it's a valid country code format
+                                            if (value.startsWith('+') || value === '') {
+                                                setCountryCodeSearch(value);
+                                                onboardingForm.setValue("countryCode", value, { shouldValidate: true });
+                                                setIsCountryCodeDropdownOpen(true);
+                                            }
                                         }}
                                         onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                         onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
@@ -227,8 +255,18 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
                                 <Label htmlFor="phoneNumber" className="block mb-2">{t('onboarding.step1.phone.label')}</Label>
                                 <Input
                                     id="phoneNumber"
+                                    type="tel"
+                                    autoComplete="tel-national"
                                     placeholder={t('onboarding.step1.phone.placeholder')}
                                     {...onboardingForm.register("phoneNumber", {
+                                        onChange: (e) => {
+                                            handlePhoneNumberChange(e);
+                                            // Prevent country code from being modified by autofill
+                                            const currentCountryCode = onboardingForm.getValues("countryCode");
+                                            if (currentCountryCode && currentCountryCode !== countryCodeSearch) {
+                                                setCountryCodeSearch(currentCountryCode);
+                                            }
+                                        },
                                         setValueAs: (value) => value.replace(/\s/g, ''),
                                     })}
                                     className={cn(
@@ -237,7 +275,9 @@ const OnboardingStep1: React.FC<OnboardingStep1Props> = ({ onNext, data, onAvata
                                         "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                     )}
                                 />
-                                {onboardingForm.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>}
+                                {onboardingForm.formState.errors.phoneNumber && (
+                                    <p className="text-red-500 text-sm">{onboardingForm.formState.errors.phoneNumber.message}</p>
+                                )}
                             </div>
                         </div>
                     </div>

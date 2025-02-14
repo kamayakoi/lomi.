@@ -136,7 +136,13 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
                                     <select
                                         id="orgCity"
-                                        {...onboardingForm.register("orgCity")}
+                                        autoComplete="address-level2"
+                                        {...onboardingForm.register("orgCity", {
+                                            onChange: () => {
+                                                // Reset district when city changes
+                                                onboardingForm.setValue('orgDistrict', '');
+                                            }
+                                        })}
                                         className={cn(
                                             "w-full mb-2 px-3 py-2 border h-[48px]",
                                             "focus:ring-1 focus:ring-primary focus:ring-offset-0 focus:outline-none",
@@ -151,15 +157,16 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                             </option>
                                         ))}
                                     </select>
-                                    {onboardingForm.formState.errors.orgCity &&
+                                    {onboardingForm.formState.errors.orgCity && (
                                         <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
-                                    }
+                                    )}
                                 </div>
                             ) : (
                                 <div className="w-full sm:w-1/2">
                                     <Label htmlFor="orgCity" className="block mb-2">{t('onboarding.step3.org_city.label')}</Label>
                                     <Input
                                         id="orgCity"
+                                        autoComplete="address-level2"
                                         placeholder={t('onboarding.step3.org_city.placeholder')}
                                         {...onboardingForm.register("orgCity")}
                                         className={cn(
@@ -168,9 +175,9 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                             "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         )}
                                     />
-                                    {onboardingForm.formState.errors.orgCity &&
+                                    {onboardingForm.formState.errors.orgCity && (
                                         <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgCity.message || '')}</p>
-                                    }
+                                    )}
                                 </div>
                             )}
                             {showDistrictField ? (
@@ -178,6 +185,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                     <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
                                     <select
                                         id="orgDistrict"
+                                        autoComplete="address-level3"
                                         {...onboardingForm.register("orgDistrict")}
                                         className={cn(
                                             "w-full mb-2 px-3 py-2 border h-[48px]",
@@ -193,15 +201,16 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                             </option>
                                         ))}
                                     </select>
-                                    {onboardingForm.formState.errors.orgDistrict &&
+                                    {onboardingForm.formState.errors.orgDistrict && (
                                         <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
-                                    }
+                                    )}
                                 </div>
                             ) : (
                                 <div className="w-full sm:w-1/2">
                                     <Label htmlFor="orgDistrict" className="block mb-2">{t('onboarding.step3.org_district.label')}</Label>
                                     <Input
                                         id="orgDistrict"
+                                        autoComplete="address-level3"
                                         placeholder={t('onboarding.step3.org_district.placeholder')}
                                         {...onboardingForm.register("orgDistrict")}
                                         className={cn(
@@ -210,9 +219,9 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                             "dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                         )}
                                     />
-                                    {onboardingForm.formState.errors.orgDistrict &&
+                                    {onboardingForm.formState.errors.orgDistrict && (
                                         <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.orgDistrict.message || '')}</p>
-                                    }
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -223,6 +232,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgPostalCode" className="block mb-2">{t('onboarding.step3.org_postal_code.label')}</Label>
                                 <Input
                                     id="orgPostalCode"
+                                    autoComplete="postal-code"
                                     placeholder={t('onboarding.step3.org_postal_code.placeholder')}
                                     {...onboardingForm.register("orgPostalCode")}
                                     className={cn(
@@ -239,6 +249,7 @@ const OnboardingStep3: React.FC<OnboardingStep3Props> = ({ onNext, onPrevious, d
                                 <Label htmlFor="orgStreet" className="block mb-2">{t('onboarding.step3.org_street.label')}</Label>
                                 <Input
                                     id="orgStreet"
+                                    autoComplete="street-address"
                                     placeholder={t('onboarding.step3.org_street.placeholder')}
                                     {...onboardingForm.register("orgStreet")}
                                     className={cn(

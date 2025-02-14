@@ -326,7 +326,7 @@
     },
     "activation": {
         "title": "Activación de cuenta",
-        "step_indicator": "Paso {step} de {total}",
+        "step_indicator": "Paso {{step}} de {{total}}",
         "steps": {
             "create_account": "Crear cuenta",
             "business_details": "Detalles del negocio",
@@ -620,9 +620,9 @@
                 "required": "La región es obligatoria"
             },
             "workspace_handle": {
-                "label": "Identificador del espacio de trabajo",
-                "placeholder": "mi-espacio",
-                "required": "El identificador del espacio de trabajo es obligatorio"
+                "label": "Identificador de la tienda",
+                "placeholder": "mi-tienda",
+                "required": "El identificador de la tienda es obligatorio"
             },
             "logo": {
                 "label": "Logo de la empresa"

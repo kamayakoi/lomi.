@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { Check, ChevronLeft } from 'lucide-react'
+import { Check } from 'lucide-react'
 import ActivationStep1 from './components/activation-step-1'
 import ActivationStep2 from './components/activation-step-2'
 import ActivationStep3 from './components/activation-step-3'
@@ -12,7 +12,6 @@ import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/lib/hooks/useUser';
 import { supabase } from '@/utils/supabase/client';
-import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
@@ -201,22 +200,12 @@ const Activation: React.FC = () => {
     const MobileStepHeader = () => (
         <div className="md:hidden flex items-center justify-between mb-6 border-b pb-4">
             <div className="flex items-center">
-                {currentStep > 0 && (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handlePrevious}
-                        className="mr-2"
-                    >
-                        <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                )}
                 <h2 className="text-lg font-semibold">
                     {t(steps[currentStep]?.title || 'activation.steps.create_account')}
                 </h2>
             </div>
             <div className="text-sm text-muted-foreground">
-                {t('activation.step_indicator', { step: currentStep + 1, total: steps.length })}
+                {t('activation.step_indicator', { step: currentStep + 1, total: steps.length - 1 })}
             </div>
         </div>
     );
