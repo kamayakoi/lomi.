@@ -7,20 +7,18 @@ on:
     branches: 
       - main
       - develop
-    paths:
-      - "supabase/migrations/**"
-      - "src/**"
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
   pull_request:
     branches: 
       - main
       - develop
-    paths:
-      - "supabase/migrations/**"
-      - "src/**"
 
 jobs:
   update-types-and-sitemap:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     
     services:
       postgres:
@@ -49,9 +47,11 @@ jobs:
       SITE_URL: ${{ secrets.SITE_URL }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Bun Runtime
         uses: oven-sh/setup-bun@v1
@@ -89,7 +89,7 @@ jobs:
           if [[ -n "$(git status --porcelain)" ]]; then
             git add database.types.ts public/sitemap.xml
             git commit -m "chore: update types and sitemap [skip ci]"
-            git push
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
           else
             echo "No changes to commit"
           fi 
