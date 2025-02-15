@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import LogoUploader from '@//components/auth/logo-uploader';
 import { useState, useEffect } from 'react';
-import { type OnboardingData } from '../Onboarding.tsx';
+import { type OnboardingData } from '../Onboarding';
 import { useTranslation } from 'react-i18next';
 import {
     operatingCountries,

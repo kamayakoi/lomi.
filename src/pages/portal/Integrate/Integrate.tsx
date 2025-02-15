@@ -2,11 +2,11 @@ import { Layout } from '@/components/custom/layout'
 import Notifications from '@/components/portal/notifications'
 import { UserNav } from '@/components/portal/user-nav'
 import { Button } from '@/components/custom/button'
-import { integrationOptions } from './components/data.tsx'
+import { integrationOptions } from './components/data'
 import { TopNav } from '@/components/portal/top-nav'
 import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
-import FeedbackForm from '@/components/portal/feedback-form.tsx'
+import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 
 export default function Providers() {

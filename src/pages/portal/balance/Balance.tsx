@@ -6,15 +6,15 @@ import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
-import { useUser } from '@/lib/hooks/use-user.ts'
+import { useUser } from '@/lib/hooks/use-user'
 import AnimatedLogoLoader from '@/components/portal/loader'
-import { useBalanceBreakdown } from './components/support.ts'
-import PayoutFilters from './components/filters.tsx'
-import PayoutActions from './components/actions.tsx'
+import { useBalanceBreakdown } from './components/support'
+import PayoutFilters from './components/filters'
+import PayoutActions from './components/actions'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
-import { payout_status, Payout, BankAccount } from './components/types.ts'
-import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiateWithdrawal } from './components/support.ts'
+import { payout_status, Payout, BankAccount } from './components/types'
+import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiateWithdrawal } from './components/support'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from 'react-query'
@@ -25,11 +25,11 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
-import { useToast } from "@/lib/hooks/use-toast.ts"
+import { useToast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
-import FeedbackForm from '@/components/portal/feedback-form.tsx'
+import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { withActivationCheck } from '@/components/custom/with-activation-check.tsx'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 
 function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()

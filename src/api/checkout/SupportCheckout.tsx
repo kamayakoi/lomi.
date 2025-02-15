@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client';
-import { CheckoutData, CustomerDetails } from './types.ts';
+import { CheckoutData, CustomerDetails } from './types';
 
 export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData | null> {
     try {
