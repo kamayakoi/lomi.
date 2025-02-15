@@ -18,7 +18,8 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "types": [
-            "bun-types"
+            "bun-types",
+            "node"
         ],
         /* Linting */
         "strict": true,
@@ -28,6 +29,9 @@
         "baseUrl": ".",
         "paths": {
             "@/*": [
+                "./src/*"
+            ],
+            "~/*": [
                 "./src/*"
             ]
         },
@@ -40,7 +44,9 @@
         "alwaysStrict": true,
         "noImplicitReturns": true,
         "noUncheckedIndexedAccess": true,
-        "noPropertyAccessFromIndexSignature": true
+        "noPropertyAccessFromIndexSignature": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true
     },
     "include": [
         "src/**/*.ts",
@@ -49,7 +55,8 @@
         "src/**/*.js",
         "src/**/*.jsx",
         "api/**/*.ts",
-        "api/**/*.js"
+        "api/**/*.js",
+        "vite.config.ts"
     ],
     "exclude": [
         "node_modules",

@@ -93,18 +93,12 @@ export default defineConfig({
   build: {
     sourcemap: false,
     minify: 'terser',
-    terserOptions: {
-      mangle: {
-        keep_fnames: /^[A-Z]|use[A-Z]|^on[A-Z]/,
-      },
-      compress: {
-        drop_console: true,
-      },
-      format: {
-        comments: false,
-      },
-    },
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
@@ -122,7 +116,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "~": path.resolve(__dirname, "./src")
     },
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
   },
   server: {
     port: 5173,
