@@ -723,33 +723,39 @@ export type Database = {
       merchant_organization_links: {
         Row: {
           created_at: string
-          how_did_you_hear_about_us: string | null
-          merchant_id: string
+          invitation_email: string | null
+          merchant_id: string | null
           merchant_org_id: string
           organization_id: string
           organization_position: string | null
           role: string
           store_handle: string
+          team_status: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          how_did_you_hear_about_us?: string | null
-          merchant_id: string
+          invitation_email?: string | null
+          merchant_id?: string | null
           merchant_org_id?: string
           organization_id: string
           organization_position?: string | null
           role: string
           store_handle: string
+          team_status?: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          how_did_you_hear_about_us?: string | null
-          merchant_id?: string
+          invitation_email?: string | null
+          merchant_id?: string | null
           merchant_org_id?: string
           organization_id?: string
           organization_position?: string | null
           role?: string
           store_handle?: string
+          team_status?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -1338,6 +1344,9 @@ export type Database = {
           metadata: Json | null
           organization_id: string
           phone_number: string | null
+          provider_business_type:
+            | Database["public"]["Enums"]["provider_business_type"]
+            | null
           provider_code: Database["public"]["Enums"]["provider_code"]
           provider_merchant_id: string | null
           updated_at: string
@@ -1350,6 +1359,9 @@ export type Database = {
           metadata?: Json | null
           organization_id: string
           phone_number?: string | null
+          provider_business_type?:
+            | Database["public"]["Enums"]["provider_business_type"]
+            | null
           provider_code: Database["public"]["Enums"]["provider_code"]
           provider_merchant_id?: string | null
           updated_at?: string
@@ -1362,6 +1374,9 @@ export type Database = {
           metadata?: Json | null
           organization_id?: string
           phone_number?: string | null
+          provider_business_type?:
+            | Database["public"]["Enums"]["provider_business_type"]
+            | null
           provider_code?: Database["public"]["Enums"]["provider_code"]
           provider_merchant_id?: string | null
           updated_at?: string
@@ -1738,7 +1753,7 @@ export type Database = {
           available_balance?: number
           balance_id?: string
           created_at?: string
-          currency_code?: Database["public"]["Enums"]["currency_code"]
+          currency_code: Database["public"]["Enums"]["currency_code"]
           total_balance?: number
           updated_at?: string
         }
@@ -1750,15 +1765,7 @@ export type Database = {
           total_balance?: number
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "platform_main_account_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: true
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-        ]
+        Relationships: []
       }
       platform_metrics: {
         Row: {
@@ -2000,302 +2007,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "transactions"
             referencedColumns: ["transaction_id"]
-          },
-        ]
-      }
-      shopify_orders: {
-        Row: {
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          metadata: Json | null
-          order_id: string
-          shopify_order_id: string
-          status: string
-          store_id: string
-          total_price: number
-          transaction_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          metadata?: Json | null
-          order_id?: string
-          shopify_order_id: string
-          status: string
-          store_id: string
-          total_price: number
-          transaction_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          currency_code?: Database["public"]["Enums"]["currency_code"]
-          metadata?: Json | null
-          order_id?: string
-          shopify_order_id?: string
-          status?: string
-          store_id?: string
-          total_price?: number
-          transaction_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopify_orders_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "shopify_orders_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "shopify_stores"
-            referencedColumns: ["store_id"]
-          },
-          {
-            foreignKeyName: "shopify_orders_transaction_id_fkey"
-            columns: ["transaction_id"]
-            isOneToOne: false
-            referencedRelation: "transactions"
-            referencedColumns: ["transaction_id"]
-          },
-        ]
-      }
-      shopify_products: {
-        Row: {
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          metadata: Json | null
-          price: number
-          product_id: string
-          shopify_product_id: string
-          store_id: string
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          metadata?: Json | null
-          price: number
-          product_id?: string
-          shopify_product_id: string
-          store_id: string
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          currency_code?: Database["public"]["Enums"]["currency_code"]
-          metadata?: Json | null
-          price?: number
-          product_id?: string
-          shopify_product_id?: string
-          store_id?: string
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopify_products_currency_code_fkey"
-            columns: ["currency_code"]
-            isOneToOne: false
-            referencedRelation: "currencies"
-            referencedColumns: ["code"]
-          },
-          {
-            foreignKeyName: "shopify_products_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "shopify_stores"
-            referencedColumns: ["store_id"]
-          },
-        ]
-      }
-      shopify_sessions: {
-        Row: {
-          accesstoken: string
-          accountowner: boolean
-          associated_user_scope: string | null
-          collaborator: boolean | null
-          created_at: string
-          email: string | null
-          emailverified: boolean | null
-          expires: string | null
-          expires_in: number | null
-          firstname: string | null
-          id: string
-          isonline: boolean
-          lastname: string | null
-          locale: string | null
-          scope: string | null
-          shop: string
-          state: string
-          updated_at: string
-          userid: number | null
-        }
-        Insert: {
-          accesstoken: string
-          accountowner?: boolean
-          associated_user_scope?: string | null
-          collaborator?: boolean | null
-          created_at?: string
-          email?: string | null
-          emailverified?: boolean | null
-          expires?: string | null
-          expires_in?: number | null
-          firstname?: string | null
-          id: string
-          isonline?: boolean
-          lastname?: string | null
-          locale?: string | null
-          scope?: string | null
-          shop: string
-          state: string
-          updated_at?: string
-          userid?: number | null
-        }
-        Update: {
-          accesstoken?: string
-          accountowner?: boolean
-          associated_user_scope?: string | null
-          collaborator?: boolean | null
-          created_at?: string
-          email?: string | null
-          emailverified?: boolean | null
-          expires?: string | null
-          expires_in?: number | null
-          firstname?: string | null
-          id?: string
-          isonline?: boolean
-          lastname?: string | null
-          locale?: string | null
-          scope?: string | null
-          shop?: string
-          state?: string
-          updated_at?: string
-          userid?: number | null
-        }
-        Relationships: []
-      }
-      shopify_shop_settings: {
-        Row: {
-          api_key: string
-          api_secret: string
-          created_at: string
-          id: string
-          merchant_id: string
-          shop: string
-          updated_at: string
-          webhook_url: string | null
-        }
-        Insert: {
-          api_key: string
-          api_secret: string
-          created_at?: string
-          id?: string
-          merchant_id: string
-          shop: string
-          updated_at?: string
-          webhook_url?: string | null
-        }
-        Update: {
-          api_key?: string
-          api_secret?: string
-          created_at?: string
-          id?: string
-          merchant_id?: string
-          shop?: string
-          updated_at?: string
-          webhook_url?: string | null
-        }
-        Relationships: []
-      }
-      shopify_stores: {
-        Row: {
-          access_token: string
-          created_at: string
-          installed_at: string | null
-          metadata: Json | null
-          organization_id: string
-          scope: string[]
-          shop_domain: string
-          store_id: string
-          uninstalled_at: string | null
-          updated_at: string
-        }
-        Insert: {
-          access_token: string
-          created_at?: string
-          installed_at?: string | null
-          metadata?: Json | null
-          organization_id: string
-          scope: string[]
-          shop_domain: string
-          store_id?: string
-          uninstalled_at?: string | null
-          updated_at?: string
-        }
-        Update: {
-          access_token?: string
-          created_at?: string
-          installed_at?: string | null
-          metadata?: Json | null
-          organization_id?: string
-          scope?: string[]
-          shop_domain?: string
-          store_id?: string
-          uninstalled_at?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopify_stores_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["organization_id"]
-          },
-        ]
-      }
-      shopify_webhooks: {
-        Row: {
-          address: string
-          created_at: string
-          shopify_webhook_id: string
-          store_id: string
-          topic: string
-          updated_at: string
-          webhook_id: string
-        }
-        Insert: {
-          address: string
-          created_at?: string
-          shopify_webhook_id: string
-          store_id: string
-          topic: string
-          updated_at?: string
-          webhook_id?: string
-        }
-        Update: {
-          address?: string
-          created_at?: string
-          shopify_webhook_id?: string
-          store_id?: string
-          topic?: string
-          updated_at?: string
-          webhook_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopify_webhooks_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "shopify_stores"
-            referencedColumns: ["store_id"]
           },
         ]
       }
@@ -3099,18 +2810,6 @@ export type Database = {
           p_product_id: string
         }
         Returns: undefined
-      }
-      delete_shopify_session: {
-        Args: {
-          p_id: string
-        }
-        Returns: boolean
-      }
-      delete_shopify_sessions: {
-        Args: {
-          p_ids: string[]
-        }
-        Returns: boolean
       }
       delete_storage_object: {
         Args: {
@@ -3938,32 +3637,6 @@ export type Database = {
         }
         Returns: string
       }
-      find_shopify_sessions_by_shop: {
-        Args: {
-          p_shop: string
-        }
-        Returns: {
-          accesstoken: string
-          accountowner: boolean
-          associated_user_scope: string | null
-          collaborator: boolean | null
-          created_at: string
-          email: string | null
-          emailverified: boolean | null
-          expires: string | null
-          expires_in: number | null
-          firstname: string | null
-          id: string
-          isonline: boolean
-          lastname: string | null
-          locale: string | null
-          scope: string | null
-          shop: string
-          state: string
-          updated_at: string
-          userid: number | null
-        }[]
-      }
       generate_api_key: {
         Args: {
           p_merchant_id: string
@@ -4022,9 +3695,9 @@ export type Database = {
           merchant_name: string
           organization_id: string
           organization_name: string
-          business_type: string
-          description: string
+          business_description: string
           website_url: string
+          industry: string
           registration_number: string
           country: string
           email: string
@@ -4191,15 +3864,6 @@ export type Database = {
           message: string
         }[]
       }
-      install_shopify_store: {
-        Args: {
-          p_organization_id: string
-          p_shop_domain: string
-          p_access_token: string
-          p_scope: string[]
-        }
-        Returns: string
-      }
       log_event: {
         Args: {
           p_merchant_id: string
@@ -4222,28 +3886,6 @@ export type Database = {
         }
         Returns: string
       }
-      manage_shopify_session: {
-        Args: {
-          p_id: string
-          p_shop: string
-          p_state: string
-          p_is_online: boolean
-          p_scope: string
-          p_expires: string
-          p_access_token: string
-          p_user_id: number
-          p_first_name: string
-          p_last_name: string
-          p_email: string
-          p_account_owner: boolean
-          p_locale: string
-          p_collaborator: boolean
-          p_email_verified: boolean
-          p_expires_in: number
-          p_associated_user_scope: string
-        }
-        Returns: string
-      }
       mark_all_notifications_read: {
         Args: {
           p_merchant_id: string
@@ -4263,15 +3905,6 @@ export type Database = {
           p_currency_code: Database["public"]["Enums"]["currency_code"]
           p_provider_code: Database["public"]["Enums"]["provider_code"]
           p_metadata?: Json
-        }
-        Returns: string
-      }
-      register_shopify_webhook: {
-        Args: {
-          p_store_id: string
-          p_topic: string
-          p_address: string
-          p_shopify_webhook_id: string
         }
         Returns: string
       }
@@ -4343,18 +3976,6 @@ export type Database = {
           p_bank_account_id: string
         }
         Returns: undefined
-      }
-      sync_shopify_order: {
-        Args: {
-          p_store_id: string
-          p_shopify_order_id: string
-          p_transaction_id: string
-          p_total_price: number
-          p_currency_code: Database["public"]["Enums"]["currency_code"]
-          p_status: string
-          p_metadata: Json
-        }
-        Returns: string
       }
       test_organization_webhook: {
         Args: {
@@ -4459,25 +4080,16 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_organization_provider_connection:
-        | {
-            Args: {
-              p_organization_id: string
-              p_provider_code: Database["public"]["Enums"]["provider_code"]
-              p_is_connected: boolean
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_organization_id: string
-              p_provider_code: Database["public"]["Enums"]["provider_code"]
-              p_is_connected: boolean
-              p_provider_merchant_id?: string
-              p_metadata?: Json
-            }
-            Returns: undefined
-          }
+      update_organization_provider_connection: {
+        Args: {
+          p_organization_id: string
+          p_provider_code: Database["public"]["Enums"]["provider_code"]
+          p_is_connected: boolean
+          p_provider_merchant_id?: string
+          p_metadata?: Json
+        }
+        Returns: undefined
+      }
       update_organization_provider_phone: {
         Args: {
           p_organization_id: string
@@ -4770,6 +4382,7 @@ export type Database = {
         | "PAYPAL"
         | "OTHER"
       payout_status: "pending" | "processing" | "completed" | "failed"
+      provider_business_type: "fintech" | "other"
       provider_code:
         | "ORANGE"
         | "WAVE"

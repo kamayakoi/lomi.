@@ -48,8 +48,11 @@
     "supabase:db:reset": "supabase db reset --linked",
     "supabase:db:reset:linked": "supabase db reset --linked",
     "update-types": "npx supabase gen types typescript --project-id mdswvokxrnfggrujsfjd > database.types.ts",
-    "sitemap": "python src/utils/scripts/generate_sitemap.py",
-    "generate:sitemap": "python src/utils/scripts/generate_sitemap.py"
+    "sitemap": "python src/lib/scripts/generate_sitemap.py",
+    "generate:sitemap": "python src/lib/scripts/generate_sitemap.py",
+    "prepare": "husky",
+    "db:check": "supabase db diff",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.36.3",
@@ -164,6 +167,8 @@
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.5",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "lucide-react": "0.453.0",
     "openapi-typescript": "7.5.2",
     "postcss": "8.5.1",
@@ -171,12 +176,23 @@
     "rollup-plugin-obfuscator": "1.1.0",
     "rollup-plugin-terser": "7.0.2",
     "rollup-plugin-visualizer": "5.14.0",
-    "supabase": "2.6.8",
+    "supabase": "2.12.1",
     "tailwindcss": "3.4.17",
     "ts-node": "10.9.2",
     "typescript": "5.7.3",
     "vite": "5.4.14",
     "vite-plugin-compression": "0.5.1",
     "vite-plugin-javascript-obfuscator": "3.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "bunx --bun eslint --fix"
+    ],
+    "*.{js,jsx}": [
+      "bunx --bun eslint --fix"
+    ],
+    "supabase/migrations/*.sql": [
+      "bun run db:check"
+    ]
   }
 }

@@ -1,0 +1,10 @@
+#!/usr/bin/env bun
+
+# Run lint-staged for database migrations
+bun run lint-staged
+
+# Run type checking
+bun run update-types
+
+# Run linting
+bun run lint

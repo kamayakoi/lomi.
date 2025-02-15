@@ -11,11 +11,11 @@ export async function POST(req: ExpressRequest, res: ExpressResponse) {
     }
 
     const anthropic = new Anthropic({
-      apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY,
+      apiKey: anthropicApiKey || process.env['ANTHROPIC_API_KEY'],
     });
 
     const response = await anthropic.messages.create({
-      model: model || 'claude-3-sonnet-20240229',
+      model: model || 'claude-3-5-sonnet-20240620',
       max_tokens: max_tokens || 150,
       temperature: temperature || 0.7,
       messages: [
