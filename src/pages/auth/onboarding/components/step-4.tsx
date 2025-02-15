@@ -5,7 +5,7 @@ import { cn } from '@/lib/actions/utils'
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { type OnboardingData } from '../Onboarding';
+import { type OnboardingData } from '../Onboarding.tsx';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSwitcher } from '@/components/design/onboarding-language-switcher';
 import { languages as i18nLanguages } from '@/lib/i18n/config';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Label } from "@/components/ui/label";
-import { ActivationData } from "../Activation";
+import { ActivationData } from "../Activation.tsx";
 import { Button } from "@/components/ui/button";
 import KYCFileUploader from "@/components/auth/kyc-file-uploader";
 import { useUser } from '@/lib/hooks/use-user';

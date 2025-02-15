@@ -21,18 +21,18 @@ import NotFoundError from './pages/errors/not-found-error';
 import MaintenanceError from './pages/errors/maintenance-error';
 // Dashboard
 import AppShell from './components/portal/app-shell';
-import Dashboard from '@/pages/portal/Portal';
+import Dashboard from '@/pages/portal/Portal.tsx';
 import Integrators from '@/pages/portal/Integrate/Integrate';
-import PaymentChannels from '@/pages/portal/payment-channels/PaymentChannels';
-import Logs from '@/pages/portal/logs/Logs';
+import PaymentChannels from '@/pages/portal/payment-channels/PaymentChannels.tsx';
+import Logs from '@/pages/portal/logs/Logs.tsx';
 import Balance from '@/pages/portal/balance/Balance';
 import Transactions from '@/pages/portal/transactions/Transactions';
 import Webhooks from './pages/portal/webhooks/Webhooks';
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks';
 import Customers from './pages/portal/customers/Customers';
-import Subscription from "./pages/portal/subscription/Subscription";
+import Subscription from "./pages/portal/subscription/Subscription.tsx";
 import Storefront from "./pages/portal/storefront/Storefront";
-import Activation from './pages/auth/activation/Activation';
+import Activation from './pages/auth/activation/Activation.tsx';
 import CheckoutPage from '@/api/checkout/Checkout';
 import Reporting from './pages/portal/reporting/Reporting';
 import Product from './pages/portal/product/Product';
@@ -46,7 +46,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
 // Settings routes
-import Settings from '@/pages/portal/settings/Settings';
+import Settings from '@/pages/portal/settings/Settings.tsx';
 import PaymentMethods from '@/pages/portal/settings/receiving-money/payment-methods';
 import CheckoutSettings from '@/pages/portal/settings/receiving-money/checkout/checkout-settings';
 import Disbursements from '@/pages/portal/settings/sending-money/disbursements';
