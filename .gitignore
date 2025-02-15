@@ -60,3 +60,6 @@ llm-prompt.md
 # Supabase
 *_secrets.sql
 /supabase
+
+# CLI
+/cli
