@@ -1,18 +1,17 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
-import { OrbitingCirclesDemo } from '@/components/landing/OrbitingCircles';
+import { OrbitingCirclesDemo } from '@/components/landing/orbiting-circles';
 import { useTranslation } from 'react-i18next';
 
 // Import the logo images
-import orangeLogo from '/orange.webp';
-import mtnLogo from '/mtn.webp';
-import waveLogo from '/wave.webp';
-import ecobankLogo from '/ecobank.webp';
-import sepaLogo from '/sepa.webp';
-import visaLogo from '/visa.webp';
-import mastercardLogo from '/mastercard.webp';
-import applePayLogo from '/apple-pay.webp';
+import orangeLogo from '/payment_channels/orange.webp';
+import mtnLogo from '/payment_channels/mtn.webp';
+import waveLogo from '/payment_channels/wave.webp';
+import ecobankLogo from '/public/payment_channels/ecobank.webp';
+import visaLogo from '/payment_channels/visa.webp';
+import mastercardLogo from '/payment_channels/mastercard.webp';
+import applePayLogo from '/payment_channels/apple_pay.webp';
 
 interface IntegrationAccordionProps {
     title: string;
@@ -122,7 +121,6 @@ const Products = () => {
                                 title="Pay by bank"
                                 logos={[
                                     { src: ecobankLogo, alt: "Ecobank" },
-                                    { src: sepaLogo, alt: "Bank Transfer" }
                                 ]}
                             />
                             <IntegrationAccordion

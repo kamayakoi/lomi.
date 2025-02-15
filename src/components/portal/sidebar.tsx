@@ -5,12 +5,12 @@ import { Button } from '@/components/custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/actions/utils'
 import { useSidelinks, type SidebarItem } from '../../lib/data/sidelinks'
-import { useTheme } from '@/lib/hooks/useTheme'
-import iconLight from "/transparent2.webp"
-import iconDark from "/transparent.webp"
+import { useTheme } from '@/lib/hooks/use-theme'
+import iconLight from "/company/transparent_dark.webp"
+import iconDark from "/company/transparent.webp"
 import { Separator } from "@/components/ui/separator"
-import { useActivationStatus } from '@/lib/hooks/useActivationStatus'
-import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useActivationStatus } from '@/lib/hooks/use-activation-status'
+import { useSidebar } from '@/lib/hooks/use-sidebar'
 import { useTranslation } from 'react-i18next'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
@@ -39,7 +39,6 @@ export default function Sidebar({ className }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile Header - Always visible */}
       <header className="fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:hidden">
         <a href="#" className="group flex items-center gap-2.5 transition-transform duration-200 ease-in-out hover:scale-[0.98]">
           <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50">

@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollToTop } from '@/components/landing/ScrollToTop';
+import { ScrollToTop } from '@/components/landing/scroll-to-top';
 import SideNav from '@/components/design/side-nav';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/use-theme';
 
 export default function TermsPage() {
     const [mounted, setMounted] = useState(false);

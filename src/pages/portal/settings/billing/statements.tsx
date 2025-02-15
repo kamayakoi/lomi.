@@ -3,10 +3,10 @@ import ContentSection from '@/components/portal/content-section'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Download, FileText, ChevronRight, Loader2, ArrowDownIcon } from 'lucide-react'
-import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { supabase } from '@/utils/supabase/client'
 import { format } from 'date-fns'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 
 interface StatementMetadata {

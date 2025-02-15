@@ -1,5 +1,5 @@
 import { ThemeProvider } from "@/components/landing/theme-provider";
-import { UserProvider } from '@/lib/contexts/UserContext';
+import { UserProvider } from '@/lib/contexts/user-context';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from 'react-router-dom';

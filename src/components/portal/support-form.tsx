@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImagePlus, CheckCircle, FileIcon, X, HelpCircle, Sparkles } from "lucide-react"
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
+import { useUser } from '@/lib/hooks/use-user'
 import { useTranslation } from 'react-i18next'
 
 const categories = [

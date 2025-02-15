@@ -52,6 +52,7 @@
     "generate:sitemap": "python src/utils/scripts/generate_sitemap.py"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.36.3",
     "@fortawesome/fontawesome-svg-core": "6.7.2",
     "@fortawesome/free-brands-svg-icons": "6.7.2",
     "@fortawesome/free-solid-svg-icons": "6.7.2",
@@ -94,6 +95,7 @@
     "@types/qrcode": "1.5.5",
     "@types/ua-parser-js": "0.7.39",
     "@vercel/analytics": "1.2.2",
+    "ai": "4.1.40",
     "axios": "1.7.9",
     "buffer": "6.0.3",
     "class-variance-authority": "0.7.1",

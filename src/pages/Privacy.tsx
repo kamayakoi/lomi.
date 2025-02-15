@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import SideNav from '@/components/design/side-nav';
 import { motion } from 'framer-motion';
-import { ScrollToTop } from '@/components/landing/ScrollToTop';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { ScrollToTop } from '@/components/landing/scroll-to-top';
+import { useTheme } from '@/lib/hooks/use-theme';
 
 const Privacy = () => {
     const [mounted, setMounted] = useState(false);

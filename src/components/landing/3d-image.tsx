@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useTheme } from '@/lib/hooks/useTheme'
+import { useTheme } from '@/lib/hooks/use-theme'
 
 interface ThreeDImageProps {
     src: {

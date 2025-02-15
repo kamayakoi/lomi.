@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "Connecting Africa to the World, one transaction at a time.",
+        "tagline": "Connecting the world to West Africa, one transaction at a time.",
         "features": {
             "title": "Características",
             "overview": "Overview",
@@ -474,7 +474,7 @@
             "step4": "¡Unos detalles más y estará listo!"
         },
         "error": {
-            "workspace_taken": {
+            "store_taken": {
                 "title": "Espacio de Trabajo No Disponible",
                 "description": "Este identificador de espacio de trabajo ya está en uso. Por favor, elija otro."
             },
@@ -619,7 +619,7 @@
                 "placeholder": "Selecciona una región",
                 "required": "La región es obligatoria"
             },
-            "workspace_handle": {
+            "store_handle": {
                 "label": "Identificador de la tienda",
                 "placeholder": "mi-tienda",
                 "required": "El identificador de la tienda es obligatorio"

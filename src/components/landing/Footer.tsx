@@ -5,9 +5,9 @@ import { GitHubIcon } from '@/components/icons/GitHubIcon'
 import { SlackIcon } from '@/components/icons/SlackIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
 import { Star } from 'lucide-react'
-import { useTheme } from '@/lib/hooks/useTheme'
+import { useTheme } from '@/lib/hooks/use-theme'
 import { useEffect, useState } from 'react'
-import { LanguageSwitcher } from '@/components/design/LanguageSwitcher'
+import { LanguageSwitcher } from '@/components/design/language-switcher'
 import { useTranslation } from 'react-i18next'
 import { ProductHuntBadge } from '@/components/design/product-hunt-badge'
 import { cn } from "@/lib/actions/utils"
@@ -117,7 +117,7 @@ export function Footer() {
         setTheme(theme === 'dark' ? 'light' : 'dark')
     }
 
-    const logoSrc = theme === 'light' ? "/transparent2.webp" : "/transparent.webp"
+    const logoSrc = theme === 'light' ? "/company/transparent_white.webp" : "/company/transparent.webp"
 
 
     // Return a simpler version during SSR
@@ -127,7 +127,7 @@ export function Footer() {
                 <div className="container max-w-7xl mx-auto px-4 py-10 flex justify-between items-center border-b border-zinc-800">
                     <div className="flex items-center gap-3 mt-[5px]">
                         <img
-                            src="/transparent.webp"
+                            src="/company/transparent.webp"
                             alt="lomi. logo"
                             width={60}
                             height={60}
@@ -136,7 +136,7 @@ export function Footer() {
                         <span className="text-white text-2xl select-none">lomi.</span>
                     </div>
                     <div className="text-white text-lg select-none mt-[5px]">
-                        Connecting Africa to the World, one transaction at a time.
+                        Connecting the World to Africa, one transaction at a time.
                     </div>
                 </div>
             </div>

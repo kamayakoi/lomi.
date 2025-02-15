@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { Checkout } from './checkoutTypes'
+import { Checkout } from './types'
 
 interface CheckoutContextProps {
     selectedPaymentMethod: string

@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useParams } from 'react-router-dom'
-import { fetchDataForCheckout, fetchOrganizationDetails } from './support-checkout.tsx'
-import { CheckoutData } from './checkoutTypes.ts'
+import { fetchDataForCheckout, fetchOrganizationDetails } from './SupportCheckout.tsx'
+import { CheckoutData } from './types.ts'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
-import WhatsAppNumberInput from '@/components/ui/whatsapp-number-input'
+import WhatsAppNumberInput from '@/components/portal/whatsapp-number-input.tsx'
 import { ArrowLeft, ImageIcon, Loader2, ChevronDown } from 'lucide-react'
 import {
     Dialog,
@@ -19,7 +19,7 @@ import {
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
 import { countries } from '@/lib/data/onboarding.ts'
 import WaveService from '@/utils/wave/service'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast.ts"
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {

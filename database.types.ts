@@ -729,7 +729,7 @@ export type Database = {
           organization_id: string
           organization_position: string | null
           role: string
-          workspace_handle: string
+          store_handle: string
         }
         Insert: {
           created_at?: string
@@ -739,7 +739,7 @@ export type Database = {
           organization_id: string
           organization_position?: string | null
           role: string
-          workspace_handle: string
+          store_handle: string
         }
         Update: {
           created_at?: string
@@ -749,7 +749,7 @@ export type Database = {
           organization_id?: string
           organization_position?: string | null
           role?: string
-          workspace_handle?: string
+          store_handle?: string
         }
         Relationships: [
           {
@@ -2737,7 +2737,7 @@ export type Database = {
           p_org_website_url: string
           p_org_employee_number: string
           p_preferred_language: string
-          p_workspace_handle: string
+          p_store_handle: string
           p_how_did_you_hear_about_us: string
           p_avatar_url: string
           p_logo_url: string

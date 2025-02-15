@@ -1,16 +1,16 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Check } from 'lucide-react'
-import ActivationStep1 from './components/activation-step-1'
-import ActivationStep2 from './components/activation-step-2'
-import ActivationStep3 from './components/activation-step-3'
-import ActivationStep4 from './components/activation-step-4'
-import ActivationStep5 from './components/activation-step-5'
-import { useToast } from '@/components/ui/use-toast';
-import { useActivationStatus } from '@/lib/hooks/useActivationStatus';
+import ActivationStep1 from './components/step-1'
+import ActivationStep2 from './components/step-2'
+import ActivationStep3 from './components/step-3'
+import ActivationStep4 from './components/step-4'
+import ActivationStep5 from './components/step-5'
+import { useToast } from '@/lib/hooks/use-toast';
+import { useActivationStatus } from '@/lib/hooks/use-activation-status';
 import LoadingButton from '@/components/portal/loader';
-import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
+import { useLocalStorage } from '@/lib/hooks/use-local-storage';
 import { useEffect, useState } from 'react';
-import { useUser } from '@/lib/hooks/useUser';
+import { useUser } from '@/lib/hooks/use-user';
 import { supabase } from '@/utils/supabase/client';
 import { useTranslation } from 'react-i18next';
 

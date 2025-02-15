@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Key, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useOrganization } from '@/lib/hooks/useOrganization';
+import { useOrganization } from '@/lib/hooks/use-organization';
 import { supabase } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

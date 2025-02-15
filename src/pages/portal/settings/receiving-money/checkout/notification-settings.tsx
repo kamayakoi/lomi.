@@ -5,11 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { PlusCircle, X } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { type CheckedState } from "@radix-ui/react-checkbox"
-import { type CheckoutSettings, type CustomerNotifications, type MerchantRecipient } from '@/lib/types/checkoutsettings'
-import { OrganizationContext } from '@/lib/contexts/OrganizationContext'
+import { type CheckoutSettings, type CustomerNotifications, type MerchantRecipient } from '@/lib/types/checkout-settings'
+import { OrganizationContext } from '@/lib/contexts/organization-context'
 import { supabase } from '@/utils/supabase/client'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 

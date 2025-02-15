@@ -8,15 +8,15 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { SegmentedControl } from "@/components/ui/segmented-control"
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
+import { useUser } from '@/lib/hooks/use-user'
 import { useNavigate } from 'react-router-dom'
-import { fetchProducts } from '@/pages/portal/product/components/support_product'
-import { fetchSubscriptionPlans } from '@/pages/portal/subscription/components/support_subscriptions'
-import { Product } from '@/pages/portal/product/components/Products_types'
+import { fetchProducts } from '@/pages/portal/product/components/support'
+import { fetchSubscriptionPlans } from '@/pages/portal/subscription/components/support'
+import { Product } from '@/pages/portal/product/components/products'
 import { SubscriptionPlan } from '@/pages/portal/subscription/components/types'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
-import { provider_code } from './PaymentLinks_types'
+import { provider_code } from './types'
 
 interface PaymentMethod {
     id: string
@@ -360,7 +360,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     {displayMode === 'desktop' && (
                         <div className="mt-8 text-left">
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
-                                Powered by <img src="/transparent2.webp" alt="lomi." className="h-8 w-8 ml-1" />
+                                Powered by <img src="/company/transparent_white.webp" alt="lomi." className="h-8 w-8 ml-1" />
                             </span>
                             <div className="mt-2 text-xs flex items-center justify-between">
                                 <div className="space-x-2">

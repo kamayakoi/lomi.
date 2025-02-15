@@ -7,14 +7,14 @@ import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
 import { ActivationRoute } from '@/lib/routes/ActivationRoute';
 import { SessionCheck } from '@/lib/routes/SessionCheck';
 // Auth pages
-import Signin from './pages/auth/sign-in';
-import Login from './pages/auth/log-in';
-import Signup from './pages/auth/sign-up';
-import Forgot from './pages/auth/forgot-password';
-import OTP from './pages/auth/otp';
-import ResetPassword from './pages/auth/reset-password';
-import Onboarding from './pages/auth/onboarding/onboarding';
-import AuthCallback from './pages/auth/callback';
+import Signin from './pages/auth/connect/sign-in';
+import Login from './pages/auth/connect/log-in';
+import Signup from './pages/auth/connect/sign-up';
+import Forgot from './pages/auth/connect/forgot-password';
+import OTP from './pages/auth/connect/otp';
+import ResetPassword from './pages/auth/connect/reset-password';
+import Onboarding from './pages/auth/onboarding/Onboarding';
+import AuthCallback from './pages/auth/connect/callback';
 // Error pages
 import GeneralError from './pages/errors/general-error';
 import NotFoundError from './pages/errors/not-found-error';
@@ -32,7 +32,7 @@ import PaymentLinks from './pages/portal/payment-links/PaymentLinks';
 import Customers from './pages/portal/customers/Customers';
 import Subscription from "./pages/portal/subscription/subscription";
 import Storefront from "./pages/portal/storefront/Storefront";
-import Activation from './pages/auth/activation/activation';
+import Activation from './pages/auth/activation/Activation';
 import CheckoutPage from '@/api/checkout/Checkout';
 import Reporting from './pages/portal/reporting/Reporting';
 import Product from './pages/portal/product/Product';
@@ -44,7 +44,7 @@ import Products from './pages/Products';
 import Integrations from './pages/Integrations';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
-import Status from './pages/Status';
+
 // Settings routes
 import Settings from './pages/portal/settings/settings';
 import PaymentMethods from './pages/portal/settings/receiving-money/payment-methods';
@@ -77,7 +77,6 @@ const AppRouter = () => (
                     <Route path="/integrations" element={<Integrations />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
-                    <Route path="/status" element={<Status />} />
                     {/* Login/Signup routes */}
                     <Route path="/sign-in" element={<Signin />} />
                     <Route path="/log-in" element={<Login />} />

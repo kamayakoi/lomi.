@@ -10,19 +10,19 @@ import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
 import { currency_code, payment_method_code, provider_code, transaction_status, transaction_type } from './components/types'
-import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue, useAverageCustomerLifetimeValue, useAverageRetentionRate } from './components/support_transactions'
-import { useUser } from '@/lib/hooks/useUser'
+import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue, useAverageCustomerLifetimeValue, useAverageRetentionRate } from './components/support'
+import { useUser } from '@/lib/hooks/use-user'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery, useQueryClient } from 'react-query'
 import AnimatedLogoLoader from '@/components/portal/loader'
-import TransactionActions from './components/actions_transactions'
-import TransactionFilters from './components/filters_transactions'
+import TransactionActions from './components/actions'
+import TransactionFilters from './components/filters'
 import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 
 
 type Transaction = {

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { CircleDot } from 'lucide-react'
-import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useSidebar } from '@/lib/hooks/use-sidebar'
 
 interface PortalPreviewProps {
     orgName: string

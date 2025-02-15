@@ -17,15 +17,15 @@ import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
 import { Layout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
-import { useUser } from '@/lib/hooks/useUser'
+import { useUser } from '@/lib/hooks/use-user'
 import AnimatedLogoLoader from '@/components/portal/loader'
 import { useQuery } from 'react-query'
 import { supabase } from '@/utils/supabase/client'
 import { Skeleton } from '@/components/ui/skeleton'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
-import { Customer } from './components/Customers_types'
-import CustomerActions from './components/actions_customers'
+import { Customer } from './components/types'
+import CustomerActions from './components/actions'
 import { cn } from '@/lib/actions/utils'
 import {
     Table,
@@ -36,12 +36,12 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { countries } from '@/lib/data/onboarding'
-import { CustomerFilters } from './components/filters_customers'
-import { EditCustomerForm } from './components/edit_customer'
-import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { CustomerFilters } from './components/filters'
+import { EditCustomerForm } from './components/edit'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import PhoneNumberInput from "@/components/ui/phone-number-input"
 
 function CustomerCard({ customer, onEditClick, onClick }: {

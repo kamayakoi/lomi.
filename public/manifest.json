@@ -8,12 +8,12 @@
   "description": "Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and crypto, send payouts and automate financial workflows with ease.",
   "icons": [
     {
-      "src": "/icon-L.png",
+      "src": "/company/lomi_icon.png",
       "sizes": "695x695",
       "type": "image/png"
     },
     {
-      "src": "/icon-L.png",
+      "src": "/company/lomi_icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }

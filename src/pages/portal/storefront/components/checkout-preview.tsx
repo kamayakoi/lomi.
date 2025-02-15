@@ -8,7 +8,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { motion } from 'framer-motion'
-import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useSidebar } from '@/lib/hooks/use-sidebar'
 
 interface CheckoutPreviewProps {
     orgName: string

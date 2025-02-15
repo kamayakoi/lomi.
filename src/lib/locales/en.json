@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "Connecting Africa to the World, one transaction at a time.",
+        "tagline": "Connecting the World to Africa, one transaction at a time.",
         "features": {
             "title": "Features",
             "overview": "Overview",
@@ -470,9 +470,9 @@
             "step4": "A few more details and you're all set!"
         },
         "error": {
-            "workspace_taken": {
-                "title": "Workspace Unavailable",
-                "description": "This workspace handle is already taken. Please choose a different one."
+            "store_taken": {
+                "title": "Store Unavailable",
+                "description": "This store handle is already taken. Please choose a different one."
             },
             "email_taken": {
                 "title": "Email Already Registered",
@@ -573,7 +573,7 @@
                 "placeholder": "Select a region",
                 "required": "Region is required"
             },
-            "workspace_handle": {
+            "store_handle": {
                 "label": "Store handle",
                 "placeholder": "my-store",
                 "required": "Store handle is required"

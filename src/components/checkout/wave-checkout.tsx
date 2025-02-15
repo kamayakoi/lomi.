@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2 } from 'lucide-react';
 import { WaveService } from '@/utils/wave/service';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/lib/hooks/use-toast";
 import { supabase } from '@/utils/supabase/client';
 
 interface WaveCheckoutProps {

@@ -2,7 +2,7 @@ import { Bell, Check, InfoIcon, AlertTriangle, ShieldAlert, RefreshCw, AlertOcta
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { formatDistanceToNow } from 'date-fns'
-import { useNotifications } from '@/lib/hooks/useNotifications'
+import { useNotifications } from '@/lib/hooks/use-notifications'
 import { useTranslation } from 'react-i18next'
 
 const NotificationIcon = ({ type }: { type: string }) => {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { supabase } from '@/utils/supabase/client'
 import Verify2FA from './verify-2fa'
 import { AuthError } from '@supabase/supabase-js'

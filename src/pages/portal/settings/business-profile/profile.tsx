@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import ContentSection from '@/components/portal/content-section'
 import { supabase, updateUserEmail } from '@/utils/supabase/client'
 import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle, PencilIcon, CheckIcon, X } from 'lucide-react'
 import { Skeleton } from "@/components/ui/skeleton"
 import ProfilePictureUploader from '@/components/auth/avatar-uploader'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from '@/components/custom/button';
 import { cn } from '@/lib/actions/utils';

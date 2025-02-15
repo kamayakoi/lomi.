@@ -1,13 +1,13 @@
 import { Suspense, memo, useMemo } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './sidebar';
-import { useMetaTags } from '@/lib/contexts/useMetaTags';
-import { useSidebarData } from '@/lib/hooks/useSidebarData';
-import { SidebarProvider } from '@/lib/contexts/sidebarContext';
-import { UserAvatarProvider } from '@/lib/contexts/userAvatarContext';
-import { NotificationsProvider } from '@/lib/contexts/notificationsContext';
-import { ActivationProvider } from '@/lib/contexts/ActivationContext';
-import { OrganizationProvider } from '@/lib/contexts/OrganizationContext';
+import { useMetaTags } from '@/lib/contexts/use-meta-tags';
+import { useSidebarData } from '@/lib/hooks/use-sidebar-data';
+import { SidebarProvider } from '@/lib/contexts/sidebar-context';
+import { UserAvatarProvider } from '@/lib/contexts/user-avatar-context';
+import { NotificationsProvider } from '@/lib/contexts/notifications-context';
+import { ActivationProvider } from '@/lib/contexts/activation-context';
+import { OrganizationProvider } from '@/lib/contexts/organization-context';
 import AnimatedLogoLoader from './loader';
 
 const MemoizedSidebar = memo(Sidebar);

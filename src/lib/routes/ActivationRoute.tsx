@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useActivationContext } from '@/lib/actions/Activation-utils';
+import { useActivationContext } from '@/lib/actions/activation-utils';
 
 export function ActivationRoute({ children }: { children: React.ReactNode }) {
     const { isActivated, error } = useActivationContext();

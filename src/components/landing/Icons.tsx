@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
-import icon from "/transparent2.webp";
-import icon11 from "/lomi-icon.webp"
-import kwameadjei from "/kwameadjei.webp";
-import iconDark from "/whiteblack.webp";
-import mtnLogo from '/mtn.webp';
-import waveLogo from '/wave.webp';
-import cardsLogo from '/mastercard.webp';
-import ecobankLogo from '/ecobank-2.webp';
+import icon from "/company/transparent_dark.webp";
+import iconDark from "/company/transparent.webp";
+import mtnLogo from '/payment_channels/mtn.webp';
+import waveLogo from '/payment_channels/wave.webp';
+import cardsLogo from '/payment_channels/mastercard.webp';
+import ecobankLogo from '/payment_channels/ecobank_blue.webp';
 
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/use-theme';
+import { useEffect, useState } from "react";
 
 export const LogoIcon = () => {
   const { theme } = useTheme();
@@ -29,33 +27,6 @@ export const LogoIcon = () => {
     />
   );
 };
-
-export const AnotherIcon = () => {
-  return (
-    <img
-      src={icon11}
-      alt="lomi.africa icon"
-      className="lucide lucide-panels-top-left mr-2"
-      width="38"
-      height="38"
-      style={{ borderRadius: '5px' }}
-    />
-  );
-};
-
-export const AboutIcon = () => {
-  return (
-    <img
-      src={iconDark}
-      alt="lomi.africa about icon"
-      className="lucide lucide-panels-top-left mr-2"
-      width="38"
-      height="38"
-      style={{ borderRadius: '5px' }}
-    />
-  );
-};
-
 
 export const MtnLogo = () => {
   return (
@@ -105,18 +76,6 @@ export const EcobankLogo = () => {
       width="100"
       height="100"
       style={{ borderRadius: '50%' }}
-    />
-  );
-};
-
-export const VisitIcon = () => {
-  return (
-    <img
-      src={kwameadjei}
-      alt="Testimonial icon"
-      className="lucide lucide-panels-top-left mr-2"
-      width="45"
-      height="45"
     />
   );
 };

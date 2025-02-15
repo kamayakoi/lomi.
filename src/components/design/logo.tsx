@@ -3,7 +3,7 @@ export function Logo() {
         <div className="flex items-center gap-4">
             <div className="relative w-[50px] h-[50px] rounded-sm overflow-hidden bg-zinc-900">
                 <img
-                    src="/transparent.webp"
+                    src="/company/transparent.webp"
                     alt="lomi. Logo"
                     className="object-cover"
                     fetchPriority="high"

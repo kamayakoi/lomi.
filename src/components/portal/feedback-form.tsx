@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Eraser } from "lucide-react"
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
+import { useUser } from '@/lib/hooks/use-user'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 

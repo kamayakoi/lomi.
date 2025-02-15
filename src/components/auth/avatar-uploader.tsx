@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { supabase } from '@/utils/supabase/client'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
@@ -99,68 +99,122 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
     }
 
     const handleSave = async () => {
-        if (selectedFile && croppedAreaPixels) {
-            try {
-                const croppedImage = await getCroppedImg(
-                    URL.createObjectURL(selectedFile),
-                    croppedAreaPixels
-                );
+        if (!selectedFile || !croppedAreaPixels) return;
 
-                if (croppedImage) {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) throw new Error('No user found');
+        try {
+            // Create the blob once, outside the retry loop
+            const croppedImage = await getCroppedImg(
+                URL.createObjectURL(selectedFile),
+                croppedAreaPixels
+            );
 
-                    // Always use jpg extension since we're converting to JPEG
-                    const fileName = `${user.id}/avatar-${Date.now()}.jpg`;
-
-                    const { data, error } = await supabase.storage
-                        .from('avatars')
-                        .upload(fileName, croppedImage, {
-                            contentType: 'image/jpeg',
-                            cacheControl: '3600',
-                            upsert: true
-                        });
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    if (data) {
-                        // Get public URL for the uploaded file
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('avatars')
-                            .getPublicUrl(data.path);
-
-                        // Update merchant avatar with public URL
-                        const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
-                            p_merchant_id: user.id,
-                            p_avatar_url: publicUrl  // Store the full public URL like in logo-uploader
-                        });
-
-                        if (updateError) {
-                            throw updateError;
-                        }
-
-                        // Update preview and parent component
-                        setPreviewUrl(publicUrl);
-                        onAvatarUpdate(publicUrl);
-
-                        // Trigger a refresh event
-                        window.dispatchEvent(new Event('merchant-profile-updated'));
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
+            if (!croppedImage) {
                 toast({
                     title: "Error",
-                    description: t('auth.avatar_uploader.error.upload_failed'),
-                    variant: "destructive",
+                    description: t('auth.avatar_uploader.error.crop_failed'),
+                    variant: "destructive"
                 });
-            } finally {
-                setIsDialogOpen(false);
+                return;
             }
+
+            // Get the current session first
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+            if (sessionError || !session) {
+                console.error('Session error:', sessionError);
+                toast({
+                    title: "Authentication Error",
+                    description: t('auth.avatar_uploader.error.session_expired'),
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            // Use the session user directly
+            const user = session.user;
+            if (!user) {
+                console.error('No user in session');
+                toast({
+                    title: "Authentication Error",
+                    description: t('auth.avatar_uploader.error.user_not_found'),
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            // Always use jpg extension since we're converting to JPEG
+            const fileName = `${user.id}/avatar-${Date.now()}.jpg`;
+
+            const { data: storageData, error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, croppedImage, {
+                    contentType: 'image/jpeg',
+                    cacheControl: '3600',
+                    upsert: true
+                });
+
+            if (uploadError) {
+                console.error('Upload error:', uploadError);
+                toast({
+                    title: "Upload Error",
+                    description: t('auth.avatar_uploader.error.upload_failed'),
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            if (!storageData) {
+                toast({
+                    title: "Upload Error",
+                    description: t('auth.avatar_uploader.error.upload_failed'),
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            // Get public URL for the uploaded file
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(storageData.path);
+
+            // Update merchant avatar with public URL
+            const { error: updateError } = await supabase.rpc('update_merchant_avatar', {
+                p_merchant_id: user.id,
+                p_avatar_url: publicUrl
+            });
+
+            if (updateError) {
+                console.error('Update error:', updateError);
+                toast({
+                    title: "Update Error",
+                    description: t('auth.avatar_uploader.error.update_failed'),
+                    variant: "destructive"
+                });
+                return;
+            }
+
+            // Update preview and parent component
+            setPreviewUrl(publicUrl);
+            onAvatarUpdate(publicUrl);
+
+            // Clean up the blob URL
+            URL.revokeObjectURL(URL.createObjectURL(selectedFile));
+
+            // Close the dialog
+            setIsDialogOpen(false);
+
+            // Trigger a refresh event
+            window.dispatchEvent(new Event('merchant-profile-updated'));
+        } catch (error) {
+            console.error('Error:', error);
+            toast({
+                title: "Error",
+                description: t('auth.avatar_uploader.error.unexpected'),
+                variant: "destructive"
+            });
+            setIsDialogOpen(false);
         }
-    }
+    };
 
     const handleRemove = () => {
         setSelectedFile(null)

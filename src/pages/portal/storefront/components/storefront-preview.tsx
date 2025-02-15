@@ -1,6 +1,6 @@
 import { CuboidIcon as CubeIcon } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useSidebar } from '@/lib/hooks/use-sidebar'
 
 interface StorefrontPreviewProps {
     orgName: string

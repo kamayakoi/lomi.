@@ -6,8 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Info } from 'lucide-react'
-import { toast } from "@/components/ui/use-toast"
-import { type CheckoutSettings } from '@/lib/types/checkoutsettings'
+import { toast } from "@/lib/hooks/use-toast"
+import { type CheckoutSettings } from '@/lib/types/checkout-settings'
 import { supabase } from '@/utils/supabase/client'
 
 interface PaymentSettingsProps {

@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label"
 import { PlusCircle, Trash2, Copy } from 'lucide-react'
 import ContentSection from '@/components/portal/content-section'
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
+import { useUser } from '@/lib/hooks/use-user'
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 
 type ApiKey = {
     name: string;

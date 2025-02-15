@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { IconChevronDown } from '@tabler/icons-react'
-import { buttonVariants } from '@/components/ui/button-variants'
 import {
   Collapsible,
   CollapsibleContent,
@@ -63,6 +62,13 @@ interface NavLinkProps extends SideLink {
   closeNav: () => void
 }
 
+function getIconColorClass(icon: JSX.Element): string {
+  // Extract the color class from the icon's className
+  const className = icon.props.className || '';
+  const colorMatch = className.match(/text-([a-z]+-[0-9]+)/);
+  return colorMatch ? colorMatch[1] : 'primary';
+}
+
 function NavLink({
   title,
   icon,
@@ -76,26 +82,26 @@ function NavLink({
   const isActive = isSettingsLink
     ? location.pathname.startsWith('/portal/settings')
     : location.pathname === href;
+  const iconColor = getIconColorClass(icon);
 
   return (
     <Link
       to={href}
       onClick={closeNav}
       className={cn(
-        buttonVariants({
-          variant: isActive ? 'secondary' : 'ghost',
-          size: 'sm',
-        }),
-        'h-9 justify-start text-wrap rounded-none px-4',
-        subLink && 'h-8 w-full border-l border-l-border/50 px-3',
-        'hover:bg-accent/50 transition-colors duration-200'
+        'group relative flex h-9 items-center gap-2.5 px-4 text-sm font-medium transition-all duration-300',
+        subLink && 'h-8 border-l border-l-border/50 px-3',
+        isActive
+          ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
+          : `text-muted-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+        'hover:bg-accent/30'
       )}
       aria-current={isActive ? 'page' : undefined}
     >
-      <div className='mr-2.5 scale-105'>{icon}</div>
-      <span className="font-medium">{title}</span>
+      <div className='scale-105'>{icon}</div>
+      <span>{title}</span>
       {label && (
-        <div className='ml-2 rounded-md bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground'>
+        <div className={cn('ml-2 rounded-md px-1.5 py-0.5 text-xs font-medium', `bg-${iconColor}`, 'text-white')}>
           {label}
         </div>
       )}
@@ -105,28 +111,31 @@ function NavLink({
 
 function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }: NavLinkProps) {
   const { checkActiveNav } = useCheckActiveNav()
-
   const isChildActive = !!sub?.find((s) => checkActiveNav(s.href) || s.subSub?.some(ss => checkActiveNav(ss.href)))
+  const iconColor = getIconColorClass(icon);
 
   return (
     <Collapsible defaultOpen={isChildActive}>
       <CollapsibleTrigger
         className={cn(
-          buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'group h-9 w-full justify-start rounded-none hover:bg-accent/50',
-          subLink ? 'pl-6' : 'px-4'
+          'group relative flex h-9 w-full items-center gap-2.5 px-4 text-sm font-medium transition-all duration-300',
+          subLink && 'h-8 border-l border-l-border/50 px-3',
+          isChildActive
+            ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
+            : `text-muted-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+          'hover:bg-accent/30'
         )}
       >
-        <div className='mr-2.5 scale-105'>{icon}</div>
-        <span className="font-medium">{title}</span>
+        <div className='scale-105'>{icon}</div>
+        <span>{title}</span>
         {label && (
-          <div className='ml-2 rounded-md bg-primary px-1.5 py-0.5 text-xs font-medium text-primary-foreground'>
+          <div className={cn('ml-2 rounded-md px-1.5 py-0.5 text-xs font-medium', `bg-${iconColor}`, 'text-white')}>
             {label}
           </div>
         )}
         <span
           className={cn(
-            'ml-auto transition-transform duration-200 group-data-[state="open"]:-rotate-180'
+            'ml-auto transition-transform duration-300 group-data-[state="open"]:-rotate-180'
           )}
         >
           <IconChevronDown className="h-4 w-4" stroke={1.5} />

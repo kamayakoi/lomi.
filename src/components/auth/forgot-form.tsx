@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/lib/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
 
 interface ForgotFormProps extends HTMLAttributes<HTMLDivElement> {

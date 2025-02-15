@@ -14,7 +14,7 @@ import {
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/lib/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 

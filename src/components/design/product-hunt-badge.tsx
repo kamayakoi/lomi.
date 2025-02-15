@@ -1,4 +1,4 @@
-import { useTheme } from '@/lib/hooks/useTheme'
+import { useTheme } from '@/lib/hooks/use-theme'
 
 export function ProductHuntBadge() {
     const { theme } = useTheme()

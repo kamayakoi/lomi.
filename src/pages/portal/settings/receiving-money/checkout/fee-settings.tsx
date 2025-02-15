@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { PlusCircle } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
-import { type CheckoutSettings, type FeeType } from '@/lib/types/checkoutsettings'
+import { toast } from "@/lib/hooks/use-toast"
+import { type CheckoutSettings, type FeeType } from '@/lib/types/checkout-settings'
 import { supabase } from '@/utils/supabase/client'
 
 interface FeeSettingsProps {

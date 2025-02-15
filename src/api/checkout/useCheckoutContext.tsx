@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { CheckoutContext } from './CheckoutContext'
-import { Checkout } from './checkoutTypes'
+import { Checkout } from './types'
 
 export const useCheckoutContext = () => {
     const context = useContext(CheckoutContext)

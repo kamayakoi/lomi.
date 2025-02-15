@@ -1,6 +1,6 @@
 import { cn } from "@/lib/actions/utils";
 import React, { ReactNode, useEffect, useState } from "react";
-import { useTheme } from "@/lib/hooks/useTheme";
+import { useTheme } from "@/lib/hooks/use-theme";
 
 interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
   children: ReactNode;

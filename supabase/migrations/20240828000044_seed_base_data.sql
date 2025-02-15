@@ -62,7 +62,7 @@ VALUES
   ((SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Country 2', 'Region 2', 'City 2', '67890');
 
 -- Seed data for merchant_organization_links table
-INSERT INTO merchant_organization_links (merchant_id, organization_id, role, workspace_handle)
+INSERT INTO merchant_organization_links (merchant_id, organization_id, role, store_handle)
 VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'workspace1'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Member', 'workspace2');
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'store1'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Member', 'store2');

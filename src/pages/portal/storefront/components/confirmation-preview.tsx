@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import { useSidebar } from '@/lib/hooks/useSidebar'
+import { useSidebar } from '@/lib/hooks/use-sidebar'
 
 interface ConfirmationPreviewProps {
     orgName: string

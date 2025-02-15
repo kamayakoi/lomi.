@@ -6,13 +6,13 @@ import Notifications from '@/components/portal/notifications'
 import { Separator } from "@/components/ui/separator"
 import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/portal/feedback-form'
-import { useUser } from '@/lib/hooks/useUser'
-import { fetchWebhooks } from './components/support_webhooks'
+import { useUser } from '@/lib/hooks/use-user'
+import { fetchWebhooks } from './components/support'
 import { Webhook, webhook_event, webhookCategories } from './components/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
-import { CreateWebhookForm } from './components/form_webhooks'
-import { WebhookFilters } from './components/filters_webhooks'
+import { CreateWebhookForm } from './components/form'
+import { WebhookFilters } from './components/filters'
 import {
     Dialog,
     DialogContent,
@@ -31,13 +31,13 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useQuery } from 'react-query'
-import WebhookActions from './components/edit_webhooks'
-import { withActivationCheck } from '@/components/custom/withActivationCheck'
+import WebhookActions from './components/edit'
+import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import WebhookView from './components/actions_webhooks'
+import WebhookView from './components/actions'
 
 function getEventCategoryColor(categoryName: string): string {
     switch (categoryName) {

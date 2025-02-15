@@ -7,7 +7,7 @@ import { Button } from '@/components/custom/button'
 import { PasswordInput } from '@/components/custom/password-input'
 import { cn } from '@/lib/actions/utils'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/lib/hooks/use-toast'
 import { AlertCircle } from "lucide-react"
 import Spinner from '@/components/portal/spinner'
 import { useTranslation } from 'react-i18next'

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { FileUp, X, FileIcon } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { useUser } from '@/lib/hooks/useUser';
+import { toast } from "@/lib/hooks/use-toast";
+import { useUser } from '@/lib/hooks/use-user';
 import { supabase } from '@/utils/supabase/client';
 import { useTranslation } from 'react-i18next';
 

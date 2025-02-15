@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from '@/utils/supabase/client'
-import { useSidebarData } from '@/lib/hooks/useSidebarData'
+import { useSidebarData } from '@/lib/hooks/use-sidebar-data'
 import Loader from '@/components/portal/loader'
 
 interface PaymentMethod {

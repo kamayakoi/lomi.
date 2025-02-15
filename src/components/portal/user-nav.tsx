@@ -1,4 +1,4 @@
-import { useUser } from '@/lib/hooks/useUserContext';
+import { useUser } from '@/lib/hooks/use-user-context';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/custom/button';
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/utils/supabase/client';
-import { useUserAvatar } from '@/lib/hooks/useUserAvatar';
+import { useUserAvatar } from '@/lib/hooks/use-user-avatar';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

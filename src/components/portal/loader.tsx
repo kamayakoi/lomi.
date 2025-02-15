@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useTheme } from '@/lib/hooks/useTheme'
+import { useTheme } from '@/lib/hooks/use-theme'
 
 export default function AnimatedLogoLoader() {
   const { theme } = useTheme()

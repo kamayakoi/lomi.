@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Label } from '@/components/ui/label'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { SmartphoneIcon } from 'lucide-react'
 import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { supabase } from '@/utils/supabase/client'

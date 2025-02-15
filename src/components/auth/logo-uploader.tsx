@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import Cropper from 'react-easy-crop'
 import { Area } from 'react-easy-crop'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { useTranslation } from 'react-i18next'
 
 interface LogoUploaderProps {

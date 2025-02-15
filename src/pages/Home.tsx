@@ -44,8 +44,8 @@ export default function Page() {
                 <Suspense fallback={<div className="w-[700px] h-[500px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg" />}>
                   <ThreeDImage
                     src={{
-                      light: "/portal.webp",
-                      dark: "/portal2.webp"
+                      light: "/company/portal.webp",
+                      dark: "/company/portal_dark.webp"
                     }}
                     alt="Dashboard Preview"
                     width={700}

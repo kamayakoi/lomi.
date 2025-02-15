@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import PulsatingButton from '@/components/ui/pulsating-button';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/use-theme';
 
 const About = () => {
     const { t } = useTranslation();

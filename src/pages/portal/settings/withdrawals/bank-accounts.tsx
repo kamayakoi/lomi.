@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button"
 import { TrashIcon, ChevronRightIcon, CreditCard } from 'lucide-react'
 import { AddBankButton } from '@/components/portal/add-bank-account'
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
-import { BankAccount } from './Withdrawal_types'
+import { useUser } from '@/lib/hooks/use-user'
+import { BankAccount } from './types'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/hooks/use-toast"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 

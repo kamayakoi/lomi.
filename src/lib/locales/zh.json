@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "连接非洲与世界，一次交易一步到位。",
+        "tagline": "连接世界到西非，一次交易一步到位。",
         "features": {
             "title": "功能",
             "overview": "概览",
@@ -474,7 +474,7 @@
             "step4": "还有一些细节就完成了！"
         },
         "error": {
-            "workspace_taken": {
+            "store_taken": {
                 "title": "工作空间不可用",
                 "description": "此工作空间标识已被占用。请选择其他标识。"
             },
@@ -619,7 +619,7 @@
                 "placeholder": "请选择地区",
                 "required": "地区为必填项"
             },
-            "workspace_handle": {
+            "store_handle": {
                 "label": "店铺标识",
                 "placeholder": "my-store",
                 "required": "店铺标识为必填项"

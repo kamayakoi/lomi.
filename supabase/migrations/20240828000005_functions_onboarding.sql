@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_org_website_url VARCHAR,
     p_org_employee_number VARCHAR,
     p_preferred_language VARCHAR,
-    p_workspace_handle VARCHAR,
+    p_store_handle VARCHAR,
     p_how_did_you_hear_about_us VARCHAR,
     p_avatar_url VARCHAR,
     p_logo_url VARCHAR,
@@ -51,12 +51,12 @@ BEGIN
     
     RAISE NOTICE 'Merchant exists check: %', v_merchant_exists;
 
-    -- Check if workspace handle is available
+    -- Check if store handle is available
     IF EXISTS (
         SELECT 1 FROM public.merchant_organization_links 
-        WHERE workspace_handle = p_workspace_handle
+        WHERE store_handle = p_store_handle
     ) THEN
-        RAISE EXCEPTION 'Workspace handle "%" is already taken', p_workspace_handle;
+        RAISE EXCEPTION 'Store handle "%" is already taken', p_store_handle;
     END IF;
 
     IF NOT v_merchant_exists THEN
@@ -187,14 +187,14 @@ BEGIN
         organization_id,
         role,
         organization_position,
-        workspace_handle,
+        store_handle,
         how_did_you_hear_about_us
     ) VALUES (
         p_merchant_id,
         v_organization_id,
         'Admin',
         p_organization_position,
-        p_workspace_handle,
+        p_store_handle,
         p_how_did_you_hear_about_us
     );
 

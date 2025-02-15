@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { PlusIcon } from 'lucide-react'
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/lib/hooks/use-toast"
 import { Checkbox } from "@/components/ui/checkbox"
 import { supabase } from '@/utils/supabase/client'
-import { useUser } from '@/lib/hooks/useUser'
-import { BankAccount } from '@/pages/portal/settings/withdrawals/Withdrawal_types'
+import { useUser } from '@/lib/hooks/use-user'
+import { BankAccount } from '@/pages/portal/settings/withdrawals/types'
 import { countries } from '@/lib/data/onboarding'
 
 interface AddBankButtonProps {

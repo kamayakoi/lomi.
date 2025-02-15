@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuthStatus } from '@/lib/hooks/useAuthStatus';
+import { useAuthStatus } from '@/lib/hooks/use-auth-status';
 import AnimatedLogoLoader from '@/components/portal/loader';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { CopyIcon } from '@radix-ui/react-icons'
 import { supabase } from '@/utils/supabase/client'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/lib/hooks/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import LogoUploader from '@/components/auth/logo-uploader'

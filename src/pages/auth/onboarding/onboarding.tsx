@@ -2,24 +2,24 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/utils/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/hooks/use-toast';
 import { User as SupabaseUser } from '@supabase/supabase-js';
 import { cn } from '@/lib/actions/utils'
-import OnboardingStep1 from './components/onboarding-step-1';
-import OnboardingStep2 from './components/onboarding-step-2';
-import OnboardingStep3 from './components/onboarding-step-3';
-import OnboardingStep4 from './components/onboarding-step-4';
+import OnboardingStep1 from './components/step-1';
+import OnboardingStep2 from './components/step-2';
+import OnboardingStep3 from './components/step-3';
+import OnboardingStep4 from './components/step-4';
 import { Button } from '@/components/ui/button';
 import LoadingButton from '@/components/portal/loader';
-import WelcomeScreen from './components/welcome-screen';
+import WelcomeScreen from './components/step-0';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 // Import types from each step
-import type { OnboardingStep1Data } from './components/onboarding-step-1';
-import type { OnboardingStep2Data } from './components/onboarding-step-2';
-import type { OnboardingStep3Data } from './components/onboarding-step-3';
-import type { OnboardingStep4Data } from './components/onboarding-step-4';
+import type { OnboardingStep1Data } from './components/step-1';
+import type { OnboardingStep2Data } from './components/step-2';
+import type { OnboardingStep3Data } from './components/step-3';
+import type { OnboardingStep4Data } from './components/step-4';
 
 const initialOnboardingData = {
     firstName: '',
@@ -40,7 +40,7 @@ const initialOnboardingData = {
     orgWebsite: '',
     orgIndustry: '',
     orgDefaultLanguage: '',
-    workspaceHandle: '',
+    storeHandle: '',
     avatarUrl: '',
     logoUrl: '',
     howDidYouHearAboutUs: '',
@@ -65,7 +65,7 @@ export type OnboardingData = {
     orgWebsite: string;
     orgIndustry: string;
     orgDefaultLanguage: string;
-    workspaceHandle: string;
+    storeHandle: string;
     avatarUrl: string;
     logoUrl: string;
     howDidYouHearAboutUs: string;
@@ -246,8 +246,8 @@ const Onboarding: React.FC = () => {
             // Normalize the website URL
             const websiteUrl = formData.orgWebsite ? formData.orgWebsite.replace(/^(https?:\/\/)?(www\.)?/i, '') : '';
 
-            // Prepend "store.lomi.africa/" to the workspace handle
-            const completeWorkspaceHandle = `store.lomi.africa/${formData.workspaceHandle}`;
+            // Prepend "store.lomi.africa/" to the store handle
+            const completeStoreHandle = `store.lomi.africa/${formData.storeHandle}`;
 
             // Call the complete_onboarding function
             const { error } = await supabase.rpc('complete_onboarding', {
@@ -267,7 +267,7 @@ const Onboarding: React.FC = () => {
                 p_org_website_url: `https://${websiteUrl}`,
                 p_org_employee_number: formData.orgEmployees,
                 p_preferred_language: formData.orgDefaultLanguage,
-                p_workspace_handle: completeWorkspaceHandle,
+                p_store_handle: completeStoreHandle,
                 p_how_did_you_hear_about_us: formData.howDidYouHearAboutUs,
                 p_avatar_url: formData.avatarUrl || '',
                 p_logo_url: formData.logoUrl || '',
@@ -277,10 +277,10 @@ const Onboarding: React.FC = () => {
             if (error) {
                 // Handle specific error cases
                 if (error.message.includes('already taken')) {
-                    if (error.message.includes('workspace_handle')) {
+                    if (error.message.includes('store_handle')) {
                         toast({
-                            title: t('onboarding.error.workspace_taken.title'),
-                            description: t('onboarding.error.workspace_taken.description'),
+                            title: t('onboarding.error.store_taken.title'),
+                            description: t('onboarding.error.store_taken.description'),
                             variant: "destructive",
                         });
                     } else if (error.message.includes('org_email')) {
