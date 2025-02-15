@@ -52,6 +52,7 @@ __pycache__/
 # Scripts and prompts
 src/lib/scripts/
 src/utils/prompts
+.cursorrules
 
 # Cursor rules
 .cursorrules
