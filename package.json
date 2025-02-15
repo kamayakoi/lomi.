@@ -45,14 +45,13 @@
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
-    "supabase:db:reset": "supabase db reset --linked",
-    "supabase:db:reset:linked": "supabase db reset --linked",
-    "update-types": "npx supabase gen types typescript --project-id mdswvokxrnfggrujsfjd > database.types.ts",
+    "db:reset": "supabase db reset --linked",
+    "update:types": "bunx supabase gen types typescript --project-id mdswvokxrnfggrujsfjd > database.types.ts",
     "sitemap": "python src/lib/scripts/generate_sitemap.py",
     "generate:sitemap": "python src/lib/scripts/generate_sitemap.py",
     "prepare": "husky",
     "db:check": "supabase db diff",
-    "lint-staged": "lint-staged"
+    "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.36.3",
