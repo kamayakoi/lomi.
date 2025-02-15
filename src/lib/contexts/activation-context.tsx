@@ -1,7 +1,7 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import Loader from '@/components/portal/loader';
-import { ActivationContext } from '../../lib/actions/activation-utils';
+import { ActivationContext } from '@/lib/actions/activation-utils';
 
 interface ActivationProviderProps {
     children: ReactNode;
