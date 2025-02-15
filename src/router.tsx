@@ -13,7 +13,7 @@ import Signup from './pages/auth/connect/sign-up';
 import Forgot from './pages/auth/connect/forgot-password';
 import OTP from './pages/auth/connect/otp';
 import ResetPassword from './pages/auth/connect/reset-password';
-import Onboarding from './pages/auth/onboarding/Onboarding';
+import Onboarding from '../src/pages/auth/onboarding/Onboarding';
 import AuthCallback from './pages/auth/connect/callback';
 // Error pages
 import GeneralError from './pages/errors/general-error';
@@ -21,18 +21,18 @@ import NotFoundError from './pages/errors/not-found-error';
 import MaintenanceError from './pages/errors/maintenance-error';
 // Dashboard
 import AppShell from './components/portal/app-shell';
-import Dashboard from '@/pages/portal/Portal';
+import Dashboard from '../src/pages/portal/Portal';
 import Integrators from '@/pages/portal/Integrate/Integrate';
-import PaymentChannels from '@/pages/portal/payment-channels/PaymentChannels';
-import Logs from '@/pages/portal/logs/Logs';
+import PaymentChannels from '../src/pages/portal/payment-channels/PaymentChannels';
+import Logs from '../src/pages/portal/logs/Logs';
 import Balance from '@/pages/portal/balance/Balance';
 import Transactions from '@/pages/portal/transactions/Transactions';
 import Webhooks from './pages/portal/webhooks/Webhooks';
 import PaymentLinks from './pages/portal/payment-links/PaymentLinks';
 import Customers from './pages/portal/customers/Customers';
-import Subscription from "./pages/portal/subscription/Subscription";
+import Subscription from "../src/pages/portal/subscription/Subscription";
 import Storefront from "./pages/portal/storefront/Storefront";
-import Activation from './pages/auth/activation/Activation';
+import Activation from '../src/pages/auth/activation/Activation';
 import CheckoutPage from '@/api/checkout/Checkout';
 import Reporting from './pages/portal/reporting/Reporting';
 import Product from './pages/portal/product/Product';
@@ -46,7 +46,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
 // Settings routes
-import Settings from '@/pages/portal/settings/Settings';
+import Settings from '../src/pages/portal/settings/Settings';
 import PaymentMethods from '@/pages/portal/settings/receiving-money/payment-methods';
 import CheckoutSettings from '@/pages/portal/settings/receiving-money/checkout/checkout-settings';
 import Disbursements from '@/pages/portal/settings/sending-money/disbursements';
