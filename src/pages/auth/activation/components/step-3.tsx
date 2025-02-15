@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { countryCodes } from '@/lib/data/onboarding';
-import { ActivationData } from "../Activation";
+import { ActivationData } from "../activation";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/design/language-switcher';
