@@ -46,7 +46,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
 // Settings routes
-import Settings from '@/pages/portal/settings/Settings';
+import Settings from '@/pages/portal/settings/settings';
 import PaymentMethods from '@/pages/portal/settings/receiving-money/payment-methods';
 import CheckoutSettings from '@/pages/portal/settings/receiving-money/checkout/checkout-settings';
 import Disbursements from '@/pages/portal/settings/sending-money/disbursements';

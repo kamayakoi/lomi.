@@ -6,7 +6,7 @@ import { cn } from '@/lib/actions/utils';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import LogoUploader from '@//components/auth/logo-uploader';
+import LogoUploader from '@/components/auth/logo-uploader';
 import { useState, useEffect } from 'react';
 import { type OnboardingData } from '../onboarding';
 import { useTranslation } from 'react-i18next';
