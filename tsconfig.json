@@ -45,8 +45,18 @@
     "include": [
         "src/**/*.ts",
         "src/**/*.tsx",
-        "api/routes/server.js",
-        "src/pages/portal/transactions/components"
+        "src/**/*.d.ts",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "api/**/*.ts",
+        "api/**/*.js"
+    ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "dist",
+        "**/*.spec.ts",
+        "**/*.test.ts"
     ],
     "references": [
         {

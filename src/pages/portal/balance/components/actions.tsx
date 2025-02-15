@@ -5,7 +5,7 @@ import { Payout, payout_status, BankAccount } from './types'
 import { Separator } from "@/components/ui/separator"
 import { ArrowDownToLine, LifeBuoy } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { fetchBankAccountDetails } from './support_balance'
+import { fetchBankAccountDetails } from './support'
 
 type PayoutActionsProps = {
     payout: Payout | null

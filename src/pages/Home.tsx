@@ -2,7 +2,7 @@ import { Suspense, useEffect } from 'react'
 import { Hero } from "@/components/landing/animated-hero"
 import { ButtonExpandIconRight, ButtonExpandTalkToUs } from "@/components/design/button-expand"
 import { TopBanner } from '@/components/landing/top-banner'
-import { Footer } from '@/components/landing/Footer'
+import { Footer } from '@/components/landing/footer'
 import ThreeDImage from '@/components/landing/3d-image'
 import { ButtonCta } from "@/components/landing/button-cta"
 
