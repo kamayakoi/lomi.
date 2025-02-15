@@ -15,7 +15,7 @@ export async function POST(req: ExpressRequest, res: ExpressResponse) {
     });
 
     const response = await anthropic.messages.create({
-      model: model || 'claude-3-5-sonnet-20240229',
+      model: model || 'claude-3-sonnet-20240229',
       max_tokens: max_tokens || 150,
       temperature: temperature || 0.7,
       messages: [
@@ -32,7 +32,12 @@ export async function POST(req: ExpressRequest, res: ExpressResponse) {
     });
 
     // Extract suggestions from the response
-    const suggestions = JSON.parse(response.content[0]?.text || '');
+    const content = response.content[0];
+    if (!content || content.type !== 'text') {
+      throw new Error('Unexpected response format from Anthropic');
+    }
+
+    const suggestions = JSON.parse(content.text || '{}');
     return res.status(200).json(suggestions);
   } catch (error) {
     console.error('Error calling Anthropic:', error);
