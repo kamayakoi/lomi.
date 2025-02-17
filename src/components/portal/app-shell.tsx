@@ -30,7 +30,7 @@ ProviderComposer.displayName = 'ProviderComposer';
 
 export default function AppShell() {
   const { sidebarData, isLoading } = useSidebarData();
-  const userOrgName = sidebarData?.organization_name || 'lomi.africa';
+  const userOrgName = sidebarData?.organizationName || 'lomi.africa';
 
   useMetaTags({
     title: `${userOrgName} | Business | lomi.`,

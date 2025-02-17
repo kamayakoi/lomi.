@@ -93,7 +93,7 @@ function NavLink({
         subLink && 'h-8 border-l border-l-border/50 px-3',
         isActive
           ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
-          : `text-muted-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+          : `text-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
         'hover:bg-accent/30'
       )}
       aria-current={isActive ? 'page' : undefined}
@@ -122,7 +122,7 @@ function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }:
           subLink && 'h-8 border-l border-l-border/50 px-3',
           isChildActive
             ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
-            : `text-muted-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+            : `text-foreground hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
           'hover:bg-accent/30'
         )}
       >

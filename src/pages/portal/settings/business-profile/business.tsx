@@ -9,7 +9,23 @@ import { toast } from '@/lib/hooks/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import LogoUploader from '@/components/auth/logo-uploader'
-import { PencilIcon, CheckIcon } from 'lucide-react'
+import { PencilIcon, CheckIcon, MoreVerticalIcon, UserPlusIcon } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { InviteMemberForm } from './invite-member-form'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { format } from "date-fns"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { cn } from "@/lib/actions/utils"
+import { Separator } from "@/components/ui/separator"
+import { useNavigate } from "react-router-dom"
 
 interface OrganizationDetails {
     organization_id: string;
@@ -27,6 +43,17 @@ interface OrganizationDetails {
     postal_code: string;
 }
 
+interface TeamMember {
+    merchant_id: string | null;
+    merchant_name: string | null;
+    merchant_email: string;
+    role: 'Admin' | 'Member';
+    team_status: 'active' | 'invited' | 'inactive';
+    organization_position: string | null;
+    invitation_email: string | null;
+    created_at: string;
+}
+
 export default function Business() {
     const [organization, setOrganization] = useState<OrganizationDetails | null>(null)
     const [loading, setLoading] = useState(true)
@@ -35,6 +62,45 @@ export default function Business() {
     const [isCopied, setIsCopied] = useState(false);
     const [editedOrganization, setEditedOrganization] = useState<OrganizationDetails | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const navigate = useNavigate()
+
+    const fetchTeamMembers = useCallback(async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            // Check if current user is admin
+            const { data: adminCheck } = await supabase.rpc('is_organization_admin', {
+                p_merchant_id: user.id,
+                p_organization_id: organization?.organization_id
+            });
+            setIsAdmin(adminCheck);
+
+            // Fetch team members
+            const { data, error } = await supabase.rpc('fetch_team_members', {
+                p_organization_id: organization?.organization_id
+            });
+
+            if (error) throw error;
+            setTeamMembers(data);
+
+        } catch (error) {
+            console.error('Error fetching team members:', error);
+            toast({
+                title: "Error",
+                description: "Failed to fetch team members",
+                variant: "destructive",
+            });
+        }
+    }, [organization?.organization_id]);
+
+    useEffect(() => {
+        if (organization) {
+            fetchTeamMembers();
+        }
+    }, [organization, fetchTeamMembers]);
 
     useEffect(() => {
         if (organization) {
@@ -75,57 +141,6 @@ export default function Business() {
     useEffect(() => {
         fetchOrganization()
     }, [])
-
-    const fetchOrganization = async () => {
-        if (typeof window === 'undefined') return
-
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('No user found');
-
-            const { data, error } = await supabase
-                .rpc('fetch_organization_details', { p_merchant_id: user.id });
-
-            if (error) {
-                console.error('Supabase function error:', error);
-                throw error;
-            }
-
-            if (data && data.length > 0) {
-                setOrganization(data[0] as OrganizationDetails);
-
-                // Extract the relative path from the logo URL
-                const logoPath = data[0].logo_url?.replace(/^.*\/logos\//, '');
-
-                if (logoPath) {
-                    // Download the organization logo using the relative path
-                    const { data: logoData, error: logoError } = await supabase
-                        .storage
-                        .from('logos')
-                        .download(logoPath);
-
-                    if (logoError) {
-                        console.error('Error downloading logo:', logoError);
-                    } else {
-                        const logoUrl = URL.createObjectURL(logoData);
-                        setLogoUrl(logoUrl);
-                    }
-                }
-            } else {
-                console.error('No organization data found');
-                throw new Error('No organization found.');
-            }
-        } catch (error) {
-            console.error('Error fetching organization:', error);
-            toast({
-                title: "Error",
-                description: "Failed to fetch organization details",
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
-    }
 
     useEffect(() => {
         if (addressRef.current) {
@@ -260,6 +275,118 @@ export default function Business() {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [isEditing, handleFieldValidate]);
+
+    const fetchOrganization = async () => {
+        if (typeof window === 'undefined') return
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            const { data, error } = await supabase
+                .rpc('fetch_organization_details', { p_merchant_id: user.id });
+
+            if (error) {
+                console.error('Supabase function error:', error);
+                throw error;
+            }
+
+            if (data && data.length > 0) {
+                setOrganization(data[0] as OrganizationDetails);
+
+                // Extract the relative path from the logo URL
+                const logoPath = data[0].logo_url?.replace(/^.*\/logos\//, '');
+
+                if (logoPath) {
+                    // Download the organization logo using the relative path
+                    const { data: logoData, error: logoError } = await supabase
+                        .storage
+                        .from('logos')
+                        .download(logoPath);
+
+                    if (logoError) {
+                        console.error('Error downloading logo:', logoError);
+                    } else {
+                        const logoUrl = URL.createObjectURL(logoData);
+                        setLogoUrl(logoUrl);
+                    }
+                }
+            } else {
+                console.error('No organization data found');
+                throw new Error('No organization found.');
+            }
+        } catch (error) {
+            console.error('Error fetching organization:', error);
+            toast({
+                title: "Error",
+                description: "Failed to fetch organization details",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleChangeRole = async (member: TeamMember) => {
+        try {
+            const newRole = member.role === 'Admin' ? 'Member' : 'Admin';
+            const { data: success, error } = await supabase.rpc('update_team_member_role', {
+                p_organization_id: organization?.organization_id,
+                p_merchant_id: member.merchant_id,
+                p_new_role: newRole
+            });
+
+            if (error) throw error;
+
+            if (!success) {
+                toast({
+                    title: "Error",
+                    description: "Cannot change the last admin to a member. Organizations must have at least one admin.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            toast({
+                title: "Success",
+                description: "Role updated successfully",
+            });
+
+            fetchTeamMembers();
+        } catch (error) {
+            console.error('Error updating role:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update role",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleRemoveMember = async (member: TeamMember) => {
+        try {
+            const { error } = await supabase.rpc('remove_team_member', {
+                p_organization_id: organization?.organization_id,
+                p_merchant_id: member.merchant_id
+            });
+
+            if (error) throw error;
+
+            toast({
+                title: "Success",
+                description: "Team member removed successfully",
+            });
+
+            fetchTeamMembers();
+        } catch (error) {
+            console.error('Error removing member:', error);
+            toast({
+                title: "Error",
+                description: "Failed to remove team member",
+                variant: "destructive",
+            });
+        }
+    };
 
     if (typeof window === 'undefined' || loading) {
         return (
@@ -533,6 +660,258 @@ export default function Business() {
                         <p className="text-sm text-muted-foreground">
                             Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Business information" className="underline">hello@lomi.africa</a> if you want to update your business details.
                         </p>
+                    </div>
+
+                    {/* Team Members Section */}
+                    <div className="mt-8 bg-card border">
+                        <div className="flex items-center justify-between p-6">
+                            <div>
+                                <h2 className="text-xl font-semibold">Team Members</h2>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Manage your organization&apos;s team members and their roles.
+                                </p>
+                            </div>
+                            {isAdmin && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button size="icon" className="h-10 w-10" title="Invite Member">
+                                            <UserPlusIcon className="h-4 w-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Invite Team Member</DialogTitle>
+                                        </DialogHeader>
+                                        <InviteMemberForm
+                                            organizationId={organization?.organization_id}
+                                            onInviteSuccess={fetchTeamMembers}
+                                        />
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        </div>
+
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent">
+                                    <TableHead className="w-[400px]">Member</TableHead>
+                                    <TableHead className="w-[120px]">Role</TableHead>
+                                    <TableHead>Position</TableHead>
+                                    <TableHead className="w-[100px] text-right">Joined</TableHead>
+                                    {isAdmin && <TableHead className="w-[70px]">Actions</TableHead>}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {teamMembers.map((member) => (
+                                    <TableRow key={member.merchant_id || member.invitation_email}>
+                                        <TableCell className="font-medium">
+                                            <div className="flex items-center gap-3">
+                                                <Avatar className="h-8 w-8">
+                                                    <AvatarImage
+                                                        src={`https://avatar.vercel.sh/${encodeURIComponent(member.merchant_email?.toLowerCase() || '')}?rounded=60`}
+                                                        alt={member.merchant_name || member.merchant_email}
+                                                    />
+                                                    <AvatarFallback>
+                                                        {(member.merchant_name || member.merchant_email)
+                                                            .split(' ')
+                                                            .map(n => n[0])
+                                                            .join('')
+                                                            .toUpperCase()
+                                                            .slice(0, 2)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="font-medium">
+                                                            {member.merchant_name || 'Pending'}
+                                                        </span>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={cn(
+                                                                "rounded-none px-1 py-0 text-[10px] font-medium h-4",
+                                                                member.team_status === 'active'
+                                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:border-emerald-400/20"
+                                                                    : member.team_status === 'invited'
+                                                                        ? "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-400/10 dark:text-yellow-200 dark:border-yellow-400/20"
+                                                                        : "bg-red-50 text-red-700 border-red-200 dark:bg-red-400/10 dark:text-red-200 dark:border-red-400/20"
+                                                            )}
+                                                        >
+                                                            {member.team_status}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground">
+                                                        {member.merchant_email}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant="outline"
+                                                className={cn(
+                                                    "rounded-none text-xs font-medium",
+                                                    member.role === 'Admin'
+                                                        ? "bg-blue-900/10 text-blue-400 border-blue-800/20 dark:bg-blue-400/10 dark:text-blue-200 dark:border-blue-400/20"
+                                                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                                                )}
+                                            >
+                                                {member.role}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-sm">
+                                            {member.organization_position}
+                                        </TableCell>
+                                        <TableCell className="text-xs text-right text-muted-foreground whitespace-nowrap">
+                                            {format(new Date(member.created_at), 'MMM d, yyyy')}
+                                        </TableCell>
+                                        {isAdmin && (
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="h-8 w-8 p-0"
+                                                        >
+                                                            <MoreVerticalIcon className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleChangeRole(member)}
+                                                            className="text-xs"
+                                                        >
+                                                            Change to {member.role === 'Admin' ? 'Member' : 'Admin'}
+                                                        </DropdownMenuItem>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <DropdownMenuItem
+                                                                    className="text-destructive text-xs"
+                                                                    onSelect={(e) => e.preventDefault()}
+                                                                >
+                                                                    Remove member
+                                                                </DropdownMenuItem>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>Remove team member</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        Are you sure you want to remove {member.merchant_name || member.merchant_email}?
+                                                                        This action cannot be undone.
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                    <AlertDialogAction
+                                                                        onClick={() => handleRemoveMember(member)}
+                                                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                                    >
+                                                                        Remove
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    {/* Delete Account Section */}
+                    <div className="mt-8">
+                        <Separator className="my-8" />
+                        <div className="space-y-3 p-6 bg-red-50/50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50">
+                            <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
+                            <p className="text-sm text-red-600/80 dark:text-red-400/80">
+                                Once you delete your account, there is no going back. Please be certain.
+                            </p>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="destructive"
+                                        className="bg-red-600 hover:bg-red-700 dark:bg-red-900 dark:hover:bg-red-800"
+                                    >
+                                        Delete Account
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription className="space-y-4">
+                                            <p>
+                                                This action cannot be undone. This will permanently deactivate your account
+                                                and remove your access to all organizations you&apos;re a member of.
+                                            </p>
+                                            {isAdmin && (
+                                                <p className="font-medium text-red-600 dark:text-red-400">
+                                                    Warning: As you are the only admin of this organization,
+                                                    the organization will also be deactivated.
+                                                </p>
+                                            )}
+                                            <div className="space-y-2 pt-4">
+                                                <Label htmlFor="confirm" className="text-sm font-medium">
+                                                    Please type &apos;<span className="font-semibold text-red-500">{organization.name}</span>&apos; to confirm
+                                                </Label>
+                                                <Input
+                                                    id="confirm"
+                                                    className="rounded-none"
+                                                    placeholder={organization.name}
+                                                    onChange={(e) => {
+                                                        const deleteButton = document.querySelector('[data-delete-button]') as HTMLButtonElement;
+                                                        if (deleteButton) {
+                                                            deleteButton.disabled = e.target.value !== organization.name;
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            data-delete-button
+                                            disabled={true}
+                                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
+                                            onClick={async () => {
+                                                try {
+                                                    const { data: { user } } = await supabase.auth.getUser()
+                                                    if (!user) throw new Error('No user found')
+
+                                                    const { error } = await supabase
+                                                        .rpc('soft_delete_merchant', {
+                                                            p_merchant_id: user.id
+                                                        })
+
+                                                    if (error) throw error
+
+                                                    toast({
+                                                        title: "Account Deleted",
+                                                        description: "Your account has been successfully deleted.",
+                                                    })
+
+                                                    // Sign out the user
+                                                    await supabase.auth.signOut()
+                                                    navigate('/')
+                                                } catch (error) {
+                                                    console.error('Error deleting account:', error)
+                                                    toast({
+                                                        title: "Error",
+                                                        description: "Failed to delete account",
+                                                        variant: "destructive",
+                                                    })
+                                                }
+                                            }}
+                                        >
+                                            Delete Account
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
                     </div>
                 </>
             </ContentSection>

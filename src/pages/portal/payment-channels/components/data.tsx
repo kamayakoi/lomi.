@@ -54,7 +54,7 @@ export const paymentMethods: PaymentMethod[] = [
     code: 'APPLE_PAY',
     name: 'Apple Pay',
     description: 'Enable seamless one-touch payments with Apple Pay. Offer your iOS users a fast, secure checkout experience with built-in biometric authentication.',
-    logo: <img src="/payment_channels/apple-pay.webp" alt="Apple Pay" className="w-full h-full object-contain" />,
+    logo: <img src="/payment_channels/apple_pay.webp" alt="Apple Pay" className="w-full h-full object-contain" />,
     provider_code: 'APPLE',
     type: 'Digital Payments',
     status: 'coming_soon',

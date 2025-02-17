@@ -219,6 +219,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                     </div>
                     <div className="flex-1 flex items-end justify-between mt-8 sm:-mb-12">
                         <ButtonExpand
+                            type="button"
                             text={t('common.back')}
                             icon={ArrowLeft}
                             iconPlacement="left"
@@ -230,6 +231,7 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                             onClick={onPrevious}
                         />
                         <ButtonExpand
+                            type="submit"
                             text={t('common.submit')}
                             icon={ArrowRight}
                             iconPlacement="right"
