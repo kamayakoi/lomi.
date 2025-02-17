@@ -11,6 +11,7 @@ interface ButtonExpandProps {
     onClick?: () => void;
     className?: string;
     iconPlacement?: 'left' | 'right';
+    type?: 'button' | 'submit' | 'reset';
 }
 
 function ButtonExpand({
@@ -22,10 +23,12 @@ function ButtonExpand({
     hoverTextColor = "hover:text-green-800 dark:hover:text-green-200",
     onClick,
     className,
-    iconPlacement = 'right'
+    iconPlacement = 'right',
+    type = 'button'
 }: ButtonExpandProps) {
     return (
         <Button
+            type={type}
             variant="expandIcon"
             Icon={() => <Icon className="h-4 w-4" />}
             iconPlacement={iconPlacement}

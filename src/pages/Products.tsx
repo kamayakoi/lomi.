@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import orangeLogo from '/payment_channels/orange.webp';
 import mtnLogo from '/payment_channels/mtn.webp';
 import waveLogo from '/payment_channels/wave.webp';
-import ecobankLogo from '/public/payment_channels/ecobank.webp';
+import ecobankLogo from '/payment_channels/ecobank.webp';
 import visaLogo from '/payment_channels/visa.webp';
 import mastercardLogo from '/payment_channels/mastercard.webp';
 import applePayLogo from '/payment_channels/apple_pay.webp';

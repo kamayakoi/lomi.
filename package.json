@@ -96,7 +96,7 @@
     "@types/node-fetch": "2.6.12",
     "@types/qrcode": "1.5.5",
     "@types/ua-parser-js": "0.7.39",
-    "@vercel/analytics": "1.2.2",
+    "@vercel/analytics": "1.5.0",
     "ai": "4.1.40",
     "axios": "1.7.9",
     "buffer": "6.0.3",

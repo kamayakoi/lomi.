@@ -58,8 +58,6 @@ export function AnimatedBeamMultipleOutputDemo({
     const div9Ref = useRef<HTMLDivElement>(null);
     const div10Ref = useRef<HTMLDivElement>(null);
     const div11Ref = useRef<HTMLDivElement>(null);
-    const div12Ref = useRef<HTMLDivElement>(null);
-    const div13Ref = useRef<HTMLDivElement>(null);
     const div14Ref = useRef<HTMLDivElement>(null);
 
     return (
@@ -114,12 +112,6 @@ export function AnimatedBeamMultipleOutputDemo({
                     <Square ref={div11Ref} className="size-14">
                         <img src="/payment_channels/airtel.webp" alt="Airtel" className="object-cover w-full h-full rounded-sm" />
                     </Square>
-                    <Square ref={div12Ref} className="size-14">
-                        <img src="/payment_channels/wizall.webp" alt="Wizall" className="object-cover w-full h-full rounded-sm" />
-                    </Square>
-                    <Square ref={div13Ref} className="size-14">
-                        <img src="/payment_channels/moov.webp" alt="Moov" className="object-cover w-full h-full rounded-sm" />
-                    </Square>
                 </div>
             </div>
 
@@ -163,18 +155,6 @@ export function AnimatedBeamMultipleOutputDemo({
             <AnimatedBeam
                 containerRef={containerRef}
                 fromRef={div11Ref}
-                toRef={div6Ref}
-                duration={3}
-            />
-            <AnimatedBeam
-                containerRef={containerRef}
-                fromRef={div12Ref}
-                toRef={div6Ref}
-                duration={3}
-            />
-            <AnimatedBeam
-                containerRef={containerRef}
-                fromRef={div13Ref}
                 toRef={div6Ref}
                 duration={3}
             />

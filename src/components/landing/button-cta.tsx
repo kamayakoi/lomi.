@@ -31,7 +31,7 @@ export function ButtonCta({ className, ...props }: ButtonCtaProps) {
       {...props}
     >
       <motion.div
-        className="absolute left-3 flex items-center"
+        className="absolute left-4 flex items-center"
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: !copied && isHovered ? 1 : 0, x: !copied && isHovered ? 0 : -20 }}
         transition={{ duration: 0.4 }}
@@ -44,7 +44,7 @@ export function ButtonCta({ className, ...props }: ButtonCtaProps) {
         initial={{ opacity: 1 }}
         animate={{ opacity: copied ? 0 : 1 }}
       >
-        <span className="text-sm sm:text-base font-medium">
+        <span className="text-sm -ml-1 mr-1 sm:text-base font-medium">
           npm install lomi.cli
         </span>
       </motion.div>

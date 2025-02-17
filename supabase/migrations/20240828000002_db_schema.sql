@@ -22,6 +22,8 @@ CREATE TYPE support_category AS ENUM ('account', 'billing', 'technical', 'featur
 CREATE TYPE support_status AS ENUM ('open', 'in_progress', 'resolved', 'closed');
 CREATE TYPE support_priority AS ENUM ('low', 'normal', 'high', 'urgent');
 CREATE TYPE fee_type AS ENUM ('platform', 'processing', 'conversion', 'payout', 'refund');
+CREATE TYPE team_status AS ENUM ('active', 'invited', 'inactive');
+CREATE TYPE member_role AS ENUM ('Admin', 'Member');
 CREATE TYPE event_type AS ENUM (
     -- Authentication & Security
     'create_api_key',
@@ -145,7 +147,7 @@ COMMENT ON COLUMN merchants.merchant_lifetime_value IS 'Estimated total revenue 
 CREATE TABLE organizations (
   organization_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
+  email VARCHAR NOT NULL,
   phone_number VARCHAR NOT NULL,
   verified BOOLEAN NOT NULL DEFAULT false,
   website_url VARCHAR,
@@ -226,8 +228,8 @@ CREATE TABLE merchant_organization_links (
   merchant_org_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   merchant_id UUID REFERENCES merchants(merchant_id),
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-  role VARCHAR NOT NULL CHECK (role IN ('Admin', 'Member')),
-  team_status VARCHAR NOT NULL DEFAULT 'active' CHECK (team_status IN ('active', 'invited', 'inactive')),
+  role member_role NOT NULL,
+  team_status team_status NOT NULL DEFAULT 'active',
   store_handle VARCHAR NOT NULL,
   organization_position VARCHAR,
   invitation_email VARCHAR,
