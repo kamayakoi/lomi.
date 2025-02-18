@@ -16,20 +16,46 @@ export const fetchSidebarData = async (
 
       if (error) {
         setError('Error fetching sidebar data');
-      } else {
+      } else if (data && data.length > 0) {
+        // Set initial data without logo
         setSidebarData({
+          organizationId: data[0].organization_id,
           organizationName: data[0].organization_name,
           merchantName: data[0].merchant_name,
           merchantRole: data[0].merchant_role,
           organizationLogo: null,
         });
 
-        const logoPath = data[0].organization_logo_url?.replace(/^.*\/logos\//, '');
-        if (logoPath) {
-          const { data: logoData, error: logoError } = await supabase.storage.from('logos').download(logoPath);
-          if (!logoError) {
-            const logoUrl = URL.createObjectURL(logoData);
-            setSidebarData((prevData: SidebarData) => ({ ...prevData, organizationLogo: logoUrl }));
+        // Handle logo separately
+        if (data[0].organization_logo_url) {
+          try {
+            // First try to get the public URL
+            const { data: publicUrl } = supabase
+              .storage
+              .from('logos')
+              .getPublicUrl(data[0].organization_logo_url);
+
+            if (publicUrl?.publicUrl) {
+              // Verify the image exists
+              const response = await fetch(publicUrl.publicUrl, { method: 'HEAD' });
+              if (response.ok) {
+                setSidebarData(prev => ({ ...prev, organizationLogo: publicUrl.publicUrl }));
+              } else {
+                // If public URL fails, try to download and create blob URL
+                const { data: logoData } = await supabase
+                  .storage
+                  .from('logos')
+                  .download(data[0].organization_logo_url);
+                
+                if (logoData) {
+                  const logoUrl = URL.createObjectURL(logoData);
+                  setSidebarData(prev => ({ ...prev, organizationLogo: logoUrl }));
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error handling logo:', error);
+            // Keep organizationLogo as null if there's an error
           }
         }
       }

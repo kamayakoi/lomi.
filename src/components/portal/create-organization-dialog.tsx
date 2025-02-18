@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 
 const createOrgSchema = z.object({
-    name: z.string().min(2, "Organization name must be at least 2 characters").max(50, "Organization name must be less than 50 characters"),
+    name: z.string().min(1, "Organization name is required").max(50, "Organization name must be less than 50 characters"),
 });
 
 type CreateOrgFormValues = z.infer<typeof createOrgSchema>
@@ -129,7 +129,7 @@ export function CreateOrganizationDialog({ open, onOpenChange }: CreateOrganizat
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px] w-[95vw] bg-background/95 backdrop-blur-sm border-border/40 rounded-none p-4 sm:p-6">
                 <DialogHeader className="mb-6">
-                    <DialogTitle className="text-xl font-semibold">Create New Organization</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Create a new organization</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                     <div className="space-y-6">
@@ -140,10 +140,10 @@ export function CreateOrganizationDialog({ open, onOpenChange }: CreateOrganizat
                         />
 
                         <div className="space-y-3">
-                            <Label htmlFor="name" className="text-sm font-medium">Organization Name</Label>
+                            <Label htmlFor="name" className="text-sm font-medium">Name</Label>
                             <Input
                                 id="name"
-                                placeholder="Enter organization name"
+                                placeholder="Ashanti Shoes"
                                 {...register('name')}
                                 className="rounded-none bg-background border-border/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-12 px-4"
                                 disabled={loading}
@@ -165,7 +165,7 @@ export function CreateOrganizationDialog({ open, onOpenChange }: CreateOrganizat
                                 Creating...
                             </>
                         ) : (
-                            "Create Organization"
+                            "Create"
                         )}
                     </Button>
                 </form>

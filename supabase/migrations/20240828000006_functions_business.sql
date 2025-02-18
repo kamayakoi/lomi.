@@ -351,6 +351,8 @@ DECLARE
     v_organization_id UUID;
     v_active_members_count INT;
     v_user_id UUID;
+    v_app_metadata jsonb;
+    v_user_metadata jsonb;
 BEGIN
     -- Get the organization ID and count active members
     SELECT 
@@ -372,20 +374,32 @@ BEGIN
     -- Get the auth user ID (which is the same as merchant_id in our case)
     v_user_id := p_merchant_id;
 
-    -- Disable the Supabase auth user
+    -- Get current metadata
+    SELECT raw_app_meta_data, raw_user_meta_data 
+    INTO v_app_metadata, v_user_metadata
+    FROM auth.users 
+    WHERE id = v_user_id;
+
+    -- Initialize metadata if NULL
+    v_app_metadata := COALESCE(v_app_metadata, '{}'::jsonb);
+    v_user_metadata := COALESCE(v_user_metadata, '{}'::jsonb);
+
+    -- Update metadata with deletion flags
+    v_app_metadata := v_app_metadata || jsonb_build_object(
+        'is_deleted', true,
+        'deleted_at', extract(epoch from now())
+    );
+    v_user_metadata := v_user_metadata || jsonb_build_object(
+        'is_deleted', true,
+        'deleted_at', extract(epoch from now())
+    );
+
+    -- Update the Supabase auth user metadata and ban status
     UPDATE auth.users 
     SET 
-        raw_app_meta_data = raw_app_meta_data || 
-            jsonb_build_object(
-                'is_deleted', true,
-                'deleted_at', extract(epoch from now())
-            ),
-        raw_user_meta_data = raw_user_meta_data || 
-            jsonb_build_object(
-                'is_deleted', true,
-                'deleted_at', extract(epoch from now())
-            ),
-        disabled = true
+        raw_app_meta_data = v_app_metadata,
+        raw_user_meta_data = v_user_metadata,
+        banned_until = TIMESTAMP 'infinity'
     WHERE id = v_user_id;
 
     -- Soft delete the merchant
@@ -426,16 +440,32 @@ CREATE OR REPLACE FUNCTION public.reactivate_merchant(
 ) RETURNS VOID AS $$
 DECLARE
     v_user_id UUID;
+    v_app_metadata jsonb;
+    v_user_metadata jsonb;
 BEGIN
     -- Get the auth user ID (which is the same as merchant_id in our case)
     v_user_id := p_merchant_id;
 
-    -- Re-enable the Supabase auth user
+    -- Get current metadata
+    SELECT raw_app_meta_data, raw_user_meta_data 
+    INTO v_app_metadata, v_user_metadata
+    FROM auth.users 
+    WHERE id = v_user_id;
+
+    -- Initialize metadata if NULL
+    v_app_metadata := COALESCE(v_app_metadata, '{}'::jsonb);
+    v_user_metadata := COALESCE(v_user_metadata, '{}'::jsonb);
+
+    -- Remove deletion flags from metadata
+    v_app_metadata := v_app_metadata - 'is_deleted' - 'deleted_at';
+    v_user_metadata := v_user_metadata - 'is_deleted' - 'deleted_at';
+
+    -- Re-enable the Supabase auth user with clean metadata
     UPDATE auth.users 
     SET 
-        raw_app_meta_data = raw_app_meta_data - 'is_deleted' - 'deleted_at',
-        raw_user_meta_data = raw_user_meta_data - 'is_deleted' - 'deleted_at',
-        disabled = false
+        raw_app_meta_data = v_app_metadata,
+        raw_user_meta_data = v_user_metadata,
+        banned_until = NULL
     WHERE id = v_user_id;
 
     -- Reactivate the merchant
@@ -461,3 +491,65 @@ BEGIN
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to unban a user (can be called from Supabase Auth UI)
+CREATE OR REPLACE FUNCTION auth.unban_user(user_id UUID)
+RETURNS void AS $$
+DECLARE
+    v_app_metadata jsonb;
+    v_user_metadata jsonb;
+BEGIN
+    -- Get current metadata
+    SELECT raw_app_meta_data, raw_user_meta_data 
+    INTO v_app_metadata, v_user_metadata
+    FROM auth.users 
+    WHERE id = user_id;
+
+    -- Initialize metadata if NULL
+    v_app_metadata := COALESCE(v_app_metadata, '{}'::jsonb);
+    v_user_metadata := COALESCE(v_user_metadata, '{}'::jsonb);
+
+    -- Remove deletion flags from metadata
+    v_app_metadata := v_app_metadata - 'is_deleted' - 'deleted_at';
+    v_user_metadata := v_user_metadata - 'is_deleted' - 'deleted_at';
+
+    -- Update user
+    UPDATE auth.users 
+    SET 
+        raw_app_meta_data = v_app_metadata,
+        raw_user_meta_data = v_user_metadata,
+        banned_until = NULL
+    WHERE id = user_id;
+
+    -- Reactivate the merchant
+    UPDATE merchants
+    SET 
+        is_deleted = false,
+        deleted_at = NULL
+    WHERE merchant_id = user_id;
+
+    -- Reactivate team memberships
+    UPDATE merchant_organization_links
+    SET team_status = 'active'
+    WHERE merchant_id = user_id
+    AND team_status = 'inactive';
+
+    -- Update organization's total_merchants count for all affected organizations
+    UPDATE organizations o
+    SET total_merchants = total_merchants + 1
+    WHERE organization_id IN (
+        SELECT organization_id 
+        FROM merchant_organization_links 
+        WHERE merchant_id = user_id
+    )
+    AND EXISTS (
+        SELECT 1 
+        FROM merchant_organization_links mol 
+        WHERE mol.organization_id = o.organization_id 
+        AND mol.merchant_id = user_id
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Grant execute permission to service_role (needed for Supabase UI)
+GRANT EXECUTE ON FUNCTION auth.unban_user(UUID) TO service_role;

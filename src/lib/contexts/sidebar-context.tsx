@@ -13,6 +13,7 @@ export const SidebarContext = createContext<SidebarContextValue | undefined>(und
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [sidebarData, setSidebarData] = useState<SidebarData>({
+        organizationId: null,
         organizationName: null,
         organizationLogo: null,
         merchantName: null,

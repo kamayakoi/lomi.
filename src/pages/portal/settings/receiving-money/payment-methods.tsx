@@ -25,11 +25,11 @@ interface ProviderSetting {
 }
 
 const paymentMethods: PaymentMethod[] = [
-    { channel: 'Visa', type: 'Card', number: null, logo: '/checkout-visa.webp', provider_code: 'ECOBANK' },
-    { channel: 'Mastercard', type: 'Card', number: null, logo: '/checkout-mastercard.webp', provider_code: 'ECOBANK' },
-    { channel: 'Orange', type: 'Mobile Money', number: null, logo: '/orange.webp', provider_code: 'ORANGE' },
-    { channel: 'MTN', type: 'Mobile Money', number: null, logo: '/mtn.webp', provider_code: 'MTN' },
-    { channel: 'Wave', type: 'E-Wallet', number: null, logo: '/wave.webp', provider_code: 'WAVE' },
+    { channel: 'Visa', type: 'Card', number: null, logo: '/payment_channels/visa.webp', provider_code: 'ECOBANK' },
+    { channel: 'Mastercard', type: 'Card', number: null, logo: '/payment_channels/mastercard.webp', provider_code: 'ECOBANK' },
+    { channel: 'Orange', type: 'Mobile Money', number: null, logo: '/payment_channels/orange.webp', provider_code: 'ORANGE' },
+    { channel: 'MTN', type: 'Mobile Money', number: null, logo: '/payment_channels/mtn.webp', provider_code: 'MTN' },
+    { channel: 'Wave', type: 'E-Wallet', number: null, logo: '/payment_channels/wave.webp', provider_code: 'WAVE' },
 ]
 
 export default function PaymentMethods() {
@@ -40,11 +40,11 @@ export default function PaymentMethods() {
 
     useEffect(() => {
         async function fetchProviderNumbers() {
-            if (!sidebarData?.organization_id) return;
+            if (!sidebarData?.organizationId) return;
 
             const { data: settings, error } = await supabase
                 .rpc('fetch_organization_providers_settings', {
-                    p_organization_id: sidebarData.organization_id
+                    p_organization_id: sidebarData.organizationId
                 })
 
             if (!error && settings) {
@@ -60,10 +60,10 @@ export default function PaymentMethods() {
             }
         }
 
-        if (sidebarData?.organization_id) {
+        if (sidebarData?.organizationId) {
             fetchProviderNumbers()
         }
-    }, [sidebarData?.organization_id])
+    }, [sidebarData?.organizationId])
 
     if (isSidebarLoading) {
         return <Loader />

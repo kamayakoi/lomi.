@@ -126,7 +126,6 @@ export function InviteMemberForm({ organizationId, onInviteSuccess }: InviteMemb
                         </option>
                     ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
                 {errors.position && (
                     <p className="text-sm text-red-500">{errors.position.message}</p>
                 )}

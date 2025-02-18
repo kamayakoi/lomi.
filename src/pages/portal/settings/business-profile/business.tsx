@@ -25,7 +25,6 @@ import { format } from "date-fns"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { cn } from "@/lib/actions/utils"
 import { Separator } from "@/components/ui/separator"
-import { useNavigate } from "react-router-dom"
 
 interface OrganizationDetails {
     organization_id: string;
@@ -64,7 +63,7 @@ export default function Business() {
     const [isEditing, setIsEditing] = useState(false);
     const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
     const [isAdmin, setIsAdmin] = useState(false);
-    const navigate = useNavigate()
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
     const fetchTeamMembers = useCallback(async () => {
         try {
@@ -680,7 +679,7 @@ export default function Business() {
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
-                                            <DialogTitle>Invite Team Member</DialogTitle>
+                                            <DialogTitle>Invite a team member</DialogTitle>
                                         </DialogHeader>
                                         <InviteMemberForm
                                             organizationId={organization?.organization_id}
@@ -842,15 +841,15 @@ export default function Business() {
                                     <AlertDialogHeader>
                                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                         <AlertDialogDescription className="space-y-4">
-                                            <p>
+                                            <div>
                                                 This action cannot be undone. This will permanently deactivate your account
                                                 and remove your access to all organizations you&apos;re a member of.
-                                            </p>
+                                            </div>
                                             {isAdmin && (
-                                                <p className="font-medium text-red-600 dark:text-red-400">
+                                                <div className="font-medium text-red-600 dark:text-red-400">
                                                     Warning: As you are the only admin of this organization,
                                                     the organization will also be deactivated.
-                                                </p>
+                                                </div>
                                             )}
                                             <div className="space-y-2 pt-4">
                                                 <Label htmlFor="confirm" className="text-sm font-medium">
@@ -860,21 +859,17 @@ export default function Business() {
                                                     id="confirm"
                                                     className="rounded-none"
                                                     placeholder={organization.name}
-                                                    onChange={(e) => {
-                                                        const deleteButton = document.querySelector('[data-delete-button]') as HTMLButtonElement;
-                                                        if (deleteButton) {
-                                                            deleteButton.disabled = e.target.value !== organization.name;
-                                                        }
-                                                    }}
+                                                    value={deleteConfirmation}
+                                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
                                                 />
                                             </div>
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>Cancel</AlertDialogCancel>
                                         <AlertDialogAction
                                             data-delete-button
-                                            disabled={true}
+                                            disabled={deleteConfirmation !== organization.name}
                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50"
                                             onClick={async () => {
                                                 try {
@@ -893,9 +888,12 @@ export default function Business() {
                                                         description: "Your account has been successfully deleted.",
                                                     })
 
-                                                    // Sign out the user
-                                                    await supabase.auth.signOut()
-                                                    navigate('/')
+                                                    // Clear all local storage and session data
+                                                    localStorage.clear();
+                                                    sessionStorage.clear();
+
+                                                    await supabase.auth.signOut({ scope: 'global' });
+                                                    window.location.href = '/';
                                                 } catch (error) {
                                                     console.error('Error deleting account:', error)
                                                     toast({
