@@ -38,10 +38,10 @@ export default function PaymentChannels() {
   ]
 
   useEffect(() => {
-    if (user?.id && sidebarData?.organization_id) {
-      fetchOrganizationProviders(sidebarData.organization_id)
+    if (user?.id && sidebarData?.organizationId) {
+      fetchOrganizationProviders(sidebarData.organizationId)
     }
-  }, [user?.id, sidebarData?.organization_id])
+  }, [user?.id, sidebarData?.organizationId])
 
   const fetchOrganizationProviders = async (organizationId: string) => {
     const { data, error } = await supabase
@@ -73,10 +73,10 @@ export default function PaymentChannels() {
   }
 
   const connectProvider = async (providerCode: string) => {
-    if (sidebarData?.organization_id) {
+    if (sidebarData?.organizationId) {
       const { error } = await supabase
         .rpc('update_organization_provider_connection', {
-          p_organization_id: sidebarData.organization_id,
+          p_organization_id: sidebarData.organizationId,
           p_provider_code: providerCode,
           p_is_connected: true,
         })
@@ -89,7 +89,7 @@ export default function PaymentChannels() {
           description: "Failed to connect to provider. Please try again.",
         })
       } else {
-        fetchOrganizationProviders(sidebarData.organization_id)
+        fetchOrganizationProviders(sidebarData.organizationId)
         const method = paymentMethods.find(m => m.provider_code === providerCode)
         toast({
           title: "Success",
@@ -100,7 +100,7 @@ export default function PaymentChannels() {
   }
 
   const handlePhoneSubmit = async () => {
-    if (!connectingProvider || !sidebarData?.organization_id || !phoneNumber) return
+    if (!connectingProvider || !sidebarData?.organizationId || !phoneNumber) return
 
     try {
       setIsProcessing(true);
@@ -110,7 +110,7 @@ export default function PaymentChannels() {
         const { WaveAggregator } = await import('@/utils/wave/aggregator');
         await WaveAggregator.registerMerchant(
           user.id,
-          sidebarData.organization_id,
+          sidebarData.organizationId,
           phoneNumber
         );
 
@@ -120,7 +120,7 @@ export default function PaymentChannels() {
           description: `Successfully connected to ${method?.name}`,
         });
 
-        fetchOrganizationProviders(sidebarData.organization_id);
+        fetchOrganizationProviders(sidebarData.organizationId);
         setPhoneDialogOpen(false);
         setConnectingProvider(null);
         setPhoneNumber("");
@@ -130,7 +130,7 @@ export default function PaymentChannels() {
       // Handle other providers
       const { error: phoneError } = await supabase
         .rpc('update_organization_provider_phone', {
-          p_organization_id: sidebarData.organization_id,
+          p_organization_id: sidebarData.organizationId,
           p_provider_code: connectingProvider,
           p_phone_number: phoneNumber,
           p_is_phone_verified: false
@@ -163,10 +163,10 @@ export default function PaymentChannels() {
   }
 
   const confirmDisconnect = async () => {
-    if (disconnectingProvider && sidebarData?.organization_id) {
+    if (disconnectingProvider && sidebarData?.organizationId) {
       const { error } = await supabase
         .rpc('update_organization_provider_connection', {
-          p_organization_id: sidebarData.organization_id,
+          p_organization_id: sidebarData.organizationId,
           p_provider_code: disconnectingProvider,
           p_is_connected: false,
         })
@@ -180,7 +180,7 @@ export default function PaymentChannels() {
         })
       } else {
         const method = paymentMethods.find(m => m.provider_code === disconnectingProvider)
-        fetchOrganizationProviders(sidebarData.organization_id)
+        fetchOrganizationProviders(sidebarData.organizationId)
         toast({
           title: "Success",
           description: `Successfully disconnected from ${method?.name}`,

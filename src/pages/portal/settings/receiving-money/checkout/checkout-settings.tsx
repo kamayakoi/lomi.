@@ -20,7 +20,7 @@ function CheckoutSettingsPage() {
 
     const fetchCheckoutSettings = useCallback(async () => {
         try {
-            const orgId = sidebarData?.organization_id;
+            const orgId = sidebarData?.organizationId;
             if (!orgId || typeof orgId !== 'string') {
                 throw new Error('Organization ID is required');
             }
@@ -44,17 +44,17 @@ function CheckoutSettingsPage() {
             console.error('Error fetching checkout settings:', err)
             setError('Failed to load checkout settings. Please try again later.')
         }
-    }, [sidebarData?.organization_id])
+    }, [sidebarData?.organizationId])
 
     useEffect(() => {
-        if (sidebarData?.organization_id) {
+        if (sidebarData?.organizationId) {
             fetchCheckoutSettings()
         }
-    }, [sidebarData?.organization_id, fetchCheckoutSettings])
+    }, [sidebarData?.organizationId, fetchCheckoutSettings])
 
     const handleSettingsUpdate = async (updatedSettings: Partial<CheckoutSettings>) => {
         try {
-            const orgId = sidebarData?.organization_id;
+            const orgId = sidebarData?.organizationId;
             if (!orgId || typeof orgId !== 'string') {
                 throw new Error('Organization ID is required');
             }
