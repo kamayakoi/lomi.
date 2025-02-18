@@ -1,5 +1,3 @@
-"use client"
-
 import { BadgeCheck, ArrowRight } from "lucide-react"
 import NumberFlow from "@number-flow/react"
 

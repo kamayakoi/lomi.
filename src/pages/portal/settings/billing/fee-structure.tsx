@@ -25,8 +25,8 @@ type FeeData = {
 const feeData: FeeData = {
     USD: {
         paymentFees: [
-            { name: 'Visa', amount: '2.9%' },
-            { name: 'Mastercard', amount: '2.9%' },
+            { name: 'Visa', amount: '3.2%' },
+            { name: 'Mastercard', amount: '3.2%' },
             { name: 'Bank Transfer (International)', amount: '1% + $5.00' },
             { name: 'Bank Transfer (Local)', amount: 'Free' }
         ],
@@ -34,22 +34,24 @@ const feeData: FeeData = {
             { name: 'Refund Processing', amount: '1.5%' },
             { name: 'Currency Conversion', amount: '1.5%' },
             { name: 'Express Payout', amount: '$1.00' },
+            { name: 'eWallet and Mobile Money Payout', amount: '1.5% + $0.50' },
         ],
     },
     XOF: {
         paymentFees: [
-            { name: 'Visa', amount: '2.9%' },
-            { name: 'Mastercard', amount: '2.9%' },
-            { name: 'Orange', amount: '2.9% + 66 XOF' },
-            { name: 'MTN', amount: '2.9% + 66 XOF' },
-            { name: 'Wave', amount: '2.9%' },
+            { name: 'Visa', amount: '3.2%' },
+            { name: 'Mastercard', amount: '3.2%' },
+            { name: 'Orange', amount: '3.2% + 200 XOF' },
+            { name: 'MTN', amount: '3.2% + 200 XOF' },
+            { name: 'Wave', amount: '3.2% + 200 XOF' },
             { name: 'Bank Transfer (International)', amount: '1% + 3,500 XOF' },
             { name: 'Bank Transfer (Local)', amount: 'Free' }
         ],
         otherFees: [
             { name: 'Refund Processing', amount: '1.5%' },
             { name: 'Currency Conversion', amount: '1.5%' },
-            { name: 'Express Payout', amount: '655 XOF' },
+            { name: 'Express Payout', amount: '1.5% + 655 XOF' },
+            { name: 'eWallet and Mobile Money Payout', amount: '1.5% + 200 XOF' },
         ],
     },
 }

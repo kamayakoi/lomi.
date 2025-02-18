@@ -18,7 +18,7 @@
             "support": "Support",
             "privacy": "Privacy Policy",
             "terms": "Terms and Conditions",
-            "branding": "Branding",
+            "branding": "Brand assets",
             "featureRequest": "Request a feature | integration",
             "review": "Leave us a review"
         },
@@ -34,7 +34,8 @@
         },
         "status": "All services are online",
         "copyright": "Copyright © 2025 — lomi.africa",
-        "star": "Star"
+        "star": "Star",
+        "emailCopied": "Email copied !"
     },
     "hero": {
         "buttons": {

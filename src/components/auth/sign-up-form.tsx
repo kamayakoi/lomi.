@@ -72,18 +72,22 @@ function PasswordRequirements({ password, isVisible }: { password: string, isVis
   if (!isVisible || !shouldShow) return null
 
   return (
-    <div className="absolute lg:right-full lg:mr-4 lg:top-0 top-full left-0 z-50 w-full lg:w-80 transform transition-all duration-200 ease-in-out mt-2 lg:mt-0">
-      <MagicCard className="p-4" gradientColor="#3b82f6" gradientOpacity={0.2}>
-        <div className="space-y-2">
+    <div className="absolute lg:left-[calc(100%+1rem)] lg:top-0 top-full left-0 z-50 w-full lg:w-64 transform transition-all duration-200 ease-in-out mt-2 lg:mt-0">
+      <MagicCard
+        className="p-3 rounded-none bg-opacity-50 backdrop-blur-sm"
+        gradientColor="#3b82f6"
+        gradientOpacity={0.1}
+      >
+        <div className="space-y-1.5">
           {requirements.map((requirement, index) => (
-            <div key={index} className="flex items-center space-x-2">
+            <div key={index} className="flex items-center space-x-1.5">
               {requirement.isMet ? (
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-3 w-3 text-green-500" />
               ) : (
-                <X className="h-4 w-4 text-red-500" />
+                <X className="h-3 w-3 text-red-500" />
               )}
               <span className={cn(
-                "text-sm",
+                "text-xs",
                 requirement.isMet ? "text-green-500" : "text-red-500"
               )}>
                 {requirement.text}

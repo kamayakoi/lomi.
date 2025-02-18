@@ -9,7 +9,7 @@ import { toast } from '@/lib/hooks/use-toast'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import LogoUploader from '@/components/auth/logo-uploader'
-import { PencilIcon, CheckIcon, MoreVerticalIcon, UserPlusIcon } from 'lucide-react'
+import { PencilIcon, CheckIcon, MoreVerticalIcon, UserPlusIcon, CheckCircle2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -52,6 +52,23 @@ interface TeamMember {
     invitation_email: string | null;
     created_at: string;
 }
+
+const styles = `
+@keyframes check {
+    0% {
+        transform: scale(0) translateY(-50%) rotate(-90deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2) translateY(-50%);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1) translateY(-50%);
+        opacity: 1;
+    }
+}
+`;
 
 export default function Business() {
     const [organization, setOrganization] = useState<OrganizationDetails | null>(null)
@@ -450,6 +467,7 @@ export default function Business() {
                 div::-webkit-scrollbar {
                     display: none;
                 }
+                ${styles}
             `}</style>
             <ContentSection
                 title="Business"
@@ -600,9 +618,27 @@ export default function Business() {
                                         id="verified"
                                         value={organization.verified ? 'Verified' : 'Unverified'}
                                         readOnly
-                                        className="bg-muted rounded-none"
+                                        className={cn(
+                                            "bg-muted rounded-none",
+                                            organization.verified && "text-emerald-600 dark:text-emerald-400 font-medium"
+                                        )}
                                     />
+                                    {organization.verified && (
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+                                            <CheckCircle2
+                                                className={cn(
+                                                    "h-4 w-4 text-emerald-500 dark:text-emerald-400",
+                                                    "animate-[check_0.3s_ease-in-out]"
+                                                )}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
+                                {organization.verified && (
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
+                                        Your business is verified and compliant.
+                                    </p>
+                                )}
                             </div>
                             <div className="grid gap-2">
                                 <Label htmlFor="default_currency">Currency</Label>
@@ -824,9 +860,9 @@ export default function Business() {
                     <div className="mt-8">
                         <Separator className="my-8" />
                         <div className="space-y-3 p-6 bg-red-50/50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50">
-                            <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">Danger Zone</h2>
+                            <h2 className="text-xl font-semibold text-red-600 dark:text-red-400">Danger zone</h2>
                             <p className="text-sm text-red-600/80 dark:text-red-400/80">
-                                Once you delete your account, there is no going back. Please be certain.
+                                Once you delete your account, there is no going back as we can&apos;t recover your data. Please be sure you want to do this.
                             </p>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -834,7 +870,7 @@ export default function Business() {
                                         variant="destructive"
                                         className="bg-red-600 hover:bg-red-700 dark:bg-red-900 dark:hover:bg-red-800"
                                     >
-                                        Delete Account
+                                        Delete account
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -842,13 +878,13 @@ export default function Business() {
                                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                                         <AlertDialogDescription className="space-y-4">
                                             <div>
-                                                This action cannot be undone. This will permanently deactivate your account
+                                                This action will permanently deactivate your account
                                                 and remove your access to all organizations you&apos;re a member of.
                                             </div>
                                             {isAdmin && (
                                                 <div className="font-medium text-red-600 dark:text-red-400">
                                                     Warning: As you are the only admin of this organization,
-                                                    the organization will also be deactivated.
+                                                    the organization will also be deleted.
                                                 </div>
                                             )}
                                             <div className="space-y-2 pt-4">

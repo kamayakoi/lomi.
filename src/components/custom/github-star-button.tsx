@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react'
 import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import React from 'react'
 
-export default function GitHubStars() {
+const GITHUB_REPO_URL = 'https://github.com/lomiafrica/lomi.'
+
+export const GitHubStarButton: React.FC = () => {
     const [stars, setStars] = useState<number | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -38,7 +41,7 @@ export default function GitHubStars() {
     }, [])
 
     const handleClick = () => {
-        window.open('https://github.com/lomiafrica/lomi%2E', '_blank', 'noopener,noreferrer')
+        window.open(GITHUB_REPO_URL, '_blank', 'noopener,noreferrer')
     }
 
     return (

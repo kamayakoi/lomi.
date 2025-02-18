@@ -38,12 +38,21 @@ import Reporting from './pages/portal/reporting/Reporting';
 import Product from './pages/portal/product/Product';
 
 // Website routes
-import Home from './pages/Home';
-import About from './pages/About';
-import Products from './pages/Products';
-import Integrations from './pages/Integrations';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
+import Home from './pages/landing/company/home';
+import About from './pages/landing/company/about';
+import Products from './pages/landing/company/Products';
+import Integrations from './pages/landing/company/integrations';
+import Terms from './pages/landing/company/Terms';
+import Privacy from './pages/landing/company/Privacy';
+import Pricing from './pages/landing/company/Pricing';
+import Story from './pages/landing/company/story';
+import FAQ from './pages/landing/company/faq';
+
+// Features routes
+import SellProducts from './pages/landing/features/sell-products';
+import SellSubscriptions from './pages/landing/features/sell-subscriptions';
+import SellWhatsApp from './pages/landing/features/sell-whatsapp';
+import SellWebsite from './pages/landing/features/sell-website';
 
 // Settings routes
 import Settings from '@/pages/portal/settings/settings';
@@ -77,6 +86,16 @@ const AppRouter = () => (
                     <Route path="/integrations" element={<Integrations />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/pricing" element={<Pricing />} />
+                    <Route path="/story" element={<Story />} />
+                    <Route path="/faq" element={<FAQ />} />
+
+                    {/* Features routes */}
+                    <Route path="/sell-products" element={<SellProducts />} />
+                    <Route path="/sell-subscriptions" element={<SellSubscriptions />} />
+                    <Route path="/sell-whatsapp" element={<SellWhatsApp />} />
+                    <Route path="/sell-website" element={<SellWebsite />} />
+
                     {/* Login/Signup routes */}
                     <Route path="/sign-in" element={<Signin />} />
                     <Route path="/log-in" element={<Login />} />

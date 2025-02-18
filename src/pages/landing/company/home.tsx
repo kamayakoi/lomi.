@@ -5,8 +5,12 @@ import { TopBanner } from '@/components/landing/top-banner'
 import { Footer } from '@/components/landing/Footer'
 import ThreeDImage from '@/components/landing/3d-image'
 import { ButtonCta } from "@/components/landing/button-cta"
+import { useNavigate } from 'react-router-dom'
+import CookieConsent from '@/components/ui/tracking-cookie'
 
 export default function Page() {
+  const navigate = useNavigate()
+
   useEffect(() => {
     // Check if user has explicitly set a theme preference
     const storedTheme = localStorage.getItem('theme')
@@ -16,7 +20,21 @@ export default function Page() {
       document.documentElement.classList.add('dark')
       localStorage.setItem('theme', 'dark')
     }
-  }, [])
+
+    // Add keyboard event listener
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        navigate('/sign-in')
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [navigate])
 
   return (
     <div className="overflow-hidden">
@@ -62,6 +80,7 @@ export default function Page() {
           <Footer />
         </div>
       </main>
+      <CookieConsent />
     </div>
   )
 }

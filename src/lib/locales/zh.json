@@ -18,7 +18,7 @@
             "support": "支持",
             "privacy": "隐私政策",
             "terms": "条款和条件",
-            "branding": "品牌",
+            "branding": "品牌资产",
             "featureRequest": "请求功能 | 集成",
             "review": "给我们评价"
         },
@@ -34,7 +34,8 @@
         },
         "status": "系统运行正常",
         "copyright": "版权所有 © 2025 — lomi.africa",
-        "star": "星标"
+        "star": "星标",
+        "emailCopied": "电子邮件地址已复制！"
     },
     "hero": {
         "buttons": {
