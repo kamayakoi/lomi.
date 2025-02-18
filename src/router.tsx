@@ -38,13 +38,13 @@ import Reporting from './pages/portal/reporting/Reporting';
 import Product from './pages/portal/product/Product';
 
 // Website routes
-import Home from './pages/landing/company/home';
+import Home from './pages/landing/home';
 import About from './pages/landing/company/about';
-import Products from './pages/landing/company/Products';
+import Products from './pages/landing/company/products';
 import Integrations from './pages/landing/company/integrations';
-import Terms from './pages/landing/company/Terms';
-import Privacy from './pages/landing/company/Privacy';
-import Pricing from './pages/landing/company/Pricing';
+import Terms from './pages/landing/company/terms';
+import Privacy from './pages/landing/company/privacy';
+import Pricing from './pages/landing/company/pricing';
 import Story from './pages/landing/company/story';
 import FAQ from './pages/landing/company/faq';
 
