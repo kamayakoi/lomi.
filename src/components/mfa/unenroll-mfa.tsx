@@ -1,4 +1,4 @@
-import { MFAList } from "./mfa-list";
+import { MFA } from "./mfa";
 
 interface UnenrollMFAProps {
   onUnenrollComplete?: () => void;
@@ -7,7 +7,7 @@ interface UnenrollMFAProps {
 export function UnenrollMFA({ onUnenrollComplete }: UnenrollMFAProps) {
   return (
     <div>
-      <MFAList onUnenrollComplete={onUnenrollComplete} />
+      <MFA onUnenrollComplete={onUnenrollComplete} />
     </div>
   );
 }

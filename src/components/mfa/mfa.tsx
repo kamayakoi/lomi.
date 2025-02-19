@@ -147,7 +147,7 @@ export function MFA({ onUnenrollComplete }: MFAProps) {
                                 >
                                     <div>
                                         <p className="font-medium">
-                                            {factor.friendly_name || 'Authenticator App'}
+                                            {factor.friendly_name || 'Authenticator'}
                                         </p>
                                         <p className="text-sm text-muted-foreground">
                                             Added on {new Date(factor.created_at).toLocaleDateString()}
@@ -245,7 +245,7 @@ function MFASetup({ onComplete, onCancel }: MFASetupProps) {
                 const { data, error } = await supabase.auth.mfa.enroll({
                     factorType: "totp",
                     issuer: "lomi.africa",
-                    friendlyName: `Authenticator (${timestamp})`
+                    friendlyName: `Authenticator n—${timestamp}`
                 });
 
                 if (error) {

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MFA } from "./mfa";
+import { UnenrollMFA } from "./unenroll-mfa";
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SetupMfa } from "./setup-mfa";
@@ -60,7 +60,13 @@ export function MfaSettingsList() {
       </CardHeader>
 
       <CardContent>
-        <MFA />
+        {hasMFA ? (
+          <UnenrollMFA onUnenrollComplete={checkMFAStatus} />
+        ) : (
+          <div className="text-sm text-muted-foreground">
+            No MFA devices configured. Add a device to enable two-factor authentication.
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="flex justify-between">
