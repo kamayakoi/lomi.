@@ -5,7 +5,7 @@ import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 
-const GITHUB_REPO_URL = 'https://github.com/lomiafrica/lomi.'
+const GITHUB_REPO_URL = 'https://github.com/lomiafrica/lomi%2E'
 
 export const GitHubStarButton: React.FC = () => {
     const [stars, setStars] = useState<number | null>(null)

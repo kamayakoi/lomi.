@@ -360,7 +360,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                     {displayMode === 'desktop' && (
                         <div className="mt-8 text-left">
                             <span className="text-sm text-gray-500 font-semibold inline-flex items-center">
-                                Powered by <img src="/company/transparent_white.webp" alt="lomi." className="h-8 w-8 ml-1" />
+                                Powered by <img src="/company/transparent_dark.webp" alt="lomi." className="h-8 w-8 ml-1" />
                             </span>
                             <div className="mt-2 text-xs flex items-center justify-between">
                                 <div className="space-x-2">
@@ -384,12 +384,12 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         {allowedPaymentMethods.includes('CARDS') && (
                             <button className="flex items-center justify-between p-4 border rounded-none transition-colors border-gray-200 dark:text-black">
                                 <div className="flex items-center">
-                                    <img src="/cards.webp" alt="Cards" className="w-8 h-8 mr-3" />
+                                    <img src="/payment_channels/visa.webp" alt="Cards" className="w-8 h-8 mr-3" />
                                     <span className="text-lg font-medium">Cards</span>
                                 </div>
                                 <div className="flex space-x-2">
-                                    <img src="/checkout-visa.webp" alt="Visa" className="h-6" />
-                                    <img src="/checkout-mastercard.webp" alt="Mastercard" className="h-6" />
+                                    <img src="/payment_channels/visa.webp" alt="Visa" className="h-6" />
+                                    <img src="/payment_channels/mastercard.webp" alt="Mastercard" className="h-6" />
                                 </div>
                             </button>
                         )}

@@ -141,10 +141,10 @@ export function UserNav() {
           <DropdownMenuItem onClick={() => navigate('/portal/settings/billing/statements')}>
             {t('portal.user_nav.billing')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('')}>
+          <DropdownMenuItem onClick={() => navigate('https://developers.lomi.africa/docs/support/contact')}>
             {t('portal.user_nav.support')}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('')}>
+          <DropdownMenuItem onClick={() => navigate('https://developers.lomi.africa/docs/introduction/what-is-lomi/')}>
             {t('portal.user_nav.developers')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
@@ -153,6 +153,6 @@ export function UserNav() {
           {t('portal.user_nav.log_out')}
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu >
   );
 }

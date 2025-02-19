@@ -12,14 +12,11 @@ import { useTranslation } from 'react-i18next'
 import { ProductHuntBadge } from '@/components/design/product-hunt-badge'
 import { cn } from "@/lib/actions/utils"
 import { BackgroundText } from './background-text'
-import { useToast } from "@/lib/hooks/use-toast"
-import { ToastTitle, ToastDescription } from "@/components/ui/toast"
 
 // GitHub repository URL constant
-const GITHUB_REPO_URL = 'https://github.com/lomiafrica/lomi.'
-const GITHUB_API_URL = 'https://api.github.com/repos/lomiafrica/lomi.'
+const GITHUB_REPO_URL = 'https://github.com/lomiafrica/lomi%2E'
+const GITHUB_API_URL = 'https://api.github.com/repos/lomiafrica/lomi%2E'
 const BRAND_ASSETS_URL = '/assets/lomi.brand.zip'
-const FEATURE_REQUEST_EMAIL = 'hello@lomi.africa'
 
 export function Footer() {
     const { t } = useTranslation()
@@ -29,7 +26,6 @@ export function Footer() {
     const [isLoading, setIsLoading] = useState(true)
     const [isVisible, setIsVisible] = useState(false)
     const [scrollProgress, setScrollProgress] = useState(0)
-    const { toast } = useToast()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -138,38 +134,6 @@ export function Footer() {
         document.body.removeChild(link)
     }
 
-    const handleFeatureRequest = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        e.preventDefault()
-        navigator.clipboard.writeText(FEATURE_REQUEST_EMAIL).then(() => {
-            toast({
-                title: t('footer.emailCopied', 'Email copied!'),
-                description: FEATURE_REQUEST_EMAIL,
-                duration: 3000,
-                children: (
-                    <div className="flex items-start gap-3">
-                        <div className="flex-1">
-                            <ToastTitle>{t('footer.emailCopied', 'Email copied!')}</ToastTitle>
-                            <ToastDescription>{FEATURE_REQUEST_EMAIL}</ToastDescription>
-                        </div>
-                    </div>
-                )
-            })
-        }).catch(() => {
-            toast({
-                variant: "destructive",
-                duration: 3000,
-                children: (
-                    <div className="flex items-start gap-3">
-                        <div className="flex-1">
-                            <ToastTitle>Failed to copy</ToastTitle>
-                            <ToastDescription>Please copy the email manually: {FEATURE_REQUEST_EMAIL}</ToastDescription>
-                        </div>
-                    </div>
-                )
-            })
-        })
-    }
-
     // Return a simpler version during SSR
     if (!mounted) {
         return (
@@ -266,18 +230,17 @@ export function Footer() {
                                 <ul className="space-y-3">
                                     {[
                                         { name: t('footer.resources.github'), link: GITHUB_REPO_URL },
-                                        { name: t('footer.resources.support'), link: 'https://discord.gg/33syDfh9', target: '_blank', rel: 'noopener noreferrer' },
+                                        { name: t('footer.resources.support'), link: 'https://developers.lomi.africa/docs/support/contact', target: '_blank', rel: 'noopener noreferrer' },
                                         { name: t('footer.resources.privacy'), link: '/privacy' },
                                         { name: t('footer.resources.terms'), link: '/terms' },
                                         { name: t('footer.resources.branding'), link: BRAND_ASSETS_URL, onClick: handleBrandingDownload },
-                                        { name: t('footer.resources.featureRequest'), link: `mailto:${FEATURE_REQUEST_EMAIL}`, onClick: handleFeatureRequest, title: FEATURE_REQUEST_EMAIL },
+                                        { name: t('footer.resources.featureRequest'), link: 'https://github.com/lomiafrica/lomi./issues/new?labels=enhancement' },
                                         { name: t('footer.resources.review'), link: 'https://www.producthunt.com/products/lomi/reviews/new' }
                                     ].map((item) => (
                                         <li key={item.name}>
                                             <Link
                                                 to={item.link}
                                                 onClick={item.onClick}
-                                                title={item.title}
                                                 className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors"
                                             >
                                                 {item.name}
@@ -294,7 +257,7 @@ export function Footer() {
                                     {[
                                         { name: t('footer.company.story'), link: '/story', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
                                         { name: t('footer.company.blog'), link: '#', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
-                                        { name: t('footer.company.openSource'), link: 'https://developers.lomi.africa/git-integration/getting-started', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
+                                        { name: t('footer.company.openSource'), link: 'https://developers.lomi.africa/docs/freedom/open-source', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
                                     ].map((item) => (
                                         <li key={item.name}>
                                             <Link to={item.link} className={`${item.color} transition-colors`}>
@@ -341,7 +304,7 @@ export function Footer() {
                                             <span className="sr-only">Suivez-nous sur Twitter</span>
                                         </Link>
                                         <Link
-                                            to="https://github.com/lomiafrica/lomi%2E"
+                                            to="https://www.producthunt.com/products/lomi/reviews"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-zinc-700 dark:text-zinc-300 hover:text-[#DA552F] dark:hover:text-[#DA552F] inline-flex items-center transition-colors"
@@ -361,10 +324,10 @@ export function Footer() {
                                             <span className="sr-only">Consultez notre code sur GitHub</span>
                                         </Link>
                                         <Link
-                                            to="https://lomi.slack.com"
+                                            to=""
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#36C5F0] dark:hover:text-[#36C5F0] items-center transition-colors"
+                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#36C5F0] d<ark:hover:text-[#36C5F0] items-center transition-colors"
                                             aria-label="Rejoignez notre communauté Slack"
                                         >
                                             <SlackIcon className="h-[20px] w-[20px]" />

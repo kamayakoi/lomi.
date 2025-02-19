@@ -15,6 +15,7 @@ dist/
 dist-ssr/
 build/
 out/
+polar/
 
 # Local environment files
 .env
