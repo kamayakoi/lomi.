@@ -12,8 +12,7 @@ import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from '@/components/custom/button';
 import { cn } from '@/lib/actions/utils';
-import { MfaSettingsList } from "@/components/mfa/mfa-settings-list";
-
+import { MFA } from "@/components/mfa/mfa";
 interface MerchantDetails {
     merchant_id: string;
     name: string;
@@ -882,7 +881,7 @@ function Profile() {
                         </div>
 
                         <div className="space-y-4">
-                            <MfaSettingsList />
+                            <MFA />
                         </div>
 
                         <p className="text-sm text-muted-foreground mt-4">
