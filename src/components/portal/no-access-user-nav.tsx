@@ -1,4 +1,4 @@
-import { useUser } from '@/lib/hooks/use-user-context';
+import { useUser } from '@/lib/hooks/use-user';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/custom/button';

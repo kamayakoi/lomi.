@@ -1,5 +1,5 @@
 import { supabase } from '@/utils/supabase/client';
-import { CheckoutData, CustomerDetails } from './types';
+import { CheckoutData } from './types';
 
 export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData | null> {
     try {
@@ -115,25 +115,44 @@ export const fetchOrganizationDetails = async (organizationId: string) => {
 export const createOrUpdateCustomer = async (
     merchantId: string,
     organizationId: string,
-    customerDetails: CustomerDetails
+    customerDetails: {
+        firstName?: string;
+        lastName?: string;
+        name?: string;
+        email?: string;
+        phoneNumber?: string;
+        countryCode?: string;
+        whatsappNumber?: string;
+        country?: string;
+        city?: string;
+        address?: string;
+        postalCode?: string;
+    }
 ): Promise<string | null> => {
-    const { data, error } = await supabase.rpc('create_or_update_customer', {
-        p_merchant_id: merchantId,
-        p_organization_id: organizationId,
-        p_name: customerDetails.name,
-        p_email: customerDetails.email,
-        p_phone_number: customerDetails.countryCode + customerDetails.phoneNumber,
-        p_whatsapp_number: customerDetails.whatsappNumber,
-        p_country: customerDetails.country,
-        p_city: customerDetails.city,
-        p_address: customerDetails.address,
-        p_postal_code: customerDetails.postalCode,
-    });
+    try {
+        const { data, error } = await supabase.rpc('create_or_update_customer', {
+            p_merchant_id: merchantId,
+            p_organization_id: organizationId,
+            p_name: customerDetails.name || `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+            p_email: customerDetails.email,
+            p_phone_number: customerDetails.countryCode
+                ? customerDetails.countryCode + customerDetails.phoneNumber
+                : customerDetails.phoneNumber,
+            p_whatsapp_number: customerDetails.whatsappNumber,
+            p_country: customerDetails.country,
+            p_city: customerDetails.city,
+            p_address: customerDetails.address,
+            p_postal_code: customerDetails.postalCode,
+        });
 
-    if (error) {
+        if (error) {
+            console.error('Error creating or updating customer:', error);
+            return null;
+        }
+
+        return data;
+    } catch (error) {
         console.error('Error creating or updating customer:', error);
         return null;
     }
-
-    return data;
 };

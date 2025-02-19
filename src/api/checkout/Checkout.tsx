@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useParams } from 'react-router-dom'
-import { fetchDataForCheckout, fetchOrganizationDetails } from './SupportCheckout'
+import { fetchDataForCheckout, fetchOrganizationDetails, createOrUpdateCustomer } from './SupportCheckout'
 import { CheckoutData } from './types'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
@@ -253,21 +253,24 @@ export default function CheckoutPage() {
 
         if (checkoutData) {
             try {
-                const { data: newCustomerId, error } = await supabase.rpc('create_or_update_customer', {
-                    p_merchant_id: checkoutData.paymentLink.merchantId,
-                    p_organization_id: checkoutData.paymentLink.organizationId,
-                    p_name: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
-                    p_email: customerDetails.email,
-                    p_phone_number: customerDetails.phoneNumber,
-                    p_whatsapp_number: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
-                    p_country: customerDetails.country,
-                    p_city: customerDetails.city,
-                    p_address: customerDetails.address,
-                    p_postal_code: customerDetails.postalCode
-                });
+                const newCustomerId = await createOrUpdateCustomer(
+                    checkoutData.paymentLink.merchantId,
+                    checkoutData.paymentLink.organizationId,
+                    {
+                        firstName: customerDetails.firstName,
+                        lastName: customerDetails.lastName,
+                        email: customerDetails.email,
+                        phoneNumber: customerDetails.phoneNumber,
+                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                        country: customerDetails.country,
+                        city: customerDetails.city,
+                        address: customerDetails.address,
+                        postalCode: customerDetails.postalCode
+                    }
+                );
 
-                if (error) {
-                    console.error('Error creating/updating customer:', error);
+                if (!newCustomerId) {
+                    console.error('Failed to create/update customer');
                     return;
                 }
 

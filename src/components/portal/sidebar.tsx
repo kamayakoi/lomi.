@@ -15,12 +15,14 @@ import { useTranslation } from 'react-i18next'
 import { PlusIcon } from 'lucide-react'
 import { supabase } from '@/utils/supabase/client'
 import { CreateOrganizationDialog } from './create-organization-dialog'
+import { useUser } from '@/lib/hooks/use-user'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useNavigate } from 'react-router-dom'
+import { sidebarCache } from '@/utils/cache/sidebar-cache'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -40,6 +42,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const { theme, setTheme } = useTheme()
   const { isActivated } = useActivationStatus()
   const { sidebarData } = useSidebarData()
+  const { user } = useUser()
   const sidelinks = useSidelinks()
   const { t } = useTranslation()
 
@@ -86,8 +89,12 @@ export default function Sidebar({ className }: SidebarProps) {
   const handleOrganizationSwitch = async (orgId: string) => {
     if (orgId === sidebarData?.organizationId) return;
 
-    navigate(`${window.location.pathname}?org=${orgId}`, { replace: true });
+    // Invalidate the cache before switching
+    if (user?.id) {
+      await sidebarCache.del(user.id, sidebarData?.organizationId || undefined);
+    }
 
+    navigate(`${window.location.pathname}?org=${orgId}`, { replace: true });
     window.location.reload();
   };
 

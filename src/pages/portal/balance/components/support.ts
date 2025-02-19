@@ -214,7 +214,7 @@ export function useBalance(userId: string | null) {
 
 export async function fetchBankAccounts(merchantId: string): Promise<BankAccount[]> {
     try {
-        const { data, error } = await supabase.rpc('fetch_bank_accounts', {
+        const { data, error } = await supabase.rpc('fetch_merchant_bank_accounts', {
             p_merchant_id: merchantId,
         })
 
