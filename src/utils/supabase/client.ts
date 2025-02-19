@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, Session } from '@supabase/supabase-js'
 
 // Use import.meta.env for client-side code
 const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
@@ -12,44 +12,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
+    storageKey: 'supabase.auth.token',
+    storage: window.localStorage,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
-    storage: {
-      getItem: (key: string) => {
-        try {
-          if (typeof window !== 'undefined') {
-            const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : null;
-          }
-          return null;
-        } catch (error) {
-          console.error('Error reading from storage:', error);
-          return null;
-        }
-      },
-      setItem: (key: string, value: string) => {
-        try {
-          if (typeof window !== 'undefined') {
-            window.localStorage.setItem(key, JSON.stringify(value));
-          }
-        } catch (error) {
-          console.error('Error writing to storage:', error);
-        }
-      },
-      removeItem: (key: string) => {
-        try {
-          if (typeof window !== 'undefined') {
-            window.localStorage.removeItem(key);
-          }
-        } catch (error) {
-          console.error('Error removing from storage:', error);
-        }
-      },
-    },
+    flowType: 'pkce'
   },
-  // Add client-side fetch options
   global: {
+    headers: {
+      'x-client-info': 'lomi-dashboard'
+    },
     fetch: (url, init) => {
       return fetch(url, {
         ...init,
@@ -60,6 +32,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     }
   }
 })
+
+// Cache the session promise to prevent multiple fetches
+let sessionPromise: Promise<Session | null> | null = null;
+
+export const getSession = async () => {
+  if (!sessionPromise) {
+    sessionPromise = supabase.auth.getSession().then(({ data }) => data.session);
+    // Reset the promise after 5 minutes to ensure fresh data
+    setTimeout(() => {
+      sessionPromise = null;
+    }, 5 * 60 * 1000);
+  }
+  return sessionPromise;
+}
 
 // Helper function for email updates
 export const updateUserEmail = async (newEmail: string) => {
@@ -129,12 +115,4 @@ export const signInWithGithub = async () => {
   return { data, error }
 }
 
-
-export const checkSession = async () => {
-  const { data, error } = await supabase.auth.getSession()
-  if (error) {
-    console.error('Error checking session:', error)
-    return null
-  }
-  return data.session
-}
+export default supabase;
