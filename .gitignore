@@ -16,6 +16,7 @@ dist-ssr/
 build/
 out/
 polar/
+midday/
 
 # Local environment files
 .env

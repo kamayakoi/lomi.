@@ -87,43 +87,76 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE OR REPLACE FUNCTION public.create_or_update_customer(
     p_merchant_id UUID,
     p_organization_id UUID,
-    p_name VARCHAR,
-    p_email VARCHAR,
-    p_phone_number VARCHAR,
-    p_whatsapp_number VARCHAR,
-    p_country VARCHAR,
-    p_city VARCHAR,
-    p_address VARCHAR,
-    p_postal_code VARCHAR
+    p_name TEXT,
+    p_email TEXT DEFAULT NULL,
+    p_phone_number TEXT DEFAULT NULL,
+    p_whatsapp_number TEXT DEFAULT NULL,
+    p_country TEXT DEFAULT NULL,
+    p_city TEXT DEFAULT NULL,
+    p_address TEXT DEFAULT NULL,
+    p_postal_code TEXT DEFAULT NULL
 )
-RETURNS UUID AS $$
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 DECLARE
     v_customer_id UUID;
 BEGIN
-    -- Check if the customer already exists
+    -- Try to find existing customer by phone or email
     SELECT customer_id INTO v_customer_id
     FROM customers
-    WHERE email = p_email AND merchant_id = p_merchant_id AND organization_id = p_organization_id;
+    WHERE merchant_id = p_merchant_id
+    AND organization_id = p_organization_id
+    AND (
+        (p_phone_number IS NOT NULL AND phone_number = p_phone_number)
+        OR (p_email IS NOT NULL AND email = p_email)
+    )
+    LIMIT 1;
 
-    IF v_customer_id IS NULL THEN
-        -- Customer doesn't exist, create a new one
-        INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, whatsapp_number, country, city, address, postal_code)
-        VALUES (p_merchant_id, p_organization_id, p_name, p_email, p_phone_number, p_whatsapp_number, p_country, p_city, p_address, p_postal_code)
-        RETURNING customer_id INTO v_customer_id;
-    ELSE
-        -- Customer exists, update their details
+    IF FOUND THEN
+        -- Update existing customer
         UPDATE customers
         SET name = p_name,
-            phone_number = p_phone_number,
-            whatsapp_number = p_whatsapp_number,
-            country = p_country,
-            city = p_city,
-            address = p_address,
-            postal_code = p_postal_code,
+            email = COALESCE(p_email, email),
+            phone_number = COALESCE(p_phone_number, phone_number),
+            whatsapp_number = COALESCE(p_whatsapp_number, whatsapp_number),
+            country = COALESCE(p_country, country),
+            city = COALESCE(p_city, city),
+            address = COALESCE(p_address, address),
+            postal_code = COALESCE(p_postal_code, postal_code),
             updated_at = NOW()
         WHERE customer_id = v_customer_id;
+    ELSE
+        -- Create new customer
+        INSERT INTO customers (
+            merchant_id,
+            organization_id,
+            name,
+            email,
+            phone_number,
+            whatsapp_number,
+            country,
+            city,
+            address,
+            postal_code
+        )
+        VALUES (
+            p_merchant_id,
+            p_organization_id,
+            p_name,
+            p_email,
+            p_phone_number,
+            p_whatsapp_number,
+            p_country,
+            p_city,
+            p_address,
+            p_postal_code
+        )
+        RETURNING customer_id INTO v_customer_id;
     END IF;
 
     RETURN v_customer_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+$$;

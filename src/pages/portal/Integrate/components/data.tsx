@@ -30,6 +30,20 @@ export const integrationOptions = [
     installLink: "#",
   },
   {
+    title: "Xero",
+    description: "Integrating with Xero allows you to synchronize lomi. transactions and payment processing in your bookkeeping software.",
+    link: "#",
+    logo: <img src="/integrations/xero.webp" alt="Xero" className="w-12 h-12 object-contain" />,
+    installLink: "#",
+  },
+  {
+    title: "Zapier",
+    description: "Zapier lets you connect lomi. to other apps and automate powerful workflows.",
+    link: "#",
+    logo: <img src="/integrations/zapier.webp" alt="Zapier" className="w-12 h-12 object-contain" />,
+    installLink: "#",
+  },
+  {
     title: "WhatsApp",
     description: "Accept payments directly on WhatsApp with our generated storefront pages.",
     link: "#",

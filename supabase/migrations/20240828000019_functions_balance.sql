@@ -66,7 +66,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to fetch bank accounts for a specific merchant
-CREATE OR REPLACE FUNCTION public.fetch_bank_accounts(
+CREATE OR REPLACE FUNCTION public.fetch_merchant_bank_accounts(
     p_merchant_id UUID
 )
 RETURNS TABLE (
