@@ -119,7 +119,7 @@ export function MFA({ onUnenrollComplete }: MFAProps) {
                     type="info"
                 >
                     Two-factor authentication is currently only available for accounts created with email authentication.
-                    Users signed in with Google or GitHub will need to use email/password authentication to enable 2FA.
+                    Merchants signed in with Google or GitHub will need to use sign-in via email and password to see 2FA challenges.
                 </InfoBox>
             )}
 

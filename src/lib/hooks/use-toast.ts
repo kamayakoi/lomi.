@@ -4,10 +4,11 @@ import * as React from "react"
 import type {
   ToastActionElement,
   ToastProps,
+  ToastVariant,
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 2000 // Match this with the progress animation duration
+const TOAST_REMOVE_DELAY = 1000000
 const DEFAULT_TOAST_DURATION = 2000 // Add this to ensure consistency
 
 type ToasterToast = ToastProps & {
@@ -15,6 +16,7 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  variant?: ToastVariant
   duration?: number
 }
 
@@ -28,7 +30,7 @@ const actionTypes = {
 let count = 0
 
 function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER
+  count = (count + 1) % Number.MAX_VALUE
   return count.toString()
 }
 

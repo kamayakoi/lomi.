@@ -67,7 +67,7 @@ export default function InfoBox({
                         <h4 className={cn("font-semibold mb-2", variantStyles[safeVariant].icon)}>
                             {title}
                         </h4>
-                        <div className={cn("text-[15px] leading-relaxed", variantStyles[safeVariant].text)}>
+                        <div className={cn("text-[12px] leading-relaxed", variantStyles[safeVariant].text)}>
                             {children}
                         </div>
                     </div>
@@ -75,7 +75,7 @@ export default function InfoBox({
             ) : (
                 <>
                     <Icon className={cn("h-5 w-5 flex-shrink-0", variantStyles[safeVariant].icon)} />
-                    <div className={cn("text-[15px]", variantStyles[safeVariant].text)}>
+                    <div className={cn("text-[10px]", variantStyles[safeVariant].text)}>
                         {children}
                         {link && (
                             <span className="border-b border-white/20 hover:border-white/40 ml-1">
