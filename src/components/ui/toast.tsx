@@ -28,12 +28,12 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-border dark:border-gray-800 bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
-        destructive: "border-red-200 dark:border-red-900 bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
-        info: "border-yellow-200 dark:border-yellow-900/50 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full",
-        notice: "border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full",
-        success: "border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
-        api: "border-cyan-200 dark:border-cyan-900/50 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-800 dark:text-cyan-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
+        default: "border-gray-200 bg-white dark:bg-background dark:border-gray-800 text-gray-900 dark:text-gray-100 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
+        destructive: "border-red-300 bg-red-100 dark:bg-background dark:border-red-900 text-red-950 dark:text-red-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
+        info: "border-yellow-300 bg-yellow-100 dark:bg-yellow-900/20 text-yellow-950 dark:text-yellow-200 dark:border-yellow-900/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full",
+        notice: "border-blue-300 bg-blue-100 dark:bg-blue-900/20 text-blue-950 dark:text-blue-200 dark:border-blue-900/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full",
+        success: "border-emerald-300 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-950 dark:text-emerald-200 dark:border-emerald-900/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
+        api: "border-cyan-300 bg-cyan-100 dark:bg-cyan-900/20 text-cyan-950 dark:text-cyan-200 dark:border-cyan-900/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-bottom-full",
       },
     },
     defaultVariants: {
@@ -83,7 +83,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-1 top-2 rounded-md p-0.5 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-1 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "absolute right-1 top-2 rounded-md p-0.5 text-gray-500 dark:text-gray-400 opacity-0 transition-opacity hover:text-gray-900 dark:hover:text-gray-200 focus:opacity-100 focus:outline-none focus:ring-1 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
       className
     )}
     toast-close=""
@@ -100,7 +100,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold text-gray-200 [&+div]:text-xs mb-0.5", className)}
+    className={cn("text-sm font-semibold text-gray-950 dark:text-gray-200 [&+div]:text-xs mb-0.5", className)}
     {...props}
   />
 ))
@@ -112,7 +112,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-xs text-gray-400 leading-relaxed mb-1", className)}
+    className={cn("text-xs text-gray-800 dark:text-gray-400 leading-relaxed mb-1", className)}
     {...props}
   />
 ))

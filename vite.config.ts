@@ -1,5 +1,5 @@
 import path from "path";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import { terser } from 'rollup-plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -16,11 +16,16 @@ export default defineConfig(({ command }) => ({
           drop_console: true,
           pure_funcs: ['console.log'],
           passes: 2,
+          unsafe_arrows: true,
+          unsafe_methods: true
         },
         format: {
           comments: false,
+          indent_level: 0
         },
-        mangle: true,
+        mangle: {
+          properties: false
+        },
       }),
       obfuscatorPlugin({
         include: ["src/**/*.ts", "src/**/*.tsx"],
@@ -41,28 +46,34 @@ export default defineConfig(({ command }) => ({
           renameGlobals: false,
         },
       }),
-      // Only run visualizer in build
       visualizer({
-      filename: 'bundle-analysis.html',
-        open: false, // Don't open automatically
+        filename: 'bundle-analysis.html',
+        open: false,
         gzipSize: true,
         brotliSize: true,
+        template: 'treemap'
       }),
-      // Optimize compression only in production
       compression({
         algorithm: 'brotliCompress',
         ext: '.br',
-        threshold: 1024 // Increased threshold
+        threshold: 1024,
+        compressionOptions: { level: 11 }
       }),
     ] : []),
   ],
   base: '/',
   build: {
-    sourcemap: false,
+    target: ['es2015', 'safari12'],
     minify: 'terser',
+    sourcemap: command === 'serve',
     outDir: 'dist',
     emptyOutDir: true,
-    target: ['es2015', 'safari12'],
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 2000,
+    assetsInlineLimit: 4096,
+    modulePreload: {
+      polyfill: false
+    },
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
@@ -74,21 +85,42 @@ export default defineConfig(({ command }) => ({
             'react-dom',
             'framer-motion',
           ],
-          'ui': [
-            '@radix-ui',
-            '@shadcn',
+          'radix': [
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-checkbox',
+            '@radix-ui/react-collapsible',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-label',
+            '@radix-ui/react-navigation-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-radio-group',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-select',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-switch',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-toggle',
+            '@radix-ui/react-toggle-group',
+            '@radix-ui/react-tooltip'
           ],
         },
-        assetFileNames: 'assets/[name]-[hash][extname]',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp/i.test(ext)) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
       },
-    },
-    cssCodeSplit: true,
-    chunkSizeWarningLimit: 2000,
-    assetsInlineLimit: 4096, // 4kb
-    modulePreload: {
-      polyfill: false, // Disable polyfill to reduce size
     },
   },
   resolve: {
@@ -96,35 +128,75 @@ export default defineConfig(({ command }) => ({
       "@": path.resolve(__dirname, "./src"),
       "~": path.resolve(__dirname, "./src")
     },
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json']
   },
   server: {
     port: 5173,
-    strictPort: false,
+    strictPort: true,
+    host: true,
+    cors: true,
     hmr: {
       protocol: 'ws',
       host: 'localhost',
-      port: 24678,
-      timeout: 5000,
+      port: 5173,
+      timeout: 10000,
+      overlay: true,
+      clientPort: 5173,
+      path: 'hmr'
+    },
+    fs: {
+      strict: false,
+      allow: ['..']
+    },
+    watch: {
+      usePolling: false,
+      interval: 100
     },
     proxy: {
       "/api": {
         target: "http://localhost:4242",
         changeOrigin: true,
+        secure: false,
         ws: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
-      },
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            console.log('proxy error', err);
+          });
+
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('Sending Request:', req.method, req.url);
+          });
+
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log('Received Response:', proxyRes.statusCode, req.url);
+          });
+
+          // Handle WebSocket upgrade with type assertion
+          (proxy as any).on('upgrade', function(req: any, socket: any, head: any) {
+            if (this.ws) {
+              console.log('WebSocket connection upgraded');
+              (this as any).ws(req, socket, head);
+            }
+          });
+        }
+      }
     },
     headers: {
       'Cache-Control': 'no-store',
       'Access-Control-Allow-Origin': '*',
-    },
+      'Access-Control-Allow-Methods': 'GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+      'Access-Control-Allow-Credentials': 'true',
+      'Connection': 'keep-alive, Upgrade',
+      'Upgrade': 'websocket'
+    }
   },
   optimizeDeps: {
     include: [
-      'react', 
+      'react',
       'react-dom',
-      'framer-motion',
+      'framer-motion'
     ],
     exclude: [
       '@radix-ui/react-accordion',
@@ -149,6 +221,12 @@ export default defineConfig(({ command }) => ({
       '@radix-ui/react-toggle',
       '@radix-ui/react-toggle-group',
       '@radix-ui/react-tooltip'
-    ],
+    ]
   },
+  preview: {
+    port: 5173,
+    strictPort: true,
+    host: true,
+    cors: true
+  }
 }));

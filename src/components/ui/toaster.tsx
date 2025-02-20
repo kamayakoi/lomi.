@@ -30,31 +30,30 @@ function getToastIcon(variant: ToastVariant) {
   switch (variant) {
     case 'destructive':
       return <XCircle className={cn(
-        "h-5 w-5 text-red-500 dark:text-red-400",
+        "h-5 w-5 text-red-950 dark:text-red-400",
         "animate-[iconSlideIn_0.3s_ease-in-out]"
       )} />
     case 'info':
       return <AlertCircle className={cn(
-        "h-5 w-5 text-yellow-500 dark:text-yellow-400",
+        "h-5 w-5 text-yellow-950 dark:text-yellow-400",
         "animate-[iconSlideIn_0.3s_ease-in-out]"
       )} />
     case 'notice':
       return <InfoIcon className={cn(
-        "h-5 w-5 text-blue-500 dark:text-blue-400",
+        "h-5 w-5 text-blue-950 dark:text-blue-400",
         "animate-[iconSlideIn_0.3s_ease-in-out]"
       )} />
     case "api":
       return <Key className={cn(
-        "h-5 w-5 text-cyan-400 dark:text-cyan-400",
+        "h-5 w-5 text-cyan-950 dark:text-cyan-400",
         "animate-[iconSlideIn_0.3s_ease-in-out]"
       )} />
     default:
       return <CheckCircle2 className={cn(
-        "h-5 w-5 text-emerald-500 dark:text-emerald-400",
+        "h-5 w-5 text-emerald-950 dark:text-emerald-400",
         "animate-[iconSlideIn_0.3s_ease-in-out]"
       )} />
   }
-
 }
 
 export function Toaster() {
@@ -66,7 +65,7 @@ export function Toaster() {
       {toasts.map(function ({ id, title, description, action, variant = "default", ...props }) {
         return (
           <Toast key={id} {...props} variant={variant as ToastVariant}>
-            <div className="flex items-start gap-3 min-h-[2rem] w-fit">
+            <div className="flex items-start gap-3 min-h-[2rem] z-9999 w-fit">
               <div className="flex-shrink-0 flex items-center self-stretch pl-1">
                 {getToastIcon(variant as ToastVariant)}
               </div>

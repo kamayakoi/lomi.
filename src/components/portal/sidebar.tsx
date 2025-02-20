@@ -34,6 +34,34 @@ interface Organization {
   is_current: boolean;
 }
 
+function getLogoUrl(logoPath: string | null, orgName: string): string {
+  if (!logoPath) {
+    return `https://avatar.vercel.sh/${encodeURIComponent(orgName.toLowerCase())}?rounded=5`;
+  }
+
+  try {
+    // If it's already a full URL, use it directly
+    if (logoPath.startsWith('http')) {
+      return logoPath;
+    }
+
+    // Get the relative path if it's a full Supabase URL
+    const relativePath = logoPath.includes('https://')
+      ? logoPath.split('/logos/').pop()
+      : logoPath;
+
+    // Get the public URL from Supabase storage
+    const { data: { publicUrl } } = supabase.storage
+      .from('logos')
+      .getPublicUrl(relativePath || '');
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error getting logo URL:', error);
+    return `https://avatar.vercel.sh/${encodeURIComponent(orgName.toLowerCase())}?rounded=5`;
+  }
+}
+
 export default function Sidebar({ className }: SidebarProps) {
   const navigate = useNavigate()
   const [navOpened, setNavOpened] = useState(false)
@@ -58,11 +86,24 @@ export default function Sidebar({ className }: SidebarProps) {
 
         if (error) throw error;
 
-        const orgs = data.map((org: Organization) => ({
-          ...org,
-          is_current: Boolean(sidebarData?.organizationId) && org.organization_id === sidebarData?.organizationId
-        }));
+        const orgs = data.map((org: Organization) => {
+          // Clean up the logo URL if it exists
+          let logoUrl = org.organization_logo_url;
+          if (logoUrl && !logoUrl.startsWith('http')) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('logos')
+              .getPublicUrl(logoUrl);
+            logoUrl = publicUrl;
+          }
 
+          return {
+            ...org,
+            organization_logo_url: logoUrl,
+            is_current: Boolean(sidebarData?.organizationId) && org.organization_id === sidebarData?.organizationId
+          };
+        });
+
+        console.debug('Organizations with logos:', orgs);
         setOrganizations(orgs);
       } catch (error) {
         console.error('Error fetching organizations:', error);
@@ -70,6 +111,18 @@ export default function Sidebar({ className }: SidebarProps) {
     };
 
     fetchOrganizations();
+
+    // Listen for organization logo updates
+    const handleLogoUpdate = () => {
+      console.debug('Organization logo updated, refreshing organizations');
+      fetchOrganizations();
+    };
+
+    window.addEventListener('organization-logo-updated', handleLogoUpdate);
+
+    return () => {
+      window.removeEventListener('organization-logo-updated', handleLogoUpdate);
+    };
   }, [sidebarData?.organizationId]);
 
   const toggleTheme = () => {
@@ -97,6 +150,11 @@ export default function Sidebar({ className }: SidebarProps) {
     navigate(`${window.location.pathname}?org=${orgId}`, { replace: true });
     window.location.reload();
   };
+
+  // Find the current organization in the list
+  const currentOrganization = useMemo(() => {
+    return organizations.find(org => org.is_current);
+  }, [organizations]);
 
   return (
     <>
@@ -185,34 +243,24 @@ export default function Sidebar({ className }: SidebarProps) {
           />
 
           {/* Organization info */}
-          {sidebarData?.merchantName && (
+          {sidebarData?.organizationName && (
             <div className="relative">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="mt-auto hidden w-full border-t border-border/40 px-4 py-4 md:block hover:bg-accent/30 transition-all duration-200 focus:outline-none focus-visible:outline-none">
                     <div className="flex items-center space-x-3">
-                      {sidebarData.organizationLogo ? (
-                        <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
-                          <img
-                            src={sidebarData.organizationLogo}
-                            alt="Organization logo"
-                            className="h-full w-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.onerror = null; // Prevent infinite loop
-                              target.src = `https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName?.toLowerCase() || 'org')}?rounded=5`;
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
-                          <img
-                            src={`https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName.toLowerCase())}?rounded=5`}
-                            alt="Generated avatar"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      )}
+                      <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
+                        <img
+                          src={getLogoUrl(currentOrganization?.organization_logo_url || null, sidebarData.organizationName)}
+                          alt="Organization logo"
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.onerror = null;
+                            target.src = `https://avatar.vercel.sh/${encodeURIComponent(sidebarData.organizationName?.toLowerCase() || 'org')}?rounded=5`;
+                          }}
+                        />
+                      </div>
                       <div className="min-w-0 flex-1 text-left">
                         <div className="truncate text-sm font-medium">
                           {sidebarData.merchantName}
@@ -258,29 +306,16 @@ export default function Sidebar({ className }: SidebarProps) {
                         )}
                       >
                         <div className="h-[36px] w-[36px] rounded-[5px] bg-primary/5 ring-1 ring-border/50 group-hover:ring-border/70 transition-all duration-200 overflow-hidden">
-                          {org.organization_logo_url ? (
-                            <img
-                              src={(() => {
-                                const logoPath = org.organization_logo_url.includes('https://')
-                                  ? org.organization_logo_url.split('/logos/').pop()
-                                  : org.organization_logo_url;
-                                return supabase.storage.from('logos').getPublicUrl(logoPath || '').data.publicUrl;
-                              })()}
-                              alt={org.organization_name}
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null; // Prevent infinite loop
-                                target.src = `https://avatar.vercel.sh/${encodeURIComponent(org.organization_name?.toLowerCase() || 'org')}?rounded=5`;
-                              }}
-                            />
-                          ) : (
-                            <img
-                              src={`https://avatar.vercel.sh/${encodeURIComponent(org.organization_name.toLowerCase())}?rounded=5`}
-                              alt={org.organization_name}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
+                          <img
+                            src={getLogoUrl(org.organization_logo_url, org.organization_name)}
+                            alt={org.organization_name}
+                            className="h-full w-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = `https://avatar.vercel.sh/${encodeURIComponent(org.organization_name?.toLowerCase() || 'org')}?rounded=5`;
+                            }}
+                          />
                         </div>
                         <div className="min-w-0 flex-1 text-left">
                           <div className="truncate text-sm font-medium">
