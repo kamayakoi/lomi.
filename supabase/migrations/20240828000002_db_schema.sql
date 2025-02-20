@@ -398,7 +398,7 @@ CREATE INDEX idx_platform_provider_balance_currency_code ON platform_provider_ba
 CREATE INDEX idx_platform_provider_balance_provider_code ON platform_provider_balance(provider_code);
 COMMENT ON TABLE platform_provider_balance IS 'Tracks the balance for each provider in each currency';
 
--- Table to keep historical data
+-- Platform Provider Balance History table
 CREATE TABLE platform_provider_balance_history (
     history_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     provider_code provider_code NOT NULL,
@@ -438,7 +438,7 @@ CREATE TABLE merchant_products (
 CREATE INDEX idx_merchant_products_merchant_id ON merchant_products(merchant_id);
 CREATE INDEX idx_merchant_products_currency_code ON merchant_products(currency_code);
 CREATE INDEX idx_merchant_products_organization_id ON merchant_products(organization_id);
-
+CREATE INDEX idx_merchant_products_active ON merchant_products(product_id) WHERE display_on_storefront = true AND is_archived = false;
 
 COMMENT ON TABLE merchant_products IS 'Stores products and services offered by merchants';
 
@@ -467,6 +467,8 @@ CREATE TABLE subscription_plans (
 CREATE INDEX idx_subscription_plans_merchant_id ON subscription_plans(merchant_id);
 CREATE INDEX idx_subscription_plans_organization_id ON subscription_plans(organization_id);
 CREATE INDEX idx_subscription_plans_currency_code ON subscription_plans(currency_code);
+CREATE INDEX idx_subscription_plans_display ON subscription_plans(display_on_storefront);
+CREATE INDEX idx_subscription_plans_active_amount ON subscription_plans(amount) WHERE display_on_storefront = true;
 
 COMMENT ON TABLE subscription_plans IS 'Stores information about available subscription plans';
 COMMENT ON COLUMN subscription_plans.billing_frequency IS 'Frequency of billing for the subscription plan';
@@ -492,6 +494,8 @@ CREATE TABLE merchant_subscriptions (
 CREATE INDEX idx_merchant_subscriptions_plan_id ON merchant_subscriptions(plan_id);
 CREATE INDEX idx_merchant_subscriptions_customer_id ON merchant_subscriptions(customer_id);
 CREATE INDEX idx_merchant_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
+CREATE INDEX idx_merchant_subscriptions_status ON merchant_subscriptions(status);
+CREATE INDEX idx_merchant_subscriptions_active_date ON merchant_subscriptions(start_date, end_date) WHERE status = 'active';
 
 COMMENT ON TABLE merchant_subscriptions IS 'Stores information for recurring payments and subscriptions, including status and visual representation';
 COMMENT ON COLUMN merchant_subscriptions.next_billing_date IS 'The next billing date of the subscription';
@@ -575,6 +579,9 @@ CREATE INDEX idx_transactions_completed ON transactions(transaction_id) WHERE st
 CREATE INDEX idx_transactions_provider_code ON transactions(provider_code);
 CREATE INDEX idx_transactions_fee_reference ON transactions(fee_reference);
 CREATE INDEX idx_transactions_payment_method_provider ON transactions(payment_method_code, provider_code);
+CREATE INDEX idx_transactions_completed_date ON transactions(created_at) WHERE status = 'completed';
+CREATE INDEX idx_transactions_completed_provider ON transactions(provider_code, created_at) WHERE status = 'completed';
+CREATE INDEX idx_transactions_completed_amount ON transactions(gross_amount, created_at) WHERE status = 'completed';
 
 COMMENT ON TABLE transactions IS 'Records all financial transactions in the system';
 COMMENT ON COLUMN transactions.metadata IS 'Additional transaction-specific data in JSON format';
@@ -819,6 +826,8 @@ CREATE TABLE customer_invoices (
 CREATE INDEX idx_customer_invoices_merchant_id ON customer_invoices(merchant_id);
 CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id);
 CREATE INDEX idx_customer_invoices_currency_code ON customer_invoices(currency_code);
+CREATE INDEX idx_customer_invoices_status_amount ON customer_invoices(status, amount);
+CREATE INDEX idx_customer_invoices_pending ON customer_invoices(amount) WHERE status IN ('sent', 'overdue');
 
 COMMENT ON TABLE customer_invoices IS 'Stores invoice information for customers of merchants';
 

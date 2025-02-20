@@ -22,3 +22,26 @@ export type ThemeProviderState = {
 export function formatNumber(value: number): string {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
+
+/**
+ * Formats a number into a compact representation with a maximum of 1 decimal place
+ * Examples:
+ * - 1234 -> 1.2K
+ * - 1234567 -> 1.2M
+ * - 1234567890 -> 1.2B
+ */
+export function formatCompactNumber(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+export function formatCurrency(amount: number, currency = 'XOF'): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+} 

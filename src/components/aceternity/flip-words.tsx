@@ -1,4 +1,4 @@
-// Thank you: https://ui.aceternity.com/
+// Thank you: https://ui.aceternity.com
 
 import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";

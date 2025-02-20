@@ -1,4 +1,4 @@
-// Thank you: https://ui.aceternity.com/
+// Thank you: https://ui.aceternity.com
 
 import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";

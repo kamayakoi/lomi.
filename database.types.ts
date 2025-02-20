@@ -723,38 +723,44 @@ export type Database = {
       merchant_organization_links: {
         Row: {
           created_at: string
+          how_did_you_hear_about_us: string | null
           invitation_email: string | null
+          invitation_token: string | null
           merchant_id: string | null
           merchant_org_id: string
           organization_id: string
           organization_position: string | null
-          role: string
+          role: Database["public"]["Enums"]["member_role"]
           store_handle: string
-          team_status: string
+          team_status: Database["public"]["Enums"]["team_status"]
           updated_at: string
         }
         Insert: {
           created_at?: string
+          how_did_you_hear_about_us?: string | null
           invitation_email?: string | null
+          invitation_token?: string | null
           merchant_id?: string | null
           merchant_org_id?: string
           organization_id: string
           organization_position?: string | null
-          role: string
+          role: Database["public"]["Enums"]["member_role"]
           store_handle: string
-          team_status?: string
+          team_status?: Database["public"]["Enums"]["team_status"]
           updated_at?: string
         }
         Update: {
           created_at?: string
+          how_did_you_hear_about_us?: string | null
           invitation_email?: string | null
+          invitation_token?: string | null
           merchant_id?: string | null
           merchant_org_id?: string
           organization_id?: string
           organization_position?: string | null
-          role?: string
+          role?: Database["public"]["Enums"]["member_role"]
           store_handle?: string
-          team_status?: string
+          team_status?: Database["public"]["Enums"]["team_status"]
           updated_at?: string
         }
         Relationships: [
@@ -965,9 +971,7 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           email: string
-          has_2fa: boolean
           is_deleted: boolean
-          last_2fa_verification: string | null
           merchant_id: string
           merchant_lifetime_value: number
           metadata: Json | null
@@ -982,7 +986,6 @@ export type Database = {
           subscription_notifications: Json | null
           timezone: string
           total_retries: number | null
-          totp_secret: string | null
           updated_at: string
         }
         Insert: {
@@ -992,9 +995,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email: string
-          has_2fa?: boolean
           is_deleted?: boolean
-          last_2fa_verification?: string | null
           merchant_id?: string
           merchant_lifetime_value?: number
           metadata?: Json | null
@@ -1009,7 +1010,6 @@ export type Database = {
           subscription_notifications?: Json | null
           timezone?: string
           total_retries?: number | null
-          totp_secret?: string | null
           updated_at?: string
         }
         Update: {
@@ -1019,9 +1019,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           email?: string
-          has_2fa?: boolean
           is_deleted?: boolean
-          last_2fa_verification?: string | null
           merchant_id?: string
           merchant_lifetime_value?: number
           metadata?: Json | null
@@ -1036,7 +1034,6 @@ export type Database = {
           subscription_notifications?: Json | null
           timezone?: string
           total_retries?: number | null
-          totp_secret?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -2390,6 +2387,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_organization_metrics: {
+        Args: {
+          p_organization_id: string
+        }
+        Returns: {
+          mrr: number
+          arr: number
+          total_transactions: number
+          total_revenue: number
+        }[]
+      }
       check_activation_state: {
         Args: {
           p_merchant_id: string
@@ -2498,36 +2506,42 @@ export type Database = {
         }
         Returns: undefined
       }
-      create_or_update_customer:
+      create_or_update_customer: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+          p_name: string
+          p_email?: string
+          p_phone_number?: string
+          p_whatsapp_number?: string
+          p_country?: string
+          p_city?: string
+          p_address?: string
+          p_postal_code?: string
+        }
+        Returns: string
+      }
+      create_organization:
         | {
             Args: {
               p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email: string
-              p_phone_number: string
-              p_whatsapp_number: string
-              p_country: string
-              p_city: string
-              p_address: string
-              p_postal_code: string
+              p_name?: string
+              p_role?: Database["public"]["Enums"]["member_role"]
             }
-            Returns: string
+            Returns: {
+              organization_id: string
+              store_handle: string
+            }[]
           }
         | {
             Args: {
               p_merchant_id: string
-              p_organization_id: string
-              p_name: string
-              p_email?: string
-              p_phone_number?: string
-              p_whatsapp_number?: string
-              p_country?: string
-              p_city?: string
-              p_address?: string
-              p_postal_code?: string
+              p_role?: Database["public"]["Enums"]["member_role"]
             }
-            Returns: string
+            Returns: {
+              organization_id: string
+              store_handle: string
+            }[]
           }
       create_organization_webhook: {
         Args: {
@@ -3093,6 +3107,24 @@ export type Database = {
           total_count: number
         }[]
       }
+      fetch_merchant_bank_accounts: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          bank_account_id: string
+          account_number: string
+          account_name: string
+          bank_name: string
+          bank_code: string
+          branch_code: string
+          country: string
+          is_default: boolean
+          is_valid: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
       fetch_merchant_details: {
         Args: {
           p_user_id: string
@@ -3106,6 +3138,18 @@ export type Database = {
           pin_code: string
           onboarded: boolean
           preferred_language: string
+        }[]
+      }
+      fetch_merchant_organizations: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          organization_id: string
+          organization_name: string
+          organization_logo_url: string
+          merchant_role: string
+          is_current: boolean
         }[]
       }
       fetch_notifications: {
@@ -3393,6 +3437,7 @@ export type Database = {
       fetch_sidebar_data: {
         Args: {
           p_merchant_id: string
+          p_organization_id?: string
         }
         Returns: {
           organization_id: string
@@ -3490,6 +3535,21 @@ export type Database = {
           priority: Database["public"]["Enums"]["support_priority"]
           created_at: string
           updated_at: string
+        }[]
+      }
+      fetch_team_members: {
+        Args: {
+          p_organization_id: string
+        }
+        Returns: {
+          merchant_id: string
+          merchant_name: string
+          merchant_email: string
+          role: Database["public"]["Enums"]["member_role"]
+          team_status: Database["public"]["Enums"]["team_status"]
+          organization_position: string
+          invitation_email: string
+          created_at: string
         }[]
       }
       fetch_top_performing_products: {
@@ -3864,6 +3924,22 @@ export type Database = {
           message: string
         }[]
       }
+      invite_team_member: {
+        Args: {
+          p_organization_id: string
+          p_email: string
+          p_role: Database["public"]["Enums"]["member_role"]
+          p_position: string
+        }
+        Returns: undefined
+      }
+      is_organization_admin: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id: string
+        }
+        Returns: boolean
+      }
       log_event: {
         Args: {
           p_merchant_id: string
@@ -3907,6 +3983,19 @@ export type Database = {
           p_metadata?: Json
         }
         Returns: string
+      }
+      reactivate_merchant: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: undefined
+      }
+      remove_team_member: {
+        Args: {
+          p_organization_id: string
+          p_merchant_id: string
+        }
+        Returns: undefined
       }
       rollover_provider_balance_quarterly: {
         Args: Record<PropertyKey, never>
@@ -3977,6 +4066,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      soft_delete_merchant: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: undefined
+      }
       test_organization_webhook: {
         Args: {
           p_webhook_id: string
@@ -4027,6 +4122,16 @@ export type Database = {
           p_organization_id: string
           p_document_type: string
           p_document_url: string
+        }
+        Returns: undefined
+      }
+      update_merchant_2fa: {
+        Args: {
+          p_merchant_id: string
+          p_totp_secret: string
+          p_has_2fa: boolean
+          p_last_2fa_verification?: string
+          p_name?: string
         }
         Returns: undefined
       }
@@ -4199,6 +4304,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      update_team_member_role: {
+        Args: {
+          p_organization_id: string
+          p_merchant_id: string
+          p_new_role: Database["public"]["Enums"]["member_role"]
+        }
+        Returns: boolean
+      }
       update_transaction_status:
         | {
             Args: {
@@ -4350,6 +4463,7 @@ export type Database = {
         | "approved"
         | "rejected"
       link_type: "product" | "plan" | "instant"
+      member_role: "Admin" | "Member"
       notification_type:
         | "onboarding"
         | "tip"
@@ -4417,6 +4531,7 @@ export type Database = {
         | "other"
       support_priority: "low" | "normal" | "high" | "urgent"
       support_status: "open" | "in_progress" | "resolved" | "closed"
+      team_status: "active" | "invited" | "inactive"
       ticket_status: "open" | "resolved" | "closed"
       transaction_status: "pending" | "completed" | "failed" | "refunded"
       transaction_type: "payment" | "instalment"

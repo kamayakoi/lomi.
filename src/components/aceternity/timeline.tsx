@@ -1,4 +1,4 @@
-// Thank you: https://ui.aceternity.com/
+// Thank you: https://ui.aceternity.com
 
 import {
     useScroll,
