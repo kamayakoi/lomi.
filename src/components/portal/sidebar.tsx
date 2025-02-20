@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator"
 import { useActivationStatus } from '@/lib/hooks/use-activation-status'
 import { useTranslation } from 'react-i18next'
 import { OrgSwitcher } from './org-switcher'
+import { SidebarActionButton } from './sidebar-action-button'
 
 type SidebarProps = React.HTMLAttributes<HTMLElement>
 
@@ -125,6 +126,12 @@ export default function Sidebar({ className }: SidebarProps) {
             closeNav={() => setNavOpened(false)}
             links={filteredLinks}
           />
+
+          {/* Action Buttons */}
+          <div className="hidden space-y-0.5 border-t border-[hsl(var(--sidebar-border))]/40 px-2 py-3 md:block">
+            <SidebarActionButton variant="developers" onClick={() => window.open('https://developers.lomi.africa/docs/introduction/what-is-lomi', '_blank')} />
+            <SidebarActionButton variant="book-call" onClick={() => window.open('https://cal.com/babacar-diop-umkvq2/30min', '_blank')} />
+          </div>
 
           {/* Organization Switcher */}
           <OrgSwitcher />

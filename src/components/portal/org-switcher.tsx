@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/actions/utils';
+import { UpDownChevronIcon } from '@/components/icons/UpDownChevronIcon';
 
 interface Organization {
     organization_id: string;
@@ -96,16 +97,13 @@ export function OrgSwitcher() {
                                 </div>
                             </div>
                             <div className="text-muted-foreground/30">
-                                <svg width="6" height="12" viewBox="0 0 6 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-60">
-                                    <path d="M3 0L6 3H0L3 0Z" fill="currentColor" />
-                                    <path d="M3 12L0 9H6L3 12Z" fill="currentColor" />
-                                </svg>
+                                <UpDownChevronIcon className="opacity-60" />
                             </div>
                         </div>
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                    className="w-[251px] p-2 rounded-[5px] border-border/40 bg-background/80 backdrop-blur-sm"
+                    className="w-[254px] p-2 rounded-[5px] border-border/40 bg-background/80 backdrop-blur-sm"
                     align="start"
                     sideOffset={-2}
                 >
