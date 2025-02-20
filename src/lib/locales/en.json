@@ -754,8 +754,8 @@
             "empty": "All caught up!"
         },
         "brand": {
-            "name": "lomi.",
-            "control_portal": "Control Portal"
+            "name": "lomi",
+            "control_portal": "PORTAL"
         }
     }
 }

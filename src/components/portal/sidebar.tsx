@@ -98,23 +98,51 @@ export default function Sidebar({ className }: SidebarProps) {
             sticky
             className='z-50 hidden items-center justify-between bg-[hsl(var(--sidebar-background))] px-4 py-3 md:flex md:px-4'
           >
-            <a href="#" className="group flex items-center gap-2.5 transition-transform duration-200 ease-in-out hover:scale-[0.98]">
-              <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-[hsl(var(--sidebar-accent))] ring-1 ring-[hsl(var(--sidebar-border))]/50">
+            <button
+              onClick={toggleTheme}
+              className="group flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 mr-2 -ml-1 transition-all duration-200 hover:bg-[hsl(var(--sidebar-accent))]/20 active:scale-[0.98]"
+            >
+              <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-[hsl(var(--sidebar-accent))] ring-1 ring-[hsl(var(--sidebar-border))]/50 transition-all duration-200 group-hover:ring-[hsl(var(--sidebar-border))]/70">
                 <img
                   src={theme === 'dark' ? iconDark : iconLight}
                   alt={t('portal.brand.name')}
-                  className="h-6 w-6 object-contain transition-opacity duration-200 group-hover:opacity-80"
-                  onClick={toggleTheme}
+                  className="h-6 w-6 object-contain transition-opacity duration-200 group-hover:opacity-90"
                 />
               </div>
-              <div className="flex flex-col justify-center truncate">
-                <span className='font-semibold tracking-tight text-[hsl(var(--sidebar-foreground))]'>{t('portal.brand.name')}</span>
-                <span className='text-xs font-medium text-[hsl(var(--sidebar-foreground))]/60'>{t('portal.brand.control_portal')}</span>
+              <div className="flex flex-col justify-center gap-0.25">
+                <div className="flex items-center">
+                  <span className='font-semibold tracking-tight text-[hsl(var(--sidebar-foreground))] transition-colors duration-200 group-hover:text-[hsl(var(--sidebar-foreground))]/90'>{t('portal.brand.name')}</span>
+                  <div className="w-[2px] h-[2px] bg-current ml-[1px] transform scale-90 translate-y-[5px]" />
+                </div>
+                <span className='text-[10px] font-semibold text-emerald-500 transition-colors duration-200'>{t('portal.brand.control_portal')}</span>
               </div>
-            </a>
+            </button>
           </Layout.Header>
 
           <Separator className="my-0 hidden md:block" />
+
+          {/* Mobile header version */}
+          <a
+            onClick={toggleTheme}
+            className="group flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition-all duration-200 hover:bg-[hsl(var(--sidebar-accent))]/20 active:scale-[0.98] md:hidden"
+          >
+            <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 transition-all duration-200 group-hover:ring-border/70">
+              <img
+                src={theme === 'dark' ? iconDark : iconLight}
+                alt={t('portal.brand.name')}
+                className="h-6 w-6 object-contain transition-opacity duration-200 group-hover:opacity-90"
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-0.5">
+              <div className="flex items-center">
+                <span className='font-semibold tracking-tight text-[hsl(var(--sidebar-foreground))] transition-colors duration-200 group-hover:text-[hsl(var(--sidebar-foreground))]/90'>{t('portal.brand.name')}</span>
+                <div className="w-[2px] h-[2px] bg-current ml-[1px] transform scale-90 translate-y-8" />
+              </div>
+              <div className="inline-flex px-1.5 py-0.5 rounded-sm bg-emerald-500/10 border border-emerald-500/20">
+                <span className='text-xs font-medium text-emerald-500 transition-colors duration-200'>{t('portal.brand.control_portal')}</span>
+              </div>
+            </div>
+          </a>
 
           {/* Navigation links */}
           <Nav
@@ -129,6 +157,7 @@ export default function Sidebar({ className }: SidebarProps) {
 
           {/* Action Buttons */}
           <div className="hidden space-y-0.5 border-t border-[hsl(var(--sidebar-border))]/40 px-2 py-3 md:block">
+            <SidebarActionButton variant="website" onClick={() => window.open('https://lomi.africa', '_blank')} />
             <SidebarActionButton variant="developers" onClick={() => window.open('https://developers.lomi.africa/docs/introduction/what-is-lomi', '_blank')} />
             <SidebarActionButton variant="book-call" onClick={() => window.open('https://cal.com/babacar-diop-umkvq2/30min', '_blank')} />
           </div>
@@ -146,7 +175,7 @@ export default function Sidebar({ className }: SidebarProps) {
             scrollbar-width: none;
           }
         `}</style>
-      </aside>
+      </aside >
     </>
   );
 }

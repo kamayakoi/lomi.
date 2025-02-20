@@ -103,14 +103,14 @@ export function OrgSwitcher() {
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                    className="w-[254px] p-2 rounded-[5px] border-border/40 bg-background/80 backdrop-blur-sm"
+                    className="w-[254px] p-2 rounded-[5px] border-[hsl(var(--sidebar-border))]/40 bg-[hsl(var(--sidebar-background))] backdrop-blur-sm"
                     align="start"
                     sideOffset={-2}
                 >
                     <div className="space-y-1">
                         <button
                             onClick={() => setCreateOrgOpen(true)}
-                            className="w-full flex items-center space-x-3 p-2 hover:bg-accent/30 transition-all duration-200 rounded-[5px] group"
+                            className="w-full flex items-center space-x-3 p-2 hover:bg-[hsl(var(--sidebar-accent))]/30 transition-all duration-200 rounded-[5px] group"
                         >
                             <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/10 ring-1 ring-primary/20 group-hover:ring-primary/30 group-hover:bg-primary/20 transition-all duration-200">
                                 <PlusIcon className="h-4 w-4 text-primary" />
@@ -131,8 +131,8 @@ export function OrgSwitcher() {
                                     }
                                 }}
                                 className={cn(
-                                    "w-full flex items-center space-x-3 p-2 hover:bg-accent/30 transition-all duration-200 rounded-[5px] group focus:outline-none focus-visible:outline-none",
-                                    org.is_current && "bg-accent/20"
+                                    "w-full flex items-center space-x-3 p-2 hover:bg-[hsl(var(--sidebar-accent))]/30 transition-all duration-200 rounded-[5px] group focus:outline-none focus-visible:outline-none",
+                                    org.is_current && "bg-[hsl(var(--sidebar-accent))]/20"
                                 )}
                             >
                                 <div className="h-[36px] w-[36px] rounded-[5px] bg-primary/5 ring-1 ring-border/50 group-hover:ring-border/70 transition-all duration-200 overflow-hidden">
