@@ -44,7 +44,7 @@ export async function updateLanguageFromMerchant() {
 
     if (error || !data || data.length === 0) return;
 
-    const { preferred_language } = data[0];
+    const { preferred_language } = data[0] as { preferred_language: string };
     if (preferred_language && i18n.language !== preferred_language) {
       await i18n.changeLanguage(preferred_language);
     }

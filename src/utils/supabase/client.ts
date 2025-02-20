@@ -1,4 +1,5 @@
 import { createClient, Session } from '@supabase/supabase-js'
+import { Database } from 'database.types'
 
 // Use import.meta.env for client-side code
 const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
@@ -9,7 +10,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     storageKey: 'supabase.auth.token',

@@ -3,6 +3,7 @@ import { supabase } from '@/utils/supabase/client'
 import { Transaction, FetchedTransaction } from './types'
 import { DateRange } from 'react-day-picker'
 import { useQuery, UseQueryOptions } from 'react-query'
+import { Database } from 'database.types'
 
 export const fetchTransactions = async (
     merchantId: string,
@@ -21,11 +22,11 @@ export const fetchTransactions = async (
 
     const { data, error } = await supabase.rpc('fetch_transactions', {
         p_merchant_id: merchantId,
-        p_provider_code: selectedProvider === 'all' ? null : selectedProvider,
-        p_status: selectedStatuses.length > 0 ? selectedStatuses : null,
-        p_type: selectedTypes.length > 0 ? selectedTypes : null,
-        p_currency: selectedCurrencies.length > 0 ? selectedCurrencies : null,
-        p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods : null,
+        p_provider_code: selectedProvider === 'all' ? undefined : selectedProvider as Database['public']['Enums']['provider_code'],
+        p_status: selectedStatuses.length > 0 ? selectedStatuses as Database['public']['Enums']['transaction_status'][] : undefined,
+        p_type: selectedTypes.length > 0 ? selectedTypes as Database['public']['Enums']['transaction_type'][] : undefined,
+        p_currency: selectedCurrencies.length > 0 ? selectedCurrencies as Database['public']['Enums']['currency_code'][] : undefined,
+        p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods as Database['public']['Enums']['payment_method_code'][] : undefined,
         p_page: page,
         p_page_size: pageSize,
     })
@@ -67,15 +68,16 @@ export const fetchTransactions = async (
                 if (subscriptionError) {
                     console.error('Error fetching subscription data:', subscriptionError);
                 } else if (subscriptionData && subscriptionData.length > 0) {
+                    const subscription = subscriptionData[0];
                     return {
                         ...transaction,
-                        subscription_id: subscriptionData[0].subscription_id,
-                        plan_name: subscriptionData[0].plan_name,
-                        plan_description: subscriptionData[0].plan_description,
-                        plan_billing_frequency: subscriptionData[0].plan_billing_frequency,
-                        subscription_end_date: subscriptionData[0].subscription_end_date,
-                        subscription_next_billing_date: subscriptionData[0].subscription_next_billing_date,
-                        subscription_status: subscriptionData[0].subscription_status,
+                        subscription_id: subscription?.subscription_id,
+                        plan_name: subscription?.plan_name,
+                        plan_description: subscription?.plan_description,
+                        plan_billing_frequency: subscription?.plan_billing_frequency,
+                        subscription_end_date: subscription?.subscription_end_date,
+                        subscription_next_billing_date: subscription?.subscription_next_billing_date,
+                        subscription_status: subscription?.subscription_status,
                     };
                 }
             }
@@ -126,6 +128,10 @@ const getDateRange = (selectedDateRange: string | null, customDateRange?: DateRa
     return { startDate, endDate }
 }
 
+const formatDateParam = (date: Date | undefined): string | undefined => {
+    return date ? format(date, 'yyyy-MM-dd HH:mm:ss') : undefined
+}
+
 export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
     if (!merchantId) {
         console.warn('Merchant ID is empty. Skipping total incoming amount fetch.')
@@ -136,8 +142,8 @@ export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateR
 
     const { data, error } = await supabase.rpc('fetch_total_incoming_amount', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -158,8 +164,8 @@ export const fetchTransactionCount = async (merchantId: string, selectedDateRang
 
     const { data, error } = await supabase.rpc('fetch_transaction_count', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -180,8 +186,8 @@ export const fetchCompletionRate = async (merchantId: string, selectedDateRange:
 
     const { data, error } = await supabase.rpc('fetch_completion_rate', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -189,11 +195,16 @@ export const fetchCompletionRate = async (merchantId: string, selectedDateRange:
         return { completed: 0, refunded: 0, failed: 0 }
     }
 
-    return {
-        completed: Number(data[0].completed),
-        refunded: Number(data[0].refunded),
-        failed: Number(data[0].failed),
+    if (data?.[0]) {
+        const stats = data[0]
+        return {
+            completed: Number(stats?.completed ?? 0),
+            refunded: Number(stats?.refunded ?? 0),
+            failed: Number(stats?.failed ?? 0),
+        }
     }
+
+    return { completed: 0, refunded: 0, failed: 0 }
 }
 
 export const fetchGrossAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
@@ -206,8 +217,8 @@ export const fetchGrossAmount = async (merchantId: string, selectedDateRange: st
 
     const { data, error } = await supabase.rpc('fetch_gross_amount', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -228,8 +239,8 @@ export const fetchFeeAmount = async (merchantId: string, selectedDateRange: stri
 
     const { data, error } = await supabase.rpc('fetch_fee_amount', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -250,8 +261,8 @@ export const fetchAverageTransactionValue = async (merchantId: string, selectedD
 
     const { data, error } = await supabase.rpc('fetch_average_transaction_value', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -418,8 +429,8 @@ export const fetchAverageCustomerLifetimeValue = async (merchantId: string, sele
 
     const { data, error } = await supabase.rpc('fetch_average_customer_lifetime_value', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {
@@ -440,8 +451,8 @@ export const fetchAverageRetentionRate = async (merchantId: string, selectedDate
 
     const { data, error } = await supabase.rpc('fetch_average_retention_rate', {
         p_merchant_id: merchantId,
-        p_start_date: startDate ? format(startDate, 'yyyy-MM-dd HH:mm:ss') : null,
-        p_end_date: endDate ? format(endDate, 'yyyy-MM-dd HH:mm:ss') : null,
+        p_start_date: formatDateParam(startDate),
+        p_end_date: formatDateParam(endDate),
     })
 
     if (error) {

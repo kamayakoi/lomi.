@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import Cookies from 'js-cookie'
-import type { Database } from '../../../database.types'
+import type { Database } from 'database.types'
 
 const supabaseUrl = Bun.env['VITE_SUPABASE_URL']
 const supabaseAnonKey = Bun.env['VITE_SUPABASE_ANON_KEY']
