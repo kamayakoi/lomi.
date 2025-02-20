@@ -1,4 +1,6 @@
 import { Database } from '@/../database.types'
+import { ZapierIcon } from '@/components/icons/ZapierIcon'
+import { XeroIcon } from '@/components/icons/XeroIcon'
 
 export type Provider = Omit<Database['public']['Tables']['providers']['Row'], 'created_at' | 'updated_at'> & {
   logo: JSX.Element;
@@ -33,14 +35,14 @@ export const integrationOptions = [
     title: "Xero",
     description: "Integrating with Xero allows you to synchronize lomi. transactions and payment processing in your bookkeeping software.",
     link: "#",
-    logo: <img src="/integrations/xero.webp" alt="Xero" className="w-12 h-12 object-contain" />,
+    logo: <XeroIcon />,
     installLink: "#",
   },
   {
     title: "Zapier",
     description: "Zapier lets you connect lomi. to other apps and automate powerful workflows.",
     link: "#",
-    logo: <img src="/integrations/zapier.webp" alt="Zapier" className="w-12 h-12 object-contain" />,
+    logo: <ZapierIcon />,
     installLink: "#",
   },
   {

@@ -1,3 +1,10 @@
+-- Disable all email-related triggers before seeding
+ALTER TABLE merchants DISABLE TRIGGER notify_new_signup_trigger;
+ALTER TABLE organization_kyc DISABLE TRIGGER send_kyc_approved_email_trigger;
+ALTER TABLE organization_kyc DISABLE TRIGGER notify_new_activation_request_trigger;
+ALTER TABLE merchant_organization_links DISABLE TRIGGER generate_onboarding_api_key_trigger;
+ALTER TABLE organization_providers_settings DISABLE TRIGGER notify_provider_connected_trigger;
+
 -- Seed data for providers table
 INSERT INTO providers (name, code, description) VALUES
   ('NOWPAYMENTS', 'NOWPAYMENTS', 'Crypto payment processor'),
@@ -42,27 +49,3 @@ INSERT INTO currencies (code, name) VALUES
   ('XOF', 'West African CFA franc'), 
   ('USD', 'United States dollar'),
   ('EUR', 'Euro');
-
--- Seed data for merchants table
-INSERT INTO merchants (name, email, phone_number, country)
-VALUES 
-  ('Merchant 1', 'merchant1@example.com', '+1234567890', 'Country 1'),
-  ('Merchant 2', 'merchant2@example.com', '+2345678901', 'Country 2');
-
--- Seed data for organizations table  
-INSERT INTO organizations (name, email, phone_number, website_url)
-VALUES
-  ('Organization 1', 'org1@example.com', '+1234567890', 'https://org1.com'),
-  ('Organization 2', 'org2@example.com', '+2345678901', 'https://org2.com');
-
--- Seed data for organization_addresses table
-INSERT INTO organization_addresses (organization_id, country, region, city, postal_code)
-VALUES
-  ((SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Country 1', 'Region 1', 'City 1', '12345'),
-  ((SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Country 2', 'Region 2', 'City 2', '67890');
-
--- Seed data for merchant_organization_links table
-INSERT INTO merchant_organization_links (merchant_id, organization_id, role, store_handle)
-VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'store1'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 2'), (SELECT organization_id FROM organizations WHERE name = 'Organization 2'), 'Member', 'store2');

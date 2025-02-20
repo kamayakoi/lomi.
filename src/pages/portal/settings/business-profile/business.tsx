@@ -86,17 +86,18 @@ export default function Business() {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No user found');
+            if (!organization?.organization_id) return;
 
             // Check if current user is admin
             const { data: adminCheck } = await supabase.rpc('is_organization_admin', {
                 p_merchant_id: user.id,
-                p_organization_id: organization?.organization_id
+                p_organization_id: organization.organization_id
             });
-            setIsAdmin(adminCheck);
+            setIsAdmin(adminCheck || false);
 
             // Fetch team members
             const { data, error } = await supabase.rpc('fetch_team_members', {
-                p_organization_id: organization?.organization_id
+                p_organization_id: organization.organization_id
             });
 
             if (error) throw error;
@@ -194,6 +195,9 @@ export default function Business() {
                 description: "Logo updated successfully",
             });
 
+            // Dispatch event for logo update
+            window.dispatchEvent(new Event('organization-logo-updated'));
+
             // Refresh the organization data to ensure we have the latest information
             await fetchOrganization();
         } catch (error) {
@@ -228,28 +232,16 @@ export default function Business() {
         if (!editedOrganization) return;
 
         try {
-            console.log('Updating organization with:', {
-                p_organization_id: editedOrganization.organization_id,
-                p_name: editedOrganization.name,
-                p_email: editedOrganization.email,
-                p_website_url: editedOrganization.website_url,
-                p_verified: editedOrganization.verified,
-                p_default_currency: editedOrganization.default_currency
-            });
-
             const { error } = await supabase.rpc('update_organization_details', {
                 p_organization_id: editedOrganization.organization_id,
                 p_name: editedOrganization.name,
                 p_email: editedOrganization.email,
-                p_website_url: editedOrganization.website_url,
+                p_website_url: editedOrganization.website_url || '',
                 p_verified: editedOrganization.verified,
-                p_default_currency: editedOrganization.default_currency as 'XOF' | 'USD' | 'EUR'
+                p_default_currency: editedOrganization.default_currency
             });
 
-            if (error) {
-                console.error('Supabase error:', error);
-                throw error;
-            }
+            if (error) throw error;
 
             setOrganization(editedOrganization);
             setIsEditing(false);
@@ -308,12 +300,13 @@ export default function Business() {
             }
 
             if (data && data.length > 0) {
-                setOrganization(data[0] as OrganizationDetails);
+                const organizationData = data[0] as OrganizationDetails;
+                setOrganization(organizationData);
 
                 // Extract the relative path from the logo URL
-                const logoPath = data[0].logo_url?.replace(/^.*\/logos\//, '');
+                if (organizationData.logo_url) {
+                    const logoPath = organizationData.logo_url.replace(/^.*\/logos\//, '');
 
-                if (logoPath) {
                     // Download the organization logo using the relative path
                     const { data: logoData, error: logoError } = await supabase
                         .storage
@@ -345,9 +338,11 @@ export default function Business() {
 
     const handleChangeRole = async (member: TeamMember) => {
         try {
+            if (!organization?.organization_id || !member.merchant_id) return;
+
             const newRole = member.role === 'Admin' ? 'Member' : 'Admin';
             const { data: success, error } = await supabase.rpc('update_team_member_role', {
-                p_organization_id: organization?.organization_id,
+                p_organization_id: organization.organization_id,
                 p_merchant_id: member.merchant_id,
                 p_new_role: newRole
             });
@@ -381,8 +376,10 @@ export default function Business() {
 
     const handleRemoveMember = async (member: TeamMember) => {
         try {
+            if (!organization?.organization_id || !member.merchant_id) return;
+
             const { error } = await supabase.rpc('remove_team_member', {
-                p_organization_id: organization?.organization_id,
+                p_organization_id: organization.organization_id,
                 p_merchant_id: member.merchant_id
             });
 

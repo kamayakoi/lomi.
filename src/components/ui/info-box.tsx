@@ -24,24 +24,24 @@ export default function InfoBox({
 }: InfoBoxProps) {
     const variantStyles = {
         blue: {
-            box: "border-blue-200/30 bg-blue-950/30",
-            icon: "text-blue-400",
-            text: "text-blue-300",
+            box: "border-blue-200 bg-blue-50 dark:border-blue-200/30 dark:bg-blue-950/30",
+            icon: "text-blue-600 dark:text-blue-400",
+            text: "text-blue-700 dark:text-blue-300",
         },
         green: {
-            box: "border-green-200/30 bg-green-950/30",
-            icon: "text-green-400",
-            text: "text-green-300",
+            box: "border-green-200 bg-green-50 dark:border-green-200/30 dark:bg-green-950/30",
+            icon: "text-green-600 dark:text-green-400",
+            text: "text-green-700 dark:text-green-300",
         },
         red: {
-            box: "border-red-200/30 bg-red-950/30",
-            icon: "text-red-400",
-            text: "text-red-300",
+            box: "border-red-200 bg-red-50 dark:border-red-200/30 dark:bg-red-950/30",
+            icon: "text-red-600 dark:text-red-400",
+            text: "text-red-700 dark:text-red-300",
         },
         tip: {
-            box: "border-green-200/30 bg-green-950/30",
-            icon: "text-green-400",
-            text: "text-green-300",
+            box: "border-green-200 bg-green-50 dark:border-green-200/30 dark:bg-green-950/30",
+            icon: "text-green-600 dark:text-green-400",
+            text: "text-green-700 dark:text-green-300",
         }
     } as const;
 

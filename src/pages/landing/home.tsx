@@ -7,6 +7,7 @@ import ThreeDImage from '@/components/landing/3d-image'
 import { ButtonCta } from "@/components/landing/button-cta"
 import { useNavigate } from 'react-router-dom'
 import CookieConsent from '@/components/ui/tracking-cookie'
+import { BackgroundLines } from '@/components/aceternity/background-lines'
 
 export default function Page() {
   const navigate = useNavigate()
@@ -37,11 +38,18 @@ export default function Page() {
   }, [navigate])
 
   return (
-    <div className="overflow-hidden">
-      <main className="relative bg-background">
+    <div className="overflow-hidden relative bg-background">
+      {/* Background Lines positioned absolutely */}
+      <div className="fixed inset-0 z-0">
+        <BackgroundLines className="w-full h-full" svgOptions={{ duration: 15 }}>
+          <div className="w-full h-full" />
+        </BackgroundLines>
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10">
         <div className="min-h-[80vh] sm:min-h-screen select-none">
           <TopBanner />
-          {/* Main Content */}
           <div className="container mx-auto px-4 sm:px-6 flex flex-col min-h-[calc(80vh-40px)] sm:min-h-[calc(100vh-40px)] pt-8 sm:pt-16">
             {/* Hero Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 -mt-24 sm:-mt-24">

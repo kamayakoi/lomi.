@@ -1,5 +1,5 @@
 import { createClient, Session } from '@supabase/supabase-js'
-import { Database } from 'database.types'
+import type { Database } from 'database.types'
 
 // Use import.meta.env for client-side code
 const supabaseUrl = import.meta.env['VITE_SUPABASE_URL']
@@ -33,6 +33,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     }
   }
 })
+
+// Type-safe helper for database operations
+export type Tables = Database['public']['Tables']
+export type Enums = Database['public']['Enums']
+
+// Type-safe table helpers
+export const getTypedTable = <T extends keyof Tables>(table: T) => 
+  supabase.from(table)
 
 // Cache the session promise to prevent multiple fetches
 let sessionPromise: Promise<Session | null> | null = null;

@@ -4,8 +4,18 @@ import { useUser } from '@/lib/hooks/use-user';
 
 interface OrganizationDetails {
     organization_id: string;
-    organization_name: string;
-    // Add other properties as needed
+    name: string;
+    email: string;
+    logo_url: string | null;
+    website_url: string | null;
+    verified: boolean;
+    default_currency: 'XOF' | 'USD' | 'EUR';
+    country: string;
+    region: string;
+    city: string;
+    district: string;
+    street: string;
+    postal_code: string;
 }
 
 interface OrganizationContextProps {
@@ -32,7 +42,7 @@ const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     console.error('Error fetching organization details:', error);
                 } else if (Array.isArray(data) && data[0]) {
                     setOrganizationId(data[0].organization_id);
-                    setOrganizationDetails(data[0] as OrganizationDetails);
+                    setOrganizationDetails(data[0]);
                 }
             }
         };

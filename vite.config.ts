@@ -6,88 +6,55 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
 import compression from 'vite-plugin-compression';
 
-export default defineConfig({
+// Separate configs for dev and prod
+export default defineConfig(({ command }) => ({
   plugins: [
     react(),
-    terser({
-      compress: {
-        drop_console: true,
-      },
-      format: {
-        comments: false,
-      },
-    }),
-    visualizer({
+    ...(command === 'build' ? [
+      terser({
+        compress: {
+          drop_console: true,
+          pure_funcs: ['console.log'],
+          passes: 2,
+        },
+        format: {
+          comments: false,
+        },
+        mangle: true,
+      }),
+      obfuscatorPlugin({
+        include: ["src/**/*.ts", "src/**/*.tsx"],
+        exclude: [/node_modules/, /\.d\.ts$/],
+        apply: "build",
+        debugger: true,
+        options: {
+          compact: true,
+          controlFlowFlattening: false,
+          deadCodeInjection: false,
+          debugProtection: false,
+          disableConsoleOutput: true,
+          stringArray: true,
+          stringArrayEncoding: [],
+          stringArrayThreshold: 0.75,
+          target: 'browser',
+          identifierNamesGenerator: 'hexadecimal',
+          renameGlobals: false,
+        },
+      }),
+      // Only run visualizer in build
+      visualizer({
       filename: 'bundle-analysis.html',
-      open: true,
-    }),
-    obfuscatorPlugin({
-      include: ["src/**/*.ts", "src/**/*.tsx"],
-      exclude: [/node_modules/, /\.d\.ts$/],
-      apply: "build",
-      debugger: true,
-      options: {
-        compact: true,
-        controlFlowFlattening: true,
-        controlFlowFlatteningThreshold: 1,
-        deadCodeInjection: true,
-        deadCodeInjectionThreshold: 0.9,
-        debugProtection: false,
-        debugProtectionInterval: 0,
-        disableConsoleOutput: true,
-        domainLock: [],
-        domainLockRedirectUrl: 'about:blank',
-        forceTransformStrings: [],
-        identifierNamesCache: null,
-        identifierNamesGenerator: 'hexadecimal',
-        identifiersDictionary: [],
-        identifiersPrefix: '',
-        ignoreImports: false,
-        inputFileName: '',
-        log: false,
-        numbersToExpressions: false,
-        optionsPreset: 'default',
-        renameGlobals: true,
-        renameProperties: false,
-        renamePropertiesMode: 'safe',
-        reservedNames: [],
-        reservedStrings: [],
-        seed: 0,
-        selfDefending: true,
-        simplify: true,
-        sourceMap: false,
-        sourceMapBaseUrl: '',
-        sourceMapFileName: '',
-        sourceMapMode: 'separate',
-        sourceMapSourcesMode: 'sources-content',
-        splitStrings: false,
-        splitStringsChunkLength: 10,
-        stringArray: true,
-        stringArrayCallsTransform: true,
-        stringArrayCallsTransformThreshold: 0.5,
-        stringArrayEncoding: [],
-        stringArrayIndexesType: [
-          'hexadecimal-number'
-        ],
-        stringArrayIndexShift: true,
-        stringArrayRotate: true,
-        stringArrayShuffle: true,
-        stringArrayWrappersCount: 1,
-        stringArrayWrappersChainedCalls: true,
-        stringArrayWrappersParametersMaxCount: 2,
-        stringArrayWrappersType: 'variable',
-        stringArrayThreshold: 1,
-        target: 'browser',
-        transformObjectKeys: false,
-        unicodeEscapeSequence: false
-      },
-    }),
-    // Add Brotli compression
-    compression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
-      threshold: 512,
-    }),
+        open: false, // Don't open automatically
+        gzipSize: true,
+        brotliSize: true,
+      }),
+      // Optimize compression only in production
+      compression({
+        algorithm: 'brotliCompress',
+        ext: '.br',
+        threshold: 1024 // Increased threshold
+      }),
+    ] : []),
   ],
   base: '/',
   build: {
@@ -95,23 +62,34 @@ export default defineConfig({
     minify: 'terser',
     outDir: 'dist',
     emptyOutDir: true,
+    target: ['es2015', 'safari12'],
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
       },
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          }
+        manualChunks: {
+          'vendor': [
+            'react',
+            'react-dom',
+            'framer-motion',
+          ],
+          'ui': [
+            '@radix-ui',
+            '@shadcn',
+          ],
         },
-        sourcemap: false,
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    assetsDir: 'assets',
-    manifest: true,
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 2000,
+    assetsInlineLimit: 4096, // 4kb
+    modulePreload: {
+      polyfill: false, // Disable polyfill to reduce size
+    },
   },
   resolve: {
     alias: {
@@ -128,21 +106,26 @@ export default defineConfig({
       host: 'localhost',
       port: 24678,
       timeout: 5000,
-      overlay: true
     },
     proxy: {
       "/api": {
         target: "http://localhost:4242",
         changeOrigin: true,
+        ws: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
     headers: {
-      'Cache-Control': 'public, max-age=31536000',
+      'Cache-Control': 'no-store',
+      'Access-Control-Allow-Origin': '*',
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom'],
+    include: [
+      'react', 
+      'react-dom',
+      'framer-motion',
+    ],
     exclude: [
       '@radix-ui/react-accordion',
       '@radix-ui/react-alert-dialog',
@@ -167,8 +150,5 @@ export default defineConfig({
       '@radix-ui/react-toggle-group',
       '@radix-ui/react-tooltip'
     ],
-    esbuildOptions: {
-      target: 'esnext',
-    }
   },
-});
+}));

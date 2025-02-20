@@ -1,93 +1,210 @@
--- Seed data for merchants
-INSERT INTO merchants (merchant_id, name, email, phone_number, is_deleted, created_at, updated_at)
-VALUES 
-  ('m1', 'Test Merchant 1', 'merchant1@test.com', '+221777777771', false, NOW(), NOW()),
-  ('m2', 'Test Merchant 2', 'merchant2@test.com', '+221777777772', false, NOW(), NOW());
+-- Start transaction
+BEGIN;
 
--- Seed data for merchant bank accounts
-INSERT INTO merchant_bank_accounts (bank_account_id, merchant_id, bank_name, account_number, is_valid, created_at, updated_at)
-VALUES 
-  ('ba1', 'm1', 'Wave Senegal', '221777777771', true, NOW(), NOW()),
-  ('ba2', 'm1', 'Orange Money', '221777777772', true, NOW(), NOW());
+-- Disable all triggers temporarily
+SET session_replication_role = 'replica';
 
--- Seed data for products
-INSERT INTO merchant_products (product_id, merchant_id, name, description, price, currency, is_active, created_at, updated_at)
+-- Seed data for merchants table
+INSERT INTO merchants (name, email, phone_number, country)
 VALUES 
-  ('p1', 'm1', 'Basic Plan', 'Basic subscription plan', 5000, 'XOF', true, NOW(), NOW()),
-  ('p2', 'm1', 'Premium Plan', 'Premium subscription plan', 10000, 'XOF', true, NOW(), NOW());
+  ('Merchant 1', 'merchant1@example.com', '+1234567890', 'Country 1');
 
--- Seed data for subscription plans
-INSERT INTO subscription_plans (plan_id, merchant_id, name, description, price, billing_interval, currency, display_on_storefront, created_at, updated_at)
-VALUES 
-  ('sp1', 'm1', 'Monthly Basic', 'Monthly basic subscription', 5000, 'month', 'XOF', true, NOW(), NOW()),
-  ('sp2', 'm1', 'Monthly Premium', 'Monthly premium subscription', 10000, 'month', 'XOF', true, NOW(), NOW());
+-- Seed data for organizations table  
+INSERT INTO organizations (name, email, phone_number, website_url)
+VALUES
+  ('Organization 1', 'org1@example.com', '+1234567890', 'https://org1.com');
 
--- Seed data for customers
-INSERT INTO customers (customer_id, merchant_id, first_name, last_name, email, phone_number, is_deleted, created_at, updated_at)
-VALUES 
-  ('c1', 'm1', 'John', 'Doe', 'john@example.com', '+221777777773', false, NOW(), NOW()),
-  ('c2', 'm1', 'Jane', 'Smith', 'jane@example.com', '+221777777774', false, NOW(), NOW());
+-- Seed data for organization_addresses table
+INSERT INTO organization_addresses (organization_id, country, region, city, postal_code)
+VALUES
+  ((SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Country 1', 'Region 1', 'City 1', '12345');
 
--- Seed data for transactions (last 30 days)
-WITH dates AS (
-  SELECT generate_series(
-    NOW() - INTERVAL '30 days',
-    NOW(),
-    INTERVAL '1 day'
-  ) AS date
-)
+-- Seed data for merchant_organization_links table
+INSERT INTO merchant_organization_links (merchant_id, organization_id, role, store_handle)
+VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'store1');
+
+-- Seed data for merchant_products table
+INSERT INTO merchant_products (merchant_id, organization_id, name, description, price, currency_code, image_url) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Premium Web Hosting', 
+   'Enterprise-grade web hosting with 99.9% uptime guarantee',
+   299.99,
+   'XOF',
+   'https://example.com/images/hosting.png'),
+   
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Business Email Suite',
+   'Professional email hosting with advanced security features',
+   149.99,
+   'XOF',
+   'https://example.com/images/email.png');
+
+-- Seed data for subscription_plans table
+INSERT INTO subscription_plans (merchant_id, organization_id, name, description, billing_frequency, amount, currency_code, failed_payment_action, charge_day) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Basic Hosting Plan',
+   'Entry-level web hosting with essential features',
+   'monthly',
+   99.99,
+   'XOF',
+   'pause',
+   1),
+   
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Premium Hosting Plan',
+   'Advanced hosting with dedicated resources',
+   'monthly',
+   299.99,
+   'XOF',
+   'pause',
+   1);
+
+-- Seed data for customers table
+INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'John Smith',
+   'john.smith@example.com',
+   '+1234567890',
+   'Senegal',
+   'Dakar'),
+   
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Tech Solutions Inc',
+   'contact@techsolutions.com',
+   '+2345678901',
+   'Ivory Coast',
+   'Abidjan');
+
+-- Seed data for merchant_subscriptions table
+INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, start_date, end_date, next_billing_date) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT plan_id FROM subscription_plans WHERE name = 'Basic Hosting Plan'),
+   (SELECT customer_id FROM customers WHERE name = 'John Smith'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 month'),
+   
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT plan_id FROM subscription_plans WHERE name = 'Premium Hosting Plan'),
+   (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 month');
+
+-- Seed data for transactions table
 INSERT INTO transactions (
-  transaction_id,
-  merchant_id,
-  customer_id,
-  amount,
-  currency,
-  status,
-  provider,
-  created_at,
-  updated_at
-)
-SELECT 
-  'tx-' || FLOOR(RANDOM() * 1000000)::text,
-  'm1',
-  CASE WHEN RANDOM() > 0.5 THEN 'c1' ELSE 'c2' END,
-  CASE 
-    WHEN RANDOM() > 0.7 THEN 10000
-    WHEN RANDOM() > 0.4 THEN 5000
-    ELSE 2500
-  END,
-  'XOF',
-  'completed',
-  CASE 
-    WHEN RANDOM() > 0.6 THEN 'wave'
-    WHEN RANDOM() > 0.3 THEN 'orange_money'
-    ELSE 'free_money'
-  END,
-  date + (RANDOM() * INTERVAL '24 hours'),
-  date + (RANDOM() * INTERVAL '24 hours')
-FROM dates
-CROSS JOIN generate_series(1, 5); -- 5 transactions per day
+    merchant_id, 
+    organization_id, 
+    customer_id, 
+    product_id,
+    subscription_id,
+    transaction_type,
+    status,
+    description,
+    gross_amount,
+    fee_amount,
+    net_amount,
+    fee_reference,
+    currency_code,
+    provider_code,
+    payment_method_code
+) VALUES
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+    (SELECT customer_id FROM customers WHERE name = 'John Smith'),
+    (SELECT product_id FROM merchant_products WHERE name = 'Premium Web Hosting'),
+    NULL,
+    'payment',
+    'completed',
+    'Premium Web Hosting Purchase',
+    299.99,
+    14.99,
+    285.00,
+    'Wave Processing Fee',
+    'XOF',
+    'WAVE',
+    'E_WALLET'
+  ),
+  (
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+    (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc'),
+    NULL,
+    (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc')),
+    'payment',
+    'completed',
+    'Premium Hosting Plan - Monthly Subscription',
+    299.99,
+    14.99,
+    285.00,
+    'Orange Processing Fee',
+    'XOF',
+    'ORANGE',
+    'MOBILE_MONEY'
+  );
 
--- Seed data for subscriptions
-INSERT INTO merchant_subscriptions (
-  subscription_id,
-  merchant_id,
-  customer_id,
-  plan_id,
-  subscription_status,
-  current_period_start,
-  current_period_end,
-  created_at,
-  updated_at
-)
-SELECT 
-  'sub-' || FLOOR(RANDOM() * 1000000)::text,
-  'm1',
-  CASE WHEN RANDOM() > 0.5 THEN 'c1' ELSE 'c2' END,
-  CASE WHEN RANDOM() > 0.5 THEN 'sp1' ELSE 'sp2' END,
-  'active',
-  NOW() - INTERVAL '1 month',
-  NOW() + INTERVAL '1 month',
-  NOW() - INTERVAL '1 month',
-  NOW()
-FROM generate_series(1, 10); -- 10 active subscriptions
+-- Seed data for providers_transactions table
+INSERT INTO providers_transactions (
+    transaction_id,
+    merchant_id,
+    provider_code,
+    provider_checkout_id,
+    provider_payment_status,
+    provider_transaction_id,
+    checkout_url
+) VALUES
+  (
+    (SELECT transaction_id FROM transactions WHERE description = 'Premium Web Hosting Purchase'),
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    'WAVE',
+    'WAVE_CHECKOUT_001',
+    'succeeded',
+    'WAVE_TXN_001',
+    'https://checkout.wave.com/WAVE_CHECKOUT_001'
+  ),
+  (
+    (SELECT transaction_id FROM transactions WHERE description = 'Premium Hosting Plan - Monthly Subscription'),
+    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+    'ORANGE',
+    'ORANGE_CHECKOUT_001',
+    'succeeded',
+    'ORANGE_TXN_001',
+    'https://checkout.orange.com/ORANGE_CHECKOUT_001'
+  );
+
+-- Seed data for merchant_accounts table
+INSERT INTO merchant_accounts (merchant_id, balance, currency_code) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 570.00, 'XOF');
+
+-- Seed data for platform_main_account table
+INSERT INTO platform_main_account (total_balance, available_balance, currency_code) VALUES
+  (599.98, 570.00, 'XOF');
+
+-- Seed data for platform_provider_balance table
+INSERT INTO platform_provider_balance (
+    provider_code,
+    total_transactions_amount,
+    current_balance,
+    currency_code,
+    provider_fees,
+    platform_revenue,
+    quarter_start_date
+) VALUES
+  ('WAVE', 299.99, 285.00, 'XOF', 14.99, 14.99, date_trunc('quarter', CURRENT_DATE)),
+  ('ORANGE', 299.99, 285.00, 'XOF', 14.99, 14.99, date_trunc('quarter', CURRENT_DATE));
+
+-- Re-enable triggers
+SET session_replication_role = 'origin';
+
+-- Commit transaction
+COMMIT;

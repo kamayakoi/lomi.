@@ -118,17 +118,18 @@ function Profile() {
                 throw error;
             }
 
-            if (data && data.length > 0) {
-                setMerchant(data[0] as MerchantDetails);
-                setHasPIN(data[0].pin_code !== null && data[0].pin_code !== ''); // Set hasPIN based on pin_code value
+            if (data && Array.isArray(data) && data.length > 0) {
+                const merchantData = data[0] as MerchantDetails;
+                setMerchant(merchantData);
+                setHasPIN(merchantData.pin_code !== null && merchantData.pin_code !== '');
 
                 // Check if avatar_url is not null before attempting to download
-                if (data[0].avatar_url) {
+                if (merchantData.avatar_url) {
                     // Download the merchant avatar
                     const { data: avatarData, error: avatarError } = await supabase
                         .storage
                         .from('avatars')
-                        .download(data[0].avatar_url);
+                        .download(merchantData.avatar_url);
 
                     if (avatarError) {
                         console.error('Error downloading avatar:', avatarError);
@@ -355,6 +356,7 @@ function Profile() {
                     p_email: updatedMerchant.email,
                     p_phone_number: updatedMerchant.phone_number,
                     p_pin_code: updatedMerchant.pin_code,
+                    p_preferred_language: updatedMerchant.preferred_language
                 })
 
                 if (error) throw error
@@ -506,7 +508,7 @@ function Profile() {
                 p_name: merchant.name,
                 p_email: merchant.email,
                 p_phone_number: merchant.phone_number,
-                p_pin_code: null,
+                p_pin_code: '',
                 p_preferred_language: merchant.preferred_language
             });
 

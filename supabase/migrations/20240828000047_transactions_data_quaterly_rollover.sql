@@ -3,6 +3,9 @@ CREATE OR REPLACE FUNCTION rollover_provider_balance_quarterly() RETURNS void AS
 DECLARE
     v_quarter_start DATE;
 BEGIN
+    -- Disable the trigger temporarily
+    ALTER TABLE platform_provider_balance DISABLE TRIGGER check_quarterly_rollover_trigger;
+    
     -- Calculate start of current quarter
     v_quarter_start := date_trunc('quarter', CURRENT_DATE);
     
@@ -54,6 +57,9 @@ BEGIN
     -- Delete old records
     DELETE FROM platform_provider_balance 
     WHERE quarter_start_date < v_quarter_start;
+    
+    -- Re-enable the trigger
+    ALTER TABLE platform_provider_balance ENABLE TRIGGER check_quarterly_rollover_trigger;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
