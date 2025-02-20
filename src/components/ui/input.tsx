@@ -12,7 +12,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          // Base styles (keeping Shadcn dimensions)
           "flex h-10 w-full text-sm",
           "px-3 py-2",
           "bg-transparent",

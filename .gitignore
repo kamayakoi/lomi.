@@ -20,6 +20,7 @@ build/
 out/
 polar/
 midday/
+apps/
 
 # Local environment files
 .env

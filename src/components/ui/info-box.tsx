@@ -3,7 +3,7 @@ import { Info, Lightbulb } from "lucide-react"
 import { cn } from "@/lib/actions/utils"
 import { Link } from "react-router-dom"
 
-interface InfoBoxProps {
+interface InfoBoxProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode
     className?: string
     title?: string
@@ -20,7 +20,8 @@ export default function InfoBox({
     mini,
     link,
     variant = 'blue',
-    type = 'info'
+    type = 'info',
+    ...props
 }: InfoBoxProps) {
     const variantStyles = {
         blue: {
@@ -51,6 +52,7 @@ export default function InfoBox({
 
     const content = (
         <div
+            {...props}
             className={cn(
                 "flex rounded-sm border",
                 variantStyles[safeVariant].box,

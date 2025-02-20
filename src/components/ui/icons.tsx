@@ -42,7 +42,6 @@ import {
   MdOutlineAccountBalance,
   MdOutlineAccountCircle,
   MdOutlineApps,
-  MdOutlineArchive,
   MdOutlineArrowDownward,
   MdOutlineArrowForward,
   MdOutlineArrowOutward,
@@ -132,8 +131,13 @@ import {
 } from "react-icons/md";
 import { PiDiscordLogo } from "react-icons/pi";
 
+type IconProps = React.SVGProps<SVGSVGElement> & {
+  size?: number | string;
+  className?: string;
+};
+
 export const Icons = {
-  LogoSmall: (props: any) => (
+  LogoSmall: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={32}
@@ -149,7 +153,7 @@ export const Icons = {
       />
     </svg>
   ),
-  LogoIcon: (props: any) => (
+  LogoIcon: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={16}
@@ -165,7 +169,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Logo: (props: any) => (
+  Logo: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={112}
@@ -185,7 +189,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Overview: (props: any) => (
+  Overview: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={24}
@@ -212,7 +216,7 @@ export const Icons = {
   Apps: MdOutlineApps,
   Transactions: MdOutlineListAlt,
   Invoice: MdOutlineDescription,
-  Vault: (props: any) => (
+  Vault: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={24}
@@ -237,7 +241,7 @@ export const Icons = {
       </defs>
     </svg>
   ),
-  Customers: (props: any) => (
+  Customers: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={24}
@@ -264,7 +268,7 @@ export const Icons = {
   X: FaXTwitter,
   Discord: PiDiscordLogo,
   GithubOutline: FiGithub,
-  Apple: (props: any) => (
+  Apple: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={19}
@@ -278,7 +282,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Google: (props: any) => (
+  Google: (props: IconProps) => (
     <svg
       width="20"
       height="20"
@@ -311,7 +315,7 @@ export const Icons = {
       </defs>
     </svg>
   ),
-  InboxCustomize: (props: any) => (
+  InboxCustomize: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={17}
@@ -328,7 +332,7 @@ export const Icons = {
   Settings: MdOutlineSettings,
   Inbox: ArchiveIcon,
   Inbox2: MdOutlineInbox,
-  Check: (props: any) => (
+  Check: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={16}
@@ -342,7 +346,7 @@ export const Icons = {
       />
     </svg>
   ),
-  AlertCircle: (props: any) => (
+  AlertCircle: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={16}
@@ -356,7 +360,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Transactions2: (props: any) => (
+  Transactions2: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={40}
@@ -370,7 +374,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Bank: (props: any) => (
+  Bank: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={36}
@@ -384,7 +388,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Info: (props: any) => (
+  Info: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={14}
@@ -400,7 +404,7 @@ export const Icons = {
   ),
   Close: MdClose,
   Remove: MdRemove,
-  ChartGantt: (props: any) => (
+  ChartGantt: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={25}
@@ -414,7 +418,7 @@ export const Icons = {
       />
     </svg>
   ),
-  CreationOutline: (props: any) => (
+  CreationOutline: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={25}
@@ -428,7 +432,7 @@ export const Icons = {
       />
     </svg>
   ),
-  OpenSource: (props: any) => (
+  OpenSource: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={25}
@@ -442,7 +446,7 @@ export const Icons = {
       />
     </svg>
   ),
-  ReceiptText: (props: any) => (
+  ReceiptText: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={25}
@@ -456,7 +460,7 @@ export const Icons = {
       />
     </svg>
   ),
-  TimeCog: (props: any) => (
+  TimeCog: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={25}
@@ -470,7 +474,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Slack: (props: any) => (
+  Slack: (props: IconProps) => (
     <svg
       width="20"
       height="21"
@@ -497,7 +501,7 @@ export const Icons = {
       </defs>
     </svg>
   ),
-  Github: (props: any) => (
+  Github: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={22}
@@ -517,7 +521,7 @@ export const Icons = {
       />
     </svg>
   ),
-  OpenAI: (props: any) => (
+  OpenAI: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={120}
@@ -531,7 +535,7 @@ export const Icons = {
       />
     </svg>
   ),
-  Sidebar: (props: any) => (
+  Sidebar: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={24}
@@ -543,7 +547,7 @@ export const Icons = {
       <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm240-80h400v-480H400v480Zm-80 0v-480H160v480h160Zm-160 0v-480 480Zm160 0h80-80Zm0-480h80-80Z" />
     </svg>
   ),
-  SidebarFilled: (props: any) => (
+  SidebarFilled: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={24}
@@ -555,7 +559,7 @@ export const Icons = {
       <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h160v640H160Zm240 0v-640h400q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H400Z" />
     </svg>
   ),
-  Reconnect: (props: any) => (
+  Reconnect: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={props.size}
@@ -567,7 +571,7 @@ export const Icons = {
       <path d="M760-120q-39 0-70-22.5T647-200H440q-66 0-113-47t-47-113q0-66 47-113t113-47h80q33 0 56.5-23.5T600-600q0-33-23.5-56.5T520-680H313q-13 35-43.5 57.5T200-600q-50 0-85-35t-35-85q0-50 35-85t85-35q39 0 69.5 22.5T313-760h207q66 0 113 47t47 113q0 66-47 113t-113 47h-80q-33 0-56.5 23.5T360-360q0 33 23.5 56.5T440-280h207q13-35 43.5-57.5T760-360q50 0 85 35t35 85q0 50-35 85t-85 35ZM200-680q17 0 28.5-11.5T240-720q0-17-11.5-28.5T200-760q-17 0-28.5 11.5T160-720q0 17 11.5 28.5T200-680Z" />
     </svg>
   ),
-  CreateTransaction: (props: any) => (
+  CreateTransaction: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={props.size ?? 24}
@@ -579,7 +583,7 @@ export const Icons = {
       <path d="M640-121v-120H520v-80h120v-120h80v120h120v80H720v120h-80ZM160-240v-80h283q-3 21-2.5 40t3.5 40H160Zm0-160v-80h386q-23 16-41.5 36T472-400H160Zm0-160v-80h600v80H160Zm0-160v-80h600v80H160Z" />
     </svg>
   ),
-  Import: (props: any) => (
+  Import: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={props.size ?? 24}
@@ -591,7 +595,7 @@ export const Icons = {
       <path d="M160-120v-720h640v400H240v80h200v80H240v80h200v80H160Zm456 0L504-232l56-56 56 56 142-142 56 56-198 198ZM240-520h200v-80H240v80Zm280 0h200v-80H520v80ZM240-680h200v-80H240v80Zm280 0h200v-80H520v80Z" />
     </svg>
   ),
-  DotRaster: (props: any) => (
+  DotRaster: (props: IconProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={8}
