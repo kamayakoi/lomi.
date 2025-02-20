@@ -1,5 +1,4 @@
 import animate from "tailwindcss-animate"
-
 /** @type {import('tailwindcss').Config} */
 export default {
 	darkMode: ["class"],
@@ -106,5 +105,19 @@ export default {
 			}
 		}
 	},
-	plugins: [animate],
+	plugins: [
+		animate,
+		addVariablesForColors
+	],
+}
+
+// This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
+function addVariablesForColors({ addBase, theme }) {
+	let newVars = Object.fromEntries(
+		Object.entries(theme("colors")).map(([key, val]) => [`--${key}`, val])
+	);
+
+	addBase({
+		":root": newVars,
+	});
 }

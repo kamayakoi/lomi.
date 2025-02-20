@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import Cookies from 'js-cookie'
+import type { Database } from '../../../database.types'
 
 const supabaseUrl = Bun.env['VITE_SUPABASE_URL']
 const supabaseAnonKey = Bun.env['VITE_SUPABASE_ANON_KEY']
@@ -42,7 +43,6 @@ export const signInWithGithub = async () => {
   return { data, error }
 }
 
-
 export const checkSession = async () => {
   const { data, error } = await supabase.auth.getSession()
   if (error) {
@@ -50,4 +50,57 @@ export const checkSession = async () => {
     return null
   }
   return data.session
+}
+
+export function createServerClient(
+  supabaseUrl: string,
+  supabaseKey: string,
+  options: {
+    cookies?: {
+      get: () => string | null | undefined
+      set: (name: string, value: string, options: object) => void
+      remove: (name: string, options: object) => void
+    }
+  } = {}
+) {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase URL or key')
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseKey, {
+    auth: {
+      storage: options.cookies
+        ? {
+            getItem: () => {
+              const value = options.cookies?.get()
+              return value ?? null
+            },
+            setItem: (key: string, value: string) => {
+              options.cookies?.set(key, value, { path: '/' })
+            },
+            removeItem: (key: string) => {
+              options.cookies?.remove(key, { path: '/' })
+            },
+          }
+        : undefined,
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  })
+}
+
+export function createStorageClient(
+  supabaseUrl: string,
+  supabaseKey: string,
+  options: {
+    cookies?: {
+      get: () => string | null | undefined
+      set: (name: string, value: string, options: object) => void
+      remove: (name: string, options: object) => void
+    }
+  } = {}
+) {
+  const client = createServerClient(supabaseUrl, supabaseKey, options)
+  return client.storage
 }

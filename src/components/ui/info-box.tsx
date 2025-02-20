@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { Info, Lightbulb } from "lucide-react"
 import { cn } from "@/lib/actions/utils"

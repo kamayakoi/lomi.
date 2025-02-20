@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/actions/utils";
 import { motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";

@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import Confetti from 'react-confetti'
 import { motion } from 'framer-motion'

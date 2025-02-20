@@ -1,7 +1,5 @@
-"use client";
-
-import { cn } from "@midday/ui/cn";
-import { Icons } from "@midday/ui/icons";
+import { cn } from "@/lib/actions/utils";
+import { Icons } from "@/components/ui/icons";
 
 type Props = {
   value: string;

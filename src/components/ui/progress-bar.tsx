@@ -1,5 +1,3 @@
-'use client'
-
 import { motion } from "framer-motion"
 import { cn } from "@/lib/actions/utils"
 import { CheckCircle2 } from "lucide-react"
