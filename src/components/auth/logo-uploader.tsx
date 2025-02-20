@@ -6,7 +6,6 @@ import { Area } from 'react-easy-crop'
 import { supabase } from '@/utils/supabase/client'
 import { toast } from "@/lib/hooks/use-toast"
 import { useTranslation } from 'react-i18next'
-import { sidebarCache } from '@/utils/cache/sidebar-cache'
 
 interface LogoUploaderProps {
     currentLogo: string | null
@@ -132,12 +131,6 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
 
                                     // Dispatch event for logo update
                                     window.dispatchEvent(new Event('organization-logo-updated'));
-
-                                    // Trigger a refresh of the sidebar data
-                                    const { data: { user } } = await supabase.auth.getUser();
-                                    if (user?.id) {
-                                        await sidebarCache.del(user.id);
-                                    }
                                 }
                             }
                         }

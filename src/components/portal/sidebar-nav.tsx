@@ -1,132 +1,195 @@
-import { useState, useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { buttonVariants } from '@/components/ui/button-variants'
+import { Link } from 'react-router-dom'
+import { IconChevronDown } from '@tabler/icons-react'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { cn } from '@/lib/actions/utils'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import useCheckActiveNav from '@/lib/hooks/use-check-active-nav'
+import { SideLink, SidebarItem } from '@/lib/data/sidelinks.tsx'
+import { useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  items: {
-    href: string
-    title: string
-    icon: JSX.Element
-    subItems?: { href: string; title: string }[]
-    defaultOpen?: boolean
-  }[]
+interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
+  links: SidebarItem[]
+  closeNav: () => void
 }
 
-interface OpenSections {
-  [key: string]: boolean;
-}
-
-export default function SidebarNav({
+export default function Nav({
+  links,
   className,
-  items,
-  ...props
-}: SidebarNavProps) {
-  const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const [val, setVal] = useState(pathname ?? '/settings')
-  const [openSections, setOpenSections] = useState<OpenSections>({})
+  closeNav,
+}: NavProps) {
+  const renderItem = (item: SidebarItem) => {
+    if ('type' in item && item.type === 'section') {
+      return (
+        <motion.div
+          key={item.title}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className='px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-[hsl(var(--sidebar-foreground))]/60'
+        >
+          {item.title}
+        </motion.div>
+      )
+    }
 
-  // Initialize and update open sections based on current pathname
-  useEffect(() => {
-    setOpenSections(prev => items.reduce((acc, item) => ({
-      ...acc,
-      [item.href]: prev[item.href] !== undefined
-        ? prev[item.href]
-        : item.subItems?.some(subItem => pathname.startsWith(subItem.href)) || item.defaultOpen || false
-    }), {}));
-  }, [pathname, items]);
+    const { sub, ...rest } = item as SideLink
+    const key = `${rest.title}-${rest.href}`
 
-  const handleSelect = (e: string) => {
-    setVal(e)
-    navigate(e)
-  }
+    if (sub)
+      return (
+        <NavLinkDropdown {...rest} sub={sub} key={key} closeNav={closeNav} />
+      )
 
-  const toggleSection = (href: string) => {
-    setOpenSections(prev => ({
-      ...prev,  // Preserve all other section states
-      [href]: !prev[href]  // Toggle only the clicked section
-    }))
+    return <NavLink {...rest} key={key} closeNav={closeNav} />
   }
 
   return (
-    <>
-      <div className='p-1 md:hidden'>
-        <Select value={val} onValueChange={handleSelect}>
-          <SelectTrigger className='h-12 sm:w-48'>
-            <SelectValue placeholder='Theme' />
-          </SelectTrigger>
-          <SelectContent>
-            {items.map((item) => (
-              <SelectItem key={item.href} value={item.href}>
-                <div className='flex gap-x-4 px-2 py-1'>
-                  <span className='scale-125'>{item.icon}</span>
-                  <span className='text-md'>{item.title}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        'group border-b border-[hsl(var(--sidebar-border))]/50 bg-[hsl(var(--sidebar-background))] py-1.5 transition-[max-height,padding] duration-500 md:border-none',
+        className
+      )}
+    >
+      <nav className='grid gap-0.5 px-2'>
+        <AnimatePresence>
+          {links.map(renderItem)}
+        </AnimatePresence>
+      </nav>
+    </motion.div>
+  )
+}
 
-      <div className='hidden w-full overflow-x-auto bg-background px-1 py-2 md:block'>
-        <nav
+interface NavLinkProps extends SideLink {
+  subLink?: boolean
+  closeNav: () => void
+}
+
+function getIconColorClass(icon: JSX.Element): string {
+  const className = icon.props.className || '';
+  const colorMatch = className.match(/text-([a-z]+-[0-9]+)/);
+  return colorMatch ? colorMatch[1] : 'primary';
+}
+
+function NavLink({
+  title,
+  icon,
+  label,
+  href,
+  closeNav,
+  subLink = false,
+}: NavLinkProps) {
+  const location = useLocation();
+  const isSettingsLink = href.startsWith('/portal/settings');
+  const isActive = isSettingsLink
+    ? location.pathname.startsWith('/portal/settings')
+    : location.pathname === href;
+  const iconColor = getIconColorClass(icon);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Link
+        to={href}
+        onClick={closeNav}
+        className={cn(
+          'group relative flex h-9 items-center gap-2.5 px-4 text-sm font-medium transition-all duration-300',
+          subLink && 'h-8 border-l border-l-[hsl(var(--sidebar-border))]/50 px-3',
+          isActive
+            ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
+            : `text-[hsl(var(--sidebar-foreground))] hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+          'hover:bg-[hsl(var(--sidebar-accent))]/30'
+        )}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        <div className='scale-105'>{icon}</div>
+        <span>{title}</span>
+        {label && (
+          <div className={cn('ml-2 rounded-md px-1.5 py-0.5 text-xs font-medium', `bg-${iconColor}`, 'text-white')}>
+            {label}
+          </div>
+        )}
+      </Link>
+    </motion.div>
+  )
+}
+
+function NavLinkDropdown({ title, icon, label, sub, closeNav, subLink = false }: NavLinkProps) {
+  const { checkActiveNav } = useCheckActiveNav()
+  const isChildActive = !!sub?.find((s) => checkActiveNav(s.href) || s.subSub?.some(ss => checkActiveNav(ss.href)))
+  const iconColor = getIconColorClass(icon);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Collapsible defaultOpen={isChildActive}>
+        <CollapsibleTrigger
           className={cn(
-            'flex flex-col space-y-1',
-            className
+            'group relative flex h-9 w-full items-center gap-2.5 px-4 text-sm font-medium transition-all duration-300',
+            subLink && 'h-8 border-l border-l-[hsl(var(--sidebar-border))]/50 px-3',
+            isChildActive
+              ? `text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-100 before:transition-all before:duration-300`
+              : `text-[hsl(var(--sidebar-foreground))] hover:text-${iconColor} before:absolute before:right-0 before:top-0 before:h-full before:w-1 before:bg-${iconColor} before:opacity-0 hover:before:opacity-50 before:transition-all before:duration-300`,
+            'hover:bg-[hsl(var(--sidebar-accent))]/30'
           )}
-          {...props}
         >
-          {items.map((item) => (
-            <Collapsible key={item.href} open={openSections[item.href]}>
-              <CollapsibleTrigger
-                className={cn(
-                  buttonVariants({ variant: 'ghost' }),
-                  'justify-between w-full text-left whitespace-nowrap rounded-none hover:bg-accent hover:text-accent-foreground transition-colors duration-200'
-                )}
-                onClick={() => toggleSection(item.href)}
+          <div className='scale-105'>{icon}</div>
+          <span>{title}</span>
+          {label && (
+            <div className={cn('ml-2 rounded-md px-1.5 py-0.5 text-xs font-medium', `bg-${iconColor}`, 'text-white')}>
+              {label}
+            </div>
+          )}
+          <span
+            className={cn(
+              'ml-auto transition-transform duration-300 group-data-[state="open"]:-rotate-180'
+            )}
+          >
+            <IconChevronDown className="h-4 w-4" stroke={1.5} />
+          </span>
+        </CollapsibleTrigger>
+        <CollapsibleContent className='collapsibleDropdown max-h-[60vh] overflow-y-auto'>
+          <motion.ul
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className={cn('mt-0.5 space-y-0.5', subLink ? 'pl-4' : 'pl-6')}
+          >
+            {sub?.map((sublink) => (
+              <motion.li
+                key={sublink.title}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className="flex items-center">
-                  <span className='mr-2'>{item.icon}</span>
-                  {item.title}
-                </div>
-                {item.subItems && (
-                  openSections[item.href] ? <ChevronUp className="h-4 w-4 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                {sublink.subSub ? (
+                  <NavLinkDropdown {...sublink} closeNav={closeNav} subLink />
+                ) : (
+                  <NavLink {...sublink} subLink closeNav={closeNav} />
                 )}
-              </CollapsibleTrigger>
-              <CollapsibleContent
-                className="space-y-1 pl-8 pr-2"
-              >
-                {item.subItems?.map((subItem) => (
-                  <Link
-                    key={subItem.href}
-                    to={subItem.href}
-                    className={cn(
-                      buttonVariants({ variant: 'ghost' }),
-                      pathname === subItem.href
-                        ? 'bg-accent text-accent-foreground rounded-none'
-                        : 'hover:bg-accent hover:text-accent-foreground hover:no-underline rounded-none',
-                      'justify-start block whitespace-nowrap transition-colors duration-200'
-                    )}
-                  >
-                    {subItem.title}
-                  </Link>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
-          <div className="h-24" />
-        </nav>
-      </div>
-    </>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </CollapsibleContent>
+      </Collapsible>
+    </motion.div>
   )
 }

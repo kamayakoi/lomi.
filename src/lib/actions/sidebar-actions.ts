@@ -1,6 +1,6 @@
 import { supabase } from '@/utils/supabase/client';
 import { SidebarData } from '@/lib/types/sidebar';
-import { sidebarCache } from '@/utils/cache/sidebar-cache';
+
 
 export const fetchSidebarData = async (
   setSidebarData: React.Dispatch<React.SetStateAction<SidebarData>>,
@@ -13,28 +13,19 @@ export const fetchSidebarData = async (
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      // Try to get data from cache first
-      const cachedData = await sidebarCache.get(user.id);
-
-      if (cachedData) {
-        setSidebarData(cachedData);
-        setIsLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase.rpc('fetch_sidebar_data', { p_merchant_id: user.id });
 
       if (error) {
         setError('Error fetching sidebar data');
       } else if (data && data.length > 0) {
         // Set initial data without logo
-        const sidebarData: SidebarData = {
+        setSidebarData({
           organizationId: data[0].organization_id,
           organizationName: data[0].organization_name,
           merchantName: data[0].merchant_name,
           merchantRole: data[0].merchant_role,
           organizationLogo: null,
-        };
+        });
 
         // Handle logo separately
         if (data[0].organization_logo_url) {
@@ -49,17 +40,17 @@ export const fetchSidebarData = async (
               // Verify the image exists
               const response = await fetch(publicUrl.publicUrl, { method: 'HEAD' });
               if (response.ok) {
-                sidebarData.organizationLogo = publicUrl.publicUrl;
+                setSidebarData(prev => ({ ...prev, organizationLogo: publicUrl.publicUrl }));
               } else {
                 // If public URL fails, try to download and create blob URL
                 const { data: logoData } = await supabase
                   .storage
                   .from('logos')
                   .download(data[0].organization_logo_url);
-                
+
                 if (logoData) {
                   const logoUrl = URL.createObjectURL(logoData);
-                  sidebarData.organizationLogo = logoUrl;
+                  setSidebarData(prev => ({ ...prev, organizationLogo: logoUrl }));
                 }
               }
             }
@@ -69,19 +60,12 @@ export const fetchSidebarData = async (
           }
         }
 
-        // Cache the data
-        await sidebarCache.set(user.id, sidebarData);
-        setSidebarData(sidebarData);
       }
     }
   } catch (error) {
+    setIsLoading(false);
     setError('Failed to fetch sidebar data');
   } finally {
     setIsLoading(false);
   }
 };
-
-// Add function to invalidate cache when needed
-export const invalidateSidebarCache = async (userId: string) => {
-  await sidebarCache.del(userId);
-}; 

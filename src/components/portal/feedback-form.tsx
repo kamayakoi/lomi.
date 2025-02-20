@@ -79,7 +79,7 @@ export default function FeedbackForm() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute md:right-0 right-[-220px] mt-[15px] w-80 bg-white dark:bg-[#121317] shadow-lg z-50"
+                        className="absolute md:right-0 right-[-220px] mt-[15px] w-80 bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg z-50"
                     >
                         <div className="p-4">
                             <Textarea

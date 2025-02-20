@@ -54,7 +54,7 @@ export default function ApiKeysSection() {
     };
 
     return (
-        <div className="w-56 p-1">
+        <div className="w-64 p-1">
             <Card className="rounded-none h-full border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800">
                 <CardContent className="pt-6 pb-5">
                     <div className="relative z-10">

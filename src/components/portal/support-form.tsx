@@ -222,7 +222,7 @@ export default function SupportForm() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute bottom-16 right-0 w-80 bg-white dark:bg-[#121317] rounded-none shadow-lg z-50"
+                        className="absolute bottom-16 right-0 w-80 bg-background/80 backdrop-blur-sm border border-border/40 shadow-lg z-50"
                     >
                         <div className="p-4 space-y-4">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('portal.support_form.title')}</h3>
