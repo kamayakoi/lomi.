@@ -38,8 +38,8 @@ export async function fetchProducts(
     offset = 0
 ): Promise<ProductsResponse> {
     const { data, error } = await supabase.rpc('fetch_products', {
-        p_merchant_id: merchantId,
-        p_is_active: isActive,
+        p_merchant_id: merchantId || '',
+        p_is_active: isActive || undefined,
         p_limit: limit,
         p_offset: offset
     })
@@ -54,7 +54,7 @@ export async function fetchProducts(
     }
 
     // The total_count is the same for all rows, so we can take it from the first row
-    const totalCount = data[0].total_count || 0
+    const totalCount = data[0]?.total_count || 0
 
     // Remove total_count from the product objects using object rest/spread
     const products = data.map(({ ...product }: { total_count: number } & Product) => product)
@@ -82,12 +82,12 @@ export async function createProduct(data: {
 
     const { error } = await supabase.rpc('create_product', {
         p_merchant_id: user.id,
-        p_organization_id: organizationData[0].organization_id,
+        p_organization_id: organizationData[0]?.organization_id || '',
         p_name: data.name,
-        p_description: data.description,
+        p_description: data.description || '',
         p_price: data.price,
-        p_currency_code: data.currency_code,
-        p_image_url: data.image_url,
+        p_currency_code: data.currency_code as 'XOF' | 'USD' | 'EUR',
+        p_image_url: data.image_url || undefined,
         p_is_active: true,
         p_display_on_storefront: data.display_on_storefront ?? true,
         p_fee_type_ids: data.fee_type_ids
@@ -108,9 +108,9 @@ export async function updateProduct(productId: string, data: {
     const { error } = await supabase.rpc('update_product', {
         p_product_id: productId,
         p_name: data.name,
-        p_description: data.description,
+        p_description: data.description || '',
         p_price: data.price,
-        p_image_url: data.image_url,
+        p_image_url: data.image_url || undefined,
         p_is_active: data.is_active,
         p_display_on_storefront: data.display_on_storefront ?? true,
         p_fee_type_ids: data.fee_type_ids

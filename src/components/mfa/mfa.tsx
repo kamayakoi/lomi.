@@ -204,7 +204,7 @@ interface MFASetupProps {
     onCancel: () => void;
 }
 
-function MFASetup({ onComplete, onCancel }: MFASetupProps) {
+export function MFASetup({ onComplete, onCancel }: MFASetupProps) {
     const [isValidating, setValidating] = useState(false);
     const [factorId, setFactorId] = useState("");
     const [qr, setQR] = useState("");

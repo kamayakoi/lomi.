@@ -12,9 +12,9 @@ export const fetchPaymentLinks = async (
 ) => {
     const { data, error } = await supabase.rpc('fetch_payment_links', {
         p_merchant_id: merchantId,
-        p_link_type: linkType === 'all' ? null : linkType,
-        p_currency_code: currency === 'all' ? null : currency,
-        p_is_active: status === 'all' ? null : status === 'active',
+        p_link_type: linkType === 'all' ? undefined : linkType,
+        p_currency_code: currency === 'all' ? undefined : currency,
+        p_is_active: status === 'all' ? undefined : status === 'active',
         p_page: page,
         p_page_size: pageSize,
     });

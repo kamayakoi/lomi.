@@ -29,7 +29,7 @@ export default function BankAccounts() {
             if (error) {
                 console.error('Error fetching bank accounts:', error)
             } else {
-                setAccounts(data)
+                setAccounts(data as BankAccount[])
             }
         }
     }, [user])

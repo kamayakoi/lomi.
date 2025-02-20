@@ -11,8 +11,12 @@ import { toast } from '@/lib/hooks/use-toast'
 import { AlertCircle } from "lucide-react"
 import Spinner from '@/components/portal/spinner'
 import { useTranslation } from 'react-i18next'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 
 type UserAuthFormProps = HTMLAttributes<HTMLDivElement>
@@ -22,43 +26,16 @@ const formSchema = z.object({
   password: z.string().min(7),
 })
 
-async function checkNeedsMFAVerification(lastVerification: string | null): Promise<boolean> {
-  // Check if there's a remembered device token
-  const rememberedDevice = localStorage.getItem('2fa_device_token')
-  if (rememberedDevice) {
-    try {
-      // Verify the device token with the server
-      const { data, error } = await supabase.rpc('verify_2fa_device_token', {
-        p_token: rememberedDevice
-      })
-      if (!error && data) {
-        return false
-      }
-    } catch (error) {
-      console.error('Error verifying device token:', error)
-    }
-  }
-
-  if (!lastVerification) return true
-
-  // Check if last verification was within 30 days
-  const lastVerificationDate = new Date(lastVerification)
-  const daysSinceLastVerification = (Date.now() - lastVerificationDate.getTime()) / (1000 * 60 * 60 * 24)
-
-  return daysSinceLastVerification > 30
-}
-
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isGithubLoading, setIsGithubLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [showMFADialog, setShowMFADialog] = useState(false)
-  const [mfaFactorId, setMfaFactorId] = useState('')
-  const [mfaError, setMfaError] = useState(false)
-  const [isVerifyingMFA, setIsVerifyingMFA] = useState(false)
-  const [rememberDevice, setRememberDevice] = useState(false)
+  const [showMFAPrompt, setShowMFAPrompt] = useState(false)
+  const [mfaError, setMFAError] = useState('')
+  const [factorId, setFactorId] = useState('')
+  const [challengeId, setChallengeId] = useState('')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -75,65 +52,30 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     setIsValidPassword(formSchema.shape.password.safeParse(e.target.value).success)
   }
 
-  const handleMFAVerification = async (code: string) => {
-    setMfaError(false)
-    setIsVerifyingMFA(true)
-
+  const handleMFAChallenge = async (code: string) => {
     try {
-      const challenge = await supabase.auth.mfa.challenge({ factorId: mfaFactorId })
-      if (!challenge.data?.id) throw new Error('Failed to create challenge')
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId: mfaFactorId,
-        challengeId: challenge.data.id,
+      const { data, error } = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId,
         code,
       })
 
-      if (verify.data) {
-        // Update last verification timestamp
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) throw new Error('No user found')
+      if (error) {
+        setMFAError(t('auth.sign_in.error.invalid_mfa_code'))
+        return
+      }
 
-        await supabase.rpc('update_merchant_2fa', {
-          p_merchant_id: user.id,
-          p_totp_secret: null, // Don't change the secret
-          p_has_2fa: true, // Keep 2FA enabled
-          p_last_2fa_verification: new Date().toISOString(),
-        })
-
-        if (rememberDevice) {
-          const { data: tokenData, error: tokenError } = await supabase.rpc('generate_2fa_device_token', {
-            p_merchant_id: user.id
-          })
-          if (!tokenError && tokenData) {
-            localStorage.setItem('2fa_device_token', tokenData as string)
-          }
-        }
-
-        setShowMFADialog(false)
+      if (data) {
+        setShowMFAPrompt(false)
         toast({
           title: t('auth.sign_in.success'),
           description: t('auth.sign_in.success_message'),
         })
         window.location.reload()
-      } else {
-        setMfaError(true)
-        toast({
-          title: "Error",
-          description: "Invalid verification code. Please try again.",
-          variant: "destructive",
-        })
       }
     } catch (error) {
-      console.error('MFA verification error:', error)
-      setMfaError(true)
-      toast({
-        title: "Error",
-        description: "Failed to verify MFA code",
-        variant: "destructive",
-      })
-    } finally {
-      setIsVerifyingMFA(false)
+      console.error('Error during MFA verification:', error)
+      setMFAError(t('auth.sign_in.error.mfa_verification'))
     }
   }
 
@@ -157,38 +99,41 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           }
           setErrorMessage(message)
         } else if (signInData.user) {
-          // Check if user has 2FA enabled
-          const { data: merchantData } = await supabase.rpc('get_merchant_2fa_status', {
-            p_merchant_id: signInData.user.id
-          })
+          // Check if MFA is required
+          const { data: factorsData } = await supabase.auth.mfa.listFactors()
 
-          const has2FA = merchantData?.[0]?.has_2fa || false
-          const lastVerification = merchantData?.[0]?.last_2fa_verification
+          if (factorsData) {
+            const verifiedFactors = factorsData.totp?.filter(f => f.status === 'verified') || []
 
-          if (has2FA) {
-            // Check if we need to verify 2FA
-            const needsVerification = await checkNeedsMFAVerification(lastVerification)
+            if (verifiedFactors.length > 0) {
+              // Get the first verified factor
+              const factor = verifiedFactors[0]
+              if (factor) {
+                setFactorId(factor.id)
 
-            if (needsVerification) {
-              // Get MFA factors
-              const { data: factorsData } = await supabase.auth.mfa.listFactors()
-              const verifiedFactors = factorsData?.all?.filter(f => f.status === 'verified')
+                // Create MFA challenge
+                const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: factor.id })
 
-              if (verifiedFactors?.[0]) {
-                setMfaFactorId(verifiedFactors[0].id)
-                setShowMFADialog(true)
-                setIsLoading(false)
-                return
+                if (challengeError) {
+                  throw challengeError
+                }
+
+                if (challengeData) {
+                  setChallengeId(challengeData.id)
+                  setShowMFAPrompt(true)
+                  return
+                }
               }
             }
           }
 
-          // If no 2FA or no verification needed, proceed with normal sign in
           toast({
             title: t('auth.sign_in.success'),
             description: t('auth.sign_in.success_message'),
           })
-          window.location.reload()
+
+          // Refresh the page to update the authentication state
+          window.location.reload();
         }
       } catch (error) {
         console.error('Error during sign in:', error)
@@ -370,24 +315,21 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         </p>
       </div>
 
-      <Dialog open={showMFADialog} onOpenChange={setShowMFADialog}>
+      <Dialog open={showMFAPrompt} onOpenChange={setShowMFAPrompt}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Two-Factor Authentication</DialogTitle>
+            <DialogTitle>Two-Factor Authentication Required</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center gap-4 py-4">
             <p className="text-sm text-center text-muted-foreground">
-              Enter the 6-digit code from your authenticator app
+              Please enter the 6-digit code from your authenticator app
             </p>
             <InputOTP
               maxLength={6}
               pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-              autoFocus
-              onComplete={handleMFAVerification}
-              disabled={isVerifyingMFA}
-              className={cn(mfaError && "invalid")}
+              onComplete={handleMFAChallenge}
               render={({ slots }) => (
-                <InputOTPGroup>
+                <InputOTPGroup className="gap-2">
                   {slots.map((slot, idx) => (
                     <InputOTPSlot
                       key={idx}
@@ -401,21 +343,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                 </InputOTPGroup>
               )}
             />
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="remember-device"
-                className="h-4 w-4 rounded border-gray-300"
-                onChange={(e) => setRememberDevice(e.target.checked)}
-              />
-              <label htmlFor="remember-device" className="text-sm text-muted-foreground">
-                Don&apos;t ask for code on this device for 30 days
-              </label>
-            </div>
-            {isVerifyingMFA && (
-              <div className="flex items-center gap-2">
-                <Spinner size={16} />
-                <span className="text-sm">Verifying...</span>
+            {mfaError && (
+              <div className="flex items-center gap-2 text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                <p className="text-sm">{mfaError}</p>
               </div>
             )}
           </div>

@@ -209,8 +209,8 @@ function WebhooksPage() {
                 return sortDirection === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue)
             } else if (Array.isArray(aValue) && Array.isArray(bValue)) {
                 // For authorized_events array, compare the first event
-                const aEvent = aValue[0] || ''
-                const bEvent = bValue[0] || ''
+                const aEvent = String(aValue[0] || '')
+                const bEvent = String(bValue[0] || '')
                 return sortDirection === 'asc' ? aEvent.localeCompare(bEvent) : bEvent.localeCompare(aEvent)
             }
             return 0

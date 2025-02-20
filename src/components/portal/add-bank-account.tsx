@@ -53,13 +53,13 @@ export function AddBankButton({ onAddAccount, disabled, hasDefaultAccount }: Add
             setIsLoading(true)
             try {
                 const { data, error } = await supabase.rpc('create_bank_account', {
-                    p_account_number: newAccount.account_number,
-                    p_account_name: newAccount.account_name,
-                    p_bank_name: newAccount.bank_name,
-                    p_bank_code: newAccount.bank_code,
-                    p_branch_code: newAccount.branch_code,
+                    p_account_number: newAccount.account_number || '',
+                    p_account_name: newAccount.account_name || '',
+                    p_bank_name: newAccount.bank_name || '',
+                    p_bank_code: newAccount.bank_code || '',
+                    p_branch_code: newAccount.branch_code || '',
                     p_country: selectedCountry,
-                    p_is_default: newAccount.is_default
+                    p_is_default: newAccount.is_default || false
                 })
 
                 if (error) {

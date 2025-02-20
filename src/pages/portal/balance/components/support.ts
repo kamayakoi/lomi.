@@ -23,7 +23,7 @@ export async function fetchPayouts(
             throw error
         }
 
-        return data
+        return data as Payout[]
     } catch (error) {
         console.error('Error fetching payouts:', error)
         return []
@@ -43,7 +43,7 @@ export function usePayoutCount(accountId: string, startDate?: string, endDate?: 
             throw error
         }
 
-        return data
+        return data as number
     })
 }
 
@@ -199,7 +199,7 @@ export function useBalance(userId: string | null) {
             return 0
         }
 
-        const { data, error } = await supabase.rpc('fetch_balance', {
+        const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
             p_merchant_id: userId,
         })
 

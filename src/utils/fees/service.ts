@@ -25,7 +25,7 @@ export class FeeService {
         if (error) throw error;
         if (!fee?.length) throw new Error('No fee configuration found');
 
-        const { name, percentage, fixed_amount } = fee[0];
+        const { name, percentage, fixed_amount } = fee[0] as { name: string; percentage: number; fixed_amount: number };
         
         // Calculate fee amount
         const feeAmount = (amount * (percentage / 100)) + fixed_amount;

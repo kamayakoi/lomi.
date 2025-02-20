@@ -350,7 +350,7 @@ function LogsPage() {
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : logsData && logsData.data ? (
-                                                    sortLogs(logsData.data).map((log: Log) => (
+                                                    sortLogs(logsData.data as Log[]).map((log: Log) => (
                                                         <TableRow key={log.log_id} className="hover:bg-muted/50">
                                                             <TableCell className="font-medium">
                                                                 <div className="flex flex-col">
@@ -416,7 +416,7 @@ function LogsPage() {
                                                 </p>
                                             </div>
                                         ) : logsData && logsData.data ? (
-                                            sortLogs(logsData.data).map((log: Log) => (
+                                            sortLogs(logsData.data as Log[]).map((log: Log) => (
                                                 <LogCard key={log.log_id} log={log} />
                                             ))
                                         ) : null}

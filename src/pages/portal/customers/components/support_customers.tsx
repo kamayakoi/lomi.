@@ -29,15 +29,15 @@ export const fetchCustomer = async (customerId: string) => {
 export const updateCustomer = async (customerId: string, data: Partial<Customer>) => {
     const { error } = await supabase.rpc('update_customer', {
         p_customer_id: customerId,
-        p_name: data.name,
-        p_email: data.email,
-        p_phone_number: data.phone_number,
-        p_whatsapp_number: data.whatsapp_number,
-        p_country: data.country,
-        p_city: data.city,
-        p_address: data.address,
-        p_postal_code: data.postal_code,
-        p_is_business: data.is_business,
+        p_name: data.name || '',
+        p_email: data.email || '',
+        p_phone_number: data.phone_number || '',
+        p_whatsapp_number: data.whatsapp_number || '',
+        p_country: data.country || '',
+        p_city: data.city || '',
+        p_address: data.address || '',
+        p_postal_code: data.postal_code || '',
+        p_is_business: data.is_business || false,
     })
 
     if (error) {

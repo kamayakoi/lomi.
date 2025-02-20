@@ -30,7 +30,7 @@ export default function Component() {
 
     const fetchOrganizationDetails = useCallback(async () => {
         const { data, error } = await supabase
-            .rpc('fetch_organization_details', { p_merchant_id: user?.id })
+            .rpc('fetch_organization_details', { p_merchant_id: user?.id || '' })
 
         if (error) {
             console.error('Error fetching organization details:', error)
@@ -73,10 +73,10 @@ export default function Component() {
 
         try {
             const { data, error } = await supabase.rpc('generate_api_key', {
-                p_merchant_id: user?.id,
-                p_organization_id: organizationId,
+                p_merchant_id: user?.id || '',
+                p_organization_id: organizationId || '',
                 p_name: newKeyName,
-                p_expiration_date: null,
+                p_expiration_date: undefined,
             })
 
             if (error) {
@@ -115,7 +115,7 @@ export default function Component() {
             const { error } = await supabase.rpc('update_api_key_status', {
                 p_api_key: apiKey.api_key,
                 p_is_active: newValue,
-                p_merchant_id: user?.id
+                p_merchant_id: user?.id || ''
             })
 
             if (error) throw error

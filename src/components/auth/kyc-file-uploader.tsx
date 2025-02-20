@@ -129,7 +129,7 @@ const KYCFileUploader: React.FC<KYCFileUploaderProps> = ({
             const { error: updateError } = await supabase.rpc('update_kyc_document_url', {
                 p_organization_id: organizationId,
                 p_document_type: documentType,
-                p_document_url: null
+                p_document_url: ''
             });
 
             if (updateError) throw updateError;

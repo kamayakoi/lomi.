@@ -758,20 +758,20 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
 
             const { data, error } = await supabase.rpc('create_payment_link', {
                 p_merchant_id: user.id,
-                p_organization_id: organizationData[0].organization_id,
-                p_link_type: paymentType,
+                p_organization_id: organizationData[0]?.organization_id || '',
+                p_link_type: paymentType as 'instant' | 'product' | 'plan',
                 p_title: paymentType === 'instant' ? instantLinkDetails.name : selectedPlan?.name || selectedProduct?.name || '',
                 p_public_description: paymentType === 'instant' ? instantLinkDetails.description : selectedPlan?.description || selectedProduct?.description || '',
                 p_private_description: instantLinkDetails.privateDescription,
-                p_price: paymentType === 'instant' && prices[0]?.amount ? parseFloat(prices[0].amount) : null,
+                p_price: paymentType === 'instant' && prices[0]?.amount ? parseFloat(prices[0].amount) : undefined,
                 p_currency_code: paymentType === 'instant' ? prices[0]?.currency || 'XOF' : selectedPlan?.currency_code || selectedProduct?.currency_code || 'XOF',
                 p_allowed_providers: mappedProviders,
                 p_allow_coupon_code: paymentType === 'instant' ? allowCouponCode : false,
-                p_expires_at: expirationDate ? expirationDate.toISOString() : null,
-                p_success_url: redirectToCustomPage ? customSuccessUrl : null,
-                p_cancel_url: redirectToCustomPage ? customCancelUrl : null,
-                p_plan_id: paymentType === 'plan' && selectedPlan?.plan_id ? selectedPlan.plan_id : null,
-                p_product_id: paymentType === 'product' && selectedProduct?.product_id ? selectedProduct.product_id : null,
+                p_expires_at: expirationDate ? expirationDate.toISOString() : undefined,
+                p_success_url: redirectToCustomPage ? customSuccessUrl : undefined,
+                p_cancel_url: redirectToCustomPage ? customCancelUrl : undefined,
+                p_plan_id: paymentType === 'plan' && selectedPlan?.plan_id ? selectedPlan.plan_id : undefined,
+                p_product_id: paymentType === 'product' && selectedProduct?.product_id ? selectedProduct.product_id : undefined,
             })
 
             if (error) {

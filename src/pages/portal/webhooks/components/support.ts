@@ -1,5 +1,6 @@
 import { supabase } from '@/utils/supabase/client'
 import { Webhook, webhook_event } from './types'
+import { Json } from 'database.types';
 
 export interface CreateWebhookData {
     url: string;
@@ -29,8 +30,8 @@ export async function fetchWebhooks(
 ): Promise<Webhook[]> {
     const { data: webhooks, error } = await supabase.rpc('fetch_organization_webhooks', {
         p_merchant_id: merchant_id,
-        p_event: event === 'all' ? null : event,
-        p_is_active: status === 'all' ? null : status === 'active'
+        p_event: event === 'all' ? undefined : event as webhook_event,
+        p_is_active: status === 'all' ? undefined : status === 'active'
     });
 
     if (error) throw error;
@@ -47,7 +48,7 @@ export async function updateWebhookDeliveryStatus(
         p_webhook_id: webhook_id,
         p_last_response_status: status,
         p_last_response_body: responseBody,
-        p_last_payload: payload
+        p_last_payload: payload as Json
     });
 
     if (error) throw error;

@@ -1,5 +1,8 @@
 import { supabase } from '@/utils/supabase/client'
-import { Log } from './types'
+import { Database } from 'database.types'
+
+type event_type = Database['public']['Enums']['event_type']
+type Log = Database['public']['Tables']['logs']['Row']
 
 interface FetchLogsParams {
     userId: string
@@ -29,8 +32,8 @@ export async function fetchLogs({
         const { data, error } = await supabase
             .rpc('fetch_logs', {
                 p_merchant_id: userId,
-                p_event: event === 'all' ? null : event,
-                p_severity: severity === 'all' ? null : severity,
+                p_event: event === 'all' ? undefined : event as event_type,
+                p_severity: severity === 'all' ? undefined : severity as string,
                 p_limit: limit,
                 p_offset: offset
             })

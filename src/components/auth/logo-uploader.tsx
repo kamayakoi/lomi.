@@ -122,11 +122,13 @@ export default function LogoUploader({ currentLogo, onLogoUpdate, companyName }:
                             }
 
                             if (organizationDetails && organizationDetails.length > 0) {
-                                const organizationId = organizationDetails[0].organization_id;
-                                await supabase.rpc('update_organization_logo', {
-                                    p_organization_id: organizationId,
-                                    p_logo_url: publicUrl,
-                                });
+                                const organizationId = organizationDetails[0]?.organization_id;
+                                if (organizationId) {
+                                    await supabase.rpc('update_organization_logo', {
+                                        p_organization_id: organizationId,
+                                        p_logo_url: publicUrl,
+                                    });
+                                }
                             }
                         }
                     }

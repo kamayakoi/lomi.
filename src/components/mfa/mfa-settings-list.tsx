@@ -8,11 +8,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UnenrollMFA } from "./unenroll-mfa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SetupMfa } from "./setup-mfa";
+import { MFASetup } from "./mfa";
 import { supabase } from "@/utils/supabase/client";
-import { useEffect } from "react";
 import { toast } from "@/lib/hooks/use-toast";
 
 export function MfaSettingsList() {
@@ -25,16 +24,11 @@ export function MfaSettingsList() {
 
   const checkMFAStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user found');
-
-      const { data, error } = await supabase.rpc('get_merchant_2fa_status', {
-        p_merchant_id: user.id
-      });
-
+      const { data: factorsData, error } = await supabase.auth.mfa.listFactors();
       if (error) throw error;
 
-      setHasMFA(data?.[0]?.has_2fa || false);
+      const verifiedFactors = factorsData.totp?.filter(f => f.status === 'verified') || [];
+      setHasMFA(verifiedFactors.length > 0);
     } catch (error) {
       console.error('Error checking MFA status:', error);
     }
@@ -81,7 +75,7 @@ export function MfaSettingsList() {
 
       <Dialog open={showMFASetup} onOpenChange={setShowMFASetup}>
         <DialogContent className="sm:max-w-[480px] p-6 bg-background border-border">
-          <SetupMfa
+          <MFASetup
             onComplete={handleMFAComplete}
             onCancel={() => setShowMFASetup(false)}
           />

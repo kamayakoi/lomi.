@@ -156,7 +156,7 @@ function CustomersPage() {
         }
 
         const { data: organizationData, error: organizationError } = await supabase
-            .rpc('fetch_organization_details', { p_merchant_id: user?.id })
+            .rpc('fetch_organization_details', { p_merchant_id: user?.id || '' })
 
         if (organizationError) {
             console.error('Error fetching organization details:', organizationError)
@@ -164,8 +164,8 @@ function CustomersPage() {
         }
 
         const { error: customerError } = await supabase.rpc('create_customer', {
-            p_merchant_id: user?.id,
-            p_organization_id: organizationData[0].organization_id,
+            p_merchant_id: user?.id || '',
+            p_organization_id: organizationData[0]?.organization_id || '',
             p_name: formData.get('name') as string,
             p_email: formData.get('email') as string,
             p_phone_number: phoneNumber,

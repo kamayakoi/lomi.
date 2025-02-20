@@ -88,16 +88,16 @@ export async function createSubscriptionPlan(data: {
         p_merchant_id: user.id,
         p_organization_id: organizationData[0].organization_id,
         p_name: data.name,
-        p_description: data.description,
+        p_description: data.description || '',
         p_billing_frequency: data.billing_frequency,
         p_amount: data.amount,
         p_currency_code: 'XOF',
         p_failed_payment_action: data.failed_payment_action || 'continue',
-        p_charge_day: data.charge_day,
+        p_charge_day: data.charge_day || undefined,
         p_metadata: data.metadata || {},
         p_first_payment_type: data.first_payment_type || 'initial',
         p_display_on_storefront: data.display_on_storefront ?? true,
-        p_image_url: data.image_url
+        p_image_url: data.image_url || undefined
     })
 
     if (error) throw error
@@ -117,7 +117,7 @@ export async function updateSubscriptionPlan(planId: string, data: {
     const { error } = await supabase.rpc('update_subscription_plan', {
         p_plan_id: planId,
         p_name: data.name,
-        p_description: data.description,
+        p_description: data.description || '',
         p_billing_frequency: data.billing_frequency,
         p_amount: data.amount,
         p_failed_payment_action: data.failed_payment_action || 'continue',

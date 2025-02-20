@@ -31,6 +31,25 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { withActivationCheck } from '@/components/custom/with-activation-check'
 
+interface BalanceBreakdownDetails {
+    available_balance: number;
+    pending_balance: number;
+    total_balance: number;
+}
+
+function isBalanceBreakdownWithDetails(breakdown: unknown): breakdown is BalanceBreakdownDetails {
+    return (
+        breakdown !== null &&
+        typeof breakdown === 'object' &&
+        'available_balance' in breakdown &&
+        'pending_balance' in breakdown &&
+        'total_balance' in breakdown &&
+        typeof (breakdown as BalanceBreakdownDetails).available_balance === 'number' &&
+        typeof (breakdown as BalanceBreakdownDetails).pending_balance === 'number' &&
+        typeof (breakdown as BalanceBreakdownDetails).total_balance === 'number'
+    )
+}
+
 function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
@@ -173,6 +192,11 @@ function BalancePage() {
         setIsRefreshing(false)
     }
 
+    // Replace the balance display sections with type guarded versions
+    const getBalanceValue = (value: number | undefined) => {
+        return value?.toLocaleString() || '0'
+    }
+
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -240,7 +264,7 @@ function BalancePage() {
                                                     {isBalanceBreakdownLoading || isRefreshing ? (
                                                         <Skeleton className="w-32 h-8 rounded-none" />
                                                     ) : (
-                                                        `XOF ${balanceBreakdown?.available_balance?.toLocaleString() || '0'}`
+                                                        `XOF ${isBalanceBreakdownWithDetails(balanceBreakdown) ? getBalanceValue(balanceBreakdown.available_balance) : '0'}`
                                                     )}
                                                 </div>
                                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -329,7 +353,7 @@ function BalancePage() {
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
                                                                 <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
-                                                                `XOF ${balanceBreakdown?.total_balance?.toLocaleString() || '0'}`
+                                                                `XOF ${isBalanceBreakdownWithDetails(balanceBreakdown) ? getBalanceValue(balanceBreakdown.total_balance) : '0'}`
                                                             )}
                                                         </span>
                                                     </div>
@@ -344,7 +368,7 @@ function BalancePage() {
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
                                                                 <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
-                                                                `XOF ${balanceBreakdown?.pending_balance?.toLocaleString() || '0'}`
+                                                                `XOF ${isBalanceBreakdownWithDetails(balanceBreakdown) ? getBalanceValue(balanceBreakdown.pending_balance) : '0'}`
                                                             )}
                                                         </span>
                                                     </div>
@@ -359,7 +383,7 @@ function BalancePage() {
                                                             {isBalanceBreakdownLoading || isRefreshing ? (
                                                                 <Skeleton className="w-20 h-4 rounded-none" />
                                                             ) : (
-                                                                `XOF ${balanceBreakdown?.available_balance?.toLocaleString() || '0'}`
+                                                                `XOF ${isBalanceBreakdownWithDetails(balanceBreakdown) ? getBalanceValue(balanceBreakdown.available_balance) : '0'}`
                                                             )}
                                                         </span>
                                                     </div>

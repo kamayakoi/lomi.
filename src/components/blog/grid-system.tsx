@@ -32,3 +32,4 @@ export function GridSystem() {
     )
 }
 
+export default GridSystem;

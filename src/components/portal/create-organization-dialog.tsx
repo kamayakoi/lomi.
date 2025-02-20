@@ -59,7 +59,7 @@ export function CreateOrganizationDialog({ open, onOpenChange }: CreateOrganizat
             }
 
             const [newOrg] = orgData;
-            if (!newOrg.organization_id) {
+            if (!newOrg || !newOrg.organization_id) {
                 throw new Error('No organization ID returned');
             }
 

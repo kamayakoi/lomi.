@@ -173,9 +173,9 @@ const Activation: React.FC = () => {
                 p_authorized_signatory_name: completeData.fullName,
                 p_authorized_signatory_email: completeData.email,
                 p_authorized_signatory_phone_number: completeData.countryCode + completeData.mobileNumber,
-                p_legal_representative_id_url: completeData.identityProof,
-                p_address_proof_url: completeData.addressProof,
-                p_business_registration_url: completeData.businessRegistration,
+                p_legal_representative_id_url: completeData.identityProof || '',
+                p_address_proof_url: completeData.addressProof || '',
+                p_business_registration_url: completeData.businessRegistration || '',
             });
 
             if (error) throw error;

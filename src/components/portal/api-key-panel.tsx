@@ -23,7 +23,7 @@ export default function ApiKeysSection() {
                 if (error) {
                     console.error('Error fetching API key:', error);
                 } else if (data && data.length > 0) {
-                    setApiKey(data[0].api_key);
+                    setApiKey(data[0]?.api_key || '');
                 }
             }
         };

@@ -1,33 +1,9 @@
-export interface Webhook {
-    webhook_id: string
-    merchant_id: string
-    url: string
-    authorized_events: webhook_event[]
-    is_active: boolean
-    last_triggered_at: string | null
-    last_payload: Record<string, unknown> | null
-    last_response_status: number | null
-    last_response_body: string | null
-    retry_count: number | null
-    metadata: Record<string, unknown> | null
-    created_at: string
-    updated_at: string
-}
+import { Database } from 'database.types'
 
-export type webhook_event = 
-    | 'new_payment'
-    | 'new_subscription'
-    | 'payment_status_change'
-    | 'subscription_status_change'
-    | 'payout_status_change'
-    | 'payment_session_completed'
-    | 'payment_session_expired'
-    | 'invoice_paid'
-    | 'payment_succeeded'
-    | 'payment_pending'
-    | 'payment_failed'
-    | 'payment_token_status'
-    | 'recurring';
+type webhook_event = Database['public']['Enums']['webhook_event']
+type Webhook = Database['public']['Tables']['webhooks']['Row']
+
+export type { webhook_event, Webhook }
 
 export interface WebhookEventCategory {
     name: string;

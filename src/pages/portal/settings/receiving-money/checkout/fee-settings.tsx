@@ -130,7 +130,7 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
             for (const fee of feeTypes) {
                 const { error } = await supabase.rpc('manage_organization_fee_type', {
                     p_organization_id: settings.organization_id,
-                    p_fee_type_id: fee.id,
+                    p_fee_type_id: fee.id || undefined,
                     p_name: fee.name,
                     p_percentage: Number(fee.percentage),
                     p_is_enabled: fee.enabled

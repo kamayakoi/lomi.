@@ -43,13 +43,13 @@ export const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customerId, 
             const customer = await fetchCustomer(customerId)
             if (customer) {
                 setValue('name', customer.name)
-                setValue('email', customer.email)
-                setValue('phone_number', customer.phone_number)
-                setValue('whatsapp_number', customer.whatsapp_number)
-                setValue('country', customer.country)
-                setValue('city', customer.city)
-                setValue('address', customer.address)
-                setValue('postal_code', customer.postal_code)
+                setValue('email', customer.email || '')
+                setValue('phone_number', customer.phone_number || '')
+                setValue('whatsapp_number', customer.whatsapp_number || '')
+                setValue('country', customer.country || '')
+                setValue('city', customer.city || '')
+                setValue('address', customer.address || '')
+                setValue('postal_code', customer.postal_code || '')
                 setValue('is_business', customer.is_business)
             }
         }
