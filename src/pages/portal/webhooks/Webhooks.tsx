@@ -30,7 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import WebhookActions from './components/edit'
 import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'

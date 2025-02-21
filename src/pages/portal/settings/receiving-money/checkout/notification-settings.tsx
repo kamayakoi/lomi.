@@ -11,7 +11,7 @@ import { type CheckedState } from "@radix-ui/react-checkbox"
 import { type CheckoutSettings, type CustomerNotifications, type MerchantRecipient } from '@/lib/types/checkout-settings'
 import { OrganizationContext } from '@/lib/contexts/organization-context'
 import { supabase } from '@/utils/supabase/client'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const DEFAULT_CUSTOMER_NOTIFICATIONS: CustomerNotifications = {
     new_payment_links: { email: false, whatsapp: false },

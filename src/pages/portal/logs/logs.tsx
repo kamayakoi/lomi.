@@ -33,7 +33,7 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 function LogsPage() {
     const { user } = useUser()

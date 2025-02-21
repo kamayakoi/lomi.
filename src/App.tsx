@@ -1,6 +1,6 @@
 import { ThemeProvider } from "@/components/landing/theme-provider";
 import { UserProvider } from '@/lib/contexts/user-context';
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from "@vercel/analytics/react";
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
@@ -14,9 +14,8 @@ const queryClient = new QueryClient({
             refetchOnWindowFocus: false,
             retry: 1,
             staleTime: 5 * 60 * 1000,
-            cacheTime: 10 * 60 * 1000,
-            suspense: false,
-            useErrorBoundary: true,
+            gcTime: 10 * 60 * 1000,
+            throwOnError: true,
         },
     },
 });

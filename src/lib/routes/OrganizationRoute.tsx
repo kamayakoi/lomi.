@@ -17,6 +17,9 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const { organizationId: currentOrgId } = useParams();
 
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const isPortalSubdomain = window.location.hostname.startsWith('portal.');
+
     useEffect(() => {
         const validateAndSetOrg = async () => {
             if (!user?.id) return;
@@ -31,7 +34,10 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
 
                 // If no organizations, redirect to onboarding
                 if (!orgs?.length) {
-                    navigate('/onboarding', { replace: true });
+                    const onboardingUrl = isProduction
+                        ? 'https://lomi.africa/onboarding'
+                        : '/onboarding';
+                    window.location.href = onboardingUrl;
                     return;
                 }
 
@@ -39,11 +45,22 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
                 if (!currentOrgId || !orgs.some((org: Organization) => org.organization_id === currentOrgId)) {
                     const firstOrg = orgs[0];
                     if (firstOrg) {
+                        if (isProduction && !isPortalSubdomain) {
+                            // Redirect to portal subdomain
+                            window.location.href = `https://portal.lomi.africa/${firstOrg.organization_id}`;
+                            return;
+                        }
                         navigate(
                             `/${firstOrg.organization_id}`,
                             { replace: true }
                         );
                     }
+                    return;
+                }
+
+                // If we're in production and not on portal subdomain, redirect
+                if (isProduction && !isPortalSubdomain) {
+                    window.location.href = `https://portal.lomi.africa${location.pathname}`;
                     return;
                 }
             } catch (error) {
@@ -53,7 +70,7 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
         };
 
         validateAndSetOrg();
-    }, [user?.id, currentOrgId, location.pathname, navigate]);
+    }, [user?.id, currentOrgId, location.pathname, navigate, isProduction, isPortalSubdomain]);
 
     if (!user) {
         return <AnimatedLogoLoader />;

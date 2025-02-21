@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
 import { Transaction, FetchedTransaction } from './types'
 import { DateRange } from 'react-day-picker'
-import { useQuery, UseQueryOptions } from 'react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { Database } from 'database.types'
 
 export const fetchTransactions = async (

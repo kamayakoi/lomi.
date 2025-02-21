@@ -21,7 +21,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { PlusCircle, Edit, ImageIcon, ClipboardList, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import ProductActions from './components/actions'
 import { EditProductForm } from './components/edit'
 import { withActivationCheck } from '@/components/custom/with-activation-check'

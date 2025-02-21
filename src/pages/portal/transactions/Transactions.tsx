@@ -14,7 +14,7 @@ import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySe
 import { useUser } from '@/lib/hooks/use-user'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useInfiniteQuery, useQueryClient } from 'react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import AnimatedLogoLoader from '@/components/portal/loader'
 import TransactionActions from './components/actions'
 import TransactionFilters from './components/filters'

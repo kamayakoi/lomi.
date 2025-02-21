@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/utils/supabase/client'
 import { Payout, payout_status, BankAccount, BalanceBreakdown } from './types'
 import { DateRange } from 'react-day-picker'
