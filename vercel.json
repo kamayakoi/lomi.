@@ -1,9 +1,12 @@
 {
-  "buildCommand": "bun run build",
+  "buildCommand": "BUN_ENV=production bun run build",
   "devCommand": "bun run dev",
   "installCommand": "bun install",
   "framework": "vite",
   "outputDirectory": "dist",
+  "env": {
+    "BUN_ENV": "production"
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ],
