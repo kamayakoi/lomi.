@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from '@/components/custom/button';
 import { cn } from '@/lib/actions/utils';
 import { MFA } from "@/components/mfa/mfa";
+import InfoBox from '@/components/ui/info-box'
 interface MerchantDetails {
     merchant_id: string;
     name: string;
@@ -886,9 +887,13 @@ function Profile() {
                             <MFA />
                         </div>
 
-                        <p className="text-sm text-muted-foreground mt-4">
-                            Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Profile information" className="underline">hello@lomi.africa</a> if you want to update your profile details.
-                        </p>
+                        <InfoBox mini
+                            variant="green"
+                            title="Need help?"
+                            type="info"
+                        >
+                            Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> if you need assistance with updating your profile details.
+                        </InfoBox>
                     </div>
 
                     {showPinModal && (

@@ -8,6 +8,8 @@ import { supabase } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 import { toast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import InfoBox from '@/components/ui/info-box'
 
 interface StatementMetadata {
     invoice_date: string;
@@ -121,6 +123,11 @@ function BillingStatements() {
                 desc="View your platform fees and monthly statements."
             >
                 <div className="space-y-6">
+                    <Alert variant="info">
+                        <AlertDescription>
+                            This information helps customers recognize your business, and may appear in your payment statements, invoices, and receipts.
+                        </AlertDescription>
+                    </Alert>
                     <Card
                         className="rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
                         onClick={() => setShowFeesBreakdown(!showFeesBreakdown)}
@@ -289,10 +296,13 @@ function BillingStatements() {
                             )}
                         </CardContent>
                     </Card>
-
-                    <p className="text-sm text-muted-foreground">
-                        Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Platform Fees Inquiry" className="underline">hello@lomi.africa</a> for any questions about your platform fees.
-                    </p>
+                    <InfoBox mini
+                        variant="green"
+                        title="Need help?"
+                        type="info"
+                    >
+                        Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> for any questions about your platform fees, statements, or balance.
+                    </InfoBox>
                 </div>
             </ContentSection>
         </div>

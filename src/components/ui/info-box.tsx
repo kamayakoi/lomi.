@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Info, Lightbulb } from "lucide-react"
+import { Info, Lightbulb, AlertTriangle, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/actions/utils"
 import { Link } from "react-router-dom"
 
@@ -9,8 +9,8 @@ interface InfoBoxProps extends React.HTMLAttributes<HTMLDivElement> {
     title?: string
     mini?: boolean
     link?: string
-    variant?: 'blue' | 'green' | 'red' | 'tip'
-    type?: 'info' | 'tip'
+    variant?: 'blue' | 'green' | 'red' | "yellow"
+    type?: 'info' | 'tip' | 'warning' | 'info2'
 }
 
 export default function InfoBox({
@@ -39,16 +39,16 @@ export default function InfoBox({
             icon: "text-red-600 dark:text-red-400",
             text: "text-red-700 dark:text-red-300",
         },
-        tip: {
-            box: "border-green-200 bg-green-50 dark:border-green-200/30 dark:bg-green-950/30",
-            icon: "text-green-600 dark:text-green-400",
-            text: "text-green-700 dark:text-green-300",
+        yellow: {
+            box: "border-yellow-200 bg-yellow-50 dark:border-yellow-200/30 dark:bg-yellow-950/30",
+            icon: "text-yellow-600 dark:text-yellow-400",
+            text: "text-yellow-700 dark:text-yellow-300",
         }
     } as const;
 
     // Ensure we use a valid variant
     const safeVariant = variant in variantStyles ? variant : 'blue';
-    const Icon = type === 'tip' ? Lightbulb : Info;
+    const Icon = type === 'tip' ? Lightbulb : type === 'warning' ? AlertTriangle : type === 'info2' ? AlertCircle : Info;
 
     const content = (
         <div
@@ -67,15 +67,15 @@ export default function InfoBox({
                         <h4 className={cn("font-semibold mb-2", variantStyles[safeVariant].icon)}>
                             {title}
                         </h4>
-                        <div className={cn("text-[12px] leading-relaxed", variantStyles[safeVariant].text)}>
+                        <div className={cn("text-[14px] leading-relaxed", variantStyles[safeVariant].text)}>
                             {children}
                         </div>
                     </div>
                 </>
             ) : (
                 <>
-                    <Icon className={cn("h-5 w-5 flex-shrink-0", variantStyles[safeVariant].icon)} />
-                    <div className={cn("text-[10px]", variantStyles[safeVariant].text)}>
+                    <Icon className={cn("h-3 w-3 flex-shrink-0 -mr-1", variantStyles[safeVariant].icon)} />
+                    <div className={cn("text-[11px]", variantStyles[safeVariant].text)}>
                         {children}
                         {link && (
                             <span className="border-b border-white/20 hover:border-white/40 ml-1">

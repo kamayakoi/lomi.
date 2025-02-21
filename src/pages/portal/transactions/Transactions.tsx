@@ -105,49 +105,81 @@ function TransactionsPage() {
     const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['totalIncomingAmount', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: transactionCount = 0, isLoading: isTransactionCountLoading } = useTransactionCount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['transactionCount', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: completionRate = { completed: 0, refunded: 0, failed: 0 }, isLoading: isCompletionRateLoading } = useCompletionRate(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['completionRate', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<CompletionRate>
 
     const { data: grossAmount = 0, isLoading: isGrossAmountLoading } = useGrossAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['grossAmount', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: feeAmount = 0, isLoading: isFeeAmountLoading } = useFeeAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['feeAmount', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: averageTransactionValue = 0, isLoading: isAverageTransactionValueLoading } = useAverageTransactionValue(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['averageTransactionValue', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: averageCustomerLifetimeValue = 0, isLoading: isAverageCustomerLifetimeValueLoading } = useAverageCustomerLifetimeValue(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['averageCustomerLifetimeValue', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const { data: averageRetentionRate = 0, isLoading: isAverageRetentionRateLoading } = useAverageRetentionRate(
         user?.id || '',
         selectedDateRange,
-        customDateRange
+        customDateRange,
+        {
+            queryKey: ['averageRetentionRate', user?.id || '', selectedDateRange, customDateRange] as const,
+            enabled: !!user?.id
+        }
     ) as QueryResult<number>
 
     const handleSort = (column: keyof Transaction) => {

@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { PlusIcon, XIcon, Mail } from 'lucide-react'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/lib/hooks/use-toast"
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import InfoBox from '@/components/ui/info-box'
 
 export default function EmailNotifications() {
     const [emails, setEmails] = useState<string[]>([])
@@ -64,7 +66,12 @@ export default function EmailNotifications() {
                 title="Email notifications"
                 desc="Configure email recipients of withdrawal notifications."
             >
-                <div>
+                <div className="space-y-6">
+                    <Alert variant="info">
+                        <AlertDescription>
+                            You can add up to 10 email recipients.
+                        </AlertDescription>
+                    </Alert>
                     <Card className="rounded-none border">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-lg font-medium">Email recipients</CardTitle>
@@ -131,10 +138,13 @@ export default function EmailNotifications() {
                             )}
                         </CardContent>
                     </Card>
-
-                    <p className="text-sm text-muted-foreground mt-4">
-                        Contact hello@lomi.africa if you need assistance with managing your email notifications.
-                    </p>
+                    <InfoBox mini
+                        variant="green"
+                        title="Need help?"
+                        type="info"
+                    >
+                        Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> if you need assistance with managing your email notifications.
+                    </InfoBox>
                 </div>
             </ContentSection>
         </div>

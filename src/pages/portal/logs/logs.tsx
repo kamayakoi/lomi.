@@ -584,16 +584,30 @@ function formatEventName(event: string): string {
     }
 }
 
-function formatUserAgent(userAgent: string): string {
-    // Extract OS name from user agent
-    const osMatch = userAgent.match(/\((.*?)\)/)
-    return osMatch?.[1]?.split(';')[0]?.trim() ?? userAgent
+function formatUserAgent(userAgent: string | null): string {
+    if (!userAgent) return 'Unknown';
+
+    try {
+        // Extract OS name from user agent
+        const osMatch = (userAgent as string).match(/\((.*?)\)/);
+        return osMatch?.[1]?.split(';')[0]?.trim() ?? 'Unknown';
+    } catch (error) {
+        console.error('Error formatting user agent string:', error);
+        return 'Unknown';
+    }
 }
 
-function formatBrowser(browser: string): string {
+function formatBrowser(browser: string | null): string {
+    if (!browser) return 'Unknown';
+
     // Extract browser name and version
-    const browserInfo = browser.split('"').filter(part => part.includes('/'))[0]
-    return browserInfo || browser
+    try {
+        const browserInfo = browser.split('"').filter(part => part.includes('/'))[0];
+        return browserInfo || 'Unknown';
+    } catch (error) {
+        console.error('Error formatting browser string:', error);
+        return 'Unknown';
+    }
 }
 
 function LogCard({ log }: { log: Log }) {

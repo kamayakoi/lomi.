@@ -25,6 +25,7 @@ import { format } from "date-fns"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { cn } from "@/lib/actions/utils"
 import { Separator } from "@/components/ui/separator"
+import InfoBox from '@/components/ui/info-box'
 
 interface OrganizationDetails {
     organization_id: string;
@@ -689,9 +690,13 @@ export default function Business() {
                             </div>
                         </div>
 
-                        <p className="text-sm text-muted-foreground">
-                            Contact <a href="mailto:hello@lomi.africa?subject=[Support] — Updating Business information" className="underline">hello@lomi.africa</a> if you want to update your business details.
-                        </p>
+                        <InfoBox mini
+                            variant="green"
+                            title="Need help?"
+                            type="info"
+                        >
+                            Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> if you need assistance with updating your business details.
+                        </InfoBox>
                     </div>
 
                     {/* Team Members Section */}

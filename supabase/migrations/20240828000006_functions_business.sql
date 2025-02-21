@@ -1,6 +1,8 @@
 -- Function to fetch organization details
-CREATE OR REPLACE FUNCTION public.fetch_organization_details(p_merchant_id UUID)
-RETURNS TABLE (
+CREATE OR REPLACE FUNCTION public.fetch_organization_details(
+    p_merchant_id UUID,
+    p_organization_id UUID DEFAULT NULL
+) RETURNS TABLE (
     organization_id UUID,
     name VARCHAR,
     email VARCHAR,
@@ -38,7 +40,8 @@ BEGIN
     LEFT JOIN 
         organization_addresses oa ON o.organization_id = oa.organization_id
     WHERE 
-        mol.merchant_id = p_merchant_id;
+        mol.merchant_id = p_merchant_id
+        AND (p_organization_id IS NULL OR o.organization_id = p_organization_id);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 

@@ -49,7 +49,6 @@
     "update:types": "bunx supabase gen types typescript --project-id mdswvokxrnfggrujsfjd > database.types.ts",
     "sitemap": "python src/lib/scripts/generate_sitemap.py",
     "generate:sitemap": "python src/lib/scripts/generate_sitemap.py",
-    "prepare": "husky",
     "db:check": "supabase db diff",
     "lint:staged": "lint-staged"
   },
@@ -176,6 +175,7 @@
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "@vitejs/plugin-react": "4.3.4",
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
     "autoprefixer": "10.4.20",
     "bun-types": "1.2.0",
     "eslint": "8.57.1",

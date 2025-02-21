@@ -64,8 +64,8 @@ export type Log = {
     log_id: string
     event: EventType
     ip_address: string
-    operating_system: string
-    browser: string
+    operating_system: string | null
+    browser: string | null
     details: Record<string, unknown>
     severity: SeverityType
     request_url: string

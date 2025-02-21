@@ -114,9 +114,9 @@ export function MFA({ onUnenrollComplete }: MFAProps) {
         <div className="space-y-2">
             {isOAuthUser && (
                 <InfoBox
-                    variant="green"
+                    variant="yellow"
                     title="Authentication Provider Support"
-                    type="info"
+                    type="warning"
                 >
                     Two-factor authentication is currently only available for accounts created with email authentication.
                     Merchants signed in with Google or GitHub will need to use sign-in via email and password to see 2FA challenges.

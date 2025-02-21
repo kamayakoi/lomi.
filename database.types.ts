@@ -2075,6 +2075,7 @@ export type Database = {
             | null
           first_payment_type: Database["public"]["Enums"]["first_payment_type"]
           image_url: string | null
+          is_active: boolean
           merchant_id: string
           metadata: Json | null
           name: string
@@ -2095,6 +2096,7 @@ export type Database = {
             | null
           first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
           image_url?: string | null
+          is_active?: boolean
           merchant_id: string
           metadata?: Json | null
           name: string
@@ -2115,6 +2117,7 @@ export type Database = {
             | null
           first_payment_type?: Database["public"]["Enums"]["first_payment_type"]
           image_url?: string | null
+          is_active?: boolean
           merchant_id?: string
           metadata?: Json | null
           name?: string
@@ -2521,28 +2524,17 @@ export type Database = {
         }
         Returns: string
       }
-      create_organization:
-        | {
-            Args: {
-              p_merchant_id: string
-              p_name?: string
-              p_role?: Database["public"]["Enums"]["member_role"]
-            }
-            Returns: {
-              organization_id: string
-              store_handle: string
-            }[]
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_role?: Database["public"]["Enums"]["member_role"]
-            }
-            Returns: {
-              organization_id: string
-              store_handle: string
-            }[]
-          }
+      create_organization: {
+        Args: {
+          p_merchant_id: string
+          p_name?: string
+          p_role?: Database["public"]["Enums"]["member_role"]
+        }
+        Returns: {
+          organization_id: string
+          store_handle: string
+        }[]
+      }
       create_organization_webhook: {
         Args: {
           p_merchant_id: string
@@ -2660,108 +2652,21 @@ export type Database = {
         }
         Returns: string
       }
-      create_transaction:
-        | {
-            Args: {
-              merchant_id: string
-              organization_id: string
-              customer_id: string
-              product_id: string
-              subscription_id: string
-              transaction_type: Database["public"]["Enums"]["transaction_type"]
-              description: string
-              reference_id: string
-              metadata: Json
-              gross_amount: number
-              fee_amount: number
-              net_amount: number
-              fee_reference: string
-              currency_code: Database["public"]["Enums"]["currency_code"]
-              provider_code: Database["public"]["Enums"]["provider_code"]
-              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-            }
-            Returns: {
-              additional_fees: Json | null
-              created_at: string
-              currency_code: Database["public"]["Enums"]["currency_code"]
-              customer_id: string
-              description: string | null
-              fee_amount: number
-              fee_reference: string
-              gross_amount: number
-              merchant_id: string
-              metadata: Json | null
-              net_amount: number
-              organization_id: string
-              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-              product_id: string | null
-              provider_code: Database["public"]["Enums"]["provider_code"]
-              status: Database["public"]["Enums"]["transaction_status"]
-              subscription_id: string | null
-              transaction_id: string
-              transaction_type: Database["public"]["Enums"]["transaction_type"]
-              updated_at: string
-            }
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id: string
-              p_customer_id: string
-              p_amount: number
-              p_currency_code: Database["public"]["Enums"]["currency_code"]
-              p_provider_code: Database["public"]["Enums"]["provider_code"]
-              p_payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-              p_description?: string
-              p_product_id?: string
-              p_subscription_id?: string
-              p_metadata?: Json
-            }
-            Returns: string
-          }
-      create_transaction_with_provider: {
+      create_transaction: {
         Args: {
-          merchant_id: string
-          organization_id: string
-          customer_id: string
-          product_id: string
-          subscription_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          description: string
-          reference_id: string
-          metadata: Json
-          gross_amount: number
-          fee_amount: number
-          net_amount: number
-          fee_reference: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          provider_transaction_id: string
-          provider_payment_status: string
+          p_merchant_id: string
+          p_organization_id: string
+          p_customer_id: string
+          p_amount: number
+          p_currency_code: Database["public"]["Enums"]["currency_code"]
+          p_provider_code: Database["public"]["Enums"]["provider_code"]
+          p_payment_method_code: Database["public"]["Enums"]["payment_method_code"]
+          p_description?: string
+          p_product_id?: string
+          p_subscription_id?: string
+          p_metadata?: Json
         }
-        Returns: {
-          additional_fees: Json | null
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id: string
-          description: string | null
-          fee_amount: number
-          fee_reference: string
-          gross_amount: number
-          merchant_id: string
-          metadata: Json | null
-          net_amount: number
-          organization_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          product_id: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          status: Database["public"]["Enums"]["transaction_status"]
-          subscription_id: string | null
-          transaction_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          updated_at: string
-        }
+        Returns: string
       }
       create_wave_checkout_transaction: {
         Args: {
@@ -2904,41 +2809,22 @@ export type Database = {
           total_balance: number
         }[]
       }
-      fetch_bank_accounts:
-        | {
-            Args: Record<PropertyKey, never>
-            Returns: {
-              id: string
-              account_number: string
-              account_name: string
-              bank_name: string
-              bank_code: string
-              branch_code: string
-              country: string
-              is_default: boolean
-              is_valid: boolean
-              created_at: string
-              updated_at: string
-            }[]
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-            }
-            Returns: {
-              bank_account_id: string
-              account_number: string
-              account_name: string
-              bank_name: string
-              bank_code: string
-              branch_code: string
-              country: string
-              is_default: boolean
-              is_valid: boolean
-              created_at: string
-              updated_at: string
-            }[]
-          }
+      fetch_bank_accounts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          account_number: string
+          account_name: string
+          bank_name: string
+          bank_code: string
+          branch_code: string
+          country: string
+          is_default: boolean
+          is_valid: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
       fetch_billing_statements: {
         Args: {
           p_merchant_id: string
@@ -3178,26 +3064,48 @@ export type Database = {
           fee_types: Json
         }[]
       }
-      fetch_organization_details: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          organization_id: string
-          name: string
-          email: string
-          logo_url: string
-          website_url: string
-          verified: boolean
-          default_currency: Database["public"]["Enums"]["currency_code"]
-          country: string
-          region: string
-          city: string
-          district: string
-          street: string
-          postal_code: string
-        }[]
-      }
+      fetch_organization_details:
+        | {
+            Args: {
+              p_merchant_id: string
+            }
+            Returns: {
+              organization_id: string
+              name: string
+              email: string
+              logo_url: string
+              website_url: string
+              verified: boolean
+              default_currency: Database["public"]["Enums"]["currency_code"]
+              country: string
+              region: string
+              city: string
+              district: string
+              street: string
+              postal_code: string
+            }[]
+          }
+        | {
+            Args: {
+              p_merchant_id: string
+              p_organization_id?: string
+            }
+            Returns: {
+              organization_id: string
+              name: string
+              email: string
+              logo_url: string
+              website_url: string
+              verified: boolean
+              default_currency: Database["public"]["Enums"]["currency_code"]
+              country: string
+              region: string
+              city: string
+              district: string
+              street: string
+              postal_code: string
+            }[]
+          }
       fetch_organization_fees: {
         Args: {
           p_merchant_id: string
@@ -3715,13 +3623,13 @@ export type Database = {
         }
         Returns: string
       }
-      get_available_providers: {
-        Args: {
-          organization_id: string
-        }
+      get_api_usage_stats: {
+        Args: Record<PropertyKey, never>
         Returns: {
-          code: Database["public"]["Enums"]["provider_code"]
-          name: string
+          total_active_users: number
+          last_24h_users: number
+          last_7d_users: number
+          last_30d_users: number
         }[]
       }
       get_base_url: {
@@ -3736,13 +3644,79 @@ export type Database = {
           browser: string
         }[]
       }
-      get_merchant_details: {
+      get_customer_demographics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          is_business: boolean
+          country: string
+          count: number
+        }[]
+      }
+      get_global_banking_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_bank_accounts: number
+          total_payouts: number
+          total_payout_amount: number
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          payout_status: Database["public"]["Enums"]["payout_status"]
+        }[]
+      }
+      get_global_product_plan_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_products: number
+          total_plans: number
+          active_subscriptions: number
+          avg_products_per_merchant: number
+        }[]
+      }
+      get_global_refund_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_refunds: number
+          total_refunded_amount: number
+          status: Database["public"]["Enums"]["refund_status"]
+          currency_code: Database["public"]["Enums"]["currency_code"]
+        }[]
+      }
+      get_global_transaction_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_transactions: number
+          total_gross_amount: number
+          total_fee_amount: number
+          total_net_amount: number
+          currency_code: Database["public"]["Enums"]["currency_code"]
+        }[]
+      }
+      get_invoices_by_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          status: string
+          count: number
+          amount: number
+          due_amount: number
+        }[]
+      }
+      get_merchant_balance_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          currency_code: string
+          average_balance: number
+          total_balance: number
+          merchant_count: number
+        }[]
+      }
+      get_merchant_customer_stats: {
         Args: {
-          merchant_id: string
+          p_merchant_id: string
         }
         Returns: {
-          id: string
-          name: string
+          total_customers: number
+          business_customers: number
+          individual_customers: number
+          customers_with_transactions: number
         }[]
       }
       get_merchant_details_for_wave: {
@@ -3764,6 +3738,15 @@ export type Database = {
           phone_number: string
         }[]
       }
+      get_merchant_growth_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_merchants: number
+          onboarded_merchants: number
+          total_mrr: number
+          total_arr: number
+        }[]
+      }
       get_merchant_organization_id: {
         Args: {
           p_merchant_id: string
@@ -3781,14 +3764,80 @@ export type Database = {
           organization_id: string
         }[]
       }
-      get_organization_details: {
+      get_merchant_product_stats: {
         Args: {
-          org_id: string
+          p_merchant_id: string
         }
         Returns: {
-          id: string
-          name: string
-          logo_url: string
+          total_products: number
+          active_products: number
+          total_plans: number
+          active_plans: number
+        }[]
+      }
+      get_merchant_refund_stats: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          total_refunds: number
+          refunded_amount: number
+          status: Database["public"]["Enums"]["refund_status"]
+          currency_code: Database["public"]["Enums"]["currency_code"]
+        }[]
+      }
+      get_merchant_transaction_stats: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          total_transactions: number
+          total_amount: number
+          total_fees: number
+          net_amount: number
+          currency_code: Database["public"]["Enums"]["currency_code"]
+          status: Database["public"]["Enums"]["transaction_status"]
+        }[]
+      }
+      get_organization_demographics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          industry: string
+          status: string
+          count: number
+          country: string
+          kyc_status: string
+        }[]
+      }
+      get_organization_kyc_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          status: Database["public"]["Enums"]["kyc_status"]
+          count: number
+        }[]
+      }
+      get_organization_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_organizations: number
+          verified_organizations: number
+          total_customers: number
+          total_merchants: number
+        }[]
+      }
+      get_organizations_by_country: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          country: string
+          count: number
+        }[]
+      }
+      get_organizations_by_industry: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          industry: string
+          status: Database["public"]["Enums"]["organization_status"]
+          count: number
         }[]
       }
       get_payment_link_available_providers: {
@@ -3798,33 +3847,6 @@ export type Database = {
         Returns: {
           code: Database["public"]["Enums"]["provider_code"]
           name: string
-        }[]
-      }
-      get_payment_link_by_id: {
-        Args: {
-          link_id: string
-        }
-        Returns: {
-          id: string
-          merchant_id: string
-          organization_id: string
-          link_type: Database["public"]["Enums"]["link_type"]
-          url: string
-          product_id: string
-          plan_id: string
-          title: string
-          public_description: string
-          private_description: string
-          price: number
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          allowed_providers: Database["public"]["Enums"]["provider_code"][]
-          allow_coupon_code: boolean
-          is_active: boolean
-          expires_at: string
-          success_url: string
-          metadata: Json
-          created_at: string
-          updated_at: string
         }[]
       }
       get_plan_by_id: {
@@ -3862,32 +3884,44 @@ export type Database = {
           organization_id: string
         }[]
       }
-      get_transaction_by_id: {
-        Args: {
-          transaction_id: string
-        }
+      get_subscription_stats: {
+        Args: Record<PropertyKey, never>
         Returns: {
-          additional_fees: Json | null
-          created_at: string
-          currency_code: Database["public"]["Enums"]["currency_code"]
-          customer_id: string
-          description: string | null
-          fee_amount: number
-          fee_reference: string
-          gross_amount: number
-          merchant_id: string
-          metadata: Json | null
-          net_amount: number
-          organization_id: string
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          product_id: string | null
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          status: Database["public"]["Enums"]["transaction_status"]
-          subscription_id: string | null
-          transaction_id: string
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          updated_at: string
-        }
+          total_subscriptions: number
+          active_subscriptions: number
+          total_revenue: number
+          recurring_revenue: number
+        }[]
+      }
+      get_subscriptions_by_plan: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          plan_id: string
+          plan_name: string
+          total_count: number
+          active_count: number
+          total_revenue: number
+          recurring_revenue: number
+        }[]
+      }
+      get_team_members_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_members: number
+          active_members: number
+          pending_invites: number
+          average_members_per_merchant: number
+        }[]
+      }
+      get_top_performing_products: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          gross_revenue: number
+          net_revenue: number
+          transactions: number
+        }[]
       }
       get_transaction_fee: {
         Args: {
@@ -3900,6 +3934,63 @@ export type Database = {
           name: string
           percentage: number
           fixed_amount: number
+        }[]
+      }
+      get_transaction_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_count: number
+          total_gross_amount: number
+          total_net_amount: number
+          total_fee_amount: number
+        }[]
+      }
+      get_transaction_stats_by_merchant: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          merchant_id: string
+          total_transactions: number
+          total_amount: number
+          average_amount: number
+        }[]
+      }
+      get_transaction_stats_by_provider: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          provider_code: string
+          total_transactions: number
+          total_amount: number
+          successful_transactions: number
+          failed_transactions: number
+          success_rate: number
+        }[]
+      }
+      get_transactions_by_date: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          date: string
+          count: number
+          gross_amount: number
+          net_amount: number
+          fee_amount: number
+        }[]
+      }
+      get_transactions_by_provider: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          provider_code: string
+          count: number
+          gross_amount: number
+          net_amount: number
+          fee_amount: number
+        }[]
+      }
+      get_transactions_by_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          status: string
+          count: number
+          gross_amount: number
         }[]
       }
       get_wave_payment_status: {
@@ -4125,16 +4216,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_merchant_2fa: {
-        Args: {
-          p_merchant_id: string
-          p_totp_secret: string
-          p_has_2fa: boolean
-          p_last_2fa_verification?: string
-          p_name?: string
-        }
-        Returns: undefined
-      }
       update_merchant_avatar: {
         Args: {
           p_merchant_id: string
@@ -4312,43 +4393,14 @@ export type Database = {
         }
         Returns: boolean
       }
-      update_transaction_status:
-        | {
-            Args: {
-              p_transaction_id: string
-              p_status: Database["public"]["Enums"]["transaction_status"]
-              p_metadata?: Json
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              transaction_id: string
-              new_status: Database["public"]["Enums"]["transaction_status"]
-            }
-            Returns: {
-              additional_fees: Json | null
-              created_at: string
-              currency_code: Database["public"]["Enums"]["currency_code"]
-              customer_id: string
-              description: string | null
-              fee_amount: number
-              fee_reference: string
-              gross_amount: number
-              merchant_id: string
-              metadata: Json | null
-              net_amount: number
-              organization_id: string
-              payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-              product_id: string | null
-              provider_code: Database["public"]["Enums"]["provider_code"]
-              status: Database["public"]["Enums"]["transaction_status"]
-              subscription_id: string | null
-              transaction_id: string
-              transaction_type: Database["public"]["Enums"]["transaction_type"]
-              updated_at: string
-            }
-          }
+      update_transaction_status: {
+        Args: {
+          p_transaction_id: string
+          p_status: Database["public"]["Enums"]["transaction_status"]
+          p_metadata?: Json
+        }
+        Returns: boolean
+      }
       update_wave_checkout_status: {
         Args: {
           p_provider_checkout_id: string

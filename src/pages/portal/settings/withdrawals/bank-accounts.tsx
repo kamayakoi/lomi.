@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from "@/lib/hooks/use-toast"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import InfoBox from '@/components/ui/info-box'
 export default function BankAccounts() {
     const [accounts, setAccounts] = useState<BankAccount[]>([])
     const { user } = useUser()
@@ -275,15 +275,15 @@ export default function BankAccounts() {
                                         </DialogHeader>
                                         <div className="space-y-4">
                                             <img
-                                                src="/autopayout.webp"
+                                                src="/company/autopayout.webp"
                                                 alt="Auto-withdrawal illustration"
                                                 className="w-full"
                                             />
                                             <DialogDescription>
                                                 <ul className="list-disc pl-5 space-y-2">
                                                     <li>Schedule your withdrawals on a recurring basis: monthly, weekly, or daily. It&apos;s up to you!</li>
-                                                    <li>Get a detailed withdrawal report directly through your email.</li>
-                                                    <li>Only takes less than 3 mins to set up!</li>
+                                                    <li>Get a detailed withdrawal report directly via email.</li>
+                                                    <li>Only takes one minute to set up!</li>
                                                 </ul>
                                             </DialogDescription>
                                         </div>
@@ -315,12 +315,15 @@ export default function BankAccounts() {
                             </div>
                         </CardContent>
                     </Card>
+                    <InfoBox mini className="mt-6"
+                        variant="green"
+                        title="Need help?"
+                        type="info"
+                    >
+                        Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> if you need assistance with managing your bank accounts.
+                    </InfoBox>
                 </ContentSection>
             </div>
-
-            <p className="text-sm text-muted-foreground mt-4">
-                Contact <a href="mailto:help@lomi.africa" className="underline">help@lomi.africa</a> if you need assistance with managing your bank accounts.
-            </p>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent className="rounded-none">
