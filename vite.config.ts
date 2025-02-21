@@ -1,5 +1,5 @@
 import path from "path";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -9,7 +9,6 @@ import compression from 'vite-plugin-compression';
 export default defineConfig({
   plugins: [
     react(),
-    // Production-only plugins
     terser({
       compress: {
         drop_console: true,
@@ -26,11 +25,9 @@ export default defineConfig({
         properties: false
       },
     }),
-    // Lightweight obfuscation
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [/node_modules/, /\.d\.ts$/],
-      apply: "build",
       options: {
         compact: true,
         controlFlowFlattening: false,
@@ -43,7 +40,6 @@ export default defineConfig({
         target: 'browser'
       },
     }),
-    // Bundle analysis
     visualizer({
       filename: 'bundle-analysis.html',
       open: false,
@@ -51,7 +47,6 @@ export default defineConfig({
       brotliSize: true,
       template: 'treemap'
     }),
-    // Compression
     compression({
       algorithm: 'brotliCompress',
       ext: '.br',
@@ -77,36 +72,16 @@ export default defineConfig({
         main: path.resolve(__dirname, 'index.html'),
       },
       output: {
-        manualChunks: {
-          'vendor': [
-            'react',
-            'react-dom',
-            'framer-motion',
-          ],
-          'radix': [
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-collapsible',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-label',
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-radio-group',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-select',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-slider',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-toggle',
-            '@radix-ui/react-toggle-group',
-            '@radix-ui/react-tooltip'
-          ],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('framer-motion')) {
+              return 'vendor';
+            }
+            if (id.includes('@radix-ui')) {
+              return 'radix';
+            }
+            return 'deps';
+          }
         },
         assetFileNames: (assetInfo) => {
           if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
@@ -157,12 +132,26 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, "")
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('Sending Request:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log('Received Response:', proxyRes.statusCode, req.url);
+          });
+          (proxy as any).on('upgrade', function(req: any, socket: any, head: any) {
+            if (this.ws) {
+              console.log('WebSocket connection upgraded');
+              (this as any).ws(req, socket, head);
+            }
+          });
+        }
       }
-    },
-    headers: {
-      'Cache-Control': 'public, max-age=31536000',
-    },
+    }
   },
   optimizeDeps: {
     include: [
