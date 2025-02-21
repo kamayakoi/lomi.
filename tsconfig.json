@@ -18,7 +18,8 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "types": [
-            "bun-types"
+            "bun-types",
+            "node"
         ],
         /* Linting */
         "strict": true,
@@ -45,8 +46,7 @@
     "include": [
         "src/**/*.ts",
         "src/**/*.tsx",
-        "api/routes/server.js",
-        "src/pages/portal/transactions/components"
+        "vite.config.ts"
     ],
     "references": [
         {
