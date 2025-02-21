@@ -1,13 +1,13 @@
 import path from "path";
 import react from "@vitejs/plugin-react-swc";
-import { defineConfig } from "vite";
-import { terser } from 'rollup-plugin-terser';
+import { defineConfig, type ConfigEnv, type UserConfig } from "vite";
+import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 import obfuscatorPlugin from "vite-plugin-javascript-obfuscator";
 import compression from 'vite-plugin-compression';
 
 // Separate configs for dev and prod
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command }: ConfigEnv): UserConfig => ({
   plugins: [
     react(),
     ...(command === 'build' ? [
@@ -111,6 +111,7 @@ export default defineConfig(({ command }) => ({
           ],
         },
         assetFileNames: (assetInfo) => {
+          if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
           const info = assetInfo.name.split('.');
           const ext = info[info.length - 1];
           if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp/i.test(ext)) {
@@ -158,28 +159,7 @@ export default defineConfig(({ command }) => ({
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on('error', (err) => {
-            console.log('proxy error', err);
-          });
-
-          proxy.on('proxyReq', (proxyReq, req) => {
-            console.log('Sending Request:', req.method, req.url);
-          });
-
-          proxy.on('proxyRes', (proxyRes, req) => {
-            console.log('Received Response:', proxyRes.statusCode, req.url);
-          });
-
-          // Handle WebSocket upgrade with type assertion
-          (proxy as any).on('upgrade', function(req: any, socket: any, head: any) {
-            if (this.ws) {
-              console.log('WebSocket connection upgraded');
-              (this as any).ws(req, socket, head);
-            }
-          });
-        }
+        rewrite: (path: string) => path.replace(/^\/api/, "")
       }
     },
     headers: {
