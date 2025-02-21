@@ -12,6 +12,7 @@ jspm_packages/
 vite/
 vite-cache/
 .vite/
+.husky/
 
 # Build directories
 dist/
