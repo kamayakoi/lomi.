@@ -1,5 +1,5 @@
 import path from "path";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -28,6 +28,7 @@ export default defineConfig({
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [/node_modules/, /\.d\.ts$/],
+      apply: "build",
       options: {
         compact: true,
         controlFlowFlattening: false,
@@ -40,6 +41,7 @@ export default defineConfig({
         target: 'browser'
       },
     }),
+    // Bundle analysis
     visualizer({
       filename: 'bundle-analysis.html',
       open: false,
@@ -47,6 +49,7 @@ export default defineConfig({
       brotliSize: true,
       template: 'treemap'
     }),
+    // Compression
     compression({
       algorithm: 'brotliCompress',
       ext: '.br',
