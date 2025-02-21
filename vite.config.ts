@@ -9,140 +9,167 @@ import compression from 'vite-plugin-compression';
 export default defineConfig({
   plugins: [
     react(),
+    // Production-only plugins
     terser({
       compress: {
         drop_console: true,
+        pure_funcs: ['console.log'],
+        passes: 1,
+        unsafe_arrows: true,
+        unsafe_methods: true
       },
       format: {
         comments: false,
+        indent_level: 0
+      },
+      mangle: {
+        properties: false
       },
     }),
-    visualizer({
-      filename: 'bundle-analysis.html',
-      open: true,
-    }),
+    // Lightweight obfuscation
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [/node_modules/, /\.d\.ts$/],
       apply: "build",
-      debugger: true,
       options: {
         compact: true,
-        controlFlowFlattening: true,
-        controlFlowFlatteningThreshold: 1,
-        deadCodeInjection: true,
-        deadCodeInjectionThreshold: 0.9,
+        controlFlowFlattening: false,
+        deadCodeInjection: false,
         debugProtection: false,
-        debugProtectionInterval: 0,
         disableConsoleOutput: true,
-        domainLock: [],
-        domainLockRedirectUrl: 'about:blank',
-        forceTransformStrings: [],
-        identifierNamesCache: null,
-        identifierNamesGenerator: 'hexadecimal',
-        identifiersDictionary: [],
-        identifiersPrefix: '',
-        ignoreImports: false,
-        inputFileName: '',
-        log: false,
-        numbersToExpressions: false,
-        optionsPreset: 'default',
-        renameGlobals: true,
-        renameProperties: false,
-        renamePropertiesMode: 'safe',
-        reservedNames: [],
-        reservedStrings: [],
-        seed: 0,
-        selfDefending: true,
-        simplify: true,
-        sourceMap: false,
-        sourceMapBaseUrl: '',
-        sourceMapFileName: '',
-        sourceMapMode: 'separate',
-        sourceMapSourcesMode: 'sources-content',
-        splitStrings: false,
-        splitStringsChunkLength: 10,
         stringArray: true,
-        stringArrayCallsTransform: true,
-        stringArrayCallsTransformThreshold: 0.5,
         stringArrayEncoding: [],
-        stringArrayIndexesType: [
-          'hexadecimal-number'
-        ],
-        stringArrayIndexShift: true,
-        stringArrayRotate: true,
-        stringArrayShuffle: true,
-        stringArrayWrappersCount: 1,
-        stringArrayWrappersChainedCalls: true,
-        stringArrayWrappersParametersMaxCount: 2,
-        stringArrayWrappersType: 'variable',
-        stringArrayThreshold: 1,
-        target: 'browser',
-        transformObjectKeys: false,
-        unicodeEscapeSequence: false
+        stringArrayThreshold: 0.5,
+        target: 'browser'
       },
     }),
-    // Add Brotli compression
+    // Bundle analysis
+    visualizer({
+      filename: 'bundle-analysis.html',
+      open: false,
+      gzipSize: true,
+      brotliSize: true,
+      template: 'treemap'
+    }),
+    // Compression
     compression({
       algorithm: 'brotliCompress',
       ext: '.br',
-      threshold: 512,
+      threshold: 1024,
+      compressionOptions: { level: 11 }
     }),
   ],
   base: '/',
   build: {
-    sourcemap: false,
+    target: ['es2015', 'safari12'],
     minify: 'terser',
+    sourcemap: false,
     outDir: 'dist',
     emptyOutDir: true,
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 2000,
+    assetsInlineLimit: 4096,
+    modulePreload: {
+      polyfill: false
+    },
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html'),
       },
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          }
+        manualChunks: {
+          'vendor': [
+            'react',
+            'react-dom',
+            'framer-motion',
+          ],
+          'radix': [
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-checkbox',
+            '@radix-ui/react-collapsible',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-label',
+            '@radix-ui/react-navigation-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-radio-group',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-select',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-switch',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-toggle',
+            '@radix-ui/react-toggle-group',
+            '@radix-ui/react-tooltip'
+          ],
         },
-        sourcemap: false,
+        assetFileNames: (assetInfo) => {
+          if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp/i.test(ext)) {
+            return `assets/images/[name]-[hash][extname]`;
+          }
+          return `assets/[name]-[hash][extname]`;
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    assetsDir: 'assets',
-    manifest: true,
-    cssCodeSplit: true,
-    chunkSizeWarningLimit: 1000,
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "~": path.resolve(__dirname, "./src")
     },
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.json']
   },
   server: {
     port: 5173,
-    strictPort: false,
+    strictPort: true,
+    host: true,
+    cors: true,
     hmr: {
       protocol: 'ws',
       host: 'localhost',
-      port: 24678,
-      timeout: 5000,
-      overlay: true
+      port: 5173,
+      timeout: 10000,
+      overlay: true,
+      clientPort: 5173,
+      path: 'hmr'
+    },
+    fs: {
+      strict: false,
+      allow: ['..']
+    },
+    watch: {
+      usePolling: false,
+      interval: 100
     },
     proxy: {
       "/api": {
         target: "http://localhost:4242",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/api/, "")
+      }
     },
     headers: {
       'Cache-Control': 'public, max-age=31536000',
     },
   },
   optimizeDeps: {
-    include: ['react', 'react-dom'],
+    include: [
+      'react',
+      'react-dom',
+      'framer-motion'
+    ],
     exclude: [
       '@radix-ui/react-accordion',
       '@radix-ui/react-alert-dialog',
@@ -166,9 +193,12 @@ export default defineConfig({
       '@radix-ui/react-toggle',
       '@radix-ui/react-toggle-group',
       '@radix-ui/react-tooltip'
-    ],
-    esbuildOptions: {
-      target: 'esnext',
-    }
+    ]
   },
+  preview: {
+    port: 5173,
+    strictPort: true,
+    host: true,
+    cors: true
+  }
 });
