@@ -1,29 +1,67 @@
 import type { ProviderDistribution, provider_code } from './types'
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { WalletIcon } from '@heroicons/react/24/outline'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent } from '@/components/ui/card'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/actions/utils'
 
 const COLORS = {
-    ORANGE: '#FC6307',
-    WAVE: '#71CDF4',
-    ECOBANK: '#074367',
-    MTN: '#F7CE46',
-    NOWPAYMENTS: '#037BFE',
-    PAYPAL: '#000000',
+    ORANGE: '#FF6B00',
+    WAVE: '#00A1E0',
+    ECOBANK: '#002F6C',
+    MTN: '#FFC107',
+    NOWPAYMENTS: '#2196F3',
+    PAYPAL: '#003087',
     APPLE: '#000000',
     GOOGLE: '#4285F4',
-    MOOV: '#0093DD',
-    AIRTEL: '#FF0000',
+    MOOV: '#00BCD4',
+    AIRTEL: '#FF1744',
     MPESA: '#4CAF50',
-    WIZALL: '#FF6B00',
-    OPAY: '#14B55A',
-    OTHER: '#E5E7EB',
+    WIZALL: '#FF9800',
+    OPAY: '#00C853',
+    OTHER: '#9E9E9E',
 }
 
 interface ProviderDistributionProps {
     providerDistribution: ProviderDistribution[]
     isLoading: boolean
+}
+
+interface CustomizedLabelProps {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    innerRadius: number;
+    outerRadius: number;
+    percent: number;
+}
+
+const RADIAN = Math.PI / 180
+const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+}: CustomizedLabelProps) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+    return percent > 0.05 ? (
+        <text
+            x={x}
+            y={y}
+            fill="white"
+            textAnchor={x > cx ? 'start' : 'end'}
+            dominantBaseline="central"
+            className="text-xs font-medium"
+        >
+            {`${(percent * 100).toFixed(0)}%`}
+        </text>
+    ) : null
 }
 
 export default function ProviderDistribution({
@@ -33,52 +71,34 @@ export default function ProviderDistribution({
     if (isLoading) {
         return (
             <div className="space-y-4">
-                {[...Array(5)].map((_, index) => (
-                    <Card key={index}>
-                        <CardContent className="flex justify-between items-center p-3">
-                            <div className="w-1/2">
-                                <Skeleton className="h-4 w-3/4 mb-2" />
-                                <Skeleton className="h-3 w-1/2" />
-                            </div>
-                            <Skeleton className="h-4 w-1/4" />
-                        </CardContent>
-                    </Card>
-                ))}
+                <Skeleton className="h-[400px] w-full rounded-lg" />
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {[...Array(6)].map((_, index) => (
+                        <Skeleton key={index} className="h-16 rounded-lg" />
+                    ))}
+                </div>
             </div>
         )
     }
 
     const formatProvider = (provider: provider_code) => {
-        switch (provider) {
-            case 'ORANGE':
-                return 'Orange'
-            case 'WAVE':
-                return 'Wave'
-            case 'ECOBANK':
-                return 'Ecobank'
-            case 'MTN':
-                return 'MTN'
-            case 'NOWPAYMENTS':
-                return 'Nowpayments'
-            case 'PAYPAL':
-                return 'Paypal'
-            case 'APPLE':
-                return 'Apple'
-            case 'GOOGLE':
-                return 'Google'
-            case 'MOOV':
-                return 'Moov'
-            case 'AIRTEL':
-                return 'Airtel'
-            case 'MPESA':
-                return 'M-Pesa'
-            case 'WIZALL':
-                return 'Wizall'
-            case 'OPAY':
-                return 'OPay'
-            default:
-                return 'Other'
+        const formattedNames: Record<provider_code, string> = {
+            ORANGE: 'Orange Money',
+            WAVE: 'Wave',
+            ECOBANK: 'Ecobank',
+            MTN: 'MTN Mobile Money',
+            NOWPAYMENTS: 'NowPayments',
+            PAYPAL: 'PayPal',
+            APPLE: 'Apple Pay',
+            GOOGLE: 'Google Pay',
+            MOOV: 'Moov Money',
+            AIRTEL: 'Airtel Money',
+            MPESA: 'M-Pesa',
+            WIZALL: 'Wizall Money',
+            OPAY: 'OPay',
+            OTHER: 'Other Methods'
         }
+        return formattedNames[provider] || 'Other'
     }
 
     const getProviderDistributionPercentage = () => {
@@ -86,78 +106,155 @@ export default function ProviderDistribution({
             (sum, provider) => sum + provider.transaction_count,
             0
         )
-        return providerDistribution.map((provider) => ({
-            ...provider,
-            name: formatProvider(provider.provider_code),
-            percentage: ((provider.transaction_count / totalTransactions) * 100).toFixed(2),
-        }))
+        return providerDistribution
+            .map((provider) => ({
+                ...provider,
+                name: formatProvider(provider.provider_code),
+                percentage: ((provider.transaction_count / totalTransactions) * 100),
+                value: provider.transaction_count
+            }))
+            .sort((a, b) => b.transaction_count - a.transaction_count)
     }
 
     if (providerDistribution.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-full pt-12">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center h-full pt-12"
+            >
                 <div className="text-center">
-                    <div className="flex justify-center mb-6">
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", duration: 0.5 }}
+                        className="flex justify-center mb-6"
+                    >
                         <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                             <WalletIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
-                    </div>
+                    </motion.div>
                     <h3 className="text-xl font-semibold mb-2 dark:text-white">No provider data yet</h3>
                     <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
                         Start processing transactions to see the distribution.
                     </p>
                 </div>
-            </div>
+            </motion.div>
         )
     }
 
     const data = getProviderDistributionPercentage()
 
     return (
-        <div className="space-y-0">
-            <ResponsiveContainer width="100%" height={400}>
-                <PieChart>
-                    <Pie
-                        data={data}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={120}
-                        fill="#8884d8"
-                        dataKey="transaction_count"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[entry.provider_code] || COLORS.OTHER} />
-                        ))}
-                    </Pie>
-                    <Tooltip
-                        contentStyle={{
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                        }}
-                        labelStyle={{ color: 'black' }}
-                        formatter={(_, __, { payload }) => [
-                            `${payload.transaction_count} transactions`,
-                            formatProvider(payload.provider_code as provider_code)
-                        ]}
-                    />
-                </PieChart>
-            </ResponsiveContainer>
-            <div className="grid grid-cols-3 gap-2">
-                {data.map((provider, index) => (
-                    <Card key={index} className="hover:bg-gray-50 dark:hover:bg-[#0c0d10] transition-colors">
-                        <CardContent className="flex items-center justify-between p-3">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[provider.provider_code] || COLORS.OTHER }}></div>
-                                <p className="text-sm font-semibold dark:text-white">{formatProvider(provider.provider_code)}</p>
-                            </div>
-                            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                {provider.percentage}%
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </div>
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
+            >
+                <div className="h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={data}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={renderCustomizedLabel}
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                                animationBegin={0}
+                                animationDuration={1000}
+                            >
+                                {data.map((entry, index) => (
+                                    <Cell
+                                        key={`cell-${index}`}
+                                        fill={COLORS[entry.provider_code] || COLORS.OTHER}
+                                        className="hover:opacity-80 transition-opacity cursor-pointer"
+                                    />
+                                ))}
+                            </Pie>
+                            <Tooltip
+                                content={({ active, payload }) => {
+                                    if (active && payload && payload.length) {
+                                        const data = payload[0]?.payload
+                                        return (
+                                            <div className="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                                                <p className="text-xs font-medium text-gray-900 dark:text-white">
+                                                    {data.name}
+                                                </p>
+                                                <p className="text-xs text-gray-600 dark:text-gray-300">
+                                                    {data.transaction_count.toLocaleString()} transactions
+                                                </p>
+                                                <p className="text-xs font-medium text-gray-900 dark:text-white">
+                                                    {data.percentage.toFixed(1)}% of total
+                                                </p>
+                                            </div>
+                                        )
+                                    }
+                                    return null
+                                }}
+                            />
+                            <Legend
+                                verticalAlign="bottom"
+                                height={36}
+                                content={({ payload }) => (
+                                    <div className="grid grid-cols-2 gap-1 mt-2">
+                                        {payload && payload.map((entry: any, index) => (
+                                            <div
+                                                key={`legend-${index}`}
+                                                className="flex items-center space-x-1"
+                                            >
+                                                <div
+                                                    className="w-2 h-2 rounded-full"
+                                                    style={{ backgroundColor: entry.color }}
+                                                />
+                                                <span className="text-[10px] text-gray-600 dark:text-gray-300 truncate">
+                                                    {entry.value}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                    {data.slice(0, 4).map((provider, index) => (
+                        <motion.div
+                            key={provider.provider_code}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.2, delay: index * 0.05 }}
+                        >
+                            <Card className={cn(
+                                "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer group",
+                                "border-l-4",
+                            )}
+                                style={{ borderLeftColor: COLORS[provider.provider_code] || COLORS.OTHER }}
+                            >
+                                <CardContent className="p-2">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-medium text-gray-900 dark:text-white truncate">
+                                            {provider.name}
+                                        </span>
+                                        <span className="text-sm font-bold mt-0.5 text-gray-900 dark:text-white">
+                                            {provider.percentage.toFixed(1)}%
+                                        </span>
+                                        <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                            {provider.transaction_count.toLocaleString()} transactions
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </motion.div>
+                    ))}
+                </div>
+            </motion.div>
+        </AnimatePresence>
     )
 }

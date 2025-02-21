@@ -80,6 +80,14 @@ export function BarChart<T>({
               stroke="currentColor"
             />
             <YAxis
+              yAxisId="left"
+              orientation="left"
+              stroke="currentColor"
+              tickFormatter={yAxisFormatter}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
               stroke="currentColor"
               tickFormatter={yAxisFormatter}
             />
@@ -98,7 +106,8 @@ export function BarChart<T>({
                 dataKey={bar.dataKey as string}
                 name={bar.name}
                 fill={bar.color}
-                yAxisId={bar.yAxisId}
+                yAxisId={bar.yAxisId || "left"}
+                radius={[4, 4, 0, 0]}
               />
             ))}
           </RechartsBarChart>

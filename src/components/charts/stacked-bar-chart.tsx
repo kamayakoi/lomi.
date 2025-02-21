@@ -81,6 +81,14 @@ export function StackedBarChart<T>({
               stroke="currentColor"
             />
             <YAxis
+              yAxisId="left"
+              orientation="left"
+              stroke="currentColor"
+              tickFormatter={yAxisFormatter}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
               stroke="currentColor"
               tickFormatter={yAxisFormatter}
             />
@@ -100,7 +108,8 @@ export function StackedBarChart<T>({
                 name={bar.name}
                 fill={bar.color}
                 stackId={bar.stackId}
-                yAxisId={bar.yAxisId}
+                yAxisId={bar.yAxisId || "left"}
+                radius={[4, 4, 0, 0]}
               />
             ))}
           </RechartsBarChart>
