@@ -19,6 +19,8 @@ BEGIN
         merchant_organization_links mol
     JOIN
         organizations o ON mol.organization_id = o.organization_id
+    JOIN
+        merchants m ON m.merchant_id = mol.merchant_id
     WHERE 
         mol.merchant_id = p_merchant_id
         AND mol.team_status = 'active'

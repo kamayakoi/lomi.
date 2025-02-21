@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { PlusIcon } from 'lucide-react';
 import { supabase } from '@/utils/supabase/client';
 import { useSidebarData } from '@/lib/hooks/use-sidebar-data';
@@ -11,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/actions/utils';
 import { UpDownChevronIcon } from '@/components/icons/UpDownChevronIcon';
+import { useOrganizationSwitch } from '@/lib/hooks/use-organization-switch';
 
 interface Organization {
     organization_id: string;
@@ -21,10 +21,10 @@ interface Organization {
 }
 
 export function OrgSwitcher() {
-    const navigate = useNavigate();
     const [createOrgOpen, setCreateOrgOpen] = useState(false);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const { sidebarData } = useSidebarData();
+    const { switchOrganization } = useOrganizationSwitch();
 
     useEffect(() => {
         const fetchOrganizations = async () => {
@@ -54,53 +54,59 @@ export function OrgSwitcher() {
 
     const handleOrganizationSwitch = async (orgId: string) => {
         if (orgId === sidebarData?.organizationId) return;
-        navigate(`${window.location.pathname}?org=${orgId}`, { replace: true });
-        window.location.reload();
+        try {
+            await switchOrganization(orgId);
+        } catch (error) {
+            console.error('Failed to switch organization:', error);
+            // Here you might want to show a toast notification
+        }
     };
 
     if (!sidebarData?.merchantName) return null;
 
     return (
-        <div className="relative">
+        <div className="relative mt-auto rounded-br-xl">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <button className="mt-auto hidden w-full border-t border-border/40 px-4 py-4 md:block hover:bg-accent/30 transition-all duration-200 focus:outline-none focus-visible:outline-none">
-                        <div className="flex items-center space-x-3">
-                            {sidebarData.organizationLogo ? (
-                                <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
-                                    <img
-                                        src={sidebarData.organizationLogo}
-                                        alt="Organization logo"
-                                        className="h-full w-full object-cover"
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.onerror = null;
-                                            target.src = `https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName?.toLowerCase() || 'org')}?rounded=5`;
-                                        }}
-                                    />
+                    <div className="w-full border-t border-border/40 bg-[hsl(var(--sidebar-background))] rounded-br-xl overflow-hidden">
+                        <button className="w-full px-4 py-4 hidden md:block hover:bg-accent/30 transition-all duration-200 focus:outline-none focus-visible:outline-none">
+                            <div className="flex items-center space-x-3">
+                                {sidebarData.organizationLogo ? (
+                                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
+                                        <img
+                                            src={sidebarData.organizationLogo}
+                                            alt="Organization logo"
+                                            className="h-full w-full object-cover"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                target.onerror = null;
+                                                target.src = `https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName?.toLowerCase() || 'org')}?rounded=5`;
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
+                                        <img
+                                            src={`https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName.toLowerCase())}?rounded=5`}
+                                            alt="Generated avatar"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                )}
+                                <div className="min-w-0 flex-1 text-left">
+                                    <div className="truncate text-sm font-medium">
+                                        {sidebarData.merchantName}
+                                    </div>
+                                    <div className="truncate text-xs text-muted-foreground/80">
+                                        {sidebarData.merchantRole} • {sidebarData.organizationName}
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[5px] bg-primary/5 ring-1 ring-border/50 overflow-hidden transition-all duration-200">
-                                    <img
-                                        src={`https://avatar.vercel.sh/${encodeURIComponent(sidebarData.merchantName.toLowerCase())}?rounded=5`}
-                                        alt="Generated avatar"
-                                        className="h-full w-full object-cover"
-                                    />
-                                </div>
-                            )}
-                            <div className="min-w-0 flex-1 text-left">
-                                <div className="truncate text-sm font-medium">
-                                    {sidebarData.merchantName}
-                                </div>
-                                <div className="truncate text-xs text-muted-foreground/80">
-                                    {sidebarData.merchantRole} • {sidebarData.organizationName}
+                                <div className="text-muted-foreground/30">
+                                    <UpDownChevronIcon className="opacity-60" />
                                 </div>
                             </div>
-                            <div className="text-muted-foreground/30">
-                                <UpDownChevronIcon className="opacity-60" />
-                            </div>
-                        </div>
-                    </button>
+                        </button>
+                    </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                     className="w-[254px] p-2 rounded-[5px] border-[hsl(var(--sidebar-border))]/40 bg-[hsl(var(--sidebar-background))] backdrop-blur-sm"

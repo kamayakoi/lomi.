@@ -8,11 +8,14 @@ import { IconPlus } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
+import { useParams } from 'react-router-dom'
 
 export default function Providers() {
+  const { organizationId } = useParams()
+
   const topNav = [
-    { title: 'Integrations', href: '/portal/integrations', isActive: true },
-    { title: 'Settings', href: '/portal/settings/profile', isActive: false },
+    { title: 'Integrations', href: `/portal/${organizationId}/integrations`, isActive: true },
+    { title: 'Settings', href: `/portal/${organizationId}/settings/profile`, isActive: false },
   ]
 
   const sortedIntegrations = integrationOptions.sort((a, b) =>

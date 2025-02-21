@@ -6,6 +6,8 @@ import { ProtectedRoute } from './lib/routes/ProtectedRoute';
 import { OnboardingRoute } from '@/lib/routes/OnboardingRoute';
 import { ActivationRoute } from '@/lib/routes/ActivationRoute';
 import { SessionCheck } from '@/lib/routes/SessionCheck';
+import { OrganizationRoute } from '@/lib/routes/OrganizationRoute';
+
 // Auth pages
 import Signin from './pages/auth/connect/sign-in';
 import Login from './pages/auth/connect/log-in';
@@ -104,10 +106,13 @@ const AppRouter = () => (
                     <Route path="/otp" element={<OTP />} />
                     <Route path="/auth/reset-password" element={<ResetPassword />} />
                     <Route path="/auth/callback" element={<AuthCallback />} />
-                    {/* Dashboard routes */}
-                    <Route path="/portal" element={
+
+                    {/* Organization routes */}
+                    <Route path="/:organizationId" element={
                         <ProtectedRoute>
-                            <AppShell />
+                            <OrganizationRoute>
+                                <AppShell />
+                            </OrganizationRoute>
                         </ProtectedRoute>
                     }>
                         <Route index element={<Dashboard />} />
@@ -150,6 +155,7 @@ const AppRouter = () => (
                             </ActivationRoute>
                         } />
                     </Route>
+
                     <Route path="/onboarding" element={
                         <OnboardingRoute>
                             <Onboarding />

@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase/client';
 import { useUser } from '@/lib/hooks/use-user';
+import { useParams } from 'react-router-dom';
 
 interface OrganizationDetails {
     organization_id: string;
@@ -21,39 +22,67 @@ interface OrganizationDetails {
 interface OrganizationContextProps {
     organizationId: string | null;
     organizationDetails: OrganizationDetails | null;
+    isLoading: boolean;
+    error: Error | null;
 }
 
 const OrganizationContext = createContext<OrganizationContextProps>({
     organizationId: null,
     organizationDetails: null,
+    isLoading: true,
+    error: null,
 });
 
 const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useUser();
-    const [organizationId, setOrganizationId] = useState<string | null>(null);
+    const params = useParams();
     const [organizationDetails, setOrganizationDetails] = useState<OrganizationDetails | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+
+    // Get organization ID from URL params, null if not present
+    const organizationId = params['organizationId'] || null;
 
     useEffect(() => {
         const fetchOrganizationDetails = async () => {
-            if (user?.id) {
-                const { data, error } = await supabase.rpc('fetch_organization_details', { p_merchant_id: user.id });
+            if (!user?.id || !organizationId) return;
 
-                if (error) {
-                    console.error('Error fetching organization details:', error);
-                } else if (Array.isArray(data) && data[0]) {
-                    setOrganizationId(data[0].organization_id);
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                // Fetch organization details
+                const { data, error } = await supabase.rpc('fetch_organization_details', {
+                    p_merchant_id: user.id,
+                    p_organization_id: organizationId
+                });
+
+                if (error) throw error;
+
+                if (Array.isArray(data) && data[0]) {
                     setOrganizationDetails(data[0]);
                 }
+            } catch (err) {
+                setError(err instanceof Error ? err : new Error('Failed to fetch organization details'));
+                console.error('Error fetching organization details:', err);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchOrganizationDetails();
-    }, [user?.id]);
+    }, [user?.id, organizationId]);
 
     return (
-        <OrganizationContext.Provider value={{ organizationId, organizationDetails }}>
+        <OrganizationContext.Provider value={{
+            organizationId,
+            organizationDetails,
+            isLoading,
+            error
+        }}>
             {children}
         </OrganizationContext.Provider>
     );
 };
+
 export { OrganizationContext, OrganizationProvider };

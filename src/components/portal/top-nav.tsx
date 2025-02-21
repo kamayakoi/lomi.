@@ -1,5 +1,5 @@
 import { cn } from '@/lib/actions/utils'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +20,12 @@ interface TopNavProps extends React.HTMLAttributes<HTMLElement> {
 
 export function TopNav({ className, links, ...props }: TopNavProps) {
   const { t } = useTranslation()
+  const { organizationId } = useParams()
+
+  const getOrgAwareHref = (href: string) => {
+    if (!organizationId) return href
+    return href.replace('/portal/', `/portal/${organizationId}/`)
+  }
 
   return (
     <>
@@ -34,7 +40,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
             {links.map(({ title, href, isActive }) => (
               <DropdownMenuItem key={`${title}-${href}`} asChild>
                 <Link
-                  to={href}
+                  to={getOrgAwareHref(href)}
                   className={!isActive ? 'text-muted-foreground' : ''}
                 >
                   {t(`portal.top_nav.${title.toLowerCase()}`)}
@@ -55,7 +61,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
         {links.map(({ title, href, isActive }) => (
           <Link
             key={`${title}-${href}`}
-            to={href}
+            to={getOrgAwareHref(href)}
             className={`text-sm font-medium transition-colors hover:text-primary ${isActive ? '' : 'text-muted-foreground'}`}
           >
             {t(`portal.top_nav.${title.toLowerCase()}`)}

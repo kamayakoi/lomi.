@@ -75,8 +75,7 @@ export default function Sidebar({ className }: SidebarProps) {
       <aside
         className={cn(
           `fixed z-40 bg-sidebar backdrop-blur supports-[backdrop-filter]:bg-sidebar/60
-           border-r-[1.25px] border-sidebar-border shadow-lg transition-all duration-300 ease-in-out
-           rounded-tl-xl rounded-br-xl
+           border-r-[1.25px] border-sidebar-border shadow-lg transition-all duration-300 ease-in-out flex flex-col rounded-br-xl rounded-tr-xl
            md:bottom-0 md:right-auto md:h-svh md:w-64`,
           'top-16 left-0 right-0 h-[calc(100svh-4rem)] md:top-0',
           navOpened ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
@@ -88,11 +87,11 @@ export default function Sidebar({ className }: SidebarProps) {
           onClick={() => setNavOpened(false)}
           className={cn(
             'fixed inset-0 bg-[hsl(var(--sidebar-background))]/80 backdrop-blur-sm transition-all duration-300',
-            navOpened ? 'opacity-100 md:hidden rounded-tl-xl rounded-br-xl' : 'pointer-events-none opacity-0'
+            navOpened ? 'opacity-100 md:hidden rounded-tl-xl' : 'pointer-events-none opacity-0'
           )}
         />
 
-        <Layout fixed className={cn(navOpened ? 'h-full' : '', 'bg-[hsl(var(--sidebar-background))]')}>
+        <Layout fixed className={cn(navOpened ? 'h-full' : '', 'bg-[hsl(var(--sidebar-background))] rounded-br-xl rounded-tr-xl flex-1 flex flex-col')}>
           {/* Header - Only visible on desktop */}
           <Layout.Header
             sticky

@@ -16,7 +16,7 @@ BEGIN
     VALUES (
         NEW.merchant_id,
         'tip'::notification_type,
-        'You can switch to dark mode by clicking on your organization logo at the bottom left of the portal.',
+        'You can switch to dark mode by clicking on the lomi. logo at the top left of your sidebar.',
         false
     );
 

@@ -1,4 +1,4 @@
-import { Outlet, Navigate } from 'react-router-dom'
+import { Outlet, Navigate, useParams } from 'react-router-dom'
 import {
   IconBriefcase,
   IconCreditCard,
@@ -24,10 +24,59 @@ import { useNavigate } from 'react-router-dom'
 function Settings() {
   const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate()
+  const { organizationId } = useParams()
 
   const topNav = [
-    { title: 'Settings', href: '/portal/settings', isActive: true },
+    { title: 'Settings', href: `/${organizationId}/settings`, isActive: true },
     { title: 'Documentation', href: 'https://developers.lomi.africa', isActive: false },
+  ]
+
+  const sidebarNavItems = [
+    {
+      title: 'Business and Profile',
+      icon: <IconBriefcase size={18} className="text-gray-500" />,
+      href: `/${organizationId}/settings/profile`,
+      subItems: [
+        { title: 'Profile', href: `/${organizationId}/settings/profile` },
+        { title: 'Business', href: `/${organizationId}/settings/business` }
+      ],
+      defaultOpen: true,
+    },
+    {
+      title: 'Receiving Money',
+      icon: <IconCreditCard size={18} className="text-gray-500" />,
+      href: `/${organizationId}/settings/receiving-money/payment-methods`,
+      subItems: [
+        { title: 'Payment methods', href: `/${organizationId}/settings/receiving-money/payment-methods` },
+        { title: 'Checkout options', href: `/${organizationId}/settings/receiving-money/checkout` },
+      ],
+    },
+    {
+      title: 'Billing and Fees',
+      icon: <IconReceipt size={18} className="text-gray-500" />,
+      href: `/${organizationId}/settings/billing/statements`,
+      subItems: [
+        { title: 'Billing statements', href: `/${organizationId}/settings/billing/statements` },
+        { title: 'Fee structure', href: `/${organizationId}/settings/billing/fee-structure` },
+      ],
+    },
+    {
+      title: 'Developers',
+      icon: <IconCode size={18} className="text-gray-500" />,
+      href: `/${organizationId}/settings/developers/api-keys`,
+      subItems: [
+        { title: 'API keys', href: `/${organizationId}/settings/developers/api-keys` },
+      ],
+    },
+    {
+      title: 'Withdrawals',
+      icon: <IconWallet size={18} className="text-gray-500" />,
+      href: `/${organizationId}/settings/withdrawals/bank-accounts`,
+      subItems: [
+        { title: 'Bank accounts', href: `/${organizationId}/settings/withdrawals/bank-accounts` },
+        { title: 'Email notifications', href: `/${organizationId}/settings/withdrawals/email-notifications` },
+      ],
+    },
   ]
 
   return (
@@ -123,58 +172,11 @@ function Settings() {
   )
 }
 
-const sidebarNavItems = [
-  {
-    title: 'Business and Profile',
-    icon: <IconBriefcase size={18} className="text-gray-500" />,
-    href: '/portal/settings/profile',
-    subItems: [
-      { title: 'Profile', href: '/portal/settings/profile' },
-      { title: 'Business', href: '/portal/settings/business' }
-    ],
-    defaultOpen: true,
-  },
-  {
-    title: 'Receiving Money',
-    icon: <IconCreditCard size={18} className="text-gray-500" />,
-    href: '/portal/settings/receiving-money/payment-methods',
-    subItems: [
-      { title: 'Payment methods', href: '/portal/settings/receiving-money/payment-methods' },
-      { title: 'Checkout options', href: '/portal/settings/receiving-money/checkout' },
-    ],
-  },
-  {
-    title: 'Billing and Fees',
-    icon: <IconReceipt size={18} className="text-gray-500" />,
-    href: '/portal/settings/billing/statements',
-    subItems: [
-      { title: 'Billing statements', href: '/portal/settings/billing/statements' },
-      { title: 'Fee structure', href: '/portal/settings/billing/fee-structure' },
-    ],
-  },
-  {
-    title: 'Developers',
-    icon: <IconCode size={18} className="text-gray-500" />,
-    href: '/portal/settings/developers/api-keys',
-    subItems: [
-      { title: 'API keys', href: '/portal/settings/developers/api-keys' },
-    ],
-  },
-  {
-    title: 'Withdrawals',
-    icon: <IconWallet size={18} className="text-gray-500" />,
-    href: '/portal/settings/withdrawals/bank-accounts',
-    subItems: [
-      { title: 'Bank accounts', href: '/portal/settings/withdrawals/bank-accounts' },
-      { title: 'Email notifications', href: '/portal/settings/withdrawals/email-notifications' },
-    ],
-  },
-]
-
 const SettingsWithActivationCheck = withActivationCheck(Settings);
 
 export default SettingsWithActivationCheck;
 
 export function SettingsIndex() {
-  return <Navigate to="/portal/settings/profile" replace />;
+  const { organizationId } = useParams()
+  return <Navigate to={`/${organizationId}/settings/profile`} replace />;
 }
