@@ -39,7 +39,7 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const baseUrl = Bun.env['VITE_APP_URL'] || window.location.origin
+      const baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin
       const callbackUrl = `${baseUrl}/auth/callback`
 
       console.log('Reset password callback URL:', callbackUrl)

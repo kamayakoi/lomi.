@@ -11,7 +11,7 @@ export async function POST(req: ExpressRequest, res: ExpressResponse) {
     }
 
     const anthropic = new Anthropic({
-      apiKey: anthropicApiKey || process.env['ANTHROPIC_API_KEY'],
+      apiKey: anthropicApiKey || import.meta.env['ANTHROPIC_API_KEY'],
     });
 
     const response = await anthropic.messages.create({

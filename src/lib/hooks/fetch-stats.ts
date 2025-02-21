@@ -1,11 +1,20 @@
 import { createServerClient, createStorageClient } from "@/utils/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env["VITE_PUBLIC_SUPABASE_URL"];
-const SUPABASE_SERVICE_KEY = process.env["VITE_SUPABASE_SERVICE_KEY"];
+// Access environment variables using import.meta.env
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_SERVICE_ROLE_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  throw new Error("Missing required Supabase environment variables");
+// Add more detailed error messages
+if (!SUPABASE_URL) {
+  throw new Error("Missing VITE_SUPABASE_URL environment variable");
+}
+if (!SUPABASE_ANON_KEY) {
+  throw new Error("Missing VITE_SUPABASE_ANON_KEY environment variable");
+}
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error("Missing VITE_SUPABASE_SERVICE_ROLE_KEY environment variable");
 }
 
 // Database function return types
@@ -414,7 +423,7 @@ export type StatsResponse = {
 export async function fetchStats(merchantId?: string): Promise<StatsResponse> {
   const supabase = createServerClient(
     SUPABASE_URL as string,
-    SUPABASE_SERVICE_KEY as string,
+    SUPABASE_SERVICE_ROLE_KEY as string,
     {
       cookies: {
         get() {
@@ -432,7 +441,7 @@ export async function fetchStats(merchantId?: string): Promise<StatsResponse> {
 
   const storage = createStorageClient(
     SUPABASE_URL as string,
-    SUPABASE_SERVICE_KEY as string,
+    SUPABASE_SERVICE_ROLE_KEY as string,
     {
       cookies: {
         get() {

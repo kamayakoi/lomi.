@@ -32,9 +32,9 @@ export const generatePaymentLink = (
     productId?: string,
     planId?: string
 ) => {
-    const baseUrl = Bun.env['BUN_ENV'] === 'production'
-        ? Bun.env['VITE_PAYMENT_LINK_BASE_URL']
-        : Bun.env['VITE_PAYMENT_LINK_BASE_URL_DEV'];
+    const baseUrl = import.meta.env['BUN_ENV'] === 'production'
+        ? import.meta.env['VITE_PAYMENT_LINK_BASE_URL']
+        : import.meta.env['VITE_PAYMENT_LINK_BASE_URL_DEV'];
 
     let linkPath = '';
 

@@ -8,15 +8,7 @@ import compression from 'vite-plugin-compression';
 
 export default defineConfig({
   plugins: [
-    react({
-      jsxRuntime: 'automatic',
-      jsxImportSource: 'react',
-      babel: {
-        plugins: [
-          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
-        ]
-      }
-    }),
+    react(),
     terser({
       compress: {
         drop_console: true,
@@ -167,7 +159,7 @@ export default defineConfig({
       }
     },
     headers: {
-      'Cache-Control': 'public, max-age=31536000',
+      'Cache-Control': 'public, max-age=1209600',
     },
   },
   optimizeDeps: {

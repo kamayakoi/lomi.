@@ -11,7 +11,7 @@ export class WhatsAppApiError extends Error {
 }
 
 export async function sendWhatsAppMessage(message: WhatsAppMessage): Promise<WhatsAppResponse> {
-  const phoneNumberId = process.env['WHATSAPP_PHONE_NUMBER_ID'];
+  const phoneNumberId = import.meta.env['WHATSAPP_PHONE_NUMBER_ID'];
   const accessToken = process.env['WHATSAPP_ACCESS_TOKEN'];
 
   if (!phoneNumberId || !accessToken) {
