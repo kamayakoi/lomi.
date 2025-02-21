@@ -135,26 +135,12 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-        configure: (proxy) => {
-          proxy.on('error', (err) => {
-            console.log('proxy error', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req) => {
-            console.log('Sending Request:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req) => {
-            console.log('Received Response:', proxyRes.statusCode, req.url);
-          });
-          (proxy as any).on('upgrade', function(req: any, socket: any, head: any) {
-            if (this.ws) {
-              console.log('WebSocket connection upgraded');
-              (this as any).ws(req, socket, head);
-            }
-          });
-        }
+        rewrite: (path) => path.replace(/^\/api/, "")
       }
-    }
+    },
+    headers: {
+      'Cache-Control': 'public, max-age=31536000',
+    },
   },
   optimizeDeps: {
     include: [
