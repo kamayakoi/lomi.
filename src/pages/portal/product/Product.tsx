@@ -131,9 +131,9 @@ function ProductsPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: productsData, isLoading: isProductsLoading, refetch } = useQuery(
-        ['products', user?.id || '', selectedStatus, currentPage],
-        async () => {
+    const { data: productsData, isLoading: isProductsLoading, refetch } = useQuery({
+        queryKey: ['products', user?.id || '', selectedStatus, currentPage] as const,
+        queryFn: async () => {
             const productsResponse = await fetchProducts(
                 user?.id || '',
                 selectedStatus === 'active' ? true : selectedStatus === 'inactive' ? false : null,
@@ -154,17 +154,15 @@ function ProductsPage() {
                 products: productsWithFees
             };
         },
-        {
-            enabled: !!user?.id,
-            staleTime: 30000,
-            cacheTime: 5 * 60 * 1000,
-            refetchOnWindowFocus: false,
-            refetchOnMount: true
-        }
-    )
+        enabled: !!user?.id,
+        staleTime: 30000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+        refetchOnMount: true
+    })
 
     // Memoize the products array
-    const products = React.useMemo(() => productsData?.products || [], [productsData?.products])
+    const products = React.useMemo(() => productsData?.products || [], [productsData?.products]) as Product[]
     const totalProducts = productsData?.totalCount || 0
     const totalPages = Math.ceil(totalProducts / itemsPerPage)
 

@@ -117,9 +117,16 @@ function CustomersPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: customers = [], isLoading: isCustomersLoading, refetch: fetchCustomers } = useQuery(
-        ['customers', user?.id, searchTerm, customerType],
-        async () => {
+    type CustomersQueryKey = readonly ['customers', string | undefined, string, 'all' | 'business' | 'individual']
+
+    const { data: customers = [], isLoading: isCustomersLoading, refetch: fetchCustomers } = useQuery<
+        Customer[],
+        Error,
+        Customer[],
+        CustomersQueryKey
+    >({
+        queryKey: ['customers', user?.id, searchTerm, customerType] as const,
+        queryFn: async () => {
             if (!user?.id) return []
 
             const { data, error } = await supabase.rpc('fetch_customers', {
@@ -137,10 +144,8 @@ function CustomersPage() {
 
             return data as Customer[]
         },
-        {
-            enabled: !!user?.id,
-        }
-    )
+        enabled: !!user?.id,
+    })
 
     const handleAddCustomer = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()

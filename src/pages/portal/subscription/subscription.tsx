@@ -168,43 +168,43 @@ function SubscriptionsPage() {
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
 
-  const { data: subscriptionPlansData, isLoading: isSubscriptionPlansLoading, refetch: refetchPlans } = useInfiniteQuery(
-    ['subscriptionPlans', user?.id || ''],
-    ({ pageParam = 1 }) =>
-      fetchSubscriptionPlans(
+  const { data: subscriptionPlansData, isLoading: isSubscriptionPlansLoading, refetch: refetchPlans } = useInfiniteQuery<SubscriptionPlan[]>({
+    queryKey: ['subscriptionPlans', user?.id || '', selectedStatus] as const,
+    queryFn: async ({ pageParam = 1 }) => {
+      return fetchSubscriptionPlans(
         user?.id || '',
-        pageParam,
+        Number(pageParam),
         pageSize
-      ),
-    {
-      getNextPageParam: (lastPage: SubscriptionPlan[], allPages: SubscriptionPlan[][]) => {
-        const nextPage = allPages.length + 1
-        return lastPage.length !== 0 ? nextPage : undefined
-      },
-      enabled: !!user?.id,
-    }
-  )
+      );
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: SubscriptionPlan[], allPages: SubscriptionPlan[][]) => {
+      const nextPage = allPages.length + 1;
+      return lastPage.length !== 0 ? nextPage : undefined;
+    },
+    enabled: !!user?.id
+  })
 
-  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, refetch: refetchSubscriptions } = useInfiniteQuery(
-    ['subscriptions', user?.id || '', selectedStatus],
-    ({ pageParam = 1 }) =>
-      fetchSubscriptions(
+  const { data: subscriptionsData, isLoading: isSubscriptionsLoading, refetch: refetchSubscriptions } = useInfiniteQuery<Subscription[]>({
+    queryKey: ['subscriptions', user?.id || '', selectedStatus] as const,
+    queryFn: async ({ pageParam = 1 }) => {
+      return fetchSubscriptions(
         user?.id || '',
         selectedStatus,
-        pageParam,
+        Number(pageParam),
         pageSize
-      ),
-    {
-      getNextPageParam: (lastPage: Subscription[], allPages: Subscription[][]) => {
-        const nextPage = allPages.length + 1
-        return lastPage.length !== 0 ? nextPage : undefined
-      },
-      enabled: !!user?.id,
-    }
-  )
+      );
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage: Subscription[], allPages: Subscription[][]) => {
+      const nextPage = allPages.length + 1;
+      return lastPage.length !== 0 ? nextPage : undefined;
+    },
+    enabled: !!user?.id
+  })
 
-  const subscriptionPlans = subscriptionPlansData?.pages?.flatMap((page) => page) || []
-  const subscriptions = subscriptionsData?.pages?.flatMap((page) => page) || []
+  const subscriptionPlans = subscriptionPlansData?.pages?.flatMap((page: SubscriptionPlan[]) => page) || []
+  const subscriptions = subscriptionsData?.pages?.flatMap((page: Subscription[]) => page) || []
 
   const handleCreatePlanSuccess = () => {
     refetchPlans()

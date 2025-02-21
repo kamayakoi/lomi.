@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { supabase } from '@/utils/supabase/client'
 import { Payout, payout_status, BankAccount, BalanceBreakdown } from './types'
 import { DateRange } from 'react-day-picker'
@@ -7,20 +7,22 @@ import { fr } from 'date-fns/locale'
 
 export async function fetchPayouts(
     merchantId: string,
-    statuses: string[],
+    statuses: payout_status[],
     page: number,
     pageSize: number
 ): Promise<Payout[]> {
     try {
-        const { data, error } = await supabase.rpc('fetch_payouts', {
-            p_merchant_id: merchantId,
-            p_statuses: statuses,
-            p_page_number: page,
-            p_page_size: pageSize,
-        })
+        const { data, error } = await supabase
+            .from('payouts')
+            .select('*')
+            .eq('merchant_id', merchantId)
+            .in('status', statuses)
+            .range((page - 1) * pageSize, page * pageSize - 1)
+            .order('created_at', { ascending: false })
 
         if (error) {
-            throw error
+            console.error('Error fetching payouts:', error)
+            return []
         }
 
         return data as Payout[]
@@ -30,20 +32,37 @@ export async function fetchPayouts(
     }
 }
 
-export function usePayoutCount(accountId: string, startDate?: string, endDate?: string) {
-    return useQuery(['payoutCount', accountId, startDate, endDate], async () => {
-        const { data, error } = await supabase.rpc('fetch_payout_count', {
-            p_account_id: accountId,
-            p_start_date: startDate,
-            p_end_date: endDate,
-        })
+export function usePayouts(userId: string | null, selectedStatuses: payout_status[]): UseQueryResult<Payout[], Error> {
+    return useQuery<Payout[], Error>({
+        queryKey: ['payouts', userId, selectedStatuses] as const,
+        queryFn: async () => {
+            if (!userId) {
+                return []
+            }
+            return fetchPayouts(userId, selectedStatuses, 1, 10)
+        },
+        enabled: !!userId,
+    })
+}
 
-        if (error) {
-            console.error('Error fetching payout count:', error)
-            throw error
-        }
+export function usePayoutCount(accountId: string, startDate?: string, endDate?: string): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['payoutCount', accountId, startDate, endDate] as const,
+        queryFn: async () => {
+            const { count, error } = await supabase
+                .from('payouts')
+                .select('*', { count: 'exact', head: true })
+                .eq('merchant_id', accountId)
+                .gte('created_at', startDate || '1970-01-01')
+                .lte('created_at', endDate || new Date().toISOString())
 
-        return data as number
+            if (error) {
+                console.error('Error fetching payout count:', error)
+                return 0
+            }
+
+            return count || 0
+        },
     })
 }
 
@@ -194,21 +213,24 @@ export function applyDateFilter(payouts: Payout[], dateRange: string | null, cus
 }
 
 export function useBalance(userId: string | null) {
-    return useQuery(['balance', userId], async () => {
-        if (!userId) {
-            return 0
+    return useQuery({
+        queryKey: ['balance', userId] as const,
+        queryFn: async () => {
+            if (!userId) {
+                return 0
+            }
+
+            const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
+                p_merchant_id: userId,
+            })
+
+            if (error) {
+                console.error('Error fetching balance:', error)
+                throw error
+            }
+
+            return data ?? 0
         }
-
-        const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
-            p_merchant_id: userId,
-        })
-
-        if (error) {
-            console.error('Error fetching balance:', error)
-            throw error
-        }
-
-        return data ?? 0
     })
 }
 
@@ -272,24 +294,24 @@ export async function fetchBankAccountDetails(bankAccountId: string): Promise<Ba
 }
 
 export function useBalanceBreakdown(userId: string | null) {
-    return useQuery(['balanceBreakdown', userId], async () => {
-        if (!userId) {
-            return {
-                available_balance: 0,
-                pending_balance: 0,
-                total_balance: 0,
+    return useQuery({
+        queryKey: ['balanceBreakdown', userId] as const,
+        queryFn: async () => {
+            if (!userId) {
+                return null
             }
-        }
 
-        const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
-            p_merchant_id: userId,
-        })
+            const { data, error } = await supabase.rpc('fetch_balance_breakdown', {
+                p_merchant_id: userId,
+            })
 
-        if (error) {
-            console.error('Error fetching balance breakdown:', error)
-            throw error
-        }
+            if (error) {
+                console.error('Error fetching balance breakdown:', error)
+                throw error
+            }
 
-        return data[0] as BalanceBreakdown
+            return data as BalanceBreakdown
+        },
+        enabled: !!userId,
     })
 }

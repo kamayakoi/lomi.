@@ -49,20 +49,18 @@ function LogsPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: logsData, isLoading: isLogsLoading, refetch } = useQuery(
-        ['logs', user?.id || '', selectedEvent, selectedSeverity, offset],
-        () => fetchLogs({
+    const { data: logsData, isLoading: isLogsLoading, refetch } = useQuery({
+        queryKey: ['logs', user?.id || '', selectedEvent, selectedSeverity, offset] as const,
+        queryFn: () => fetchLogs({
             userId: user?.id || '',
             event: selectedEvent,
             severity: selectedSeverity,
             offset,
             limit: 50
         }),
-        {
-            enabled: !!user?.id,
-            keepPreviousData: true
-        }
-    )
+        enabled: !!user?.id,
+        placeholderData: (previousData) => previousData
+    })
 
     const handleRefresh = async () => {
         setIsRefreshing(true)

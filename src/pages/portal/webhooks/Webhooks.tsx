@@ -167,13 +167,11 @@ function WebhooksPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: webhooksData, isLoading: isWebhooksLoading, refetch } = useQuery(
-        ['webhooks', user?.id || '', selectedEvent, selectedStatus],
-        () => fetchWebhooks(user?.id || '', selectedEvent, selectedStatus),
-        {
-            enabled: !!user?.id,
-        }
-    )
+    const { data: webhooksData, isLoading: isWebhooksLoading, refetch } = useQuery<Webhook[]>({
+        queryKey: ['webhooks', user?.id || '', selectedEvent, selectedStatus] as const,
+        queryFn: () => fetchWebhooks(user?.id || '', selectedEvent, selectedStatus),
+        enabled: !!user?.id
+    })
 
     const webhooks = webhooksData || []
 

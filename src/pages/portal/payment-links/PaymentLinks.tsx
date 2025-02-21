@@ -126,9 +126,9 @@ function PaymentLinksPage() {
     { title: 'Settings', href: 'settings', isActive: false },
   ]
 
-  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage, refetch } = useInfiniteQuery(
-    ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus],
-    ({ pageParam = 1 }) =>
+  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage, refetch } = useInfiniteQuery({
+    queryKey: ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus] as const,
+    queryFn: ({ pageParam = 1 }) =>
       fetchPaymentLinks(
         user?.id || '',
         selectedLinkType,
@@ -137,17 +137,15 @@ function PaymentLinksPage() {
         pageParam,
         pageSize
       ),
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        const nextPage = allPages.length + 1
-        return lastPage.length !== 0 ? nextPage : undefined
-      },
-      enabled: !!user?.id,
-    }
-  )
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const nextPage = allPages.length + 1
+      return lastPage.length !== 0 ? nextPage : undefined
+    },
+    enabled: !!user?.id
+  })
 
-  const paymentLinks = paymentLinksData?.pages?.flatMap((page) => page) || []
-
+  const paymentLinks = paymentLinksData?.pages?.flatMap((page: PaymentLink[]) => page) || []
 
   const sortPaymentLinks = (paymentLinks: PaymentLink[]) => {
     if (!sortColumn) return paymentLinks

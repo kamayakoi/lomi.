@@ -31,45 +31,57 @@ function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
 
-    const { data: revenueData = [], isLoading: isRevenueLoading } = useQuery<RevenueData[]>(
-        ['revenueByDate', user?.id, selectedDateRange],
-        () => fetchRevenueByDate({
+    const { data: revenueData = [], isLoading: isRevenueLoading } = useQuery<RevenueData[]>({
+        queryKey: ['revenueByDate', user?.id, selectedDateRange] as const,
+        queryFn: () => fetchRevenueByDate({
             merchantId: user?.id || '',
             startDate: getStartDate(selectedDateRange),
             endDate: getEndDate(selectedDateRange),
             granularity: getGranularity(selectedDateRange),
         }),
-        { enabled: !!user?.id }
-    )
+        enabled: !!user?.id
+    })
 
-    const { data: transactionVolumeData = [], isLoading: isTransactionVolumeLoading } = useQuery<TransactionVolumeData[]>(
-        ['transactionVolumeByDate', user?.id, selectedDateRange],
-        () => fetchTransactionVolumeByDate({
+    const { data: transactionVolumeData = [], isLoading: isTransactionVolumeLoading } = useQuery<TransactionVolumeData[]>({
+        queryKey: ['transactionVolumeByDate', user?.id, selectedDateRange] as const,
+        queryFn: () => fetchTransactionVolumeByDate({
             merchantId: user?.id || '',
             startDate: getStartDate(selectedDateRange),
             endDate: getEndDate(selectedDateRange),
             granularity: getGranularity(selectedDateRange),
         }),
-        { enabled: !!user?.id }
-    )
+        enabled: !!user?.id
+    })
 
-    const { data: topPerformingProducts = [], isLoading: isTopPerformingProductsLoading } = useQuery<TopPerformingProduct[]>(
-        ['topPerformingProducts', user?.id, selectedDateRange],
-        () => fetchTopPerformingProducts({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
-        { enabled: !!user?.id }
-    )
+    const { data: topPerformingProducts = [], isLoading: isTopPerformingProductsLoading } = useQuery<TopPerformingProduct[]>({
+        queryKey: ['topPerformingProducts', user?.id, selectedDateRange] as const,
+        queryFn: () => fetchTopPerformingProducts({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange),
+            endDate: getEndDate(selectedDateRange)
+        }),
+        enabled: !!user?.id
+    })
 
-    const { data: topPerformingSubscriptionPlans = [], isLoading: isTopPerformingSubscriptionPlansLoading } = useQuery<TopPerformingSubscriptionPlan[]>(
-        ['topPerformingSubscriptionPlans', user?.id, selectedDateRange],
-        () => fetchTopPerformingSubscriptionPlans({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
-        { enabled: !!user?.id }
-    )
+    const { data: topPerformingSubscriptionPlans = [], isLoading: isTopPerformingSubscriptionPlansLoading } = useQuery<TopPerformingSubscriptionPlan[]>({
+        queryKey: ['topPerformingSubscriptionPlans', user?.id, selectedDateRange] as const,
+        queryFn: () => fetchTopPerformingSubscriptionPlans({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange),
+            endDate: getEndDate(selectedDateRange)
+        }),
+        enabled: !!user?.id
+    })
 
-    const { data: providerDistribution = [], isLoading: isProviderDistributionLoading } = useQuery<ProviderDistributionType[]>(
-        ['providerDistribution', user?.id, selectedDateRange],
-        () => fetchProviderDistribution({ merchantId: user?.id || '', startDate: getStartDate(selectedDateRange), endDate: getEndDate(selectedDateRange) }),
-        { enabled: !!user?.id }
-    )
+    const { data: providerDistribution = [], isLoading: isProviderDistributionLoading } = useQuery<ProviderDistributionType[]>({
+        queryKey: ['providerDistribution', user?.id, selectedDateRange] as const,
+        queryFn: () => fetchProviderDistribution({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange),
+            endDate: getEndDate(selectedDateRange)
+        }),
+        enabled: !!user?.id
+    })
 
     if (isUserLoading) {
         return <AnimatedLogoLoader />

@@ -50,6 +50,9 @@ function isBalanceBreakdownWithDetails(breakdown: unknown): breakdown is Balance
     )
 }
 
+type PayoutsResponse = Payout[]
+
+
 function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
@@ -83,25 +86,23 @@ function BalancePage() {
 
     const { data: balanceBreakdown, isLoading: isBalanceBreakdownLoading, refetch: refetchBalanceBreakdown } = useBalanceBreakdown(user?.id || null)
 
-    const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage, refetch: refetchPayouts } = useInfiniteQuery(
-        ['payouts', user?.id || '', selectedStatuses],
-        ({ pageParam = 1 }) =>
+    const { data: payoutsData, isLoading: isPayoutsLoading, fetchNextPage, refetch: refetchPayouts } = useInfiniteQuery<PayoutsResponse, Error>({
+        queryKey: ['payouts', user?.id || '', selectedStatuses],
+        queryFn: ({ pageParam }) =>
             fetchPayouts(
                 user?.id || '',
-                selectedStatuses,
-                pageParam,
+                selectedStatuses as payout_status[],
+                pageParam as number,
                 pageSize
             ),
-        {
-            getNextPageParam: (lastPage, allPages) => {
-                const nextPage = allPages.length + 1
-                return lastPage.length !== 0 ? nextPage : undefined
-            },
-            enabled: !!user?.id,
-        }
-    )
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: PayoutsResponse, allPages: PayoutsResponse[]) => {
+            return lastPage.length !== 0 ? allPages.length + 1 : undefined
+        },
+        enabled: !!user?.id,
+    })
 
-    const payouts = payoutsData?.pages?.flatMap((page) => page) || []
+    const payouts = (payoutsData?.pages?.flatMap((page) => page) || []) as Payout[]
 
     useEffect(() => {
         if (user?.id) {

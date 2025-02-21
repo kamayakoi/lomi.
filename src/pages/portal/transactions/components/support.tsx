@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
 import { Transaction, FetchedTransaction } from './types'
 import { DateRange } from 'react-day-picker'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
 import { Database } from 'database.types'
 
 export const fetchTransactions = async (
@@ -327,7 +327,7 @@ export const applyDateFilter = (transactions: Transaction[], selectedDateRange: 
     })
 }
 
-export const useTransactions = (
+export function useTransactions(
     merchantId: string,
     selectedProvider: string | null,
     selectedStatuses: string[],
@@ -336,87 +336,98 @@ export const useTransactions = (
     selectedPaymentMethods: string[],
     page: number,
     pageSize: number
-) => {
-    return useQuery(['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize], () =>
-        fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize),
-        {
-            keepPreviousData: true,
-            cacheTime: 5 * 60 * 1000, // Cache for 5 minutes
-            staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
-        }
-    )
+): UseQueryResult<Transaction[], Error> {
+    return useQuery<Transaction[], Error>({
+        queryKey: ['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize] as const,
+        queryFn: () => fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize),
+        placeholderData: (previousData) => previousData,
+        gcTime: 5 * 60 * 1000,
+        staleTime: 2 * 60 * 1000,
+    })
 }
 
-export const useTotalIncomingAmount = (
+export function useTotalIncomingAmount(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['totalIncomingAmount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchTotalIncomingAmount(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['totalIncomingAmount', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchTotalIncomingAmount(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useTransactionCount = (
+export function useTransactionCount(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['transactionCount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchTransactionCount(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['transactionCount', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchTransactionCount(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useCompletionRate = (
+interface CompletionRateData {
+    completed: number;
+    refunded: number;
+    failed: number;
+}
+
+export function useCompletionRate(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<{ completed: number; refunded: number; failed: number }, unknown, { completed: number; refunded: number; failed: number }, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['completionRate', merchantId, selectedDateRange, customDateRange], () =>
-        fetchCompletionRate(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<CompletionRateData, Error>
+): UseQueryResult<CompletionRateData, Error> {
+    return useQuery<CompletionRateData, Error>({
+        queryKey: ['completionRate', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchCompletionRate(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useGrossAmount = (
+export function useGrossAmount(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['grossAmount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchGrossAmount(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['grossAmount', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchGrossAmount(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useFeeAmount = (
+export function useFeeAmount(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['feeAmount', merchantId, selectedDateRange, customDateRange], () =>
-        fetchFeeAmount(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['feeAmount', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchFeeAmount(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useAverageTransactionValue = (
+export function useAverageTransactionValue(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['averageTransactionValue', merchantId, selectedDateRange, customDateRange], () =>
-        fetchAverageTransactionValue(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['averageTransactionValue', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchAverageTransactionValue(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
 export const fetchAverageCustomerLifetimeValue = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
@@ -463,26 +474,28 @@ export const fetchAverageRetentionRate = async (merchantId: string, selectedDate
     return data
 }
 
-export const useAverageCustomerLifetimeValue = (
+export function useAverageCustomerLifetimeValue(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['averageCustomerLifetimeValue', merchantId, selectedDateRange, customDateRange], () =>
-        fetchAverageCustomerLifetimeValue(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['averageCustomerLifetimeValue', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchAverageCustomerLifetimeValue(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }
 
-export const useAverageRetentionRate = (
+export function useAverageRetentionRate(
     merchantId: string,
     selectedDateRange: string | null,
     customDateRange?: DateRange,
-    options?: UseQueryOptions<number, unknown, number, (string | null | DateRange | undefined)[]>
-) => {
-    return useQuery(['averageRetentionRate', merchantId, selectedDateRange, customDateRange], () =>
-        fetchAverageRetentionRate(merchantId, selectedDateRange, customDateRange),
-        options
-    )
+    options?: UseQueryOptions<number, Error>
+): UseQueryResult<number, Error> {
+    return useQuery<number, Error>({
+        queryKey: ['averageRetentionRate', merchantId, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchAverageRetentionRate(merchantId, selectedDateRange, customDateRange),
+        ...options
+    })
 }

@@ -39,7 +39,6 @@ function TransactionsPage() {
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
     const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>()
-    const pageSize = 50
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
     const [columns, setColumns] = useState<string[]>([
         'Transaction ID',
@@ -66,85 +65,90 @@ function TransactionsPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
-    const { data: transactionsData, isLoading: isTransactionsLoading, fetchNextPage } = useInfiniteQuery(
-        ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods],
-        ({ pageParam = 1 }) =>
-            fetchTransactions(
-                user?.id || '',
-                selectedProvider,
-                selectedStatuses,
-                selectedTypes,
-                selectedCurrencies,
-                selectedPaymentMethods,
-                pageParam,
-                pageSize
-            ),
-        {
-            getNextPageParam: (lastPage, allPages) => {
-                const nextPage = allPages.length + 1
-                return lastPage.length !== 0 ? nextPage : undefined
-            },
-            enabled: !!user?.id,
-        }
-    )
+    interface QueryResult<T> {
+        data: T;
+        isLoading: boolean;
+    }
 
-    const transactions = transactionsData?.pages?.flatMap((page) => page) || []
+    interface CompletionRate {
+        completed: number;
+        refunded: number;
+        failed: number;
+    }
+
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useInfiniteQuery({
+        queryKey: ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods] as const,
+        queryFn: ({ pageParam = 1 }) => fetchTransactions(
+            user?.id || '',
+            selectedProvider,
+            selectedStatuses,
+            selectedTypes,
+            selectedCurrencies,
+            selectedPaymentMethods,
+            pageParam,
+            10
+        ),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.length === 10 ? allPages.length + 1 : undefined
+        },
+        enabled: !!user?.id,
+    })
+
+    const transactions = data?.pages.flat() || []
 
     const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: transactionCount = 0, isLoading: isTransactionCountLoading } = useTransactionCount(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: completionRate = { completed: 0, refunded: 0, failed: 0 }, isLoading: isCompletionRateLoading } = useCompletionRate(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<CompletionRate>
 
     const { data: grossAmount = 0, isLoading: isGrossAmountLoading } = useGrossAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: feeAmount = 0, isLoading: isFeeAmountLoading } = useFeeAmount(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: averageTransactionValue = 0, isLoading: isAverageTransactionValueLoading } = useAverageTransactionValue(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: averageCustomerLifetimeValue = 0, isLoading: isAverageCustomerLifetimeValueLoading } = useAverageCustomerLifetimeValue(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const { data: averageRetentionRate = 0, isLoading: isAverageRetentionRateLoading } = useAverageRetentionRate(
         user?.id || '',
         selectedDateRange,
-        customDateRange,
-        { enabled: !!user?.id }
-    )
+        customDateRange
+    ) as QueryResult<number>
 
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
@@ -235,7 +239,7 @@ function TransactionsPage() {
 
     const refetch = async () => {
         setIsRefreshing(true)
-        await queryClient.refetchQueries(['transactions'])
+        await queryClient.refetchQueries({ queryKey: ['transactions'] })
         setIsRefreshing(false)
     }
 
@@ -512,7 +516,7 @@ function TransactionsPage() {
                                     <InfiniteScroll
                                         dataLength={transactions.length}
                                         next={() => fetchNextPage()}
-                                        hasMore={transactionsData?.pages?.[transactionsData.pages.length - 1]?.length === pageSize}
+                                        hasMore={hasNextPage}
                                         loader={<Skeleton className="w-full h-8 rounded-none" />}
                                     >
                                         <Table>
@@ -621,7 +625,7 @@ function TransactionsPage() {
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {isTransactionsLoading ? (
+                                                {isFetchingNextPage ? (
                                                     Array.from({ length: 5 }).map((_, index) => (
                                                         <TableRow key={index}>
                                                             <TableCell colSpan={10}>
@@ -646,7 +650,7 @@ function TransactionsPage() {
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : (
-                                                    applySearch(applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange), searchTerm).map((transaction: Transaction) => (
+                                                    sortTransactions(transactions).map((transaction: Transaction) => (
                                                         <TableRow
                                                             key={transaction.transaction_id}
                                                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
