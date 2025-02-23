@@ -1,31 +1,29 @@
-interface SpinnerProps {
-    size?: number
-    color?: string
-}
-
-export default function Spinner({ size = 16, color = '#9CA3AF' }: SpinnerProps) {
+export default function Loader() {
     return (
-        <svg
-            className="animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            width={size}
-            height={size}
-        >
-            <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke={color}
-                strokeWidth="4"
-            ></circle>
-            <path
-                className="opacity-75"
-                fill={color}
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-        </svg>
+        <div className="flex items-center justify-center">
+            <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                className="animate-spin"
+            >
+                {[...Array(8)].map((_, i) => (
+                    <line
+                        key={i}
+                        x1="12"
+                        y1="3"
+                        x2="12"
+                        y2="7"
+                        className="stroke-foreground"
+                        style={{
+                            opacity: Math.max(0.2, 1 - (i * 0.1))
+                        }}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        transform={`rotate(${i * 45} 12 12)`}
+                    />
+                ))}
+            </svg>
+        </div>
     )
 }

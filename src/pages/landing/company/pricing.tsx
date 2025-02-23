@@ -210,7 +210,7 @@ export default function PricingPage() {
                                                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                                         The Premium have been removed from this calculator for simplicity.
                                                         <a
-                                                            href="https://developers.lomi.africa/pricing"
+                                                            href="https://developers.lomi.africa/docs/merchant-of-record/pricing"
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 inline-flex items-center ml-1"

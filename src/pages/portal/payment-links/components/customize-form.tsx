@@ -254,10 +254,10 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     const [customCancelUrl, setCustomCancelUrl] = useState('')
 
     const paymentMethods: PaymentMethod[] = [
-        { id: 'CARDS', name: 'Cards', icon: '/cards.webp' },
-        { id: 'WAVE', name: 'Wave', icon: '/wave.webp' },
-        { id: 'MTN', name: 'MTN', icon: '/mtn.webp' },
-        { id: 'ORANGE', name: 'Orange', icon: '/orange.webp' },
+        { id: 'CARDS', name: 'Cards', icon: '/payment_channels/cards.webp' },
+        { id: 'WAVE', name: 'Wave', icon: '/payment_channels/wave.webp' },
+        { id: 'MTN', name: 'MTN', icon: '/payment_channels/mtn.webp' },
+        { id: 'ORANGE', name: 'Orange', icon: '/payment_channels/orange.webp' },
     ]
 
     useEffect(() => {

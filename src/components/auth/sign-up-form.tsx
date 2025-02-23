@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/custom/password-input'
 import { supabase } from '@/utils/supabase/client'
 import { useTranslation } from 'react-i18next'
-import Spinner from '@/components/portal/spinner'
+import Spinner from '@/components/ui/spinner'
 import { MagicCard } from '@/components/ui/magic-card'
 import { Check, X } from 'lucide-react'
 
@@ -308,7 +308,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
         <Button className="w-full h-12" variant="outline" onClick={() => handleOAuthSignUp('google')}>
           <div className="flex items-center justify-center">
             {isGoogleLoading ? (
-              <Spinner size={20} color="#4285F4" />
+              <Spinner />
             ) : (
               <svg
                 className="w-5 h-5 mr-2"
@@ -346,7 +346,7 @@ export function SignUpForm({ className, onSubmit, isLoading, isConfirmationSent,
         >
           <div className="flex items-center justify-center">
             {isGithubLoading ? (
-              <Spinner size={20} color="#24292e" />
+              <Spinner />
             ) : (
               <IconBrandGithub className='h-6 w-6 mr-2' />
             )}

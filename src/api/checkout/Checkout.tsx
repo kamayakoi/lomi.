@@ -830,7 +830,7 @@ export default function CheckoutPage() {
                                     style={{ width: '100px', height: '100px', padding: '0' }}
                                 >
                                     <img
-                                        src={`/${provider.toLowerCase()}.webp`}
+                                        src={`/payment_channels/${provider.toLowerCase()}.webp`}
                                         alt={provider}
                                         className="w-full h-full object-contain rounded-lg"
                                     />
@@ -852,7 +852,7 @@ export default function CheckoutPage() {
                                     <div className="flex items-center space-x-4">
                                         {selectedProvider && (
                                             <img
-                                                src={`/${selectedProvider.toLowerCase()}.webp`}
+                                                src={`/payment_channels/${selectedProvider.toLowerCase()}.webp`}
                                                 alt={selectedProvider}
                                                 className="w-12 h-12 object-contain"
                                             />
