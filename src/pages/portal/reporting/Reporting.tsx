@@ -11,12 +11,11 @@ import { fetchRevenueByDate, fetchProviderDistribution } from './components/supp
 import { RevenueData, ProviderDistribution } from './components/types'
 import { useQuery } from '@tanstack/react-query'
 import { format, subMonths, startOfYear, subDays } from 'date-fns'
-import { cn } from '@/lib/actions/utils'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { withActivationCheck } from '@/components/custom/with-activation-check'
-import { MerchantRevenueChart } from '@/pages/portal/reporting/merchant/merchant-revenue-chart'
-import { ProviderDistributionChart } from '@/pages/portal/reporting/components/provider-distribution-chart'
+import { MerchantRevenueChart } from '@/pages/portal/reporting/components/charts/merchant-revenue-chart'
+import { ProviderDistributionChart } from '@/pages/portal/reporting/components/charts/provider-distribution-chart'
 import type { ChartType } from '@/components/charts/area-chart'
 import { DateRange } from 'react-day-picker'
 
@@ -125,7 +124,7 @@ function ReportingPage() {
                             />
                         </div>
 
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+                        <div className="w-full min-h-[470px]">
                             {selectedChartType === 'providers' ? (
                                 <ProviderDistributionChart
                                     providerDistribution={providerDistribution}
@@ -146,16 +145,6 @@ function ReportingPage() {
                                     isLoading={isRevenueLoading}
                                 />
                             )}
-                        </div>
-
-                        <div className={cn(
-                            "flex items-center my-8",
-                            "before:content-[''] before:flex-grow before:h-0.5 before:bg-gray-200 before:dark:bg-gray-700 before:mr-4",
-                            "after:content-[''] after:flex-grow after:h-0.5 after:bg-gray-200 after:dark:bg-gray-700 after:ml-4"
-                        )}>
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Merchant Analytics
-                            </span>
                         </div>
                     </div>
                 </div>

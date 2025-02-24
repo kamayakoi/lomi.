@@ -4,7 +4,6 @@ import { Fragment } from 'react'
 import { format } from 'date-fns'
 import Spinner from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/actions/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,8 +14,8 @@ import { ChevronDown } from 'lucide-react'
 
 // Chart Configuration Constants
 const CHART_CONFIG = {
-  height: 315,
-  margin: { top: 5, right: 5, left: 0, bottom: 0 },
+  height: 470,
+  margin: { top: 5, right: 5, left: 20, bottom: -30 },
   colors: {
     axis: '#6b7280',
     tooltip: {
@@ -27,6 +26,14 @@ const CHART_CONFIG = {
     start: 0.15,
     end: 0.05
   }
+} as const
+
+// Animation Configuration
+const ANIMATION_CONFIG = {
+  isAnimationActive: true,
+  animationBegin: 100,
+  animationDuration: 1200,
+  animationEasing: "ease-out"
 } as const
 
 const AXIS_CONFIG = {
@@ -40,18 +47,24 @@ const X_AXIS_CONFIG = {
   ...AXIS_CONFIG,
   interval: 'preserveStartEnd',
   minTickGap: 30,
-  dy: 5,
+  dy: 10,
+  angle: 0,
+  textAnchor: 'middle' as const,
+  height: 60,
   padding: { left: 30, right: 30 }
 } as const
 
 const Y_AXIS_CONFIG = {
   ...AXIS_CONFIG,
-  width: 0,
+  width: 35,
   orientation: 'left' as const,
   allowDataOverflow: true,
   minTickGap: 20,
-  padding: { top: 20, bottom: 20 },
-  hide: true
+  padding: { top: -30, bottom: 130 },
+  hide: false,
+  tickFormatter: (value: number) => value === 0 ? '0' : '',
+  interval: 0,
+  ticks: [0] as number[]
 } as const
 
 const TOOLTIP_STYLES = {
@@ -79,8 +92,7 @@ const TOOLTIP_STYLES = {
   },
   cursor: {
     stroke: CHART_CONFIG.colors.tooltip.cursor,
-    strokeWidth: 1,
-    strokeDasharray: '3 3'
+    strokeWidth: 1
   }
 } as const
 
@@ -89,7 +101,8 @@ const AREA_CONFIG = {
   strokeWidth: 2,
   connectNulls: true,
   baseValue: 0,
-  dot: false
+  dot: false,
+  ...ANIMATION_CONFIG
 } as const
 
 const TRANSACTION_DOT_CONFIG = {
@@ -149,19 +162,15 @@ export function AreaChart<T, C extends string = string>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={cn(
-                      "h-8 px-3 text-sm font-medium",
-                      "focus-visible:ring-1 focus-visible:ring-primary",
-                      "bg-[#10B981] text-white hover:bg-[#10B981]/90"
-                    )}
+                    className="text-sm font-medium flex items-center gap-2 hover:bg-transparent hover:text-primary"
                   >
                     {chartLabel}
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="start">
                   {chartTypes.map((type) => (
                     <DropdownMenuItem
                       key={type.id}
@@ -178,7 +187,7 @@ export function AreaChart<T, C extends string = string>({
             )}
           </div>
         </CardHeader>
-        <CardContent className="flex items-center justify-center min-h-[315px]">
+        <CardContent className="flex items-center justify-center" style={{ height: `${CHART_CONFIG.height}px` }}>
           <Spinner />
         </CardContent>
       </Card>
@@ -194,19 +203,15 @@ export function AreaChart<T, C extends string = string>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    className={cn(
-                      "h-8 px-3 text-sm font-medium",
-                      "focus-visible:ring-1 focus-visible:ring-primary",
-                      "bg-[#10B981] text-white hover:bg-[#10B981]/90"
-                    )}
+                    className="text-sm font-medium flex items-center gap-2 hover:bg-transparent hover:text-primary"
                   >
                     {chartLabel}
-                    <ChevronDown className="ml-2 h-4 w-4" />
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="start">
                   {chartTypes.map((type) => (
                     <DropdownMenuItem
                       key={type.id}
@@ -288,19 +293,15 @@ export function AreaChart<T, C extends string = string>({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className={cn(
-                    "h-8 px-3 text-sm font-medium",
-                    "focus-visible:ring-1 focus-visible:ring-primary",
-                    "bg-[#10B981] text-white hover:bg-[#10B981]/90"
-                  )}
+                  className="text-sm font-medium flex items-center gap-1 hover:bg-transparent hover:text-primary"
                 >
                   {chartLabel}
-                  <ChevronDown className="ml-2 h-4 w-4" />
+                  <ChevronDown className="h-3 w-3 mt-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="start">
                 {chartTypes.map((type) => (
                   <DropdownMenuItem
                     key={type.id}
@@ -346,7 +347,10 @@ export function AreaChart<T, C extends string = string>({
               {...Y_AXIS_CONFIG}
               yAxisId="left"
               tickFormatter={yAxisFormatter}
-              domain={[(dataMin: number) => Math.min(0, dataMin), (dataMax: number) => Math.max(dataMax * 1.5, 0)]}
+              domain={[
+                (dataMin: number) => Math.min(0, dataMin),
+                (dataMax: number) => Math.max(dataMax * 1.2, 1)
+              ]}
             />
             <Tooltip
               formatter={tooltipFormatter}
@@ -364,7 +368,14 @@ export function AreaChart<T, C extends string = string>({
                   stroke={area.color}
                   fill={`url(#gradient-${String(area.dataKey)})`}
                   yAxisId={area.yAxisId || "left"}
-                  activeDot={(props: any) => {
+                  activeDot={(props: {
+                    cx: number;
+                    cy: number;
+                    payload: {
+                      date: string | Date;
+                      [key: string]: string | Date | number;
+                    };
+                  }) => {
                     const isTransactionPoint = area.transactionTime && props.payload.date &&
                       (typeof props.payload.date === 'string'
                         ? props.payload.date.includes(':')
