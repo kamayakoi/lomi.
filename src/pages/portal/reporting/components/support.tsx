@@ -164,3 +164,31 @@ export const fetchProviderDistribution = async ({ merchantId, startDate, endDate
         return []
     }
 }
+
+export const fetchMRRMetrics = async ({ merchantId, startDate, endDate }: FetchRevenueByDateParams) => {
+    if (!merchantId || !startDate || !endDate) {
+        console.error('Missing required parameters:', { merchantId, startDate, endDate })
+        return []
+    }
+
+    try {
+        const { data, error } = await supabase.rpc('fetch_mrr_metrics_custom_range', {
+            p_merchant_id: merchantId,
+            p_start_date: startDate,
+            p_end_date: endDate
+        })
+
+        if (error) {
+            console.error('Error fetching MRR metrics:', error)
+            return []
+        }
+
+        return data.map((item: any) => ({
+            date: item.date,
+            mrr: parseFloat(item.mrr)
+        }))
+    } catch (error) {
+        console.error('Error in fetchMRRMetrics:', error)
+        return []
+    }
+}

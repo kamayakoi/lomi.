@@ -7,8 +7,8 @@ import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
 import { Separator } from '@/components/ui/separator'
-import { fetchRevenueByDate, fetchProviderDistribution } from './components/support'
-import { RevenueData, ProviderDistribution } from './components/types'
+import { fetchRevenueByDate, fetchProviderDistribution, fetchMRRMetrics } from './components/support'
+import { RevenueData, ProviderDistribution, MRRData } from './components/types'
 import { useQuery } from '@tanstack/react-query'
 import { format, subMonths, startOfYear, subDays } from 'date-fns'
 import FeedbackForm from '@/components/portal/feedback-form'
@@ -18,6 +18,7 @@ import { MerchantRevenueChart } from '@/pages/portal/reporting/components/charts
 import { ProviderDistributionChart } from '@/pages/portal/reporting/components/charts/provider-distribution-chart'
 import type { ChartType } from '@/components/charts/area-chart'
 import { DateRange } from 'react-day-picker'
+import { MRRChart } from '@/pages/portal/reporting/components/charts/mrr-chart'
 
 const topNav = [
     { title: 'Reporting', href: '/portal/reporting', isActive: true },
@@ -28,12 +29,12 @@ const chartTypes: ChartType<'revenue' | 'mrr' | 'aov' | 'active_subscriptions' |
     { id: 'revenue', label: 'Revenue', color: '#2563eb' },
     { id: 'mrr', label: 'Monthly Recurring Revenue', color: '#10B981' },
     { id: 'aov', label: 'Average Order Value', color: '#6366F1' },
+    { id: 'providers', label: 'Provider Distribution', color: '#6366F1' },
     { id: 'active_subscriptions', label: 'Active Subscriptions', color: '#EC4899' },
     { id: 'new_subscriptions', label: 'New Subscriptions', color: '#F59E0B' },
     { id: 'renewed_subscriptions', label: 'Renewed Subscriptions', color: '#8B5CF6' },
     { id: 'new_subscriptions_revenue', label: 'New Subscriptions Revenue', color: '#14B8A6' },
     { id: 'renewed_subscriptions_revenue', label: 'Renewed Subscriptions Revenue', color: '#F43F5E' },
-    { id: 'providers', label: 'Providers', color: '#6366F1' },
 ] as const
 
 function ReportingPage() {
@@ -50,32 +51,27 @@ function ReportingPage() {
             endDate: getEndDate(selectedDateRange, date),
             granularity: getGranularity(selectedDateRange),
         }),
-        enabled: !!user?.id && selectedChartType !== 'providers'
+        enabled: !!user?.id && !['providers', 'mrr'].includes(selectedChartType)
     })
 
     const { data: providerDistribution = [], isLoading: isProviderLoading } = useQuery<ProviderDistribution[]>({
         queryKey: ['providerDistribution', user?.id, selectedDateRange, date] as const,
-        queryFn: () => {
-            if (!user?.id) {
-                console.error('No user ID available')
-                return []
-            }
-
-            const startDate = getStartDate(selectedDateRange, date)
-            const endDate = getEndDate(selectedDateRange, date)
-
-            if (!startDate || !endDate) {
-                console.error('Invalid date range')
-                return []
-            }
-
-            return fetchProviderDistribution({
-                merchantId: user.id,
-                startDate,
-                endDate
-            })
-        },
+        queryFn: () => fetchProviderDistribution({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange, date) || '',
+            endDate: getEndDate(selectedDateRange, date) || '',
+        }),
         enabled: !!user?.id && selectedChartType === 'providers'
+    })
+
+    const { data: mrrData = [], isLoading: isMRRLoading } = useQuery<MRRData[]>({
+        queryKey: ['mrrMetrics', user?.id, selectedDateRange, date] as const,
+        queryFn: () => fetchMRRMetrics({
+            merchantId: user?.id || '',
+            startDate: getStartDate(selectedDateRange, date) || '',
+            endDate: getEndDate(selectedDateRange, date) || '',
+        }),
+        enabled: !!user?.id && selectedChartType === 'mrr'
     })
 
     if (isUserLoading) {
@@ -133,6 +129,15 @@ function ReportingPage() {
                                     chartTypes={chartTypes}
                                     isLoading={isProviderLoading}
                                     selectedDateRange={selectedDateRange}
+                                />
+                            ) : selectedChartType === 'mrr' ? (
+                                <MRRChart
+                                    mrrData={mrrData}
+                                    selectedDateRange={selectedDateRange}
+                                    selectedChartType="mrr"
+                                    onChartTypeChange={setSelectedChartType}
+                                    chartTypes={chartTypes.filter(type => type.id === 'mrr') as ChartType<'mrr'>[]}
+                                    isLoading={isMRRLoading}
                                 />
                             ) : (
                                 <MerchantRevenueChart

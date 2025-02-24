@@ -63,14 +63,14 @@ export type Subscription = {
     updated_at: string
 }
 
-export type RevenueData = {
-    date: string
-    revenue: number
+export interface RevenueData {
+    date: string;
+    revenue: number;
 }
 
-export type TransactionVolumeData = {
-    date: string
-    transaction_count: number
+export interface TransactionVolumeData {
+    date: string;
+    volume: number;
 }
 
 export type TopPerformingProduct = {
@@ -136,6 +136,11 @@ export interface ProviderDistribution {
     date: string
     provider_code: provider_code
     transaction_count: number
+}
+
+export interface MRRData {
+    date: string;
+    mrr: number;
 }
 
 export const COLORS = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c']
