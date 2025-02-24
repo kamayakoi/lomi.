@@ -48,20 +48,20 @@ export function formatCurrency(amount: number, currency = 'XOF'): string {
 
 export function formatProvider(provider: string): string {
     const formattedNames: Record<string, string> = {
-        ORANGE: 'Orange Money',
+        ORANGE: 'Orange',
         WAVE: 'Wave',
-        ECOBANK: 'Ecobank',
-        MTN: 'MTN Mobile Money',
-        NOWPAYMENTS: 'NowPayments',
+        ECOBANK: 'Cards',
+        MTN: 'MTN',
+        NOWPAYMENTS: 'Crypto',
         PAYPAL: 'PayPal',
         APPLE: 'Apple Pay',
         GOOGLE: 'Google Pay',
-        MOOV: 'Moov Money',
-        AIRTEL: 'Airtel Money',
+        MOOV: 'Moov',
+        AIRTEL: 'Airtel',
         MPESA: 'M-Pesa',
-        WIZALL: 'Wizall Money',
+        WIZALL: 'Wizall',
         OPAY: 'OPay',
-        OTHER: 'Other Methods'
+        OTHER: 'Other'
     }
     return formattedNames[provider] || 'Other'
 } 

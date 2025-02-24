@@ -223,8 +223,58 @@ export function AreaChart<T, C extends string = string>({
             )}
           </div>
         </CardHeader>
-        <CardContent className="flex items-center justify-center min-h-[315px]">
-          <Spinner />
+        <CardContent>
+          <ResponsiveContainer width="100%" height={CHART_CONFIG.height}>
+            <RechartsAreaChart
+              data={[{ [xAxisDataKey]: new Date(), ...Object.fromEntries(areas.map(area => [area.dataKey, 0])) }]}
+              margin={CHART_CONFIG.margin}
+            >
+              <defs>
+                {areas.map((area) => (
+                  <linearGradient
+                    key={String(area.dataKey)}
+                    id={`gradient-${String(area.dataKey)}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor={area.color} stopOpacity={CHART_CONFIG.gradientOpacity.start} />
+                    <stop offset="95%" stopColor={area.color} stopOpacity={CHART_CONFIG.gradientOpacity.end} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <XAxis
+                {...X_AXIS_CONFIG}
+                dataKey={xAxisDataKey as string}
+              />
+              <YAxis
+                {...Y_AXIS_CONFIG}
+                yAxisId="left"
+                tickFormatter={yAxisFormatter}
+                domain={[0, 1]}
+              />
+              <Tooltip
+                formatter={tooltipFormatter}
+                contentStyle={TOOLTIP_STYLES.contentStyle}
+                itemStyle={TOOLTIP_STYLES.itemStyle}
+                labelStyle={TOOLTIP_STYLES.labelStyle}
+                cursor={TOOLTIP_STYLES.cursor}
+              />
+              {areas.map((area) => (
+                <Fragment key={String(area.dataKey)}>
+                  <Area
+                    {...AREA_CONFIG}
+                    dataKey={area.dataKey as string}
+                    name={area.name}
+                    stroke={area.color}
+                    fill={`url(#gradient-${String(area.dataKey)})`}
+                    yAxisId={area.yAxisId || "left"}
+                  />
+                </Fragment>
+              ))}
+            </RechartsAreaChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     )

@@ -1,5 +1,5 @@
 import { AreaChart, ChartType } from '@/components/charts/area-chart'
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, startOfDay, endOfDay, addHours } from 'date-fns'
 import { ProviderDistribution } from './types'
 import { formatProvider } from '@/lib/actions/utils'
 
@@ -26,17 +26,18 @@ interface ProviderDistributionChartProps {
 }
 
 const PROVIDER_COLORS = {
-    'Orange Money': '#FC6307',
+    'Orange': '#FC6307',
     'Wave': '#71CDF4',
-    'Ecobank': '#074367',
-    'MTN Mobile Money': '#F7CE46',
-    'NowPayments': '#037BFE',
-    'Moov Money': '#0093DD',
-    'Airtel Money': '#FF0000',
+    'Cards': '#074367',
+    'MTN': '#F7CE46',
+    'Crypto': '#037BFE',
+    'Moov': '#0093DD',
+    'Airtel': '#FF0000',
     'M-Pesa': '#4CAF50',
-    'Wizall Money': '#FF6B00',
+    'Wizall': '#FF6B00',
     'OPay': '#14B55A',
-    'PayPal': '#003087'
+    'PayPal': '#003087',
+    'Activity': '#2563eb'
 } as const
 
 export function ProviderDistributionChart({
@@ -48,17 +49,33 @@ export function ProviderDistributionChart({
     selectedDateRange
 }: ProviderDistributionChartProps) {
     const getChartData = () => {
-        if (!providerDistribution?.length) {
-            return []
-        }
-
-        // Get unique providers excluding 'OTHER'
+        // Get unique providers even if no distribution data
         const uniqueProviders = Array.from(
             new Set(providerDistribution
                 .map(d => formatProvider(d.provider_code))
                 .filter(provider => provider !== 'Other Methods')
             )
         )
+
+        // If no data and it's 24H view, create hourly data points
+        if (!providerDistribution?.length && selectedDateRange === '24H') {
+            const today = new Date()
+            const start = startOfDay(today)
+            const end = endOfDay(today)
+            const hourlyData = []
+
+            // Create data points for each hour with a default "Activity" line
+            for (let i = 0; i <= 23; i++) {
+                const date = addHours(start, i)
+                if (date <= end) {
+                    hourlyData.push({
+                        date: format(date, 'HH:mm'),
+                        'Activity': 0
+                    })
+                }
+            }
+            return hourlyData
+        }
 
         // Group data by date and provider
         const groupedData = providerDistribution.reduce<GroupedData>((acc, curr) => {
@@ -104,12 +121,14 @@ export function ProviderDistributionChart({
     }
 
     const chartData = getChartData()
-    const providers = Array.from(
-        new Set(providerDistribution
-            .map(d => formatProvider(d.provider_code))
-            .filter(provider => provider !== 'Other Methods')
+    const providers = !providerDistribution?.length && selectedDateRange === '24H'
+        ? ['Activity']
+        : Array.from(
+            new Set(providerDistribution
+                .map(d => formatProvider(d.provider_code))
+                .filter(provider => provider !== 'Other Methods')
+            )
         )
-    )
 
     return (
         <AreaChart<ChartData, ChartTypes>
