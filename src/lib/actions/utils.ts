@@ -44,4 +44,24 @@ export function formatCurrency(amount: number, currency = 'XOF'): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+export function formatProvider(provider: string): string {
+    const formattedNames: Record<string, string> = {
+        ORANGE: 'Orange Money',
+        WAVE: 'Wave',
+        ECOBANK: 'Ecobank',
+        MTN: 'MTN Mobile Money',
+        NOWPAYMENTS: 'NowPayments',
+        PAYPAL: 'PayPal',
+        APPLE: 'Apple Pay',
+        GOOGLE: 'Google Pay',
+        MOOV: 'Moov Money',
+        AIRTEL: 'Airtel Money',
+        MPESA: 'M-Pesa',
+        WIZALL: 'Wizall Money',
+        OPAY: 'OPay',
+        OTHER: 'Other Methods'
+    }
+    return formattedNames[provider] || 'Other'
 } 

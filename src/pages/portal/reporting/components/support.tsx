@@ -115,17 +115,60 @@ export const fetchTopPerformingSubscriptionPlans = async ({ merchantId, startDat
     return data as TopPerformingSubscriptionPlan[]
 }
 
+interface ProviderDistributionDataItem {
+    date: string;
+    provider_code: string;
+    transaction_count: string;
+}
+
 export const fetchProviderDistribution = async ({ merchantId, startDate, endDate }: FetchProviderDistributionParams) => {
-    const { data, error } = await supabase.rpc('fetch_provider_distribution', {
-        p_merchant_id: merchantId,
-        p_start_date: startDate,
-        p_end_date: endDate,
+    // Debug logging
+    console.log('Fetching provider distribution with params:', {
+        merchantId,
+        startDate,
+        endDate
     })
 
-    if (error) {
-        console.error('Error fetching provider distribution:', error)
+    if (!merchantId) {
+        console.error('Missing merchantId parameter')
         return []
     }
 
-    return data as ProviderDistribution[]
+    if (!startDate) {
+        console.error('Missing startDate parameter')
+        return []
+    }
+
+    if (!endDate) {
+        console.error('Missing endDate parameter')
+        return []
+    }
+
+    try {
+        const { data, error } = await supabase
+            .rpc('fetch_provider_distribution_custom_range', {
+                p_merchant_id: merchantId,
+                p_start_date: startDate,
+                p_end_date: endDate
+            })
+
+        if (error) {
+            console.error('Supabase error fetching provider distribution:', error)
+            return []
+        }
+
+        if (!data) {
+            console.error('No data returned from provider distribution query')
+            return []
+        }
+
+        return data.map((item: ProviderDistributionDataItem) => ({
+            date: item.date,
+            provider_code: item.provider_code,
+            transaction_count: parseInt(item.transaction_count)
+        })) as ProviderDistribution[]
+    } catch (error) {
+        console.error('Error in fetchProviderDistribution:', error)
+        return []
+    }
 }

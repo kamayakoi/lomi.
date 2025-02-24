@@ -3064,48 +3064,27 @@ export type Database = {
           fee_types: Json
         }[]
       }
-      fetch_organization_details:
-        | {
-            Args: {
-              p_merchant_id: string
-            }
-            Returns: {
-              organization_id: string
-              name: string
-              email: string
-              logo_url: string
-              website_url: string
-              verified: boolean
-              default_currency: Database["public"]["Enums"]["currency_code"]
-              country: string
-              region: string
-              city: string
-              district: string
-              street: string
-              postal_code: string
-            }[]
-          }
-        | {
-            Args: {
-              p_merchant_id: string
-              p_organization_id?: string
-            }
-            Returns: {
-              organization_id: string
-              name: string
-              email: string
-              logo_url: string
-              website_url: string
-              verified: boolean
-              default_currency: Database["public"]["Enums"]["currency_code"]
-              country: string
-              region: string
-              city: string
-              district: string
-              street: string
-              postal_code: string
-            }[]
-          }
+      fetch_organization_details: {
+        Args: {
+          p_merchant_id: string
+          p_organization_id?: string
+        }
+        Returns: {
+          organization_id: string
+          name: string
+          email: string
+          logo_url: string
+          website_url: string
+          verified: boolean
+          default_currency: Database["public"]["Enums"]["currency_code"]
+          country: string
+          region: string
+          city: string
+          district: string
+          street: string
+          postal_code: string
+        }[]
+      }
       fetch_organization_fees: {
         Args: {
           p_merchant_id: string
@@ -3291,6 +3270,90 @@ export type Database = {
           transaction_count: number
         }[]
       }
+      fetch_provider_distribution_by_date: {
+        Args: {
+          p_merchant_id: string
+          p_start_date?: string
+          p_end_date?: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_custom_range: {
+        Args: {
+          p_merchant_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_last_1_month: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_last_24_hours: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_last_3_months: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_last_6_months: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_last_7_days: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
+      fetch_provider_distribution_ytd: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          provider_code: Database["public"]["Enums"]["provider_code"]
+          transaction_count: number
+        }[]
+      }
       fetch_revenue_by_date: {
         Args: {
           p_merchant_id: string
@@ -3315,6 +3378,17 @@ export type Database = {
           revenue: number
         }[]
       }
+      fetch_revenue_custom_range: {
+        Args: {
+          p_merchant_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          date: string
+          revenue: number
+        }[]
+      }
       fetch_revenue_last_1_month: {
         Args: {
           p_merchant_id: string
@@ -3333,7 +3407,34 @@ export type Database = {
           revenue: number
         }[]
       }
+      fetch_revenue_last_3_months: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          revenue: number
+        }[]
+      }
+      fetch_revenue_last_6_months: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          revenue: number
+        }[]
+      }
       fetch_revenue_last_7_days: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          date: string
+          revenue: number
+        }[]
+      }
+      fetch_revenue_ytd: {
         Args: {
           p_merchant_id: string
         }

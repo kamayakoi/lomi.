@@ -1,62 +1,53 @@
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
 import { cn } from "@/lib/actions/utils"
 import { DateRange } from 'react-day-picker'
 import { DateRangePicker } from "@/components/ui/date-range-picker"
-import { useState } from "react"
 
 interface ReportingFiltersProps {
     selectedDateRange: string | null
     setSelectedDateRange: (value: string | null) => void
+    date: DateRange | undefined
+    setDate: (value: DateRange | undefined) => void
 }
 
 const dateRanges = [
-    { value: '24H', label: 'Last 24h' },
-    { value: '7D', label: 'Last 7d' },
-    { value: '1M', label: 'Last 30d' },
-    { value: '3M', label: 'Last 3m' },
-    { value: '6M', label: 'Last 6m' },
-    { value: 'YTD', label: 'Year to date' },
+    { value: '24H', label: '24h' },
+    { value: '7D', label: '7d' },
+    { value: '1M', label: '30d' },
+    { value: '3M', label: '3m' },
+    { value: '6M', label: '6m' },
+    { value: 'YTD', label: 'YTD' },
 ] as const
 
 export default function ReportingFilters({
     selectedDateRange,
     setSelectedDateRange,
+    date,
+    setDate,
 }: ReportingFiltersProps) {
-    const [date, setDate] = useState<DateRange | undefined>()
-
     return (
-        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 items-end sm:items-center justify-between">
-            <div className="flex flex-wrap gap-2">
-                {dateRanges.map((range, index) => (
-                    <motion.div
+        <div className="flex items-center justify-end">
+            <div className="flex">
+                {dateRanges.map((range) => (
+                    <Button
                         key={range.value}
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                            setSelectedDateRange(range.value)
+                            setDate(undefined)
+                        }}
+                        className={cn(
+                            "h-10 px-3 text-sm font-medium border-r-0",
+                            "focus-visible:z-10 focus-visible:ring-1 focus-visible:ring-primary",
+                            selectedDateRange === range.value
+                                ? "bg-[#10B981] text-white hover:bg-[#10B981]/90 border-[#10B981]"
+                                : "bg-card text-card-foreground hover:bg-muted/50"
+                        )}
                     >
-                        <Button
-                            variant={selectedDateRange === range.value ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => {
-                                setSelectedDateRange(range.value)
-                                setDate(undefined)
-                            }}
-                            className={cn(
-                                "relative h-9 px-4 text-sm transition-all duration-200",
-                                selectedDateRange === range.value && "bg-primary text-primary-foreground shadow-sm",
-                                "hover:bg-muted/50 dark:hover:bg-muted",
-                                "data-[state=open]:bg-muted/50 dark:data-[state=open]:bg-muted",
-                                "active:scale-95"
-                            )}
-                        >
-                            {range.label}
-                        </Button>
-                    </motion.div>
+                        {range.label}
+                    </Button>
                 ))}
-            </div>
-
-            <div className="flex-shrink-0">
                 <DateRangePicker
                     date={date}
                     setDate={(newDate) => {

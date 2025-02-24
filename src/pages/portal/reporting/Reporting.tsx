@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ReportingFilters from './components/filters'
 import { useUser } from '@/lib/hooks/use-user'
 import AnimatedLogoLoader from '@/components/portal/loader'
@@ -8,82 +7,76 @@ import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
 import { Separator } from '@/components/ui/separator'
-import { fetchRevenueByDate, fetchTransactionVolumeByDate, fetchTopPerformingProducts, fetchTopPerformingSubscriptionPlans, fetchProviderDistribution } from './components/support'
-import { RevenueData, TransactionVolumeData, TopPerformingProduct, TopPerformingSubscriptionPlan, ProviderDistribution as ProviderDistributionType } from './components/types'
+import { fetchRevenueByDate, fetchProviderDistribution } from './components/support'
+import { RevenueData, ProviderDistribution } from './components/types'
 import { useQuery } from '@tanstack/react-query'
-import { format, subMonths, startOfYear } from 'date-fns'
-import TopPerformingItems from './components/performing-items'
-import ProviderDistribution from './components/provider-distribution'
+import { format, subMonths, startOfYear, subDays } from 'date-fns'
 import { cn } from '@/lib/actions/utils'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { withActivationCheck } from '@/components/custom/with-activation-check'
-import { MerchantTransactionStats } from '@/pages/portal/reporting/merchant/MerchantTransactionStats'
-import { MerchantGrowthChart } from '@/pages/portal/reporting/merchant/merchant-growth-chart'
-import { MerchantRefundStats } from '@/pages/portal/reporting/merchant/MerchantRefundStats'
-import { MerchantCustomerStats } from '@/pages/portal/reporting/merchant/MerchantCustomerStats'
-import { MerchantProductStats } from '@/pages/portal/reporting/merchant/MerchantProductStats'
-import { MerchantRevenueChart } from '@/pages/portal/reporting/merchant/MerchantRevenueChart'
+import { MerchantRevenueChart } from '@/pages/portal/reporting/merchant/merchant-revenue-chart'
+import { ProviderDistributionChart } from '@/pages/portal/reporting/components/provider-distribution-chart'
+import type { ChartType } from '@/components/charts/area-chart'
+import { DateRange } from 'react-day-picker'
 
 const topNav = [
     { title: 'Reporting', href: '/portal/reporting', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
 ]
 
+const chartTypes: ChartType<'revenue' | 'mrr' | 'aov' | 'active_subscriptions' | 'new_subscriptions' | 'renewed_subscriptions' | 'new_subscriptions_revenue' | 'renewed_subscriptions_revenue' | 'providers'>[] = [
+    { id: 'revenue', label: 'Revenue', color: '#2563eb' },
+    { id: 'mrr', label: 'Monthly Recurring Revenue', color: '#10B981' },
+    { id: 'aov', label: 'Average Order Value', color: '#6366F1' },
+    { id: 'active_subscriptions', label: 'Active Subscriptions', color: '#EC4899' },
+    { id: 'new_subscriptions', label: 'New Subscriptions', color: '#F59E0B' },
+    { id: 'renewed_subscriptions', label: 'Renewed Subscriptions', color: '#8B5CF6' },
+    { id: 'new_subscriptions_revenue', label: 'New Subscriptions Revenue', color: '#14B8A6' },
+    { id: 'renewed_subscriptions_revenue', label: 'Renewed Subscriptions Revenue', color: '#F43F5E' },
+    { id: 'providers', label: 'Providers', color: '#6366F1' },
+] as const
+
 function ReportingPage() {
     const { user, isLoading: isUserLoading } = useUser()
     const [selectedDateRange, setSelectedDateRange] = useState<string | null>('24H')
+    const [date, setDate] = useState<DateRange | undefined>()
+    const [selectedChartType, setSelectedChartType] = useState<'revenue' | 'mrr' | 'aov' | 'active_subscriptions' | 'new_subscriptions' | 'renewed_subscriptions' | 'new_subscriptions_revenue' | 'renewed_subscriptions_revenue' | 'providers'>('revenue')
 
     const { data: revenueData = [], isLoading: isRevenueLoading } = useQuery<RevenueData[]>({
-        queryKey: ['revenueByDate', user?.id, selectedDateRange] as const,
+        queryKey: ['revenueByDate', user?.id, selectedDateRange, date] as const,
         queryFn: () => fetchRevenueByDate({
             merchantId: user?.id || '',
-            startDate: getStartDate(selectedDateRange),
-            endDate: getEndDate(selectedDateRange),
+            startDate: getStartDate(selectedDateRange, date),
+            endDate: getEndDate(selectedDateRange, date),
             granularity: getGranularity(selectedDateRange),
         }),
-        enabled: !!user?.id
+        enabled: !!user?.id && selectedChartType !== 'providers'
     })
 
-    const { data: transactionVolumeData = [], isLoading: isTransactionVolumeLoading } = useQuery<TransactionVolumeData[]>({
-        queryKey: ['transactionVolumeByDate', user?.id, selectedDateRange] as const,
-        queryFn: () => fetchTransactionVolumeByDate({
-            merchantId: user?.id || '',
-            startDate: getStartDate(selectedDateRange),
-            endDate: getEndDate(selectedDateRange),
-            granularity: getGranularity(selectedDateRange),
-        }),
-        enabled: !!user?.id
-    })
+    const { data: providerDistribution = [], isLoading: isProviderLoading } = useQuery<ProviderDistribution[]>({
+        queryKey: ['providerDistribution', user?.id, selectedDateRange, date] as const,
+        queryFn: () => {
+            if (!user?.id) {
+                console.error('No user ID available')
+                return []
+            }
 
-    const { data: topPerformingProducts = [], isLoading: isTopPerformingProductsLoading } = useQuery<TopPerformingProduct[]>({
-        queryKey: ['topPerformingProducts', user?.id, selectedDateRange] as const,
-        queryFn: () => fetchTopPerformingProducts({
-            merchantId: user?.id || '',
-            startDate: getStartDate(selectedDateRange),
-            endDate: getEndDate(selectedDateRange)
-        }),
-        enabled: !!user?.id
-    })
+            const startDate = getStartDate(selectedDateRange, date)
+            const endDate = getEndDate(selectedDateRange, date)
 
-    const { data: topPerformingSubscriptionPlans = [], isLoading: isTopPerformingSubscriptionPlansLoading } = useQuery<TopPerformingSubscriptionPlan[]>({
-        queryKey: ['topPerformingSubscriptionPlans', user?.id, selectedDateRange] as const,
-        queryFn: () => fetchTopPerformingSubscriptionPlans({
-            merchantId: user?.id || '',
-            startDate: getStartDate(selectedDateRange),
-            endDate: getEndDate(selectedDateRange)
-        }),
-        enabled: !!user?.id
-    })
+            if (!startDate || !endDate) {
+                console.error('Invalid date range')
+                return []
+            }
 
-    const { data: providerDistribution = [], isLoading: isProviderDistributionLoading } = useQuery<ProviderDistributionType[]>({
-        queryKey: ['providerDistribution', user?.id, selectedDateRange] as const,
-        queryFn: () => fetchProviderDistribution({
-            merchantId: user?.id || '',
-            startDate: getStartDate(selectedDateRange),
-            endDate: getEndDate(selectedDateRange)
-        }),
-        enabled: !!user?.id
+            return fetchProviderDistribution({
+                merchantId: user.id,
+                startDate,
+                endDate
+            })
+        },
+        enabled: !!user?.id && selectedChartType === 'providers'
     })
 
     if (isUserLoading) {
@@ -127,33 +120,32 @@ function ReportingPage() {
                             <ReportingFilters
                                 selectedDateRange={selectedDateRange}
                                 setSelectedDateRange={setSelectedDateRange}
+                                date={date}
+                                setDate={setDate}
                             />
                         </div>
 
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-                            <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
+                            {selectedChartType === 'providers' ? (
+                                <ProviderDistributionChart
+                                    providerDistribution={providerDistribution}
+                                    selectedChartType={selectedChartType}
+                                    onChartTypeChange={setSelectedChartType}
+                                    chartTypes={chartTypes}
+                                    isLoading={isProviderLoading}
+                                    selectedDateRange={selectedDateRange}
+                                />
+                            ) : (
                                 <MerchantRevenueChart
                                     revenueData={revenueData}
-                                    transactionVolumeData={transactionVolumeData}
+                                    transactionVolumeData={[]}
                                     selectedDateRange={selectedDateRange}
-                                    isLoading={isRevenueLoading || isTransactionVolumeLoading}
+                                    selectedChartType={selectedChartType}
+                                    onChartTypeChange={setSelectedChartType}
+                                    chartTypes={chartTypes}
+                                    isLoading={isRevenueLoading}
                                 />
-                            </Card>
-
-                            <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <ProviderDistributionCard
-                                    providerDistribution={providerDistribution}
-                                    isLoading={isProviderDistributionLoading}
-                                />
-                            </Card>
-
-                            <Card className="rounded-none w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <TopPerformingItemsCard
-                                    topPerformingProducts={topPerformingProducts}
-                                    topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
-                                    isLoading={isTopPerformingProductsLoading || isTopPerformingSubscriptionPlansLoading}
-                                />
-                            </Card>
+                            )}
                         </div>
 
                         <div className={cn(
@@ -165,24 +157,6 @@ function ReportingPage() {
                                 Merchant Analytics
                             </span>
                         </div>
-
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <MerchantTransactionStats merchantId={user.id} />
-                            </div>
-                            <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <MerchantGrowthChart />
-                            </div>
-                            <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <MerchantRefundStats merchantId={user.id} />
-                            </div>
-                            <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <MerchantCustomerStats merchantId={user.id} />
-                            </div>
-                            <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                                <MerchantProductStats merchantId={user.id} />
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -192,75 +166,36 @@ function ReportingPage() {
     )
 }
 
-function TopPerformingItemsCard({
-    topPerformingProducts,
-    topPerformingSubscriptionPlans,
-    isLoading
-}: {
-    topPerformingProducts: TopPerformingProduct[];
-    topPerformingSubscriptionPlans: TopPerformingSubscriptionPlan[];
-    isLoading: boolean;
-}) {
-    return (
-        <Card className="rounded-none">
-            <CardHeader>
-                <CardTitle>Performing Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <TopPerformingItems
-                    topPerformingProducts={topPerformingProducts}
-                    topPerformingSubscriptionPlans={topPerformingSubscriptionPlans}
-                    isLoading={isLoading}
-                />
-            </CardContent>
-        </Card>
-    )
-}
+function getStartDate(selectedDateRange: string | null, date?: DateRange): string | undefined {
+    if (!selectedDateRange && date?.from) {
+        return format(date.from, 'yyyy-MM-dd HH:mm:ss')
+    }
 
-function ProviderDistributionCard({
-    providerDistribution,
-    isLoading
-}: {
-    providerDistribution: ProviderDistributionType[];
-    isLoading: boolean;
-}) {
-    return (
-        <Card className="rounded-none">
-            <CardHeader>
-                <CardTitle>Providers Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ProviderDistribution
-                    providerDistribution={providerDistribution}
-                    isLoading={isLoading}
-                />
-            </CardContent>
-        </Card>
-    )
-}
-
-function getStartDate(selectedDateRange: string | null): string | undefined {
+    const now = new Date()
     switch (selectedDateRange) {
+        case '24H':
+            return format(subDays(now, 1), 'yyyy-MM-dd HH:mm:ss')
+        case '7D':
+            return format(subDays(now, 7), 'yyyy-MM-dd HH:mm:ss')
+        case '1M':
+            return format(subMonths(now, 1), 'yyyy-MM-dd HH:mm:ss')
         case '3M':
-            return format(subMonths(new Date(), 3), 'yyyy-MM-dd HH:mm:ss')
+            return format(subMonths(now, 3), 'yyyy-MM-dd HH:mm:ss')
         case '6M':
-            return format(subMonths(new Date(), 6), 'yyyy-MM-dd HH:mm:ss')
+            return format(subMonths(now, 6), 'yyyy-MM-dd HH:mm:ss')
         case 'YTD':
-            return format(startOfYear(new Date()), 'yyyy-MM-dd HH:mm:ss')
+            return format(startOfYear(now), 'yyyy-MM-dd HH:mm:ss')
         default:
             return undefined
     }
 }
 
-function getEndDate(selectedDateRange: string | null): string | undefined {
-    switch (selectedDateRange) {
-        case '3M':
-        case '6M':
-        case 'YTD':
-            return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
-        default:
-            return undefined
+function getEndDate(selectedDateRange: string | null, date?: DateRange): string | undefined {
+    if (!selectedDateRange && date?.to) {
+        return format(date.to, 'yyyy-MM-dd HH:mm:ss')
     }
+
+    return format(new Date(), 'yyyy-MM-dd HH:mm:ss')
 }
 
 function getGranularity(selectedDateRange: string | null): '24H' | '7D' | '1M' | 'hour' | 'day' | 'week' | 'month' | undefined {
@@ -276,6 +211,9 @@ function getGranularity(selectedDateRange: string | null): '24H' | '7D' | '1M' |
         case 'YTD':
             return 'month'
         default:
+            if (!selectedDateRange) {
+                return '1M' // Use same granularity as 30D for custom ranges
+            }
             return undefined
     }
 }
@@ -283,5 +221,5 @@ function getGranularity(selectedDateRange: string | null): '24H' | '7D' | '1M' |
 function ReportingWithActivationCheck() {
     return withActivationCheck(ReportingPage)({});
 }
-
 export default ReportingWithActivationCheck;
+

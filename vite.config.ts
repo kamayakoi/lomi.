@@ -159,7 +159,7 @@ export default defineConfig({
       }
     },
     headers: {
-      'Cache-Control': 'public, max-age=1209600',
+      'Cache-Control': 'public, no-cache, no-store, must-revalidate',
     },
   },
   optimizeDeps: {

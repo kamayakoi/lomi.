@@ -2,7 +2,16 @@ import { Area, AreaChart as RechartsAreaChart, ResponsiveContainer, Tooltip, XAx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Fragment } from 'react'
 import { format } from 'date-fns'
-import Spinner from '@/components/portal/spinner'
+import Spinner from '@/components/ui/spinner'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/actions/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from 'lucide-react'
 
 // Chart Configuration Constants
 const CHART_CONFIG = {
@@ -89,7 +98,13 @@ const TRANSACTION_DOT_CONFIG = {
   fill: '#fff'
 } as const
 
-export interface AreaChartProps<T> {
+export interface ChartType<T = string> {
+  id: T
+  label: string
+  color: string
+}
+
+export interface AreaChartProps<T, C extends string = string> {
   title: string
   data: T[]
   isLoading?: boolean
@@ -104,25 +119,67 @@ export interface AreaChartProps<T> {
   xAxisDataKey: keyof T
   yAxisFormatter?: (value: number) => string
   tooltipFormatter?: (value: number, name: string) => [string, string]
+  chartTypes?: ChartType<C>[]
+  selectedChartType?: C
+  onChartTypeChange?: (type: C) => void
 }
 
-export function AreaChart<T>({
+export function AreaChart<T, C extends string = string>({
   title,
   data,
   isLoading,
   areas,
   xAxisDataKey,
   yAxisFormatter,
-  tooltipFormatter
-}: AreaChartProps<T>) {
+  tooltipFormatter,
+  chartTypes = [],
+  selectedChartType,
+  onChartTypeChange,
+}: AreaChartProps<T, C>) {
+  const currentChartType = chartTypes.find(type => type.id === selectedChartType)
+  const defaultChartType = chartTypes[0]
+  const chartLabel = currentChartType?.label || defaultChartType?.label || title
+
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <div className="flex items-center justify-between">
+            {chartTypes.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-8 px-3 text-sm font-medium",
+                      "focus-visible:ring-1 focus-visible:ring-primary",
+                      "bg-[#10B981] text-white hover:bg-[#10B981]/90"
+                    )}
+                  >
+                    {chartLabel}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {chartTypes.map((type) => (
+                    <DropdownMenuItem
+                      key={type.id}
+                      onClick={() => onChartTypeChange?.(type.id)}
+                      className="cursor-pointer"
+                    >
+                      {type.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <CardTitle>{title}</CardTitle>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="flex items-center justify-center min-h-[315px]">
-          <Spinner size={24} />
+          <Spinner />
         </CardContent>
       </Card>
     )
@@ -132,10 +189,42 @@ export function AreaChart<T>({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <div className="flex items-center justify-between">
+            {chartTypes.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "h-8 px-3 text-sm font-medium",
+                      "focus-visible:ring-1 focus-visible:ring-primary",
+                      "bg-[#10B981] text-white hover:bg-[#10B981]/90"
+                    )}
+                  >
+                    {chartLabel}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {chartTypes.map((type) => (
+                    <DropdownMenuItem
+                      key={type.id}
+                      onClick={() => onChartTypeChange?.(type.id)}
+                      className="cursor-pointer"
+                    >
+                      {type.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <CardTitle>{title}</CardTitle>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="flex items-center justify-center min-h-[315px]">
-          <Spinner size={24} />
+          <Spinner />
         </CardContent>
       </Card>
     )
@@ -144,7 +233,39 @@ export function AreaChart<T>({
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <div className="flex items-center justify-between">
+          {chartTypes.length > 0 ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "h-8 px-3 text-sm font-medium",
+                    "focus-visible:ring-1 focus-visible:ring-primary",
+                    "bg-[#10B981] text-white hover:bg-[#10B981]/90"
+                  )}
+                >
+                  {chartLabel}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {chartTypes.map((type) => (
+                  <DropdownMenuItem
+                    key={type.id}
+                    onClick={() => onChartTypeChange?.(type.id)}
+                    className="cursor-pointer"
+                  >
+                    {type.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={CHART_CONFIG.height}>

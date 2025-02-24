@@ -19,11 +19,11 @@ export function DateRangePicker({ date, setDate }: DateRangePickerProps) {
                     variant={'outline'}
                     size="sm"
                     className={cn(
-                        "h-9 px-4 text-sm transition-all duration-200 min-w-[150px] justify-start",
-                        date?.from && "bg-primary text-primary-foreground shadow-sm",
-                        "hover:bg-muted/50 dark:hover:bg-muted",
-                        "data-[state=open]:bg-muted/50 dark:data-[state=open]:bg-muted",
-                        "active:scale-95"
+                        "h-10 w-[125px] px-3 text-sm font-medium justify-start border-r",
+                        "focus-visible:z-10 focus-visible:ring-1 focus-visible:ring-primary",
+                        date?.from
+                            ? "bg-[#10B981] text-white hover:bg-[#10B981]/90 border-[#10B981]"
+                            : "bg-card text-card-foreground hover:bg-muted/50"
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -37,7 +37,7 @@ export function DateRangePicker({ date, setDate }: DateRangePickerProps) {
                             format(date.from, 'LLL dd, y')
                         )
                     ) : (
-                        <span>Pick a date range</span>
+                        <span>Pick a date</span>
                     )}
                 </Button>
             </PopoverTrigger>
@@ -50,9 +50,9 @@ export function DateRangePicker({ date, setDate }: DateRangePickerProps) {
                     onSelect={setDate}
                     numberOfMonths={2}
                     className={cn(
-                        "[&_.rdp-day_span]:rounded-none",
+                        "[&_.rdp-day_span]:rounded-sm",
                         "[&_.rdp-day_span]:transition-none",
-                        "[&_.rdp-day]:rounded-none",
+                        "[&_.rdp-day]:rounded-sm",
                         "[&_.rdp-day]:transition-none",
                         "[&_.rdp-day]:border",
                         "[&_.rdp-day]:border-transparent",
@@ -61,14 +61,14 @@ export function DateRangePicker({ date, setDate }: DateRangePickerProps) {
                         "[&_.rdp-day_span]:hover:text-foreground",
                         "[&_.rdp-day_span]:focus:bg-transparent",
                         "[&_.rdp-day_span]:focus:text-foreground",
-                        "[&_.rdp-day_span]:data-[selected]:bg-primary",
-                        "[&_.rdp-day_span]:data-[selected]:text-primary-foreground",
-                        "[&_.rdp-day]:data-[selected]:bg-primary",
-                        "[&_.rdp-day]:data-[selected]:text-primary-foreground",
-                        "[&_.rdp-day]:data-[selected]:hover:bg-primary/90",
-                        "[&_.rdp-day]:data-[selected]:hover:text-primary-foreground",
-                        "[&_.rdp-day]:data-[selected]:focus:bg-primary/90",
-                        "[&_.rdp-day]:data-[selected]:focus:text-primary-foreground"
+                        "[&_.rdp-day_span]:data-[selected]:bg-[#10B981]",
+                        "[&_.rdp-day_span]:data-[selected]:text-white",
+                        "[&_.rdp-day]:data-[selected]:bg-[#10B981]",
+                        "[&_.rdp-day]:data-[selected]:text-white",
+                        "[&_.rdp-day]:data-[selected]:hover:bg-[#10B981]/90",
+                        "[&_.rdp-day]:data-[selected]:hover:text-white",
+                        "[&_.rdp-day]:data-[selected]:focus:bg-[#10B981]/90",
+                        "[&_.rdp-day]:data-[selected]:focus:text-white"
                     )}
                 />
             </PopoverContent>

@@ -737,6 +737,7 @@ function TransactionsPage() {
                                                                         ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'WIZALL' ? 'bg-[#FF6B00] text-white dark:bg-[#FF6B00] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
                                                                     `}>
                                                                         {formatProviderCode(transaction.provider_code)}

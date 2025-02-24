@@ -126,15 +126,16 @@ export type FetchTopPerformingSubscriptionPlansParams = {
     limit?: number
 }
 
-export type ProviderDistribution = {
-    provider_code: provider_code
-    transaction_count: number
-}
-
 export type FetchProviderDistributionParams = {
     merchantId: MerchantId
-    startDate?: string
-    endDate?: string
+    startDate: string
+    endDate: string
+}
+
+export interface ProviderDistribution {
+    date: string
+    provider_code: provider_code
+    transaction_count: number
 }
 
 export const COLORS = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c']
