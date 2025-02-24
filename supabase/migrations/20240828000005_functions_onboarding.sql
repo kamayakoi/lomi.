@@ -1,6 +1,3 @@
--- Drop the existing function if it exists
-DROP FUNCTION IF EXISTS public.complete_onboarding;
-
 -- Create the complete_onboarding function
 CREATE OR REPLACE FUNCTION public.complete_onboarding(
     p_merchant_id UUID,

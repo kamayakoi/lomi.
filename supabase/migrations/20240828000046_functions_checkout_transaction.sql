@@ -114,7 +114,7 @@ BEGIN
         SET 
             balance = platform_main_account.balance + v_transaction.fee_amount,
             available_balance = platform_main_account.available_balance + v_transaction.fee_amount,
-            last_updated_at = NOW();
+            updated_at = NOW();
 
         -- 2. Update merchant account (what they receive)
         INSERT INTO merchant_accounts (
@@ -143,7 +143,7 @@ BEGIN
         ON CONFLICT (provider_code, currency_code) DO UPDATE
         SET 
             balance = platform_provider_balance.balance + v_transaction.gross_amount,
-            last_updated_at = NOW();
+            updated_at = NOW();
     END IF;
 
     RETURN TRUE;

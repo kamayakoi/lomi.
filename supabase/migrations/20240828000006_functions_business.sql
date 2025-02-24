@@ -77,7 +77,7 @@ CREATE OR REPLACE FUNCTION public.calculate_organization_metrics(
   arr NUMERIC,
   total_transactions INT,
   total_revenue NUMERIC
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   WITH org_metrics AS (
@@ -212,7 +212,7 @@ BEGIN
         )::text
     );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Add invitation_token column to merchant_organization_links if not exists
 DO $$ 
@@ -257,7 +257,7 @@ BEGIN
     WHERE mol.organization_id = p_organization_id
     ORDER BY mol.created_at DESC;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to update team member role
 CREATE OR REPLACE FUNCTION public.update_team_member_role(
@@ -300,7 +300,7 @@ BEGIN
 
     RETURN true;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to remove team member
 CREATE OR REPLACE FUNCTION public.remove_team_member(
@@ -322,7 +322,7 @@ BEGIN
     SET total_merchants = total_merchants - 1
     WHERE organization_id = p_organization_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to check if user is admin
 CREATE OR REPLACE FUNCTION public.is_organization_admin(
@@ -344,7 +344,7 @@ BEGIN
     
     RETURN v_is_admin;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to soft delete merchant and potentially their organization
 CREATE OR REPLACE FUNCTION public.soft_delete_merchant(
@@ -435,7 +435,7 @@ BEGIN
     DELETE FROM auth.sessions
     WHERE user_id = v_user_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to reactivate a soft-deleted merchant
 CREATE OR REPLACE FUNCTION public.reactivate_merchant(
@@ -493,7 +493,7 @@ BEGIN
         WHERE merchant_id = p_merchant_id
     );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to unban a user (can be called from Supabase Auth UI)
 CREATE OR REPLACE FUNCTION auth.unban_user(user_id UUID)
@@ -552,7 +552,7 @@ BEGIN
         AND mol.merchant_id = user_id
     );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permission to service_role (needed for Supabase UI)
 GRANT EXECUTE ON FUNCTION auth.unban_user(UUID) TO service_role;

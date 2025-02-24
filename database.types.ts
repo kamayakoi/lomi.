@@ -785,28 +785,28 @@ export type Database = {
           amount: number
           balance_id: string
           currency_code: Database["public"]["Enums"]["currency_code"]
-          last_updated_at: string
           merchant_id: string
           metadata: Json | null
           organization_id: string
+          updated_at: string
         }
         Insert: {
           amount?: number
           balance_id?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
           merchant_id: string
           metadata?: Json | null
           organization_id: string
+          updated_at?: string
         }
         Update: {
           amount?: number
           balance_id?: string
           currency_code?: Database["public"]["Enums"]["currency_code"]
-          last_updated_at?: string
           merchant_id?: string
           metadata?: Json | null
           organization_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -2390,6 +2390,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_created_at_column: {
+        Args: {
+          p_table_name: string
+        }
+        Returns: undefined
+      }
+      add_timestamp_columns: {
+        Args: {
+          p_table_name: string
+        }
+        Returns: undefined
+      }
+      add_updated_at_column: {
+        Args: {
+          p_table_name: string
+        }
+        Returns: undefined
+      }
+      calculate_merchant_mrr: {
+        Args: {
+          p_merchant_id: string
+        }
+        Returns: {
+          mrr: number
+          arr: number
+        }[]
+      }
       calculate_organization_metrics: {
         Args: {
           p_organization_id: string
@@ -2416,6 +2443,13 @@ export type Database = {
       check_onboarding_status: {
         Args: {
           p_merchant_id: string
+        }
+        Returns: boolean
+      }
+      column_exists: {
+        Args: {
+          p_table_name: string
+          p_column_name: string
         }
         Returns: boolean
       }
@@ -2500,6 +2534,15 @@ export type Database = {
           p_merchant_id: string
           p_sentiment: string
           p_message: string
+        }
+        Returns: undefined
+      }
+      create_index_if_not_exists: {
+        Args: {
+          p_index_name: string
+          p_table_name: string
+          p_column_name: string
+          p_index_type?: string
         }
         Returns: undefined
       }
@@ -2667,6 +2710,12 @@ export type Database = {
           p_metadata?: Json
         }
         Returns: string
+      }
+      create_updated_at_trigger: {
+        Args: {
+          p_table_name: string
+        }
+        Returns: undefined
       }
       create_wave_checkout_transaction: {
         Args: {
@@ -3038,6 +3087,21 @@ export type Database = {
           is_current: boolean
         }[]
       }
+      fetch_mrr_metrics_custom_range: {
+        Args: {
+          p_merchant_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          date: string
+          mrr: number
+          new_mrr: number
+          churned_mrr: number
+          expansion_mrr: number
+          contraction_mrr: number
+        }[]
+      }
       fetch_notifications: {
         Args: {
           p_merchant_id: string
@@ -3136,17 +3200,6 @@ export type Database = {
           url: string
           verification_token: string
           webhook_id: string
-        }[]
-      }
-      fetch_payment_channel_distribution: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-        }
-        Returns: {
-          payment_method_code: Database["public"]["Enums"]["payment_method_code"]
-          transaction_count: number
         }[]
       }
       fetch_payment_links: {
@@ -3259,29 +3312,6 @@ export type Database = {
           total_count: number
         }[]
       }
-      fetch_provider_distribution: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-        }
-        Returns: {
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_by_date: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
       fetch_provider_distribution_custom_range: {
         Args: {
           p_merchant_id: string
@@ -3294,149 +3324,11 @@ export type Database = {
           transaction_count: number
         }[]
       }
-      fetch_provider_distribution_last_1_month: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_last_24_hours: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_last_3_months: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_last_6_months: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_last_7_days: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_provider_distribution_ytd: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          provider_code: Database["public"]["Enums"]["provider_code"]
-          transaction_count: number
-        }[]
-      }
-      fetch_revenue_by_date: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-          p_granularity?: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_by_month: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-        }
-        Returns: {
-          date: string
-          month: string
-          revenue: number
-        }[]
-      }
       fetch_revenue_custom_range: {
         Args: {
           p_merchant_id: string
           p_start_date: string
           p_end_date: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_last_1_month: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_last_24_hours: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          hour: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_last_3_months: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_last_6_months: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_last_7_days: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          revenue: number
-        }[]
-      }
-      fetch_revenue_ytd: {
-        Args: {
-          p_merchant_id: string
         }
         Returns: {
           date: string
@@ -3454,20 +3346,6 @@ export type Database = {
           organization_logo_url: string
           merchant_name: string
           merchant_role: string
-        }[]
-      }
-      fetch_subscription_data: {
-        Args: {
-          p_transaction_id: string
-        }
-        Returns: {
-          subscription_id: string
-          plan_name: string
-          plan_description: string
-          plan_billing_frequency: Database["public"]["Enums"]["frequency"]
-          subscription_end_date: string
-          subscription_next_billing_date: string
-          subscription_status: Database["public"]["Enums"]["subscription_status"]
         }[]
       }
       fetch_subscription_plans: {
@@ -3561,33 +3439,7 @@ export type Database = {
           created_at: string
         }[]
       }
-      fetch_top_performing_products: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-          p_limit?: number
-        }
-        Returns: {
-          product_name: string
-          sales_count: number
-          total_revenue: number
-        }[]
-      }
       fetch_top_performing_subscription_plans: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-          p_limit?: number
-        }
-        Returns: {
-          plan_name: string
-          sales_count: number
-          total_revenue: number
-        }[]
-      }
-      fetch_top_performing_subscriptions: {
         Args: {
           p_merchant_id: string
           p_start_date?: string
@@ -3615,56 +3467,6 @@ export type Database = {
           p_end_date?: string
         }
         Returns: number
-      }
-      fetch_transaction_volume_by_date: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-          p_granularity?: string
-        }
-        Returns: {
-          date: string
-          transaction_count: number
-        }[]
-      }
-      fetch_transaction_volume_by_month: {
-        Args: {
-          p_merchant_id: string
-          p_start_date?: string
-          p_end_date?: string
-        }
-        Returns: {
-          month: string
-          transaction_count: number
-        }[]
-      }
-      fetch_transaction_volume_last_1_month: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          transaction_count: number
-        }[]
-      }
-      fetch_transaction_volume_last_24_hours: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          hour: string
-          transaction_count: number
-        }[]
-      }
-      fetch_transaction_volume_last_7_days: {
-        Args: {
-          p_merchant_id: string
-        }
-        Returns: {
-          date: string
-          transaction_count: number
-        }[]
       }
       fetch_transactions: {
         Args: {
@@ -4182,6 +3984,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      recalculate_all_merchants_mrr: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          merchant_id: string
+          mrr: number
+          arr: number
+        }[]
+      }
       remove_team_member: {
         Args: {
           p_organization_id: string
@@ -4268,6 +4078,13 @@ export type Database = {
         Args: {
           p_webhook_id: string
           p_merchant_id: string
+        }
+        Returns: boolean
+      }
+      trigger_exists: {
+        Args: {
+          p_table_name: string
+          p_trigger_name: string
         }
         Returns: boolean
       }

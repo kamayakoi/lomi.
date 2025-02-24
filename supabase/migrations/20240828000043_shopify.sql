@@ -16,8 +16,6 @@ CREATE TABLE shopify.stores (
     UNIQUE(organization_id, shop_domain)
 );
 
-CREATE INDEX idx_shopify_stores_organization ON shopify.stores(organization_id);
-CREATE INDEX idx_shopify_stores_domain ON shopify.stores(shop_domain);
 
 CREATE TABLE shopify.webhooks (
     webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -30,7 +28,6 @@ CREATE TABLE shopify.webhooks (
     UNIQUE(store_id, topic)
 );
 
-CREATE INDEX idx_shopify_webhooks_store ON shopify.webhooks(store_id);
 
 CREATE TABLE shopify.products (
     product_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -46,6 +43,7 @@ CREATE TABLE shopify.products (
 );
 
 CREATE INDEX idx_shopify_products_store ON shopify.products(store_id);
+CREATE INDEX idx_shopify_products_currency_code ON shopify.products(currency_code);
 
 CREATE TABLE shopify.orders (
     order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -62,6 +60,7 @@ CREATE TABLE shopify.orders (
 );
 
 CREATE INDEX idx_shopify_orders_store ON shopify.orders(store_id);
+CREATE INDEX idx_shopify_orders_currency_code ON shopify.orders(currency_code);
 CREATE INDEX idx_shopify_orders_transaction ON shopify.orders(transaction_id);
 
 CREATE TABLE shopify.shop_settings (
@@ -74,8 +73,6 @@ CREATE TABLE shopify.shop_settings (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-CREATE INDEX idx_shopify_shop_settings_shop ON shopify.shop_settings(shop);
 
 COMMENT ON TABLE shopify.shop_settings IS 'Stores Shopify shop integration settings and credentials';
 
@@ -100,9 +97,6 @@ CREATE TABLE shopify.sessions (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
-CREATE INDEX idx_shopify_sessions_shop ON shopify.sessions(shop);
-CREATE INDEX idx_shopify_sessions_state ON shopify.sessions(state);
 
 COMMENT ON TABLE shopify.sessions IS 'Stores Shopify session data for authentication';
 
@@ -183,13 +177,6 @@ CREATE POLICY "Organizations can manage their store sessions"
             WHERE mol.merchant_id = (SELECT auth.uid()::uuid)
         )
     ));
-
--- Allow service role to bypass RLS
-ALTER TABLE shopify.stores FORCE ROW LEVEL SECURITY;
-ALTER TABLE shopify.webhooks FORCE ROW LEVEL SECURITY;
-ALTER TABLE shopify.products FORCE ROW LEVEL SECURITY;
-ALTER TABLE shopify.orders FORCE ROW LEVEL SECURITY;
-ALTER TABLE shopify.sessions FORCE ROW LEVEL SECURITY;
 
 -- Create RPC functions in the shopify schema
 CREATE OR REPLACE FUNCTION shopify.install_store(

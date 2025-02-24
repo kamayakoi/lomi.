@@ -309,7 +309,6 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create trigger for KYC approved email
-DROP TRIGGER IF EXISTS send_kyc_approved_email_trigger ON organization_kyc;
 CREATE TRIGGER send_kyc_approved_email_trigger
 AFTER UPDATE OF status ON organization_kyc
 FOR EACH ROW

@@ -1,15 +1,3 @@
--- Enable required extensions
-CREATE EXTENSION IF NOT EXISTS "http" WITH SCHEMA extensions;
-
--- Create secrets schema if it doesn't exist  
-CREATE SCHEMA IF NOT EXISTS secrets;
-
--- Create a secure secret for the Resend API key
-CREATE TABLE IF NOT EXISTS secrets.resend_config (
-  key TEXT PRIMARY KEY,
-  value TEXT NOT NULL
-);
-
 -- Function to get the Resend API key securely
 CREATE OR REPLACE FUNCTION secrets.get_resend_api_key()
 RETURNS TEXT AS $$

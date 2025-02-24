@@ -5,7 +5,7 @@ RETURNS TABLE (
   total_gross_amount numeric,
   total_net_amount numeric,
   total_fee_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -26,7 +26,7 @@ RETURNS TABLE (
   gross_amount numeric,
   net_amount numeric,
   fee_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -48,7 +48,7 @@ RETURNS TABLE (
   status text,
   count bigint,
   gross_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -69,7 +69,7 @@ RETURNS TABLE (
   gross_amount numeric,
   net_amount numeric,
   fee_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -94,7 +94,7 @@ RETURNS TABLE (
   gross_revenue numeric,
   net_revenue numeric,
   transactions bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -121,7 +121,7 @@ RETURNS TABLE (
   active_subscriptions bigint,
   total_revenue numeric,
   recurring_revenue numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -144,7 +144,7 @@ RETURNS TABLE (
   active_count bigint,
   total_revenue numeric,
   recurring_revenue numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -169,7 +169,7 @@ RETURNS TABLE (
   count bigint,
   amount numeric,
   due_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -190,7 +190,7 @@ RETURNS TABLE (
   onboarded_merchants bigint,
   total_mrr numeric,
   total_arr numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -210,7 +210,7 @@ RETURNS TABLE (
   verified_organizations bigint,
   total_customers bigint,
   total_merchants bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -229,7 +229,7 @@ RETURNS TABLE (
   industry text,
   status organization_status,
   count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -248,7 +248,7 @@ CREATE OR REPLACE FUNCTION get_organizations_by_country()
 RETURNS TABLE (
   country text,
   count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -267,7 +267,7 @@ CREATE OR REPLACE FUNCTION get_organization_kyc_stats()
 RETURNS TABLE (
   status kyc_status,
   count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -285,7 +285,7 @@ RETURNS TABLE (
   is_business boolean,
   country text,
   count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -306,7 +306,7 @@ RETURNS TABLE (
   average_balance numeric,
   total_balance numeric,
   merchant_count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -327,7 +327,7 @@ RETURNS TABLE (
   total_transactions bigint,
   total_amount numeric,
   average_amount numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -351,7 +351,7 @@ RETURNS TABLE (
   successful_transactions bigint,
   failed_transactions bigint,
   success_rate numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -376,7 +376,7 @@ RETURNS TABLE (
   total_plans bigint,
   active_subscriptions bigint,
   avg_products_per_merchant numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   WITH merchant_product_counts AS (
@@ -404,7 +404,7 @@ RETURNS TABLE (
   total_fee_amount numeric,
   total_net_amount numeric,
   currency_code currency_code
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -425,7 +425,7 @@ RETURNS TABLE (
   total_refunded_amount numeric,
   status refund_status,
   currency_code currency_code
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -447,7 +447,7 @@ RETURNS TABLE (
   total_payout_amount numeric,
   currency_code currency_code,
   payout_status payout_status
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -468,7 +468,7 @@ RETURNS TABLE (
   last_24h_users bigint,
   last_7d_users bigint,
   last_30d_users bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -489,7 +489,7 @@ RETURNS TABLE (
   active_products bigint,
   total_plans bigint,
   active_plans bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -514,7 +514,7 @@ RETURNS TABLE (
   net_amount numeric,
   currency_code currency_code,
   status transaction_status
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -537,7 +537,7 @@ RETURNS TABLE (
   business_customers bigint,
   individual_customers bigint,
   customers_with_transactions bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -559,7 +559,7 @@ RETURNS TABLE (
   refunded_amount numeric,
   status refund_status,
   currency_code currency_code
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
   RETURN QUERY
   SELECT 
@@ -582,7 +582,7 @@ RETURNS TABLE (
     count bigint,
     country text,
     kyc_status text
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
     RETURN QUERY
     SELECT 
@@ -603,7 +603,7 @@ RETURNS TABLE (
     is_business boolean,
     country text,
     count bigint
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
     RETURN QUERY
     SELECT 
@@ -623,7 +623,7 @@ RETURNS TABLE (
     active_members bigint,
     pending_invites bigint,
     average_members_per_merchant numeric
-) LANGUAGE plpgsql AS $$
+) LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 BEGIN
     RETURN QUERY
     SELECT 

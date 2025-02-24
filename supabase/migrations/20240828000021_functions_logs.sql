@@ -47,6 +47,3 @@ BEGIN
     OFFSET p_offset;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
--- Remove the count_logs function as it's no longer needed since we're using window function
-DROP FUNCTION IF EXISTS public.count_logs;

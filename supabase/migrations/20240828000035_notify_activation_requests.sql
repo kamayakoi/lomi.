@@ -111,7 +111,6 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create trigger for activation request notifications
-DROP TRIGGER IF EXISTS notify_new_activation_request_trigger ON organization_kyc;
 CREATE TRIGGER notify_new_activation_request_trigger
 AFTER INSERT OR UPDATE ON organization_kyc
 FOR EACH ROW
@@ -300,7 +299,6 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create trigger for provider connected notifications  
-DROP TRIGGER IF EXISTS notify_provider_connected_trigger ON organization_providers_settings;
 CREATE TRIGGER notify_provider_connected_trigger
 AFTER UPDATE ON organization_providers_settings
 FOR EACH ROW  

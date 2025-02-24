@@ -241,7 +241,6 @@ END;
 $$;
 
 -- Create trigger for merchant account updates
-DROP TRIGGER IF EXISTS trg_update_merchant_account ON transactions;
 CREATE TRIGGER trg_update_merchant_account
     AFTER UPDATE ON transactions
     FOR EACH ROW

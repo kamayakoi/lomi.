@@ -1,6 +1,3 @@
--- Enable required extensions
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 -- Function to verify TOTP code
 CREATE OR REPLACE FUNCTION verify_totp_code(
     secret TEXT,
@@ -61,7 +58,7 @@ BEGIN
     
     RETURN FALSE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to enable 2FA
 CREATE OR REPLACE FUNCTION public.enable_2fa(
@@ -96,7 +93,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to verify 2FA during login
 CREATE OR REPLACE FUNCTION public.verify_2fa_login(
@@ -133,7 +130,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to disable 2FA
 CREATE OR REPLACE FUNCTION public.disable_2fa(
@@ -151,7 +148,7 @@ BEGIN
 
     RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION public.verify_totp_code(TEXT, TEXT) TO authenticated;

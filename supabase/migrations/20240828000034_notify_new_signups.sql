@@ -90,7 +90,6 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Create trigger for new signup notifications
-DROP TRIGGER IF EXISTS notify_new_signup_trigger ON merchants;
 CREATE TRIGGER notify_new_signup_trigger
 AFTER INSERT ON merchants
 FOR EACH ROW

@@ -37,7 +37,6 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger to call the update_organization_verification_status function
-DROP TRIGGER IF EXISTS update_organization_verification_status_trigger ON organization_kyc;
 CREATE TRIGGER update_organization_verification_status_trigger
 AFTER UPDATE OF status ON organization_kyc
 FOR EACH ROW

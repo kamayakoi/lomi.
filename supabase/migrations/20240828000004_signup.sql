@@ -1,7 +1,3 @@
--- Drop existing triggers if they exist
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
-
 -- Function to create a merchant record
 CREATE OR REPLACE FUNCTION public.create_merchant_record()
 RETURNS TRIGGER AS $$

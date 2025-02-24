@@ -42,7 +42,7 @@ INSERT INTO merchant_products (merchant_id, organization_id, name, description, 
    'XOF',
    'https://example.com/images/email.png');
 
--- Seed data for subscription_plans table
+-- Seed data for subscription_plans table with more plans
 INSERT INTO subscription_plans (merchant_id, organization_id, name, description, billing_frequency, amount, currency_code, failed_payment_action, charge_day) VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
@@ -62,9 +62,39 @@ INSERT INTO subscription_plans (merchant_id, organization_id, name, description,
    299.99,
    'XOF',
    'pause',
+   1),
+
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Enterprise Hosting Plan',
+   'Enterprise hosting with unlimited resources',
+   'yearly',
+   5999.99,
+   'XOF',
+   'pause',
+   1),
+
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Business Email Pro',
+   'Professional email hosting for teams',
+   'monthly',
+   199.99,
+   'XOF',
+   'pause',
+   1),
+
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Email Enterprise',
+   'Enterprise email solution with advanced security',
+   'quarterly',
+   899.99,
+   'XOF',
+   'pause',
    1);
 
--- Seed data for customers table
+-- Seed data for customers table with more customers
 INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, country, city) VALUES
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
@@ -80,10 +110,35 @@ INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, 
    'contact@techsolutions.com',
    '+2345678901',
    'Ivory Coast',
-   'Abidjan');
+   'Abidjan'),
 
--- Seed data for merchant_subscriptions table
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Global Corp',
+   'billing@globalcorp.com',
+   '+3456789012',
+   'Senegal',
+   'Dakar'),
+
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'Digital Agency Pro',
+   'finance@digitalagency.com',
+   '+4567890123',
+   'Mali',
+   'Bamako'),
+
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
+   'StartUp Hub',
+   'accounts@startuphub.com',
+   '+5678901234',
+   'Burkina Faso',
+   'Ouagadougou');
+
+-- Seed data for merchant_subscriptions table with more active subscriptions
 INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, start_date, end_date, next_billing_date) VALUES
+  -- Basic Hosting Plan Subscriptions
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Basic Hosting Plan'),
    (SELECT customer_id FROM customers WHERE name = 'John Smith'),
@@ -91,21 +146,48 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE,
    CURRENT_DATE + INTERVAL '1 year',
    CURRENT_DATE + INTERVAL '1 month'),
-   
+
+  -- Premium Hosting Plan Subscriptions
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Premium Hosting Plan'),
    (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc'),
    'active',
    CURRENT_DATE,
    CURRENT_DATE + INTERVAL '1 year',
-   CURRENT_DATE + INTERVAL '1 month');
+   CURRENT_DATE + INTERVAL '1 month'),
 
--- Seed data for transactions table
+  -- Enterprise Hosting Plan Subscriptions (Yearly)
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT plan_id FROM subscription_plans WHERE name = 'Enterprise Hosting Plan'),
+   (SELECT customer_id FROM customers WHERE name = 'Global Corp'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 year'),
+
+  -- Business Email Pro Subscriptions
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT plan_id FROM subscription_plans WHERE name = 'Business Email Pro'),
+   (SELECT customer_id FROM customers WHERE name = 'Digital Agency Pro'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '1 month'),
+
+  -- Email Enterprise Subscriptions (Quarterly)
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT plan_id FROM subscription_plans WHERE name = 'Email Enterprise'),
+   (SELECT customer_id FROM customers WHERE name = 'StartUp Hub'),
+   'active',
+   CURRENT_DATE,
+   CURRENT_DATE + INTERVAL '1 year',
+   CURRENT_DATE + INTERVAL '3 months');
+
+-- Seed data for transactions table with more transactions
 INSERT INTO transactions (
     merchant_id, 
     organization_id, 
     customer_id, 
-    product_id,
     subscription_id,
     transaction_type,
     status,
@@ -117,94 +199,77 @@ INSERT INTO transactions (
     currency_code,
     provider_code,
     payment_method_code
-) VALUES
-  (
-    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-    (SELECT customer_id FROM customers WHERE name = 'John Smith'),
-    (SELECT product_id FROM merchant_products WHERE name = 'Premium Web Hosting'),
-    NULL,
-    'payment',
-    'completed',
-    'Premium Web Hosting Purchase',
-    299.99,
-    14.99,
-    285.00,
-    'Wave Processing Fee',
-    'XOF',
-    'WAVE',
-    'E_WALLET'
-  ),
-  (
-    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-    (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-    (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc'),
-    NULL,
-    (SELECT subscription_id FROM merchant_subscriptions WHERE customer_id = (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc')),
-    'payment',
-    'completed',
-    'Premium Hosting Plan - Monthly Subscription',
-    299.99,
-    14.99,
-    285.00,
-    'Orange Processing Fee',
-    'XOF',
-    'ORANGE',
-    'MOBILE_MONEY'
-  );
+) 
+SELECT
+    m.merchant_id,
+    o.organization_id,
+    ms.customer_id,
+    ms.subscription_id,
+    'payment'::transaction_type,
+    'completed'::transaction_status,
+    sp.name || ' - Monthly Subscription',
+    sp.amount,
+    sp.amount * 0.05,  -- 5% fee
+    sp.amount * 0.95,  -- net amount after fee
+    'Processing Fee',
+    sp.currency_code,
+    (ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[])[floor(random() * 4 + 1)],
+    (ARRAY['MOBILE_MONEY', 'E_WALLET', 'CARDS']::payment_method_code[])[floor(random() * 3 + 1)]
+FROM merchant_subscriptions ms
+JOIN subscription_plans sp ON ms.plan_id = sp.plan_id
+JOIN merchants m ON ms.merchant_id = m.merchant_id
+JOIN organizations o ON sp.organization_id = o.organization_id
+WHERE ms.status = 'active';
 
--- Seed data for providers_transactions table
-INSERT INTO providers_transactions (
-    transaction_id,
-    merchant_id,
-    provider_code,
-    provider_checkout_id,
-    provider_payment_status,
-    provider_transaction_id,
-    checkout_url
-) VALUES
-  (
-    (SELECT transaction_id FROM transactions WHERE description = 'Premium Web Hosting Purchase'),
-    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-    'WAVE',
-    'WAVE_CHECKOUT_001',
-    'succeeded',
-    'WAVE_TXN_001',
-    'https://checkout.wave.com/WAVE_CHECKOUT_001'
-  ),
-  (
-    (SELECT transaction_id FROM transactions WHERE description = 'Premium Hosting Plan - Monthly Subscription'),
-    (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-    'ORANGE',
-    'ORANGE_CHECKOUT_001',
-    'succeeded',
-    'ORANGE_TXN_001',
-    'https://checkout.orange.com/ORANGE_CHECKOUT_001'
-  );
-
--- Seed data for merchant_accounts table
-INSERT INTO merchant_accounts (merchant_id, balance, currency_code) VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 570.00, 'XOF');
-
--- Seed data for platform_main_account table
-INSERT INTO platform_main_account (total_balance, available_balance, currency_code) VALUES
-  (599.98, 570.00, 'XOF');
-
--- Seed data for platform_provider_balance table
-INSERT INTO platform_provider_balance (
-    provider_code,
-    total_transactions_amount,
-    current_balance,
+-- Add historical transactions for the past 3 months
+INSERT INTO transactions (
+    merchant_id, 
+    organization_id, 
+    customer_id, 
+    subscription_id,
+    transaction_type,
+    status,
+    description,
+    gross_amount,
+    fee_amount,
+    net_amount,
+    fee_reference,
     currency_code,
-    provider_fees,
-    platform_revenue,
-    quarter_start_date
-) VALUES
-  ('WAVE', 299.99, 285.00, 'XOF', 14.99, 14.99, date_trunc('quarter', CURRENT_DATE)),
-  ('ORANGE', 299.99, 285.00, 'XOF', 14.99, 14.99, date_trunc('quarter', CURRENT_DATE));
+    provider_code,
+    payment_method_code,
+    created_at
+)
+SELECT
+    m.merchant_id,
+    o.organization_id,
+    ms.customer_id,
+    ms.subscription_id,
+    'payment'::transaction_type,
+    'completed'::transaction_status,
+    sp.name || ' - Monthly Subscription',
+    sp.amount,
+    sp.amount * 0.05,
+    sp.amount * 0.95,
+    'Processing Fee',
+    sp.currency_code,
+    (ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[])[floor(random() * 4 + 1)],
+    (ARRAY['MOBILE_MONEY', 'E_WALLET', 'CARDS']::payment_method_code[])[floor(random() * 3 + 1)],
+    CURRENT_DATE - (n || ' days')::interval
+FROM merchant_subscriptions ms
+JOIN subscription_plans sp ON ms.plan_id = sp.plan_id
+JOIN merchants m ON ms.merchant_id = m.merchant_id
+JOIN organizations o ON sp.organization_id = o.organization_id
+CROSS JOIN generate_series(1, 90) n
+WHERE ms.status = 'active'
+AND n % 30 = 0;  -- Create a transaction every 30 days
 
 -- Re-enable triggers
 SET session_replication_role = 'origin';
+
+-- This will trigger the MRR calculation
+UPDATE merchant_subscriptions
+SET updated_at = NOW()
+WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1');
 
 -- Commit transaction
 COMMIT;

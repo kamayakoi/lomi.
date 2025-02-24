@@ -1,6 +1,3 @@
--- Enable the pgcrypto extension
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 -- Function to generate an API key
 CREATE OR REPLACE FUNCTION public.generate_api_key(
     p_merchant_id UUID,

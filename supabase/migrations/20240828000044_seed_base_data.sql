@@ -1,6 +1,5 @@
 -- Disable all email-related triggers before seeding
 ALTER TABLE merchants DISABLE TRIGGER notify_new_signup_trigger;
-ALTER TABLE organization_kyc DISABLE TRIGGER send_kyc_approved_email_trigger;
 ALTER TABLE organization_kyc DISABLE TRIGGER notify_new_activation_request_trigger;
 ALTER TABLE merchant_organization_links DISABLE TRIGGER generate_onboarding_api_key_trigger;
 ALTER TABLE organization_providers_settings DISABLE TRIGGER notify_provider_connected_trigger;
