@@ -136,7 +136,7 @@ function ReportingPage() {
                                     selectedDateRange={selectedDateRange}
                                     selectedChartType="mrr"
                                     onChartTypeChange={setSelectedChartType}
-                                    chartTypes={chartTypes.filter(type => type.id === 'mrr') as ChartType<'mrr'>[]}
+                                    chartTypes={chartTypes}
                                     isLoading={isMRRLoading}
                                 />
                             ) : (

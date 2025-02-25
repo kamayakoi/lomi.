@@ -172,6 +172,13 @@ export const fetchMRRMetrics = async ({ merchantId, startDate, endDate }: FetchR
     }
 
     try {
+        // Debug logging
+        console.log('Fetching MRR metrics with params:', {
+            merchantId,
+            startDate,
+            endDate
+        })
+
         const { data, error } = await supabase.rpc('fetch_mrr_metrics_custom_range', {
             p_merchant_id: merchantId,
             p_start_date: startDate,
@@ -183,10 +190,32 @@ export const fetchMRRMetrics = async ({ merchantId, startDate, endDate }: FetchR
             return []
         }
 
-        return data.map((item: any) => ({
-            date: item.date,
-            mrr: parseFloat(item.mrr)
-        }))
+        if (!data) {
+            console.error('No data returned from MRR metrics query')
+            return []
+        }
+
+        console.log(`Received ${data.length} MRR data points from database`)
+
+        // Validate and transform the data
+        const transformedData = data
+            .filter((item: any) => item && item.date) // Filter out invalid items
+            .map((item: any) => {
+                const mrrValue = parseFloat(item.mrr)
+                if (isNaN(mrrValue)) {
+                    console.warn('Invalid MRR value in data:', item)
+                    return null
+                }
+                return {
+                    date: item.date,
+                    mrr: mrrValue
+                }
+            })
+            .filter(Boolean) // Remove null entries
+
+        console.log(`Transformed to ${transformedData.length} valid MRR data points`)
+
+        return transformedData
     } catch (error) {
         console.error('Error in fetchMRRMetrics:', error)
         return []
