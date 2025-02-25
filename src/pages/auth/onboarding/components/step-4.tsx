@@ -178,7 +178,13 @@ const OnboardingStep4: React.FC<OnboardingStep4Props> = ({ onSubmit, onPrevious,
                                     value={onboardingForm.watch('orgDefaultLanguage.code')}
                                     onChange={(e) => {
                                         const lang = i18nLanguages.find(l => l.code === e.target.value) || i18nLanguages[0];
+
+                                        // Update form value
                                         handleLanguageChange(lang);
+
+                                        // Immediately change the language to update translations on the page
+                                        i18n.changeLanguage(lang.code);
+                                        localStorage.setItem('language', lang.code);
                                     }}
                                     className={cn(
                                         "w-full mb-2 h-[48px]",

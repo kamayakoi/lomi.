@@ -670,6 +670,7 @@
     },
     "sidebar": {
         "sections": {
+            "kyc": "ONBOARDING",
             "main_menu": "MENU PRINCIPAL",
             "payments": "PAIEMENTS",
             "developers": "DÉVELOPPEURS",

@@ -1,3 +1,4 @@
+/*
 import { useState, useEffect } from 'react'
 import { Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -59,3 +60,4 @@ export const GitHubStarButton: React.FC = () => {
         </div>
     )
 }
+*/

@@ -9,6 +9,7 @@ import { SideLink, SidebarItem } from '@/lib/data/sidelinks.tsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface NavProps extends React.HTMLAttributes<HTMLDivElement> {
   links: SidebarItem[]
@@ -69,6 +70,7 @@ function NavLink({ href, title, icon, label, subLink = false, closeNav }: NavLin
 function NavSection({ title, links, closeNav }: { title: string; links: SideLink[]; closeNav: () => void }) {
   const [isOpen, setIsOpen] = useState(true)
   const location = useLocation()
+  const { t } = useTranslation()
   const hasActiveLink = links.some(link => {
     const isSettingsLink = link.href.startsWith('/portal/settings')
     return isSettingsLink
@@ -78,7 +80,12 @@ function NavSection({ title, links, closeNav }: { title: string; links: SideLink
 
   return (
     <Collapsible defaultOpen={hasActiveLink || isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex w-full items-center justify-between px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-[hsl(var(--sidebar-foreground))]/90 hover:text-[hsl(var(--sidebar-foreground))] transition-colors duration-200">
+      <CollapsibleTrigger
+        className={cn(
+          "flex w-full items-center justify-between px-3 py-1.5 text-xs font-medium uppercase tracking-wider hover:text-[hsl(var(--sidebar-foreground))] transition-colors duration-200",
+          title === t('sidebar.sections.kyc') ? "text-red-500" : "text-[hsl(var(--sidebar-foreground))]/90"
+        )}
+      >
         <span>{title}</span>
         {isOpen ? <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200" /> : <ChevronRight className="h-3.5 w-3.5 transition-transform duration-200" />}
       </CollapsibleTrigger>
@@ -94,13 +101,15 @@ function NavSection({ title, links, closeNav }: { title: string; links: SideLink
 }
 
 export default function Nav({ links, closeNav, className, ...props }: NavProps) {
+  const { t } = useTranslation()
+
   const currentLinks = links.reduce<{ title: string; links: SideLink[] }[]>((acc, item) => {
     if ('type' in item && item.type === 'section') {
       acc.push({ title: item.title, links: [] })
     } else if (!('type' in item)) {
       const lastSection = acc[acc.length - 1]
       if (!lastSection) {
-        acc.push({ title: 'Main', links: [item] })
+        acc.push({ title: t('sidebar.sections.kyc'), links: [item] })
       } else {
         lastSection.links.push(item)
       }

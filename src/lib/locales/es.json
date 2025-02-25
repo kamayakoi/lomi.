@@ -777,6 +777,7 @@
     },
     "sidebar": {
         "sections": {
+            "kyc": "KYC",
             "main_menu": "MENÚ PRINCIPAL",
             "payments": "PAGOS",
             "developers": "DESARROLLADORES",

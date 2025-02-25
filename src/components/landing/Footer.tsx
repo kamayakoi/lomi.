@@ -198,12 +198,12 @@ export function Footer() {
                                 <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.features.title')}</h2>
                                 <ul className="space-y-3 relative z-20">
                                     {[
-                                        { name: t('footer.features.overview'), link: '/overview', showBadge: false },
-                                        { name: t('footer.features.sellProducts'), link: '/sell-products', showBadge: false },
-                                        { name: t('footer.features.sellSubscriptions'), link: '/sell-subscriptions', showBadge: false },
-                                        { name: t('footer.features.sellWhatsApp'), link: '/sell-whatsapp', showBadge: false },
-                                        { name: t('footer.features.sellWebsite'), link: '/sell-website', showBadge: false },
-                                        { name: t('footer.features.sendInvoices'), link: '/billing', showBadge: false },
+                                        { name: t('footer.features.overview'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellProducts'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellSubscriptions'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellWhatsApp'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sellWebsite'), link: '#', showBadge: false },
+                                        { name: t('footer.features.sendInvoices'), link: '#', showBadge: false },
                                         { name: t('footer.features.pricing'), link: '/pricing', showBadge: false },
                                         { name: t('footer.features.faq'), link: '/faq', showBadge: false }
                                     ].map((item) => (
@@ -278,17 +278,10 @@ export function Footer() {
                                         className="flex items-center h-10 shrink-0"
                                     >
                                         <div className="inline-flex items-center gap-2 bg-transparent px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 h-full">
-                                            <GitHubIcon className="h-[18px] w-[18px]" />
-                                            <span>{t('footer.star')}</span>
+                                            <GitHubIcon className="h-[20px] w-[20px] text-zinc-700 dark:text-zinc-300  hover:text-amber-500 dark:hover:text-amber-400" />
                                         </div>
-                                        <div className="bg-transparent w-[54px] px-2 py-2 text-amber-500 hover:text-amber-600 border border-l-0 border-zinc-200 dark:border-zinc-800 h-full flex items-center justify-end">
-                                            <span className="text-right mr-1">
-                                                {isLoading ? '...' :
-                                                    starCount >= 1000
-                                                        ? `${Math.floor(starCount / 1000)}k`
-                                                        : starCount
-                                                }
-                                            </span>
+                                        <div className="bg-transparent min-w-[54px] px-2 py-2 text-amber-500 hover:text-amber-600 border border-l-0 border-zinc-200 dark:border-zinc-800 h-full flex items-center justify-end">
+                                            <span className="text-right mr-1 font-bold text-amber-500 dark:text-amber-400">{t('footer.star')}</span>
                                             <Star className="h-4 w-4 fill-current flex-shrink-0" />
                                         </div>
                                     </Link>
@@ -324,10 +317,10 @@ export function Footer() {
                                             <span className="sr-only">Consultez notre code sur GitHub</span>
                                         </Link>
                                         <Link
-                                            to=""
+                                            to="#"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#36C5F0] d<ark:hover:text-[#36C5F0] items-center transition-colors"
+                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#E01E5A] dark:hover:text-[#E01E5A] items-center transition-colors"
                                             aria-label="Rejoignez notre communauté Slack"
                                         >
                                             <SlackIcon className="h-[20px] w-[20px]" />

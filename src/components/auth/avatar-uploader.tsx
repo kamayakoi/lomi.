@@ -1,10 +1,7 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { supabase } from '@/utils/supabase/client'
 import { toast } from "@/lib/hooks/use-toast"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import Cropper from 'react-easy-crop'
-import { Area } from 'react-easy-crop'
 import { useTranslation } from 'react-i18next'
 
 interface ProfilePictureUploaderProps {
@@ -22,101 +19,34 @@ const colors = [
 
 export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, name }: ProfilePictureUploaderProps) {
     const { t } = useTranslation();
-    const [selectedFile, setSelectedFile] = useState<File | null>(null)
-    const [crop, setCrop] = useState({ x: 0, y: 0 })
-    const [zoom, setZoom] = useState(1)
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatar)
 
-    const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
-        setCroppedAreaPixels(croppedAreaPixels)
-    }, [])
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
-        if (file) {
-            if (file.size > 1024 * 1024) {
-                toast({ title: "Error", description: t('auth.avatar_uploader.error.file_size') })
-                return
-            }
-            // Check file type
-            const fileType = file.type.toLowerCase();
-            if (!fileType.match(/^image\/(jpeg|jpg|png)$/)) {
-                toast({
-                    title: "Error",
-                    description: "Only JPEG and PNG files are allowed",
-                    variant: "destructive"
-                });
-                return;
-            }
-            setSelectedFile(file)
-            setIsDialogOpen(true)
-        }
-    }
+        if (!file) return
 
-    const createImage = (url: string): Promise<HTMLImageElement> =>
-        new Promise((resolve, reject) => {
-            const image = new Image()
-            image.addEventListener('load', () => resolve(image))
-            image.addEventListener('error', error => reject(error))
-            image.setAttribute('crossOrigin', 'anonymous')
-            image.src = url
-        })
-
-    const getCroppedImg = async (
-        imageSrc: string,
-        pixelCrop: Area
-    ): Promise<Blob | null> => {
-        const image = await createImage(imageSrc)
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-
-        if (!ctx) {
-            return null
+        // Validate file size
+        if (file.size > 1024 * 1024) {
+            toast({ title: "Error", description: t('auth.avatar_uploader.error.file_size') })
+            return
         }
 
-        canvas.width = 200
-        canvas.height = 200
+        // Validate file type
+        const fileType = file.type.toLowerCase();
+        if (!fileType.match(/^image\/(jpeg|jpg|png)$/)) {
+            toast({
+                title: "Error",
+                description: "Only JPEG and PNG files are allowed",
+                variant: "destructive"
+            });
+            return;
+        }
 
-        ctx.drawImage(
-            image,
-            pixelCrop.x,
-            pixelCrop.y,
-            pixelCrop.width,
-            pixelCrop.height,
-            0,
-            0,
-            200,
-            200
-        )
-
-        return new Promise((resolve) => {
-            canvas.toBlob((blob) => {
-                resolve(blob)
-            }, 'image/jpeg', 0.95) // Changed to JPEG with high quality
-        })
+        handleUpload(file)
     }
 
-    const handleSave = async () => {
-        if (!selectedFile || !croppedAreaPixels) return;
-
+    const handleUpload = async (file: File) => {
         try {
-            // Create the blob once, outside the retry loop
-            const croppedImage = await getCroppedImg(
-                URL.createObjectURL(selectedFile),
-                croppedAreaPixels
-            );
-
-            if (!croppedImage) {
-                toast({
-                    title: "Error",
-                    description: t('auth.avatar_uploader.error.crop_failed'),
-                    variant: "destructive"
-                });
-                return;
-            }
-
             // Get the current session first
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -147,8 +77,8 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
 
             const { data: storageData, error: uploadError } = await supabase.storage
                 .from('avatars')
-                .upload(fileName, croppedImage, {
-                    contentType: 'image/jpeg',
+                .upload(fileName, file, {
+                    contentType: file.type,
                     cacheControl: '3600',
                     upsert: true
                 });
@@ -197,12 +127,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
             setPreviewUrl(publicUrl);
             onAvatarUpdate(publicUrl);
 
-            // Clean up the blob URL
-            URL.revokeObjectURL(URL.createObjectURL(selectedFile));
-
-            // Close the dialog
-            setIsDialogOpen(false);
-
             // Trigger a refresh event
             window.dispatchEvent(new Event('merchant-profile-updated'));
         } catch (error) {
@@ -212,18 +136,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
                 description: t('auth.avatar_uploader.error.unexpected'),
                 variant: "destructive"
             });
-            setIsDialogOpen(false);
-        }
-    };
-
-    const handleRemove = () => {
-        setSelectedFile(null)
-        setPreviewUrl(null)
-        onAvatarUpdate('')
-        // Reset the file input value to allow selecting the same file again
-        const fileInput = document.getElementById('profile-upload') as HTMLInputElement
-        if (fileInput) {
-            fileInput.value = ''
         }
     }
 
@@ -234,6 +146,15 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
     const getBackgroundColor = (name: string) => {
         const index = name.length - 1;
         return colors[index] || colors[colors.length - 1];
+    }
+
+    const handleRemove = () => {
+        setPreviewUrl(null)
+        onAvatarUpdate('')
+        const fileInput = document.getElementById('profile-upload') as HTMLInputElement
+        if (fileInput) {
+            fileInput.value = ''
+        }
     }
 
     return (
@@ -277,42 +198,6 @@ export default function ProfilePictureUploader({ currentAvatar, onAvatarUpdate, 
             <p className="text-xs text-muted-foreground">
                 {t('auth.avatar_uploader.file_requirements')}
             </p>
-
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[425px] w-[95vw] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold">{t('auth.avatar_uploader.crop.title')}</DialogTitle>
-                    </DialogHeader>
-                    <div className="relative h-[50vh] sm:h-64 w-full">
-                        {selectedFile && (
-                            <Cropper
-                                image={URL.createObjectURL(selectedFile)}
-                                crop={crop}
-                                zoom={zoom}
-                                aspect={1}
-                                onCropChange={setCrop}
-                                onCropComplete={onCropComplete}
-                                onZoomChange={setZoom}
-                            />
-                        )}
-                    </div>
-                    <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsDialogOpen(false)}
-                            className="w-full sm:w-auto h-[48px] text-base font-medium rounded-none"
-                        >
-                            {t('auth.avatar_uploader.crop.cancel')}
-                        </Button>
-                        <Button
-                            onClick={handleSave}
-                            className="w-full sm:w-auto h-[48px] text-base font-medium rounded-none"
-                        >
-                            {t('auth.avatar_uploader.crop.save')}
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

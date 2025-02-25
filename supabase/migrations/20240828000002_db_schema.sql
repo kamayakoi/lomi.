@@ -103,6 +103,9 @@ CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
 CREATE TYPE provider_payment_status AS ENUM ('processing', 'cancelled', 'succeeded');
 CREATE TYPE provider_business_type AS ENUM ('fintech', 'other');
+CREATE TYPE permission_category AS ENUM ('payments', 'accounts', 'products', 'subscriptions', 'customers');
+CREATE TYPE permission_action AS ENUM ('view', 'create', 'edit', 'delete', 'approve');
+CREATE TYPE reconciliation_status AS ENUM ('pending', 'matched', 'partial_match', 'mismatch', 'resolved');
 
 --------------- TABLES ---------------
 
@@ -219,6 +222,8 @@ CREATE TABLE merchant_organization_links (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role member_role NOT NULL,
   team_status team_status NOT NULL DEFAULT 'active',
+  category permission_category NOT NULL,
+  action permission_action NOT NULL,
   store_handle VARCHAR NOT NULL,
   organization_position VARCHAR,
   invitation_email VARCHAR,
@@ -320,20 +325,67 @@ CREATE INDEX idx_customers_organization_id ON customers(organization_id);
 -- Merchant Accounts table
 CREATE TABLE merchant_accounts (
     account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    merchant_id UUID REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     balance NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (merchant_id, currency_code)
+    UNIQUE (organization_id, currency_code),
+    CHECK (merchant_id IS NOT NULL OR organization_id IS NOT NULL)
 );
 
 COMMENT ON TABLE merchant_accounts IS 'Represents the account for each merchant, storing their balance in each currency';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_merchant_accounts_currency_code ON merchant_accounts(currency_code);
 
--- Platform Main account Balance table
+-- Balance access rules
+CREATE TABLE team_balance_access_rules (
+    rule_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    role_id UUID REFERENCES organization_roles(role_id),
+    merchant_id UUID REFERENCES merchants(merchant_id),
+    account_id UUID REFERENCES merchant_accounts(account_id),
+    can_view BOOLEAN NOT NULL DEFAULT FALSE,
+    can_withdraw BOOLEAN NOT NULL DEFAULT FALSE,
+    approval_required BOOLEAN NOT NULL DEFAULT FALSE,
+    withdraw_limit NUMERIC(15,2),
+    currency_code currency_code,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT role_or_merchant CHECK (role_id IS NOT NULL OR merchant_id IS NOT NULL),
+    CONSTRAINT valid_limit CHECK (
+        NOT can_withdraw OR 
+        (can_withdraw AND (withdraw_limit IS NULL OR (withdraw_limit IS NOT NULL AND currency_code IS NOT NULL)))
+    )
+);
+
+CREATE INDEX idx_balance_access_rules_organization_id ON balance_access_rules(organization_id);
+CREATE INDEX idx_balance_access_rules_role_id ON balance_access_rules(role_id);
+CREATE INDEX idx_balance_access_rules_merchant_id ON balance_access_rules(merchant_id);
+CREATE INDEX idx_balance_access_rules_account_id ON balance_access_rules(account_id);
+
+
+-- Merchant Outstanding Balance table
+CREATE TABLE merchant_outstanding_balance (
+    balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    amount NUMERIC(15,2) NOT NULL DEFAULT 0,
+    currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    metadata JSONB,
+    UNIQUE (merchant_id, organization_id, currency_code)
+);
+
+COMMENT ON TABLE merchant_outstanding_balance IS 'Tracks outstanding balances that merchants owe to the platform (e.g., from chargebacks)';
+COMMENT ON COLUMN merchant_outstanding_balance.amount IS 'Current outstanding balance amount';
+COMMENT ON COLUMN merchant_outstanding_balance.metadata IS 'Additional information about the outstanding balance, including history of changes';
+
+CREATE INDEX idx_merchant_outstanding_balance_currency_code ON merchant_outstanding_balance(currency_code);
+CREATE INDEX idx_merchant_outstanding_balance_organization_id ON merchant_outstanding_balance(organization_id);
+
+-- Platform Main account table
 CREATE TABLE platform_main_account (
     balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     total_balance NUMERIC(15,2) NOT NULL DEFAULT 0,
@@ -436,6 +488,7 @@ CREATE INDEX idx_subscription_plans_organization_id ON subscription_plans(organi
 CREATE TABLE merchant_subscriptions (
     subscription_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     plan_id UUID NOT NULL REFERENCES subscription_plans(plan_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
     status subscription_status NOT NULL DEFAULT 'pending',
@@ -526,6 +579,67 @@ CREATE INDEX idx_transactions_product_id ON transactions(product_id);
 CREATE INDEX idx_transactions_provider_code ON transactions(provider_code);
 CREATE INDEX idx_transactions_subscription_id ON transactions(subscription_id);
 
+-- Multi-payment transactions
+CREATE TABLE payment_groups (
+    group_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    customer_id UUID REFERENCES customers(customer_id),
+    product_id UUID REFERENCES merchant_products(product_id),
+    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
+    total_amount NUMERIC(15,2) NOT NULL,
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    status transaction_status NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMPTZ NOT NULL,
+    CONSTRAINT product_or_subscription CHECK (
+        (product_id IS NOT NULL AND subscription_id IS NULL) OR 
+        (product_id IS NULL AND subscription_id IS NOT NULL)
+    )
+);
+
+CREATE INDEX idx_payment_groups_organization_id ON payment_groups(organization_id);
+CREATE INDEX idx_payment_groups_merchant_id ON payment_groups(merchant_id);
+CREATE INDEX idx_payment_groups_customer_id ON payment_groups(customer_id);
+CREATE INDEX idx_payment_groups_product_id ON payment_groups(product_id);
+CREATE INDEX idx_payment_groups_subscription_id ON payment_groups(subscription_id);
+CREATE INDEX idx_payment_groups_status ON payment_groups(status);
+
+-- Individual payments within a group
+CREATE TABLE payment_group_items (
+    item_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    group_id UUID NOT NULL REFERENCES payment_groups(group_id) ON DELETE CASCADE,
+    amount NUMERIC(15,2) NOT NULL,
+    provider_code provider_code,
+    payment_method_code payment_method_code,
+    transaction_id UUID REFERENCES transactions(transaction_id),
+    status transaction_status NOT NULL DEFAULT 'pending',
+    payment_link VARCHAR(255),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+CREATE INDEX idx_payment_group_items_group_id ON payment_group_items(group_id);
+CREATE INDEX idx_payment_group_items_transaction_id ON payment_group_items(transaction_id);
+CREATE INDEX idx_payment_group_items_status ON payment_group_items(status);
+CREATE INDEX idx_payment_group_config_organization_id ON payment_group_config(organization_id);
+
+-- Create a table for payment group configuration
+CREATE TABLE payment_group_config (
+    config_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    max_split_count INT NOT NULL DEFAULT 3 CHECK (max_split_count >= 1 AND max_split_count <= 10),
+    min_payment_percentage NUMERIC(5,2) NOT NULL DEFAULT 10 CHECK (min_payment_percentage > 0 AND min_payment_percentage <= 100),
+    split_expiry_hours INT NOT NULL DEFAULT 24 CHECK (split_expiry_hours > 0),
+    allow_different_providers BOOLEAN NOT NULL DEFAULT TRUE,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (organization_id)
+);
+
 -- Providers Transactions table
 CREATE TABLE providers_transactions (
     transaction_id UUID PRIMARY KEY REFERENCES transactions(transaction_id),
@@ -547,7 +661,6 @@ CREATE TABLE providers_transactions (
 
 COMMENT ON TABLE providers_transactions IS 'Stores provider-specific transaction data including Wave checkout sessions';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_providers_transactions_merchant_id ON providers_transactions(merchant_id);
 
 -- Refunds table
@@ -569,13 +682,13 @@ COMMENT ON COLUMN refunds.amount IS 'Original transaction amount';
 COMMENT ON COLUMN refunds.refunded_amount IS 'Amount refunded to the customer';
 COMMENT ON COLUMN refunds.fee_amount IS 'Fee charged for processing the refund';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_refunds_transaction_id ON refunds(transaction_id);
 
 -- Merchant Bank Accounts table
 CREATE TABLE merchant_bank_accounts (
     bank_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     account_number VARCHAR NOT NULL,
     account_name VARCHAR NOT NULL,
     bank_name VARCHAR NOT NULL,
@@ -633,7 +746,6 @@ CREATE TABLE api_keys (
 
 COMMENT ON TABLE api_keys IS 'Stores API keys for authenticated access to the system';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_api_keys_merchant_id ON api_keys(merchant_id);
 
 -- API Usage table
@@ -657,6 +769,7 @@ COMMENT ON TABLE api_usage IS 'Tracks API usage statistics for each organization
 CREATE TABLE webhooks (
     webhook_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     url VARCHAR NOT NULL,
     authorized_events webhook_event[] NOT NULL DEFAULT '{}',
     is_active BOOLEAN NOT NULL DEFAULT true,
@@ -692,7 +805,6 @@ CREATE TABLE logs (
 
 COMMENT ON TABLE logs IS 'Audit log for tracking important events in the system';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_logs_merchant_id ON logs(merchant_id);
 
 -- Platform Invoices table
@@ -721,6 +833,7 @@ CREATE INDEX idx_platform_invoices_organization_id ON platform_invoices(organiza
 CREATE TABLE customer_invoices (
     customer_invoice_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     customer_id UUID NOT NULL REFERENCES customers(customer_id),
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     description TEXT,
@@ -788,13 +901,13 @@ CREATE TABLE merchant_feedback (
 
 COMMENT ON TABLE merchant_feedback IS 'Stores merchant feedback, bug reports, or feature requests';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_merchant_feedback_merchant_id ON merchant_feedback(merchant_id);
 
 -- Support Requests table
 CREATE TABLE support_requests (
     support_requests_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     category support_category NOT NULL,
     message TEXT NOT NULL,
     image_url TEXT,
@@ -806,7 +919,6 @@ CREATE TABLE support_requests (
 
 COMMENT ON TABLE support_requests IS 'Stores support requests submitted by merchants';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_support_requests_merchant_id ON support_requests(merchant_id);
 
 -- Notifications table
@@ -821,11 +933,10 @@ CREATE TABLE notifications (
 
 COMMENT ON TABLE notifications IS 'Stores notifications for merchants and organizations';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_notifications_merchant_id ON notifications(merchant_id);
 
--- Customer API Interactions table
-CREATE TABLE customer_api_interactions (
+-- API Interactions table
+CREATE TABLE api_interactions (
     interaction_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
     endpoint VARCHAR(255) NOT NULL,
@@ -857,7 +968,6 @@ CREATE TABLE api_rate_limits (
 
 COMMENT ON TABLE api_rate_limits IS 'Stores rate limiting information for API endpoints per organization and API key';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_api_rate_limits_api_key ON api_rate_limits(api_key);
 
 -- API Error Logs table
@@ -910,6 +1020,77 @@ CREATE INDEX idx_payment_links_organization_id ON payment_links(organization_id)
 CREATE INDEX idx_payment_links_plan_id ON payment_links(plan_id);
 CREATE INDEX idx_payment_links_product_id ON payment_links(product_id);
 
+-- Create a table for payment requests
+CREATE TABLE payment_requests (
+    request_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    customer_id UUID REFERENCES customers(customer_id),
+    amount NUMERIC(15,2) NOT NULL,
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    description TEXT,
+    status transaction_status NOT NULL DEFAULT 'pending',
+    expiry_date TIMESTAMPTZ NOT NULL,
+    payment_link VARCHAR(255),
+    payment_reference VARCHAR(100),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_payment_requests_organization_id ON payment_requests(organization_id);
+CREATE INDEX idx_payment_requests_merchant_id ON payment_requests(merchant_id);
+CREATE INDEX idx_payment_requests_customer_id ON payment_requests(customer_id);
+CREATE INDEX idx_payment_requests_status ON payment_requests(status);
+
+-- Create a table for installment plans
+CREATE TABLE installment_plans (
+    plan_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    customer_id UUID NOT NULL REFERENCES customers(customer_id),
+    product_id UUID REFERENCES merchant_products(product_id),
+    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
+    total_amount NUMERIC(15,2) NOT NULL,
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    installment_count INT NOT NULL CHECK (installment_count >= 2),
+    status transaction_status NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT product_or_subscription CHECK (
+        (product_id IS NOT NULL AND subscription_id IS NULL) OR 
+        (product_id IS NULL AND subscription_id IS NOT NULL) OR
+        (product_id IS NULL AND subscription_id IS NULL)
+    )
+);
+
+CREATE INDEX idx_installment_plans_organization_id ON installment_plans(organization_id);
+CREATE INDEX idx_installment_plans_merchant_id ON installment_plans(merchant_id);
+CREATE INDEX idx_installment_plans_customer_id ON installment_plans(customer_id);
+CREATE INDEX idx_installment_plans_product_id ON installment_plans(product_id);
+CREATE INDEX idx_installment_plans_subscription_id ON installment_plans(subscription_id);
+CREATE INDEX idx_installment_plans_status ON installment_plans(status);
+
+-- Create a table for individual installments
+CREATE TABLE installment_payments (
+    installment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    plan_id UUID NOT NULL REFERENCES installment_plans(plan_id) ON DELETE CASCADE,
+    amount NUMERIC(15,2) NOT NULL,
+    due_date TIMESTAMPTZ NOT NULL,
+    transaction_id UUID REFERENCES transactions(transaction_id),
+    status transaction_status NOT NULL DEFAULT 'pending',
+    payment_link VARCHAR(255),
+    sequence_number INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (plan_id, sequence_number)
+);
+
+CREATE INDEX idx_installment_payments_plan_id ON installment_payments(plan_id);
+CREATE INDEX idx_installment_payments_transaction_id ON installment_payments(transaction_id);
+CREATE INDEX idx_installment_payments_status ON installment_payments(status);
+CREATE INDEX idx_installment_payments_due_date ON installment_payments(due_date);
+
+
 -- Storefronts table
 CREATE TABLE storefronts (
     storefront_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -928,7 +1109,6 @@ CREATE TABLE storefronts (
 
 COMMENT ON TABLE storefronts IS 'Stores storefront settings and configurations for each merchant';
 
--- Add index for unindexed foreign key
 CREATE INDEX idx_storefronts_organization_id ON storefronts(organization_id);
 
 -- Organization Checkout Settings table
@@ -962,25 +1142,6 @@ CREATE TABLE organization_fees (
 );
 
 COMMENT ON TABLE organization_fees IS 'Stores custom fees defined by organizations';
-
--- Merchant Outstanding Balance table
-CREATE TABLE merchant_outstanding_balance (
-    balance_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
-    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    amount NUMERIC(15,2) NOT NULL DEFAULT 0,
-    currency_code currency_code NOT NULL REFERENCES currencies(code) DEFAULT 'XOF',
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    metadata JSONB,
-    UNIQUE (merchant_id, organization_id, currency_code)
-);
-
-COMMENT ON TABLE merchant_outstanding_balance IS 'Tracks outstanding balances that merchants owe to the platform (e.g., from chargebacks)';
-COMMENT ON COLUMN merchant_outstanding_balance.amount IS 'Current outstanding balance amount';
-COMMENT ON COLUMN merchant_outstanding_balance.metadata IS 'Additional information about the outstanding balance, including history of changes';
-
-CREATE INDEX idx_merchant_outstanding_balance_currency_code ON merchant_outstanding_balance(currency_code);
-CREATE INDEX idx_merchant_outstanding_balance_organization_id ON merchant_outstanding_balance(organization_id);
 
 -- Organization Fee Links table
 CREATE TABLE organization_fee_links (

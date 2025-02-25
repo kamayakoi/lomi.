@@ -777,6 +777,7 @@
     },
     "sidebar": {
         "sections": {
+            "kyc": "了解您的客户",
             "main_menu": "主菜单",
             "payments": "支付",
             "developers": "开发者",

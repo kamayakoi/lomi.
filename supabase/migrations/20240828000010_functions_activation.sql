@@ -16,7 +16,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to complete activation (renamed from upsert_organization_kyc)
+-- Function to complete activation
 CREATE OR REPLACE FUNCTION public.complete_activation(
     p_merchant_id UUID,
     p_legal_organization_name VARCHAR,
