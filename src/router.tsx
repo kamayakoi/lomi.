@@ -17,6 +17,7 @@ import OTP from './pages/auth/connect/otp';
 import ResetPassword from './pages/auth/connect/reset-password';
 import Onboarding from './pages/auth/onboarding/onboarding';
 import AuthCallback from './pages/auth/connect/callback';
+import EmailVerified from './pages/auth/connect/email-verified';
 // Error pages
 import GeneralError from './pages/errors/general-error';
 import NotFoundError from './pages/errors/not-found-error';
@@ -79,6 +80,22 @@ const AppRouter = () => {
     if (isProduction && isPortalSubdomain) {
         return (
             <Routes>
+                {/* Auth routes */}
+                <Route path="/sign-in" element={<Signin />} />
+                <Route path="/log-in" element={<Login />} />
+                <Route path="/sign-up" element={<Signup />} />
+                <Route path="/forgot-password" element={<Forgot />} />
+                <Route path="/otp" element={<OTP />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/auth/connect/email-verified" element={<EmailVerified />} />
+                <Route path="/onboarding" element={
+                    <OnboardingRoute>
+                        <Onboarding />
+                    </OnboardingRoute>
+                } />
+
+                {/* Protected routes */}
                 <Route path="/" element={
                     <ProtectedRoute>
                         <OrganizationRoute>
@@ -169,6 +186,7 @@ const AppRouter = () => {
                         <Route path="/otp" element={<OTP />} />
                         <Route path="/auth/reset-password" element={<ResetPassword />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
+                        <Route path="/auth/connect/email-verified" element={<EmailVerified />} />
 
                         {/* Organization routes */}
                         <Route path="/:organizationId" element={

@@ -275,6 +275,13 @@
                 "password_label": "Senha",
                 "sign_in_button": "Entrar",
                 "signing_in": "Entrando..."
+            },
+            "email_verified": {
+                "title": "Email verificado com sucesso",
+                "checking": "Revisando sua sessão...",
+                "redirecting_onboarding": "Você será redirecionado para completar seu perfil em um momento...",
+                "different_browser": "Parece que você abriu este link em um navegador diferente. Por favor, retorne ao seu navegador original ou clique no botão abaixo para entrar.",
+                "sign_in_button": "Entrar"
             }
         }
     },

@@ -274,9 +274,15 @@
             "password_label": "Contraseña",
             "sign_in_button": "Iniciar sesión",
             "signing_in": "Iniciando sesión..."
+        },
+        "email_verified": {
+            "title": "Correo electrónico verificado exitosamente",
+            "checking": "Revisando tu sesión...",
+            "redirecting_onboarding": "Te redirigiremos a completar tu perfil en un momento...",
+            "different_browser": "Parece que abriste este enlace en un navegador diferente. Por favor, regresa a tu navegador original o haz clic en el botón de abajo para iniciar sesión.",
+            "sign_in_button": "Iniciar sesión"
         }
-    }
-    },
+    }},
     "dashboard": {
         "getting_started": {
             "title": "Empezando",

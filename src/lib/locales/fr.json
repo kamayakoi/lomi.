@@ -274,6 +274,13 @@
                 "password_label": "Mot de passe",
                 "sign_in_button": "Se connecter",
                 "signing_in": "Connexion..."
+            },
+            "email_verified": {
+                "title": "Email vérifié avec succès",
+                "checking": "Vérification de votre session...",
+                "redirecting_onboarding": "Vous serez redirigé vers la complétion de votre profil dans un moment...",
+                "different_browser": "Il semble que vous avez ouvert ce lien dans un autre navigateur. Veuillez retourner à votre navigateur original ou cliquer sur le bouton ci-dessous pour vous connecter.",
+                "sign_in_button": "Se connecter"
             }
         }
     },

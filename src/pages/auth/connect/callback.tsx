@@ -45,6 +45,12 @@ const AuthCallback = () => {
                 const next = searchParams.get('next');
                 const code = urlParams.get('code') || hashParams.get('code');
 
+                // Handle email verification
+                if (type === 'signup' || urlParams.get('message')?.includes('Email verified')) {
+                    navigate('/auth/connect/email-verified', { replace: true });
+                    return;
+                }
+
                 // Handle email change confirmation
                 if (type === 'email_change' || urlParams.get('message')?.includes('Confirmation link accepted')) {
                     const { data: { session }, error: sessionError } = await supabase.auth.getSession();

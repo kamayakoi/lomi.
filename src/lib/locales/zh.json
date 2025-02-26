@@ -274,6 +274,13 @@
                 "password_label": "密码",
                 "sign_in_button": "登录",
                 "signing_in": "登录中..."
+            },
+            "email_verified": {
+                "title": "邮箱验证成功",
+                "checking": "检查您的会话...",
+                "redirecting_onboarding": "您将很快被重定向以完成您的个人资料...",
+                "different_browser": "看起来您在不同的浏览器中打开了此链接。请返回您的原始浏览器或点击下面的按钮登录以继续。",
+                "sign_in_button": "登录"
             }
         }
     },

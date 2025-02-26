@@ -264,7 +264,7 @@
         },
         "success": "2FA verification successful",
         "sign_in": {
-            "title": "Welcome back",
+            "title": "Welcome back",    
             "subtitle": "Enter your credentials to access your account",
             "email_label": "Email",
             "email_placeholder": "m@example.com",
@@ -272,7 +272,15 @@
             "sign_in_button": "Sign in",
             "signing_in": "Signing in..."
         }
-    } },
+    },
+        "email_verified": {
+            "title": "Email Verified Successfully",
+            "checking": "Checking your session...",
+            "redirecting_onboarding": "You'll be redirected to complete your profile in a moment...",
+            "different_browser": "It looks like you opened this link in a different browser. Please return to your original browser or click the button below to sign in.",
+            "sign_in_button": "Sign In"
+        }
+    },
     "dashboard": {
         "getting_started": {
             "title": "Getting Started",
