@@ -577,7 +577,8 @@
             "store_handle": {
                 "label": "Store handle",
                 "placeholder": "my-store",
-                "required": "Store handle is required"
+                "required": "Store handle is required",
+                "help": "This will be used to create your storefront URL. It can only contain lowercase letters, numbers, and hyphens."
             },
             "logo": {
                 "label": "Company logo"

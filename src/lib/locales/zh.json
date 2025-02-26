@@ -623,7 +623,8 @@
             "store_handle": {
                 "label": "店铺标识",
                 "placeholder": "my-store",
-                "required": "店铺标识为必填项"
+                "required": "店铺标识为必填项",
+                "help": "这将用于创建您的店铺URL。只能包含小写字母、数字和连字符。"
             },
             "logo": {
                 "label": "公司标志"

@@ -590,10 +590,11 @@
             "store_handle": {
                 "label": "URL da sua loja",
                 "placeholder": "my-store",
-                "required": "URL da sua loja é obrigatório"
+                "required": "URL da sua loja é obrigatório",
+                "help": "Este será utilizado para criar sua URL da loja. Pode conter apenas letras minúsculas, números e hífens."
             },
             "logo": {
-                "label": "Company logo"
+                "label": "Logo da empresa"
             }
         },
         "step3": {

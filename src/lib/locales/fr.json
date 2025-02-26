@@ -576,7 +576,8 @@
             "store_handle": {
                 "label": "URL de votre boutique",
                 "placeholder": "ma-boutique",
-                "required": "L'URL de votre boutique est requise"
+                "required": "L'URL de votre boutique est requise",
+                "help": "Cela sera utilisé pour créer votre URL de boutique. Il peut contenir uniquement des lettres minuscules, des chiffres et des traits de soulignement."
             }
         },
         "step3": {

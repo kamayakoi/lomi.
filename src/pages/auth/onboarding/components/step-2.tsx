@@ -318,9 +318,13 @@ const OnboardingStep2: React.FC<OnboardingStep2Props> = ({ onNext, onPrevious, d
                                     store.lomi.africa/
                                 </div>
                             </div>
-                            {onboardingForm.formState.errors.storeHandle &&
+                            {onboardingForm.formState.errors.storeHandle ? (
                                 <p className="text-red-500 text-sm">{t(onboardingForm.formState.errors.storeHandle.message || '')}</p>
-                            }
+                            ) : (
+                                <p className="text-xs text-muted-foreground mt-1 -translate-y-[70%]">
+                                    {t('onboarding.step2.store_handle.help')}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <div className="flex-1 flex items-end justify-between mt-8">

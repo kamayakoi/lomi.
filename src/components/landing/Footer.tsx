@@ -4,7 +4,7 @@ import { PHIcon } from '@/components/icons/PHIcon'
 import { GitHubIcon } from '@/components/icons/GitHubIcon'
 import { SlackIcon } from '@/components/icons/SlackIcon'
 import { LinkedInIcon } from '@/components/icons/LinkedInIcon'
-import { Star } from 'lucide-react'
+import { Globe, Star } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/use-theme'
 import { useEffect, useState } from 'react'
 import { LanguageSwitcher } from '@/components/design/language-switcher'
@@ -306,7 +306,7 @@ export function Footer() {
                                             <PHIcon className="h-[22px] w-[22px]" />
                                             <span className="sr-only">Découvrez-nous sur Product Hunt</span>
                                         </Link>
-                                        <Link
+                                        {/* <Link
                                             to={GITHUB_REPO_URL}
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -315,6 +315,16 @@ export function Footer() {
                                         >
                                             <GitHubIcon className="h-[20px] w-[20px]" />
                                             <span className="sr-only">Consultez notre code sur GitHub</span>
+                                        </Link> */}
+                                        <Link
+                                            to="#"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-zinc-700 dark:text-zinc-300 hover:text-blue-400 dark:hover:text-blue-400 inline-flex items-center transition-colors"
+                                            aria-label="Join our newsletter"
+                                        >
+                                            <Globe className="h-[20px] w-[20px]" />
+                                            <span className="sr-only">Join our newsletter</span>
                                         </Link>
                                         <Link
                                             to="#"

@@ -623,7 +623,8 @@
             "store_handle": {
                 "label": "Identificador de la tienda",
                 "placeholder": "mi-tienda",
-                "required": "El identificador de la tienda es obligatorio"
+                "required": "El identificador de la tienda es obligatorio",
+                "help": "Este será utilizado para crear tu URL de la tienda. Puede contener solo letras minúsculas, números y guiones."
             },
             "logo": {
                 "label": "Logo de la empresa"
