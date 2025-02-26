@@ -13,13 +13,13 @@ import PayoutFilters from './components/filters'
 import PayoutActions from './components/actions'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DateRange } from 'react-day-picker'
-import { payout_status, Payout, BankAccount, BalanceBreakdown, currency_code, ConversionRate } from './components/types'
+import { payout_status, Payout, BankAccount, BalanceBreakdown, currency_code } from './components/types'
 import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiateWithdrawal } from './components/support'
 import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
-import { ArrowUpDown, ArrowDownIcon, RefreshCw, DollarSign } from 'lucide-react'
+import { ArrowUpDown, ArrowDownIcon, DollarSign } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -29,7 +29,8 @@ import { useToast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { formatCurrency, initializeRates, getDualCurrencyDisplay } from './components/currency-utils'
+import { formatCurrency } from './components/currency-converter-utils'
+import CurrencyConverter from './components/CurrencyConverter'
 
 type PayoutsResponse = Payout[]
 
@@ -63,15 +64,8 @@ function BalancePage() {
     const [showBalanceBreakdown, setShowBalanceBreakdown] = useState<Record<string, boolean>>({})
     const [selectedWithdrawalCurrency, setSelectedWithdrawalCurrency] = useState<currency_code>('XOF')
     const [showCurrencyConverter, setShowCurrencyConverter] = useState(false)
-    const [conversionAmount, setConversionAmount] = useState("")
-    const [fromCurrency, setFromCurrency] = useState<currency_code>('XOF')
-    const [toCurrency, setToCurrency] = useState<currency_code>('USD')
-    const [convertedAmount, setConvertedAmount] = useState<number | null>(null)
     const [preferredCurrency, setPreferredCurrency] = useState<currency_code>('XOF')
     const { data: conversionRates } = useConversionRates()
-    const [formattedTotalBalance, setFormattedTotalBalance] = useState<Record<string, string>>({});
-    const [formattedPendingBalance, setFormattedPendingBalance] = useState<Record<string, string>>({});
-    const [formattedAvailableBalance, setFormattedAvailableBalance] = useState<Record<string, string>>({});
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
@@ -103,46 +97,6 @@ function BalancePage() {
             fetchBankAccounts(user.id).then(setBankAccounts)
         }
     }, [user?.id])
-
-    useEffect(() => {
-        initializeRates();
-    }, []);
-
-    useEffect(() => {
-        if (balanceBreakdown && balanceBreakdown.length > 0) {
-            const updateFormattedBalances = async () => {
-                const totalBalances: Record<string, string> = {};
-                const pendingBalances: Record<string, string> = {};
-                const availableBalances: Record<string, string> = {};
-
-                for (const balance of balanceBreakdown) {
-                    totalBalances[balance.currency_code] = await formatBalanceWithConversion(
-                        balance.total_balance,
-                        balance.currency_code,
-                        preferredCurrency
-                    );
-
-                    pendingBalances[balance.currency_code] = await formatBalanceWithConversion(
-                        balance.pending_balance,
-                        balance.currency_code,
-                        preferredCurrency
-                    );
-
-                    availableBalances[balance.currency_code] = await formatBalanceWithConversion(
-                        balance.available_balance,
-                        balance.currency_code,
-                        preferredCurrency
-                    );
-                }
-
-                setFormattedTotalBalance(totalBalances);
-                setFormattedPendingBalance(pendingBalances);
-                setFormattedAvailableBalance(availableBalances);
-            };
-
-            updateFormattedBalances();
-        }
-    }, [balanceBreakdown, preferredCurrency]);
 
     const handleSort = (column: keyof Payout) => {
         if (sortColumn === column) {
@@ -273,68 +227,6 @@ function BalancePage() {
         return value?.toLocaleString() || '0';
     };
 
-    const handleCurrencyConversion = async () => {
-        if (!conversionAmount || !fromCurrency || !toCurrency || fromCurrency === toCurrency) {
-            setConvertedAmount(null);
-            return;
-        }
-
-        try {
-            const amount = parseFloat(conversionAmount);
-            if (isNaN(amount) || amount <= 0) {
-                setConvertedAmount(null);
-                return;
-            }
-
-            const converted = await convertCurrencyDB(amount, fromCurrency, toCurrency);
-            setConvertedAmount(converted);
-        } catch (error) {
-            console.error('Error converting currency:', error);
-            toast({
-                title: "Conversion Error",
-                description: "Failed to convert currency. Please try again.",
-                variant: "destructive",
-            });
-            setConvertedAmount(null);
-        }
-    };
-
-    const swapCurrencies = async () => {
-        setFromCurrency(toCurrency);
-        setToCurrency(fromCurrency);
-        setConvertedAmount(null);
-        if (conversionAmount) {
-            const amount = parseFloat(conversionAmount);
-            if (!isNaN(amount) && amount > 0) {
-                const converted = await convertCurrencyDB(amount, toCurrency, fromCurrency);
-                setConvertedAmount(converted);
-            }
-        }
-    };
-
-    const formatBalanceWithConversion = async (amount: number, currency: currency_code, targetCurrency: currency_code): Promise<string> => {
-        if (currency === targetCurrency) {
-            return formatCurrency(amount, currency);
-        }
-        return await getDualCurrencyDisplay(amount, currency, targetCurrency);
-    };
-
-    // Update the current rates display
-    const getCurrentRatesDisplay = (conversionRates: ConversionRate[] | undefined): string => {
-        if (!conversionRates || conversionRates.length === 0) return 'Loading rates...';
-
-        // Find the rates for USD to XOF and XOF to USD
-        const usdToXofRate = conversionRates.find(rate =>
-            rate.from_currency === 'USD' && rate.to_currency === 'XOF'
-        );
-
-        const xofToUsdRate = conversionRates.find(rate =>
-            rate.from_currency === 'XOF' && rate.to_currency === 'USD'
-        );
-
-        return `Current rates: 1 USD = ${usdToXofRate?.rate || 605} XOF | 1 XOF = ${xofToUsdRate?.rate || 0.00165} USD`;
-    };
-
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -381,109 +273,8 @@ function BalancePage() {
                         </div>
 
                         {showCurrencyConverter && (
-                            <Card className="rounded-none mb-6">
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium">Currency Converter</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="conversion-amount">Amount</Label>
-                                            <Input
-                                                id="conversion-amount"
-                                                type="text"
-                                                value={conversionAmount}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    if (/^\d*\.?\d*$/.test(value)) {
-                                                        setConversionAmount(value);
-                                                        if (value) {
-                                                            handleCurrencyConversion();
-                                                        } else {
-                                                            setConvertedAmount(null);
-                                                        }
-                                                    }
-                                                }}
-                                                className="rounded-none"
-                                                placeholder="Enter amount"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <Label htmlFor="from-currency">From</Label>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={swapCurrencies}
-                                                    className="h-6 w-6 p-0"
-                                                >
-                                                    <RefreshCw className="h-4 w-4" />
-                                                </Button>
-                                                <Label htmlFor="to-currency">To</Label>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Select value={fromCurrency} onValueChange={(value) => {
-                                                    setFromCurrency(value as currency_code);
-                                                    if (conversionAmount) handleCurrencyConversion();
-                                                }}>
-                                                    <SelectTrigger className="rounded-none flex-1">
-                                                        <SelectValue placeholder="From" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="rounded-none">
-                                                        <SelectItem value="XOF">XOF</SelectItem>
-                                                        <SelectItem value="USD">USD</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <Select value={toCurrency} onValueChange={(value) => {
-                                                    setToCurrency(value as currency_code);
-                                                    if (conversionAmount) handleCurrencyConversion();
-                                                }}>
-                                                    <SelectTrigger className="rounded-none flex-1">
-                                                        <SelectValue placeholder="To" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="rounded-none">
-                                                        <SelectItem value="XOF">XOF</SelectItem>
-                                                        <SelectItem value="USD">USD</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>Result</Label>
-                                            <div className="h-10 border px-3 py-2 flex items-center rounded-none bg-muted/50">
-                                                {convertedAmount !== null ? (
-                                                    <span>
-                                                        {formatCurrency(convertedAmount, toCurrency)}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-muted-foreground">
-                                                        Enter an amount to see conversion
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2 text-xs text-muted-foreground">
-                                        <p>{getCurrentRatesDisplay(conversionRates)}</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                            <CurrencyConverter conversionRates={conversionRates} />
                         )}
-
-                        <div className="flex justify-between items-center mb-4">
-                            <h1 className="text-2xl font-bold tracking-tight">Balance</h1>
-                            <div className="flex items-center space-x-4">
-                                <Select value={preferredCurrency} onValueChange={(value) => setPreferredCurrency(value as currency_code)}>
-                                    <SelectTrigger className="w-[180px] rounded-none">
-                                        <SelectValue placeholder="Select display currency" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="XOF">XOF (Default)</SelectItem>
-                                        <SelectItem value="USD">USD</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
                             {isBalanceBreakdownLoading || isRefreshing ? (
@@ -510,9 +301,19 @@ function BalancePage() {
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                             <CardTitle className="text-sm font-medium cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
                                                 {balance.currency_code} Balance
-                                                {balance.currency_code === preferredCurrency && (
+                                                {balance.currency_code === preferredCurrency ? (
                                                     <span className="ml-2 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                                         Default
+                                                    </span>
+                                                ) : (
+                                                    <span
+                                                        className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 cursor-pointer hover:bg-blue-50 hover:text-blue-700"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setPreferredCurrency(balance.currency_code);
+                                                        }}
+                                                    >
+                                                        Set Default
                                                     </span>
                                                 )}
                                             </CardTitle>
@@ -531,16 +332,11 @@ function BalancePage() {
                                                     >
                                                         <div className="flex flex-col">
                                                             <div className="text-2xl font-bold cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
-                                                                {formattedAvailableBalance[balance.currency_code] || formatCurrency(balance.available_balance, balance.currency_code)}
-                                                                {balance.currency_code === preferredCurrency && (
-                                                                    <span className="ml-2 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
-                                                                        Default
-                                                                    </span>
-                                                                )}
+                                                                {formatCurrency(balance.available_balance, balance.currency_code)}
                                                             </div>
                                                             {balance.currency_code !== preferredCurrency && (
                                                                 <div className="text-sm text-muted-foreground">
-                                                                    ≈ {formattedAvailableBalance[balance.currency_code] || formatCurrency(
+                                                                    ≈ {formatCurrency(
                                                                         balance.currency_code === 'USD'
                                                                             ? balance.available_balance * (
                                                                                 conversionRates?.find(rate =>
@@ -662,7 +458,7 @@ function BalancePage() {
                                                                     Total
                                                                 </span>
                                                                 <span className="text-sm font-medium">
-                                                                    {formattedTotalBalance[balance.currency_code] || formatCurrency(balance.total_balance, balance.currency_code)}
+                                                                    {formatCurrency(balance.total_balance, balance.currency_code)}
                                                                 </span>
                                                             </div>
                                                             <div className="flex justify-between">
@@ -670,7 +466,7 @@ function BalancePage() {
                                                                     Pending
                                                                 </span>
                                                                 <span className="text-sm font-medium text-blue-500 dark:text-yellow-500">
-                                                                    {formattedPendingBalance[balance.currency_code] || formatCurrency(balance.pending_balance, balance.currency_code)}
+                                                                    {formatCurrency(balance.pending_balance, balance.currency_code)}
                                                                 </span>
                                                             </div>
                                                             <div className="flex justify-between">
@@ -678,7 +474,7 @@ function BalancePage() {
                                                                     Available
                                                                 </span>
                                                                 <span className="text-sm font-medium text-green-500">
-                                                                    {formattedAvailableBalance[balance.currency_code] || formatCurrency(balance.available_balance, balance.currency_code)}
+                                                                    {formatCurrency(balance.available_balance, balance.currency_code)}
                                                                 </span>
                                                             </div>
                                                         </div>

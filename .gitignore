@@ -60,6 +60,7 @@ __pycache__/
 src/lib/scripts/
 src/utils/prompts
 .cursorrules
+/cursor
 
 # Cursor rules
 .cursorrules

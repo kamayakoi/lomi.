@@ -4,7 +4,7 @@ import { Payout, payout_status, BankAccount, BalanceBreakdown, currency_code, co
 import { DateRange } from 'react-day-picker'
 import { subDays, subMonths, startOfYear, format, parse } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { getConversionRates, findConversionRate } from './currency-utils'
+import { getConversionRates, findConversionRate } from './currency-converter-utils'
 
 export async function fetchPayouts(
     merchantId: string,

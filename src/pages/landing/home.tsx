@@ -84,7 +84,7 @@ export default function Page() {
           </div>
         </div>
 
-        <div className="scroll-footer bottom-0 left-0 mt-12 sm:mt-16 right-0 pb-0">
+        <div className="scroll-footer bottom-0 left-0 mt-12 sm:mt-32 right-0 pb-0">
           <Footer />
         </div>
       </main>

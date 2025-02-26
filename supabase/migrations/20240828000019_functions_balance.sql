@@ -278,7 +278,8 @@ RETURNS TABLE (
 ) AS $$
 DECLARE
     v_organization_id UUID;
-    v_latest_rates RECORD;
+    v_xof_to_usd NUMERIC(20,8);
+    v_usd_to_xof NUMERIC(20,8);
 BEGIN
     -- Get the organization ID for the merchant
     SELECT mol.organization_id INTO v_organization_id
@@ -286,8 +287,19 @@ BEGIN
     WHERE mol.merchant_id = p_merchant_id
     LIMIT 1;
 
-    -- Get latest conversion rates
-    SELECT * INTO v_latest_rates FROM fetch_latest_conversion_rates();
+    -- Get XOF to USD conversion rate
+    SELECT rate INTO v_xof_to_usd
+    FROM currency_conversion_rates
+    WHERE from_currency = 'XOF' AND to_currency = 'USD'
+    ORDER BY created_at DESC
+    LIMIT 1;
+
+    -- Get USD to XOF conversion rate
+    SELECT rate INTO v_usd_to_xof
+    FROM currency_conversion_rates
+    WHERE from_currency = 'USD' AND to_currency = 'XOF'
+    ORDER BY created_at DESC
+    LIMIT 1;
 
     RETURN QUERY
     WITH balances AS (
@@ -314,23 +326,23 @@ BEGIN
         b.total_balance,
         CASE
             WHEN p_target_currency = 'USD' AND b.currency_code = 'XOF' THEN
-                b.available_balance * v_latest_rates.xof_to_usd
+                b.available_balance * v_xof_to_usd
             WHEN p_target_currency = 'XOF' AND b.currency_code = 'USD' THEN
-                b.available_balance * v_latest_rates.usd_to_xof
+                b.available_balance * v_usd_to_xof
             ELSE b.available_balance
         END AS converted_available_balance,
         CASE
             WHEN p_target_currency = 'USD' AND b.currency_code = 'XOF' THEN
-                b.pending_balance * v_latest_rates.xof_to_usd
+                b.pending_balance * v_xof_to_usd
             WHEN p_target_currency = 'XOF' AND b.currency_code = 'USD' THEN
-                b.pending_balance * v_latest_rates.usd_to_xof
+                b.pending_balance * v_usd_to_xof
             ELSE b.pending_balance
         END AS converted_pending_balance,
         CASE
             WHEN p_target_currency = 'USD' AND b.currency_code = 'XOF' THEN
-                b.total_balance * v_latest_rates.xof_to_usd
+                b.total_balance * v_xof_to_usd
             WHEN p_target_currency = 'XOF' AND b.currency_code = 'USD' THEN
-                b.total_balance * v_latest_rates.usd_to_xof
+                b.total_balance * v_usd_to_xof
             ELSE b.total_balance
         END AS converted_total_balance,
         COALESCE(p_target_currency, b.currency_code) AS target_currency
