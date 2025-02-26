@@ -343,9 +343,9 @@ CREATE INDEX idx_merchant_accounts_currency_code ON merchant_accounts(currency_c
 CREATE TABLE team_balance_access_rules (
     rule_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID NOT NULL REFERENCES organizations(organization_id),
-    role_id UUID REFERENCES organization_roles(role_id),
     merchant_id UUID REFERENCES merchants(merchant_id),
     account_id UUID REFERENCES merchant_accounts(account_id),
+    role member_role NOT NULL,
     can_view BOOLEAN NOT NULL DEFAULT FALSE,
     can_withdraw BOOLEAN NOT NULL DEFAULT FALSE,
     approval_required BOOLEAN NOT NULL DEFAULT FALSE,
@@ -353,18 +353,16 @@ CREATE TABLE team_balance_access_rules (
     currency_code currency_code,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT role_or_merchant CHECK (role_id IS NOT NULL OR merchant_id IS NOT NULL),
     CONSTRAINT valid_limit CHECK (
         NOT can_withdraw OR 
         (can_withdraw AND (withdraw_limit IS NULL OR (withdraw_limit IS NOT NULL AND currency_code IS NOT NULL)))
     )
 );
 
-CREATE INDEX idx_balance_access_rules_organization_id ON balance_access_rules(organization_id);
-CREATE INDEX idx_balance_access_rules_role_id ON balance_access_rules(role_id);
-CREATE INDEX idx_balance_access_rules_merchant_id ON balance_access_rules(merchant_id);
-CREATE INDEX idx_balance_access_rules_account_id ON balance_access_rules(account_id);
-
+CREATE INDEX idx_team_balance_access_rules_organization_id ON team_balance_access_rules(organization_id);
+CREATE INDEX idx_team_balance_access_rules_merchant_id ON team_balance_access_rules(merchant_id);
+CREATE INDEX idx_team_balance_access_rules_account_id ON team_balance_access_rules(account_id);
+CREATE INDEX idx_team_balance_access_rules_role ON team_balance_access_rules(role);
 
 -- Merchant Outstanding Balance table
 CREATE TABLE merchant_outstanding_balance (
@@ -624,7 +622,6 @@ CREATE TABLE payment_group_items (
 CREATE INDEX idx_payment_group_items_group_id ON payment_group_items(group_id);
 CREATE INDEX idx_payment_group_items_transaction_id ON payment_group_items(transaction_id);
 CREATE INDEX idx_payment_group_items_status ON payment_group_items(status);
-CREATE INDEX idx_payment_group_config_organization_id ON payment_group_config(organization_id);
 
 -- Create a table for payment group configuration
 CREATE TABLE payment_group_config (
@@ -639,6 +636,8 @@ CREATE TABLE payment_group_config (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (organization_id)
 );
+
+CREATE INDEX idx_payment_group_config_organization_id ON payment_group_config(organization_id);
 
 -- Providers Transactions table
 CREATE TABLE providers_transactions (
@@ -949,10 +948,10 @@ CREATE TABLE api_interactions (
     api_key VARCHAR NOT NULL REFERENCES api_keys(api_key)
 );
 
-COMMENT ON TABLE customer_api_interactions IS 'Logs customer interactions with the API for debugging and analysis';
+COMMENT ON TABLE api_interactions IS 'Logs customer interactions with the API for debugging and analysis';
 
-CREATE INDEX idx_customer_api_interactions_api_key ON customer_api_interactions(api_key);
-CREATE INDEX idx_customer_api_interactions_organization_id ON customer_api_interactions(organization_id);
+CREATE INDEX idx_api_interactions_api_key ON api_interactions(api_key);
+CREATE INDEX idx_api_interactions_organization_id ON api_interactions(organization_id);
 
 -- API Rate Limits table
 CREATE TABLE api_rate_limits (

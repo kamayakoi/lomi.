@@ -49,7 +49,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql 
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp; 
 
 CREATE TRIGGER update_group_status
 AFTER INSERT OR UPDATE ON payment_group_items

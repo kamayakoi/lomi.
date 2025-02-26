@@ -20,9 +20,9 @@ VALUES
   ((SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Country 1', 'Region 1', 'City 1', '12345');
 
 -- Seed data for merchant_organization_links table
-INSERT INTO merchant_organization_links (merchant_id, organization_id, role, store_handle)
+INSERT INTO merchant_organization_links (merchant_id, organization_id, role, category, action, store_handle)
 VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'store1');
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 'Admin', 'accounts', 'view', 'store1');
 
 -- Seed data for merchant_products table with more products
 INSERT INTO merchant_products (merchant_id, organization_id, name, description, price, currency_code, image_url) VALUES
@@ -301,9 +301,10 @@ INSERT INTO customers (merchant_id, organization_id, name, email, phone_number, 
    'Abidjan');
 
 -- Seed data for merchant_subscriptions table with more active subscriptions
-INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, start_date, end_date, next_billing_date) VALUES
+INSERT INTO merchant_subscriptions (merchant_id, organization_id, plan_id, customer_id, status, start_date, end_date, next_billing_date) VALUES
   -- Existing subscriptions
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Basic Hosting Plan'),
    (SELECT customer_id FROM customers WHERE name = 'John Smith'),
    'active',
@@ -312,6 +313,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
 
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Premium Hosting Plan'),
    (SELECT customer_id FROM customers WHERE name = 'Tech Solutions Inc'),
    'active',
@@ -320,6 +322,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
 
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Enterprise Hosting Plan'),
    (SELECT customer_id FROM customers WHERE name = 'Global Corp'),
    'active',
@@ -328,6 +331,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 year'),
 
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Business Email Pro'),
    (SELECT customer_id FROM customers WHERE name = 'Digital Agency Pro'),
    'active',
@@ -336,6 +340,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
 
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Email Enterprise'),
    (SELECT customer_id FROM customers WHERE name = 'StartUp Hub'),
    'active',
@@ -345,6 +350,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    
   -- New subscriptions in XOF
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Website Builder Basic'),
    (SELECT customer_id FROM customers WHERE name = 'Sarah Johnson'),
    'active',
@@ -353,6 +359,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
    
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Website Builder Premium'),
    (SELECT customer_id FROM customers WHERE name = 'Innovative Solutions'),
    'active',
@@ -362,6 +369,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    
   -- New subscriptions in USD
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Cloud Storage Basic'),
    (SELECT customer_id FROM customers WHERE name = 'NextGen Retail'),
    'active',
@@ -370,6 +378,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
    
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'Cloud Storage Pro'),
    (SELECT customer_id FROM customers WHERE name = 'Michael Brown'),
    'active',
@@ -378,6 +387,7 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 month'),
    
   ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+   (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
    (SELECT plan_id FROM subscription_plans WHERE name = 'VPN Premium'),
    (SELECT customer_id FROM customers WHERE name = 'Emma Wilson'),
    'active',
@@ -386,13 +396,14 @@ INSERT INTO merchant_subscriptions (merchant_id, plan_id, customer_id, status, s
    CURRENT_DATE + INTERVAL '1 year');
 
 -- Create merchant accounts in XOF and USD
-INSERT INTO merchant_accounts (merchant_id, balance, currency_code) VALUES
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 50000.00, 'XOF'),
-  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), 2500.00, 'USD');
+INSERT INTO merchant_accounts (merchant_id, organization_id, balance, currency_code) VALUES
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 50000.00, 'XOF'),
+  ((SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'), (SELECT organization_id FROM organizations WHERE name = 'Organization 1'), 2500.00, 'USD');
 
 -- Create a bank account for the merchant
 INSERT INTO merchant_bank_accounts (
-  merchant_id, 
+  merchant_id,
+  organization_id,
   account_number, 
   account_name, 
   bank_name, 
@@ -403,6 +414,7 @@ INSERT INTO merchant_bank_accounts (
   is_valid
 ) VALUES (
   (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
+  (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
   '1234567890',
   'Merchant 1 Business Account',
   'Ecobank',
