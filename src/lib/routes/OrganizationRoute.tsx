@@ -46,8 +46,15 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
                     const firstOrg = orgs[0];
                     if (firstOrg) {
                         if (isProduction && !isPortalSubdomain) {
-                            // Redirect to portal subdomain
-                            window.location.href = `https://portal.lomi.africa/${firstOrg.organization_id}`;
+                            // Redirect to portal subdomain with auth state
+                            const session = await supabase.auth.getSession();
+                            const redirectUrl = `https://portal.lomi.africa/${firstOrg.organization_id}`;
+                            if (session.data.session) {
+                                // Store the current auth state before redirecting
+                                localStorage.setItem('pendingRedirect', redirectUrl);
+                                await supabase.auth.refreshSession();
+                            }
+                            window.location.href = redirectUrl;
                             return;
                         }
                         navigate(
@@ -60,7 +67,14 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
 
                 // If we're in production and not on portal subdomain, redirect
                 if (isProduction && !isPortalSubdomain) {
-                    window.location.href = `https://portal.lomi.africa${location.pathname}`;
+                    const session = await supabase.auth.getSession();
+                    const redirectUrl = `https://portal.lomi.africa${location.pathname}`;
+                    if (session.data.session) {
+                        // Store the current auth state before redirecting
+                        localStorage.setItem('pendingRedirect', redirectUrl);
+                        await supabase.auth.refreshSession();
+                    }
+                    window.location.href = redirectUrl;
                     return;
                 }
             } catch (error) {

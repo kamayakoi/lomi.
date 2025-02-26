@@ -14,10 +14,19 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
     const location = useLocation();
     const { isLoading, isAuthenticated } = useAuthStatus();
     const isPortalSubdomain = window.location.hostname.startsWith('portal.');
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
     useEffect(() => {
         if (!isLoading) {
             const currentPath = location.pathname;
+
+            // Handle portal subdomain redirection in production
+            if (isProduction && !isPortalSubdomain && currentPath.startsWith('/portal')) {
+                const portalPath = currentPath.replace('/portal', '');
+                const targetPath = portalPath || '/';
+                window.location.href = `https://portal.lomi.africa${targetPath}`;
+                return;
+            }
 
             if (!isAuthenticated) {
                 // Only redirect to sign-in if trying to access protected routes
@@ -33,7 +42,7 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
                 }
             }
         }
-    }, [isLoading, isAuthenticated, location, navigate, isPortalSubdomain]);
+    }, [isLoading, isAuthenticated, location, navigate, isPortalSubdomain, isProduction]);
 
     if (isLoading) {
         return <AnimatedLogoLoader />;

@@ -98,6 +98,14 @@ const AuthCallback = () => {
                     throw new Error('Failed to establish session after multiple attempts');
                 }
 
+                // Check for stored redirect from subdomain change
+                const pendingRedirect = localStorage.getItem('pendingRedirect');
+                if (pendingRedirect) {
+                    localStorage.removeItem('pendingRedirect');
+                    window.location.href = pendingRedirect;
+                    return;
+                }
+
                 // Only proceed with navigation when we have both session and loading state
                 if (!isLoading && finalSession) {
                     if (!isOnboarded) {
