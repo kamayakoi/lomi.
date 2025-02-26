@@ -281,7 +281,9 @@ export function Footer() {
                                             <GitHubIcon className="h-[20px] w-[20px] text-zinc-700 dark:text-zinc-300 hover:text-[#6e5494] dark:hover:text-[#6e5494] inline-flex items-center transition-colors" />
                                         </div>
                                         <div className="bg-transparent min-w-[54px] px-2 py-2 text-amber-500 hover:text-amber-600 border border-l-0 border-zinc-200 dark:border-zinc-800 h-full flex items-center justify-end">
-                                            <span className="text-right mr-1 font-bold text-amber-500 dark:text-amber-400">{t('footer.star')}</span>
+                                            <span className="text-right mr-1 font-bold text-amber-500 dark:text-amber-400">
+                                                {isLoading ? '...' : starCount}
+                                            </span>
                                             <Star className="h-4 w-4 fill-current flex-shrink-0" />
                                         </div>
                                     </Link>
