@@ -13,7 +13,6 @@ import { useQuery } from '@tanstack/react-query'
 import { format, subMonths, startOfYear, subDays } from 'date-fns'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { MerchantRevenueChart } from '@/pages/portal/reporting/components/charts/merchant-revenue-chart'
 import { ProviderDistributionChart } from '@/pages/portal/reporting/components/charts/provider-distribution-chart'
 import type { ChartType } from '@/components/charts/area-chart'
@@ -212,8 +211,4 @@ function getGranularity(selectedDateRange: string | null): '24H' | '7D' | '1M' |
     }
 }
 
-function ReportingWithActivationCheck() {
-    return withActivationCheck(ReportingPage)({});
-}
-export default ReportingWithActivationCheck;
-
+export default ReportingPage;

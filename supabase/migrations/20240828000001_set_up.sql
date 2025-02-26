@@ -4,6 +4,15 @@
 CREATE EXTENSION IF NOT EXISTS http WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions;
 
+-- Function to update the updated_at column
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
+
 -- Function to check if a column exists
 CREATE OR REPLACE FUNCTION column_exists(p_table_name text, p_column_name text)
 RETURNS boolean AS $$

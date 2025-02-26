@@ -7,7 +7,6 @@ import ContentSection from '@/components/portal/content-section'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from '@/utils/supabase/client'
 import { useSidebarData } from '@/lib/hooks/use-sidebar-data'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { AlertCircle } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { type CheckoutSettings } from '@/lib/types/checkout-settings'
@@ -159,5 +158,4 @@ function CheckoutSettingsPage() {
     )
 }
 
-const CheckoutSettingsWithActivationCheck = withActivationCheck(CheckoutSettingsPage)
-export default CheckoutSettingsWithActivationCheck
+export default CheckoutSettingsPage;

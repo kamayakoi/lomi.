@@ -17,7 +17,6 @@ import AnimatedLogoLoader from '@/components/portal/loader'
 import { PaymentLinkFilters } from './components/filters'
 import { fetchPaymentLinks } from './components/support'
 import { PaymentLink, link_type, currency_code } from './components/types'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Link2Icon } from 'lucide-react'
 import SupportForm from '@/components/portal/support-form'
 import PaymentLinkActions from './components/actions'
@@ -428,8 +427,4 @@ function PaymentLinksPage() {
   )
 }
 
-function PaymentLinksWithActivationCheck() {
-  return withActivationCheck(PaymentLinksPage)({});
-}
-
-export default PaymentLinksWithActivationCheck;
+export default PaymentLinksPage;

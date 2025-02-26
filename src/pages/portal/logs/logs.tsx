@@ -30,7 +30,6 @@ import { Log } from './components/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/portal/feedback-form'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 import { useQuery } from '@tanstack/react-query'
@@ -641,8 +640,4 @@ function LogCard({ log }: { log: Log }) {
     );
 }
 
-function LogsWithActivationCheck() {
-    return withActivationCheck(LogsPage)({})
-}
-
-export default LogsWithActivationCheck
+export default LogsPage;

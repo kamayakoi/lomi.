@@ -8,7 +8,6 @@ import { EyeIcon, EyeOffIcon, KeyRound, AlertCircle, PencilIcon, CheckIcon, X } 
 import { Skeleton } from "@/components/ui/skeleton"
 import ProfilePictureUploader from '@/components/auth/avatar-uploader'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from '@/components/custom/button';
 import { cn } from '@/lib/actions/utils';
@@ -980,8 +979,4 @@ function Profile() {
     )
 }
 
-function ProfileWithActivationCheck() {
-    return withActivationCheck(Profile)({});
-}
-
-export default ProfileWithActivationCheck;
+export default Profile;

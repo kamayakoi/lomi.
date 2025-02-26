@@ -24,7 +24,6 @@ import { PlusCircle, Edit, ImageIcon, ClipboardList, ChevronLeft, ChevronRight }
 import { useQuery } from '@tanstack/react-query'
 import ProductActions from './components/actions'
 import { EditProductForm } from './components/edit'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Card, CardContent } from "@/components/ui/card"
 import { fetchProducts, fetchProductFees } from './components/support'
 import { cn } from '@/lib/actions/utils'
@@ -512,8 +511,4 @@ function ProductsPage() {
     )
 }
 
-function ProductsWithActivationCheck() {
-    return withActivationCheck(ProductsPage)({});
-}
-
-export default ProductsWithActivationCheck;
+export default ProductsPage;

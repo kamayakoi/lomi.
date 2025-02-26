@@ -10,7 +10,7 @@ CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', '
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE kyc_status AS ENUM ('not_submitted', 'pending', 'not_authorized', 'approved', 'rejected');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE', 'BANK_TRANSFER', 'CRYPTO', 'PAYPAL', 'OTHER');
-CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR');
+CREATE TYPE currency_code AS ENUM ('XOF', 'USD', 'EUR', 'GHS', 'NGN', 'KES', 'MRO');
 CREATE TYPE payout_status AS ENUM ('pending', 'processing', 'completed', 'failed');
 CREATE TYPE dispute_status AS ENUM ('pending', 'resolved', 'closed');
 CREATE TYPE entity_type AS ENUM ('merchant', 'organization', 'platform');
@@ -106,6 +106,7 @@ CREATE TYPE provider_business_type AS ENUM ('fintech', 'other');
 CREATE TYPE permission_category AS ENUM ('payments', 'accounts', 'products', 'subscriptions', 'customers');
 CREATE TYPE permission_action AS ENUM ('view', 'create', 'edit', 'delete', 'approve');
 CREATE TYPE reconciliation_status AS ENUM ('pending', 'matched', 'partial_match', 'mismatch', 'resolved');
+CREATE TYPE conversion_type AS ENUM ('payment', 'withdrawal', 'refund', 'manual');
 
 --------------- TABLES ---------------
 
@@ -222,8 +223,8 @@ CREATE TABLE merchant_organization_links (
   organization_id UUID NOT NULL REFERENCES organizations(organization_id),
   role member_role NOT NULL,
   team_status team_status NOT NULL DEFAULT 'active',
-  category permission_category NOT NULL,
-  action permission_action NOT NULL,
+  category permission_category,
+  action permission_action,
   store_handle VARCHAR NOT NULL,
   organization_position VARCHAR,
   invitation_email VARCHAR,
@@ -277,6 +278,7 @@ CREATE TABLE organization_providers_settings (
     PRIMARY KEY (organization_id, provider_code),
     UNIQUE (organization_id, provider_code)
 );
+
 CREATE INDEX idx_org_providers_provider_code ON organization_providers_settings(provider_code);
 
 COMMENT ON TABLE organization_providers_settings IS 'Links organizations to their chosen payment providers';
@@ -338,6 +340,7 @@ CREATE TABLE merchant_accounts (
 COMMENT ON TABLE merchant_accounts IS 'Represents the account for each merchant, storing their balance in each currency';
 
 CREATE INDEX idx_merchant_accounts_currency_code ON merchant_accounts(currency_code);
+CREATE INDEX idx_merchant_accounts_merchant_id ON merchant_accounts(merchant_id);
 
 -- Balance access rules
 CREATE TABLE team_balance_access_rules (
@@ -514,6 +517,7 @@ COMMENT ON TYPE subscription_status IS 'Enum for subscription statuses:
 CREATE INDEX idx_merchant_subscriptions_customer_id ON merchant_subscriptions(customer_id);
 CREATE INDEX idx_merchant_subscriptions_merchant_id ON merchant_subscriptions(merchant_id);
 CREATE INDEX idx_merchant_subscriptions_plan_id ON merchant_subscriptions(plan_id);
+CREATE INDEX idx_merchant_subscriptions_organization_id ON merchant_subscriptions(organization_id);
 
 -- Fees table
 CREATE TABLE fees (
@@ -603,6 +607,7 @@ CREATE INDEX idx_payment_groups_customer_id ON payment_groups(customer_id);
 CREATE INDEX idx_payment_groups_product_id ON payment_groups(product_id);
 CREATE INDEX idx_payment_groups_subscription_id ON payment_groups(subscription_id);
 CREATE INDEX idx_payment_groups_status ON payment_groups(status);
+CREATE INDEX idx_payment_groups_currency_code ON payment_groups(currency_code);
 
 -- Individual payments within a group
 CREATE TABLE payment_group_items (
@@ -705,6 +710,7 @@ CREATE TABLE merchant_bank_accounts (
 );
 
 COMMENT ON TABLE merchant_bank_accounts IS 'Stores bank account information for merchants';
+CREATE INDEX idx_merchant_bank_accounts_organization_id ON merchant_bank_accounts(organization_id);
 
 -- Payouts table
 CREATE TABLE payouts (
@@ -785,6 +791,7 @@ CREATE TABLE webhooks (
 );
 
 COMMENT ON TABLE webhooks IS 'Configures webhook endpoints for real-time event notifications';
+CREATE INDEX idx_webhooks_organization_id ON webhooks(organization_id);
 
 -- Logs table
 CREATE TABLE logs (
@@ -849,6 +856,7 @@ COMMENT ON TABLE customer_invoices IS 'Stores invoice information for customers 
 CREATE INDEX idx_customer_invoices_currency_code ON customer_invoices(currency_code);
 CREATE INDEX idx_customer_invoices_customer_id ON customer_invoices(customer_id);
 CREATE INDEX idx_customer_invoices_merchant_id ON customer_invoices(merchant_id);
+CREATE INDEX idx_customer_invoices_organization_id ON customer_invoices(organization_id);
 
 -- Disputes table
 CREATE TABLE disputes (
@@ -919,6 +927,7 @@ CREATE TABLE support_requests (
 COMMENT ON TABLE support_requests IS 'Stores support requests submitted by merchants';
 
 CREATE INDEX idx_support_requests_merchant_id ON support_requests(merchant_id);
+CREATE INDEX idx_support_requests_organization_id ON support_requests(organization_id);
 
 -- Notifications table
 CREATE TABLE notifications (
@@ -1040,6 +1049,7 @@ CREATE INDEX idx_payment_requests_organization_id ON payment_requests(organizati
 CREATE INDEX idx_payment_requests_merchant_id ON payment_requests(merchant_id);
 CREATE INDEX idx_payment_requests_customer_id ON payment_requests(customer_id);
 CREATE INDEX idx_payment_requests_status ON payment_requests(status);
+CREATE INDEX idx_payment_requests_currency_code ON payment_requests(currency_code);
 
 -- Create a table for installment plans
 CREATE TABLE installment_plans (
@@ -1068,6 +1078,7 @@ CREATE INDEX idx_installment_plans_customer_id ON installment_plans(customer_id)
 CREATE INDEX idx_installment_plans_product_id ON installment_plans(product_id);
 CREATE INDEX idx_installment_plans_subscription_id ON installment_plans(subscription_id);
 CREATE INDEX idx_installment_plans_status ON installment_plans(status);
+CREATE INDEX idx_installment_plans_currency_code ON installment_plans(currency_code);
 
 -- Create a table for individual installments
 CREATE TABLE installment_payments (
@@ -1157,3 +1168,69 @@ COMMENT ON TABLE organization_fee_links IS 'Links organization fees to specific 
 CREATE INDEX idx_organization_fee_links_fee_type_id ON organization_fee_links(fee_type_id);
 CREATE INDEX idx_organization_fee_links_organization_id ON organization_fee_links(organization_id);
 CREATE INDEX idx_organization_fee_links_product_id ON organization_fee_links(product_id);
+
+-- Currency Conversion Rates
+CREATE TABLE IF NOT EXISTS public.currency_conversion_rates (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    from_currency currency_code NOT NULL,
+    to_currency currency_code NOT NULL,
+    rate NUMERIC(20,8) NOT NULL,
+    inverse_rate NUMERIC(20,8) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(from_currency, to_currency)
+);
+
+-- Enable RLS for currency_conversion_rates
+ALTER TABLE public.currency_conversion_rates ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policy for currency_conversion_rates
+CREATE POLICY "Allow authenticated users to read currency_conversion_rates"
+    ON public.currency_conversion_rates
+    FOR SELECT
+    TO authenticated
+    USING (true);
+
+CREATE INDEX idx_currency_conversion_rates_pair ON currency_conversion_rates(from_currency, to_currency);
+
+-- Currency Conversion History
+CREATE TABLE IF NOT EXISTS public.currency_conversion_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    from_currency currency_code NOT NULL,
+    to_currency currency_code NOT NULL,
+    original_amount NUMERIC(10,2) NOT NULL,
+    converted_amount NUMERIC(10,2) NOT NULL,
+    conversion_rate NUMERIC(10,8) NOT NULL,
+    conversion_type conversion_type NOT NULL,
+    payout_id UUID REFERENCES payouts(payout_id),
+    transaction_id UUID REFERENCES transactions(transaction_id),
+    refund_id UUID REFERENCES refunds(refund_id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Enable RLS for currency_conversion_history
+ALTER TABLE public.currency_conversion_history ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policy for currency_conversion_history
+CREATE POLICY "Allow merchants to read their own currency_conversion_history"
+    ON public.currency_conversion_history
+    FOR SELECT
+    TO authenticated
+    USING (
+        (SELECT auth.uid()) = merchant_id OR
+        EXISTS (
+            SELECT 1 FROM merchant_organization_links
+            WHERE merchant_organization_links.organization_id = currency_conversion_history.organization_id
+            AND merchant_organization_links.merchant_id = (SELECT auth.uid())
+        )
+    );
+
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_merchant ON currency_conversion_history(merchant_id);
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_organization ON currency_conversion_history(organization_id);
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_payout ON currency_conversion_history(payout_id);
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_transaction ON currency_conversion_history(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_refund ON currency_conversion_history(refund_id);
+CREATE INDEX IF NOT EXISTS idx_currency_conversion_history_created_at ON currency_conversion_history(created_at);

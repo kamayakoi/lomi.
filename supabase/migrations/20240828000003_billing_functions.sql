@@ -181,8 +181,8 @@ BEGIN
         'XOF',
         DATE_TRUNC('month', CURRENT_DATE + INTERVAL '1 month'),
         CASE 
-            WHEN v_outstanding_balance > 0 THEN 'sent'
-            ELSE 'paid'
+            WHEN v_outstanding_balance > 0 THEN 'sent'::invoice_status
+            ELSE 'paid'::invoice_status
         END,
         jsonb_build_object(
             'invoice_date', CURRENT_DATE,

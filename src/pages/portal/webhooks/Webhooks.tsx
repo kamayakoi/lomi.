@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/table"
 import { useQuery } from '@tanstack/react-query'
 import WebhookActions from './components/edit'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from "@/components/ui/badge"
@@ -413,8 +412,4 @@ function WebhooksPage() {
     )
 }
 
-function WebhooksWithActivationCheck() {
-    return withActivationCheck(WebhooksPage)({});
-}
-
-export default WebhooksWithActivationCheck;
+export default WebhooksPage;

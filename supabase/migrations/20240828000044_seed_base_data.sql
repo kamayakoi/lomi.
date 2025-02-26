@@ -47,4 +47,24 @@ INSERT INTO payment_methods (payment_method_code, provider_code) VALUES
 INSERT INTO currencies (code, name) VALUES
   ('XOF', 'West African CFA franc'), 
   ('USD', 'United States dollar'),
-  ('EUR', 'Euro');
+  ('EUR', 'Euro'),
+  ('GHS', 'Ghanaian cedi'),
+  ('NGN', 'Nigerian naira'),
+  ('KES', 'Kenyan shilling'),
+  ('MRO', 'Mauritanian ouguiya');
+
+
+-- Seed default conversion rates
+INSERT INTO currency_conversion_rates (from_currency, to_currency, rate, inverse_rate) VALUES
+  ('XOF', 'USD', 0.00165, 605.00),
+  ('USD', 'XOF', 605.00, 0.00165),
+  ('XOF', 'EUR', 0.0015, 666.67),
+  ('EUR', 'XOF', 666.67, 0.0015),
+  ('GHS', 'XOF', 250000.00, 0.000004),
+  ('XOF', 'GHS', 0.000004, 250000.00),
+  ('XOF', 'NGN', 0.000004, 250000.00),
+  ('NGN', 'XOF', 250000.00, 0.000004),
+  ('XOF', 'KES', 0.000004, 250000.00),
+  ('KES', 'XOF', 250000.00, 0.000004),
+  ('XOF', 'MRO', 0.000004, 250000.00),
+  ('MRO', 'XOF', 250000.00, 0.000004);

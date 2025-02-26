@@ -1,6 +1,3 @@
--- Drop the function if it exists to avoid conflicts
-DROP FUNCTION IF EXISTS public.fetch_mrr_metrics_custom_range;
-
 -- Create the MRR metrics function with improved historical data handling
 CREATE OR REPLACE FUNCTION public.fetch_mrr_metrics_custom_range(
     p_merchant_id UUID,

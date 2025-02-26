@@ -259,6 +259,123 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_conversion_history: {
+        Row: {
+          conversion_rate: number
+          conversion_type: Database["public"]["Enums"]["conversion_type"]
+          converted_amount: number
+          created_at: string
+          from_currency: Database["public"]["Enums"]["currency_code"]
+          id: string
+          merchant_id: string
+          organization_id: string
+          original_amount: number
+          payout_id: string | null
+          refund_id: string | null
+          to_currency: Database["public"]["Enums"]["currency_code"]
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          conversion_rate: number
+          conversion_type: Database["public"]["Enums"]["conversion_type"]
+          converted_amount: number
+          created_at?: string
+          from_currency: Database["public"]["Enums"]["currency_code"]
+          id?: string
+          merchant_id: string
+          organization_id: string
+          original_amount: number
+          payout_id?: string | null
+          refund_id?: string | null
+          to_currency: Database["public"]["Enums"]["currency_code"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          conversion_rate?: number
+          conversion_type?: Database["public"]["Enums"]["conversion_type"]
+          converted_amount?: number
+          created_at?: string
+          from_currency?: Database["public"]["Enums"]["currency_code"]
+          id?: string
+          merchant_id?: string
+          organization_id?: string
+          original_amount?: number
+          payout_id?: string | null
+          refund_id?: string | null
+          to_currency?: Database["public"]["Enums"]["currency_code"]
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "currency_conversion_history_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["merchant_id"]
+          },
+          {
+            foreignKeyName: "currency_conversion_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["organization_id"]
+          },
+          {
+            foreignKeyName: "currency_conversion_history_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "payouts"
+            referencedColumns: ["payout_id"]
+          },
+          {
+            foreignKeyName: "currency_conversion_history_refund_id_fkey"
+            columns: ["refund_id"]
+            isOneToOne: false
+            referencedRelation: "refunds"
+            referencedColumns: ["refund_id"]
+          },
+          {
+            foreignKeyName: "currency_conversion_history_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["transaction_id"]
+          },
+        ]
+      }
+      currency_conversion_rates: {
+        Row: {
+          created_at: string
+          from_currency: Database["public"]["Enums"]["currency_code"]
+          id: string
+          inverse_rate: number
+          rate: number
+          to_currency: Database["public"]["Enums"]["currency_code"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_currency: Database["public"]["Enums"]["currency_code"]
+          id?: string
+          inverse_rate: number
+          rate: number
+          to_currency: Database["public"]["Enums"]["currency_code"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_currency?: Database["public"]["Enums"]["currency_code"]
+          id?: string
+          inverse_rate?: number
+          rate?: number
+          to_currency?: Database["public"]["Enums"]["currency_code"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customer_invoices: {
         Row: {
           amount: number
@@ -894,8 +1011,8 @@ export type Database = {
       }
       merchant_organization_links: {
         Row: {
-          action: Database["public"]["Enums"]["permission_action"]
-          category: Database["public"]["Enums"]["permission_category"]
+          action: Database["public"]["Enums"]["permission_action"] | null
+          category: Database["public"]["Enums"]["permission_category"] | null
           created_at: string
           how_did_you_hear_about_us: string | null
           invitation_email: string | null
@@ -910,8 +1027,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          action: Database["public"]["Enums"]["permission_action"]
-          category: Database["public"]["Enums"]["permission_category"]
+          action?: Database["public"]["Enums"]["permission_action"] | null
+          category?: Database["public"]["Enums"]["permission_category"] | null
           created_at?: string
           how_did_you_hear_about_us?: string | null
           invitation_email?: string | null
@@ -926,8 +1043,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          action?: Database["public"]["Enums"]["permission_action"]
-          category?: Database["public"]["Enums"]["permission_category"]
+          action?: Database["public"]["Enums"]["permission_action"] | null
+          category?: Database["public"]["Enums"]["permission_category"] | null
           created_at?: string
           how_did_you_hear_about_us?: string | null
           invitation_email?: string | null
@@ -3045,6 +3162,18 @@ export type Database = {
         }
         Returns: undefined
       }
+      convert_currency: {
+        Args: {
+          p_amount: number
+          p_from_currency: Database["public"]["Enums"]["currency_code"]
+          p_to_currency: Database["public"]["Enums"]["currency_code"]
+          p_merchant_id?: string
+          p_organization_id?: string
+          p_conversion_type?: Database["public"]["Enums"]["conversion_type"]
+          p_reference_id?: string
+        }
+        Returns: number
+      }
       create_bank_account: {
         Args: {
           p_account_number: string
@@ -3396,11 +3525,17 @@ export type Database = {
       fetch_balance_breakdown: {
         Args: {
           p_merchant_id: string
+          p_target_currency?: Database["public"]["Enums"]["currency_code"]
         }
         Returns: {
+          currency_code: Database["public"]["Enums"]["currency_code"]
           available_balance: number
           pending_balance: number
           total_balance: number
+          converted_available_balance: number
+          converted_pending_balance: number
+          converted_total_balance: number
+          target_currency: Database["public"]["Enums"]["currency_code"]
         }[]
       }
       fetch_bank_accounts: {
@@ -3563,6 +3698,19 @@ export type Database = {
           p_end_date?: string
         }
         Returns: number
+      }
+      fetch_latest_conversion_rates: {
+        Args: {
+          p_from_currency?: Database["public"]["Enums"]["currency_code"]
+          p_to_currency?: Database["public"]["Enums"]["currency_code"]
+        }
+        Returns: {
+          from_currency: Database["public"]["Enums"]["currency_code"]
+          to_currency: Database["public"]["Enums"]["currency_code"]
+          rate: number
+          inverse_rate: number
+          created_at: string
+        }[]
       }
       fetch_logs: {
         Args: {
@@ -4454,6 +4602,7 @@ export type Database = {
           p_merchant_id: string
           p_amount: number
           p_bank_account_id: string
+          p_currency_code?: Database["public"]["Enums"]["currency_code"]
         }
         Returns: {
           success: boolean
@@ -4544,6 +4693,17 @@ export type Database = {
       rollover_provider_balance_quarterly: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      save_conversion_rates: {
+        Args: {
+          p_from_currency: Database["public"]["Enums"]["currency_code"]
+          p_to_currency: Database["public"]["Enums"]["currency_code"]
+          p_rate: number
+        }
+        Returns: {
+          success: boolean
+          message: string
+        }[]
       }
       send_activation_request_notification: {
         Args: {
@@ -4910,7 +5070,8 @@ export type Database = {
       }
     }
     Enums: {
-      currency_code: "XOF" | "USD" | "EUR"
+      conversion_type: "payment" | "withdrawal" | "refund" | "manual"
+      currency_code: "XOF" | "USD" | "EUR" | "GHS" | "NGN" | "KES" | "MRO"
       dispute_status: "pending" | "resolved" | "closed"
       entity_type: "merchant" | "organization" | "platform"
       event_type:

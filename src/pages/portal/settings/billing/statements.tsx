@@ -3,7 +3,6 @@ import ContentSection from '@/components/portal/content-section'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Download, FileText, ChevronRight, Loader2, ArrowDownIcon } from 'lucide-react'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { supabase } from '@/utils/supabase/client'
 import { format } from 'date-fns'
 import { toast } from "@/lib/hooks/use-toast"
@@ -32,7 +31,7 @@ interface Statement {
     metadata: StatementMetadata;
 }
 
-function BillingStatements() {
+function Statements() {
     const [last30DaysFees, setLast30DaysFees] = useState(0)
     const [lastMonthFees, setLastMonthFees] = useState(0)
     const [outstandingBalance, setOutstandingBalance] = useState(0)
@@ -309,8 +308,4 @@ function BillingStatements() {
     )
 }
 
-function StatementsWithActivationCheck() {
-    return withActivationCheck(BillingStatements)({});
-}
-
-export default StatementsWithActivationCheck;
+export default Statements;

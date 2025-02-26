@@ -425,49 +425,41 @@ INSERT INTO merchant_bank_accounts (
   true
 );
 
--- Seed data for transactions table with more transactions
-INSERT INTO transactions (
-    merchant_id, 
-    organization_id, 
-    customer_id, 
-    subscription_id,
-    transaction_type,
-    status,
-    description,
-    gross_amount,
-    fee_amount,
-    net_amount,
-    fee_reference,
-    currency_code,
-    provider_code,
-    payment_method_code
-) 
-SELECT
-    m.merchant_id,
-    o.organization_id,
+-- Update subscription amounts to more realistic values
+UPDATE subscription_plans SET amount = 29999.99 WHERE name = 'Basic Hosting Plan' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 59999.99 WHERE name = 'Premium Hosting Plan' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 299999.99 WHERE name = 'Enterprise Hosting Plan' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 39999.99 WHERE name = 'Business Email Pro' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 89999.99 WHERE name = 'Email Enterprise' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 19999.99 WHERE name = 'Website Builder Basic' AND currency_code = 'XOF';
+UPDATE subscription_plans SET amount = 49999.99 WHERE name = 'Website Builder Premium' AND currency_code = 'XOF';
+
+UPDATE subscription_plans SET amount = 49.99 WHERE name = 'Cloud Storage Basic' AND currency_code = 'USD';
+UPDATE subscription_plans SET amount = 99.99 WHERE name = 'Cloud Storage Pro' AND currency_code = 'USD';
+UPDATE subscription_plans SET amount = 9.99 WHERE name = 'VPN Basic' AND currency_code = 'USD';
+UPDATE subscription_plans SET amount = 99.99 WHERE name = 'VPN Premium' AND currency_code = 'USD';
+
+-- Clear existing transactions to rebuild them
+TRUNCATE TABLE transactions CASCADE;
+
+-- Insert subscription transactions (last 3 months, monthly payments)
+WITH subscription_data AS (
+  SELECT 
+    ms.merchant_id,
+    ms.organization_id,
     ms.customer_id,
     ms.subscription_id,
-    'payment'::transaction_type,
-    'completed'::transaction_status,
-    sp.name || ' - Monthly Subscription',
     sp.amount,
-    sp.amount * 0.05,  -- 5% fee
-    sp.amount * 0.95,  -- net amount after fee
-    'Processing Fee',
     sp.currency_code,
-    (ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[])[floor(random() * 4 + 1)],
-    (ARRAY['MOBILE_MONEY', 'E_WALLET', 'CARDS']::payment_method_code[])[floor(random() * 3 + 1)]
-FROM merchant_subscriptions ms
-JOIN subscription_plans sp ON ms.plan_id = sp.plan_id
-JOIN merchants m ON ms.merchant_id = m.merchant_id
-JOIN organizations o ON sp.organization_id = o.organization_id
-WHERE ms.status = 'active';
-
--- Add historical transactions for the past 3 months for subscriptions
+    generate_series(1, 3) as month
+  FROM merchant_subscriptions ms
+  JOIN subscription_plans sp ON ms.plan_id = sp.plan_id
+  WHERE ms.status = 'active'
+)
 INSERT INTO transactions (
-    merchant_id, 
-    organization_id, 
-    customer_id, 
+    merchant_id,
+    organization_id,
+    customer_id,
     subscription_id,
     transaction_type,
     status,
@@ -475,37 +467,35 @@ INSERT INTO transactions (
     gross_amount,
     fee_amount,
     net_amount,
-    fee_reference,
     currency_code,
     provider_code,
     payment_method_code,
+    fee_reference,
     created_at
 )
-SELECT
-    m.merchant_id,
-    o.organization_id,
-    ms.customer_id,
-    ms.subscription_id,
-    'payment'::transaction_type,
-    'completed'::transaction_status,
-    sp.name || ' - Monthly Subscription',
-    sp.amount,
-    sp.amount * 0.05,
-    sp.amount * 0.95,
-    'Processing Fee',
-    sp.currency_code,
-    (ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[])[floor(random() * 4 + 1)],
-    (ARRAY['MOBILE_MONEY', 'E_WALLET', 'CARDS']::payment_method_code[])[floor(random() * 3 + 1)],
-    CURRENT_DATE - (n || ' days')::interval
-FROM merchant_subscriptions ms
-JOIN subscription_plans sp ON ms.plan_id = sp.plan_id
-JOIN merchants m ON ms.merchant_id = m.merchant_id
-JOIN organizations o ON sp.organization_id = o.organization_id
-CROSS JOIN generate_series(1, 90) n
-WHERE ms.status = 'active'
-AND n % 30 = 0;  -- Create a transaction every 30 days
+SELECT 
+    merchant_id,
+    organization_id,
+    customer_id,
+    subscription_id,
+    'payment',
+    'completed',
+    'Monthly subscription payment',
+    amount,
+    amount * 0.035, -- 3.5% fee
+    amount * 0.965, -- Net amount after fee
+    currency_code,
+    (ARRAY['ORANGE'::provider_code, 'WAVE'::provider_code, 'MTN'::provider_code, 'MOOV'::provider_code])[floor(random() * 4 + 1)],
+    'MOBILE_MONEY',
+    CASE 
+        WHEN currency_code = 'XOF' THEN 'Platform Processing Fee'
+        WHEN currency_code = 'USD' THEN 'Platform Processing Fee'
+        ELSE 'Platform Processing Fee'
+    END,
+    CURRENT_DATE - ((month - 1) || ' months')::interval
+FROM subscription_data;
 
--- Add transactions for one-time product purchases
+-- Insert one-time product purchases
 INSERT INTO transactions (
     merchant_id,
     organization_id,
@@ -517,10 +507,10 @@ INSERT INTO transactions (
     gross_amount,
     fee_amount,
     net_amount,
-    fee_reference,
     currency_code,
     provider_code,
     payment_method_code,
+    fee_reference,
     created_at
 )
 SELECT
@@ -528,229 +518,130 @@ SELECT
     o.organization_id,
     c.customer_id,
     p.product_id,
-    'payment'::transaction_type,
-    'completed'::transaction_status,
+    'payment',
+    'completed',
     'Purchase of ' || p.name,
     p.price,
-    p.price * 0.05,
-    p.price * 0.95,
-    'Processing Fee',
+    p.price * 0.035, -- 3.5% fee
+    p.price * 0.965, -- Net amount after fee
     p.currency_code,
-    (ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV', 'ECOBANK']::provider_code[])[floor(random() * 5 + 1)],
-    (ARRAY['MOBILE_MONEY', 'E_WALLET', 'CARDS', 'BANK_TRANSFER']::payment_method_code[])[floor(random() * 4 + 1)],
+    (ARRAY['ORANGE'::provider_code, 'WAVE'::provider_code, 'MTN'::provider_code, 'MOOV'::provider_code])[floor(random() * 4 + 1)],
+    'MOBILE_MONEY',
+    CASE 
+        WHEN p.currency_code = 'XOF' THEN 'Platform Processing Fee'
+        WHEN p.currency_code = 'USD' THEN 'Platform Processing Fee'
+        ELSE 'Platform Processing Fee'
+    END,
+    CURRENT_DATE - (floor(random() * 90) || ' days')::interval
+FROM merchant_products p
+CROSS JOIN LATERAL (
+    SELECT customer_id 
+    FROM customers 
+    WHERE merchant_id = p.merchant_id 
+    ORDER BY random() 
+    LIMIT 1
+) c
+JOIN merchants m ON p.merchant_id = m.merchant_id
+JOIN organizations o ON p.organization_id = o.organization_id
+LIMIT 50;
+
+-- Add some refunded transactions
+INSERT INTO transactions (
+    merchant_id,
+    organization_id,
+    customer_id,
+    product_id,
+    transaction_type,
+    status,
+    description,
+    gross_amount,
+    fee_amount,
+    net_amount,
+    currency_code,
+    provider_code,
+    payment_method_code,
+    fee_reference,
+    created_at
+)
+SELECT
+    m.merchant_id,
+    o.organization_id,
+    c.customer_id,
+    p.product_id,
+    'payment',
+    'refunded',
+    'Purchase of ' || p.name || ' (Refunded)',
+    p.price,
+    p.price * 0.035,
+    p.price * 0.965,
+    p.currency_code,
+    (ARRAY['ORANGE'::provider_code, 'WAVE'::provider_code, 'MTN'::provider_code, 'MOOV'::provider_code])[floor(random() * 4 + 1)],
+    'MOBILE_MONEY',
+    CASE 
+        WHEN p.currency_code = 'XOF' THEN 'Platform Processing Fee'
+        WHEN p.currency_code = 'USD' THEN 'Platform Processing Fee'
+        ELSE 'Platform Processing Fee'
+    END,
     CURRENT_DATE - (floor(random() * 60) || ' days')::interval
 FROM merchant_products p
+CROSS JOIN LATERAL (
+    SELECT customer_id 
+    FROM customers 
+    WHERE merchant_id = p.merchant_id 
+    ORDER BY random() 
+    LIMIT 1
+) c
 JOIN merchants m ON p.merchant_id = m.merchant_id
 JOIN organizations o ON p.organization_id = o.organization_id
-CROSS JOIN customers c
-WHERE c.merchant_id = m.merchant_id
-AND c.organization_id = o.organization_id
-ORDER BY random()
-LIMIT 50;  -- Create 50 random product transactions
+LIMIT 10;
 
--- Create payment links for products
-INSERT INTO payment_links (
-    merchant_id,
-    organization_id,
-    link_type,
-    url,
-    product_id,
-    title,
-    public_description,
-    private_description,
-    currency_code,
-    allowed_providers,
-    is_active,
-    success_url,
-    cancel_url
-)
-SELECT
-    m.merchant_id,
-    o.organization_id,
-    'product'::link_type,
-    'https://pay.lomi.africa/p/' || encode(gen_random_bytes(8), 'hex'),
-    p.product_id,
-    'Pay for ' || p.name,
-    'Purchase ' || p.name,
-    'Internal payment link for ' || p.name,
-    p.currency_code,
-    ARRAY['ORANGE', 'WAVE', 'MTN']::provider_code[],
-    true,
-    'https://example.com/success',
-    'https://example.com/cancel'
-FROM merchant_products p
-JOIN merchants m ON p.merchant_id = m.merchant_id
-JOIN organizations o ON p.organization_id = o.organization_id
-WHERE p.name IN ('Premium Web Hosting', 'Business Email Suite', 'Website Builder Pro', 'SEO Optimization Package', 'Cloud Storage Premium');
-
--- Create payment links for subscription plans
-INSERT INTO payment_links (
-    merchant_id,
-    organization_id,
-    link_type,
-    url,
-    plan_id,
-    title,
-    public_description,
-    private_description,
-    currency_code,
-    allowed_providers,
-    is_active,
-    success_url,
-    cancel_url
-)
-SELECT
-    m.merchant_id,
-    o.organization_id,
-    'plan'::link_type,
-    'https://pay.lomi.africa/s/' || encode(gen_random_bytes(8), 'hex'),
-    sp.plan_id,
-    'Subscribe to ' || sp.name,
-    'Subscribe to our ' || sp.name,
-    'Internal subscription link for ' || sp.name,
-    sp.currency_code,
-    ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[],
-    true,
-    'https://example.com/success',
-    'https://example.com/cancel'
-FROM subscription_plans sp
-JOIN merchants m ON sp.merchant_id = m.merchant_id
-JOIN organizations o ON sp.organization_id = o.organization_id
-WHERE sp.name IN ('Basic Hosting Plan', 'Premium Hosting Plan', 'Website Builder Premium', 'Cloud Storage Pro', 'VPN Premium');
-
--- Create instant payment links
-INSERT INTO payment_links (
-    merchant_id,
-    organization_id,
-    link_type,
-    url,
-    title,
-    public_description,
-    private_description,
-    price,
-    currency_code,
-    allowed_providers,
-    is_active,
-    success_url,
-    cancel_url
-)
-VALUES
-    (
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        'instant'::link_type,
-        'https://pay.lomi.africa/i/' || encode(gen_random_bytes(8), 'hex'),
-        'Custom Website Development',
-        'Custom website development service',
-        'One-time payment for custom website development',
-        1499.99,
-        'XOF',
-        ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[],
-        true,
-        'https://example.com/success',
-        'https://example.com/cancel'
-    ),
-    (
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        'instant'::link_type,
-        'https://pay.lomi.africa/i/' || encode(gen_random_bytes(8), 'hex'),
-        'Logo Design Service',
-        'Professional logo design service',
-        'One-time payment for logo design',
-        299.99,
-        'XOF',
-        ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV']::provider_code[],
-        true,
-        'https://example.com/success',
-        'https://example.com/cancel'
-    ),
-    (
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        'instant'::link_type,
-        'https://pay.lomi.africa/i/' || encode(gen_random_bytes(8), 'hex'),
-        'Premium Support Package',
-        'One-time premium support package',
-        'One-time payment for premium support',
-        199.99,
-        'USD',
-        ARRAY['ORANGE', 'WAVE', 'MTN', 'MOOV', 'PAYPAL']::provider_code[],
-        true,
-        'https://example.com/success',
-        'https://example.com/cancel'
-    );
-
--- Create payouts for the merchant
-INSERT INTO payouts (
-    account_id,
-    merchant_id,
-    organization_id,
-    bank_account_id,
+-- Insert refund records for refunded transactions
+INSERT INTO refunds (
+    transaction_id,
     amount,
-    currency_code,
+    refunded_amount,
+    fee_amount,
+    reason,
     status,
     created_at
 )
-VALUES
-    (
-        (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND currency_code = 'XOF'),
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
-        10000.00,
-        'XOF',
-        'completed',
-        CURRENT_DATE - INTERVAL '30 days'
-    ),
-    (
-        (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND currency_code = 'XOF'),
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
-        15000.00,
-        'XOF',
-        'completed',
-        CURRENT_DATE - INTERVAL '15 days'
-    ),
-    (
-        (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND currency_code = 'XOF'),
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
-        5000.00,
-        'XOF',
-        'pending',
-        CURRENT_DATE - INTERVAL '2 days'
-    ),
-    (
-        (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND currency_code = 'USD'),
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
-        500.00,
-        'USD',
-        'completed',
-        CURRENT_DATE - INTERVAL '20 days'
-    ),
-    (
-        (SELECT account_id FROM merchant_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1') AND currency_code = 'USD'),
-        (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1'),
-        (SELECT organization_id FROM organizations WHERE name = 'Organization 1'),
-        (SELECT bank_account_id FROM merchant_bank_accounts WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1')),
-        750.00,
-        'USD',
-        'processing',
-        CURRENT_DATE - INTERVAL '5 days'
-    );
+SELECT
+    t.transaction_id,
+    t.gross_amount,
+    t.gross_amount,
+    t.fee_amount,
+    'Customer requested refund',
+    'completed',
+    t.created_at + interval '2 days'
+FROM transactions t
+WHERE t.status = 'refunded';
+
+-- Calculate total inflow for each currency
+WITH transaction_totals AS (
+    SELECT 
+        currency_code,
+        SUM(CASE 
+            WHEN status = 'completed' THEN net_amount
+            WHEN status = 'refunded' THEN -net_amount
+            ELSE 0
+        END) as net_total
+    FROM transactions
+    GROUP BY currency_code
+)
+-- Update merchant account balances based on transaction history minus payouts
+UPDATE merchant_accounts ma
+SET balance = tt.net_total - COALESCE(
+    (SELECT SUM(amount)
+     FROM payouts p
+     WHERE p.currency_code = ma.currency_code
+     AND p.status = 'completed'),
+    0
+)
+FROM transaction_totals tt
+WHERE ma.currency_code = tt.currency_code;
 
 -- Re-enable triggers
 SET session_replication_role = 'origin';
-
--- This will trigger the MRR calculation
-UPDATE merchant_subscriptions
-SET updated_at = NOW()
-WHERE merchant_id = (SELECT merchant_id FROM merchants WHERE name = 'Merchant 1');
 
 -- Commit transaction
 COMMIT;

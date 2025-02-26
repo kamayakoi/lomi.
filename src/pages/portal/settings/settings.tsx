@@ -15,7 +15,6 @@ import SupportForm from '@/components/portal/support-form'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SidebarNav from '@/components/portal/settings-sidebar-nav'
 import { TopNav } from '@/components/portal/top-nav'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { useState } from 'react'
@@ -172,9 +171,7 @@ function Settings() {
   )
 }
 
-const SettingsWithActivationCheck = withActivationCheck(Settings);
-
-export default SettingsWithActivationCheck;
+export default Settings;
 
 export function SettingsIndex() {
   const { organizationId } = useParams()

@@ -22,7 +22,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 
 
 type Transaction = TransactionType
@@ -767,11 +766,7 @@ function TransactionsPage() {
     )
 }
 
-function TransactionsWithActivationCheck() {
-    return withActivationCheck(TransactionsPage)({});
-}
-
-export default TransactionsWithActivationCheck;
+export default TransactionsPage;
 
 function formatPaymentMethod(paymentMethod: payment_method_code): string {
     switch (paymentMethod) {

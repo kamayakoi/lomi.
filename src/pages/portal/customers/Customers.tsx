@@ -38,7 +38,6 @@ import {
 import { countries } from '@/lib/data/onboarding'
 import { CustomerFilters } from './components/filters'
 import { EditCustomerForm } from './components/edit'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/lib/hooks/use-toast"
@@ -597,8 +596,4 @@ function CustomersPage() {
     )
 }
 
-function CustomersWithActivationCheck() {
-    return withActivationCheck(CustomersPage)({});
-}
-
-export default CustomersWithActivationCheck;
+export default CustomersPage;

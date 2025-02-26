@@ -25,7 +25,6 @@ import {
 import { PlusCircle, Edit, ArrowUpDown } from 'lucide-react'
 import SubscriptionActions from './components/actions'
 import { EditPlanForm } from './components/edit'
-import { withActivationCheck } from '@/components/custom/with-activation-check'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { ClipboardList, ImageIcon } from 'lucide-react'
@@ -634,8 +633,4 @@ function SubscriptionsPage() {
   )
 }
 
-function SubscriptionsWithActivationCheck() {
-  return withActivationCheck(SubscriptionsPage)({});
-}
-
-export default SubscriptionsWithActivationCheck;
+export default SubscriptionsPage;
