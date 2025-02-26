@@ -72,85 +72,7 @@ import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts';
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications';
 import AnimatedLogoLoader from './components/portal/loader';
 
-const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-const isPortalSubdomain = window.location.hostname.startsWith('portal.');
-
 const AppRouter = () => {
-    // If we're in production and on the portal subdomain, only show portal routes
-    if (isProduction && isPortalSubdomain) {
-        return (
-            <Routes>
-                {/* Auth routes */}
-                <Route path="/sign-in" element={<Signin />} />
-                <Route path="/log-in" element={<Login />} />
-                <Route path="/sign-up" element={<Signup />} />
-                <Route path="/forgot-password" element={<Forgot />} />
-                <Route path="/otp" element={<OTP />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/auth/connect/email-verified" element={<EmailVerified />} />
-                <Route path="/onboarding" element={
-                    <OnboardingRoute>
-                        <Onboarding />
-                    </OnboardingRoute>
-                } />
-
-                {/* Protected routes */}
-                <Route path="/" element={
-                    <ProtectedRoute>
-                        <OrganizationRoute>
-                            <AppShell />
-                        </OrganizationRoute>
-                    </ProtectedRoute>
-                }>
-                    <Route path=":organizationId">
-                        <Route index element={<Dashboard />} />
-                        <Route path="integrations" element={<Integrators />} />
-                        <Route path="subscription" element={<Subscription />} />
-                        <Route path="product" element={
-                            <Suspense fallback={<AnimatedLogoLoader />}>
-                                <Product />
-                            </Suspense>
-                        } />
-                        <Route path="payment-channels" element={<PaymentChannels />} />
-                        <Route path="logs" element={<Logs />} />
-                        <Route path="balance" element={<Balance />} />
-                        <Route path="transactions" element={<Transactions />} />
-                        <Route path="reporting" element={
-                            <Suspense fallback={<AnimatedLogoLoader />}>
-                                <Reporting />
-                            </Suspense>
-                        } />
-                        <Route path="webhooks" element={<Webhooks />} />
-                        <Route path="payment-links" element={<PaymentLinks />} />
-                        <Route path="storefront" element={<Storefront />} />
-                        <Route path="customers" element={<Customers />} />
-                        <Route path="settings" element={<Settings />}>
-                            <Route path="receiving-money/payment-methods" element={<PaymentMethods />} />
-                            <Route path="receiving-money/checkout" element={<CheckoutSettings />} />
-                            <Route path="sending-money/disbursements" element={<Disbursements />} />
-                            <Route path="sending-money/notifications" element={<DisbursementNotifications />} />
-                            <Route path="business" element={<Business />} />
-                            <Route path="profile" element={<Profile />} />
-                            <Route path="billing/statements" element={<BillingStatements />} />
-                            <Route path="billing/fee-structure" element={<FeeStructure />} />
-                            <Route path="developers/api-keys" element={<ApiKeys />} />
-                            <Route path="withdrawals/bank-accounts" element={<BankAccounts />} />
-                            <Route path="withdrawals/email-notifications" element={<WithdrawalNotifications />} />
-                        </Route>
-                        <Route path="activation" element={
-                            <ActivationRoute>
-                                <Activation />
-                            </ActivationRoute>
-                        } />
-                    </Route>
-                </Route>
-                <Route path="*" element={<NotFoundError />} />
-            </Routes>
-        );
-    }
-
-    // For localhost or main domain, show all routes
     return (
         <Routes>
             {/* Checkout routes */}
@@ -178,7 +100,7 @@ const AppRouter = () => {
                         <Route path="/sell-whatsapp" element={<SellWhatsApp />} />
                         <Route path="/sell-website" element={<SellWebsite />} />
 
-                        {/* Login/Signup routes */}
+                        {/* Auth routes */}
                         <Route path="/sign-in" element={<Signin />} />
                         <Route path="/log-in" element={<Login />} />
                         <Route path="/sign-up" element={<Signup />} />
@@ -242,6 +164,7 @@ const AppRouter = () => {
                                 <Onboarding />
                             </OnboardingRoute>
                         } />
+
                         {/* Error routes */}
                         <Route path="/500" element={<GeneralError />} />
                         <Route path="/404" element={<NotFoundError />} />

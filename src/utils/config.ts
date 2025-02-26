@@ -1,11 +1,9 @@
 export const config = {
-  isPortal: window.location.hostname === 'portal.lomi.africa',
   isPay: window.location.hostname === 'pay.lomi.africa',
   isLocalhost: window.location.hostname === 'localhost',
   supabaseUrl: import.meta.env['VITE_SUPABASE_URL'],
   supabaseAnonKey: import.meta.env['VITE_SUPABASE_ANON_KEY'],
   baseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://lomi.africa' : 'http://localhost:5173',
-  portalBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://portal.lomi.africa' : 'http://localhost:5173',
   mainSiteBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://lomi.africa' : 'http://localhost:5173',
   paymentBaseUrl: import.meta.env['BUN_ENV'] === 'production' ? 'https://pay.lomi.africa' : 'http://localhost:5173',
   apiUrl: import.meta.env['BUN_ENV'] === 'production' 

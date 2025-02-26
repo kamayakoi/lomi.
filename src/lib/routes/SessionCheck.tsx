@@ -7,42 +7,30 @@ import AnimatedLogoLoader from '@/components/portal/loader';
 const authRoutes = ['/sign-in', '/sign-up', '/log-in', '/sign-in-test', '/forgot-password', '/otp', '/auth/reset-password'];
 
 // Routes that require authentication
-const protectedRoutes = ['/portal', '/onboarding'];
+const protectedRoutes = ['/onboarding'];
 
 export function SessionCheck({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
     const location = useLocation();
     const { isLoading, isAuthenticated } = useAuthStatus();
-    const isPortalSubdomain = window.location.hostname.startsWith('portal.');
-    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 
     useEffect(() => {
         if (!isLoading) {
             const currentPath = location.pathname;
 
-            // Handle portal subdomain redirection in production
-            if (isProduction && !isPortalSubdomain && currentPath.startsWith('/portal')) {
-                const portalPath = currentPath.replace('/portal', '');
-                const targetPath = portalPath || '/';
-                window.location.href = `https://portal.lomi.africa${targetPath}`;
-                return;
-            }
-
             if (!isAuthenticated) {
                 // Only redirect to sign-in if trying to access protected routes
                 if (protectedRoutes.some(route => currentPath.startsWith(route))) {
-                    const signInPath = isPortalSubdomain ? '/sign-in' : '/sign-in';
-                    navigate(signInPath, { replace: true });
+                    navigate('/sign-in', { replace: true });
                 }
             } else {
                 if (authRoutes.includes(currentPath)) {
-                    // If authenticated and on an auth route, redirect to appropriate location
-                    const redirectPath = isPortalSubdomain ? '/' : '/portal';
-                    navigate(redirectPath, { replace: true });
+                    // If authenticated and on an auth route, redirect to home
+                    navigate('/', { replace: true });
                 }
             }
         }
-    }, [isLoading, isAuthenticated, location, navigate, isPortalSubdomain, isProduction]);
+    }, [isLoading, isAuthenticated, location, navigate]);
 
     if (isLoading) {
         return <AnimatedLogoLoader />;
