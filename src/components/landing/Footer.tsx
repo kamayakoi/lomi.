@@ -278,7 +278,7 @@ export function Footer() {
                                         className="flex items-center h-10 shrink-0"
                                     >
                                         <div className="inline-flex items-center gap-2 bg-transparent px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200 dark:border-zinc-800 h-full">
-                                            <GitHubIcon className="h-[20px] w-[20px] text-zinc-700 dark:text-zinc-300  hover:text-amber-500 dark:hover:text-amber-400" />
+                                            <GitHubIcon className="h-[20px] w-[20px] text-zinc-700 dark:text-zinc-300 hover:text-[#6e5494] dark:hover:text-[#6e5494] inline-flex items-center transition-colors" />
                                         </div>
                                         <div className="bg-transparent min-w-[54px] px-2 py-2 text-amber-500 hover:text-amber-600 border border-l-0 border-zinc-200 dark:border-zinc-800 h-full flex items-center justify-end">
                                             <span className="text-right mr-1 font-bold text-amber-500 dark:text-amber-400">{t('footer.star')}</span>

@@ -8,9 +8,15 @@
   "description": "Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and crypto, send payouts and automate financial workflows with ease.",
   "icons": [
     {
-      "src": "/company/lomi_icon.png",
+      "src": "https://res.cloudinary.com/dzrdlevfn/image/upload/v1740528383/r2prxgntubnqhsu0wrfe.webp",
+      "sizes": "1200x630",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/dzrdlevfn/image/upload/v1740528383/r2prxgntubnqhsu0wrfe.webp",
       "sizes": "695x695",
-      "type": "image/png"
+      "type": "image/webp"
     },
     {
       "src": "/company/lomi_icon.png",
@@ -18,12 +24,7 @@
       "type": "image/png"
     }
   ],
-  "categories": ["finance", "business", "productivity", "software"],
-  "orientation": "any",
-  "scope": "/",
-  "lang": ["en", "fr"],
-  "dir": "ltr",
-  "prefer_related_applications": false,
+  "categories": ["finance", "business", "productivity", "software", "open-source", "west-africa", "start-up", "payments", "payments-orchestration", "payments-platform", "payments-api", "payment-integration", "checkout", "payment-infrastructure", "payment-gateway", "payments-processor-integration", "payments-processor-gateway", "api", "payment", "saas", "orange", "wave", "products", "subscriptions", "mtn", "digital-products", "payment-orchestration", "merchant-of-record"],
   "shortcuts": [
     {
       "name": "Portal",
