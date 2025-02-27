@@ -108,8 +108,8 @@ const AppRouter = () => {
                         <Route path="/auth/reset-password" element={<ResetPassword />} />
                         <Route path="/auth/callback" element={<AuthCallback />} />
 
-                        {/* Portal routes */}
-                        <Route path="/portal/:organizationId" element={
+                        {/* Organization routes */}
+                        <Route path="/:organizationId" element={
                             <ProtectedRoute>
                                 <OrganizationRoute>
                                     <AppShell />
