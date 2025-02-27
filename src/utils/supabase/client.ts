@@ -13,26 +13,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient<Partial<Database>>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
+    storageKey: 'supabase.auth.token',
+    storage: window.localStorage,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
-    storage: {
-      getItem: (key) => {
-        const item = window.localStorage.getItem(key);
-        if (item) {
-          document.cookie = `${key}=${item};domain=${process.env.NODE_ENV === 'production' ? '.lomi.africa' : 'localhost'};path=/;max-age=31536000;SameSite=Lax${process.env.NODE_ENV === 'production' ? ';Secure' : ''}`;
-        }
-        return item;
-      },
-      setItem: (key, value) => {
-        window.localStorage.setItem(key, value);
-        document.cookie = `${key}=${value};domain=${process.env.NODE_ENV === 'production' ? '.lomi.africa' : 'localhost'};path=/;max-age=31536000;SameSite=Lax${process.env.NODE_ENV === 'production' ? ';Secure' : ''}`;
-      },
-      removeItem: (key) => {
-        window.localStorage.removeItem(key);
-        document.cookie = `${key}=;domain=${process.env.NODE_ENV === 'production' ? '.lomi.africa' : 'localhost'};path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-      }
-    }
+    flowType: 'pkce'
   },
   global: {
     headers: {
@@ -43,7 +28,7 @@ export const supabase = createClient<Partial<Database>>(supabaseUrl, supabaseAno
         ...init,
         keepalive: true,
         cache: 'no-store', // Prevent caching of auth requests
-        credentials: 'include'  // Changed from 'same-origin' to 'include'
+        credentials: 'same-origin'
       })
     }
   }
