@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useUser } from '@/lib/hooks/use-user';
 import { supabase } from '@/utils/supabase/client';
 import AnimatedLogoLoader from '@/components/portal/loader';
+import { getPortalPath } from '@/utils/config';
 
 interface Organization {
     organization_id: string;
@@ -39,7 +40,12 @@ export function OrganizationRoute({ children }: { children: React.ReactNode }) {
                 if (!currentOrgId || !orgs.some((org: Organization) => org.organization_id === currentOrgId)) {
                     const firstOrg = orgs[0];
                     if (firstOrg) {
-                        navigate(`/${firstOrg.organization_id}`, { replace: true });
+                        const redirectPath = getPortalPath(`/${firstOrg.organization_id}`);
+                        if (redirectPath.startsWith('http')) {
+                            window.location.href = redirectPath;
+                        } else {
+                            navigate(redirectPath, { replace: true });
+                        }
                     }
                     return;
                 }

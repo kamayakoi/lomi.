@@ -4,6 +4,7 @@ import { useAuthStatus } from '@/lib/hooks/use-auth-status';
 import LoadingButton from '@/components/portal/loader';
 import { supabase } from '@/utils/supabase/client';
 import { toast } from '@/lib/hooks/use-toast';
+import { getPortalPath } from '@/utils/config';
 
 const AuthCallback = () => {
     const navigate = useNavigate();
@@ -65,7 +66,12 @@ const AuthCallback = () => {
 
                     // Clear URL parameters and hash
                     window.history.replaceState(null, '', window.location.pathname);
-                    navigate(next || '/portal/settings/business-profile', { replace: true });
+                    const redirectPath = getPortalPath('/settings/business-profile');
+                    if (redirectPath.startsWith('http')) {
+                        window.location.href = redirectPath;
+                    } else {
+                        navigate(redirectPath, { replace: true });
+                    }
                     return;
                 }
 
@@ -103,7 +109,12 @@ const AuthCallback = () => {
                     if (!isOnboarded) {
                         navigate('/onboarding', { replace: true });
                     } else {
-                        navigate(next || '/', { replace: true });
+                        const redirectPath = getPortalPath(next || '/');
+                        if (redirectPath.startsWith('http')) {
+                            window.location.href = redirectPath;
+                        } else {
+                            navigate(redirectPath, { replace: true });
+                        }
                     }
                 }
             } catch (error) {
