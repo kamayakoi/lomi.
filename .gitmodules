@@ -1,0 +1,3 @@
+[submodule "apps/developers"]
+	path = apps/developers
+	url = https://github.com/lomiafrica/developers.lomi.africa
