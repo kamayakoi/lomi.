@@ -1,8 +1,5 @@
 # Project files
-/apps/cli
-/apps/api
 /apps/store
 /apps/admin
 /apps/next
-/apps/shopify
 /apps/commerce
