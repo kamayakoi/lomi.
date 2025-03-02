@@ -331,6 +331,50 @@
             }
         }
     },
+    "pricing": {
+        "title": "por transacción",
+        "subtitle": "Solo ganamos cuando tú lo haces — sin sorpresas, sin tarifas ocultas, sin costos mensuales.",
+        "calculator": {
+            "currency": "Moneda",
+            "transaction_amount": "Monto de la transacción",
+            "our_fee": "Nuestra tarifa (3.2%)",
+            "you_receive": "Tú recibes",
+            "disclaimer": "Se ha eliminado una prima del 1% por pago de este calculador para mayor simplicidad.",
+            "see_fees": "Ver cómo se aplican nuestras tarifas"
+        }
+    },
+    "faq": {
+        "title": "Preguntas frecuentes",
+        "subtitle": "Encuentra respuestas a preguntas comunes sobre nuestros servicios.",
+        "still_have_questions": "¿Todavía tienes preguntas?",
+        "visit_docs": "Visita nuestra documentación para desarrolladores",
+        "items": {
+            "pricing": {
+                "question": "¿Cómo funciona el modelo de precios de lomi.?",
+                "answer": "lomi. ofrece precios transparentes sin tarifas ocultas. Cobramos una simple tarifa del 3.2% por transacción más una pequeña tarifa fija dependiendo de la moneda. No hay tarifas de configuración, tarifas mensuales o cargos ocultos."
+            },
+            "funds": {
+                "question": "¿Cuándo puedo recibir mis fondos?",
+                "answer": "Los fondos suelen estar disponibles para retiro dentro de los 2 días hábiles después de que se complete un pago."
+            },
+            "payment_methods": {
+                "question": "¿Qué métodos de pago soportan?",
+                "answer": "Soportamos las principales tarjetas de crédito y débito, y dinero móvil en varios países africanos."
+            },
+            "minimum_amount": {
+                "question": "¿Hay un monto mínimo de transacción?",
+                "answer": "No, no hay un monto mínimo de transacción. Puedes procesar pagos de cualquier tamaño a través de nuestra plataforma."
+            },
+            "security": {
+                "question": "¿Qué tan seguro es lomi.?",
+                "answer": "lomi. utiliza protocolos de seguridad estándar de la industria y cumple completamente con los requisitos PCI DSS para el procesamiento de pagos con tarjeta. Empleamos encriptación, tokenización y otras medidas de seguridad para proteger tus datos y la información de tus clientes."
+            },
+            "international": {
+                "question": "¿Puedo usar lomi. para transacciones internacionales?",
+                "answer": "Sí, lomi. soporta transacciones internacionales. Podemos procesar pagos en múltiples monedas, incluyendo USD y XOF."
+            }
+        }
+    },
     "activation": {
         "title": "Activación de cuenta",
         "step_indicator": "Paso {{step}} de {{total}}",
@@ -867,6 +911,102 @@
         "brand": {
             "name": "lomi.",
             "control_portal": "Portal de Control"
+        }
+    },
+    "blog": {
+        "title": "Blog",
+        "description": "Conocimientos, actualizaciones y noticias del equipo de lomi.",
+        "heading": "Blog",
+        "subheading": "Descubre los últimos artículos, guías y actualizaciones de nuestro equipo",
+        "noPosts": "No se encontraron publicaciones",
+        "noPostsDesc": "No hay publicaciones disponibles en tu idioma en este momento. Por favor, vuelve más tarde.",
+        "readArticle": "Leer artículo",
+        "backHome": "Volver al inicio",
+        "backToBlog": "Volver al blog",
+        "loading": "Cargando...",
+        "loadingDesc": "Cargando publicación...",
+        "notFound": "Publicación no encontrada",
+        "notFoundDesc": "La publicación que estás buscando no existe o ha sido eliminada.",
+        "byAuthor": "Por {{author}}",
+        "featuredImage": "Imagen destacada",
+        "illustration": "Ilustración",
+        "article": "Artículo",
+        "categories": {
+            "news": "Noticias",
+            "opinion": "Opinión",
+            "payments": "Pagos",
+            "startupOpenSource": "Startup y Código Abierto",
+            "case-study": "Caso de Estudio",
+            "online-business": "Negocio en Línea"
+        }
+    },
+    "story": {
+        "mission": "Potenciando empresas de África Occidental con soluciones de pago localizadas",
+        "ourStory": "Nuestra Historia",
+        "storyParagraph1": "lomi. nació de una visión para transformar cómo las empresas en África aceptan pagos. Reconocimos los desafíos que enfrentan los comerciantes para conectarse con sistemas de pago globales y nos propusimos construir una solución que cierre esta brecha.",
+        "storyParagraph2": "Nuestro viaje comenzó con una idea simple: crear una plataforma de pagos que sea accesible, confiable y adaptada a las necesidades únicas de las empresas de África Occidental. Hoy, estamos orgullosos de servir a comerciantes en todo el continente, ayudándoles a crecer y prosperar en la economía digital.",
+        "storyParagraph3": "A medida que continuamos evolucionando, nuestro compromiso sigue siendo inquebrantable: proporcionar soluciones de pago innovadoras que empoderen a emprendedores y empresas de todos los tamaños para alcanzar su máximo potencial.",
+        "ourValues": "Nuestros Valores",
+        "innovation": "Innovación",
+        "innovationDescription": "Constantemente empujamos los límites para crear soluciones de pago vanguardistas que aborden los desafíos únicos del mercado africano.",
+        "customerObsession": "Obsesión por el Cliente",
+        "customerObsessionDescription": "Nuestros clientes están en el centro de todo lo que hacemos. Escuchamos, aprendemos y nos adaptamos para asegurar que estamos satisfaciendo sus necesidades en evolución.",
+        "integrity": "Integridad",
+        "integrityDescription": "Operamos con transparencia y honestidad, construyendo confianza con nuestros clientes, socios y miembros del equipo.",
+        "speed": "Velocidad",
+        "speedDescription": "Nos movemos rápidamente para ofrecer soluciones que ayuden a nuestros clientes a mantenerse a la vanguardia en un panorama digital en rápida evolución.",
+        "getStarted": "Comenzar"
+    },
+    "about": {
+        "title": "Acerca de lomi.",
+        "description": "Somos un equipo de personas apasionadas dedicadas a revolucionar los pagos digitales en África.",
+        "mission": {
+            "title": "Nuestra Misión",
+            "description": "Empoderar a las empresas africanas con soluciones de pago accesibles, confiables e innovadoras que impulsen el crecimiento económico y la inclusión financiera en todo el continente."
+        },
+        "vision": {
+            "title": "Nuestra Visión",
+            "description": "Crear un ecosistema de pagos digitales sin fisuras donde cada empresa en África, independientemente de su tamaño, pueda participar en la economía global sin barreras."
+        },
+        "cta": {
+            "title": "Únete a la Revolución lomi.",
+            "description": "Sé parte del futuro de los pagos digitales en África. Comienza a aceptar pagos con lomi. hoy.",
+            "button": "Comenzar Ahora"
+        }
+    },
+    "productSales": {
+        "title": "Vende en WhatsApp",
+        "description": "Vende tus productos fácilmente en línea a través de múltiples canales, incluyendo tu sitio web, WhatsApp y redes sociales con nuestra solución integral de comercio electrónico.",
+        "channels": {
+            "website": {
+                "title": "Integración en Sitio Web",
+                "description": "Integra sin problemas nuestra solución de pago en tu sitio web existente o utiliza nuestras páginas de pago alojadas.",
+                "feature1": "Fácil integración de API",
+                "feature2": "Checkout personalizable",
+                "feature3": "Funcionalidad de carrito de compras",
+                "button": "Más Información"
+            },
+            "whatsapp": {
+                "title": "Comercio en WhatsApp",
+                "description": "Vende directamente a través de WhatsApp con catálogos de productos automatizados, gestión de pedidos y enlaces de pago.",
+                "feature1": "Catálogo de productos digital",
+                "feature2": "Procesamiento automatizado de pedidos",
+                "feature3": "Enlaces de pago seguros",
+                "button": "Más Información"
+            },
+            "paymentLinks": {
+                "title": "Enlaces de Pago",
+                "description": "Crea enlaces de pago compartibles para tus productos para vender en redes sociales, correo electrónico o cualquier canal digital.",
+                "feature1": "Creación de enlaces con un clic",
+                "feature2": "Compartir en redes sociales",
+                "feature3": "Seguimiento de ventas en tiempo real",
+                "button": "Más Información"
+            }
+        },
+        "cta": {
+            "title": "¿Listo para impulsar tus ventas de productos?",
+            "description": "Únete a miles de empresas que utilizan lomi. para vender productos a través de múltiples canales y aumentar sus ingresos.",
+            "button": "Comenzar"
         }
     }
 }

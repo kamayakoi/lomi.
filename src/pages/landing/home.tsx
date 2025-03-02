@@ -105,7 +105,7 @@ export default function Page() {
   return (
     <div className="overflow-hidden relative bg-background">
       {/* Background Lines positioned absolutely */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 hidden sm:block">
         <BackgroundLines className="w-full h-full" svgOptions={{ duration: 15 }}>
           <div className="w-full h-full" />
         </BackgroundLines>

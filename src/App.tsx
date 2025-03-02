@@ -2,12 +2,13 @@ import { ThemeProvider } from "@/components/landing/theme-provider";
 import { UserProvider } from '@/lib/contexts/user-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Analytics } from "@vercel/analytics/react";
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import AppRouter from "./router";
 import AnimatedLogoLoader from "@/components/portal/loader";
 import mixpanelService from "@/utils/mixpanel/mixpanel";
+import { Helmet } from "react-helmet";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -24,7 +25,23 @@ const queryClient = new QueryClient({
 // Initialize Mixpanel
 mixpanelService.init();
 
+// Component to handle title resets
+function TitleResetManager() {
+    const location = useLocation();
+    const defaultTitle = "lomi. | West Africa's Payment Orchestration Platform";
+
+    useEffect(() => {
+        // Reset the title when navigating away from blog pages
+        if (!location.pathname.startsWith('/blog')) {
+            document.title = defaultTitle;
+        }
+    }, [location.pathname, defaultTitle]);
+
+    return null;
+}
+
 export function App() {
+    const defaultTitle = "lomi. | West Africa's Payment Orchestration Platform";
     return (
         <QueryClientProvider client={queryClient}>
             <Suspense fallback={<AnimatedLogoLoader />}>
@@ -36,6 +53,10 @@ export function App() {
                                 v7_relativeSplatPath: true
                             }}
                         >
+                            <Helmet>
+                                <title>{defaultTitle}</title>
+                            </Helmet>
+                            <TitleResetManager />
                             <AppRouter />
                             <Toaster />
                         </BrowserRouter>

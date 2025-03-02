@@ -100,7 +100,7 @@ export default function SubscriptionManagementPage() {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Features Grid */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

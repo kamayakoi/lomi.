@@ -329,6 +329,50 @@
             }
         }
     },
+    "pricing": {
+        "title": "per transaction",
+        "subtitle": "We only earn when you do — no surprises, no hidden fees, no monthly costs.",
+        "calculator": {
+            "currency": "Currency",
+            "transaction_amount": "Transaction Amount",
+            "our_fee": "Our fee (3.2%)",
+            "you_receive": "You receive",
+            "disclaimer": "A Premium of 1% per payout has been removed from this calculator for simplicity.",
+            "see_fees": "See how our fees apply"
+        }
+    },
+    "faq": {
+        "title": "Frequently asked questions",
+        "subtitle": "Find answers to common questions about our services.",
+        "still_have_questions": "Still have questions?",
+        "visit_docs": "Visit our developer documentation",
+        "items": {
+            "pricing": {
+                "question": "How does lomi. pricing work?",
+                "answer": "lomi. offers transparent pricing with no hidden fees. We charge a simple 3.2% fee per transaction plus a small fixed fee depending on the currency. There are no setup fees, monthly fees, or hidden charges."
+            },
+            "funds": {
+                "question": "When can I receive my funds?",
+                "answer": "Funds are typically available for withdrawal within 2 business days after a payout is completed."
+            },
+            "payment_methods": {
+                "question": "What payment methods do you support?",
+                "answer": "We support major credit and debit cards, and mobile money across multiple African countries."
+            },
+            "minimum_amount": {
+                "question": "Is there a minimum transaction amount?",
+                "answer": "No, there is no minimum transaction amount. You can process payments of any size through our platform."
+            },
+            "security": {
+                "question": "How secure is lomi.?",
+                "answer": "lomi. uses industry-standard security protocols and is fully compliant with PCI DSS requirements for card payments processing. We employ encryption, tokenization, and other security measures to protect your data and your customers' information."
+            },
+            "international": {
+                "question": "Can I use lomi. for international transactions?",
+                "answer": "Yes, lomi. supports international transactions. We can process payments in multiple currencies, including USD and XOF."
+            }
+        }
+    },
     "activation": {
         "title": "Account Activation",
         "step_indicator": "Step {{step}} of {{total}}",
@@ -766,6 +810,181 @@
         "brand": {
             "name": "lomi",
             "control_portal": "PORTAL"
+        }
+    },
+    "story": {
+        "mission": "Empowering West African businesses with localized payment solutions",
+        "ourStory": "Our Story",
+        "storyParagraph1": "lomi. was born from a vision to transform how businesses in Africa accept payments. We recognized the challenges faced by merchants in connecting with global payment systems and set out to build a solution that bridges this gap.",
+        "storyParagraph2": "Our journey began with a simple idea: create a payment platform that is accessible, reliable, and tailored to the unique needs of West African businesses. Today, we're proud to serve merchants across the continent, helping them grow and thrive in the digital economy.",
+        "storyParagraph3": "As we continue to evolve, our commitment remains unwavering - to provide innovative payment solutions that empower entrepreneurs and businesses of all sizes to reach their full potential.",
+        "ourValues": "Our Values",
+        "innovation": "Innovation",
+        "innovationDescription": "We constantly push boundaries to create cutting-edge payment solutions that address the unique challenges of the African market.",
+        "customerObsession": "Customer Obsession",
+        "customerObsessionDescription": "Our customers are at the heart of everything we do. We listen, learn, and adapt to ensure we're meeting their evolving needs.",
+        "integrity": "Integrity",
+        "integrityDescription": "We operate with transparency and honesty, building trust with our customers, partners, and team members.",
+        "speed": "Speed",
+        "speedDescription": "We move quickly to deliver solutions that help our customers stay ahead in a rapidly changing digital landscape.",
+        "getStarted": "Get Started"
+    },
+    "about": {
+        "title": "About lomi.",
+        "description": "We are a team of passionate individuals dedicated to revolutionizing digital payments in Africa.",
+        "mission": {
+            "title": "Our Mission",
+            "description": "To empower African businesses with accessible, reliable, and innovative payment solutions that drive economic growth and financial inclusion across the continent."
+        },
+        "vision": {
+            "title": "Our Vision",
+            "description": "To create a seamless digital payment ecosystem where every business in Africa, regardless of size, can participate in the global economy without barriers."
+        },
+        "cta": {
+            "title": "Join the lomi. Revolution",
+            "description": "Be part of the future of digital payments in Africa. Start accepting payments with lomi. today.",
+            "button": "Get Started Now"
+        }
+    },
+    "productSales": {
+        "title": "Sell on WhatsApp",
+        "description": "Easily sell your products online through multiple channels including your website, WhatsApp, and social media with our comprehensive e-commerce solution.",
+        "channels": {
+            "website": {
+                "title": "Website Integration",
+                "description": "Seamlessly integrate our payment solution into your existing website or use our hosted checkout pages.",
+                "feature1": "Easy API integration",
+                "feature2": "Customizable checkout",
+                "feature3": "Shopping cart functionality",
+                "button": "Learn More"
+            },
+            "whatsapp": {
+                "title": "WhatsApp Commerce",
+                "description": "Sell directly through WhatsApp with automated product catalogs, order management, and payment links.",
+                "feature1": "Digital product catalog",
+                "feature2": "Automated order processing",
+                "feature3": "Secure payment links",
+                "button": "Learn More"
+            },
+            "paymentLinks": {
+                "title": "Payment Links",
+                "description": "Create shareable payment links for your products to sell on social media, email, or any digital channel.",
+                "feature1": "One-click link creation",
+                "feature2": "Social media sharing",
+                "feature3": "Real-time sales tracking",
+                "button": "Learn More"
+            }
+        },
+        "cta": {
+            "title": "Ready to boost your product sales?",
+            "description": "Join thousands of businesses using lomi. to sell products across multiple channels and grow their revenue.",
+            "button": "Get Started"
+        }
+    },
+    "blog": {
+        "title": "Blog",
+        "description": "Insights, updates, and news from the lomi. team",
+        "heading": "Blog",
+        "subheading": "Discover the latest articles, guides, and updates from our team.",
+        "noPosts": "No posts found",
+        "noPostsDesc": "There are no posts available in your language at the moment. Please check back later.",
+        "readArticle": "Read article",
+        "backHome": "Back to Home",
+        "backToBlog": "Back to blog",
+        "loading": "Loading...",
+        "loadingDesc": "Loading blog post...",
+        "notFound": "Post not found",
+        "notFoundDesc": "The blog post you're looking for doesn't exist or has been removed.",
+        "byAuthor": "By {{author}}",
+        "featuredImage": "Featured Image",
+        "illustration": "Illustration",
+        "article": "Article",
+        "categories": {
+            "news": "News",
+            "opinion": "Opinion",
+            "payments": "Payments",
+            "startupOpenSource": "Startup & Open Source",
+            "case-study": "Case Study",
+            "online-business": "Online Business"
+        }
+    },
+    "billing": {
+        "title": "Streamlined billing",
+        "description": "Create and send professional invoices, manage recurring billing, and automate payment collection with our comprehensive billing solution.",
+        "features": {
+            "invoices": {
+                "title": "Professional Invoices",
+                "feature1": "Customizable templates",
+                "feature2": "Automatic reminders"
+            },
+            "recurring": {
+                "title": "Recurring Billing",
+                "feature1": "Flexible billing cycles",
+                "feature2": "Automatic retry on failed payments"
+            },
+            "automation": {
+                "title": "Payment Automation",
+                "feature1": "Automated invoice generation",
+                "feature2": "Payment collection workflows"
+            }
+        },
+        "howItWorks": {
+            "title": "How It Works",
+            "step1": {
+                "title": "Create",
+                "description": "Design invoices with your branding and set up recurring schedules."
+            },
+            "step2": {
+                "title": "Send",
+                "description": "Automatically send invoices via email with secure payment links."
+            },
+            "step3": {
+                "title": "Get Paid",
+                "description": "Receive payments directly with real-time notifications."
+            }
+        },
+        "cta": {
+            "title": "Ready to streamline your billing process?",
+            "button": "Get Started"
+        }
+    },
+    "websiteSales": {
+        "title": "Sell on your website",
+        "description": "Integrate our payment solution into your existing website or use our hosted checkout pages to sell your products and services online.",
+        "options": {
+            "api": {
+                "title": "API Integration",
+                "description": "Integrate our payment API directly into your website for a seamless checkout experience.",
+                "feature1": "Full customization control",
+                "feature2": "Seamless user experience"
+            },
+            "hosted": {
+                "title": "Hosted Checkout",
+                "description": "Use our pre-built checkout pages that you can embed or redirect to from your website.",
+                "feature1": "No coding required",
+                "feature2": "Secure payment processing"
+            },
+            "links": {
+                "title": "Payment Links",
+                "description": "Create shareable payment links that you can add to your website, emails, or social media.",
+                "feature1": "Quick setup",
+                "feature2": "Works with any website"
+            }
+        },
+        "benefits": {
+            "title": "Benefits of Selling on Your Website",
+            "control": {
+                "title": "Complete Control",
+                "description": "Maintain full control over your brand experience, customer journey, and checkout process."
+            },
+            "fees": {
+                "title": "Lower Fees",
+                "description": "Avoid marketplace commissions and keep more of your revenue with our competitive payment processing rates."
+            }
+        },
+        "cta": {
+            "title": "Ready to start selling on your website?",
+            "button": "Get Started"
         }
     }
 }

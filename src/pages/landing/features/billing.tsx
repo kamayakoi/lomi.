@@ -80,10 +80,10 @@ export default function BillingPage() {
                         className="relative pt-16 md:pt-20"
                     >
                         <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('billing.title', 'Streamlined billing')}
+                            {t('billing.title')}
                         </h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
-                            {t('billing.description', 'Create and send professional invoices, manage recurring billing, and automate payment collection with our comprehensive billing solution.')}
+                            {t('billing.description')}
                         </p>
                     </motion.div>
 
@@ -100,32 +100,26 @@ export default function BillingPage() {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Features Grid */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                             {/* Feature 1 */}
                                             <div className="space-y-3">
                                                 <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.invoices.title', 'Professional Invoices')}
+                                                    {t('billing.features.invoices.title')}
                                                 </h3>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature1', 'Customizable templates')}
+                                                            {t('billing.features.invoices.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature2', 'Automatic reminders')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature3', 'Payment tracking')}
+                                                            {t('billing.features.invoices.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -134,25 +128,19 @@ export default function BillingPage() {
                                             {/* Feature 2 */}
                                             <div className="space-y-3">
                                                 <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.recurring.title', 'Recurring Billing')}
+                                                    {t('billing.features.recurring.title')}
                                                 </h3>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature1', 'Flexible billing cycles')}
+                                                            {t('billing.features.recurring.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature2', 'Automatic retry on failed payments')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature3', 'Subscription management')}
+                                                            {t('billing.features.recurring.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -161,25 +149,19 @@ export default function BillingPage() {
                                             {/* Feature 3 */}
                                             <div className="space-y-3">
                                                 <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.automation.title', 'Payment Automation')}
+                                                    {t('billing.features.automation.title')}
                                                 </h3>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature1', 'Automated invoice generation')}
+                                                            {t('billing.features.automation.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature2', 'Payment collection workflows')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature3', 'Accounting system integration')}
+                                                            {t('billing.features.automation.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -189,7 +171,7 @@ export default function BillingPage() {
                                         {/* How It Works Section */}
                                         <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
-                                                {t('billing.howItWorks.title', 'How It Works')}
+                                                {t('billing.howItWorks.title')}
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div className="flex items-start">
@@ -198,10 +180,10 @@ export default function BillingPage() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step1.title', 'Create')}
+                                                            {t('billing.howItWorks.step1.title')}
                                                         </p>
                                                         <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step1.description', 'Design invoices with your branding and set up recurring schedules.')}
+                                                            {t('billing.howItWorks.step1.description')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -211,10 +193,10 @@ export default function BillingPage() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step2.title', 'Send')}
+                                                            {t('billing.howItWorks.step2.title')}
                                                         </p>
                                                         <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step2.description', 'Automatically send invoices via email with secure payment links.')}
+                                                            {t('billing.howItWorks.step2.description')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -224,10 +206,10 @@ export default function BillingPage() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step3.title', 'Get Paid')}
+                                                            {t('billing.howItWorks.step3.title')}
                                                         </p>
                                                         <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step3.description', 'Receive payments directly with real-time notifications.')}
+                                                            {t('billing.howItWorks.step3.description')}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -238,10 +220,10 @@ export default function BillingPage() {
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-medium text-zinc-900 dark:text-white mb-4 sm:mb-0">
-                                                    {t('billing.cta.title', 'Ready to streamline your billing process?')}
+                                                    {t('billing.cta.title')}
                                                 </p>
                                                 <ButtonExpand
-                                                    text={t('billing.cta.button', 'Get Started')}
+                                                    text={t('billing.cta.button')}
                                                     bgColor="bg-blue-50 dark:bg-blue-900/30"
                                                     textColor="text-blue-700 dark:text-blue-300"
                                                     hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"

@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/landing/Footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle2, ShoppingCart, Smartphone, Globe } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, ShoppingCart, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { ButtonExpand } from '@/components/design/button-expand';
@@ -100,37 +100,10 @@ export default function ProductSalesPage() {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Sales Channels */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                            {/* Channel 1: Website */}
-                                            <div className="space-y-3">
-                                                <div className="flex items-center mb-2">
-                                                    <Globe className="h-5 w-5 text-blue-500 mr-2" />
-                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                        {t('productSales.channels.website.title', 'Website Integration')}
-                                                    </h3>
-                                                </div>
-                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                    {t('productSales.channels.website.description', 'Seamlessly integrate our payment solution into your existing website or use our hosted checkout pages.')}
-                                                </p>
-                                                <ul className="space-y-2">
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('productSales.channels.website.feature1', 'Easy API integration')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('productSales.channels.website.feature2', 'Customizable checkout')}
-                                                        </span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                             {/* Channel 2: WhatsApp */}
                                             <div className="space-y-3">
                                                 <div className="flex items-center mb-2">
@@ -209,7 +182,7 @@ export default function ProductSalesPage() {
                                                     </p>
                                                 </div>
                                             </div>
-                                        </div>s
+                                        </div>
 
                                         {/* CTA Section */}
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">

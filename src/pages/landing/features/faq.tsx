@@ -12,16 +12,17 @@ import { Card, CardContent } from "@/components/ui/card";
 interface FAQItemProps {
     question: string;
     answer: string;
+    isOpen: boolean;
+    index: number;
+    toggleItem: (index: number) => void;
 }
 
-const FAQItem = ({ question, answer }: FAQItemProps) => {
-    const [isOpen, setIsOpen] = useState(false);
-
+const FAQItem = ({ question, answer, isOpen, index, toggleItem }: FAQItemProps) => {
     return (
         <div className="mb-3">
             <button
                 className="w-full text-left p-3 sm:p-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm hover:shadow-md transition-shadow duration-200 flex justify-between items-center"
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => toggleItem(index)}
             >
                 <span className="font-medium text-zinc-900 dark:text-white text-base">{question}</span>
                 <ChevronDown className={`h-4 w-4 text-zinc-500 dark:text-zinc-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'transform rotate-180' : ''}`} />
@@ -48,8 +49,14 @@ const FAQItem = ({ question, answer }: FAQItemProps) => {
 export default function FAQPage() {
     const [mounted, setMounted] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [openItemIndex, setOpenItemIndex] = useState<number | null>(0); // Default open the first item
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    // Toggle FAQ item - accordion style
+    const toggleItem = (index: number) => {
+        setOpenItemIndex(openItemIndex === index ? null : index);
+    };
 
     // Handle hydration mismatch
     useEffect(() => {
@@ -160,7 +167,7 @@ export default function FAQPage() {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8 max-h-[calc(100vh-240px)] overflow-y-auto">
                                         <div className="space-y-3">
                                             {faqItems.map((item, index) => (
@@ -168,6 +175,9 @@ export default function FAQPage() {
                                                     key={index}
                                                     question={item.question}
                                                     answer={item.answer}
+                                                    isOpen={openItemIndex === index}
+                                                    index={index}
+                                                    toggleItem={toggleItem}
                                                 />
                                             ))}
                                         </div>

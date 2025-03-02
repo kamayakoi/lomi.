@@ -4,9 +4,11 @@ import { Code, MoveRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from 'react-i18next';
 import { ButtonExpand } from "@/components/design/button-expand";
+import { useNavigate } from "react-router-dom";
 
 function Hero() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const titles = useMemo(
     () => [
       t('hero.title.rotatingWords.0'),
@@ -37,6 +39,7 @@ function Hero() {
           <div className="flex flex-col sm:flex-row items-start gap-4 w-full max-w-2xl pl-0 sm:pl-2">
             <Button
               variant="ghost"
+              onClick={() => navigate('/blog/open-source-alternative')}
               className="gap-2 font-medium transition-all duration-300 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/40 dark:hover:text-blue-200 whitespace-nowrap text-sm sm:text-base border border-zinc-200 dark:border-zinc-800"
             >
               {t('hero.buttons.launch')} <MoveRight className="w-4 h-4" />

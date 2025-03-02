@@ -7,7 +7,7 @@ import { BlogLayout } from "@/components/blog/blog-layout";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Spinner from "@/components/ui/spinner";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import "./blog.css";
 
 // Helper function to get category from post
@@ -29,6 +29,7 @@ export default function Blog() {
     const currentLanguage = i18n.language || 'en';
     const navigate = useNavigate();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [isBlogTitleHovered, setIsBlogTitleHovered] = useState(false);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -113,22 +114,6 @@ export default function Blog() {
         return post.languages.includes(currentLanguage);
     };
 
-    // Function to get category display name (translated)
-    const getCategoryDisplayName = (category: string) => {
-        if (!category) return '';
-
-        const categoryMap: Record<string, string> = {
-            'news': t("blog.categories.news"),
-            'opinion': t("blog.categories.opinion"),
-            'payments': t("blog.categories.payments"),
-            'startupOpenSource': t("blog.categories.startupOpenSource"),
-            'case-study': t("blog.categories.caseStudy"),
-            'online-business': t("blog.categories.onlineBusiness")
-        };
-
-        return categoryMap[category] || category;
-    };
-
     // Function to get category color
     const getCategoryColor = (category: string) => {
         if (!category) return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
@@ -161,12 +146,20 @@ export default function Blog() {
             <div className="container mx-auto px-4 py-0 max-w-7xl">
                 <div className="relative pt-16 md:pt-20 mb-12">
                     <motion.h1
-                        className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6"
+                        className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6 cursor-pointer hover:opacity-80 transition-opacity"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
+                        onClick={() => navigate('/')}
+                        onMouseEnter={() => setIsBlogTitleHovered(true)}
+                        onMouseLeave={() => setIsBlogTitleHovered(false)}
                     >
-                        {t("blog.heading")}
+                        <span className="flex items-center">
+                            <ArrowLeft className={`mr-2 h-8 w-8 transition-all duration-300 absolute ${isBlogTitleHovered ? 'opacity-100 -translate-x-6' : 'opacity-0 -translate-x-4'}`} />
+                            <span className="transition-transform duration-300" style={{ transform: isBlogTitleHovered ? 'translateX(20px)' : 'translateX(0)' }}>
+                                {t("blog.heading")}
+                            </span>
+                        </span>
                     </motion.h1>
                     <motion.p
                         className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl"
@@ -211,7 +204,7 @@ export default function Blog() {
                                 <motion.div
                                     key={post._id}
                                     variants={itemVariants}
-                                    className="w-full sm:w-[290px] h-[410px] sm:h-[290px]sm:flex-shrink-0 mb-6 sm:mb-0"
+                                    className="w-full sm:w-[290px] sm:flex-shrink-0 mb-6 sm:mb-0"
                                     onMouseEnter={() => setHoveredCard(post._id)}
                                     onMouseLeave={() => setHoveredCard(null)}
                                 >
@@ -219,7 +212,7 @@ export default function Blog() {
                                         to={`/blog/${post.slug.current}`}
                                         className="group flex flex-col h-full"
                                     >
-                                        <article className="flex flex-col h-[410px] sm:h-auto bg-white dark:bg-zinc-900 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800" style={{ height: "calc(100% + 15px)" }}>
+                                        <article className="flex flex-col bg-white dark:bg-zinc-900 rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-zinc-200 dark:border-zinc-800 h-full">
                                             {post.image && (
                                                 <div className="aspect-[3/2] overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
                                                     <img
@@ -230,25 +223,43 @@ export default function Blog() {
                                                     />
                                                 </div>
                                             )}
-                                            <div className="p-4 flex flex-col flex-grow">
-                                                <div className="flex-grow">
-                                                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-1">
-                                                        {new Date(post.publishedAt).toLocaleDateString(
-                                                            currentLanguage === 'fr' ? 'fr-FR' :
-                                                                currentLanguage === 'es' ? 'es-ES' :
-                                                                    currentLanguage === 'pt' ? 'pt-BR' :
-                                                                        currentLanguage === 'zh' ? 'zh-CN' : 'en-US',
-                                                            {
-                                                                year: "numeric",
-                                                                month: "short",
-                                                                day: "numeric",
-                                                            }
-                                                        )}
-                                                    </p>
-                                                    <h2 className="font-medium text-lg mb-2 leading-tight text-zinc-900 dark:text-white line-clamp-2">
+                                            <div className="p-5 flex flex-col flex-grow">
+                                                <div className="flex-grow flex flex-col">
+                                                    {post.author && post.publishedAt && (
+                                                        <div className="flex items-center mb-1">
+                                                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                                {new Date(post.publishedAt).toLocaleDateString(
+                                                                    currentLanguage === 'zh' ? 'zh-CN' : currentLanguage,
+                                                                    {
+                                                                        year: "numeric",
+                                                                        month: "short",
+                                                                        day: "numeric",
+                                                                    }
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {!post.author && post.publishedAt && (
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">
+                                                            {new Date(post.publishedAt).toLocaleDateString(
+                                                                currentLanguage === 'fr' ? 'fr-FR' :
+                                                                    currentLanguage === 'es' ? 'es-ES' :
+                                                                        currentLanguage === 'pt' ? 'pt-BR' :
+                                                                            currentLanguage === 'zh' ? 'zh-CN' : 'en-US',
+                                                                {
+                                                                    year: "numeric",
+                                                                    month: "short",
+                                                                    day: "numeric",
+                                                                }
+                                                            )}
+                                                        </p>
+                                                    )}
+
+                                                    <h2 className="font-medium text-lg mb-3 leading-tight text-zinc-900 dark:text-white min-h-fit">
                                                         {getLocalizedField(post, 'title', post.title)}
                                                     </h2>
-                                                    <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-3 line-clamp-2">
+                                                    <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-4 overflow-hidden line-clamp-2">
                                                         {getLocalizedField(post, 'excerpt', '')}
                                                     </p>
                                                 </div>

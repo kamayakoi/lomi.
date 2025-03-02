@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { XIcon } from '@/components/icons/XIcon'
 import { PHIcon } from '@/components/icons/PHIcon'
 import { GitHubIcon } from '@/components/icons/GitHubIcon'
@@ -23,6 +23,7 @@ export function Footer() {
     const [mounted, setMounted] = useState(false)
     const [isVisible, setIsVisible] = useState(false)
     const [scrollProgress, setScrollProgress] = useState(0)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -58,6 +59,43 @@ export function Footer() {
 
     const toggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark')
+    }
+
+    const handleLogoTextClick = () => {
+        navigate('/')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    const handleLinkClick = (path: string, external = false) => (e: React.MouseEvent) => {
+        if (external) return; // Let external links behave normally
+
+        // For links that use the onClick handler
+        if (path.startsWith('http') || path.includes('producthunt') || path.endsWith('.zip')) {
+            return; // Let these special links behave normally
+        }
+
+        e.preventDefault()
+
+        // Prevent spinner from showing abruptly when navigating
+        const smoothTransition = () => {
+            // If we're already on the same path, just scroll to top
+            if (window.location.pathname === path) {
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+                return
+            }
+
+            // For blog navigation, set isVisible to true to avoid flicker
+            if (path === '/blog') {
+                setIsVisible(true)
+            }
+
+            // Otherwise navigate and then scroll to top
+            navigate(path)
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+
+        // Add a slight delay for smoother transition, especially for blog link
+        setTimeout(smoothTransition, 50)
     }
 
     const logoSrc = theme === 'light' ? "/company/transparent_dark.webp" : "/company/transparent.webp"
@@ -98,11 +136,11 @@ export function Footer() {
     return (
         <div
             className={cn(
-                "transition-all duration-500 ease-in-out",
+                "transition-all duration-700 ease-out",
                 isVisible ? "opacity-100" : "opacity-0"
             )}
             style={{
-                opacity: isVisible ? 1 : Math.min(scrollProgress * 2, 1)
+                opacity: isVisible ? 1 : Math.min(scrollProgress * 3, 0.95)
             }}
         >
             <div className="relative w-full bg-background">
@@ -117,7 +155,10 @@ export function Footer() {
                             className="text-zinc-900 dark:text-white cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={toggleTheme}
                         />
-                        <span className="text-zinc-900 dark:text-white text-2xl select-none flex items-baseline">
+                        <span
+                            onClick={handleLogoTextClick}
+                            className="text-zinc-900 dark:text-white text-2xl select-none flex items-baseline cursor-pointer hover:opacity-80 transition-opacity"
+                        >
                             <span>lomi</span>
                             <div className="w-[3px] h-[3px] bg-current ml-[2px] mb-[2px]"></div>
                         </span>
@@ -149,6 +190,7 @@ export function Footer() {
                                             <Link
                                                 to={item.link}
                                                 className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors inline-flex items-center gap-2"
+                                                onClick={handleLinkClick(item.link, item.link.startsWith('http'))}
                                             >
                                                 {item.name}
                                                 {item.showBadge && (
@@ -178,8 +220,8 @@ export function Footer() {
                                         <li key={item.name}>
                                             <Link
                                                 to={item.link}
-                                                onClick={item.onClick}
                                                 className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors"
+                                                onClick={handleLinkClick(item.link, item.link.startsWith('http'))}
                                             >
                                                 {item.name}
                                             </Link>
@@ -193,13 +235,45 @@ export function Footer() {
                                 <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.company.title')}</h2>
                                 <ul className="space-y-3">
                                     {[
-                                        { name: t('footer.company.story'), link: '/story', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
-                                        { name: t('footer.company.blog'), link: '/blog', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
-                                        { name: t('footer.company.openSource'), link: 'https://developers.lomi.africa/docs/freedom/open-source', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
+                                        {
+                                            name: t('footer.company.story'),
+                                            link: '/story',
+                                            color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400',
+                                            icon: (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 transform group-hover:translate-x-1 opacity-0 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                </svg>
+                                            )
+                                        },
+                                        {
+                                            name: t('footer.company.blog'),
+                                            link: '/blog',
+                                            color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400',
+                                            icon: (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 transform group-hover:translate-x-1 opacity-0 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                </svg>
+                                            )
+                                        },
+                                        {
+                                            name: t('footer.company.openSource'),
+                                            link: 'https://developers.lomi.africa/docs/freedom/open-source',
+                                            color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400',
+                                            icon: (
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transition-transform duration-300 transform group-hover:translate-x-1 opacity-0 group-hover:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            )
+                                        }
                                     ].map((item) => (
                                         <li key={item.name}>
-                                            <Link to={item.link} className={`${item.color} transition-colors`}>
-                                                {item.name}
+                                            <Link
+                                                to={item.link}
+                                                className={`${item.color} transition-colors group flex items-center`}
+                                                onClick={handleLinkClick(item.link, item.link.startsWith('http'))}
+                                            >
+                                                <span>{item.name}</span>
+                                                {item.icon}
                                             </Link>
                                         </li>
                                     ))}

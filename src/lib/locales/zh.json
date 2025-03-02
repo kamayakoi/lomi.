@@ -33,7 +33,7 @@
             "button": "订阅"
         },
         "status": "系统运行正常",
-        "copyright": "版权所有 © 2025 — lomi.africa",
+        "copyright": "版权所有 © 2025 — lomi.africa LLC",
         "star": "星标",
         "emailCopied": "电子邮件地址已复制！"
     },
@@ -867,6 +867,222 @@
         "brand": {
             "name": "lomi.",
             "control_portal": "控制门户"
+        }
+    },
+    "blog": {
+        "title": "博客",
+        "description": "来自 lomi. 团队的见解、更新和新闻",
+        "heading": "博客",
+        "subheading": "发现我们团队的最新文章、指南和更新",
+        "noPosts": "未找到文章",
+        "noPostsDesc": "目前您的语言中没有可用的文章。请稍后再查看。",
+        "readArticle": "阅读文章",
+        "backHome": "返回首页",
+        "backToBlog": "返回博客",
+        "loading": "加载中...",
+        "loadingDesc": "正在加载文章...",
+        "notFound": "文章未找到",
+        "notFoundDesc": "您查找的文章不存在或已被删除。",
+        "byAuthor": "作者：{{author}}",
+        "categories": {
+            "news": "新闻",
+            "opinion": "观点",
+            "payments": "支付",
+            "startupOpenSource": "创业与开源",
+            "case-study": "案例研究",
+            "online-business": "在线业务"
+        }
+    },
+    "pricing": {
+        "title": "每笔交易",
+        "subtitle": "我们只在您盈利时盈利 — 没有意外，没有隐藏费用，没有月费。",
+        "calculator": {
+            "currency": "货币",
+            "transaction_amount": "交易金额",
+            "our_fee": "我们的费用 (3.2%)",
+            "you_receive": "您收到",
+            "disclaimer": "为简单起见，此计算器中已移除每次支付1%的溢价。",
+            "see_fees": "了解我们的费用如何适用"
+        }
+    },
+    "faq": {
+        "title": "常见问题",
+        "subtitle": "找到关于我们服务的常见问题答案。",
+        "still_have_questions": "还有问题？",
+        "visit_docs": "访问我们的开发者文档",
+        "items": {
+            "pricing": {
+                "question": "lomi. 的定价方式是怎样的？",
+                "answer": "lomi. 提供透明定价，没有隐藏费用。我们对每笔交易收取简单的3.2%费用，外加根据货币不同的小额固定费用。没有设置费、月费或隐藏费用。"
+            },
+            "funds": {
+                "question": "我何时可以收到资金？",
+                "answer": "付款完成后，资金通常在2个工作日内可供提取。"
+            },
+            "payment_methods": {
+                "question": "您支持哪些支付方式？",
+                "answer": "我们支持多个非洲国家的主要信用卡和借记卡，以及移动支付。"
+            },
+            "minimum_amount": {
+                "question": "是否有最低交易金额？",
+                "answer": "不，没有最低交易金额。您可以通过我们的平台处理任何规模的支付。"
+            },
+            "security": {
+                "question": "lomi. 有多安全？",
+                "answer": "lomi. 使用行业标准安全协议，并完全符合卡支付处理的PCI DSS要求。我们采用加密、令牌化和其他安全措施来保护您的数据和客户信息。"
+            },
+            "international": {
+                "question": "我可以使用lomi.进行国际交易吗？",
+                "answer": "是的，lomi. 支持国际交易。我们可以处理多种货币的支付，包括美元和西非法郎。"
+            }
+        }
+    },
+    "story": {
+        "mission": "为西非企业提供本地化支付解决方案",
+        "ourStory": "我们的故事",
+        "storyParagraph1": "lomi. 源于一个愿景：改变非洲企业接受支付的方式。我们认识到商家在连接全球支付系统时面临的挑战，并着手构建一个弥合这一差距的解决方案。",
+        "storyParagraph2": "我们的旅程始于一个简单的想法：创建一个便捷、可靠且专为西非企业独特需求量身定制的支付平台。今天，我们很自豪能够为整个非洲大陆的商家提供服务，帮助他们在数字经济中成长和蓬勃发展。",
+        "storyParagraph3": "随着我们不断发展，我们的承诺依然坚定不移——提供创新的支付解决方案，赋能各种规模的企业家和企业，帮助他们充分发挥潜力。",
+        "ourValues": "我们的价值观",
+        "innovation": "创新",
+        "innovationDescription": "我们不断突破界限，创造尖端支付解决方案，解决非洲市场的独特挑战。",
+        "customerObsession": "以客户为中心",
+        "customerObsessionDescription": "我们的客户是我们所做一切的核心。我们倾听、学习并适应，确保满足他们不断发展的需求。",
+        "integrity": "诚信",
+        "integrityDescription": "我们以透明和诚实的方式运营，与客户、合作伙伴和团队成员建立信任。",
+        "speed": "速度",
+        "speedDescription": "我们快速行动，提供解决方案，帮助客户在快速变化的数字环境中保持领先地位。",
+        "getStarted": "开始使用"
+    },
+    "about": {
+        "title": "关于 lomi.",
+        "description": "我们是一支致力于革新非洲数字支付的热情团队。",
+        "mission": {
+            "title": "我们的使命",
+            "description": "为非洲企业提供便捷、可靠和创新的支付解决方案，推动整个大陆的经济增长和金融包容性。"
+        },
+        "vision": {
+            "title": "我们的愿景",
+            "description": "创建一个无缝的数字支付生态系统，使非洲的每一个企业，无论规模大小，都能无障碍地参与全球经济。"
+        },
+        "cta": {
+            "title": "加入 lomi. 革命",
+            "description": "成为非洲数字支付未来的一部分。立即开始使用 lomi. 接受支付。",
+            "button": "立即开始"
+        }
+    },
+    "productSales": {
+        "title": "在 WhatsApp 上销售",
+        "description": "通过我们全面的电子商务解决方案，轻松通过包括您的网站、WhatsApp 和社交媒体在内的多种渠道在线销售您的产品。",
+        "channels": {
+            "website": {
+                "title": "网站集成",
+                "description": "将我们的支付解决方案无缝集成到您现有的网站中，或使用我们托管的结账页面。",
+                "feature1": "简单的 API 集成",
+                "feature2": "可定制的结账流程",
+                "feature3": "购物车功能",
+                "button": "了解更多"
+            },
+            "whatsapp": {
+                "title": "WhatsApp 商务",
+                "description": "通过自动化产品目录、订单管理和支付链接，直接通过 WhatsApp 销售。",
+                "feature1": "数字产品目录",
+                "feature2": "自动订单处理",
+                "feature3": "安全支付链接",
+                "button": "了解更多"
+            },
+            "paymentLinks": {
+                "title": "支付链接",
+                "description": "为您的产品创建可共享的支付链接，在社交媒体、电子邮件或任何数字渠道上销售。",
+                "feature1": "一键创建链接",
+                "feature2": "社交媒体分享",
+                "feature3": "实时销售跟踪",
+                "button": "了解更多"
+            }
+        },
+        "cta": {
+            "title": "准备好提升您的产品销售？",
+            "description": "加入数千家使用 lomi. 通过多种渠道销售产品并增加收入的企业。",
+            "button": "开始使用"
+        }
+    },
+    "billing": {
+        "title": "精简账单",
+        "description": "使用我们全面的账单解决方案创建和发送专业发票，管理定期账单，并自动收取款项。",
+        "features": {
+            "invoices": {
+                "title": "专业发票",
+                "feature1": "可定制模板",
+                "feature2": "自动提醒"
+            },
+            "recurring": {
+                "title": "定期账单",
+                "feature1": "灵活的计费周期",
+                "feature2": "失败付款时自动重试"
+            },
+            "automation": {
+                "title": "支付自动化",
+                "feature1": "自动生成发票",
+                "feature2": "付款收集工作流程"
+            }
+        },
+        "howItWorks": {
+            "title": "工作原理",
+            "step1": {
+                "title": "创建",
+                "description": "设计带有您品牌的发票并设置定期计划。"
+            },
+            "step2": {
+                "title": "发送",
+                "description": "通过电子邮件自动发送带有安全支付链接的发票。"
+            },
+            "step3": {
+                "title": "获得付款",
+                "description": "直接收到付款并获得实时通知。"
+            }
+        },
+        "cta": {
+            "title": "准备好简化您的账单流程了吗？",
+            "button": "开始使用"
+        }
+    },
+    "websiteSales": {
+        "title": "在您的网站上销售",
+        "description": "将我们的支付解决方案集成到您现有的网站中，或使用我们托管的结账页面在线销售您的产品和服务。",
+        "options": {
+            "api": {
+                "title": "API集成",
+                "description": "将我们的支付API直接集成到您的网站中，实现无缝结账体验。",
+                "feature1": "完全定制控制",
+                "feature2": "无缝用户体验"
+            },
+            "hosted": {
+                "title": "托管结账",
+                "description": "使用我们预建的结账页面，您可以从您的网站中嵌入或重定向到这些页面。",
+                "feature1": "无需编码",
+                "feature2": "安全支付处理"
+            },
+            "links": {
+                "title": "支付链接",
+                "description": "创建可分享的支付链接，您可以将其添加到您的网站、电子邮件或社交媒体中。",
+                "feature1": "快速设置",
+                "feature2": "适用于任何网站"
+            }
+        },
+        "benefits": {
+            "title": "在您的网站上销售的好处",
+            "control": {
+                "title": "完全控制",
+                "description": "保持对您的品牌体验、客户旅程和结账流程的完全控制。"
+            },
+            "fees": {
+                "title": "更低费用",
+                "description": "避免市场佣金，通过我们具有竞争力的支付处理费率保留更多收入。"
+            }
+        },
+        "cta": {
+            "title": "准备好在您的网站上开始销售了吗？",
+            "button": "开始使用"
         }
     }
 }

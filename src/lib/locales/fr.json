@@ -7,7 +7,7 @@
             "sellProducts": "Vendre des produits",
             "sellSubscriptions": "Vendre des abonnements",
             "sellWhatsApp": "Vendre sur WhatsApp",
-            "sellWebsite": "Vendre sur votre application",
+            "sellWebsite": "Vendre sur votre site",
             "sendInvoices": "Facturation",
             "pricing": "Pricing",
             "faq": "FAQ"
@@ -327,8 +327,52 @@
                 },
                 "support": {
                     "title": "Support",
-                    "description": "Obtenez rapidement de l'aide et des conseils de notre équipe."
+                    "description": "Obtenez rapidement de l'aide et des conseils de nos équipes."
                 }
+            }
+        }
+    },
+    "pricing": {
+        "title": "par transaction",
+        "subtitle": "Nous ne gagnons que lorsque vous gagnez — pas de surprises, pas de frais cachés, pas de coûts mensuels.",
+        "calculator": {
+            "currency": "Devise",
+            "transaction_amount": "Montant de la transaction",
+            "our_fee": "Nos frais (3.2%)",
+            "you_receive": "Vous recevez",
+            "disclaimer": "Un premium de 1% par retrait a été retirée de ce calculateur pour plus de simplicité.",
+            "see_fees": "Voir comment nos frais s'appliquent"
+        }
+    },
+    "faq": {
+        "title": "Questions fréquemment posées",
+        "subtitle": "Trouvez des réponses aux questions courantes sur nos produits et services.",
+        "still_have_questions": "Vous avez encore des questions ?",
+        "visit_docs": "Consultez notre documentation",
+        "items": {
+            "pricing": {
+                "question": "Comment fonctionne notre tarification ?",
+                "answer": "Nous facturons 3.2% + 200 XOF ou + 0.30 USD par transaction. Il n'y a pas de frais d'installation, de frais mensuels ou de charges additionnelles."
+            },
+            "funds": {
+                "question": "Quand puis-je recevoir mes fonds ?",
+                "answer": "Les fonds sont généralement disponibles pour retrait dans les 2 jours ouvrables (généralement moins de 24 heures) après la finalisation d'un paiement."
+            },
+            "payment_methods": {
+                "question": "Quels moyens de paiement prenez-vous en charge ?",
+                "answer": "Nous prenons en charge les principales cartes de crédit et de débit, ainsi que le mobile money en Afrique de l'Ouest."
+            },
+            "minimum_amount": {
+                "question": "Y a-t-il un montant minimum de transaction ?",
+                "answer": "Non, il n'y a pas de montant minimum de transaction. Vous pouvez traiter des paiements de n'importe quel montant via notre plateforme. Un montant maximum cependant peut s'appliquer dépendant du prestataire de paiement utilisé et/ou du pays où vous opérez."
+            },
+            "security": {
+                "question": "Dans quelle mesure votre plateforme est-elle sécurisée ?",
+                "answer": "Nous respectons les protocoles de sécurité standards de l'industrie et sommes entièrement conformes aux exigences PCI DSS pour le traitement des paiements par carte. Nous employons le chiffrement, la tokenisation et d'autres mesures de sécurité pour protéger vos données et les informations de vos clients."
+            },
+            "international": {
+                "question": "Puis-je utiliser lomi. pour des transactions internationales ?",
+                "answer": "Oui, lomi. peut vous permettre de vendre à l'international. Nous pouvons traiter des paiements dans plusieurs devises, notamment USD et Euro."
             }
         }
     },
@@ -760,6 +804,276 @@
         "brand": {
             "name": "lomi.",
             "control_portal": "Portail de Contrôle"
+        }
+    },
+    "story": {
+        "mission": "Permettre aux entreprises africaines d'accéder à des solutions de paiement fluides",
+        "ourStory": "Notre Histoire",
+        "storyParagraph1": "lomi. est né d'une vision visant à transformer la façon dont les entreprises en Afrique acceptent les paiements. Nous avons reconnu les défis auxquels sont confrontés les commerçants pour se connecter aux systèmes de paiement mondiaux et avons entrepris de créer une solution qui comble cette lacune.",
+        "storyParagraph2": "Notre voyage a commencé par une idée simple : créer une plateforme de paiement accessible, fiable et adaptée aux besoins uniques des entreprises africaines. Aujourd'hui, nous sommes fiers de servir des milliers de commerçants à travers le continent, les aidant à se développer et à prospérer dans l'économie numérique.",
+        "storyParagraph3": "Alors que nous continuons à évoluer, notre engagement reste inébranlable - fournir des solutions de paiement innovantes qui permettent aux entreprises de toutes tailles d'atteindre leur plein potentiel.",
+        "ourValues": "Nos Valeurs",
+        "innovation": "Innovation",
+        "innovationDescription": "Nous repoussons constamment les limites pour créer des solutions de paiement de pointe qui répondent aux défis uniques du marché africain.",
+        "customerObsession": "Obsession du Client",
+        "customerObsessionDescription": "Nos clients sont au cœur de tout ce que nous faisons. Nous écoutons, apprenons et nous adaptons pour répondre à leurs besoins en constante évolution.",
+        "integrity": "Intégrité",
+        "integrityDescription": "Nous opérons avec transparence et honnêteté, en établissant la confiance avec nos clients, partenaires et membres de l'équipe.",
+        "speed": "Rapidité",
+        "speedDescription": "Nous agissons rapidement pour fournir des solutions qui aident nos clients à rester en avance dans un paysage numérique en rapide évolution.",
+        "getStarted": "Commencer"
+    },
+    "about": {
+        "title": "À propos de lomi.",
+        "description": "Nous sommes une équipe de personnes passionnées dédiées à révolutionner les paiements numériques en Afrique.",
+        "mission": {
+            "title": "Notre Mission",
+            "description": "Permettre aux entreprises africaines d'accéder à des solutions de paiement accessibles, fiables et innovantes qui stimulent la croissance économique et l'inclusion financière à travers le continent."
+        },
+        "vision": {
+            "title": "Notre Vision",
+            "description": "Créer un écosystème de paiement numérique fluide où chaque entreprise en Afrique, quelle que soit sa taille, peut participer à l'économie mondiale sans barrières."
+        },
+        "cta": {
+            "title": "Rejoignez la Révolution lomi.",
+            "description": "Faites partie de l'avenir des paiements numériques en Afrique. Commencez à accepter les paiements avec lomi. dès aujourd'hui.",
+            "button": "Commencer Maintenant"
+        }
+    },
+    "productSales": {
+        "title": "Vendez sur les réseaux sociaux",
+        "description": "Vendez facilement vos produits et services sur WhatsApp et les réseaux sociaux, grâce à notre gamme de produits e-commerce.",
+        "channels": {
+            "whatsapp": {
+                "title": "Commercez sur WhatsApp",
+                "description": "Vendez directement sur votre application favorite, nous prenons en charge la gestion des commandes, le paiement et la facturation.",
+                "feature1": "Votre catalogue de produits numérique",
+                "feature2": "Traitement automatisé des commandes",
+                "feature3": "Gérez vos stocks et commandes en temps réel",
+                "button": "En Savoir Plus"
+            },
+            "paymentLinks": {
+                "title": "Liens de Paiement",
+                "description": "Créez des liens de paiement partageables pour vos produits, vos clients peuvent payer directement depuis leur téléphone.",
+                "feature1": "Ajoutez de nouveaux produits en quelques clics",
+                "feature2": "Partager le lien de page de paiement sur les réseaux sociaux",
+                "feature3": "Suivez vos ventes en temps réel",
+                "button": "En Savoir Plus"
+            }
+        },
+        "features": {
+            "title": "Des fonctionnalités puissantes",
+            "inventory": {
+                "title": "Gestion des stocks",
+                "description": "Suivez les niveaux de stock, gérez les variantes de vos produits et recevez des alertes en cas de stock bas par email ou WhatsApp."
+            },
+            "orders": {
+                "title": "Gestion des commandes",
+                "description": "Traitez les commandes, gérez l'exécution et suivez vos ventes depuis un tableau de bord centralisé."
+            }
+        },
+        "cta": {
+            "title": "Prêt à booster vos ventes ?",
+            "description": "Rejoignez des centaines d'entreprises qui utilisent lomi. pour vendre des produits sur plusieurs canaux et augmenter leurs revenus.",
+            "button": "Commencer"
+        }
+    },
+    "blog": {
+        "title": "Blog",
+        "description": "Perspectives, mises à jour et actualités de l'équipe lomi.",
+        "heading": "Blog",
+        "subheading": "Découvrez les derniers articles, guides et mises à jour de nos équipes.",
+        "noPosts": "Aucun article trouvé",
+        "noPostsDesc": "Il n'y a pas d'articles disponibles dans votre langue pour le moment. Veuillez vérifier ultérieurement.",
+        "readArticle": "Lire l'article",
+        "backHome": "Retour à l'accueil",
+        "backToBlog": "Retour au blog",
+        "loading": "Chargement...",
+        "loadingDesc": "Chargement de l'article...",
+        "notFound": "Article non trouvé",
+        "notFoundDesc": "L'article que vous recherchez n'existe pas ou a été supprimé.",
+        "byAuthor": "Par {{author}}",
+        "featuredImage": "Image à la une",
+        "illustration": "Illustration",
+        "article": "Article",
+        "categories": {
+            "news": "Actualités",
+            "opinion": "Opinion",
+            "payments": "Paiements",
+            "startupOpenSource": "Startup & Open Source",
+            "case-study": "Étude de cas",
+            "online-business": "Commerce en ligne"
+        }
+    },
+    "products": {
+        "title": "Vendez des produits",
+        "description": "Créez, gérez et vendez vos produits avec notre système complet de gestion de produits. Suivez facilement les stocks, définissez les prix et analysez les performances de vente.",
+        "features": {
+            "catalog": {
+                "title": "Catalogue de produits",
+                "description": "Créez et gérez votre catalogue de produits avec des descriptions détaillées, des images et des variantes.",
+                "feature1": "Produits illimités",
+                "feature2": "Plusieurs images par produit"
+            },
+            "pricing": {
+                "title": "Prix et inventaire",
+                "description": "Définissez des options de prix flexibles et suivez les niveaux d'inventaire en temps réel.",
+                "feature1": "Options de tarification par paliers",
+                "feature2": "Alertes de stock bas"
+            },
+            "analytics": {
+                "title": "Analytique des ventes",
+                "description": "Suivez la performance des produits avec des analyses et des rapports de vente détaillés.",
+                "feature1": "Tableaux de bord de performance des ventes",
+                "feature2": "Analyses clients"
+            }
+        },
+        "howItWorks": {
+            "title": "Comment ça marche",
+            "step1": {
+                "title": "1. Créez des produits",
+                "description": "Ajoutez vos produits avec descriptions, images, prix et niveaux de stock."
+            },
+            "step2": {
+                "title": "2. Vendez partout",
+                "description": "Vendez vos produits via votre site web, WhatsApp ou des liens de paiement."
+            },
+            "step3": {
+                "title": "3. Suivez les performances",
+                "description": "Surveillez les ventes, les stocks et le comportement des clients avec des analyses détaillées."
+            }
+        },
+        "cta": {
+            "title": "Prêt à gérer efficacement vos produits ?",
+            "button": "Commencer"
+        }
+    },
+    "subscriptionManagement": {
+        "title": "Vendez des abonnements",
+        "description": "Créez et gérez vos flux de revenus récurrents avec nos puissants outils de gestion d'abonnements. Parfait pour les SaaS, les adhésions et les services récurrents.",
+        "features": {
+            "billing": {
+                "title": "Options de facturation flexibles",
+                "description": "Configurez des cycles de facturation quotidiens, hebdomadaires, bimensuels, mensuels, trimestriels ou annuels avec des niveaux de prix personnalisables et des périodes d'essai.",
+                "feature1": "Fréquences de facturation très flexibles",
+                "feature2": "Options d'essai gratuit et payant"
+            },
+            "payment": {
+                "title": "Facturation automatisée des paiements récurrents",
+                "description": "Facturez automatiquement les clients selon leur cycle de facturation s'ils ont des cartes enregistrées. S'ils n'ont pas payé par carte, nous les relancerons automatiquement par email et téléphone pour qu'ils poursuivent leur abonnement via Mobile Money.",
+                "feature1": "Conforme aux normes PCI DSS",
+                "feature2": "Logique de relance modulaire et flexible"
+            },
+            "analytics": {
+                "title": "Analytique",
+                "description": "Suivez les métriques clés comme le MRR, le taux de désabonnement, la valeur vie client (LTV) et la croissance des abonnements avec des graphiques détaillés.",
+                "feature1": "LTV et prévisions de revenus récurrents",
+                "feature2": "Analyse des désabonnements"
+            },
+            "management": {
+                "title": "Libre-service client",
+                "description": "Permettez aux clients de gérer leurs propres abonnements grâce à un portail convivial pour les mises à niveau, les rétrogradations, les annulations et les demandes d'assistance.",
+                "feature1": "Changement de plan",
+                "feature2": "Mises à jour des moyens de paiement"
+            }
+        },
+        "useCases": {
+            "title": "Parfait pour",
+            "saas": {
+                "title": "Entreprises SaaS",
+                "description": "Gérez des plans tarifaires, des essais gratuits et des facturations annuelles ou mensuelles pour votre service logiciel."
+            },
+            "membership": {
+                "title": "Sites d'adhésion",
+                "description": "Créez des plans d'adhésion récurrents avec différents niveaux d'accès et une facturation automatisée."
+            },
+            "services": {
+                "title": "Prestataires de services",
+                "description": "Proposez des services récurrents comme les abonnements à des magazines, des cours en ligne ou la livraison de produits avec des options de planification flexibles."
+            }
+        },
+        "cta": {
+            "title": "Prêt à développer vos revenus récurrents ?",
+            "button": "Commencer"
+        }
+    },
+    "billing": {
+        "title": "Une facturation simplifiée",
+        "description": "Créez et envoyez des factures — gérez et automatisez les paiements récurrents avec notre solution de facturation",
+        "features": {
+            "invoices": {
+                "title": "Factures professionnelles",
+                "feature1": "Modèles personnalisables",
+                "feature2": "Rappels automatiques"
+            },
+            "recurring": {
+                "title": "Facturation récurrente",
+                "feature1": "Cycles de facturation flexibles",
+                "feature2": "Rappel automatique en cas d'échec de paiement"
+            },
+            "automation": {
+                "title": "Essentiellement automatique",
+                "feature1": "Génération automatique de factures",
+                "feature2": "Flux de travail de collecte des paiements"
+            }
+        },
+        "howItWorks": {
+            "title": "Comment ça fonctionne",
+            "step1": {
+                "title": "Créer",
+                "description": "Concevez des factures avec votre branding ou laisser notre système le faire pour vous à chaque paiement."
+            },
+            "step2": {
+                "title": "Envoyer",
+                "description": "Envoyez sur demande des factures par e-mail, SMS ou WhatsApp avec des liens de paiement sécurisés."
+            },
+            "step3": {
+                "title": "Être Payé",
+                "description": "Soyez alerté des paiements avec des notifications en temps réel."
+            }
+        },
+        "cta": {
+            "title": "Prêt à simplifier votre processus de facturation?",
+            "button": "Commencer"
+        }
+    },
+    "websiteSales": {
+        "title": "Vendez sur votre site",
+        "description": "Intégrez notre solution de paiement à votre site ou utilisez nos pages de paiement hébergées pour vendre produits et services en ligne en quelques minutes.",
+        "options": {
+            "api": {
+                "title": "Checkout API",
+                "description": "Intégrez notre API de checkout pour une expérience de paiement fluide et personnalisable.",
+                "feature1": "Contrôle total de l'expérience utilisateur",
+                "feature2": "Automatisation des paiements"
+            },
+            "hosted": {
+                "title": "Page de paiement",
+                "description": "Utilisez nos pages de paiement préconçues que vous pouvez intégrer ou rediriger depuis votre site web en quelques minutes.",
+                "feature1": "No-code",
+                "feature2": "Prêt en quelques minutes"
+            },
+            "links": {
+                "title": "Liens de paiement",
+                "description": "Générez des liens de paiement que vous pouvez ajouter à votre site web ou partager sur les réseaux sociaux.",
+                "feature1": "Configuration rapide",
+                "feature2": "Flexibilité d'utilisation"
+            }
+        },
+        "benefits": {
+            "title": "Les avantages",
+            "control": {
+                "title": "Contrôle total",
+                "description": "Soyez au contrôle de l'expérience utilisateur et du parcours client."
+            },
+            "fees": {
+                "title": "Frais réduits",
+                "description": "Évitez les commissions des places de marché et conservez davantage de vos revenus grâce à nos tarifs compétitifs de traitement des paiements."
+            }
+        },
+        "cta": {
+            "title": "Prêt à commencer à vendre sur votre site web?",
+            "button": "Commencer"
         }
     }
 }

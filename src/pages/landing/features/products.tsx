@@ -14,7 +14,7 @@ import { ButtonExpand } from '@/components/design/button-expand';
 // Smaller version of OrbitingCirclesDemo for the products page
 const CompactOrbitingCircles = () => {
     return (
-        <div className="scale-[0.6] origin-center transform-gpu -mt-6">
+        <div className="scale-[0.6] md:scale-[0.75] lg:scale-[0.6] origin-center transform-gpu -mt-6">
             <div className="w-[400px] h-[300px] overflow-visible">
                 <OrbitingCirclesDemo />
             </div>
@@ -74,7 +74,19 @@ const Products = () => {
                             variant="ghost"
                             size="icon"
                             className="absolute top-10 left-10 inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-black/50 text-gray-700 hover:text-gray-900 dark:text-sage-100 dark:hover:text-sage-200 dark:hover:bg-zinc-900 dark:border-zinc-800 border border-gray-200 h-10 w-10 rounded-none transition-colors"
-                            onClick={() => navigate(-1)}
+                            onClick={() => {
+                                navigate(-1);
+                                // Add slight delay to ensure navigation completes before scrolling
+                                setTimeout(() => {
+                                    // If coming from home, we want to scroll to the bottom where the footer is
+                                    if (document.referrer.includes('/')) {
+                                        const footer = document.querySelector('.scroll-footer');
+                                        if (footer) {
+                                            footer.scrollIntoView({ behavior: 'smooth' });
+                                        }
+                                    }
+                                }, 100);
+                            }}
                         >
                             <ChevronLeft className="h-5 w-5" />
                         </Button>
@@ -91,22 +103,21 @@ const Products = () => {
                         transition={{ duration: 0.5 }}
                         className="relative pt-16 md:pt-20"
                     >
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                            <div className="md:max-w-2xl">
-                                <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                                    {t('products.title', 'Sell products')}
-                                </h1>
-                                <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl mb-8 md:mb-0">
-                                    {t('products.description', 'Create, manage, and sell your products with our comprehensive product management system. Easily track inventory, set pricing, and analyze sales performance.')}
-                                </p>
-                                {/* Mobile orbiting circles - only visible on small screens */}
-                                <div className="flex justify-center md:hidden my-6">
-                                    <CompactOrbitingCircles />
-                                </div>
-                            </div>
-                            <div className="hidden md:block md:flex-shrink-0">
-                                <CompactOrbitingCircles />
-                            </div>
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
+                            {t('products.title', 'Sell products')}
+                        </h1>
+                        <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
+                            {t('products.description', 'Create, manage, and sell your products with our comprehensive product management system. Easily track inventory, set pricing, and analyze sales performance.')}
+                        </p>
+
+                        {/* Orbiting circles - positioned absolutely */}
+                        <div className="absolute top-16 right-0 md:top-20 lg:top-12 transform translate-x-0 md:-translate-x-8 lg:translate-x-12 xl:translate-x-24 hidden md:block z-10">
+                            <CompactOrbitingCircles />
+                        </div>
+
+                        {/* Mobile orbiting circles - only visible on small screens */}
+                        <div className="flex justify-center md:hidden mt-12 mb-8">
+                            <CompactOrbitingCircles />
                         </div>
                     </motion.div>
 
@@ -123,7 +134,7 @@ const Products = () => {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Product Management Features */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

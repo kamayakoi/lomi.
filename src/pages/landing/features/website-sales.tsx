@@ -80,10 +80,10 @@ export default function WebsiteSalesPage() {
                         className="relative pt-16 md:pt-20"
                     >
                         <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('websiteSales.title', 'Sell on your website')}
+                            {t('websiteSales.title')}
                         </h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
-                            {t('websiteSales.description', 'Integrate our payment solution into your existing website or use our hosted checkout pages to sell your products and services online.')}
+                            {t('websiteSales.description')}
                         </p>
                     </motion.div>
 
@@ -100,7 +100,7 @@ export default function WebsiteSalesPage() {
                                 viewport={{ once: true, margin: "-100px" }}
                                 className="mb-16"
                             >
-                                <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
+                                <Card className="w-full max-w-5xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Integration Options */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -109,23 +109,23 @@ export default function WebsiteSalesPage() {
                                                 <div className="flex items-center mb-2">
                                                     <Code className="h-5 w-5 text-blue-500 mr-2" />
                                                     <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                        {t('websiteSales.options.api.title', 'API Integration')}
+                                                        {t('websiteSales.options.api.title')}
                                                     </h3>
                                                 </div>
                                                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                    {t('websiteSales.options.api.description', 'Integrate our payment API directly into your website for a seamless checkout experience.')}
+                                                    {t('websiteSales.options.api.description')}
                                                 </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.api.feature1', 'Full customization control')}
+                                                            {t('websiteSales.options.api.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.api.feature2', 'Seamless user experience')}
+                                                            {t('websiteSales.options.api.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -136,23 +136,23 @@ export default function WebsiteSalesPage() {
                                                 <div className="flex items-center mb-2">
                                                     <Globe className="h-5 w-5 text-blue-500 mr-2" />
                                                     <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                        {t('websiteSales.options.hosted.title', 'Hosted Checkout')}
+                                                        {t('websiteSales.options.hosted.title')}
                                                     </h3>
                                                 </div>
                                                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                    {t('websiteSales.options.hosted.description', 'Use our pre-built checkout pages that you can embed or redirect to from your website.')}
+                                                    {t('websiteSales.options.hosted.description')}
                                                 </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.hosted.feature1', 'No coding required')}
+                                                            {t('websiteSales.options.hosted.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.hosted.feature2', 'Secure payment processing')}
+                                                            {t('websiteSales.options.hosted.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -163,23 +163,23 @@ export default function WebsiteSalesPage() {
                                                 <div className="flex items-center mb-2">
                                                     <ShoppingCart className="h-5 w-5 text-blue-500 mr-2" />
                                                     <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                        {t('websiteSales.options.links.title', 'Payment Links')}
+                                                        {t('websiteSales.options.links.title')}
                                                     </h3>
                                                 </div>
                                                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                    {t('websiteSales.options.links.description', 'Create shareable payment links that you can add to your website, emails, or social media.')}
+                                                    {t('websiteSales.options.links.description')}
                                                 </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.links.feature1', 'Quick setup')}
+                                                            {t('websiteSales.options.links.feature1')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('websiteSales.options.links.feature2', 'Works with any website')}
+                                                            {t('websiteSales.options.links.feature2')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -189,23 +189,23 @@ export default function WebsiteSalesPage() {
                                         {/* Benefits Section */}
                                         <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-6">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
-                                                {t('websiteSales.benefits.title', 'Benefits of Selling on Your Website')}
+                                                {t('websiteSales.benefits.title')}
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
                                                     <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
-                                                        {t('websiteSales.benefits.control.title', 'Complete Control')}
+                                                        {t('websiteSales.benefits.control.title')}
                                                     </h4>
                                                     <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                                                        {t('websiteSales.benefits.control.description', 'Maintain full control over your brand experience, customer journey, and checkout process.')}
+                                                        {t('websiteSales.benefits.control.description')}
                                                     </p>
                                                 </div>
                                                 <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
                                                     <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
-                                                        {t('websiteSales.benefits.fees.title', 'Lower Fees')}
+                                                        {t('websiteSales.benefits.fees.title')}
                                                     </h4>
                                                     <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                                                        {t('websiteSales.benefits.fees.description', 'Avoid marketplace commissions and keep more of your revenue with our competitive payment processing rates.')}
+                                                        {t('websiteSales.benefits.fees.description')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -215,10 +215,10 @@ export default function WebsiteSalesPage() {
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-medium text-zinc-900 dark:text-white mb-4 sm:mb-0">
-                                                    {t('websiteSales.cta.title', 'Ready to start selling on your website?')}
+                                                    {t('websiteSales.cta.title')}
                                                 </p>
                                                 <ButtonExpand
-                                                    text={t('websiteSales.cta.button', 'Get Started')}
+                                                    text={t('websiteSales.cta.button')}
                                                     bgColor="bg-blue-50 dark:bg-blue-900/30"
                                                     textColor="text-blue-700 dark:text-blue-300"
                                                     hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"

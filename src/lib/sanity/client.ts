@@ -26,10 +26,24 @@ export const client = createClient({
   stega: false, // Disable stega in development
 });
 
-// Helper function to build image URLs
+// Enhanced image builder with improved defaults
 const builder = imageUrlBuilder(client);
 
-export const urlFor = (source: SanityImageSource) => {
-  // Always return an ImageUrlBuilder even if source is null/undefined
-  return source ? builder.image(source) : builder.image({});
+// Improved image URL helper with better defaults and options
+export const urlFor = (source: SanityImageSource, options?: { width?: number, height?: number, quality?: number }) => {
+  if (!source) return builder.image({});
+  
+  let imageBuilder = builder.image(source);
+  
+  // Apply options if provided
+  if (options) {
+    if (options.width) imageBuilder = imageBuilder.width(options.width);
+    if (options.height) imageBuilder = imageBuilder.height(options.height);
+    if (options.quality) imageBuilder = imageBuilder.quality(options.quality);
+  }
+  
+  // Always ensure proper format and auto-optimization
+  imageBuilder = imageBuilder.format('webp').auto('format');
+  
+  return imageBuilder;
 }; 
