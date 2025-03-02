@@ -329,14 +329,14 @@ export function Footer() {
                                             <span className="sr-only">Consultez notre code sur GitHub</span>
                                         </Link> */}
                                         <Link
-                                            to="#"
+                                            to="/blog"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-zinc-700 dark:text-zinc-300 hover:text-blue-400 dark:hover:text-blue-400 inline-flex items-center transition-colors"
                                             aria-label="Join our newsletter"
                                         >
                                             <Globe className="h-[20px] w-[20px]" />
-                                            <span className="sr-only">Join our newsletter</span>
+                                            <span className="sr-only">Read our blog</span>
                                         </Link>
                                         <Link
                                             to="#"

@@ -137,6 +137,7 @@ export default function Sidebar({ className }: SidebarProps) {
             <SidebarActionButton variant="website" onClick={() => window.open('https://lomi.africa', '_blank')} />
             <SidebarActionButton variant="developers" onClick={() => window.open('https://developers.lomi.africa/docs/introduction/what-is-lomi', '_blank')} />
             <SidebarActionButton variant="book-call" onClick={() => window.open('https://cal.com/babacar-diop', '_blank')} />
+            <SidebarActionButton variant="blog" onClick={() => window.open('https://lomi.africa/blog', '_blank')} />
           </div>
 
           {/* Organization Switcher */}

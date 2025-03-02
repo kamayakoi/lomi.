@@ -1,8 +1,8 @@
 import { cn } from '@/lib/actions/utils'
-import { IconCircleCheck, IconCode, IconTent, IconPhone } from '@tabler/icons-react'
+import { IconCircleCheck, IconCode, IconTent, IconPhone, IconBook } from '@tabler/icons-react'
 
 interface SidebarActionButtonProps {
-    variant: 'developers' | 'book-call' | 'website' | 'status'
+    variant: 'developers' | 'book-call' | 'website' | 'status' | 'blog'
     onClick?: () => void
 }
 
@@ -11,6 +11,8 @@ export function SidebarActionButton({ variant, onClick }: SidebarActionButtonPro
         switch (variant) {
             case 'developers':
                 return <IconCode size={16} className="text-emerald-500" />
+            case 'blog':
+                return <IconBook size={16} className="text-zinc-700 dark:text-zinc-300" />
             case 'book-call':
                 return <IconPhone size={16} className="text-orange-500" />
             case 'website':
@@ -24,6 +26,8 @@ export function SidebarActionButton({ variant, onClick }: SidebarActionButtonPro
         switch (variant) {
             case 'developers':
                 return 'Documentation'
+            case 'blog':
+                return 'Blog'
             case 'website':
                 return 'Website'
             case 'status':
