@@ -342,7 +342,7 @@ export function Footer() {
                                             to="#"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hidden sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#E01E5A] dark:hover:text-[#E01E5A] items-center transition-colors"
+                                            className="sm:inline-flex text-zinc-700 dark:text-zinc-300 hover:text-[#E01E5A] dark:hover:text-[#E01E5A] items-center transition-colors"
                                             aria-label="Rejoignez notre communauté Slack"
                                         >
                                             <SlackIcon className="h-[20px] w-[20px]" />

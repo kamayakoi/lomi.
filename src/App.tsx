@@ -8,7 +8,7 @@ import { Suspense, useEffect } from 'react';
 import AppRouter from "./router";
 import AnimatedLogoLoader from "@/components/portal/loader";
 import mixpanelService from "@/utils/mixpanel/mixpanel";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -43,27 +43,29 @@ function TitleResetManager() {
 export function App() {
     const defaultTitle = "lomi. | West Africa's Payment Orchestration Platform";
     return (
-        <QueryClientProvider client={queryClient}>
-            <Suspense fallback={<AnimatedLogoLoader />}>
-                <ThemeProvider>
-                    <UserProvider>
-                        <BrowserRouter
-                            future={{
-                                v7_startTransition: true,
-                                v7_relativeSplatPath: true
-                            }}
-                        >
-                            <Helmet>
-                                <title>{defaultTitle}</title>
-                            </Helmet>
-                            <TitleResetManager />
-                            <AppRouter />
-                            <Toaster />
-                        </BrowserRouter>
-                        <Analytics />
-                    </UserProvider>
-                </ThemeProvider>
-            </Suspense>
-        </QueryClientProvider>
+        <HelmetProvider>
+            <QueryClientProvider client={queryClient}>
+                <Suspense fallback={<AnimatedLogoLoader />}>
+                    <ThemeProvider>
+                        <UserProvider>
+                            <BrowserRouter
+                                future={{
+                                    v7_startTransition: true,
+                                    v7_relativeSplatPath: true
+                                }}
+                            >
+                                <Helmet>
+                                    <title>{defaultTitle}</title>
+                                </Helmet>
+                                <TitleResetManager />
+                                <AppRouter />
+                                <Toaster />
+                            </BrowserRouter>
+                            <Analytics />
+                        </UserProvider>
+                    </ThemeProvider>
+                </Suspense>
+            </QueryClientProvider>
+        </HelmetProvider>
     );
 } 

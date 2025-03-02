@@ -22,7 +22,6 @@ export default function SignUp() {
     setErrorMessage('');
 
     try {
-      console.log('Calling supabase.auth.signUp with data:', data);
       const { data: signUpData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,

@@ -146,7 +146,7 @@ export default function PricingPage() {
                                     <AnimatePresence mode="wait">
                                         <motion.span
                                             key={titleNumber}
-                                            className="absolute text-zinc-800 dark:text-white"
+                                            className="absolute text-zinc-800 dark:text-white whitespace-nowrap mt-2"
                                             initial={{ opacity: 0, y: titleNumber === 0 ? -50 : 50 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: titleNumber === 0 ? 50 : -50 }}
@@ -156,6 +156,7 @@ export default function PricingPage() {
                                                 duration: 2,
                                                 exit: { duration: 1.5 }
                                             }}
+                                            style={{ top: "9px" }}
                                         >
                                             {prices[titleNumber]}
                                         </motion.span>

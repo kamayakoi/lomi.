@@ -114,15 +114,12 @@ export default function StoryPage() {
                                                 <p>
                                                     {t('story.storyParagraph2')}
                                                 </p>
-                                                <p>
-                                                    {t('story.storyParagraph3')}
-                                                </p>
                                             </div>
                                         </div>
 
                                         {/* Our Values Section */}
                                         <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-8">
-                                            <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
+                                            <h3 className="text-2xl font-medium mb-4 text-zinc-900 dark:text-white">
                                                 {t('story.ourValues')}
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

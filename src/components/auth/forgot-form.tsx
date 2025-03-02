@@ -42,8 +42,6 @@ export function ForgotForm({ className, onSuccess, ...props }: ForgotFormProps) 
       const baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin
       const callbackUrl = `${baseUrl}/auth/callback`
 
-      console.log('Reset password callback URL:', callbackUrl)
-
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
         redirectTo: callbackUrl,
       })

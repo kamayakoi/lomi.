@@ -213,7 +213,7 @@ export default function SubscriptionManagementPage() {
                                             </div>
                                         </div>
 
-                                        {/* Use Cases Section */}
+                                        {/* Use Cases Section
                                         <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-6">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
                                                 {t('subscriptionManagement.useCases.title', 'Perfect for')}
@@ -244,7 +244,7 @@ export default function SubscriptionManagementPage() {
                                                     </p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         {/* CTA Section */}
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">

@@ -405,7 +405,6 @@ export const postType = defineType({
           { title: 'Portuguese', value: 'pt' },
           { title: 'Chinese', value: 'zh' },
         ],
-        layout: 'tags',
       },
       initialValue: ['en'],
     }),

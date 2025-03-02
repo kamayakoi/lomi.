@@ -27,7 +27,6 @@ class MixpanelService {
         api_host: "https://api.mixpanel.com",
       });
       this.initialized = true;
-      console.log('Mixpanel initialized with token:', MIXPANEL_TOKEN);
     } catch (error) {
       console.error('Failed to initialize Mixpanel:', error);
     }
@@ -65,7 +64,6 @@ class MixpanelService {
    * @param properties - Additional properties to include with the event
    */
   track(eventName: string, properties?: Record<string, any>) {
-    console.log('Tracking event:', eventName, properties);
     if (!this.initialized) {
       this.init();
     }

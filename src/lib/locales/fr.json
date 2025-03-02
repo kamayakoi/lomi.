@@ -54,7 +54,7 @@
         "cta": "Soutenez-nous !"
     },
     "actions": {
-        "talk": "Parlons-en",
+        "talk": "Contactez-nous",
         "connect": "Se connecter"
     },
     "auth": {
@@ -807,37 +807,23 @@
         }
     },
     "story": {
-        "mission": "Permettre aux entreprises africaines d'accéder à des solutions de paiement fluides",
-        "ourStory": "Notre Histoire",
-        "storyParagraph1": "lomi. est né d'une vision visant à transformer la façon dont les entreprises en Afrique acceptent les paiements. Nous avons reconnu les défis auxquels sont confrontés les commerçants pour se connecter aux systèmes de paiement mondiaux et avons entrepris de créer une solution qui comble cette lacune.",
-        "storyParagraph2": "Notre voyage a commencé par une idée simple : créer une plateforme de paiement accessible, fiable et adaptée aux besoins uniques des entreprises africaines. Aujourd'hui, nous sommes fiers de servir des milliers de commerçants à travers le continent, les aidant à se développer et à prospérer dans l'économie numérique.",
-        "storyParagraph3": "Alors que nous continuons à évoluer, notre engagement reste inébranlable - fournir des solutions de paiement innovantes qui permettent aux entreprises de toutes tailles d'atteindre leur plein potentiel.",
-        "ourValues": "Nos Valeurs",
+        "mission": "Notre mission",
+        "description": "Nous donnons aux entreprises d'Afrique de l'Ouest de toutes tailles accès à des solutions financières adaptées et accessibles.",
+        "ourStory": "Notre histoire",
+        "storyParagraph1": "lomi. est né d'une vision visant à transformer la façon dont les entreprises en Afrique acceptent les paiements. Nous avons reconnu les défis auxquels sont confrontés les commerçants pour se connecter aux systèmes de paiement locaux et mondiaux et avons entrepris de créer une solution open source qui comble cette lacune.",
+        "storyParagraph2": "Notre voyage a commencé avec l'idée de construire une plateforme de paiement accessible et fiable, adaptée aux besoins uniques des entreprises d'Afrique de l'Ouest francophone. Aujourd'hui, nous sommes fiers de servir des commerçants dans toute la région et de les aider à se développer et à prospérer dans l'économie numérique. Alors que nous continuons à évoluer, notre engagement reste inébranlable : fournir des solutions innovantes qui permettent aux entrepreneurs et aux entreprises d'atteindre leur plein potentiel.",
+        "ourValues": "Nos valeurs",
         "innovation": "Innovation",
-        "innovationDescription": "Nous repoussons constamment les limites pour créer des solutions de paiement de pointe qui répondent aux défis uniques du marché africain.",
-        "customerObsession": "Obsession du Client",
-        "customerObsessionDescription": "Nos clients sont au cœur de tout ce que nous faisons. Nous écoutons, apprenons et nous adaptons pour répondre à leurs besoins en constante évolution.",
+        "innovationDescription": "Nous nous efforçons de créer de nouvelles solutions pour répondre aux défis uniques auxquels sont confrontées les entreprises d'Afrique de l'Ouest.",
+        "customerObsession": "Obsession du client",
+        "customerObsessionDescription": "Nous plaçons nos commerçants au centre de tout ce que nous faisons, en concevant des produits et services qui répondent véritablement à leurs besoins.",
         "integrity": "Intégrité",
-        "integrityDescription": "Nous opérons avec transparence et honnêteté, en établissant la confiance avec nos clients, partenaires et membres de l'équipe.",
+        "integrityDescription": "Nous respectons les normes les plus élevées de sécurité et de transparence dans toutes nos opérations.",
         "speed": "Rapidité",
-        "speedDescription": "Nous agissons rapidement pour fournir des solutions qui aident nos clients à rester en avance dans un paysage numérique en rapide évolution.",
-        "getStarted": "Commencer"
-    },
-    "about": {
-        "title": "À propos de lomi.",
-        "description": "Nous sommes une équipe de personnes passionnées dédiées à révolutionner les paiements numériques en Afrique.",
-        "mission": {
-            "title": "Notre Mission",
-            "description": "Permettre aux entreprises africaines d'accéder à des solutions de paiement accessibles, fiables et innovantes qui stimulent la croissance économique et l'inclusion financière à travers le continent."
-        },
-        "vision": {
-            "title": "Notre Vision",
-            "description": "Créer un écosystème de paiement numérique fluide où chaque entreprise en Afrique, quelle que soit sa taille, peut participer à l'économie mondiale sans barrières."
-        },
+        "speedDescription": "Nous agissons rapidement pour construire, itérer et livrer des solutions qui permettent à nos commerçants de rester en avance dans un écosystème en évolution rapide.",
         "cta": {
-            "title": "Rejoignez la Révolution lomi.",
-            "description": "Faites partie de l'avenir des paiements numériques en Afrique. Commencez à accepter les paiements avec lomi. dès aujourd'hui.",
-            "button": "Commencer Maintenant"
+            "title": "Prêt à travailler avec nous ?",
+            "button": "Commencer"
         }
     },
     "productSales": {
@@ -906,11 +892,11 @@
         }
     },
     "products": {
-        "title": "Vendez des produits",
+        "title": "Vendez vos produits",
         "description": "Créez, gérez et vendez vos produits avec notre système complet de gestion de produits. Suivez facilement les stocks, définissez les prix et analysez les performances de vente.",
         "features": {
             "catalog": {
-                "title": "Catalogue de produits",
+                "title": "Catalogue de produits et services",
                 "description": "Créez et gérez votre catalogue de produits avec des descriptions détaillées, des images et des variantes.",
                 "feature1": "Produits illimités",
                 "feature2": "Plusieurs images par produit"
@@ -949,7 +935,7 @@
         }
     },
     "subscriptionManagement": {
-        "title": "Vendez des abonnements",
+        "title": "Vendez vos abonnements",
         "description": "Créez et gérez vos flux de revenus récurrents avec nos puissants outils de gestion d'abonnements. Parfait pour les SaaS, les adhésions et les services récurrents.",
         "features": {
             "billing": {

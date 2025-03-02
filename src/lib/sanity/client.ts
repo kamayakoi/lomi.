@@ -16,14 +16,18 @@ console.log("Sanity Configuration:", {
   hasToken: !!token 
 });
 
+// Determine environment
+const isDevelopment = import.meta.env.DEV;
+
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: false, // Don't use CDN to ensure we get the latest data
+  useCdn: !isDevelopment, // Use CDN in production, not in development
   token, // Include token for authenticated requests
   perspective: 'published', // Only fetch published content
   stega: false, // Disable stega in development
+  withCredentials: true, // Add withCredentials for CORS
 });
 
 // Enhanced image builder with improved defaults

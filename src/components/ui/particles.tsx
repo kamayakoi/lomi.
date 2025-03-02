@@ -74,13 +74,11 @@ const Particles: React.FC<ParticlesProps> = ({
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
 
   const initCanvas = () => {
-    console.log("initCanvas called");
     resizeCanvas();
     drawParticles();
   };
 
   const animate = () => {
-    console.log("animate called");
     clearContext();
     circles.current.forEach((circle: Circle, i: number) => {
       // Handle the alpha value
@@ -132,7 +130,6 @@ const Particles: React.FC<ParticlesProps> = ({
   };
 
   useEffect(() => {
-    console.log("Particles useEffect called");
     if (canvasRef.current) {
       context.current = canvasRef.current.getContext("2d");
     }
@@ -158,7 +155,6 @@ const Particles: React.FC<ParticlesProps> = ({
       circles.current.length = 0;
       canvasSize.current.w = canvasContainerRef.current.offsetWidth;
       canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-      console.log("Canvas dimensions:", canvasSize.current.w, canvasSize.current.h);
       canvasRef.current.width = canvasSize.current.w * dpr;
       canvasRef.current.height = canvasSize.current.h * dpr;
       canvasRef.current.style.width = `${canvasSize.current.w}px`;

@@ -80,7 +80,6 @@ export default function CookieConsent() {
             setIsVisible(false)
             setShowAnimation(false)
             // Here you would typically initialize your tracking code
-            console.log("Tracking cookies accepted")
         }, 800) // Faster animation
     }
 
@@ -93,7 +92,6 @@ export default function CookieConsent() {
             setCookieConsentStatus("declined")
             setIsVisible(false)
             setShowAnimation(false)
-            console.log("Tracking cookies declined")
         }, 300) // Very fast disappearance
     }
 

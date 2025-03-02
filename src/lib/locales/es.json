@@ -917,7 +917,7 @@
         "title": "Blog",
         "description": "Conocimientos, actualizaciones y noticias del equipo de lomi.",
         "heading": "Blog",
-        "subheading": "Descubre los últimos artículos, guías y actualizaciones de nuestro equipo",
+        "subheading": "Descubre los últimos artículos, guías y actualizaciones de nuestro equipo.",
         "noPosts": "No se encontraron publicaciones",
         "noPostsDesc": "No hay publicaciones disponibles en tu idioma en este momento. Por favor, vuelve más tarde.",
         "readArticle": "Leer artículo",
@@ -941,21 +941,24 @@
         }
     },
     "story": {
-        "mission": "Potenciando empresas de África Occidental con soluciones de pago localizadas",
-        "ourStory": "Nuestra Historia",
-        "storyParagraph1": "lomi. nació de una visión para transformar cómo las empresas en África aceptan pagos. Reconocimos los desafíos que enfrentan los comerciantes para conectarse con sistemas de pago globales y nos propusimos construir una solución que cierre esta brecha.",
-        "storyParagraph2": "Nuestro viaje comenzó con una idea simple: crear una plataforma de pagos que sea accesible, confiable y adaptada a las necesidades únicas de las empresas de África Occidental. Hoy, estamos orgullosos de servir a comerciantes en todo el continente, ayudándoles a crecer y prosperar en la economía digital.",
-        "storyParagraph3": "A medida que continuamos evolucionando, nuestro compromiso sigue siendo inquebrantable: proporcionar soluciones de pago innovadoras que empoderen a emprendedores y empresas de todos los tamaños para alcanzar su máximo potencial.",
-        "ourValues": "Nuestros Valores",
+        "mission": "Nuestra misión",
+        "description": "Empoderamos a las empresas de África Occidental de todos los tamaños con soluciones financieras accesibles y adaptadas.",
+        "ourStory": "Nuestra historia",
+        "storyParagraph1": "lomi. nació de una visión para transformar cómo las empresas en África aceptan pagos. Reconocimos los desafíos que enfrentan los comerciantes para conectarse con sistemas de pago locales y globales y nos propusimos construir una solución de código abierto que cierre esta brecha.",
+        "storyParagraph2": "Nuestro viaje comenzó con la idea de crear una plataforma de pagos accesible y confiable, adaptada a las necesidades únicas de las empresas en África Occidental francófona. Hoy, estamos orgullosos de servir a comerciantes en toda la región y ayudarles a crecer y prosperar en la economía digital. A medida que continuamos evolucionando, nuestro compromiso sigue siendo inquebrantable: proporcionar soluciones innovadoras que empoderen a emprendedores y empresas para alcanzar su máximo potencial.",
+        "ourValues": "Nuestros valores",
         "innovation": "Innovación",
-        "innovationDescription": "Constantemente empujamos los límites para crear soluciones de pago vanguardistas que aborden los desafíos únicos del mercado africano.",
-        "customerObsession": "Obsesión por el Cliente",
-        "customerObsessionDescription": "Nuestros clientes están en el centro de todo lo que hacemos. Escuchamos, aprendemos y nos adaptamos para asegurar que estamos satisfaciendo sus necesidades en evolución.",
+        "innovationDescription": "Nos esforzamos por crear nuevas soluciones para abordar los desafíos únicos que enfrentan las empresas de África Occidental.",
+        "customerObsession": "Obsesión por el cliente",
+        "customerObsessionDescription": "Ponemos a nuestros comerciantes en el centro de todo lo que hacemos, diseñando productos y servicios que realmente satisfacen sus necesidades.",
         "integrity": "Integridad",
-        "integrityDescription": "Operamos con transparencia y honestidad, construyendo confianza con nuestros clientes, socios y miembros del equipo.",
+        "integrityDescription": "Mantenemos los más altos estándares de seguridad y transparencia en todas nuestras operaciones.",
         "speed": "Velocidad",
-        "speedDescription": "Nos movemos rápidamente para ofrecer soluciones que ayuden a nuestros clientes a mantenerse a la vanguardia en un panorama digital en rápida evolución.",
-        "getStarted": "Comenzar"
+        "speedDescription": "Nos movemos rápidamente para construir, iterar y entregar soluciones que mantienen a nuestros comerciantes a la vanguardia en un ecosistema que evoluciona rápidamente.",
+        "cta": {
+            "title": "¿Listo para trabajar con nosotros?",
+            "button": "Comenzar ahora"
+        }
     },
     "about": {
         "title": "Acerca de lomi.",
@@ -1007,6 +1010,177 @@
             "title": "¿Listo para impulsar tus ventas de productos?",
             "description": "Únete a miles de empresas que utilizan lomi. para vender productos a través de múltiples canales y aumentar sus ingresos.",
             "button": "Comenzar"
+        }
+    },
+    "products": {
+        "title": "Vender productos",
+        "description": "Cree, gestione y venda sus productos con nuestro sistema integral de gestión de productos. Realice un seguimiento fácil del inventario, establezca precios y analice el rendimiento de las ventas.",
+        "features": {
+            "catalog": {
+                "title": "Catálogo de productos y servicios",
+                "description": "Cree y gestione su catálogo de productos con descripciones detalladas, imágenes y variantes.",
+                "feature1": "Productos ilimitados",
+                "feature2": "Múltiples imágenes por producto"
+            },
+            "pricing": {
+                "title": "Precios y inventario",
+                "description": "Establezca opciones de precios flexibles y realice un seguimiento de los niveles de inventario en tiempo real.",
+                "feature1": "Opciones de precios escalonados",
+                "feature2": "Alertas de stock bajo"
+            },
+            "analytics": {
+                "title": "Análisis de ventas",
+                "description": "Realice un seguimiento del rendimiento del producto con análisis de ventas detallados e informes.",
+                "feature1": "Paneles de rendimiento de ventas",
+                "feature2": "Información sobre clientes"
+            }
+        },
+        "howItWorks": {
+            "title": "Cómo Funciona",
+            "step1": {
+                "title": "1. Crear productos",
+                "description": "Añada sus productos con descripciones, imágenes, precios y niveles de inventario."
+            },
+            "step2": {
+                "title": "2. Vender en cualquier lugar",
+                "description": "Venda sus productos a través de su sitio web, WhatsApp o enlaces de pago."
+            },
+            "step3": {
+                "title": "3. Seguimiento del rendimiento",
+                "description": "Monitoree las ventas, el inventario y el comportamiento del cliente con análisis detallados."
+            }
+        },
+        "cta": {
+            "title": "¿Listo para gestionar sus productos de manera eficiente?",
+            "button": "Comenzar Ahora"
+        }
+    },
+    "subscriptionManagement": {
+        "title": "Vender suscripciones",
+        "description": "Cree y gestione flujos de ingresos recurrentes con nuestras potentes herramientas de gestión de suscripciones. Perfecto para SaaS, membresías y servicios recurrentes.",
+        "features": {
+            "billing": {
+                "title": "Opciones de facturación flexibles",
+                "description": "Configure ciclos de facturación diarios, semanales, quincenales, mensuales, trimestrales o anuales con niveles de precios personalizables y períodos de prueba.",
+                "feature1": "Frecuencias de facturación altamente flexibles",
+                "feature2": "Opciones de prueba gratuitas y de pago"
+            },
+            "payment": {
+                "title": "Facturación automatizada de pagos recurrentes",
+                "description": "Cobre automáticamente a los clientes en su ciclo de facturación si tienen tarjetas registradas. Si no pagaron con tarjetas, haremos un seguimiento automático por correo electrónico y teléfono para que continúen con su suscripción.",
+                "feature1": "Cumple con PCI DSS",
+                "feature2": "Lógica de reintento modular"
+            },
+            "analytics": {
+                "title": "Análisis",
+                "description": "Realice un seguimiento de métricas clave como MRR, tasa de cancelación, valor de vida del cliente y crecimiento de suscripciones con gráficos detallados.",
+                "feature1": "Valor de vida del cliente y previsión de ingresos",
+                "feature2": "Análisis de cancelaciones"
+            },
+            "management": {
+                "title": "Autoservicio para clientes",
+                "description": "Permita a los clientes gestionar sus propias suscripciones con un portal fácil de usar para actualizaciones, degradaciones, cancelaciones y solicitudes de soporte.",
+                "feature1": "Cambio de plan",
+                "feature2": "Actualizaciones de método de pago"
+            }
+        },
+        "useCases": {
+            "title": "Perfecto para",
+            "saas": {
+                "title": "Negocios SaaS",
+                "description": "Gestione planes de precios escalonados, pruebas gratuitas y facturación anual versus mensual para su servicio de software."
+            },
+            "membership": {
+                "title": "Sitios de Membresía",
+                "description": "Cree planes de membresía recurrentes con diferentes niveles de acceso y facturación automatizada."
+            },
+            "services": {
+                "title": "Proveedores de Servicios",
+                "description": "Ofrezca servicios recurrentes como limpieza, mantenimiento o consultoría con opciones de programación flexibles."
+            }
+        },
+        "cta": {
+            "title": "¿Listo para aumentar sus ingresos recurrentes?",
+            "button": "Comenzar Ahora"
+        }
+    },
+    "websiteSales": {
+        "title": "Vender en tu aplicación",
+        "description": "Integre nuestra solución de pago en su sitio web existente o utilice nuestras páginas de pago alojadas para vender sus productos y servicios en línea.",
+        "options": {
+            "api": {
+                "title": "Integración API",
+                "description": "Integre nuestra API de pagos directamente en su sitio web para una experiencia de pago perfecta.",
+                "feature1": "Control de personalización completo",
+                "feature2": "Experiencia de usuario fluida"
+            },
+            "hosted": {
+                "title": "Pago alojado",
+                "description": "Utilice nuestras páginas de pago prediseñadas que puede incrustar o redirigir desde su sitio web.",
+                "feature1": "No requiere codificación",
+                "feature2": "Procesamiento de pagos seguro"
+            },
+            "links": {
+                "title": "Enlaces de pago",
+                "description": "Cree enlaces de pago compartibles que puede añadir a su sitio web, correos electrónicos o redes sociales.",
+                "feature1": "Configuración rápida",
+                "feature2": "Funciona con cualquier sitio web"
+            }
+        },
+        "benefits": {
+            "title": "Beneficios de vender en su sitio web",
+            "control": {
+                "title": "Control completo",
+                "description": "Mantenga control total sobre la experiencia de su marca, el recorrido del cliente y el proceso de pago."
+            },
+            "fees": {
+                "title": "Tarifas más bajas",
+                "description": "Evite comisiones de marketplace y conserve más de sus ingresos con nuestras tarifas competitivas de procesamiento de pagos."
+            }
+        },
+        "cta": {
+            "title": "¿Listo para comenzar a vender en su sitio web?",
+            "button": "Comenzar Ahora"
+        }
+    },
+    "billing": {
+        "title": "Facturación simplificada",
+        "description": "Cree y envíe facturas profesionales, gestione la facturación recurrente y cobre pagos automáticamente con nuestra solución completa de facturación.",
+        "features": {
+            "invoices": {
+                "title": "Facturas profesionales",
+                "feature1": "Plantillas personalizables",
+                "feature2": "Recordatorios automáticos"
+            },
+            "recurring": {
+                "title": "Facturación recurrente",
+                "feature1": "Ciclos de facturación flexibles",
+                "feature2": "Reintentos automáticos para pagos fallidos"
+            },
+            "automation": {
+                "title": "Automatización de pagos",
+                "feature1": "Generación automática de facturas",
+                "feature2": "Flujos de trabajo de cobro de pagos"
+            }
+        },
+        "howItWorks": {
+            "title": "Cómo funciona",
+            "step1": {
+                "title": "Crear",
+                "description": "Diseñe facturas con su marca y configure programaciones recurrentes."
+            },
+            "step2": {
+                "title": "Enviar",
+                "description": "Envíe automáticamente facturas con enlaces de pago seguros por correo electrónico."
+            },
+            "step3": {
+                "title": "Recibir pagos",
+                "description": "Reciba pagos directamente y obtenga notificaciones en tiempo real."
+            }
+        },
+        "cta": {
+            "title": "¿Listo para simplificar su proceso de facturación?",
+            "button": "Comenzar Ahora"
         }
     }
 }

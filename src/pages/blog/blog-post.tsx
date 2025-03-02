@@ -58,12 +58,9 @@ export default function BlogPost() {
 
             try {
                 const fetchedPost = await getPostBySlug(slug);
-                console.log("Fetched post:", fetchedPost);
 
                 // Debug multilingual content
                 if (fetchedPost) {
-                    console.log("Languages available:", fetchedPost.languages);
-                    console.log("Current language:", i18n.language);
 
                     // Log body structure to debug list rendering issues
                     const bodyKey = i18n.language !== 'en' ? `body_${i18n.language}` : 'body';

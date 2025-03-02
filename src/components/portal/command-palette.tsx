@@ -127,8 +127,7 @@ export function CommandPalette() {
   }
 });
 
-const data = await response.json();
-console.log(data);`}
+const data = await response.json();`}
                                         </pre>
                                     </ScrollArea>
                                 </TabsContent>

@@ -43,7 +43,6 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious,
     });
 
     const handleFileUploaded = (docType: keyof ActivationStep4Data) => (url: string) => {
-        console.log(`File uploaded for ${docType}:`, url);
         setDocuments(prev => ({ ...prev, [docType]: url }));
         setErrors(prev => ({ ...prev, [docType]: false }));
     };

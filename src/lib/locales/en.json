@@ -1,6 +1,6 @@
 {
     "footer": {
-        "tagline": "Connecting the World to Africa, one transaction at a time.",
+        "tagline": "Connecting the World to West Africa, one transaction at a time.",
         "features": {
             "title": "Features",
             "overview": "Overview",
@@ -812,40 +812,6 @@
             "control_portal": "PORTAL"
         }
     },
-    "story": {
-        "mission": "Empowering West African businesses with localized payment solutions",
-        "ourStory": "Our Story",
-        "storyParagraph1": "lomi. was born from a vision to transform how businesses in Africa accept payments. We recognized the challenges faced by merchants in connecting with global payment systems and set out to build a solution that bridges this gap.",
-        "storyParagraph2": "Our journey began with a simple idea: create a payment platform that is accessible, reliable, and tailored to the unique needs of West African businesses. Today, we're proud to serve merchants across the continent, helping them grow and thrive in the digital economy.",
-        "storyParagraph3": "As we continue to evolve, our commitment remains unwavering - to provide innovative payment solutions that empower entrepreneurs and businesses of all sizes to reach their full potential.",
-        "ourValues": "Our Values",
-        "innovation": "Innovation",
-        "innovationDescription": "We constantly push boundaries to create cutting-edge payment solutions that address the unique challenges of the African market.",
-        "customerObsession": "Customer Obsession",
-        "customerObsessionDescription": "Our customers are at the heart of everything we do. We listen, learn, and adapt to ensure we're meeting their evolving needs.",
-        "integrity": "Integrity",
-        "integrityDescription": "We operate with transparency and honesty, building trust with our customers, partners, and team members.",
-        "speed": "Speed",
-        "speedDescription": "We move quickly to deliver solutions that help our customers stay ahead in a rapidly changing digital landscape.",
-        "getStarted": "Get Started"
-    },
-    "about": {
-        "title": "About lomi.",
-        "description": "We are a team of passionate individuals dedicated to revolutionizing digital payments in Africa.",
-        "mission": {
-            "title": "Our Mission",
-            "description": "To empower African businesses with accessible, reliable, and innovative payment solutions that drive economic growth and financial inclusion across the continent."
-        },
-        "vision": {
-            "title": "Our Vision",
-            "description": "To create a seamless digital payment ecosystem where every business in Africa, regardless of size, can participate in the global economy without barriers."
-        },
-        "cta": {
-            "title": "Join the lomi. Revolution",
-            "description": "Be part of the future of digital payments in Africa. Start accepting payments with lomi. today.",
-            "button": "Get Started Now"
-        }
-    },
     "productSales": {
         "title": "Sell on WhatsApp",
         "description": "Easily sell your products online through multiple channels including your website, WhatsApp, and social media with our comprehensive e-commerce solution.",
@@ -984,6 +950,118 @@
         },
         "cta": {
             "title": "Ready to start selling on your website?",
+            "button": "Get Started"
+        }
+    },
+    "products": {
+        "title": "Sell products",
+        "description": "Create, manage, and sell your products with our comprehensive product management system. Easily track inventory, set pricing, and analyze sales performance.",
+        "features": {
+            "catalog": {
+                "title": "Sell products and services",
+                "description": "Create and manage your catalog with detailed descriptions, images, and variants.",
+                "feature1": "Unlimited products and services",
+                "feature2": "Multiple images per product"
+            },
+            "pricing": {
+                "title": "Manage pricing and inventory",
+                "description": "Set flexible pricing options and track inventory levels in real-time.",
+                "feature1": "Modular pricing options",
+                "feature2": "Low stock alerts"
+            },
+            "analytics": {
+                "title": "Track performance",
+                "description": "Track sales performance with detailed analytics and reports.",
+                "feature1": "Analytics dashboards",
+                "feature2": "Customer insights"
+            }
+        },
+        "howItWorks": {
+            "title": "How It Works",
+            "step1": {
+                "title": "1. Create your catalog",
+                "description": "Add your products or services with descriptions, images, pricing, and inventory levels."
+            },
+            "step2": {
+                "title": "2. Sell anywhere",
+                "description": "Sell through your website, WhatsApp, or via payment links."
+            },
+            "step3": {
+                "title": "3. Track Performance",
+                "description": "Monitor sales, inventory, and customer behavior with detailed analytics."
+            }
+        },
+        "cta": {
+            "title": "Ready to manage your products efficiently?",
+            "button": "Get Started"
+        }
+    },
+    "subscriptionManagement": {
+        "title": "Sell subscriptions",
+        "description": "Create and manage recurring revenue streams with our powerful subscription management tools. Perfect for SaaS, memberships, and recurring services.",
+        "features": {
+            "billing": {
+                "title": "Flexible billing options",
+                "description": "Set up daily, weekly, bi-weekly, monthly, quarterly, or annual billing cycles with customizable pricing tiers and trial periods.",
+                "feature1": "Highly flexible billing frequencies",
+                "feature2": "Free and paid trial options"
+            },
+            "payment": {
+                "title": "Automated recurring payments billing",
+                "description": "Automatically charge customers on their billing cycle if they have cards on file. If they didn't pay with cards, we'll automatically follow up with them by email and phone to get them to continue their subscription.",
+                "feature1": "PCI DSS compliant",
+                "feature2": "Modular retry logic"
+            },
+            "analytics": {
+                "title": "Subscription analytics",
+                "description": "Track key metrics like MRR, churn rate, customer lifetime value, and subscription growth with detailed charts.",
+                "feature1": "Customer Lifetime Value and revenue forecasting",
+                "feature2": "Churn analysis"
+            },
+            "management": {
+                "title": "Customer self-service portal",
+                "description": "Empower customers to manage their own subscriptions with a user-friendly portal for upgrades, downgrades, cancellations and support requests.",
+                "feature1": "Plan switching",
+                "feature2": "Payment method updates"
+            }
+        },
+        "useCases": {
+            "title": "Perfect for",
+            "saas": {
+                "title": "SaaS Businesses",
+                "description": "Manage tiered pricing plans, free trials, and annual vs. monthly billing for your software service."
+            },
+            "membership": {
+                "title": "Membership Sites",
+                "description": "Create recurring membership plans with different access levels and automated billing."
+            },
+            "services": {
+                "title": "Service Providers",
+                "description": "Offer recurring services like cleaning, maintenance, or consulting with flexible scheduling options."
+            }
+        },
+        "cta": {
+            "title": "Ready to grow your recurring revenue?",
+            "button": "Get Started"
+        }
+    },
+    "story": {
+        "mission": "Our mission",
+        "description": "We empower West African Businesses of all sizes with accessible and adapted financial solutions.",
+        "ourStory": "Our story",
+        "storyParagraph1": "Our journey began with the idea of building an accessible, reliable payment platform tailored to the unique needs of businesses in francophone West Africa. We recognized the challenges merchants face when connecting to local and global payment systems and set out to build an open source solution that bridges this gap. Today, we're proud to serve merchants across the region and to help them grow and thrive in the digital economy.",
+        "storyParagraph2": "As we continue to grow, our commitment remains unwavering—to provide innovative solutions that empower entrepreneurs and businesses to reach their full potential.",
+        "ourValues": "Our values",
+        "innovation": "Innovation",
+        "innovationDescription": "We strive to build new solutions to address the unique challenges faced by West African businesses.",
+        "customerObsession": "Customer obsession",
+        "customerObsessionDescription": "We put our merchants at the center of everything we do, designing products and services that truly meet their needs.",
+        "integrity": "Integrity",
+        "integrityDescription": "We uphold the highest standards of security and transparency in all our operations.",
+        "speed": "Speed",
+        "speedDescription": "We move quickly to build, iterate, and deliver solutions that keep our merchants ahead in a rapidly evolving ecosystem.",
+        "cta": {
+            "title": "Ready to work with us?",
             "button": "Get Started"
         }
     }

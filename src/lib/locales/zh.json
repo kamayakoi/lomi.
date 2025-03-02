@@ -873,7 +873,7 @@
         "title": "博客",
         "description": "来自 lomi. 团队的见解、更新和新闻",
         "heading": "博客",
-        "subheading": "发现我们团队的最新文章、指南和更新",
+        "subheading": "发现我们团队的最新文章、指南和更新。",
         "noPosts": "未找到文章",
         "noPostsDesc": "目前您的语言中没有可用的文章。请稍后再查看。",
         "readArticle": "阅读文章",
@@ -938,21 +938,24 @@
         }
     },
     "story": {
-        "mission": "为西非企业提供本地化支付解决方案",
+        "mission": "我们的使命",
+        "description": "通过提供可访问且适应性强的金融解决方案，我们赋能各种规模的西非企业。",
         "ourStory": "我们的故事",
-        "storyParagraph1": "lomi. 源于一个愿景：改变非洲企业接受支付的方式。我们认识到商家在连接全球支付系统时面临的挑战，并着手构建一个弥合这一差距的解决方案。",
-        "storyParagraph2": "我们的旅程始于一个简单的想法：创建一个便捷、可靠且专为西非企业独特需求量身定制的支付平台。今天，我们很自豪能够为整个非洲大陆的商家提供服务，帮助他们在数字经济中成长和蓬勃发展。",
-        "storyParagraph3": "随着我们不断发展，我们的承诺依然坚定不移——提供创新的支付解决方案，赋能各种规模的企业家和企业，帮助他们充分发挥潜力。",
+        "storyParagraph1": "lomi. 源于一个愿景：改变非洲企业接受支付的方式。我们认识到商家在连接本地和全球支付系统时面临的挑战，并着手构建一个开源解决方案来弥合这一差距。",
+        "storyParagraph2": "我们的旅程始于构建一个可访问、可靠的支付平台的想法，该平台专为法语西非企业的独特需求量身定制。今天，我们很自豪能够为整个地区的商家提供服务，帮助他们在数字经济中成长和蓬勃发展。随着我们不断发展，我们的承诺依然坚定不移——提供创新解决方案，赋能企业家和企业实现其全部潜力。",
         "ourValues": "我们的价值观",
         "innovation": "创新",
-        "innovationDescription": "我们不断突破界限，创造尖端支付解决方案，解决非洲市场的独特挑战。",
-        "customerObsession": "以客户为中心",
-        "customerObsessionDescription": "我们的客户是我们所做一切的核心。我们倾听、学习并适应，确保满足他们不断发展的需求。",
+        "innovationDescription": "我们努力构建新的解决方案，以应对西非企业面临的独特挑战。",
+        "customerObsession": "客户至上",
+        "customerObsessionDescription": "我们将商家置于一切工作的中心，设计真正满足他们需求的产品和服务。",
         "integrity": "诚信",
-        "integrityDescription": "我们以透明和诚实的方式运营，与客户、合作伙伴和团队成员建立信任。",
+        "integrityDescription": "我们在所有运营中坚持最高标准的安全性和透明度。",
         "speed": "速度",
-        "speedDescription": "我们快速行动，提供解决方案，帮助客户在快速变化的数字环境中保持领先地位。",
-        "getStarted": "开始使用"
+        "speedDescription": "我们快速行动，构建、迭代和交付解决方案，使我们的商家在快速发展的生态系统中保持领先地位。",
+        "cta": {
+            "title": "准备好与我们合作了吗？",
+            "button": "开始使用"
+        }
     },
     "about": {
         "title": "关于 lomi.",
@@ -1082,6 +1085,98 @@
         },
         "cta": {
             "title": "准备好在您的网站上开始销售了吗？",
+            "button": "开始使用"
+        }
+    },
+    "products": {
+        "title": "销售产品",
+        "description": "通过我们全面的产品管理系统创建、管理和销售您的产品。轻松跟踪库存、设置价格和分析销售业绩。",
+        "features": {
+            "catalog": {
+                "title": "产品目录",
+                "description": "创建和管理您的产品目录，包含详细描述、图片和产品变体。",
+                "feature1": "无限产品数量",
+                "feature2": "每个产品多张图片"
+            },
+            "pricing": {
+                "title": "定价与库存",
+                "description": "设置灵活的定价选项并实时跟踪库存水平。",
+                "feature1": "分层定价选项",
+                "feature2": "低库存提醒"
+            },
+            "analytics": {
+                "title": "销售分析",
+                "description": "通过详细的销售分析和报告跟踪产品业绩。",
+                "feature1": "销售业绩仪表板",
+                "feature2": "客户洞察"
+            }
+        },
+        "howItWorks": {
+            "title": "工作原理",
+            "step1": {
+                "title": "1. 创建产品",
+                "description": "添加产品描述、图片、价格和库存水平。"
+            },
+            "step2": {
+                "title": "2. 随处销售",
+                "description": "通过您的网站、WhatsApp或支付链接销售产品。"
+            },
+            "step3": {
+                "title": "3. 跟踪业绩",
+                "description": "通过详细分析监控销售、库存和客户行为。"
+            }
+        },
+        "cta": {
+            "title": "准备好高效管理您的产品了吗？",
+            "button": "开始使用"
+        }
+    },
+    "subscriptionManagement": {
+        "title": "销售订阅",
+        "description": "通过我们强大的订阅管理工具创建和管理经常性收入流。非常适合SaaS、会员资格和定期服务。",
+        "features": {
+            "billing": {
+                "title": "灵活的计费选项",
+                "description": "设置每日、每周、双周、每月、每季度或年度计费周期，可自定义定价层级和试用期。",
+                "feature1": "高度灵活的计费频率",
+                "feature2": "免费和付费试用选项"
+            },
+            "payment": {
+                "title": "自动循环付款计费",
+                "description": "如果客户有登记的银行卡，系统会在其计费周期自动收费。如果他们没有使用银行卡支付，我们会通过电子邮件和电话自动跟进，让他们继续订阅。",
+                "feature1": "符合PCI DSS标准",
+                "feature2": "模块化重试逻辑"
+            },
+            "analytics": {
+                "title": "分析功能",
+                "description": "通过详细图表跟踪关键指标，如月度经常性收入(MRR)、流失率、客户终身价值和订阅增长。",
+                "feature1": "客户终身价值和收入预测",
+                "feature2": "流失分析"
+            },
+            "management": {
+                "title": "客户自助服务",
+                "description": "让客户通过用户友好的门户网站管理自己的订阅，实现升级、降级、取消和支持请求。",
+                "feature1": "方案切换",
+                "feature2": "支付方式更新"
+            }
+        },
+        "useCases": {
+            "title": "非常适合",
+            "saas": {
+                "title": "SaaS业务",
+                "description": "为您的软件服务管理分层定价计划、免费试用以及年度与月度计费选项。"
+            },
+            "membership": {
+                "title": "会员网站",
+                "description": "创建具有不同访问级别和自动计费的经常性会员计划。"
+            },
+            "services": {
+                "title": "服务提供商",
+                "description": "提供经常性服务，如清洁、维护或咨询，并配有灵活的调度选项。"
+            }
+        },
+        "cta": {
+            "title": "准备好增长您的经常性收入了吗？",
             "button": "开始使用"
         }
     }

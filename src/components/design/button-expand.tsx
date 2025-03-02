@@ -1,5 +1,6 @@
 import { ArrowRight, LucideIcon, Phone, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTranslation } from "react-i18next"
 
 interface ButtonExpandProps {
     text: string;
@@ -42,9 +43,10 @@ function ButtonExpand({
 
 // Pre-configured button for Connect action
 function ButtonExpandIconRight() {
+    const { t } = useTranslation()
     return (
         <ButtonExpand
-            text="Connect"
+            text={t("actions.connect")}
             onClick={() => window.location.href = '/sign-in'}
         />
     )
@@ -52,9 +54,10 @@ function ButtonExpandIconRight() {
 
 // Pre-configured button for Talk to us action
 function ButtonExpandTalkToUs() {
+    const { t } = useTranslation()
     return (
         <ButtonExpand
-            text="Talk to us"
+            text={t("actions.talk")}
             icon={Phone}
             bgColor="bg-blue-50 dark:bg-blue-900/30"
             textColor="text-blue-700 dark:text-blue-300"
