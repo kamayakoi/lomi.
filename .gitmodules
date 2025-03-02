@@ -10,3 +10,12 @@
 [submodule "apps/cli"]
 	path = apps/cli
 	url = https://github.com/lomiafrica/cli.lomi.africa
+[submodule "apps/admin"]
+	path = apps/admin
+	url = https://github.com/lomiafrica/admin.lomi.africa
+[submodule "apps/commerce"]
+	path = apps/commerce
+	url = https://github.com/lomiafrica/commerce.lomi.africa
+[submodule "apps/store"]
+	path = apps/store
+	url = https://github.com/lomiafrica/store.lomi.africa
