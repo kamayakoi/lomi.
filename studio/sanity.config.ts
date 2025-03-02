@@ -12,6 +12,10 @@ export default defineConfig({
 
   plugins: [structureTool(), visionTool()],
 
+  cors: {
+    origin: ['https://lomi.africa', 'https://www.lomi.africa', 'https://portal.lomi.africa', 'https://pay.lomi.africa', 'https://store.lomi.africa', 'https://app.lomi.africa'],
+  },
+
   schema: {
     types: schemaTypes,
   },
