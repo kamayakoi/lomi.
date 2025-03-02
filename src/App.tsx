@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from 'react';
 import AppRouter from "./router";
 import AnimatedLogoLoader from "@/components/portal/loader";
+import mixpanelService from "@/utils/mixpanel/mixpanel";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -19,6 +20,9 @@ const queryClient = new QueryClient({
         },
     },
 });
+
+// Initialize Mixpanel
+mixpanelService.init();
 
 export function App() {
     return (

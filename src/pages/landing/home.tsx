@@ -8,6 +8,7 @@ import { ButtonCta } from "@/components/landing/button-cta"
 import { useNavigate } from 'react-router-dom'
 import CookieConsent from '@/components/ui/tracking-cookie'
 import { BackgroundLines } from '@/components/aceternity/background-lines'
+import mixpanelService from '@/utils/mixpanel/mixpanel'
 
 export default function Page() {
   const navigate = useNavigate()
@@ -37,6 +38,70 @@ export default function Page() {
     }
   }, [navigate])
 
+  // Track page view when component mounts
+  useEffect(() => {
+    // Track landing page view with device and browser information
+    mixpanelService.track('Landing Page Viewed', {
+      timestamp: new Date().toISOString(),
+      referrer: document.referrer || 'direct',
+      url: window.location.href,
+      path: window.location.pathname,
+      utm_source: new URLSearchParams(window.location.search).get('utm_source') || undefined,
+      utm_medium: new URLSearchParams(window.location.search).get('utm_medium') || undefined,
+      utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign') || undefined,
+      device_type: /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+      browser: getBrowserInfo()
+      // operating_system is automatically added by the mixpanelService
+    });
+  }, []);
+
+  // Helper function to get browser information
+  const getBrowserInfo = () => {
+    const userAgent = navigator.userAgent;
+    let browserName;
+
+    if (userAgent.match(/chrome|chromium|crios/i)) {
+      browserName = "Chrome";
+    } else if (userAgent.match(/firefox|fxios/i)) {
+      browserName = "Firefox";
+    } else if (userAgent.match(/safari/i)) {
+      browserName = "Safari";
+    } else if (userAgent.match(/opr\//i)) {
+      browserName = "Opera";
+    } else if (userAgent.match(/edg/i)) {
+      browserName = "Edge";
+    } else {
+      browserName = "Unknown";
+    }
+
+    return browserName;
+  };
+
+  // Custom onClick handlers with Mixpanel tracking
+  const handleTalkToUsClick = () => {
+    mixpanelService.track('Talk To Us Button Clicked', {
+      location: 'landing_page',
+      timestamp: new Date().toISOString()
+    });
+    // The original onClick in ButtonExpandTalkToUs will still execute
+  };
+
+  const handleConnectClick = () => {
+    mixpanelService.track('Connect Button Clicked', {
+      location: 'landing_page',
+      timestamp: new Date().toISOString()
+    });
+    // The original onClick in ButtonExpandIconRight will still execute
+  };
+
+  const handleCtaClick = () => {
+    mixpanelService.track('CTA Button Clicked', {
+      location: 'landing_page',
+      timestamp: new Date().toISOString()
+    });
+    // The original onClick in ButtonCta will still execute
+  };
+
   return (
     <div className="overflow-hidden relative bg-background">
       {/* Background Lines positioned absolutely */}
@@ -57,11 +122,17 @@ export default function Page() {
                 <Hero />
                 {/* Custom Buttons */}
                 <div className="flex flex-row items-start gap-3 mt-6 sm:mt-8 relative z-20 pl-4 sm:pl-2">
-                  <ButtonExpandTalkToUs />
-                  <ButtonExpandIconRight />
+                  <div onClick={handleTalkToUsClick}>
+                    <ButtonExpandTalkToUs />
+                  </div>
+                  <div onClick={handleConnectClick}>
+                    <ButtonExpandIconRight />
+                  </div>
                 </div>
                 <div className="mt-2 pl-4 sm:pl-2 hidden sm:block">
-                  <ButtonCta />
+                  <div onClick={handleCtaClick}>
+                    <ButtonCta />
+                  </div>
                 </div>
               </div>
 

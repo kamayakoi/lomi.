@@ -41,20 +41,22 @@ import Product from './pages/portal/product/Product';
 
 // Website routes
 import Home from './pages/landing/home';
-import About from './pages/landing/company/about';
-import Products from './pages/landing/company/products';
-import Integrations from './pages/landing/company/integrations';
+import Products from './pages/landing/features/products';
 import Terms from './pages/landing/company/terms';
 import Privacy from './pages/landing/company/privacy';
-import Pricing from './pages/landing/company/pricing';
+import Pricing from './pages/landing/features/pricing';
 import Story from './pages/landing/company/story';
-import FAQ from './pages/landing/company/faq';
+import FAQ from './pages/landing/features/faq';
+import Billing from './pages/landing/features/billing';
+import WebsiteSales from './pages/landing/features/website-sales';
+import SubscriptionManagement from './pages/landing/features/subscription-management';
+import WhatsAppSales from './pages/landing/features/whatsapp';
 
 // Features routes
-import SellProducts from './pages/landing/features/sell-products';
-import SellSubscriptions from './pages/landing/features/sell-subscriptions';
-import SellWhatsApp from './pages/landing/features/sell-whatsapp';
-import SellWebsite from './pages/landing/features/sell-website';
+import SellProducts from './pages/landing/features/products';
+import SellSubscriptions from './pages/landing/features/subscription-management';
+import SellWhatsApp from './pages/landing/features/whatsapp';
+import SellWebsite from './pages/landing/features/website-sales';
 
 // Settings routes
 import Settings from '@/pages/portal/settings/settings';
@@ -71,6 +73,10 @@ import BankAccounts from './pages/portal/settings/withdrawals/bank-accounts';
 import WithdrawalNotifications from './pages/portal/settings/withdrawals/email-notifications';
 import AnimatedLogoLoader from './components/portal/loader';
 
+// Blog routes
+import Blog from './pages/blog/blog';
+import BlogPost from './pages/blog/blog-post';
+
 const AppRouter = () => {
     return (
         <Routes>
@@ -84,15 +90,19 @@ const AppRouter = () => {
                         {/* Website routes */}
                         <Route path="/" element={<Home />} />
                         <Route path="/home" element={<Home />} />
-                        <Route path="/about" element={<About />} />
                         <Route path="/products" element={<Products />} />
-                        <Route path="/integrations" element={<Integrations />} />
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/pricing" element={<Pricing />} />
                         <Route path="/story" element={<Story />} />
                         <Route path="/faq" element={<FAQ />} />
-
+                        <Route path="/billing" element={<Billing />} />
+                        <Route path="/website" element={<WebsiteSales />} />
+                        <Route path="/subscription-management" element={<SubscriptionManagement />} />
+                        <Route path="/whatsapp" element={<WhatsAppSales />} />
+                        {/* Blog routes */}
+                        <Route path="/blog" element={<Blog />} />
+                        <Route path="/blog/:slug" element={<BlogPost />} />
                         {/* Features routes */}
                         <Route path="/sell-products" element={<SellProducts />} />
                         <Route path="/sell-subscriptions" element={<SellSubscriptions />} />

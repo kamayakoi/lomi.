@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/landing/Footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, ShoppingCart, Smartphone, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { ButtonExpand } from '@/components/design/button-expand';
 
-export default function BillingPage() {
+export default function ProductSalesPage() {
     const [mounted, setMounted] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
     const navigate = useNavigate();
@@ -80,10 +80,10 @@ export default function BillingPage() {
                         className="relative pt-16 md:pt-20"
                     >
                         <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('billing.title', 'Streamlined billing')}
+                            {t('productSales.title', 'Sell Products Anywhere')}
                         </h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
-                            {t('billing.description', 'Create and send professional invoices, manage recurring billing, and automate payment collection with our comprehensive billing solution.')}
+                            {t('productSales.description', 'Easily sell your products online through multiple channels including your website, WhatsApp, and social media with our comprehensive e-commerce solution.')}
                         </p>
                     </motion.div>
 
@@ -102,146 +102,123 @@ export default function BillingPage() {
                             >
                                 <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
-                                        {/* Features Grid */}
+                                        {/* Sales Channels */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                            {/* Feature 1 */}
+                                            {/* Channel 1: Website */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.invoices.title', 'Professional Invoices')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <Globe className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('productSales.channels.website.title', 'Website Integration')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('productSales.channels.website.description', 'Seamlessly integrate our payment solution into your existing website or use our hosted checkout pages.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature1', 'Customizable templates')}
+                                                            {t('productSales.channels.website.feature1', 'Easy API integration')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature2', 'Automatic reminders')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature3', 'Payment tracking')}
+                                                            {t('productSales.channels.website.feature2', 'Customizable checkout')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 2 */}
+                                            {/* Channel 2: WhatsApp */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.recurring.title', 'Recurring Billing')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <Smartphone className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('productSales.channels.whatsapp.title', 'WhatsApp Commerce')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('productSales.channels.whatsapp.description', 'Sell directly through WhatsApp with automated product catalogs, order management, and payment links.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature1', 'Flexible billing cycles')}
+                                                            {t('productSales.channels.whatsapp.feature1', 'Digital product catalog')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature2', 'Automatic retry on failed payments')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature3', 'Subscription management')}
+                                                            {t('productSales.channels.whatsapp.feature2', 'Automated order processing')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 3 */}
+                                            {/* Channel 3: Payment Links */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.automation.title', 'Payment Automation')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <ShoppingCart className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('productSales.channels.paymentLinks.title', 'Payment Links')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('productSales.channels.paymentLinks.description', 'Create shareable payment links for your products to sell on social media, email, or any digital channel.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature1', 'Automated invoice generation')}
+                                                            {t('productSales.channels.paymentLinks.feature1', 'One-click link creation')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature2', 'Payment collection workflows')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature3', 'Accounting system integration')}
+                                                            {t('productSales.channels.paymentLinks.feature2', 'Social media sharing')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
 
-                                        {/* How It Works Section */}
-                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                                        {/* Features Section */}
+                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-6">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
-                                                {t('billing.howItWorks.title', 'How It Works')}
+                                                {t('productSales.features.title', 'Powerful E-commerce Features')}
                                             </h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">1</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step1.title', 'Create')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step1.description', 'Design invoices with your branding and set up recurring schedules.')}
-                                                        </p>
-                                                    </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('productSales.features.inventory.title', 'Inventory Management')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('productSales.features.inventory.description', 'Track stock levels, manage product variants, and receive low inventory alerts across all your sales channels.')}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">2</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step2.title', 'Send')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step2.description', 'Automatically send invoices via email with secure payment links.')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">3</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step3.title', 'Get Paid')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step3.description', 'Receive payments directly with real-time notifications.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('productSales.features.orders.title', 'Order Management')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('productSales.features.orders.description', 'Process orders, manage fulfillment, and track shipping status from a centralized dashboard.')}
+                                                    </p>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>s
 
                                         {/* CTA Section */}
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-medium text-zinc-900 dark:text-white mb-4 sm:mb-0">
-                                                    {t('billing.cta.title', 'Ready to streamline your billing process?')}
+                                                    {t('productSales.cta.title', 'Ready to boost your product sales?')}
                                                 </p>
                                                 <ButtonExpand
-                                                    text={t('billing.cta.button', 'Get Started')}
+                                                    text={t('productSales.cta.button', 'Get Started')}
                                                     bgColor="bg-blue-50 dark:bg-blue-900/30"
                                                     textColor="text-blue-700 dark:text-blue-300"
                                                     hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"

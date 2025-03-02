@@ -4,6 +4,8 @@ import mtnLogo from '/payment_channels/mtn.webp';
 import waveLogo from '/payment_channels/wave.webp';
 import cardsLogo from '/payment_channels/mastercard.webp';
 import ecobankLogo from '/payment_channels/ecobank_blue.webp';
+import visaLogo from '/payment_channels/visa.webp';
+import mastercardLogo from '/payment_channels/mastercard.webp';
 
 import { useTheme } from '@/lib/hooks/use-theme';
 import { useEffect, useState } from "react";
@@ -72,6 +74,32 @@ export const EcobankLogo = () => {
     <img
       src={ecobankLogo}
       alt="Ecobank logo"
+      className="lucide lucide-panels-top-left mr-2"
+      width="100"
+      height="100"
+      style={{ borderRadius: '50%' }}
+    />
+  );
+};
+
+export const VisaLogo = () => {
+  return (
+    <img
+      src={visaLogo}
+      alt="Visa logo"
+      className="lucide lucide-panels-top-left mr-2"
+      width="100"
+      height="100"
+      style={{ borderRadius: '50%' }}
+    />
+  );
+};
+
+export const MastercardLogo = () => {
+  return (
+    <img
+      src={mastercardLogo}
+      alt="Mastercard logo"
       className="lucide lucide-panels-top-left mr-2"
       width="100"
       height="100"

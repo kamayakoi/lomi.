@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollToTop } from '@/components/landing/scroll-to-top';
-import { Card, CardContent } from "@/components/ui/card";
-import { Footer } from '@/components/landing/Footer';
-import { Toaster } from "@/components/ui/toaster";
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from "react-i18next";
+import { OrbitingCirclesDemo } from "@/components/landing/orbiting-circles";
+import { useTranslation } from 'react-i18next';
+import { ScrollToTop } from '@/components/landing/scroll-to-top';
+import { Footer } from '@/components/landing/Footer';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { CheckCircle2, ShoppingCart, ChevronLeft, Tag, BarChart3 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Toaster } from "@/components/ui/toaster";
 import { ButtonExpand } from '@/components/design/button-expand';
 
-export default function BillingPage() {
+// Smaller version of OrbitingCirclesDemo for the products page
+const CompactOrbitingCircles = () => {
+    return (
+        <div className="scale-[0.6] origin-center transform-gpu -mt-6">
+            <div className="w-[400px] h-[300px] overflow-visible">
+                <OrbitingCirclesDemo />
+            </div>
+        </div>
+    );
+};
+
+const Products = () => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
     const [mounted, setMounted] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
-    const navigate = useNavigate();
-    const { t } = useTranslation();
 
     // Handle hydration mismatch
     useEffect(() => {
@@ -79,12 +91,23 @@ export default function BillingPage() {
                         transition={{ duration: 0.5 }}
                         className="relative pt-16 md:pt-20"
                     >
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('billing.title', 'Streamlined billing')}
-                        </h1>
-                        <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
-                            {t('billing.description', 'Create and send professional invoices, manage recurring billing, and automate payment collection with our comprehensive billing solution.')}
-                        </p>
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div className="md:max-w-2xl">
+                                <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
+                                    {t('products.title', 'Sell products')}
+                                </h1>
+                                <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl mb-8 md:mb-0">
+                                    {t('products.description', 'Create, manage, and sell your products with our comprehensive product management system. Easily track inventory, set pricing, and analyze sales performance.')}
+                                </p>
+                                {/* Mobile orbiting circles - only visible on small screens */}
+                                <div className="flex justify-center md:hidden my-6">
+                                    <CompactOrbitingCircles />
+                                </div>
+                            </div>
+                            <div className="hidden md:block md:flex-shrink-0">
+                                <CompactOrbitingCircles />
+                            </div>
+                        </div>
                     </motion.div>
 
                     <motion.div
@@ -102,84 +125,84 @@ export default function BillingPage() {
                             >
                                 <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
-                                        {/* Features Grid */}
+                                        {/* Product Management Features */}
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                            {/* Feature 1 */}
+                                            {/* Feature 1: Product Catalog */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.invoices.title', 'Professional Invoices')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <ShoppingCart className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('products.features.catalog.title', 'Product Catalog')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('products.features.catalog.description', 'Create and manage your product catalog with detailed descriptions, images, and variants.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature1', 'Customizable templates')}
+                                                            {t('products.features.catalog.feature1', 'Unlimited products')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature2', 'Automatic reminders')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature3', 'Payment tracking')}
+                                                            {t('products.features.catalog.feature2', 'Multiple images per product')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 2 */}
+                                            {/* Feature 2: Pricing & Inventory */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.recurring.title', 'Recurring Billing')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <Tag className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('products.features.pricing.title', 'Pricing & Inventory')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('products.features.pricing.description', 'Set flexible pricing options and track inventory levels in real-time.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature1', 'Flexible billing cycles')}
+                                                            {t('products.features.pricing.feature1', 'Tiered pricing options')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature2', 'Automatic retry on failed payments')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature3', 'Subscription management')}
+                                                            {t('products.features.pricing.feature2', 'Low stock alerts')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 3 */}
+                                            {/* Feature 3: Analytics */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.automation.title', 'Payment Automation')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <BarChart3 className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('products.features.analytics.title', 'Sales Analytics')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('products.features.analytics.description', 'Track product performance with detailed sales analytics and reports.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature1', 'Automated invoice generation')}
+                                                            {t('products.features.analytics.feature1', 'Sales performance dashboards')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature2', 'Payment collection workflows')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature3', 'Accounting system integration')}
+                                                            {t('products.features.analytics.feature2', 'Customer insights')}
                                                         </span>
                                                     </li>
                                                 </ul>
@@ -187,49 +210,34 @@ export default function BillingPage() {
                                         </div>
 
                                         {/* How It Works Section */}
-                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-6">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
-                                                {t('billing.howItWorks.title', 'How It Works')}
+                                                {t('products.howItWorks.title', 'How It Works')}
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">1</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step1.title', 'Create')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step1.description', 'Design invoices with your branding and set up recurring schedules.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('products.howItWorks.step1.title', '1. Create Products')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('products.howItWorks.step1.description', 'Add your products with descriptions, images, pricing, and inventory levels.')}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">2</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step2.title', 'Send')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step2.description', 'Automatically send invoices via email with secure payment links.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('products.howItWorks.step2.title', '2. Sell Anywhere')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('products.howItWorks.step2.description', 'Sell your products through your website, WhatsApp, or payment links.')}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">3</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step3.title', 'Get Paid')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step3.description', 'Receive payments directly with real-time notifications.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('products.howItWorks.step3.title', '3. Track Performance')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('products.howItWorks.step3.description', 'Monitor sales, inventory, and customer behavior with detailed analytics.')}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -238,10 +246,10 @@ export default function BillingPage() {
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-medium text-zinc-900 dark:text-white mb-4 sm:mb-0">
-                                                    {t('billing.cta.title', 'Ready to streamline your billing process?')}
+                                                    {t('products.cta.title', 'Ready to manage your products efficiently?')}
                                                 </p>
                                                 <ButtonExpand
-                                                    text={t('billing.cta.button', 'Get Started')}
+                                                    text={t('products.cta.button', 'Get Started')}
                                                     bgColor="bg-blue-50 dark:bg-blue-900/30"
                                                     textColor="text-blue-700 dark:text-blue-300"
                                                     hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"
@@ -263,4 +271,6 @@ export default function BillingPage() {
             <Toaster />
         </div>
     );
-} 
+};
+
+export default Products;

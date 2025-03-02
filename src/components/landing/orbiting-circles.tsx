@@ -3,14 +3,14 @@ import * as Icons from "@/components/landing/Icons";
 
 export function OrbitingCirclesDemo() {
     return (
-        <div className="relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden rounded-lg ">
-            <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent dark:from-white dark:to-black">
-                Unified
+        <div className="relative flex h-[400px] w-full flex-col items-center justify-center overflow-visible rounded-lg">
+            <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300 bg-clip-text text-center text-6xl font-semibold leading-none text-transparent dark:from-white dark:to-black">
+                Products
             </span>
 
             {/* Inner Circles */}
             <OrbitingCircles
-                className="size-[95px] bg-transparent"
+                className="size-[80px] bg-transparent"
                 duration={20}
                 delay={20}
                 radius={80}
@@ -18,7 +18,7 @@ export function OrbitingCirclesDemo() {
                 <Icons.MtnLogo />
             </OrbitingCircles>
             <OrbitingCircles
-                className="size-[95px] bg-transparent"
+                className="size-[80px] bg-transparent"
                 duration={20}
                 delay={10}
                 radius={80}
@@ -28,21 +28,21 @@ export function OrbitingCirclesDemo() {
 
             {/* Outer Circles (reverse) */}
             <OrbitingCircles
-                className="size-[95px] bg-transparent"
-                radius={190}
+                className="size-[80px] bg-transparent"
+                radius={160}
                 duration={20}
                 reverse
             >
-                <Icons.ApplePayLogo />
+                <Icons.MastercardLogo />
             </OrbitingCircles>
             <OrbitingCircles
-                className="size-[95px] bg-transparent"
-                radius={190}
+                className="size-[80px] bg-transparent"
+                radius={160}
                 duration={20}
                 delay={20}
                 reverse
             >
-                <Icons.EcobankLogo />
+                <Icons.VisaLogo />
             </OrbitingCircles>
         </div>
     );

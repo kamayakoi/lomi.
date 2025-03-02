@@ -136,12 +136,12 @@ export function Footer() {
                                 <h2 className="text-zinc-900 dark:text-white font-medium text-lg">{t('footer.features.title')}</h2>
                                 <ul className="space-y-3 relative z-20">
                                     {[
-                                        { name: t('footer.features.overview'), link: '#', showBadge: false },
-                                        { name: t('footer.features.sellProducts'), link: '#', showBadge: false },
-                                        { name: t('footer.features.sellSubscriptions'), link: '#', showBadge: false },
-                                        { name: t('footer.features.sellWhatsApp'), link: '#', showBadge: false },
-                                        { name: t('footer.features.sellWebsite'), link: '#', showBadge: false },
-                                        { name: t('footer.features.sendInvoices'), link: '#', showBadge: false },
+                                        { name: t('footer.features.overview'), link: '/', showBadge: false },
+                                        { name: t('footer.features.sellProducts'), link: '/products', showBadge: false },
+                                        { name: t('footer.features.sellSubscriptions'), link: '/subscription-management', showBadge: false },
+                                        { name: t('footer.features.sellWhatsApp'), link: '/whatsapp', showBadge: false },
+                                        { name: t('footer.features.sellWebsite'), link: '/website', showBadge: false },
+                                        { name: t('footer.features.sendInvoices'), link: '/billing', showBadge: false },
                                         { name: t('footer.features.pricing'), link: '/pricing', showBadge: false },
                                         { name: t('footer.features.faq'), link: '/faq', showBadge: false }
                                     ].map((item) => (
@@ -194,7 +194,7 @@ export function Footer() {
                                 <ul className="space-y-3">
                                     {[
                                         { name: t('footer.company.story'), link: '/story', color: 'text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-400' },
-                                        { name: t('footer.company.blog'), link: '#', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
+                                        { name: t('footer.company.blog'), link: '/blog', color: 'text-orange-700 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-400' },
                                         { name: t('footer.company.openSource'), link: 'https://developers.lomi.africa/docs/freedom/open-source', color: 'text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-400' }
                                     ].map((item) => (
                                         <li key={item.name}>

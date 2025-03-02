@@ -19,6 +19,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import PhoneNumberInput from '@/components/ui/phone-number-input'
 import { useToast } from '@/lib/hooks/use-toast'
 import { cn } from '@/lib/actions/utils'
+import mixpanelService from '@/utils/mixpanel/mixpanel'
 
 export default function PaymentChannels() {
   const { toast } = useToast()
@@ -36,6 +37,20 @@ export default function PaymentChannels() {
     { title: 'payment_channels', href: '/portal/payment-channels', isActive: true },
     { title: 'Settings', href: '/portal/settings/profile', isActive: false },
   ]
+
+  // Track page view when component mounts
+  useEffect(() => {
+    if (user) {
+      mixpanelService.track('Payment Channels Page Viewed', {
+        user_id: user.id,
+        email: user.email,
+        timestamp: new Date().toISOString(),
+        referrer: document.referrer,
+        url: window.location.href,
+        path: window.location.pathname
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user?.id && sidebarData?.organizationId) {
@@ -91,6 +106,18 @@ export default function PaymentChannels() {
       } else {
         fetchOrganizationProviders(sidebarData.organizationId)
         const method = paymentMethods.find(m => m.provider_code === providerCode)
+
+        // Track successful provider connection
+        if (user && method) {
+          mixpanelService.track('Payment Provider Connected', {
+            user_id: user.id,
+            provider_code: providerCode,
+            provider_name: method.name,
+            provider_type: method.type,
+            timestamp: new Date().toISOString()
+          });
+        }
+
         toast({
           title: "Success",
           description: `Successfully connected to ${method?.name}`,
@@ -115,6 +142,18 @@ export default function PaymentChannels() {
         );
 
         const method = paymentMethods.find(m => m.provider_code === connectingProvider);
+
+        // Track Wave provider connection
+        if (user && method) {
+          mixpanelService.track('Wave Provider Connected', {
+            user_id: user.id,
+            provider_code: connectingProvider,
+            provider_name: method.name,
+            phone_number: phoneNumber,
+            timestamp: new Date().toISOString()
+          });
+        }
+
         toast({
           title: "Success",
           description: `Successfully connected to ${method?.name}`,
@@ -152,6 +191,17 @@ export default function PaymentChannels() {
       setPhoneNumber("")
     } catch (error) {
       console.error('Error connecting provider:', error);
+
+      // Track connection error
+      if (user) {
+        mixpanelService.track('Payment Provider Connection Error', {
+          user_id: user.id,
+          provider_code: connectingProvider,
+          error_message: error instanceof Error ? error.message : "Unknown error",
+          timestamp: new Date().toISOString()
+        });
+      }
+
       toast({
         variant: "destructive",
         title: "Error",
@@ -181,6 +231,18 @@ export default function PaymentChannels() {
       } else {
         const method = paymentMethods.find(m => m.provider_code === disconnectingProvider)
         fetchOrganizationProviders(sidebarData.organizationId)
+
+        // Track provider disconnection
+        if (user && method) {
+          mixpanelService.track('Payment Provider Disconnected', {
+            user_id: user.id,
+            provider_code: disconnectingProvider,
+            provider_name: method.name,
+            provider_type: method.type,
+            timestamp: new Date().toISOString()
+          });
+        }
+
         toast({
           title: "Success",
           description: `Successfully disconnected from ${method?.name}`,

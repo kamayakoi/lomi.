@@ -136,7 +136,7 @@ export default function Sidebar({ className }: SidebarProps) {
           <div className="hidden space-y-0.5 border-t border-[hsl(var(--sidebar-border))]/40 px-2 py-3 md:block">
             <SidebarActionButton variant="website" onClick={() => window.open('https://lomi.africa', '_blank')} />
             <SidebarActionButton variant="developers" onClick={() => window.open('https://developers.lomi.africa/docs/introduction/what-is-lomi', '_blank')} />
-            <SidebarActionButton variant="book-call" onClick={() => window.open('https://cal.com/babacar-diop-umkvq2/30min', '_blank')} />
+            <SidebarActionButton variant="book-call" onClick={() => window.open('https://cal.com/babacar-diop', '_blank')} />
           </div>
 
           {/* Organization Switcher */}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
@@ -28,6 +28,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { fetchProducts, fetchProductFees } from './components/support'
 import { cn } from '@/lib/actions/utils'
 import React from 'react'
+import mixpanelService from '@/utils/mixpanel/mixpanel'
 
 // Utility functions
 function calculateTotalPrice(product: Product): number {
@@ -130,6 +131,20 @@ function ProductsPage() {
         { title: 'Settings', href: '/portal/settings/profile', isActive: false },
     ]
 
+    // Track page view when component mounts
+    useEffect(() => {
+        if (user) {
+            mixpanelService.track('Products Page Viewed', {
+                user_id: user.id,
+                email: user.email,
+                timestamp: new Date().toISOString(),
+                referrer: document.referrer,
+                url: window.location.href,
+                path: window.location.pathname
+            });
+        }
+    }, [user]);
+
     const { data: productsData, isLoading: isProductsLoading, refetch } = useQuery({
         queryKey: ['products', user?.id || '', selectedStatus, currentPage] as const,
         queryFn: async () => {
@@ -149,16 +164,12 @@ function ProductsPage() {
             );
 
             return {
-                ...productsResponse,
-                products: productsWithFees
+                products: productsWithFees,
+                totalCount: productsResponse.totalCount
             };
         },
         enabled: !!user?.id,
-        staleTime: 30000,
-        gcTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
-        refetchOnMount: true
-    })
+    });
 
     // Memoize the products array
     const products = React.useMemo(() => productsData?.products || [], [productsData?.products]) as Product[]
@@ -193,28 +204,68 @@ function ProductsPage() {
     }, [products, sortColumn, sortDirection])
 
     const handleCreateProductSuccess = () => {
-        refetch()
-    }
+        setIsCreateProductOpen(false);
+        refetch();
+
+        // Track product creation
+        if (user) {
+            mixpanelService.track('Product Created', {
+                user_id: user.id,
+                timestamp: new Date().toISOString()
+            });
+        }
+    };
 
     const handleRefresh = async () => {
-        setIsRefreshing(true)
-        await refetch()
-        setIsRefreshing(false)
-    }
+        setIsRefreshing(true);
+        await refetch();
+        setIsRefreshing(false);
+    };
 
     const handleProductClick = (product: Product) => {
-        setSelectedProduct(product)
-        setIsActionsOpen(true)
-    }
+        setSelectedProduct(product);
+        setIsActionsOpen(true);
+
+        // Track product selection
+        if (user) {
+            mixpanelService.track('Product Selected', {
+                user_id: user.id,
+                product_id: product.product_id,
+                product_name: product.name,
+                product_price: product.price,
+                product_currency: product.currency_code,
+                timestamp: new Date().toISOString()
+            });
+        }
+    };
 
     const handleEditClick = (product: Product) => {
-        setSelectedProduct(product)
-        setIsEditProductOpen(true)
-    }
+        setSelectedProduct(product);
+        setIsEditProductOpen(true);
+
+        // Track product edit start
+        if (user) {
+            mixpanelService.track('Product Edit Started', {
+                user_id: user.id,
+                product_id: product.product_id,
+                product_name: product.name,
+                timestamp: new Date().toISOString()
+            });
+        }
+    };
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage)
-    }
+        setCurrentPage(newPage);
+
+        // Track pagination
+        if (user) {
+            mixpanelService.track('Products Pagination', {
+                user_id: user.id,
+                page_number: newPage,
+                timestamp: new Date().toISOString()
+            });
+        }
+    };
 
     return (
         <Layout fixed>

@@ -6,6 +6,9 @@ import AnimatedLogoLoader from '@/components/portal/loader';
 // Auth routes that should redirect to /portal if user is already authenticated
 const authRoutes = ['/sign-in', '/sign-up', '/log-in', '/sign-in-test', '/forgot-password', '/otp', '/auth/reset-password'];
 
+// Protected routes that require authentication
+const protectedRoutes = ['/portal', '/onboarding', '/activation'];
+
 export function SessionCheck({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -16,7 +19,9 @@ export function SessionCheck({ children }: { children: React.ReactNode }) {
             const currentPath = location.pathname;
 
             if (!isAuthenticated) {
-                if (currentPath.startsWith('/portal') || currentPath.startsWith('/onboarding')) {
+                // Only redirect to sign-in if trying to access a protected route
+                const isProtectedRoute = protectedRoutes.some(route => currentPath.startsWith(route));
+                if (isProtectedRoute) {
                     navigate('/sign-in', { replace: true });
                 }
             } else {

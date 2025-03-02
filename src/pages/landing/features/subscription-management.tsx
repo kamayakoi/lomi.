@@ -5,12 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Footer } from '@/components/landing/Footer';
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, Calendar, CreditCard, BarChart3, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { ButtonExpand } from '@/components/design/button-expand';
 
-export default function BillingPage() {
+export default function SubscriptionManagementPage() {
     const [mounted, setMounted] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
     const navigate = useNavigate();
@@ -80,10 +80,10 @@ export default function BillingPage() {
                         className="relative pt-16 md:pt-20"
                     >
                         <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('billing.title', 'Streamlined billing')}
+                            {t('subscriptionManagement.title', 'Sell subscriptions')}
                         </h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
-                            {t('billing.description', 'Create and send professional invoices, manage recurring billing, and automate payment collection with our comprehensive billing solution.')}
+                            {t('subscriptionManagement.description', 'Create and manage recurring revenue streams with our powerful subscription management tools. Perfect for SaaS, memberships, and recurring services.')}
                         </p>
                     </motion.div>
 
@@ -103,133 +103,145 @@ export default function BillingPage() {
                                 <Card className="w-full max-w-4xl mx-auto bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-none shadow-sm">
                                     <CardContent className="p-4 sm:p-6 md:p-8">
                                         {/* Features Grid */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                            {/* Feature 1 */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                            {/* Feature 1: Flexible Billing */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.invoices.title', 'Professional Invoices')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <Calendar className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('subscriptionManagement.features.billing.title', 'Flexible billing options')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('subscriptionManagement.features.billing.description', 'Set up daily, weekly, bi-weekly, monthly, quarterly, or annual billing cycles with customizable pricing tiers and trial periods.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature1', 'Customizable templates')}
+                                                            {t('subscriptionManagement.features.billing.feature1', 'Highly flexible billing frequencies')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature2', 'Automatic reminders')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.invoices.feature3', 'Payment tracking')}
+                                                            {t('subscriptionManagement.features.billing.feature2', 'Free and paid trial options')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 2 */}
+                                            {/* Feature 2: Payment Processing */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.recurring.title', 'Recurring Billing')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <CreditCard className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('subscriptionManagement.features.payment.title', 'Automated recurring payments billing')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('subscriptionManagement.features.payment.description', 'Automatically charge customers on their billing cycle if they have cards on file. If they didn\'t pay with cards, we\'ll automatically follow up with them by email and phone to get them to continue their subscription.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature1', 'Flexible billing cycles')}
+                                                            {t('subscriptionManagement.features.payment.feature1', 'PCI DSS compliant')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature2', 'Automatic retry on failed payments')}
-                                                        </span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.recurring.feature3', 'Subscription management')}
+                                                            {t('subscriptionManagement.features.payment.feature2', 'Modular retry logic')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
 
-                                            {/* Feature 3 */}
+                                            {/* Feature 3: Analytics */}
                                             <div className="space-y-3">
-                                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
-                                                    {t('billing.features.automation.title', 'Payment Automation')}
-                                                </h3>
+                                                <div className="flex items-center mb-2">
+                                                    <BarChart3 className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('subscriptionManagement.features.analytics.title', 'Analytics')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('subscriptionManagement.features.analytics.description', 'Track key metrics like MRR, churn rate, customer lifetime value, and subscription growth with detailed charts.')}
+                                                </p>
                                                 <ul className="space-y-2">
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature1', 'Automated invoice generation')}
+                                                            {t('subscriptionManagement.features.analytics.feature1', 'Customer Lifetime Value and revenue forecasting')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature2', 'Payment collection workflows')}
+                                                            {t('subscriptionManagement.features.analytics.feature2', 'Churn analysis')}
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            {/* Feature 4: Customer Management */}
+                                            <div className="space-y-3">
+                                                <div className="flex items-center mb-2">
+                                                    <Settings className="h-5 w-5 text-blue-500 mr-2" />
+                                                    <h3 className="text-lg font-medium text-zinc-900 dark:text-white">
+                                                        {t('subscriptionManagement.features.management.title', 'Customer self-service')}
+                                                    </h3>
+                                                </div>
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                    {t('subscriptionManagement.features.management.description', 'Empower customers to manage their own subscriptions with a user-friendly portal for upgrades, downgrades, cancellations and support requests.')}
+                                                </p>
+                                                <ul className="space-y-2">
+                                                    <li className="flex items-start">
+                                                        <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
+                                                        <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                                                            {t('subscriptionManagement.features.management.feature1', 'Plan switching')}
                                                         </span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <CheckCircle2 className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0 mt-0.5" />
                                                         <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                                                            {t('billing.features.automation.feature3', 'Accounting system integration')}
+                                                            {t('subscriptionManagement.features.management.feature2', 'Payment method updates')}
                                                         </span>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
 
-                                        {/* How It Works Section */}
-                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                                        {/* Use Cases Section */}
+                                        <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800 mb-6">
                                             <h3 className="text-lg font-medium mb-4 text-zinc-900 dark:text-white">
-                                                {t('billing.howItWorks.title', 'How It Works')}
+                                                {t('subscriptionManagement.useCases.title', 'Perfect for')}
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">1</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step1.title', 'Create')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step1.description', 'Design invoices with your branding and set up recurring schedules.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('subscriptionManagement.useCases.saas.title', 'SaaS Businesses')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('subscriptionManagement.useCases.saas.description', 'Manage tiered pricing plans, free trials, and annual vs. monthly billing for your software service.')}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">2</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step2.title', 'Send')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step2.description', 'Automatically send invoices via email with secure payment links.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('subscriptionManagement.useCases.membership.title', 'Membership Sites')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('subscriptionManagement.useCases.membership.description', 'Create recurring membership plans with different access levels and automated billing.')}
+                                                    </p>
                                                 </div>
-                                                <div className="flex items-start">
-                                                    <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3 flex-shrink-0">
-                                                        <span className="text-blue-600 dark:text-blue-400 text-xs font-medium">3</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-zinc-900 dark:text-white">
-                                                            {t('billing.howItWorks.step3.title', 'Get Paid')}
-                                                        </p>
-                                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
-                                                            {t('billing.howItWorks.step3.description', 'Receive payments directly with real-time notifications.')}
-                                                        </p>
-                                                    </div>
+                                                <div className="bg-zinc-50 dark:bg-zinc-800 p-4 rounded">
+                                                    <h4 className="text-sm font-medium text-zinc-900 dark:text-white mb-2">
+                                                        {t('subscriptionManagement.useCases.services.title', 'Service Providers')}
+                                                    </h4>
+                                                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                        {t('subscriptionManagement.useCases.services.description', 'Offer recurring services like cleaning, maintenance, or consulting with flexible scheduling options.')}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -238,10 +250,10 @@ export default function BillingPage() {
                                         <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                                 <p className="text-sm font-medium text-zinc-900 dark:text-white mb-4 sm:mb-0">
-                                                    {t('billing.cta.title', 'Ready to streamline your billing process?')}
+                                                    {t('subscriptionManagement.cta.title', 'Ready to grow your recurring revenue?')}
                                                 </p>
                                                 <ButtonExpand
-                                                    text={t('billing.cta.button', 'Get Started')}
+                                                    text={t('subscriptionManagement.cta.button', 'Get Started')}
                                                     bgColor="bg-blue-50 dark:bg-blue-900/30"
                                                     textColor="text-blue-700 dark:text-blue-300"
                                                     hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"

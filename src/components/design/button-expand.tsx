@@ -60,7 +60,7 @@ function ButtonExpandTalkToUs() {
             textColor="text-blue-700 dark:text-blue-300"
             hoverBgColor="hover:bg-blue-100 dark:hover:bg-blue-900/40"
             hoverTextColor="hover:text-blue-800 dark:hover:text-blue-200"
-            onClick={() => window.open('https://cal.com/babacar-diop-umkvq2/30min', '_blank')}
+            onClick={() => window.open('https://cal.com/babacar-diop', '_blank')}
         />
     )
 }

@@ -21,7 +21,7 @@ export function FooterCTA() {
       <div className="mt-10 md:mb-8">
         <div className="flex items-center space-x-4">
           <Link
-            to="https://cal.com/babacardiop/30min"
+            to="https://cal.com/babacardiop"
             target="_blank"
             rel="noopener noreferrer"
           >

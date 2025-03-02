@@ -12,6 +12,8 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import ApiKeysSection from '@/components/portal/api-key-panel'
 import { useTranslation } from 'react-i18next'
+import mixpanelService from '@/utils/mixpanel/mixpanel'
+import { useEffect } from 'react'
 
 export default function Dashboard() {
   const { t } = useTranslation()
@@ -53,6 +55,13 @@ export default function Dashboard() {
       link: "mailto:hello@lomi.africa?subject=[Support] — Question about integration"
     },
   ]
+
+  useEffect(() => {
+    mixpanelService.track('Dashboard Viewed', {
+      timestamp: new Date().toISOString(),
+      referrer: document.referrer
+    });
+  }, []);
 
   return (
     <Layout fixed>

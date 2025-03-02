@@ -174,7 +174,7 @@ BEGIN
             'Content-Type', 'application/json'
         ),
         body:=jsonb_build_object(
-            'from', 'Lomi <hello@lomi.africa>',
+            'from', 'lomi. <hello@lomi.africa>',
             'to', p_email,
             'subject', 'Invitation to join ' || v_organization_name || ' on lomi.',
             'html', format(

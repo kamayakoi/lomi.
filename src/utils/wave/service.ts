@@ -28,7 +28,7 @@ interface TransactionMetadata {
 
 export class WaveService {
     /**
-     * Creates or retrieves a Wave aggregated merchant for a Lomi merchant
+     * Creates or retrieves a Wave aggregated merchant for a lomi. merchant
      */
     static async ensureWaveAggregatedMerchant(merchantId: string): Promise<string> {
         try {

@@ -109,7 +109,7 @@ export default function CookieConsent() {
                 transition={{ duration: 0.3 }}
             >
                 <motion.div
-                    className="w-full md:w-[340px] overflow-hidden flex justify-end"
+                    className="w-[calc(100vw-60px)] max-w-[370px] overflow-hidden flex justify-end"
                     animate={{
                         width: showAnimation && animationType === "accept" ? "40px" : "100%",
                         height: showAnimation && animationType === "accept" ? "40px" : "auto",
@@ -127,9 +127,9 @@ export default function CookieConsent() {
                     style={{ borderRadius: "6px" }}
                 >
                     <motion.div
-                        className="px-5 py-4 relative overflow-hidden w-full"
+                        className="px-4 py-3 sm:px-5 sm:py-4 relative overflow-hidden w-full"
                         animate={{
-                            padding: showAnimation && animationType === "accept" ? "0px" : "20px",
+                            padding: showAnimation && animationType === "accept" ? "0px" : showAnimation ? "0px" : "12px 16px",
                             borderRadius: showAnimation && animationType === "accept" ? "50%" : "6px",
                         }}
                         transition={{ duration: 0.5 }}
@@ -152,19 +152,19 @@ export default function CookieConsent() {
                             }}
                             transition={{ duration: 0.2 }}
                         >
-                            <p className="mb-3 text-gray-300 text-sm text-left">
+                            <p className="mb-2 sm:mb-3 text-gray-300 text-xs sm:text-sm text-left">
                                 We use tracking cookies to understand how you use the product and help us improve it.
                             </p>
-                            <div className="flex gap-4">
+                            <div className="flex flex-wrap gap-3 sm:gap-4">
                                 <button
                                     onClick={handleAccept}
-                                    className="text-white text-sm hover:text-gray-200 transition-colors font-medium"
+                                    className="text-white text-xs sm:text-sm hover:text-gray-200 transition-colors font-medium"
                                 >
                                     Accept
                                 </button>
                                 <button
                                     onClick={handleDecline}
-                                    className="text-gray-500 text-sm hover:text-gray-400 transition-colors"
+                                    className="text-gray-500 text-xs sm:text-sm hover:text-gray-400 transition-colors"
                                 >
                                     Decline
                                 </button>

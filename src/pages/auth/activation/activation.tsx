@@ -13,6 +13,15 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@/lib/hooks/use-user';
 import { supabase } from '@/utils/supabase/client';
 import { useTranslation } from 'react-i18next';
+import mixpanelService from '@/utils/mixpanel/mixpanel';
+
+// Add this type declaration
+declare global {
+    interface Window {
+        __stepStartTime?: number;
+        __activationStartTime?: number;
+    }
+}
 
 const StepIndicator = ({ step, isCompleted, isActive, children }: { step: number; isCompleted: boolean; isActive: boolean; children: React.ReactNode }) => (
     <div className={`flex items-center mb-8 ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -90,6 +99,19 @@ const Activation: React.FC = () => {
     const { user, isLoading: userLoading } = useUser();
     const [loading, setLoading] = useState(false);
 
+    // Track when a user starts activation
+    useEffect(() => {
+        if (user && currentStep === 0 && !activationStatusLoading && !isActivated) {
+            mixpanelService.track('Activation Started', {
+                user_id: user.id,
+                email: user.email,
+                timestamp: new Date().toISOString()
+            });
+            window.__activationStartTime = Date.now();
+            window.__stepStartTime = Date.now();
+        }
+    }, [user, currentStep, activationStatusLoading, isActivated]);
+
     useEffect(() => {
         const checkActivationStatus = async () => {
             if (user) {
@@ -136,16 +158,63 @@ const Activation: React.FC = () => {
     }, [user, userLoading, setCurrentStep, setActivationData, activationData]);
 
     const handleNext = (stepData: Partial<ActivationData>) => {
+        if (user) {
+            mixpanelService.track('Activation Step Completed', {
+                user_id: user.id,
+                step_number: currentStep + 1,
+                step_name: steps[currentStep]?.title || '',
+                time_spent_ms: Date.now() - (window.__stepStartTime || Date.now()),
+                // Include relevant data from the step
+                ...(currentStep === 0 && {
+                    agreed_to_terms: true
+                }),
+                ...(currentStep === 1 && {
+                    business_country: stepData.country,
+                    business_type: stepData.proofOfBusiness,
+                    has_business_url: !!stepData.businessUrl
+                }),
+                ...(currentStep === 2 && {
+                    signatory_country_code: stepData.countryCode
+                })
+            });
+        }
+
+        window.__stepStartTime = Date.now();
         setActivationData((prevData) => ({ ...prevData, ...stepData }));
         setCurrentStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
     };
 
     const handlePrevious = () => {
+        if (user) {
+            mixpanelService.track('Activation Step Back', {
+                user_id: user.id,
+                from_step: currentStep + 1,
+                to_step: currentStep,
+                from_step_name: steps[currentStep]?.title || '',
+                to_step_name: steps[currentStep - 1]?.title || ''
+            });
+        }
+
+        window.__stepStartTime = Date.now();
         setCurrentStep((prevStep) => Math.max(prevStep - 1, 0));
     };
 
     const onSubmit = async (completeData: ActivationData) => {
         try {
+            // Track final step completion
+            if (user) {
+                mixpanelService.track('Activation Step Completed', {
+                    user_id: user.id,
+                    step_number: currentStep + 1,
+                    step_name: steps[currentStep]?.title || '',
+                    time_spent_ms: Date.now() - (window.__stepStartTime || Date.now()),
+                    is_final_step: true,
+                    has_identity_proof: !!completeData.identityProof,
+                    has_address_proof: !!completeData.addressProof,
+                    has_business_registration: !!completeData.businessRegistration
+                });
+            }
+
             setLoading(true);
             setActivationData(completeData);
 
@@ -180,12 +249,44 @@ const Activation: React.FC = () => {
 
             if (error) throw error;
 
+            // Track KYC submission
+            mixpanelService.track('KYC Submitted', {
+                user_id: user.id,
+                email: user.email,
+                business_name: completeData.legalName,
+                business_country: completeData.country,
+                business_type: completeData.proofOfBusiness,
+                has_tax_number: !!completeData.taxNumber,
+                has_identity_proof: !!completeData.identityProof,
+                has_address_proof: !!completeData.addressProof,
+                has_business_registration: !!completeData.businessRegistration,
+                time_to_complete_ms: Date.now() - (window.__activationStartTime || Date.now())
+            });
+
+            // Update user properties in Mixpanel
+            mixpanelService.identify(user.id, {
+                business_name: completeData.legalName,
+                business_country: completeData.country,
+                business_type: completeData.proofOfBusiness,
+                kyc_submitted: true,
+                kyc_submission_date: new Date().toISOString()
+            });
+
             toast({
                 title: "KYC Submitted",
                 description: "Your KYC details have been submitted successfully.",
             });
             setCurrentStep(4); // Move to verification in progress step
         } catch (error) {
+            // Track KYC submission error
+            if (user) {
+                mixpanelService.track('KYC Submission Error', {
+                    user_id: user.id,
+                    error_message: error instanceof Error ? error.message : 'Unknown error',
+                    step_number: currentStep + 1
+                });
+            }
+
             console.error('Error submitting KYC details:', error);
             toast({
                 title: "Error",
