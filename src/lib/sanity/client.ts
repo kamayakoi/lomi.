@@ -18,6 +18,8 @@ console.log("Sanity Configuration:", {
 
 // Determine environment
 const isDevelopment = import.meta.env.DEV;
+const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
 export const client = createClient({
   projectId,
@@ -27,7 +29,7 @@ export const client = createClient({
   token, // Include token for authenticated requests
   perspective: 'published', // Only fetch published content
   stega: false, // Disable stega in development
-  withCredentials: true, // Add withCredentials for CORS
+  withCredentials: !isLocalhost, // Only use credentials for non-localhost domains
 });
 
 // Enhanced image builder with improved defaults

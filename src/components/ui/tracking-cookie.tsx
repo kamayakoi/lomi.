@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check } from "lucide-react"
 import { useTheme } from "@/lib/hooks/use-theme"
+import { useTranslation } from "react-i18next"
 
 const COOKIE_CONSENT_KEY = "cookie-consent-status"
 
@@ -20,6 +21,7 @@ function setCookieConsentStatus(status: string) {
 
 export default function CookieConsent() {
     const { theme } = useTheme()
+    const { t } = useTranslation()
     const [isVisible, setIsVisible] = useState(false)
     const [showAnimation, setShowAnimation] = useState(false)
     const [animationType, setAnimationType] = useState<"accept" | "decline" | null>(null)
@@ -151,20 +153,20 @@ export default function CookieConsent() {
                             transition={{ duration: 0.2 }}
                         >
                             <p className="mb-2 sm:mb-3 text-gray-300 text-xs sm:text-sm text-left">
-                                We use tracking cookies to understand how you use the product and help us improve it.
+                                {t("components.tracking_cookie.message")}
                             </p>
                             <div className="flex flex-wrap gap-3 sm:gap-4">
                                 <button
                                     onClick={handleAccept}
                                     className="text-white text-xs sm:text-sm hover:text-gray-200 transition-colors font-medium"
                                 >
-                                    Accept
+                                    {t("components.tracking_cookie.accept")}
                                 </button>
                                 <button
                                     onClick={handleDecline}
                                     className="text-gray-500 text-xs sm:text-sm hover:text-gray-400 transition-colors"
                                 >
-                                    Decline
+                                    {t("components.tracking_cookie.decline")}
                                 </button>
                             </div>
                         </motion.div>

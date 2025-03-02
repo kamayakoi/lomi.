@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollToTop } from '@/components/landing/scroll-to-top';
 import { Footer } from '@/components/landing/Footer';
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { CheckCircle2, ShoppingCart, ChevronLeft, Tag, BarChart3 } from 'lucide-react';
+import { CheckCircle2, ShoppingCart, Tag, BarChart3, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from "@/components/ui/toaster";
 import { ButtonExpand } from '@/components/design/button-expand';
@@ -27,6 +26,7 @@ const Products = () => {
     const navigate = useNavigate();
     const [mounted, setMounted] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [isTitleHovered, setIsTitleHovered] = useState(false);
 
     // Handle hydration mismatch
     useEffect(() => {
@@ -65,35 +65,6 @@ const Products = () => {
                 style={{ width: `${scrollProgress}%` }}
             />
 
-            {/* Desktop back button - hidden on mobile */}
-            <div className="fixed left-0 bottom-25 hidden h-screen w-80 lg:block">
-                <div className="flex h-full flex-col overflow-hidden">
-                    {/* Back button */}
-                    <div className="absolute top-15 left-15">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-10 left-10 inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-black/50 text-gray-700 hover:text-gray-900 dark:text-sage-100 dark:hover:text-sage-200 dark:hover:bg-zinc-900 dark:border-zinc-800 border border-gray-200 h-10 w-10 rounded-none transition-colors"
-                            onClick={() => {
-                                navigate(-1);
-                                // Add slight delay to ensure navigation completes before scrolling
-                                setTimeout(() => {
-                                    // If coming from home, we want to scroll to the bottom where the footer is
-                                    if (document.referrer.includes('/')) {
-                                        const footer = document.querySelector('.scroll-footer');
-                                        if (footer) {
-                                            footer.scrollIntoView({ behavior: 'smooth' });
-                                        }
-                                    }
-                                }, 100);
-                            }}
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
             {/* Main Content */}
             <main className="container mx-auto max-w-6xl px-4 pb-32">
                 <div className="space-y-16">
@@ -103,9 +74,19 @@ const Products = () => {
                         transition={{ duration: 0.5 }}
                         className="relative pt-16 md:pt-20"
                     >
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            {t('products.title', 'Sell products')}
-                        </h1>
+                        <motion.h1
+                            className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => navigate(-1)}
+                            onMouseEnter={() => setIsTitleHovered(true)}
+                            onMouseLeave={() => setIsTitleHovered(false)}
+                        >
+                            <span className="flex items-center">
+                                <ArrowLeft className={`mr-2 h-8 w-8 transition-all duration-300 absolute ${isTitleHovered ? 'opacity-100 -translate-x-6' : 'opacity-0 -translate-x-4'}`} />
+                                <span className="transition-transform duration-300" style={{ transform: isTitleHovered ? 'translateX(20px)' : 'translateX(0)' }}>
+                                    {t('products.title', 'Sell products')}
+                                </span>
+                            </span>
+                        </motion.h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
                             {t('products.description', 'Create, manage, and sell your products with our comprehensive product management system. Easily track inventory, set pricing, and analyze sales performance.')}
                         </p>

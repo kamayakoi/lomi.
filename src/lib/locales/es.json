@@ -1,4 +1,8 @@
 {
+    "app": {
+        "title": "lomi. | Plataforma de orquestación de pagos de África Occidental",
+        "description": "Vende productos y suscripciones online con lomi. Acepta pagos a través de tarjetas, mobile money y criptomonedas, envía desembolsos y automatiza flujos financieros con facilidad."
+    },
     "footer": {
         "tagline": "Connecting the World to West Africa, one transaction at a time.",
         "features": {
@@ -1181,6 +1185,18 @@
         "cta": {
             "title": "¿Listo para simplificar su proceso de facturación?",
             "button": "Comenzar Ahora"
+        }
+    },
+    "components": {
+        "tracking_cookie": {
+            "message": "Utilizamos cookies de seguimiento para entender cómo usas el producto y ayudarnos a mejorarlo.",
+            "accept": "Aceptar",
+            "decline": "Rechazar"
+        },
+        "business_outreach": {
+            "message": "¿Tienes una empresa grande o en rápido crecimiento? Obtén precios y soporte dedicados.",
+            "reach_out": "Contáctanos",
+            "dismiss": "Descartar"
         }
     }
 }

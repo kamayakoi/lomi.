@@ -1,4 +1,8 @@
 {
+    "app": {
+        "title": "lomi. | West Africa's Payment Orchestration Platform",
+        "description": "Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and crypto, send payouts and automate financial workflows with ease."
+    },
     "footer": {
         "tagline": "Connecting the World to West Africa, one transaction at a time.",
         "features": {
@@ -1063,6 +1067,18 @@
         "cta": {
             "title": "Ready to work with us?",
             "button": "Get Started"
+        }
+    },
+    "components": {
+        "tracking_cookie": {
+            "message": "We use tracking cookies to understand how you use the product and help us improve it.",
+            "accept": "Accept",
+            "decline": "Decline"
+        },
+        "business_outreach": {
+            "message": "Large or fast-growing business? Get dedicated pricing and support.",
+            "reach_out": "Reach out to us",
+            "dismiss": "Dismiss"
         }
     }
 }

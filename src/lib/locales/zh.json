@@ -1,4 +1,8 @@
 {
+    "app": {
+        "title": "lomi. | 西非支付编排平台",
+        "description": "通过卡片、移动货币和加密货币在线销售产品和服务。接受付款、发送付款和自动化财务工作流程。"
+    },
     "footer": {
         "tagline": "连接世界到西非，一次交易一步到位。",
         "features": {
@@ -282,6 +286,18 @@
                 "different_browser": "看起来您在不同的浏览器中打开了此链接。请返回您的原始浏览器或点击下面的按钮登录以继续。",
                 "sign_in_button": "登录"
             }
+        }
+    },
+    "components": {
+        "tracking_cookie": {
+            "message": "我们使用跟踪cookies来了解您如何使用产品并帮助我们改进它。",
+            "accept": "接受",
+            "decline": "拒绝"
+        },
+        "business_outreach": {
+            "message": "大型或快速增长的企业？获取专属定价和支持。",
+            "reach_out": "联系我们",
+            "dismiss": "关闭"
         }
     },
     "dashboard": {

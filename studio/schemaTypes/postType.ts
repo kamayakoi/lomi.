@@ -224,7 +224,54 @@ export const postType = defineType({
       title: 'Body (French)',
       type: 'array',
       of: [
-        { type: 'block' },
+        { type: 'block',
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+              { title: 'Code', value: 'code' },
+              { title: 'Underline', value: 'underline' },
+              { title: 'Strike', value: 'strike-through' },
+              { title: 'Highlight', value: 'highlight' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+              {
+                name: 'button',
+                type: 'object',
+                title: 'Button',
+                fields: [
+                  {
+                    name: 'url',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+            ],
+          },
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H1', value: 'h1' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+            { title: 'H4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+            { title: 'Lead Paragraph', value: 'lead' },
+            { title: 'Custom List', value: 'customList' },
+          ],
+        },
         {
           type: 'image',
           fields: [
@@ -237,6 +284,89 @@ export const postType = defineType({
               name: 'caption',
               type: 'string',
               title: 'Caption',
+              description: 'A caption that will appear below the image',
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'codeBlock',
+          title: 'Code Block',
+          fields: [
+            {
+              name: 'language',
+              title: 'Language',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'JavaScript', value: 'javascript' },
+                  { title: 'TypeScript', value: 'typescript' },
+                  { title: 'HTML', value: 'html' },
+                  { title: 'CSS', value: 'css' },
+                  { title: 'JSON', value: 'json' },
+                  { title: 'Bash', value: 'bash' },
+                  { title: 'Python', value: 'python' },
+                ],
+              },
+            },
+            {
+              name: 'code',
+              title: 'Code',
+              type: 'text',
+              rows: 10,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'infoBlock',
+          title: 'Info Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'warningBlock',
+          title: 'Warning Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'table',
+          title: 'Table',
+          fields: [
+            {
+              name: 'rows',
+              title: 'Rows',
+              type: 'array',
+              of: [
+                {
+                  name: 'row',
+                  title: 'Row',
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'cells',
+                      title: 'Cells',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -260,7 +390,54 @@ export const postType = defineType({
       title: 'Body (Spanish)',
       type: 'array',
       of: [
-        { type: 'block' },
+        { type: 'block',
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+              { title: 'Code', value: 'code' },
+              { title: 'Underline', value: 'underline' },
+              { title: 'Strike', value: 'strike-through' },
+              { title: 'Highlight', value: 'highlight' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+              {
+                name: 'button',
+                type: 'object',
+                title: 'Button',
+                fields: [
+                  {
+                    name: 'url',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+            ],
+          },
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H1', value: 'h1' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+            { title: 'H4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+            { title: 'Lead Paragraph', value: 'lead' },
+            { title: 'Custom List', value: 'customList' },
+          ],
+        },
         {
           type: 'image',
           fields: [
@@ -273,6 +450,89 @@ export const postType = defineType({
               name: 'caption',
               type: 'string',
               title: 'Caption',
+              description: 'A caption that will appear below the image',
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'codeBlock',
+          title: 'Code Block',
+          fields: [
+            {
+              name: 'language',
+              title: 'Language',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'JavaScript', value: 'javascript' },
+                  { title: 'TypeScript', value: 'typescript' },
+                  { title: 'HTML', value: 'html' },
+                  { title: 'CSS', value: 'css' },
+                  { title: 'JSON', value: 'json' },
+                  { title: 'Bash', value: 'bash' },
+                  { title: 'Python', value: 'python' },
+                ],
+              },
+            },
+            {
+              name: 'code',
+              title: 'Code',
+              type: 'text',
+              rows: 10,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'infoBlock',
+          title: 'Info Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'warningBlock',
+          title: 'Warning Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'table',
+          title: 'Table',
+          fields: [
+            {
+              name: 'rows',
+              title: 'Rows',
+              type: 'array',
+              of: [
+                {
+                  name: 'row',
+                  title: 'Row',
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'cells',
+                      title: 'Cells',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -296,7 +556,54 @@ export const postType = defineType({
       title: 'Body (Portuguese)',
       type: 'array',
       of: [
-        { type: 'block' },
+        { type: 'block',
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+              { title: 'Code', value: 'code' },
+              { title: 'Underline', value: 'underline' },
+              { title: 'Strike', value: 'strike-through' },
+              { title: 'Highlight', value: 'highlight' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+              {
+                name: 'button',
+                type: 'object',
+                title: 'Button',
+                fields: [
+                  {
+                    name: 'url',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+            ],
+          },
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H1', value: 'h1' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+            { title: 'H4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+            { title: 'Lead Paragraph', value: 'lead' },
+            { title: 'Custom List', value: 'customList' },
+          ],
+        },
         {
           type: 'image',
           fields: [
@@ -309,6 +616,89 @@ export const postType = defineType({
               name: 'caption',
               type: 'string',
               title: 'Caption',
+              description: 'A caption that will appear below the image',
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'codeBlock',
+          title: 'Code Block',
+          fields: [
+            {
+              name: 'language',
+              title: 'Language',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'JavaScript', value: 'javascript' },
+                  { title: 'TypeScript', value: 'typescript' },
+                  { title: 'HTML', value: 'html' },
+                  { title: 'CSS', value: 'css' },
+                  { title: 'JSON', value: 'json' },
+                  { title: 'Bash', value: 'bash' },
+                  { title: 'Python', value: 'python' },
+                ],
+              },
+            },
+            {
+              name: 'code',
+              title: 'Code',
+              type: 'text',
+              rows: 10,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'infoBlock',
+          title: 'Info Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'warningBlock',
+          title: 'Warning Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'table',
+          title: 'Table',
+          fields: [
+            {
+              name: 'rows',
+              title: 'Rows',
+              type: 'array',
+              of: [
+                {
+                  name: 'row',
+                  title: 'Row',
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'cells',
+                      title: 'Cells',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -332,7 +722,54 @@ export const postType = defineType({
       title: 'Body (Chinese)',
       type: 'array',
       of: [
-        { type: 'block' },
+        { type: 'block',
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+              { title: 'Code', value: 'code' },
+              { title: 'Underline', value: 'underline' },
+              { title: 'Strike', value: 'strike-through' },
+              { title: 'Highlight', value: 'highlight' },
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Link',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+              {
+                name: 'button',
+                type: 'object',
+                title: 'Button',
+                fields: [
+                  {
+                    name: 'url',
+                    type: 'url',
+                    title: 'URL',
+                  },
+                ],
+              },
+            ],
+          },
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H1', value: 'h1' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+            { title: 'H4', value: 'h4' },
+            { title: 'Quote', value: 'blockquote' },
+            { title: 'Lead Paragraph', value: 'lead' },
+            { title: 'Custom List', value: 'customList' },
+          ],
+        },
         {
           type: 'image',
           fields: [
@@ -345,6 +782,89 @@ export const postType = defineType({
               name: 'caption',
               type: 'string',
               title: 'Caption',
+              description: 'A caption that will appear below the image',
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'codeBlock',
+          title: 'Code Block',
+          fields: [
+            {
+              name: 'language',
+              title: 'Language',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'JavaScript', value: 'javascript' },
+                  { title: 'TypeScript', value: 'typescript' },
+                  { title: 'HTML', value: 'html' },
+                  { title: 'CSS', value: 'css' },
+                  { title: 'JSON', value: 'json' },
+                  { title: 'Bash', value: 'bash' },
+                  { title: 'Python', value: 'python' },
+                ],
+              },
+            },
+            {
+              name: 'code',
+              title: 'Code',
+              type: 'text',
+              rows: 10,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'infoBlock',
+          title: 'Info Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'warningBlock',
+          title: 'Warning Block',
+          fields: [
+            {
+              name: 'text',
+              title: 'Text',
+              type: 'text',
+              rows: 3,
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'table',
+          title: 'Table',
+          fields: [
+            {
+              name: 'rows',
+              title: 'Rows',
+              type: 'array',
+              of: [
+                {
+                  name: 'row',
+                  title: 'Row',
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'cells',
+                      title: 'Cells',
+                      type: 'array',
+                      of: [{ type: 'string' }],
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },

@@ -1,4 +1,8 @@
 {
+    "app": {
+        "title": "lomi. | Plateforme d'orchestration de paiement en Afrique de l'Ouest",
+        "description": "Vendez produits et abonnements en ligne avec lomi. Acceptez des paiements via cartes, mobile money et crypto, envoyer des versements et automatiser les flux financiers avec facilité."
+    },
     "footer": {
         "tagline": "Connecting the World to West Africa, one transaction at a time.",
         "features": {
@@ -1060,6 +1064,18 @@
         "cta": {
             "title": "Prêt à commencer à vendre sur votre site web?",
             "button": "Commencer"
+        }
+    },
+    "components": {
+        "tracking_cookie": {
+            "message": "Nous utilisons des cookies de suivi pour comprendre comment vous utilisez le produit et nous aider à l'améliorer.",
+            "accept": "Accepter",
+            "decline": "Refuser"
+        },
+        "business_outreach": {
+            "message": "Entreprise en croissance rapide ? Bénéficiez de tarifs et d'une assistance dédiés.",
+            "reach_out": "Contactez-nous",
+            "dismiss": "Ignorer"
         }
     }
 }

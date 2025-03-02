@@ -4,12 +4,10 @@ import { ScrollToTop } from '@/components/landing/scroll-to-top';
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Footer } from '@/components/landing/Footer';
 import { Toaster } from "@/components/ui/toaster"
 import BusinessOutreach from "@/components/ui/business-outreach"
-import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +15,7 @@ export default function PricingPage() {
     const [mounted, setMounted] = useState(false);
     const [titleNumber, setTitleNumber] = useState(0);
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [isTitleHovered, setIsTitleHovered] = useState(false);
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -101,6 +100,32 @@ export default function PricingPage() {
         }
     }
 
+    // Custom ToggleGroup component to ensure no gap
+    const CurrencyToggle = () => (
+        <div className="flex w-fit">
+            <button
+                type="button"
+                onClick={() => setCurrency("XOF")}
+                className={`px-4 sm:px-6 py-2 border border-zinc-200 dark:border-zinc-800 border-r-0 transition-colors ${currency === "XOF"
+                    ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
+                    : "bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                    }`}
+            >
+                XOF
+            </button>
+            <button
+                type="button"
+                onClick={() => setCurrency("USD")}
+                className={`px-4 sm:px-6 py-2 border border-zinc-200 dark:border-zinc-800 transition-colors ${currency === "USD"
+                    ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
+                    : "bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                    }`}
+            >
+                USD
+            </button>
+        </div>
+    );
+
     if (!mounted) {
         return null;
     }
@@ -113,23 +138,6 @@ export default function PricingPage() {
                 style={{ width: `${scrollProgress}%` }}
             />
 
-            {/* Desktop back button - hidden on mobile */}
-            <div className="fixed left-0 bottom-25 hidden h-screen w-80 lg:block">
-                <div className="flex h-full flex-col overflow-hidden">
-                    {/* Back button */}
-                    <div className="absolute top-15 left-15">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-10 left-10 inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-black/50 text-gray-700 hover:text-gray-900 dark:text-sage-100 dark:hover:text-sage-200 dark:hover:bg-zinc-900 dark:border-zinc-800 border border-gray-200 h-10 w-10 rounded-none transition-colors"
-                            onClick={() => navigate(-1)}
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
             {/* Main Content */}
             <main className="container mx-auto max-w-6xl px-4 pb-32">
                 <div className="space-y-16">
@@ -139,32 +147,42 @@ export default function PricingPage() {
                         transition={{ duration: 0.5 }}
                         className="relative pt-16 md:pt-20"
                     >
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6">
-                            <div className="flex flex-wrap items-baseline">
-                                <span className="inline-flex whitespace-nowrap mr-2">3.2% +</span>
-                                <div className="relative inline-flex items-center h-14 sm:h-20 min-w-[200px] w-auto">
-                                    <AnimatePresence mode="wait">
-                                        <motion.span
-                                            key={titleNumber}
-                                            className="absolute text-zinc-800 dark:text-white whitespace-nowrap mt-2"
-                                            initial={{ opacity: 0, y: titleNumber === 0 ? -50 : 50 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: titleNumber === 0 ? 50 : -50 }}
-                                            transition={{
-                                                type: "spring",
-                                                stiffness: 30,
-                                                duration: 2,
-                                                exit: { duration: 1.5 }
-                                            }}
-                                            style={{ top: "9px" }}
-                                        >
-                                            {prices[titleNumber]}
-                                        </motion.span>
-                                    </AnimatePresence>
-                                </div>
-                            </div>
-                            <span className="block mt-1">{t("pricing.title")}</span>
-                        </h1>
+                        <motion.h1
+                            className="text-4xl sm:text-5xl md:text-7xl tracking-tighter font-regular text-zinc-800 dark:text-white mb-6 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => navigate(-1)}
+                            onMouseEnter={() => setIsTitleHovered(true)}
+                            onMouseLeave={() => setIsTitleHovered(false)}
+                        >
+                            <span className="flex items-center">
+                                <ArrowLeft className={`mr-2 h-8 w-8 transition-all duration-300 absolute ${isTitleHovered ? 'opacity-100 -translate-x-6' : 'opacity-0 -translate-x-4'}`} />
+                                <span className="transition-transform duration-300" style={{ transform: isTitleHovered ? 'translateX(20px)' : 'translateX(0)' }}>
+                                    <div className="flex flex-wrap items-baseline">
+                                        <span className="inline-flex whitespace-nowrap mr-2">3.2% +</span>
+                                        <div className="relative inline-flex items-center h-14 sm:h-20 min-w-[200px] w-auto">
+                                            <AnimatePresence mode="wait">
+                                                <motion.span
+                                                    key={titleNumber}
+                                                    className="absolute text-zinc-800 dark:text-white whitespace-nowrap mt-2"
+                                                    initial={{ opacity: 0, y: titleNumber === 0 ? -50 : 50 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: titleNumber === 0 ? 50 : -50 }}
+                                                    transition={{
+                                                        type: "spring",
+                                                        stiffness: 30,
+                                                        duration: 2,
+                                                        exit: { duration: 1.5 }
+                                                    }}
+                                                    style={{ top: "9px" }}
+                                                >
+                                                    {prices[titleNumber]}
+                                                </motion.span>
+                                            </AnimatePresence>
+                                        </div>
+                                    </div>
+                                    <span className="block mt-1">{t("pricing.title")}</span>
+                                </span>
+                            </span>
+                        </motion.h1>
                         <p className="text-zinc-600 dark:text-zinc-200 text-base sm:text-lg md:text-xl leading-relaxed tracking-tight max-w-2xl">
                             {t("pricing.subtitle")}
                         </p>
@@ -189,27 +207,7 @@ export default function PricingPage() {
                                             <div className="space-y-6 sm:space-y-8 flex flex-col justify-between h-full">
                                                 <div>
                                                     <Label className="text-lg font-semibold mb-2 sm:mb-4 block text-zinc-900 dark:text-white">{t("pricing.calculator.currency")}</Label>
-                                                    <ToggleGroup
-                                                        type="single"
-                                                        value={currency}
-                                                        onValueChange={(value: "USD" | "XOF") => setCurrency(value)}
-                                                        className="justify-start border border-zinc-200 dark:border-zinc-800 rounded-none inline-flex [&>*:not(:first-child)]:border-l-0"
-                                                    >
-                                                        <ToggleGroupItem
-                                                            value="XOF"
-                                                            aria-label="Toggle XOF"
-                                                            className="data-[state=on]:bg-zinc-100 dark:data-[state=on]:bg-zinc-800 data-[state=on]:text-zinc-900 dark:data-[state=on]:text-white px-4 sm:px-6 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-transparent border-r border-zinc-200 dark:border-zinc-800 rounded-none transition-colors"
-                                                        >
-                                                            XOF
-                                                        </ToggleGroupItem>
-                                                        <ToggleGroupItem
-                                                            value="USD"
-                                                            aria-label="Toggle USD"
-                                                            className="data-[state=on]:bg-zinc-100 dark:data-[state=on]:bg-zinc-800 data-[state=on]:text-zinc-900 dark:data-[state=on]:text-white px-4 sm:px-6 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-transparent rounded-none transition-colors"
-                                                        >
-                                                            USD
-                                                        </ToggleGroupItem>
-                                                    </ToggleGroup>
+                                                    <CurrencyToggle />
                                                 </div>
 
                                                 <div className="flex-grow">

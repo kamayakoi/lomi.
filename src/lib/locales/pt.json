@@ -1,4 +1,8 @@
 {
+    "app": {
+        "title": "lomi. | Plataforma de Orquestração de Pagamentos da África Ocidental",
+        "description": "Capacitando processamento de pagamentos online e soluções financeiras para empresas da Áfri a Ocidental francófona."
+    },
     "footer": {
         "tagline": "Connecting the World to West Africa, one transaction at a time.",
         "features": {
@@ -1089,6 +1093,18 @@
         "cta": {
             "title": "Pronto para simplificar seu processo de faturamento?",
             "button": "Comece Agora"
+        }
+    },
+    "components": {
+        "tracking_cookie": {
+            "message": "Usamos cookies de rastreamento para entender como você usa o produto e nos ajudar a melhorá-lo.",
+            "accept": "Aceitar",
+            "decline": "Recusar"
+        },
+        "business_outreach": {
+            "message": "Empresa grande ou em rápido crescimento? Obtenha preços e suporte dedicados.",
+            "reach_out": "Entre em contato conosco",
+            "dismiss": "Dispensar"
         }
     }
 }

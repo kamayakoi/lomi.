@@ -9,6 +9,7 @@ import AppRouter from "./router";
 import AnimatedLogoLoader from "@/components/portal/loader";
 import mixpanelService from "@/utils/mixpanel/mixpanel";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { useTranslation } from "react-i18next";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -25,10 +26,13 @@ const queryClient = new QueryClient({
 // Initialize Mixpanel
 mixpanelService.init();
 
-// Component to handle title resets
-function TitleResetManager() {
+// Component to handle title resets and language metadata
+function MetadataManager() {
     const location = useLocation();
-    const defaultTitle = "lomi. | West Africa's Payment Orchestration Platform";
+    const { t, i18n } = useTranslation();
+    const currentLanguage = i18n.language || 'en';
+    const defaultTitle = t('app.title', 'lomi. | West Africa\'s Payment Orchestration Platform');
+    const defaultDescription = t('app.description', 'Sell products and subscriptions online with lomi. Accept payments via cards, mobile money and crypto, send payouts and automate financial workflows with ease.');
 
     useEffect(() => {
         // Reset the title when navigating away from blog pages
@@ -37,11 +41,35 @@ function TitleResetManager() {
         }
     }, [location.pathname, defaultTitle]);
 
-    return null;
+    // Get all supported languages for hreflang tags
+    const supportedLanguages = ['en', 'fr', 'es', 'pt', 'zh'];
+
+    return (
+        <Helmet>
+            <html lang={currentLanguage} />
+            <title>{defaultTitle}</title>
+            <meta name="description" content={defaultDescription} />
+
+            {/* Hreflang tags for language alternatives */}
+            {supportedLanguages.map(lang => (
+                <link
+                    key={lang}
+                    rel="alternate"
+                    hrefLang={lang}
+                    href={`${window.location.origin}${location.pathname}${location.search ? location.search : ''}${location.search ? '&' : '?'}lang=${lang}`}
+                />
+            ))}
+            {/* Default hreflang for international users */}
+            <link
+                rel="alternate"
+                hrefLang="x-default"
+                href={`${window.location.origin}${location.pathname}${location.search}`}
+            />
+        </Helmet>
+    );
 }
 
 export function App() {
-    const defaultTitle = "lomi. | West Africa's Payment Orchestration Platform";
     return (
         <HelmetProvider>
             <QueryClientProvider client={queryClient}>
@@ -54,10 +82,7 @@ export function App() {
                                     v7_relativeSplatPath: true
                                 }}
                             >
-                                <Helmet>
-                                    <title>{defaultTitle}</title>
-                                </Helmet>
-                                <TitleResetManager />
+                                <MetadataManager />
                                 <AppRouter />
                                 <Toaster />
                             </BrowserRouter>
