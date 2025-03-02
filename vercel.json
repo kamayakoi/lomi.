@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd apps/front && bun run build",
-  "devCommand": "cd apps/front && bun run dev",
-  "installCommand": "cd apps/front && bun install",
-  "outputDirectory": "apps/front/dist"
-} 
