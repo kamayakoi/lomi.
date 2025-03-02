@@ -24,7 +24,7 @@ export default defineConfig({
       mangle: {
         properties: false
       },
-    }),
+    }) as any,
     obfuscatorPlugin({
       include: ["src/**/*.ts", "src/**/*.tsx"],
       exclude: [/node_modules/, /\.d\.ts$/],
