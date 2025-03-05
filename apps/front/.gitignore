@@ -1,10 +1,8 @@
 # Logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+bun-debug.log*
+bun-error.log*
 
 # Dependency directories
 node_modules/
@@ -21,28 +19,18 @@ build/
 out/
 polar/
 midday/
-apps/
 
 # Local environment files
 .env
 .env.local
 .env.production
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Editor directories and files
 .vscode/
 .idea/
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
 # Miscellaneous
-coverage/
 *.tgz
 *.lock
 .pnp.*
@@ -62,13 +50,6 @@ src/utils/prompts
 .cursorrules
 /cursor
 
-# Cursor rules
-.cursorrules
-llm-prompt.md
-
 # Supabase
 *_secrets.sql
 /supabase/functions
-
-# CLI
-/cli
