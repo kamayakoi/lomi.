@@ -19,3 +19,6 @@
 [submodule "apps/store"]
 	path = apps/store
 	url = https://github.com/lomiafrica/store.lomi.africa
+[submodule "apps/jumbo"]
+	path = apps/jumbo
+	url = https://github.com/PrinceMuichkine/jumbo.git
