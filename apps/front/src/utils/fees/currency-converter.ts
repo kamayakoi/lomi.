@@ -1,4 +1,4 @@
-import { currency_code, ConversionRate } from './types';
+import { currency_code, ConversionRate } from '../../pages/portal/balance/components/types';
 
 // Default conversion rates
 const DEFAULT_CONVERSION_RATES: ConversionRate[] = [

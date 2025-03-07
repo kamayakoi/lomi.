@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useToast } from "@/lib/hooks/use-toast";
 import { currency_code, ConversionRate } from './types';
-import { convertCurrencyWithPrecision, formatCurrentRates, formatCurrency } from './currency-converter-utils';
+import { convertCurrencyWithPrecision, formatCurrentRates, formatCurrency } from '../../../../utils/fees/currency-converter';
 
 interface CurrencyConverterProps {
     conversionRates?: ConversionRate[];
