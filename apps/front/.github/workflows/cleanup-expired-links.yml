@@ -1,0 +1,18 @@
+name: Cleanup Expired Payment Links
+
+on:
+  schedule:
+    # Runs at 01:00 UTC every day
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    # Allows manual triggering
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke cleanup function
+        run: |
+          curl -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/cleanup-expired-links" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Content-Type: application/json" 
