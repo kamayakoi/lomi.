@@ -6,7 +6,8 @@ import type {
     WaveBusinessType,
     WavePaymentStatus,
     WavePaymentError,
-    CreateWaveAggregatedMerchantParams
+    CreateWaveAggregatedMerchantParams,
+    WavePayoutStatus
 } from './types';
 
 interface TransactionMetadata {
@@ -24,6 +25,15 @@ interface TransactionMetadata {
     customerName?: string;
     whatsappNumber?: string;
     [key: string]: unknown;
+}
+
+// Define an interface for the provider settings
+interface ProviderSetting {
+    provider_code: string;
+    is_connected: boolean;
+    phone_number?: string;
+    is_phone_verified?: boolean;
+    provider_merchant_id?: string;
 }
 
 export class WaveService {
@@ -308,6 +318,216 @@ export class WaveService {
      */
     static async listAggregatedMerchants() {
         return waveClient.listAggregatedMerchants();
+    }
+
+    /**
+     * Initiates a payout to a Wave mobile money user
+     */
+    static async createPayout({
+        merchantId,
+        organizationId,
+        amount,
+        currency,
+        reason,
+        metadata
+    }: {
+        merchantId: string;
+        organizationId: string;
+        amount: number;
+        currency: string;
+        reason?: string;
+        metadata?: Record<string, unknown>;
+    }): Promise<{
+        payoutId: string;
+        status: WavePayoutStatus;
+    }> {
+        try {
+            // 1. Get provider settings to retrieve the Wave merchant ID and registered phone number
+            const { data: providerSettings, error: providerError } = await supabase
+                .rpc('fetch_organization_providers_settings', {
+                    p_organization_id: organizationId
+                });
+                
+            if (providerError || !providerSettings) {
+                throw new Error('Error fetching payment providers configuration');
+            }
+            
+            // Find the Wave provider
+            const waveProvider = Array.isArray(providerSettings) 
+                ? providerSettings.find((p: ProviderSetting) => p.provider_code === 'WAVE')
+                : null;
+            
+            if (!waveProvider || !waveProvider.is_connected || !waveProvider.phone_number) {
+                throw new Error('Wave provider not configured or not connected');
+            }
+
+            // 2. Check available balance for the merchant
+            const { data: availableBalance, error: balanceError } = await supabase
+                .rpc('check_merchant_available_balance', {
+                    p_merchant_id: merchantId,
+                    p_currency_code: currency
+                });
+
+            if (balanceError) {
+                throw new Error(`Error checking balance: ${balanceError.message}`);
+            }
+
+            if ((availableBalance || 0) < amount) {
+                throw new Error(`Insufficient balance for withdrawal. Available: ${availableBalance || 0} ${currency}`);
+            }
+
+            // 3. Get merchant account ID for the currency
+            const { data: accountData, error: accountError } = await supabase
+                .from('merchant_accounts')
+                .select('account_id')
+                .eq('merchant_id', merchantId)
+                .eq('currency_code', currency)
+                .single();
+
+            if (accountError || !accountData) {
+                throw new Error(`No merchant account found for currency: ${currency}`);
+            }
+
+            // 4. Get the Wave payout fee
+            const { data: fee, error: feeError } = await supabase
+                .from('fees')
+                .select('*')
+                .eq('provider_code', 'WAVE')
+                .eq('fee_type', 'payout')
+                .eq('currency_code', currency)
+                .single();
+
+            if (feeError) {
+                console.warn('Wave payout fee not found, using default 1%', feeError);
+            }
+
+            // Standard Wave fee is 1%
+            const feePercentage = fee?.percentage || 1.0;
+            const feeAmount = amount * (feePercentage / 100);
+
+            // 5. Create a client reference ID
+            const clientReference = `payout_${merchantId}_${Date.now()}`;
+
+            // 6. Get provider merchant ID using RPC to get full provider settings
+            const { data: fullProviderSettings, error: fullProviderError } = await supabase
+                .from('organization_providers_settings')
+                .select('provider_merchant_id, phone_number')
+                .eq('organization_id', organizationId)
+                .eq('provider_code', 'WAVE')
+                .single();
+                
+            if (fullProviderError || !fullProviderSettings?.provider_merchant_id) {
+                throw new Error('Wave merchant ID not found');
+            }
+
+            // 7. Create a Wave payout via the Edge Function
+            const wavePayout = await waveClient.createPayout({
+                recipient_mobile: waveProvider.phone_number,
+                amount: amount.toString(),
+                currency,
+                client_reference: clientReference,
+                aggregated_merchant_id: fullProviderSettings.provider_merchant_id,
+                reason: reason || 'Merchant withdrawal'
+            });
+
+            // 8. Record the payout in the database
+            const { data: recordedPayout, error: recordError } = await supabase
+                .from('payouts')
+                .insert({
+                    merchant_id: merchantId,
+                    organization_id: organizationId,
+                    account_id: accountData.account_id,
+                    status: 'processing',
+                    amount,
+                    currency_code: currency,
+                    metadata: {
+                        wave_payout: {
+                            id: wavePayout.id,
+                            status: wavePayout.payment_status,
+                            recipient_mobile: waveProvider.phone_number,
+                            client_reference: clientReference,
+                            transaction_id: wavePayout.transaction_id,
+                            when_created: wavePayout.when_created,
+                            aggregated_merchant_id: fullProviderSettings.provider_merchant_id,
+                            ...metadata
+                        },
+                        fees: {
+                            percentage: feePercentage,
+                            amount: feeAmount
+                        }
+                    }
+                })
+                .select('payout_id')
+                .single();
+
+            if (recordError) {
+                console.error('Error recording Wave payout:', recordError);
+                throw recordError;
+            }
+
+            // 9. Update the merchant account balance
+            await supabase.rpc('update_merchant_account_balance', {
+                p_merchant_id: merchantId,
+                p_amount: -amount,
+                p_currency_code: currency
+            });
+
+            return {
+                payoutId: recordedPayout.payout_id,
+                status: wavePayout.payment_status as WavePayoutStatus
+            };
+        } catch (error) {
+            console.error('Error creating Wave payout:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Updates the status of a payout in the database
+     */
+    static async updatePayoutStatus(
+        payoutId: string,
+        wavePayoutId: string
+    ): Promise<void> {
+        try {
+            // 1. Get the current status from Wave
+            const wavePayout = await waveClient.getPayout(wavePayoutId);
+            
+            // 2. Map Wave status to our status
+            let payoutStatus: 'pending' | 'processing' | 'completed' | 'failed';
+            
+            switch (wavePayout.payment_status) {
+                case 'pending':
+                case 'processing':
+                    payoutStatus = 'processing';
+                    break;
+                case 'completed':
+                    payoutStatus = 'completed';
+                    break;
+                case 'failed':
+                    payoutStatus = 'failed';
+                    break;
+                default:
+                    payoutStatus = 'processing';
+            }
+            
+            // 3. Update the payout in the database
+            await supabase
+                .from('payouts')
+                .update({
+                    status: payoutStatus,
+                    metadata: {
+                        wave_payout: {
+                            ...wavePayout
+                        }
+                    },
+                    updated_at: new Date().toISOString()
+                })
+                .eq('payout_id', payoutId);
+        } catch (error) {
+            console.error('Error updating payout status:', error);
+            throw error;
+        }
     }
 }
 

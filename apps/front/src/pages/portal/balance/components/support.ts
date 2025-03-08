@@ -4,7 +4,16 @@ import { Payout, payout_status, BankAccount, BalanceBreakdown, currency_code, co
 import { DateRange } from 'react-day-picker'
 import { subDays, subMonths, startOfYear, format, parse } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import { getConversionRates, findConversionRate } from './currency-converter-utils'
+import { getConversionRates, findConversionRate } from '@/utils/fees/currency-converter'
+import { WaveService } from '@/utils/wave/service'
+
+// Define an interface for the provider settings
+interface ProviderSetting {
+    provider_code: string;
+    is_connected: boolean;
+    phone_number?: string;
+    is_phone_verified?: boolean;
+}
 
 export async function fetchPayouts(
     merchantId: string,
@@ -254,24 +263,91 @@ export async function initiateWithdrawal(
     merchantId: string,
     amount: number,
     bankAccountId: string,
-    currencyCode: currency_code = 'XOF'
+    currencyCode: currency_code = 'XOF',
+    withdrawalMethod: 'bank' | 'mobile_money' = 'bank'
 ): Promise<{ success: boolean; message?: string }> {
     try {
+        // Mobile money withdrawal using Wave
+        if (withdrawalMethod === 'mobile_money') {
+            try {
+                // 1. Get organization ID for this merchant using RPC
+                const { data: orgId, error: orgError } = await supabase
+                    .rpc('get_merchant_organization_id', {
+                        p_merchant_id: merchantId
+                    });
+
+                if (orgError || !orgId) {
+                    console.error('Error getting organization ID:', orgError);
+                    return {
+                        success: false,
+                        message: 'Could not find organization for this merchant'
+                    };
+                }
+
+                // 2. Get provider settings using RPC
+                const { data: providerSettings, error: providerError } = await supabase
+                    .rpc('fetch_organization_providers_settings', {
+                        p_organization_id: orgId
+                    });
+                
+                if (providerError || !providerSettings) {
+                    console.error('Error fetching provider settings:', providerError);
+                    return {
+                        success: false,
+                        message: 'Error fetching payment providers configuration'
+                    };
+                }
+                
+                // 3. Find the Wave provider and check if it's properly configured
+                const waveProvider = providerSettings.find(
+                    (p: ProviderSetting) => p.provider_code === 'WAVE'
+                );
+                
+                if (!waveProvider || !waveProvider.is_connected || !waveProvider.phone_number) {
+                    return {
+                        success: false,
+                        message: 'Wave is not configured or not connected. Please check your Payment Channels settings.'
+                    };
+                }
+
+                // 4. Create a payout using Wave
+                await WaveService.createPayout({
+                    merchantId,
+                    organizationId: orgId,
+                    amount,
+                    currency: currencyCode,
+                    reason: 'Merchant withdrawal'
+                });
+
+                return { 
+                    success: true, 
+                    message: `Withdrawal of ${amount} ${currencyCode} initiated via Wave mobile money.`
+                };
+            } catch (waveError: unknown) {
+                console.error('Wave payout error:', waveError);
+                return { 
+                    success: false, 
+                    message: `Wave payout failed: ${waveError instanceof Error ? waveError.message : 'Unknown error'}`
+                };
+            }
+        }
+        
+        // Bank account withdrawal
         const { data, error } = await supabase.rpc('initiate_withdrawal', {
             p_merchant_id: merchantId,
             p_amount: amount,
             p_bank_account_id: bankAccountId,
             p_currency_code: currencyCode,
-        })
+        });
 
         if (error) {
-            throw error
+            throw error;
         }
 
-        return data[0] as { success: boolean; message: string }
+        return data[0] as { success: boolean; message: string };
     } catch (error) {
-        console.error('Error initiating withdrawal:', error)
-        return { success: false, message: 'Failed to initiate withdrawal' }
+        console.error('Error initiating withdrawal:', error);
+        return { success: false, message: 'Failed to initiate withdrawal' };
     }
 }
 
@@ -496,4 +572,69 @@ export function useConversionHistory(
                 : Promise.resolve([]),
         enabled: !!merchantId
     });
+}
+
+/**
+ * Checks the status of a Wave payout and updates it in the database
+ */
+export async function checkPayoutStatus(payoutId: string): Promise<{
+    status: payout_status;
+    message: string;
+}> {
+    try {
+        // 1. Get the payout details including Wave metadata
+        const { data: payout, error: payoutError } = await supabase
+            .from('payouts')
+            .select('*')
+            .eq('payout_id', payoutId)
+            .single();
+
+        if (payoutError || !payout) {
+            throw new Error('Payout not found');
+        }
+
+        // 2. If it's a Wave payout, check the status via Wave API
+        if (
+            payout.metadata?.wave_payout?.id &&
+            (payout.status === 'pending' || payout.status === 'processing')
+        ) {
+            try {
+                // Update the status via Wave service
+                await WaveService.updatePayoutStatus(
+                    payoutId,
+                    payout.metadata.wave_payout.id
+                );
+
+                // Fetch the updated payout
+                const { data: updatedPayout } = await supabase
+                    .from('payouts')
+                    .select('status')
+                    .eq('payout_id', payoutId)
+                    .single();
+
+                return {
+                    status: updatedPayout?.status || 'pending',
+                    message: `Payout status updated: ${updatedPayout?.status || 'pending'}`
+                };
+            } catch (waveError: unknown) {
+                console.error('Error checking Wave payout status:', waveError);
+                return {
+                    status: payout.status,
+                    message: `Error checking status: ${waveError instanceof Error ? waveError.message : 'Unknown error'}`
+                };
+            }
+        }
+
+        // 3. Return the current status for non-Wave payouts
+        return {
+            status: payout.status,
+            message: `Current payout status: ${payout.status}`
+        };
+    } catch (error: unknown) {
+        console.error('Error checking payout status:', error);
+        return {
+            status: 'pending',
+            message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`
+        };
+    }
 }

@@ -722,6 +722,8 @@ CREATE TABLE payouts (
     amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
     currency_code currency_code NOT NULL REFERENCES currencies(code),
     status payout_status NOT NULL DEFAULT 'pending',
+    provider_code provider_code,
+    payment_method_code payment_method_code,
     metadata JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

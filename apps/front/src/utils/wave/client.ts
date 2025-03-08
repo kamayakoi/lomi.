@@ -1,4 +1,4 @@
-import type { WaveCheckoutSession, WaveAggregatedMerchant, CreateWaveAggregatedMerchantParams, WaveAggregatedMerchantResponse } from './types';
+import type { WaveCheckoutSession, WaveAggregatedMerchant, CreateWaveAggregatedMerchantParams, WaveAggregatedMerchantResponse, WavePayout } from './types';
 import { supabase } from '../supabase/client';
 
 export class WaveClient {
@@ -88,6 +88,48 @@ export class WaveClient {
         return this.request<WaveAggregatedMerchantResponse>(
             `/v1/aggregated_merchants${params.toString() ? `?${params.toString()}` : ''}`
         );
+    }
+
+    /**
+     * Creates a payout to a mobile money user
+     * 
+     * According to Wave's Payout API documentation, the endpoint is /v1/payouts
+     * and requires recipient_mobile, amount, currency, and optionally client_reference
+     */
+    async createPayout(params: {
+        recipient_mobile: string;
+        amount: string;
+        currency: string;
+        client_reference?: string;
+        aggregated_merchant_id?: string;
+        reason?: string;
+    }): Promise<WavePayout> {
+        // Ensure mobile number is in the correct format (E.164 standard)
+        const formattedMobile = params.recipient_mobile.startsWith('+') 
+            ? params.recipient_mobile 
+            : `+${params.recipient_mobile}`;
+
+        const payloadParams = {
+            ...params,
+            recipient_mobile: formattedMobile
+        };
+
+        console.log('Creating Wave payout with params:', {
+            ...payloadParams,
+            recipient_mobile: `${formattedMobile.substring(0, 5)}****` // Log partial number for privacy
+        });
+
+        return this.request<WavePayout>('/v1/payouts', {
+            method: 'POST',
+            body: JSON.stringify(payloadParams)
+        });
+    }
+
+    /**
+     * Gets the status of a payout
+     */
+    async getPayout(id: string): Promise<WavePayout> {
+        return this.request<WavePayout>(`/v1/payouts/${id}`);
     }
 }
 

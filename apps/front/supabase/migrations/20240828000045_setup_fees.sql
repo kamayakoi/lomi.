@@ -36,7 +36,8 @@ VALUES
     -- Payout processing fees
     ('USD Payout Processing Fee', 'payment', 'payout', 1.0, 0.00, 'USD', NULL, NULL),
     ('EUR Payout Processing Fee', 'payment', 'payout', 1.0, 0.00, 'EUR', NULL, NULL),
-    ('XOF Payout Processing Fee', 'payment', 'payout', 1.0, 0.00, 'XOF', NULL, NULL);
+    ('XOF Payout Processing Fee', 'payment', 'payout', 1.0, 0.00, 'XOF', NULL, NULL),
+    ('Wave Payout Fee', 'payment', 'payout', 1.0, 0, 'XOF', 'WAVE', 'E_WALLET');
 
 -- Function to get fee for a specific provider and payment method
 -- Returns the provider-specific fee if found, otherwise returns the platform default fee

@@ -19,8 +19,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
-import { ArrowUpDown, ArrowDownIcon, DollarSign } from 'lucide-react'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ArrowUpDown, ArrowDownIcon } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -29,13 +29,22 @@ import { useToast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { formatCurrency } from './components/currency-converter-utils'
-import CurrencyConverter from './components/CurrencyConverter'
+import { formatCurrency } from '../../../utils/fees/currency-converter'
+import { supabase } from '@/utils/supabase/client'
+// import CurrencyConverter from './components/CurrencyConverter'
 
 type PayoutsResponse = Payout[]
 
 // Define the order of currencies to display
 const CURRENCY_DISPLAY_ORDER: currency_code[] = ['XOF', 'USD'];
+
+// Define an interface for the provider settings
+interface ProviderSetting {
+    provider_code: string;
+    is_connected: boolean;
+    phone_number?: string;
+    is_phone_verified?: boolean;
+}
 
 function BalancePage() {
     const { user, isLoading: isUserLoading } = useUser()
@@ -63,9 +72,10 @@ function BalancePage() {
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [showBalanceBreakdown, setShowBalanceBreakdown] = useState<Record<string, boolean>>({})
     const [selectedWithdrawalCurrency, setSelectedWithdrawalCurrency] = useState<currency_code>('XOF')
-    const [showCurrencyConverter, setShowCurrencyConverter] = useState(false)
-    const [preferredCurrency, setPreferredCurrency] = useState<currency_code>('XOF')
+    const [preferredCurrency] = useState<currency_code>('XOF')
     const { data: conversionRates } = useConversionRates()
+    const [withdrawalMethod, setWithdrawalMethod] = useState<'bank' | 'mobile_money'>('bank')
+    const [waveEnabled, setWaveEnabled] = useState(false)
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
@@ -94,9 +104,56 @@ function BalancePage() {
 
     useEffect(() => {
         if (user?.id) {
-            fetchBankAccounts(user.id).then(setBankAccounts)
+            fetchBankAccounts(user.id).then(setBankAccounts);
+
+            // Check if Wave is enabled for this merchant
+            const checkWaveEnabled = async () => {
+                try {
+                    // 1. Get the organization ID using the RPC function
+                    const { data: orgData, error: orgError } = await supabase
+                        .rpc('get_merchant_organization_id', {
+                            p_merchant_id: user.id
+                        });
+
+                    if (orgError || !orgData) {
+                        console.error('Error getting organization ID:', orgError);
+                        setWaveEnabled(false);
+                        return;
+                    }
+
+                    // 2. Get provider settings using the RPC function
+                    const { data: providerSettings, error: providerError } = await supabase
+                        .rpc('fetch_organization_providers_settings', {
+                            p_organization_id: orgData
+                        });
+
+                    if (providerError || !providerSettings) {
+                        console.error('Error fetching provider settings:', providerError);
+                        setWaveEnabled(false);
+                        return;
+                    }
+
+                    // 3. Find the Wave provider and check if it's configured properly
+                    const waveProvider = providerSettings.find(
+                        (p: ProviderSetting) => p.provider_code === 'WAVE'
+                    );
+
+                    const isWaveReady = waveProvider?.is_connected === true &&
+                        !!waveProvider?.phone_number;
+
+                    console.log('Wave provider settings:', waveProvider);
+                    console.log('Wave enabled:', isWaveReady);
+
+                    setWaveEnabled(isWaveReady);
+                } catch (error) {
+                    console.error('Error checking Wave status:', error);
+                    setWaveEnabled(false);
+                }
+            };
+
+            checkWaveEnabled();
         }
-    }, [user?.id])
+    }, [user?.id]);
 
     const handleSort = (column: keyof Payout) => {
         if (sortColumn === column) {
@@ -131,59 +188,115 @@ function BalancePage() {
     }
 
     const handleWithdraw = async () => {
-        if (!withdrawalAmount || !selectedBankAccount) {
+        if (withdrawalMethod === 'bank' && (!withdrawalAmount || !selectedBankAccount)) {
             toast({
                 title: "Error",
                 description: "Please enter an amount and select a bank account.",
                 variant: "destructive",
-            })
-            return
+            });
+            return;
         }
 
-        const amount = parseFloat(withdrawalAmount)
+        if (withdrawalMethod === 'mobile_money' && !withdrawalAmount) {
+            toast({
+                title: "Error",
+                description: "Please enter an amount for mobile money withdrawal.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        const amount = parseFloat(withdrawalAmount);
         if (isNaN(amount) || amount <= 0) {
             toast({
                 title: "Invalid amount",
                 description: "Please enter a valid amount.",
                 variant: "destructive",
-            })
-            return
+            });
+            return;
         }
 
-        setIsWithdrawing(true)
+        // Calculate estimated fees for display
+        if (withdrawalMethod === 'mobile_money') {
+            // Get organization ID first
+            const { data: merchantData } = await supabase
+                .from('merchants')
+                .select('organization_id')
+                .eq('merchant_id', user?.id || '')
+                .single();
+
+            // Get fee settings
+            const { data: feeSettings } = await supabase
+                .from('organization_fees')
+                .select('*')
+                .eq('organization_id', merchantData?.organization_id)
+                .eq('fee_type', 'payout')
+                .eq('currency_code', selectedWithdrawalCurrency)
+                .single();
+
+            // Default Wave fee is 1%
+            const waveFeePercentage = 0.01;
+            const platformFeePercentage = feeSettings?.percentage || 0;
+
+            const waveFeeAmount = parseFloat((amount * waveFeePercentage).toFixed(2));
+            const platformFeeAmount = parseFloat((amount * platformFeePercentage).toFixed(2));
+            const totalFeeAmount = waveFeeAmount + platformFeeAmount;
+
+            // Show fee breakdown in toast
+            toast({
+                title: "Fee Information",
+                description: (
+                    <div className="space-y-2 mt-2">
+                        <p>Withdrawal amount: {formatCurrency(amount, selectedWithdrawalCurrency)}</p>
+                        <p>Wave fee (1%): {formatCurrency(waveFeeAmount, selectedWithdrawalCurrency)}</p>
+                        {platformFeePercentage > 0 && (
+                            <p>Platform fee ({(platformFeePercentage * 100).toFixed(1)}%): {formatCurrency(platformFeeAmount, selectedWithdrawalCurrency)}</p>
+                        )}
+                        <div className="border-t pt-1 mt-1">
+                            <p className="font-semibold">Total deduction: {formatCurrency(amount + totalFeeAmount, selectedWithdrawalCurrency)}</p>
+                        </div>
+                    </div>
+                ),
+            });
+        }
+
+        setIsWithdrawing(true);
         try {
-            let finalAmount = amount
+            let finalAmount = amount;
             if (selectedWithdrawalCurrency !== preferredCurrency) {
-                finalAmount = await convertCurrencyDB(amount, selectedWithdrawalCurrency, preferredCurrency)
+                finalAmount = await convertCurrencyDB(amount, selectedWithdrawalCurrency, preferredCurrency);
             }
 
             const result = await initiateWithdrawal(
                 user?.id || '',
                 finalAmount,
                 selectedBankAccount,
-                selectedWithdrawalCurrency
-            )
+                selectedWithdrawalCurrency,
+                withdrawalMethod
+            );
+
             if (result.success) {
                 toast({
-                    title: "Withdrawal Successful",
-                    description: `${formatCurrency(finalAmount, selectedWithdrawalCurrency)} has been withdrawn from your account.`,
-                })
-                setIsDialogOpen(false)
-                setWithdrawalAmount("")
-                setSelectedBankAccount("")
-                setSelectedWithdrawalCurrency('XOF')
-                refetchBalanceBreakdown()
+                    title: "Withdrawal Initiated",
+                    description: result.message || `${formatCurrency(finalAmount, selectedWithdrawalCurrency)} has been withdrawn from your account.`,
+                });
+                setIsDialogOpen(false);
+                setWithdrawalAmount("");
+                setSelectedBankAccount("");
+                setSelectedWithdrawalCurrency('XOF');
+                setWithdrawalMethod('bank');
+                refetchBalanceBreakdown();
             } else {
-                throw new Error(result.message)
+                throw new Error(result.message);
             }
         } catch (error) {
             toast({
                 title: "Withdrawal Failed",
                 description: error instanceof Error ? error.message : "An unexpected error occurred",
                 variant: "destructive",
-            })
+            });
         } finally {
-            setIsWithdrawing(false)
+            setIsWithdrawing(false);
         }
     }
 
@@ -262,6 +375,7 @@ function BalancePage() {
                     <div className="space-y-4 pb-8 max-w-full">
                         <div className="flex justify-between items-center mb-4">
                             <h1 className="text-2xl font-bold tracking-tight">Balance</h1>
+                            {/* Currency Converter button commented out temporarily
                             <Button
                                 variant="outline"
                                 className="rounded-none"
@@ -270,11 +384,14 @@ function BalancePage() {
                                 <DollarSign className="h-4 w-4 mr-2" />
                                 Currency Converter
                             </Button>
+                            */}
                         </div>
 
+                        {/* Currency converter component commented out temporarily
                         {showCurrencyConverter && (
                             <CurrencyConverter conversionRates={conversionRates} />
                         )}
+                        */}
 
                         <div className="grid gap-4 md:grid-cols-2 mb-6">
                             {isBalanceBreakdownLoading || isRefreshing ? (
@@ -292,7 +409,7 @@ function BalancePage() {
                                         <CardTitle className="text-sm font-medium">Balance</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">No balance information available</div>
+                                        <div className="text-2xl font-bold">XOF 0</div>
                                     </CardContent>
                                 </Card>
                             ) : (
@@ -301,6 +418,7 @@ function BalancePage() {
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                             <CardTitle className="text-sm font-medium cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
                                                 {balance.currency_code} Balance
+                                                {/* Default badge logic commented out temporarily
                                                 {balance.currency_code === preferredCurrency ? (
                                                     <span className="ml-2 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                                         Default
@@ -316,6 +434,7 @@ function BalancePage() {
                                                         Set Default
                                                     </span>
                                                 )}
+                                                */}
                                             </CardTitle>
                                             <ArrowDownIcon className="h-4 w-4 text-muted-foreground cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)} />
                                         </CardHeader>
@@ -367,7 +486,7 @@ function BalancePage() {
                                                                 <DialogHeader>
                                                                     <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
                                                                     <DialogDescription>
-                                                                        Enter the amount you wish to withdraw and select your bank account.
+                                                                        Select withdrawal method and enter amount
                                                                     </DialogDescription>
                                                                 </DialogHeader>
                                                                 <div className="grid gap-4 py-4">
@@ -375,7 +494,13 @@ function BalancePage() {
                                                                         <Label htmlFor="currency" className="text-right">Currency</Label>
                                                                         <Select
                                                                             value={selectedWithdrawalCurrency}
-                                                                            onValueChange={(value) => setSelectedWithdrawalCurrency(value as currency_code)}
+                                                                            onValueChange={(value) => {
+                                                                                setSelectedWithdrawalCurrency(value as currency_code);
+                                                                                // Reset withdrawal method to 'bank' if not XOF
+                                                                                if (value !== 'XOF') {
+                                                                                    setWithdrawalMethod('bank');
+                                                                                }
+                                                                            }}
                                                                         >
                                                                             <SelectTrigger className="col-span-3 rounded-none">
                                                                                 <SelectValue placeholder="Select currency" />
@@ -394,53 +519,104 @@ function BalancePage() {
                                                                         </Select>
                                                                     </div>
                                                                     <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
+                                                                        <Select
+                                                                            value={withdrawalMethod}
+                                                                            onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
+                                                                        >
+                                                                            <SelectTrigger className="col-span-3 rounded-none">
+                                                                                <SelectValue placeholder="Select withdrawal method" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="rounded-none">
+                                                                                <SelectItem value="bank" className="rounded-none">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
+                                                                                            <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
+                                                                                        </svg>
+                                                                                        <span>Bank Account</span>
+                                                                                    </div>
+                                                                                </SelectItem>
+                                                                                {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
+                                                                                    <SelectItem value="mobile_money" className="rounded-none">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
+                                                                                            <span>Wave</span>
+                                                                                        </div>
+                                                                                    </SelectItem>
+                                                                                ) : null}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
+
+                                                                    {withdrawalMethod === 'bank' && (
+                                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                                            <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                                            <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                                <SelectTrigger className="col-span-3 rounded-none">
+                                                                                    <SelectValue placeholder="Select a bank account" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent className="rounded-none">
+                                                                                    {bankAccounts.map((account) => (
+                                                                                        <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
+                                                                                            <div className="flex items-center">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
+                                                                                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
+                                                                                                    <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
+                                                                                                </svg>
+                                                                                                {account.bank_name} - {account.account_number}
+                                                                                            </div>
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
                                                                         <Label htmlFor="amount" className="text-right">Amount</Label>
                                                                         <Input
                                                                             id="amount"
                                                                             type="text"
                                                                             value={withdrawalAmount}
                                                                             onChange={(e) => {
-                                                                                const value = e.target.value
+                                                                                const value = e.target.value;
                                                                                 if (/^\d*\.?\d*$/.test(value)) {
-                                                                                    setWithdrawalAmount(value)
+                                                                                    setWithdrawalAmount(value);
                                                                                 }
                                                                             }}
                                                                             className="col-span-3 rounded-none"
                                                                             placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
                                                                         />
                                                                     </div>
-                                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                                        <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
-                                                                        <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
-                                                                            <SelectTrigger className="col-span-3 rounded-none">
-                                                                                <SelectValue placeholder="Select a bank account" />
-                                                                            </SelectTrigger>
-                                                                            <SelectContent className="rounded-none">
-                                                                                {bankAccounts.map((account) => (
-                                                                                    <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
-                                                                                        {account.bank_name} - {account.account_number}
-                                                                                    </SelectItem>
-                                                                                ))}
-                                                                            </SelectContent>
-                                                                        </Select>
+
+                                                                    <div className="flex justify-end mt-4 space-x-2">
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            onClick={() => {
+                                                                                setIsDialogOpen(false);
+                                                                                setWithdrawalAmount("");
+                                                                                setSelectedBankAccount("");
+                                                                            }}
+                                                                            className="rounded-sm"
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <Button
+                                                                            onClick={handleWithdraw}
+                                                                            disabled={isWithdrawing}
+                                                                            className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
+                                                                        >
+                                                                            {isWithdrawing ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Processing...
+                                                                                </>
+                                                                            ) : (
+                                                                                'Withdraw'
+                                                                            )}
+                                                                        </Button>
                                                                     </div>
                                                                 </div>
-                                                                <DialogFooter>
-                                                                    <Button
-                                                                        onClick={handleWithdraw}
-                                                                        disabled={isWithdrawing}
-                                                                        className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none"
-                                                                    >
-                                                                        {isWithdrawing ? (
-                                                                            <>
-                                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                                Processing...
-                                                                            </>
-                                                                        ) : (
-                                                                            "Confirm"
-                                                                        )}
-                                                                    </Button>
-                                                                </DialogFooter>
                                                             </DialogContent>
                                                         </Dialog>
                                                     </motion.div>

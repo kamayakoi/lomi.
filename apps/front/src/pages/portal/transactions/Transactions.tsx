@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon } from 'lucide-react'
@@ -42,12 +42,9 @@ function TransactionsPage() {
     const [columns, setColumns] = useState<string[]>([
         'Transaction ID',
         'Customer',
-        'Gross Amount',
         'Net Amount',
         'Currency',
-        'Payment Method',
         'Status',
-        'Type',
         'Date',
         'Provider',
     ])
@@ -81,7 +78,7 @@ function TransactionsPage() {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery({
-        queryKey: ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods] as const,
+        queryKey: ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, selectedDateRange, customDateRange] as const,
         queryFn: ({ pageParam = 1 }) => fetchTransactions(
             user?.id || '',
             selectedProvider,
@@ -90,11 +87,13 @@ function TransactionsPage() {
             selectedCurrencies,
             selectedPaymentMethods,
             pageParam,
-            10
+            50,
+            selectedDateRange,
+            customDateRange
         ),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {
-            return lastPage.length === 10 ? allPages.length + 1 : undefined
+            return lastPage.length === 50 ? allPages.length + 1 : undefined
         },
         enabled: !!user?.id,
     })
@@ -270,9 +269,104 @@ function TransactionsPage() {
 
     const refetch = async () => {
         setIsRefreshing(true)
-        await queryClient.refetchQueries({ queryKey: ['transactions'] })
+        await queryClient.refetchQueries({
+            queryKey: ['transactions', user?.id || '', selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, undefined, undefined, selectedDateRange, customDateRange]
+        })
         setIsRefreshing(false)
     }
+
+    // Global scroll lock implementation
+    useEffect(() => {
+        // Store original styles to restore them later
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        const originalHTMLStyle = window.getComputedStyle(document.documentElement).overflow;
+
+        // Lock scrolling on body and html
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        // Prevent wheel events on the document
+        const preventWheel = (e: WheelEvent) => {
+            // Only allow wheel events in the table container
+            const tableContainer = document.getElementById('table-container');
+            if (tableContainer && !tableContainer.contains(e.target as Node)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+
+        // Prevent touchmove events that might cause scrolling
+        const preventTouch = (e: TouchEvent) => {
+            const tableContainer = document.getElementById('table-container');
+            if (tableContainer && !tableContainer.contains(e.target as Node)) {
+                e.preventDefault();
+            }
+        };
+
+        // Prevent scrolling with keyboard
+        const preventKeyScroll = (e: KeyboardEvent) => {
+            // Prevent the default action for keys that can scroll the page
+            if (['Space', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+                // Allow keyboard navigation within the table container
+                const tableContainer = document.getElementById('table-container');
+                const activeElement = document.activeElement;
+
+                // Only prevent if we're not inside the table container
+                if (!(tableContainer && tableContainer.contains(activeElement as Node))) {
+                    e.preventDefault();
+                }
+            }
+        };
+
+        // Add event listeners with passive: false to ensure preventDefault works
+        document.addEventListener('wheel', preventWheel, { passive: false });
+        document.addEventListener('touchmove', preventTouch, { passive: false });
+        document.addEventListener('keydown', preventKeyScroll, { passive: false });
+
+        // Cleanup function
+        return () => {
+            // Restore original styles
+            document.body.style.overflow = originalStyle;
+            document.documentElement.style.overflow = originalHTMLStyle;
+
+            // Remove event listeners
+            document.removeEventListener('wheel', preventWheel);
+            document.removeEventListener('touchmove', preventTouch);
+            document.removeEventListener('keydown', preventKeyScroll);
+        };
+    }, []);
+
+    // Add a style tag for global CSS
+    useEffect(() => {
+        // Create a style element
+        const style = document.createElement('style');
+        style.id = 'no-scroll-style';
+
+        // Define CSS to prevent scrolling
+        style.innerHTML = `
+            html, body {
+                overflow: hidden !important;
+                height: 100% !important;
+                position: fixed !important;
+                width: 100% !important;
+            }
+            #__next {
+                height: 100% !important;
+                overflow: hidden !important;
+            }
+        `;
+
+        // Append style to head
+        document.head.appendChild(style);
+
+        // Cleanup function
+        return () => {
+            const styleElement = document.getElementById('no-scroll-style');
+            if (styleElement) {
+                styleElement.remove();
+            }
+        };
+    }, []);
 
     if (isUserLoading) {
         return <AnimatedLogoLoader />
@@ -283,7 +377,7 @@ function TransactionsPage() {
     }
 
     return (
-        <Layout fixed>
+        <Layout fixed className="h-screen overflow-hidden">
             <Layout.Header>
                 <div className='hidden md:block'>
                     <TopNav links={topNav} />
@@ -541,21 +635,43 @@ function TransactionsPage() {
                             isRefreshing={isRefreshing}
                         />
 
-                        <Card className="rounded-none">
-                            <CardContent className="p-4">
-                                <div className="border">
+                        <Card className="rounded-none border shadow-sm">
+                            <CardContent className="p-0">
+                                <div
+                                    id="table-container"
+                                    className="h-[47vh] overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
+                                    onWheel={(e) => {
+                                        // When scrolled at the boundaries, prevent default to avoid page scrolling
+                                        const container = e.currentTarget;
+                                        const { scrollTop, scrollHeight, clientHeight } = container;
+
+                                        // Check if we're at the top or bottom boundary
+                                        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+                                        const isAtTop = scrollTop <= 0;
+
+                                        // If at boundaries and trying to scroll further, prevent default
+                                        if ((isAtBottom && e.deltaY > 0) || (isAtTop && e.deltaY < 0)) {
+                                            e.preventDefault();
+                                        }
+
+                                        // In any case, stop propagation to contain scroll within this element
+                                        e.stopPropagation();
+                                    }}
+                                >
                                     <InfiniteScroll
                                         dataLength={transactions.length}
                                         next={() => fetchNextPage()}
                                         hasMore={hasNextPage}
-                                        loader={<Skeleton className="w-full h-8 rounded-none" />}
+                                        loader={<div className="p-4"><Skeleton className="w-full h-8 rounded-none" /></div>}
+                                        scrollableTarget="table-container"
+                                        className="overflow-visible"
                                     >
-                                        <Table>
+                                        <Table className="w-full">
                                             <TableHeader>
-                                                <TableRow>
+                                                <TableRow className="hover:bg-transparent border-b bg-muted/50">
                                                     {columns.includes('Transaction ID') && (
-                                                        <TableHead className="text-center w-[25%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Transaction ID
                                                                 {sortColumn === 'transaction_id' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -564,8 +680,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Customer') && (
-                                                        <TableHead className="text-left w-[20%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-left w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Customer
                                                                 {sortColumn === 'customer_name' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -574,8 +690,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Gross Amount') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Gross Amount
                                                                 {sortColumn === 'gross_amount' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -584,8 +700,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Net Amount') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Net Amount
                                                                 {sortColumn === 'net_amount' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -594,8 +710,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Currency') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('currency')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('currency')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Currency
                                                                 {sortColumn === 'currency' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -604,8 +720,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Payment Method') && (
-                                                        <TableHead className="text-center w-[20%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Payment Method
                                                                 {sortColumn === 'payment_method' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -614,8 +730,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Status') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Status
                                                                 {sortColumn === 'status' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -624,8 +740,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Type') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('type')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('type')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Type
                                                                 {sortColumn === 'type' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -634,8 +750,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Date') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('date')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('date')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Date
                                                                 {sortColumn === 'date' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -644,8 +760,8 @@ function TransactionsPage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Provider') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto">
-                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')} className="whitespace-nowrap px-2 md:px-4">
+                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')} className="whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Provider
                                                                 {sortColumn === 'provider_code' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -657,16 +773,14 @@ function TransactionsPage() {
                                             </TableHeader>
                                             <TableBody>
                                                 {isFetchingNextPage ? (
-                                                    Array.from({ length: 5 }).map((_, index) => (
-                                                        <TableRow key={index}>
-                                                            <TableCell colSpan={10}>
-                                                                <Skeleton className="w-full h-8 rounded-none" />
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
+                                                    <TableRow>
+                                                        <TableCell colSpan={columns.length} className="text-center p-4">
+                                                            <Skeleton className="w-full h-8 rounded-none" />
+                                                        </TableCell>
+                                                    </TableRow>
                                                 ) : transactions.length === 0 ? (
                                                     <TableRow>
-                                                        <TableCell colSpan={10} className="text-center py-8">
+                                                        <TableCell colSpan={columns.length} className="text-center py-8">
                                                             <div className="flex flex-col items-center justify-center space-y-4">
                                                                 <div className="bg-transparent dark:bg-transparent p-4">
                                                                     <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
@@ -681,49 +795,75 @@ function TransactionsPage() {
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : (
-                                                    sortTransactions(transactions).map((transaction: Transaction) => (
+                                                    applySearch(
+                                                        applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange),
+                                                        searchTerm
+                                                    ).map((transaction: Transaction) => (
                                                         <TableRow
                                                             key={transaction.transaction_id}
-                                                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                            className="cursor-pointer border-b hover:bg-muted/30"
                                                             onClick={() => setSelectedTransaction(transaction)}
                                                         >
                                                             {columns.includes('Transaction ID') && (
-                                                                <TableCell className="text-center">{shortenTransactionId(transaction.transaction_id)}</TableCell>
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-mono text-xs">{shortenTransactionId(transaction.transaction_id)}</span>
+                                                                </TableCell>
                                                             )}
                                                             {columns.includes('Customer') && (
-                                                                <TableCell className="text-left font-medium">{transaction.customer_name}</TableCell>
+                                                                <TableCell className="text-left py-4 font-medium">
+                                                                    {transaction.customer_name}
+                                                                </TableCell>
                                                             )}
                                                             {columns.includes('Gross Amount') && (
-                                                                <TableCell className="text-center">
-                                                                    {formatAmount(transaction.gross_amount)}
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-medium">{formatAmount(transaction.gross_amount)}</span>
                                                                 </TableCell>
                                                             )}
                                                             {columns.includes('Net Amount') && (
-                                                                <TableCell className="text-center">
-                                                                    {formatAmount(transaction.net_amount)}
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-medium">{formatAmount(transaction.net_amount)}</span>
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Currency') && <TableCell className="text-center">{transaction.currency}</TableCell>}
+                                                            {columns.includes('Currency') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    {transaction.currency}
+                                                                </TableCell>
+                                                            )}
                                                             {columns.includes('Payment Method') && (
-                                                                <TableCell className="text-center">{formatPaymentMethod(transaction.payment_method)}</TableCell>
+                                                                <TableCell className="text-center py-4">
+                                                                    {formatPaymentMethod(transaction.payment_method)}
+                                                                </TableCell>
                                                             )}
                                                             {columns.includes('Status') && (
-                                                                <TableCell className="text-center">
-                                                                    <span className={`
-                                                                        inline-block px-2 py-1 text-xs font-normal rounded-none
-                                                                        ${transaction.status === 'refunded' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                                                        ${transaction.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                                        ${transaction.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                        ${transaction.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                                                    `}>
-                                                                        {formatTransactionStatus(transaction.status)}
-                                                                    </span>
+                                                                <TableCell className="text-center py-4">
+                                                                    <div className="flex justify-center">
+                                                                        <span
+                                                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${transaction.status === 'completed'
+                                                                                ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                                                                : transaction.status === 'failed'
+                                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
+                                                                                    : transaction.status === 'refunded'
+                                                                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                                                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                                                                                }`}
+                                                                        >
+                                                                            {formatTransactionStatus(transaction.status)}
+                                                                        </span>
+                                                                    </div>
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Type') && <TableCell className="text-center">{formatTransactionType(transaction.type)}</TableCell>}
-                                                            {columns.includes('Date') && <TableCell className="text-center">{formatDate(transaction.date)}</TableCell>}
+                                                            {columns.includes('Type') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    {formatTransactionType(transaction.type)}
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Date') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="text-sm text-muted-foreground">{formatDate(transaction.date)}</span>
+                                                                </TableCell>
+                                                            )}
                                                             {columns.includes('Provider') && (
-                                                                <TableCell className="text-center">
+                                                                <TableCell className="text-center py-4">
                                                                     <span className={`
                                                                         inline-block px-2 py-1 text-xs font-semibold rounded-none
                                                                         ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
@@ -768,6 +908,9 @@ function TransactionsPage() {
 
 export default TransactionsPage;
 
+// Formats the payment method code into a more readable format
+// This function is used conditionally when Payment Method column is enabled
+/* eslint-disable @typescript-eslint/no-unused-vars */
 function formatPaymentMethod(paymentMethod: payment_method_code): string {
     switch (paymentMethod) {
         case 'CARDS':
@@ -791,14 +934,17 @@ function formatPaymentMethod(paymentMethod: payment_method_code): string {
     }
 }
 
+// Formats the transaction status into a more readable format
 function formatTransactionStatus(status: transaction_status): string {
     return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
+// Formats the transaction type into a more readable format
 function formatTransactionType(type: transaction_type): string {
     return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
+// Formats the provider code into a more readable format
 function formatProviderCode(providerCode: provider_code): string {
     switch (providerCode) {
         case 'ORANGE':
@@ -834,20 +980,24 @@ function formatProviderCode(providerCode: provider_code): string {
     }
 }
 
+// Formats a date string to a more readable format
 function formatDate(dateString: string): string {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
+// Shortens a transaction ID for display purposes
 function shortenTransactionId(transactionId: string): string {
     return `${transactionId.slice(0, 8)}${transactionId.slice(8, 12)}-...`
 }
 
+// Calculates the completion rate as a percentage
 function calculateCompletionRate(completed: number, refunded: number, failed: number): number {
     const total = completed + refunded + failed
     return total > 0 ? Math.round((completed / total) * 100) : 0
 }
 
+// Formats a number as a currency amount with appropriate decimal places
 function formatAmount(amount: number): string {
     const formatter = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,

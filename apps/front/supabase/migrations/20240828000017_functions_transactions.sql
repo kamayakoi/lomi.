@@ -7,7 +7,9 @@ CREATE OR REPLACE FUNCTION public.fetch_transactions(
     p_currency currency_code[] DEFAULT NULL,
     p_payment_method payment_method_code[] DEFAULT NULL,
     p_page INTEGER DEFAULT 1,
-    p_page_size INTEGER DEFAULT 50
+    p_page_size INTEGER DEFAULT 50,
+    p_start_date TIMESTAMP DEFAULT NULL,
+    p_end_date TIMESTAMP DEFAULT NULL
 )
 RETURNS TABLE (
     transaction_id UUID,
@@ -66,7 +68,9 @@ BEGIN
         (p_status IS NULL OR t.status = ANY(p_status)) AND
         (p_type IS NULL OR t.transaction_type = ANY(p_type)) AND
         (p_currency IS NULL OR t.currency_code = ANY(p_currency)) AND
-        (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method))
+        (p_payment_method IS NULL OR t.payment_method_code = ANY(p_payment_method)) AND
+        (p_start_date IS NULL OR t.created_at >= p_start_date::TIMESTAMP) AND
+        (p_end_date IS NULL OR t.created_at <= p_end_date::TIMESTAMP)
     ORDER BY
         t.created_at DESC
     LIMIT p_page_size

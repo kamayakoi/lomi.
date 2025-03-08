@@ -13,14 +13,37 @@ export const fetchTransactions = async (
     selectedCurrencies: string[],
     selectedPaymentMethods: string[],
     page: number,
-    pageSize: number
+    pageSize: number,
+    selectedDateRange: string | null = null,
+    customDateRange?: DateRange
 ) => {
     if (!merchantId) {
         console.warn('Merchant ID is empty. Skipping transactions fetch.')
         return []
     }
 
-    const { data, error } = await supabase.rpc('fetch_transactions', {
+    console.log('fetchTransactions called with filters:', {
+        merchantId,
+        selectedProvider,
+        selectedStatuses,
+        selectedTypes,
+        selectedCurrencies,
+        selectedPaymentMethods,
+        page,
+        pageSize,
+        selectedDateRange,
+        customDateRange
+    })
+
+    // Get date range for filtering
+    const { startDate, endDate } = getDateRange(selectedDateRange, customDateRange)
+
+    const formattedStartDate = startDate ? formatDateParam(startDate) : undefined
+    const formattedEndDate = endDate ? formatDateParam(endDate) : undefined
+
+    console.log('Formatted dates for database:', { formattedStartDate, formattedEndDate })
+
+    const params = {
         p_merchant_id: merchantId,
         p_provider_code: selectedProvider === 'all' ? undefined : selectedProvider as Database['public']['Enums']['provider_code'],
         p_status: selectedStatuses.length > 0 ? selectedStatuses as Database['public']['Enums']['transaction_status'][] : undefined,
@@ -29,12 +52,20 @@ export const fetchTransactions = async (
         p_payment_method: selectedPaymentMethods.length > 0 ? selectedPaymentMethods as Database['public']['Enums']['payment_method_code'][] : undefined,
         p_page: page,
         p_page_size: pageSize,
-    })
+        p_start_date: formattedStartDate,
+        p_end_date: formattedEndDate
+    }
+
+    console.log('Database params:', params)
+
+    const { data, error } = await supabase.rpc('fetch_transactions', params)
 
     if (error) {
         console.error('Error fetching transactions:', error)
         return []
     }
+
+    console.log('Fetched transactions count:', data?.length || 0)
 
     const transactions = data.map((transaction: FetchedTransaction) => ({
         transaction_id: transaction.transaction_id,
@@ -92,6 +123,8 @@ const getDateRange = (selectedDateRange: string | null, customDateRange?: DateRa
     let startDate: Date | undefined
     let endDate: Date | undefined
 
+    console.log('getDateRange called with:', { selectedDateRange, customDateRange })
+
     if (selectedDateRange === 'custom' && customDateRange) {
         startDate = customDateRange.from
         endDate = customDateRange.to
@@ -125,11 +158,15 @@ const getDateRange = (selectedDateRange: string | null, customDateRange?: DateRa
         }
     }
 
+    console.log('Date range calculated:', { startDate, endDate })
     return { startDate, endDate }
 }
 
 const formatDateParam = (date: Date | undefined): string | undefined => {
-    return date ? format(date, 'yyyy-MM-dd HH:mm:ss') : undefined
+    if (!date) return undefined;
+
+    // Format date as ISO string without timezone for PostgreSQL
+    return format(date, 'yyyy-MM-dd HH:mm:ss');
 }
 
 export const fetchTotalIncomingAmount = async (merchantId: string, selectedDateRange: string | null, customDateRange?: DateRange) => {
@@ -335,14 +372,17 @@ export function useTransactions(
     selectedCurrencies: string[],
     selectedPaymentMethods: string[],
     page: number,
-    pageSize: number
+    pageSize: number,
+    selectedDateRange: string | null = null,
+    customDateRange?: DateRange
 ): UseQueryResult<Transaction[], Error> {
     return useQuery<Transaction[], Error>({
-        queryKey: ['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize] as const,
-        queryFn: () => fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize),
+        queryKey: ['transactions', merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize, selectedDateRange, customDateRange] as const,
+        queryFn: () => fetchTransactions(merchantId, selectedProvider, selectedStatuses, selectedTypes, selectedCurrencies, selectedPaymentMethods, page, pageSize, selectedDateRange, customDateRange),
         placeholderData: (previousData) => previousData,
         gcTime: 5 * 60 * 1000,
         staleTime: 2 * 60 * 1000,
+        enabled: !!merchantId
     })
 }
 

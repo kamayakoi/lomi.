@@ -5,10 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { format } from "date-fns"
 import { DateRange } from 'react-day-picker'
 import { Checkbox } from "@/components/ui/checkbox"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 interface TransactionFiltersProps {
     searchTerm: string
@@ -65,6 +63,7 @@ export default function TransactionFilters({
     isRefreshing,
 }: TransactionFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
+    const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false)
 
     const allColumns = [
         'Transaction ID',
@@ -118,20 +117,18 @@ export default function TransactionFilters({
                     ${selectedDateRange === 'custom' ? 'bg-muted text-muted-foreground' : 'bg-card text-card-foreground'}
                     rounded-none border border-border
                     focus:outline-none focus:ring-1 focus:ring-primary focus:z-10
-                    flex-1
+                    flex-1 min-w-[100px] whitespace-nowrap
                   `}
                                     onClick={() => setSelectedDateRange('custom')}
                                 >
                                     {customDateRange?.from ? (
-                                        customDateRange.to ? (
-                                            <>
-                                                {format(customDateRange.from, "LLL dd, y")} - {format(customDateRange.to, "LLL dd, y")}
-                                            </>
-                                        ) : (
-                                            format(customDateRange.from, "LLL dd, y")
-                                        )
+                                        <span className="flex items-center justify-center">
+                                            —
+                                        </span>
                                     ) : (
-                                        <span>Custom <Calendar className="ml-2 h-4 w-4 inline" /></span>
+                                        <span className="flex items-center justify-center">
+                                            Custom <Calendar className="ml-2 h-4 w-4" />
+                                        </span>
                                     )}
                                 </Button>
                             </PopoverTrigger>
@@ -162,9 +159,9 @@ export default function TransactionFilters({
                             <SelectItem value="all">All Providers</SelectItem>
                             <SelectItem value="ORANGE">Orange</SelectItem>
                             <SelectItem value="WAVE">Wave</SelectItem>
-                            <SelectItem value="ECOBANK">Ecobank</SelectItem>
+                            {/* <SelectItem value="ECOBANK">Ecobank</SelectItem> */}
                             <SelectItem value="MTN">MTN</SelectItem>
-                            <SelectItem value="OTHER">Other</SelectItem>
+                            {/* <SelectItem value="OTHER">Other</SelectItem> */}
                         </SelectContent>
                     </Select>
                 </div>
@@ -187,19 +184,19 @@ export default function TransactionFilters({
                 </div>
 
                 <div className="flex space-x-2 ml-auto">
-                    <Sheet>
-                        <SheetTrigger asChild>
+                    <Popover open={isFilterPopoverOpen} onOpenChange={setIsFilterPopoverOpen}>
+                        <PopoverTrigger asChild>
                             <Button variant="outline" className="bg-card text-card-foreground px-2 h-10 rounded-none">
                                 <Filter className="h-5 w-5" />
                                 <span className="sr-only">Filters</span>
                             </Button>
-                        </SheetTrigger>
-                        <SheetContent className="w-[450px] p-4 bg-card text-card-foreground">
-                            <div className="flex flex-col space-y-4 p-4">
-                                <h3 className="text-lg font-semibold">Filters</h3>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[350px] p-4 bg-card text-card-foreground" side="bottom" align="end">
+                            <h3 className="mb-4 text-sm font-medium">Filters</h3>
+                            <div className="space-y-4">
                                 <div>
-                                    <h4 className="mb-2 font-medium">Status</h4>
-                                    <div className="space-y-2">
+                                    <h4 className="mb-2 text-xs font-medium text-muted-foreground">Status</h4>
+                                    <div className="grid grid-cols-2 gap-2">
                                         {['pending', 'completed', 'failed', 'refunded'].map((status) => (
                                             <div key={status} className="flex items-center">
                                                 <Checkbox
@@ -219,8 +216,8 @@ export default function TransactionFilters({
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="mb-2 font-medium">Type</h4>
-                                    <div className="space-y-2">
+                                    <h4 className="mb-2 text-xs font-medium text-muted-foreground">Type</h4>
+                                    <div className="grid grid-cols-2 gap-2">
                                         {['payment', 'instalment'].map((type) => (
                                             <div key={type} className="flex items-center">
                                                 <Checkbox
@@ -240,27 +237,24 @@ export default function TransactionFilters({
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="mb-2 font-medium">Currency</h4>
-                                    <div className="space-y-2">
+                                    <h4 className="mb-2 text-xs font-medium text-muted-foreground">Currency</h4>
+                                    <div className="grid grid-cols-3 gap-2">
                                         {['XOF', 'EUR', 'USD'].map((currency) => (
                                             <div key={currency} className="flex items-center">
                                                 <Checkbox
                                                     id={`currency-${currency}`}
                                                     checked={selectedCurrencies.includes(currency)}
                                                     onCheckedChange={(checked) => {
-                                                        if (currency === 'XOF') {
-                                                            if (checked) {
-                                                                setSelectedCurrencies([...selectedCurrencies, currency])
-                                                            } else {
-                                                                setSelectedCurrencies(selectedCurrencies.filter(c => c !== currency))
-                                                            }
+                                                        if (checked) {
+                                                            setSelectedCurrencies([...selectedCurrencies, currency])
+                                                        } else {
+                                                            setSelectedCurrencies(selectedCurrencies.filter(c => c !== currency))
                                                         }
                                                     }}
-                                                    disabled={currency !== 'XOF'}
                                                 />
                                                 <label
                                                     htmlFor={`currency-${currency}`}
-                                                    className={`ml-2 text-sm ${currency !== 'XOF' ? 'text-gray-400' : ''}`}
+                                                    className="ml-2 text-sm"
                                                 >
                                                     {currency}
                                                 </label>
@@ -269,17 +263,12 @@ export default function TransactionFilters({
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="mb-2 font-medium">Payment Method</h4>
-                                    <div className="space-y-2">
+                                    <h4 className="mb-2 text-xs font-medium text-muted-foreground">Payment Method</h4>
+                                    <div className="grid grid-cols-1 gap-2">
                                         {[
                                             { code: 'CARDS', label: 'Cards' },
                                             { code: 'MOBILE_MONEY', label: 'Mobile money' },
                                             { code: 'E_WALLET', label: 'E-wallet' },
-                                            { code: 'BANK_TRANSFER', label: 'Bank transfer' },
-                                            { code: 'APPLE_PAY', label: 'Apple Pay' },
-                                            { code: 'GOOGLE_PAY', label: 'Google Pay' },
-                                            { code: 'USSD', label: 'USSD' },
-                                            { code: 'QR_CODE', label: 'QR Code' }
                                         ].map(({ code, label }) => (
                                             <div key={code} className="flex items-center">
                                                 <Checkbox
@@ -299,8 +288,8 @@ export default function TransactionFilters({
                                     </div>
                                 </div>
                             </div>
-                        </SheetContent>
-                    </Sheet>
+                        </PopoverContent>
+                    </Popover>
                     <Popover open={isColumnsPopoverOpen} onOpenChange={setIsColumnsPopoverOpen}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" className="bg-card text-card-foreground px-2 h-10 rounded-none">

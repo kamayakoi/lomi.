@@ -85,3 +85,21 @@ export interface WaveAggregatedMerchantResponse {
     };
     items: WaveAggregatedMerchant[];
 }
+
+export type WavePayoutStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface WavePayout {
+    id: string;
+    amount: string;
+    client_reference?: string;
+    currency: string;
+    fee_amount: string;
+    payment_status: WavePayoutStatus;
+    recipient_mobile: string;
+    transaction_id?: string;
+    aggregated_merchant_id?: string;
+    reason?: string;
+    last_payment_error?: WavePaymentError;
+    when_created: string;
+    when_completed?: string;
+}
