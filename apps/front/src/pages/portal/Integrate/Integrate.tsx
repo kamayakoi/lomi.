@@ -79,9 +79,10 @@ export default function Providers() {
                     variant='outline'
                     size='sm'
                     className='flex items-center px-4 py-2 text-sm font-medium rounded-none'
-                    onClick={() => handleInstallClick(integration.installLink)}
+                    onClick={() => integration.status !== 'coming_soon' && handleInstallClick(integration.installLink)}
+                    disabled={integration.status === 'coming_soon'}
                   >
-                    Install
+                    {integration.status === 'coming_soon' ? 'Coming Soon' : 'Install'}
                   </Button>
                 </div>
                 <div>

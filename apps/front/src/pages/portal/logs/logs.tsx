@@ -417,7 +417,7 @@ function LogsPage() {
                                 </div>
                             </div>
                             {logsData && logsData.totalCount > 0 && (
-                                <div className="flex items-center justify-between border-t border-border px-4 py-4">
+                                <div className="flex items-center justify-between border-t border-border px-4 py-4 mr-12">
                                     <div className="flex-1 text-sm text-muted-foreground">
                                         <span className="hidden md:inline">
                                             Showing {offset + 1} to {Math.min(offset + 50, logsData.totalCount)} of {logsData.totalCount} entries

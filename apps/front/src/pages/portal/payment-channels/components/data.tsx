@@ -30,6 +30,7 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/payment_channels/visa.webp" alt="Visa" className="w-full h-full object-contain" />,
     provider_code: 'ECOBANK',
     type: 'Digital Payments',
+    status: 'coming_soon',
     category: 'Cards'
   },
   {
@@ -39,6 +40,7 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/payment_channels/mastercard.webp" alt="Mastercard" className="w-full h-full object-contain" />,
     provider_code: 'ECOBANK',
     type: 'Digital Payments',
+    status: 'coming_soon',
     category: 'Cards'
   },
   {
@@ -48,6 +50,7 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/payment_channels/paypal.webp" alt="PayPal" className="w-full h-full object-contain" />,
     provider_code: 'PAYPAL',
     type: 'Digital Payments',
+    status: 'coming_soon',
     category: 'Cards'
   },
   {
@@ -79,6 +82,7 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/payment_channels/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
     provider_code: 'MTN',
     type: 'Mobile Money',
+    status: 'coming_soon',
     category: 'Mobile Money'
   },
   {
@@ -88,6 +92,7 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <img src="/payment_channels/orange.webp" alt="Orange Money" className="w-full h-full object-contain" />,
     provider_code: 'ORANGE',
     type: 'Mobile Money',
+    status: 'coming_soon',
     category: 'Mobile Money'
   },
   {

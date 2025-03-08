@@ -155,14 +155,14 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="max-w-lg">
-                <div className="max-h-[70vh] overflow-y-auto">
-                    <Card className="rounded-none">
+            <div className="max-w-3xl mx-auto">
+                <div className="max-h-[70vh] overflow-y-auto border-none">
+                    <Card className="rounded-none border-0">
                         <CardHeader>
                             <CardTitle>Create subscription plan</CardTitle>
                             <CardDescription>Set up a new subscription plan for your customers</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-4 border-b-0">
                             <div className="space-y-2">
                                 <Label htmlFor="image">Plan Image</Label>
                                 <div className="mt-1.5">
@@ -437,7 +437,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                     </Card>
                 </div>
 
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-4 -mt-2 px-6 pb-2">
                     <Button
                         type="button"
                         variant="outline"

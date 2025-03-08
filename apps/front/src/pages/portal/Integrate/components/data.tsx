@@ -6,6 +6,7 @@ export type Provider = Omit<Database['public']['Tables']['providers']['Row'], 'c
   logo: JSX.Element;
   includedPayments?: Array<{ name: string; icon: JSX.Element }>;
   installLink: string;
+  status?: 'coming_soon' | 'available';
 }
 
 
@@ -16,6 +17,7 @@ export const integrationOptions = [
     link: "#",
     logo: <img src="/integrations/shopify.webp" alt="Shopify" className="w-12 h-12 object-contain" />,
     installLink: "#",
+    status: 'available',
   },
   {
     title: "Next.js",
@@ -23,27 +25,31 @@ export const integrationOptions = [
     link: "https://github.com/lomiafrica/nextjs.lomi.boilerplate",
     logo: <img src="/integrations/nextjs.webp" alt="Next.js" className="w-12 h-12 object-contain" />,
     installLink: "https://github.com/lomiafrica/nextjs.lomi.boilerplate",
+    status: 'available',
   },
   {
     title: "WordPress",
     description: "Accept payments on your website with our easy-to-use plugin.",
     link: "#",
     logo: <img src="/integrations/wordpress.webp" alt="WordPress" className="w-12 h-12 object-contain" />,
-    installLink: "#",
+    installLink: "",
+    status: 'coming_soon',
   },
   {
     title: "Xero",
     description: "Integrating with Xero allows you to synchronize lomi. transactions and payment processing in your bookkeeping software.",
     link: "#",
     logo: <XeroIcon />,
-    installLink: "#",
+    installLink: "",
+    status: 'coming_soon',
   },
   {
     title: "Zapier",
     description: "Zapier lets you connect lomi. to other apps and automate powerful workflows.",
     link: "#",
     logo: <ZapierIcon />,
-    installLink: "#",
+    installLink: "",
+    status: 'coming_soon',
   },
   {
     title: "WhatsApp",
@@ -51,5 +57,6 @@ export const integrationOptions = [
     link: "#",
     logo: <img src="/integrations/whatsapp.webp" alt="WhatsApp" className="w-12 h-12 object-contain" />,
     installLink: "#",
+    status: 'available',
   },
 ];
