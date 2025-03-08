@@ -36,6 +36,10 @@ interface PayoutFiltersProps {
     setColumns: (value: string[]) => void
     refetch: () => void
     isRefreshing: boolean
+    isDownloadOpen: boolean
+    setIsDownloadOpen: (isOpen: boolean) => void
+    handleDownload: () => void
+    copyAsJSON: () => void
 }
 
 export default function PayoutFilters({
@@ -51,6 +55,10 @@ export default function PayoutFilters({
     setColumns,
     refetch,
     isRefreshing,
+    isDownloadOpen,
+    setIsDownloadOpen,
+    handleDownload,
+    copyAsJSON,
 }: PayoutFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
     const [isStatusPopoverOpen, setIsStatusPopoverOpen] = useState(false)
@@ -247,10 +255,22 @@ export default function PayoutFilters({
                             ))}
                         </PopoverContent>
                     </Popover>
-                    <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
-                        <Download className="h-5 w-5" />
-                        <span className="sr-only">Export</span>
-                    </Button>
+                    <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" className="border-border text-card-foreground px-2 h-10 rounded-none">
+                                <Download className="h-5 w-5" />
+                                <span className="sr-only">Export</span>
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40 p-2" side="bottom" align="end" sideOffset={5}>
+                            <Button variant="ghost" size="sm" className="w-full" onClick={handleDownload}>
+                                Download CSV
+                            </Button>
+                            <Button variant="ghost" size="sm" className="w-full mt-2" onClick={copyAsJSON}>
+                                Copy as JSON
+                            </Button>
+                        </PopoverContent>
+                    </Popover>
                     <Button
                         variant="outline"
                         onClick={() => refetch()}

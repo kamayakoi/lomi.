@@ -76,6 +76,7 @@ function BalancePage() {
     const { data: conversionRates } = useConversionRates()
     const [withdrawalMethod, setWithdrawalMethod] = useState<'bank' | 'mobile_money'>('bank')
     const [waveEnabled, setWaveEnabled] = useState(false)
+    const [isDownloadOpen, setIsDownloadOpen] = useState(false)
 
     const topNav = [
         { title: 'Balance', href: '/portal/balance', isActive: true },
@@ -154,6 +155,90 @@ function BalancePage() {
             checkWaveEnabled();
         }
     }, [user?.id]);
+
+    // Global scroll lock implementation for Balance page
+    useEffect(() => {
+        // Store original styles to restore them later
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        const originalHTMLStyle = window.getComputedStyle(document.documentElement).overflow;
+
+        // Lock scrolling on body and html
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+
+        // Prevent wheel events on the document
+        const preventWheel = (e: WheelEvent) => {
+            // Only allow wheel events in the table container
+            const tableContainer = document.getElementById('balance-table-container');
+            if (tableContainer && !tableContainer.contains(e.target as Node)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+
+        // Prevent touchmove events that might cause scrolling
+        const preventTouch = (e: TouchEvent) => {
+            const tableContainer = document.getElementById('balance-table-container');
+            if (tableContainer && !tableContainer.contains(e.target as Node)) {
+                e.preventDefault();
+            }
+        };
+
+        // Prevent scrolling with keyboard
+        const preventKeyScroll = (e: KeyboardEvent) => {
+            // Prevent the default action for keys that can scroll the page
+            if (['Space', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+                // Allow keyboard navigation within the table container
+                const tableContainer = document.getElementById('balance-table-container');
+                const activeElement = document.activeElement;
+
+                // Only prevent if we're not inside the table container
+                if (!(tableContainer && tableContainer.contains(activeElement as Node))) {
+                    e.preventDefault();
+                }
+            }
+        };
+
+        // Add event listeners with passive: false to ensure preventDefault works
+        document.addEventListener('wheel', preventWheel, { passive: false });
+        document.addEventListener('touchmove', preventTouch, { passive: false });
+        document.addEventListener('keydown', preventKeyScroll, { passive: false });
+
+        // Add style tag for global CSS
+        const style = document.createElement('style');
+        style.id = 'no-scroll-style-balance';
+        style.innerHTML = `
+            html, body {
+                overflow: hidden !important;
+                height: 100% !important;
+                position: fixed !important;
+                width: 100% !important;
+            }
+            #__next {
+                height: 100% !important;
+                overflow: hidden !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Cleanup function
+        return () => {
+            // Restore original styles
+            document.body.style.overflow = originalStyle;
+            document.documentElement.style.overflow = originalHTMLStyle;
+
+            // Remove event listeners
+            document.removeEventListener('wheel', preventWheel);
+            document.removeEventListener('touchmove', preventTouch);
+            document.removeEventListener('keydown', preventKeyScroll);
+
+            // Remove style tag
+            const styleElement = document.getElementById('no-scroll-style-balance');
+            if (styleElement) {
+                styleElement.remove();
+            }
+        };
+    }, []);
 
     const handleSort = (column: keyof Payout) => {
         if (sortColumn === column) {
@@ -340,6 +425,55 @@ function BalancePage() {
         return value?.toLocaleString() || '0';
     };
 
+    const handleDownload = () => {
+        const filteredPayouts = applySearch(applyDateFilter(sortPayouts(payouts), selectedDateRange, customDateRange), searchTerm)
+        const csvData = convertToCSV(filteredPayouts)
+        downloadCSV(csvData)
+        setIsDownloadOpen(false)
+    }
+
+    function convertToCSV(data: (Payout | undefined)[]): string {
+        const filteredData = data.filter((item): item is Payout => item !== undefined);
+
+        if (filteredData.length === 0) {
+            return '';
+        }
+
+        const headers = Object.keys(filteredData[0] || {}).join(',');
+        const rows = filteredData.map(payout => {
+            if (!payout) return '';
+            return Object.values(payout)
+                .map(value => {
+                    if (typeof value === 'string') {
+                        return `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
+                })
+                .join(',');
+        }).join('\n');
+
+        return `${headers}\n${rows}`;
+    }
+
+    function downloadCSV(csvData: string) {
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' })
+        const link = document.createElement('a')
+        const url = URL.createObjectURL(blob)
+        link.setAttribute('href', url)
+        link.setAttribute('download', 'payouts.csv')
+        link.style.visibility = 'hidden'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
+
+    function copyAsJSON() {
+        const filteredPayouts = applySearch(applyDateFilter(sortPayouts(payouts), selectedDateRange, customDateRange), searchTerm)
+        const jsonData = JSON.stringify(filteredPayouts, null, 2)
+        navigator.clipboard.writeText(jsonData)
+        setIsDownloadOpen(false)
+    }
+
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -349,7 +483,7 @@ function BalancePage() {
     }
 
     return (
-        <Layout fixed>
+        <Layout fixed className="h-screen overflow-hidden">
             <Layout.Header>
                 <div className='hidden md:block'>
                     <TopNav links={topNav} />
@@ -393,9 +527,14 @@ function BalancePage() {
                         )}
                         */}
 
-                        <div className="grid gap-4 md:grid-cols-2 mb-6">
+                        <div
+                            className="grid gap-4 mb-6"
+                            style={{
+                                gridTemplateColumns: `repeat(${getSortedBalances().length > 0 ? Math.min(getSortedBalances().length, 3) : 1}, 1fr)`
+                            }}
+                        >
                             {isBalanceBreakdownLoading || isRefreshing ? (
-                                <Card className="rounded-none">
+                                <Card className="rounded-none col-span-full md:col-span-1">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">Balance</CardTitle>
                                     </CardHeader>
@@ -404,7 +543,7 @@ function BalancePage() {
                                     </CardContent>
                                 </Card>
                             ) : getSortedBalances().length === 0 ? (
-                                <Card className="rounded-none">
+                                <Card className="rounded-none col-span-full md:col-span-1">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-sm font-medium">Balance</CardTitle>
                                     </CardHeader>
@@ -418,23 +557,6 @@ function BalancePage() {
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                             <CardTitle className="text-sm font-medium cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
                                                 {balance.currency_code} Balance
-                                                {/* Default badge logic commented out temporarily
-                                                {balance.currency_code === preferredCurrency ? (
-                                                    <span className="ml-2 inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                                        Default
-                                                    </span>
-                                                ) : (
-                                                    <span
-                                                        className="ml-2 inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10 cursor-pointer hover:bg-blue-50 hover:text-blue-700"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setPreferredCurrency(balance.currency_code);
-                                                        }}
-                                                    >
-                                                        Set Default
-                                                    </span>
-                                                )}
-                                                */}
                                             </CardTitle>
                                             <ArrowDownIcon className="h-4 w-4 text-muted-foreground cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)} />
                                         </CardHeader>
@@ -447,9 +569,9 @@ function BalancePage() {
                                                         animate={{ opacity: 1, y: 0 }}
                                                         exit={{ opacity: 0, y: -20 }}
                                                         transition={{ duration: 0.2 }}
-                                                        className="flex items-center justify-between"
+                                                        className="flex justify-between items-center"
                                                     >
-                                                        <div className="flex flex-col">
+                                                        <div>
                                                             <div className="text-2xl font-bold cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
                                                                 {formatCurrency(balance.available_balance, balance.currency_code)}
                                                             </div>
@@ -627,8 +749,9 @@ function BalancePage() {
                                                         animate={{ opacity: 1, y: 0 }}
                                                         exit={{ opacity: 0, y: -20 }}
                                                         transition={{ duration: 0.2 }}
+                                                        className="flex justify-between items-start"
                                                     >
-                                                        <div className="space-y-2">
+                                                        <div className="space-y-1 w-4/5 pr-4">
                                                             <div className="flex justify-between">
                                                                 <span className="text-sm cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
                                                                     Total
@@ -654,6 +777,153 @@ function BalancePage() {
                                                                 </span>
                                                             </div>
                                                         </div>
+                                                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    variant="default"
+                                                                    className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none"
+                                                                    onClick={() => setSelectedWithdrawalCurrency(balance.currency_code)}
+                                                                >
+                                                                    Withdraw
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="sm:max-w-[425px] rounded-none">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Select withdrawal method and enter amount
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="grid gap-4 py-4">
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="currency" className="text-right">Currency</Label>
+                                                                        <Select
+                                                                            value={selectedWithdrawalCurrency}
+                                                                            onValueChange={(value) => {
+                                                                                setSelectedWithdrawalCurrency(value as currency_code);
+                                                                                // Reset withdrawal method to 'bank' if not XOF
+                                                                                if (value !== 'XOF') {
+                                                                                    setWithdrawalMethod('bank');
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            <SelectTrigger className="col-span-3 rounded-none">
+                                                                                <SelectValue placeholder="Select currency" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="rounded-none">
+                                                                                {getSortedBalances().map((balance) => (
+                                                                                    <SelectItem
+                                                                                        key={balance.currency_code}
+                                                                                        value={balance.currency_code}
+                                                                                        className="rounded-none"
+                                                                                    >
+                                                                                        {balance.currency_code} - Available: {getBalanceValue(balance.available_balance)}
+                                                                                    </SelectItem>
+                                                                                ))}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
+                                                                        <Select
+                                                                            value={withdrawalMethod}
+                                                                            onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
+                                                                        >
+                                                                            <SelectTrigger className="col-span-3 rounded-none">
+                                                                                <SelectValue placeholder="Select withdrawal method" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="rounded-none">
+                                                                                <SelectItem value="bank" className="rounded-none">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
+                                                                                            <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
+                                                                                        </svg>
+                                                                                        <span>Bank Account</span>
+                                                                                    </div>
+                                                                                </SelectItem>
+                                                                                {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
+                                                                                    <SelectItem value="mobile_money" className="rounded-none">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
+                                                                                            <span>Wave</span>
+                                                                                        </div>
+                                                                                    </SelectItem>
+                                                                                ) : null}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
+
+                                                                    {withdrawalMethod === 'bank' && (
+                                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                                            <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                                            <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                                <SelectTrigger className="col-span-3 rounded-none">
+                                                                                    <SelectValue placeholder="Select a bank account" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent className="rounded-none">
+                                                                                    {bankAccounts.map((account) => (
+                                                                                        <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
+                                                                                            <div className="flex items-center">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
+                                                                                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
+                                                                                                    <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
+                                                                                                </svg>
+                                                                                                {account.bank_name} - {account.account_number}
+                                                                                            </div>
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="amount" className="text-right">Amount</Label>
+                                                                        <Input
+                                                                            id="amount"
+                                                                            type="text"
+                                                                            value={withdrawalAmount}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value;
+                                                                                if (/^\d*\.?\d*$/.test(value)) {
+                                                                                    setWithdrawalAmount(value);
+                                                                                }
+                                                                            }}
+                                                                            className="col-span-3 rounded-none"
+                                                                            placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
+                                                                        />
+                                                                    </div>
+
+                                                                    <div className="flex justify-end mt-4 space-x-2">
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            onClick={() => {
+                                                                                setIsDialogOpen(false);
+                                                                                setWithdrawalAmount("");
+                                                                                setSelectedBankAccount("");
+                                                                            }}
+                                                                            className="rounded-sm"
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <Button
+                                                                            onClick={handleWithdraw}
+                                                                            disabled={isWithdrawing}
+                                                                            className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
+                                                                        >
+                                                                            {isWithdrawing ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Processing...
+                                                                                </>
+                                                                            ) : (
+                                                                                'Withdraw'
+                                                                            )}
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </motion.div>
                                                 )}
                                             </AnimatePresence>
@@ -677,23 +947,49 @@ function BalancePage() {
                             setColumns={setColumns}
                             refetch={handleRefresh}
                             isRefreshing={isRefreshing}
+                            isDownloadOpen={isDownloadOpen}
+                            setIsDownloadOpen={setIsDownloadOpen}
+                            handleDownload={handleDownload}
+                            copyAsJSON={copyAsJSON}
                         />
 
-                        <Card className="rounded-none">
-                            <CardContent className="p-4">
-                                <div className="border">
+                        <Card className="rounded-none border shadow-sm">
+                            <CardContent className="p-0">
+                                <div
+                                    id="balance-table-container"
+                                    className="h-[47vh] overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
+                                    onWheel={(e) => {
+                                        // When scrolled at the boundaries, prevent default to avoid page scrolling
+                                        const container = e.currentTarget;
+                                        const { scrollTop, scrollHeight, clientHeight } = container;
+
+                                        // Check if we're at the top or bottom boundary
+                                        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+                                        const isAtTop = scrollTop <= 0;
+
+                                        // If at boundaries and trying to scroll further, prevent default
+                                        if ((isAtBottom && e.deltaY > 0) || (isAtTop && e.deltaY < 0)) {
+                                            e.preventDefault();
+                                        }
+
+                                        // In any case, stop propagation to contain scroll within this element
+                                        e.stopPropagation();
+                                    }}
+                                >
                                     <InfiniteScroll
                                         dataLength={payouts.length}
                                         next={() => fetchNextPage()}
                                         hasMore={payoutsData?.pages?.[payoutsData.pages.length - 1]?.length === pageSize}
-                                        loader={<Skeleton className="w-full h-8 rounded-none" />}
+                                        loader={<div className="p-4"><Skeleton className="w-full h-8 rounded-none" /></div>}
+                                        scrollableTarget="balance-table-container"
+                                        className="overflow-visible"
                                     >
-                                        <Table>
+                                        <Table className="w-full">
                                             <TableHeader>
-                                                <TableRow>
+                                                <TableRow className="hover:bg-transparent border-b bg-muted/50">
                                                     {columns.includes('Payout ID') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('payout_id')} className="rounded-none">
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('payout_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Payout ID
                                                                 {sortColumn === 'payout_id' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -702,8 +998,8 @@ function BalancePage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Amount') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('amount')}>
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Amount
                                                                 {sortColumn === 'amount' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -712,8 +1008,8 @@ function BalancePage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Currency') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('currency_code')}>
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('currency_code')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Currency
                                                                 {sortColumn === 'currency_code' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -722,8 +1018,8 @@ function BalancePage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Status') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('status')}>
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Status
                                                                 {sortColumn === 'status' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -732,8 +1028,8 @@ function BalancePage() {
                                                         </TableHead>
                                                     )}
                                                     {columns.includes('Date') && (
-                                                        <TableHead className="text-center">
-                                                            <Button variant="ghost" onClick={() => handleSort('created_at')}>
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('created_at')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
                                                                 Date
                                                                 {sortColumn === 'created_at' && (
                                                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -745,16 +1041,14 @@ function BalancePage() {
                                             </TableHeader>
                                             <TableBody>
                                                 {isPayoutsLoading ? (
-                                                    Array.from({ length: 5 }).map((_, index) => (
-                                                        <TableRow key={index}>
-                                                            <TableCell colSpan={6}>
-                                                                <Skeleton className="w-full h-8 rounded-none" />
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
+                                                    <TableRow>
+                                                        <TableCell colSpan={columns.length} className="text-center p-4">
+                                                            <Skeleton className="w-full h-8 rounded-none" />
+                                                        </TableCell>
+                                                    </TableRow>
                                                 ) : payouts.length === 0 ? (
                                                     <TableRow>
-                                                        <TableCell colSpan={6} className="text-center py-8">
+                                                        <TableCell colSpan={columns.length} className="text-center py-8">
                                                             <div className="flex flex-col items-center justify-center space-y-4">
                                                                 <div className="bg-transparent dark:bg-transparent p-4">
                                                                     <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
@@ -763,41 +1057,52 @@ function BalancePage() {
                                                                     No payout history found
                                                                 </p>
                                                                 <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                                                    Start processing payouts to see your payout history here.
+                                                                    Make some withdrawals to see your payout history.
                                                                 </p>
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : (
                                                     applySearch(applyDateFilter(sortPayouts(payouts), selectedDateRange, customDateRange), searchTerm).map((payout: Payout) => (
-                                                        <TableRow
-                                                            key={payout.payout_id}
-                                                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                            onClick={() => setSelectedPayout(payout)}
-                                                        >
+                                                        <TableRow key={payout.payout_id} className="cursor-pointer border-b hover:bg-muted/30">
                                                             {columns.includes('Payout ID') && (
-                                                                <TableCell className="text-center">{shortenPayoutId(payout.payout_id)}</TableCell>
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-mono text-xs">{shortenPayoutId(payout.payout_id)}</span>
+                                                                </TableCell>
                                                             )}
                                                             {columns.includes('Amount') && (
-                                                                <TableCell className="text-center">
-                                                                    {formatAmount(payout.amount)}
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-medium">{formatAmount(payout.amount)}</span>
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Currency') && <TableCell className="text-center">{payout.currency_code}</TableCell>}
+                                                            {columns.includes('Currency') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    {payout.currency_code}
+                                                                </TableCell>
+                                                            )}
                                                             {columns.includes('Status') && (
-                                                                <TableCell className="text-center">
-                                                                    <span className={`
-                                                                        inline-block px-2 py-1 text-xs font-normal rounded-none
-                                                                        ${payout.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                                        ${payout.status === 'pending' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                        ${payout.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                                                    `}
-                                                                    >
-                                                                        {formatPayoutStatus(payout.status)}
-                                                                    </span>
+                                                                <TableCell className="text-center py-4">
+                                                                    <div className="flex justify-center">
+                                                                        <span
+                                                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${payout.status === 'completed'
+                                                                                ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                                                                : payout.status === 'failed'
+                                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
+                                                                                    : payout.status === 'pending' || payout.status === 'processing'
+                                                                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                                                                                        : 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                                                                }`}
+                                                                        >
+                                                                            {formatPayoutStatus(payout.status)}
+                                                                        </span>
+                                                                    </div>
                                                                 </TableCell>
                                                             )}
-                                                            {columns.includes('Date') && <TableCell className="text-center">{formatDate(payout.created_at)}</TableCell>}
+                                                            {columns.includes('Date') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="text-sm text-muted-foreground">{formatDate(payout.created_at)}</span>
+                                                                </TableCell>
+                                                            )}
                                                         </TableRow>
                                                     ))
                                                 )}
