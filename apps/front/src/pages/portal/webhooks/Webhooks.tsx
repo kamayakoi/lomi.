@@ -88,19 +88,19 @@ function EventBadges({ events }: { events: webhook_event[] }) {
 
 function EmptyState() {
     return (
-        <>
-            <div className="flex justify-center mb-6">
-                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-full">
-                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+        <div className="flex flex-col items-center justify-center h-full py-10">
+            <div className="flex justify-center mb-8">
+                <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                    <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                 </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+            <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mb-3">
                 No webhooks found
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center">
                 Try changing your filter or create a new webhook.
             </p>
-        </>
+        </div>
     );
 }
 
@@ -274,123 +274,119 @@ function WebhooksPage() {
                     />
 
                     <Card className="mt-4 rounded-none">
-                        <CardContent className="p-4">
-                            <div className="border rounded-none">
-                                <div className="max-h-[calc(100vh-210px)] overflow-y-auto pr-2 scrollbar-hide">
-                                    {/* Desktop Table View */}
-                                    <div className="hidden md:block">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead className="text-left w-1/2 pl-4">
-                                                        <Button variant="ghost" onClick={() => handleSort('url')}>
-                                                            URL
-                                                            {sortColumn === 'url' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                    <TableHead className="text-left w-1/3 pl-2">
-                                                        <Button variant="ghost" onClick={() => handleSort('authorized_events')}>
-                                                            Events
-                                                            {sortColumn === 'authorized_events' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                    <TableHead className="text-center w-1/6">
-                                                        <Button variant="ghost" onClick={() => handleSort('is_active')}>
-                                                            Status
-                                                            {sortColumn === 'is_active' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                    <TableHead className="w-[100px]"></TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {isWebhooksLoading ? (
-                                                    Array.from({ length: 5 }).map((_, index) => (
-                                                        <TableRow key={index}>
-                                                            <TableCell colSpan={4}>
-                                                                <Skeleton className="w-full h-8" />
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                ) : webhooks.length === 0 ? (
-                                                    <TableRow>
+                        <CardContent className="p-0">
+                            <div id="webhooks-table-container" className="h-[72vh] overflow-auto">
+                                {/* Desktop Table View */}
+                                <div className="hidden md:block">
+                                    <Table className="w-full">
+                                        <TableHeader>
+                                            <TableRow className="hover:bg-transparent border-b bg-muted/50">
+                                                <TableHead className="text-left w-1/2 pl-4">
+                                                    <Button variant="ghost" onClick={() => handleSort('url')}>
+                                                        URL
+                                                        {sortColumn === 'url' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="text-left w-1/3 pl-2">
+                                                    <Button variant="ghost" onClick={() => handleSort('authorized_events')}>
+                                                        Events
+                                                        {sortColumn === 'authorized_events' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="text-center w-1/6">
+                                                    <Button variant="ghost" onClick={() => handleSort('is_active')}>
+                                                        Status
+                                                        {sortColumn === 'is_active' && (
+                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                        )}
+                                                    </Button>
+                                                </TableHead>
+                                                <TableHead className="w-[100px]"></TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {isWebhooksLoading ? (
+                                                Array.from({ length: 5 }).map((_, index) => (
+                                                    <TableRow key={index}>
                                                         <TableCell colSpan={4}>
-                                                            <div className="py-24 text-center">
-                                                                <EmptyState />
-                                                            </div>
+                                                            <Skeleton className="w-full h-8" />
                                                         </TableCell>
                                                     </TableRow>
-                                                ) : (
-                                                    sortWebhooks(webhooks).map((webhook: Webhook) => (
-                                                        <TableRow
-                                                            key={webhook.webhook_id}
-                                                            className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                                                            onClick={() => handleRowClick(webhook)}
-                                                        >
-                                                            <TableCell className="text-left pl-4">{webhook.url}</TableCell>
-                                                            <TableCell className="text-left pl-2">
-                                                                <EventBadges events={webhook.authorized_events} />
-                                                            </TableCell>
-                                                            <TableCell className="text-center">
-                                                                <span className={`
-                                                                    inline-block px-2 py-1 rounded-none text-xs font-normal
-                                                                    ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
-                                                                `}>
-                                                                    {webhook.is_active ? 'Active' : 'Inactive'}
-                                                                </span>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setSelectedWebhook(webhook);
-                                                                        setIsActionsOpen(true);
-                                                                    }}
-                                                                    className="text-blue-500 hover:text-blue-600 p-1.5"
-                                                                >
-                                                                    <Edit className="h-4.5 w-4.5" />
-                                                                </button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
+                                                ))
+                                            ) : webhooks.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="h-[65vh]">
+                                                        <EmptyState />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                sortWebhooks(webhooks).map((webhook: Webhook) => (
+                                                    <TableRow
+                                                        key={webhook.webhook_id}
+                                                        className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                                                        onClick={() => handleRowClick(webhook)}
+                                                    >
+                                                        <TableCell className="text-left pl-4">{webhook.url}</TableCell>
+                                                        <TableCell className="text-left pl-2">
+                                                            <EventBadges events={webhook.authorized_events} />
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                            <span className={`
+                                                                inline-block px-2 py-1 rounded-none text-xs font-normal
+                                                                ${webhook.is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}
+                                                            `}>
+                                                                {webhook.is_active ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setSelectedWebhook(webhook);
+                                                                    setIsActionsOpen(true);
+                                                                }}
+                                                                className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                            >
+                                                                <Edit className="h-4.5 w-4.5" />
+                                                            </button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
 
-                                    {/* Mobile Card View */}
-                                    <div className="md:hidden">
-                                        {isWebhooksLoading ? (
-                                            Array.from({ length: 3 }).map((_, index) => (
-                                                <div key={index} className="p-4 border-b last:border-b-0">
-                                                    <Skeleton className="w-full h-24" />
-                                                </div>
-                                            ))
-                                        ) : webhooks.length === 0 ? (
-                                            <div className="py-24 text-center">
-                                                <EmptyState />
+                                {/* Mobile Card View */}
+                                <div className="md:hidden">
+                                    {isWebhooksLoading ? (
+                                        Array.from({ length: 3 }).map((_, index) => (
+                                            <div key={index} className="p-4 border-b last:border-b-0">
+                                                <Skeleton className="w-full h-24" />
                                             </div>
-                                        ) : (
-                                            sortWebhooks(webhooks).map((webhook: Webhook) => (
-                                                <WebhookCard
-                                                    key={webhook.webhook_id}
-                                                    webhook={webhook}
-                                                    onEditClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedWebhook(webhook);
-                                                        setIsActionsOpen(true);
-                                                    }}
-                                                    onClick={() => handleRowClick(webhook)}
-                                                />
-                                            ))
-                                        )}
-                                    </div>
+                                        ))
+                                    ) : webhooks.length === 0 ? (
+                                        <div className="h-[65vh] flex items-center justify-center">
+                                            <EmptyState />
+                                        </div>
+                                    ) : (
+                                        sortWebhooks(webhooks).map((webhook: Webhook) => (
+                                            <WebhookCard
+                                                key={webhook.webhook_id}
+                                                webhook={webhook}
+                                                onEditClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedWebhook(webhook);
+                                                    setIsActionsOpen(true);
+                                                }}
+                                                onClick={() => handleRowClick(webhook)}
+                                            />
+                                        ))
+                                    )}
                                 </div>
                             </div>
                         </CardContent>

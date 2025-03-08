@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION public.create_organization_webhook(
 RETURNS webhooks AS $$
 DECLARE
     v_webhook webhooks;
+    v_organization_id UUID;
 BEGIN
     -- Validate URL format
     IF NOT p_url ~ '^https?://' THEN
@@ -19,9 +20,20 @@ BEGIN
     IF array_length(p_authorized_events, 1) IS NULL THEN
         RAISE EXCEPTION 'At least one event must be specified';
     END IF;
+    
+    -- Get the organization ID for this merchant
+    SELECT organization_id INTO v_organization_id
+    FROM merchant_organization_links
+    WHERE merchant_id = p_merchant_id
+    LIMIT 1;
+    
+    IF v_organization_id IS NULL THEN
+        RAISE EXCEPTION 'No organization found for merchant ID %', p_merchant_id;
+    END IF;
 
     INSERT INTO webhooks (
         merchant_id,
+        organization_id,
         url,
         authorized_events,
         is_active,
@@ -29,6 +41,7 @@ BEGIN
     )
     VALUES (
         p_merchant_id,
+        v_organization_id,
         p_url,
         p_authorized_events,
         p_is_active,
@@ -51,6 +64,9 @@ BEGIN
     );
 
     RETURN v_webhook;
+EXCEPTION
+    WHEN unique_violation THEN
+        RAISE EXCEPTION 'A webhook with URL % already exists for this merchant', p_url;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
