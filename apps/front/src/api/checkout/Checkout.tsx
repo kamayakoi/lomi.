@@ -27,6 +27,82 @@ const formatNumber = (num: number | string) => {
     return num.toLocaleString('fr-FR').replace(/\s/g, '.');
 };
 
+// Add a comprehensive style override at the top of the file
+const checkoutLightModeStyles = `
+  /* Global checkout container styles */
+  .checkout-container {
+    color-scheme: light !important;
+  }
+
+  /* Override ALL input styles within checkout */
+  .checkout-container input,
+  .checkout-container select,
+  .checkout-container .react-phone-number-input__input,
+  .checkout-container .react-phone-number-input__country-select {
+    background-color: white !important;
+    color: #1f2937 !important;
+    border-color: #d1d5db !important;
+  }
+
+  /* Override focus, hover & active states */
+  .checkout-container input:focus,
+  .checkout-container input:hover,
+  .checkout-container input:active,
+  .checkout-container select:focus,
+  .checkout-container select:hover,
+  .checkout-container select:active,
+  .checkout-container .react-phone-number-input__input:focus,
+  .checkout-container .react-phone-number-input__input:hover,
+  .checkout-container .react-phone-number-input__input:active {
+    background-color: white !important;
+    color: #1f2937 !important;
+    border-color: #d1d5db !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Phone input specific styles */
+  .checkout-container .react-phone-number-input,
+  .checkout-container .react-phone-number-input * {
+    background-color: white !important;
+    color: #1f2937 !important;
+  }
+
+  .checkout-container .react-phone-number-input__country {
+    background-color: white !important;
+    border-color: #d1d5db !important;
+  }
+
+  /* Placeholder text */
+  .checkout-container input::placeholder,
+  .checkout-container .react-phone-number-input__input::placeholder {
+    color: #9ca3af !important;
+  }
+
+  /* Ensure consistent border styles */
+  .checkout-container .rounded-lg,
+  .checkout-container .rounded-md,
+  .checkout-container .rounded-sm,
+  .checkout-container .rounded {
+    border-color: #d1d5db !important;
+  }
+
+  /* Fix for flags and UI elements */
+  .checkout-container .flag,
+  .checkout-container .react-phone-number-input__icon,
+  .checkout-container .react-phone-number-input__country-icon {
+    background-color: transparent !important;
+  }
+
+  /* Fix any promo code inputs */
+  .checkout-container .promo-input input,
+  .checkout-container .promo-input button {
+    background-color: white !important;
+    color: #1f2937 !important;
+    border-color: #d1d5db !important;
+  }
+`;
+
 export default function CheckoutPage() {
     const { sessionId, linkId } = useParams<{ sessionId?: string; linkId?: string }>();
 
@@ -57,6 +133,8 @@ export default function CheckoutPage() {
     const [customerId, setCustomerId] = useState<string | null>(null);
     const [sessionError, setSessionError] = useState<string | null>(null);
     const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
+    const nameInputRef = useRef<HTMLInputElement>(null);
+    const [rawNameInput, setRawNameInput] = useState('');
 
     useEffect(() => {
         // Get user's country using their IP
@@ -108,19 +186,19 @@ export default function CheckoutPage() {
                     // Store the checkout session ID
                     setCheckoutSessionId(sessionData.checkout_session_id);
 
-                    // Continue with the rest of the function - logo handling etc.
+                    // Handle organization logo and favicon
                     if (data?.paymentLink?.organizationLogoUrl) {
-                        const logoPath = data.paymentLink.organizationLogoUrl
+                        const logoPath = data.paymentLink.organizationLogoUrl;
                         const { data: logoData, error: logoError } = await supabase
                             .storage
                             .from('logos')
-                            .download(logoPath)
+                            .download(logoPath);
 
                         if (logoError) {
-                            console.error('Error downloading logo:', logoError)
+                            console.error('Error downloading logo:', logoError);
                         } else {
-                            const logoUrl = URL.createObjectURL(logoData)
-                            setOrganization(prevOrg => ({ ...prevOrg, logoUrl }))
+                            const logoUrl = URL.createObjectURL(logoData);
+                            setOrganization(prevOrg => ({ ...prevOrg, logoUrl }));
 
                             // Update favicons
                             let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
@@ -264,8 +342,37 @@ export default function CheckoutPage() {
         };
     }, [checkoutSessionId]);
 
+    // Add a new effect to update the page title and meta description when checkout data is loaded
+    useEffect(() => {
+        if (checkoutData?.paymentLink?.organizationName) {
+            // Update page title
+            document.title = `${checkoutData.paymentLink.organizationName} | Checkout`;
+
+            // Update meta description
+            const metaDescription = document.querySelector("meta[name='description']") as HTMLMetaElement;
+            if (metaDescription) {
+                metaDescription.content = `Secure checkout page for ${checkoutData.paymentLink.organizationName}`;
+            }
+        }
+    }, [checkoutData?.paymentLink?.organizationName]);
+
     const handleProviderClick = async (provider: string) => {
         setSelectedProvider(provider)
+
+        // Check if required fields are filled, if not, focus the name field
+        if (!areRequiredFieldsFilled()) {
+            toast({
+                variant: "destructive",
+                title: "Required Information",
+                description: "Please fill in your full name and email first."
+            });
+
+            // Focus on the name input
+            if (nameInputRef.current) {
+                nameInputRef.current.focus();
+            }
+            return;
+        }
 
         if (provider === 'WAVE') {
             try {
@@ -419,6 +526,11 @@ export default function CheckoutPage() {
         // Handle success/error
     }
 
+    // 1. First, let's add a function to check if required fields are filled
+    const areRequiredFieldsFilled = () => {
+        return rawNameInput.trim().includes(' ') && customerDetails.email && customerDetails.email.includes('@');
+    };
+
     // Render the error state when session creation fails
     if (sessionError) {
         return (
@@ -465,800 +577,838 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row bg-white">
-            {/* Left side - Product details */}
-            <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col relative`}>
-                {/* Mobile Header - Fixed */}
-                <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#121317]">
-                    <div className="flex items-center justify-between w-full h-14 px-4">
-                        <div className="flex items-center gap-1.5">
-                            <AnimatePresence mode="wait">
-                                {!isDetailsOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, width: 0, marginRight: 0 }}
-                                        animate={{ opacity: 1, width: "auto", marginRight: 4 }}
-                                        exit={{ opacity: 0, width: 0, marginRight: 0 }}
-                                        transition={{ duration: 0.15, ease: "easeInOut" }}
-                                        onClick={handleGoBack}
-                                        className="cursor-pointer"
-                                    >
-                                        <ArrowLeft className="h-4 w-4 text-gray-500 hover:text-gray-300 transition-colors" />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                            <motion.div
-                                animate={{ x: isDetailsOpen ? "-4px" : 0 }}
-                                transition={{ duration: 0.15, ease: "easeInOut" }}
-                            >
-                                {organization.logoUrl && (
-                                    <img
-                                        src={organization.logoUrl}
-                                        alt="Organization Logo"
-                                        className="w-7 h-7 rounded-md"
-                                    />
-                                )}
-                            </motion.div>
-                        </div>
-                        <button
-                            onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-                            className="flex items-center gap-0.5 text-gray-500 hover:text-gray-300 transition-colors text-[13px] font-medium tracking-wide"
-                        >
-                            Details
-                            <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isDetailsOpen ? 'rotate-180' : ''}`} />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Desktop View */}
-                <div className="hidden lg:block max-w-[488px] ml-auto pr-8 w-full">
-                    <div className="flex mb-8">
-                        <div
-                            className="group flex items-center gap-2 cursor-pointer"
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                            onClick={handleGoBack}
-                        >
-                            <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
-                            <div className="relative w-[40px] h-[40px]">
+        <>
+            <style>{checkoutLightModeStyles}</style>
+            <div className="min-h-screen flex flex-col lg:flex-row bg-white checkout-container">
+                {/* Left side - Product details */}
+                <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col relative`}>
+                    {/* Mobile Header - Fixed */}
+                    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#121317]">
+                        <div className="flex items-center justify-between w-full h-14 px-4">
+                            <div className="flex items-center gap-1.5">
                                 <AnimatePresence mode="wait">
-                                    {!isHovered && organization.logoUrl && (
-                                        <motion.img
-                                            key="logo"
-                                            src={organization.logoUrl}
-                                            alt="Organization Logo"
-                                            className="rounded-md absolute inset-0 w-full h-full object-cover"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.1 }}
-                                        />
-                                    )}
-                                    {isHovered && (
+                                    {!isDetailsOpen && (
                                         <motion.div
-                                            key="text"
-                                            className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.1 }}
+                                            initial={{ opacity: 0, width: 0, marginRight: 0 }}
+                                            animate={{ opacity: 1, width: "auto", marginRight: 4 }}
+                                            exit={{ opacity: 0, width: 0, marginRight: 0 }}
+                                            transition={{ duration: 0.15, ease: "easeInOut" }}
+                                            onClick={handleGoBack}
+                                            className="cursor-pointer"
                                         >
-                                            Back
+                                            <ArrowLeft className="h-4 w-4 text-gray-500 hover:text-gray-300 transition-colors" />
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
+                                <motion.div
+                                    animate={{ x: isDetailsOpen ? "-4px" : 0 }}
+                                    transition={{ duration: 0.15, ease: "easeInOut" }}
+                                >
+                                    {organization.logoUrl && (
+                                        <img
+                                            src={organization.logoUrl}
+                                            alt="Organization Logo"
+                                            className="w-7 h-7 rounded-md"
+                                        />
+                                    )}
+                                </motion.div>
                             </div>
+                            <button
+                                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
+                                className="flex items-center gap-0.5 text-gray-500 hover:text-gray-300 transition-colors text-[13px] font-medium tracking-wide"
+                            >
+                                Details
+                                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${isDetailsOpen ? 'rotate-180' : ''}`} />
+                            </button>
                         </div>
                     </div>
-                    <div className="pl-[28px]">
-                        <div className="mb-12">
-                            {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
-                                <>
-                                    <h2 className="text-xl text-gray-300 mb-4">Complete your payment</h2>
-                                    <div className="flex items-baseline gap-2 mb-4">
-                                        <span className="text-4xl font-bold">{formatNumber(checkoutData?.paymentLink?.price || 0)}</span>
-                                        <span className="text-4xl">{checkoutData?.paymentLink?.currency_code}</span>
-                                    </div>
-                                    {organization.logoUrl && (
-                                        <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
-                                            <img
+
+                    {/* Desktop View */}
+                    <div className="hidden lg:block max-w-[488px] ml-auto pr-8 w-full">
+                        <div className="flex mb-8">
+                            <div
+                                className="group flex items-center gap-2 cursor-pointer"
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                                onClick={handleGoBack}
+                            >
+                                <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
+                                <div className="relative w-[40px] h-[40px]">
+                                    <AnimatePresence mode="wait">
+                                        {!isHovered && organization.logoUrl && (
+                                            <motion.img
+                                                key="logo"
                                                 src={organization.logoUrl}
                                                 alt="Organization Logo"
-                                                className="w-12 h-12 rounded-md"
-                                            />
-                                            <div className="flex-1">
-                                                <div className="text-white font-medium">{checkoutData?.paymentLink?.title}</div>
-                                                <div className="text-sm text-gray-400">{checkoutData?.paymentLink?.public_description}</div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                            {checkoutData?.subscriptionPlan && (
-                                <>
-                                    <h2 className="text-xl text-gray-300 mb-4">Subscribe to {checkoutData.subscriptionPlan.name}</h2>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="flex items-center">
-                                            <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
-                                            <span className="text-4xl ml-2">{checkoutData.subscriptionPlan.currency_code}</span>
-                                        </div>
-                                        <div className="text-gray-400 text-lg ml-2 h-[2.2rem] flex flex-col justify-between leading-none">
-                                            <span>per</span>
-                                            <span>{checkoutData.subscriptionPlan.billingFrequency.toLowerCase()
-                                                .replace('weekly', 'week')
-                                                .replace('bi-weekly', 'two weeks')
-                                                .replace('monthly', 'month')
-                                                .replace('bi-monthly', 'two months')
-                                                .replace('quarterly', 'quarter')
-                                                .replace('semi-annual', 'six months')
-                                                .replace('yearly', 'year')
-                                                .replace('one-time', 'payment')}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
-                                        <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
-                                            {checkoutData.subscriptionPlan.image_url ? (
-                                                <img
-                                                    src={checkoutData.subscriptionPlan.image_url}
-                                                    alt={checkoutData.subscriptionPlan.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ImageIcon className="h-6 w-6 text-gray-400" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="text-white font-medium">{checkoutData.subscriptionPlan.name}</div>
-                                            <div className="text-sm text-gray-400">{checkoutData.subscriptionPlan.description}</div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                            {checkoutData?.merchantProduct && (
-                                <>
-                                    <h2 className="text-xl text-gray-300 mb-4">Pay for {checkoutData.merchantProduct.name}</h2>
-                                    <div className="flex items-baseline gap-2 mb-4">
-                                        <span className="text-4xl font-bold">{formatNumber(checkoutData.merchantProduct.price)}</span>
-                                        <span className="text-4xl">{checkoutData.merchantProduct.currency_code}</span>
-                                    </div>
-                                    <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
-                                        <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
-                                            {checkoutData.merchantProduct.image_url ? (
-                                                <img
-                                                    src={checkoutData.merchantProduct.image_url}
-                                                    alt={checkoutData.merchantProduct.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ImageIcon className="h-6 w-6 text-gray-400" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="text-white font-medium">{checkoutData.merchantProduct.name}</div>
-                                            <div className="text-sm text-gray-400">{checkoutData.merchantProduct.description}</div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-
-                        <div className="pl-[60px] space-y-4">
-                            <div className="border-t border-gray-800 pt-4">
-                                <div className="flex justify-between items-baseline">
-                                    <span className="text-gray-400">Subtotal</span>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
-                                        <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
-                                    </div>
-                                </div>
-
-                                {/* Fees Section */}
-                                {checkoutData?.merchantProduct?.fees?.map((fee) => {
-                                    const basePrice = checkoutData.merchantProduct?.price || 0;
-                                    const feeAmount = basePrice * (fee.percentage / 100);
-                                    return (
-                                        <div key={fee.fee_type_id} className="flex justify-between items-baseline pt-2">
-                                            <div className="flex items-baseline gap-1.5">
-                                                <span className="text-gray-400">{fee.name}</span>
-                                                <span className="text-xs text-gray-500">({fee.percentage}%)</span>
-                                            </div>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-gray-400">{formatNumber(feeAmount)}</span>
-                                                <span className="text-gray-500">{checkoutData.paymentLink.currency_code}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="relative flex justify-start">
-                                {!isPromoCodeOpen ? (
-                                    <button
-                                        onClick={() => {
-                                            setIsPromoCodeOpen(true)
-                                            setTimeout(() => promoInputRef.current?.focus(), 0)
-                                        }}
-                                        className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
-                                    >
-                                        Add promotion code
-                                    </button>
-                                ) : (
-                                    <motion.div
-                                        className="w-full"
-                                        initial={{ width: "auto" }}
-                                        animate={{ width: "100%" }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        <div className="relative h-[42px]">
-                                            <Input
-                                                ref={promoInputRef}
-                                                value={promoCode}
-                                                onChange={(e) => setPromoCode(e.target.value)}
-                                                onBlur={handlePromoCodeBlur}
-                                                placeholder="Enter promotion code"
-                                                className="w-full h-full bg-[#1A1D23] border-gray-800 text-white placeholder:text-gray-500 rounded-md px-4"
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        handlePromoCodeSubmit()
-                                                    }
-                                                }}
-                                            />
-                                            {promoCode && (
-                                                <button
-                                                    onClick={handlePromoCodeSubmit}
-                                                    className="absolute right-0 top-0 h-full px-4 text-red-500 hover:text-red-400 transition-colors bg-transparent"
-                                                >
-                                                    Apply
-                                                </button>
-                                            )}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </div>
-
-                            {appliedPromoCode && (
-                                <div className="flex items-center justify-end">
-                                    <div className="relative flex items-center bg-red-100/10 text-red-400 px-3 py-2 text-sm rounded-md">
-                                        <span className="font-medium">{appliedPromoCode}</span>
-                                        <button
-                                            onClick={() => setAppliedPromoCode(null)}
-                                            className="ml-3 text-red-400 hover:text-red-300 transition-colors"
-                                        >
-                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="border-t border-gray-800 pt-4">
-                                <div className="flex justify-between items-baseline">
-                                    <span className="text-white font-medium">Total due today</span>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-lg font-medium">
-                                            {(() => {
-                                                if (!checkoutData) return formatNumber(0);
-                                                const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
-                                                const fees = checkoutData.merchantProduct?.fees || [];
-                                                const feeAmount = fees.reduce((total, fee) => {
-                                                    return total + (basePrice * (fee.percentage / 100));
-                                                }, 0);
-                                                return formatNumber(basePrice + feeAmount);
-                                            })()}
-                                        </span>
-                                        <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Mobile View - Add top padding to account for fixed header */}
-                <div className="lg:hidden flex flex-col items-center px-2 mt-14">
-                    {/* Product Image */}
-                    <div className="w-36 h-36 mb-5 rounded-lg overflow-hidden bg-gray-800">
-                        {(() => {
-                            if (checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) {
-                                return (
-                                    <img
-                                        src={checkoutData.merchantProduct?.image_url || checkoutData.subscriptionPlan?.image_url || ''}
-                                        alt="Product"
-                                        className="w-full h-full object-cover"
-                                    />
-                                );
-                            }
-
-                            if (organization.logoUrl) {
-                                return (
-                                    <img
-                                        src={organization.logoUrl}
-                                        alt="Organization Logo"
-                                        className="w-full h-full object-cover"
-                                    />
-                                );
-                            }
-
-                            return (
-                                <div className="w-full h-full flex items-center justify-center">
-                                    <ImageIcon className="h-12 w-12 text-gray-600" />
-                                </div>
-                            );
-                        })()}
-                    </div>
-
-                    {/* Product Title & Price */}
-                    <div className="text-center mb-5">
-                        <h2 className="text-base text-gray-400 mb-1.5">
-                            {checkoutData?.subscriptionPlan ? 'Subscribe to ' : 'Pay for '}
-                            {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
-                        </h2>
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="text-3xl font-bold">
-                                {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}
-                            </span>
-                            <span className="text-3xl">{checkoutData?.paymentLink?.currency_code}</span>
-                        </div>
-                    </div>
-
-                    {/* Add Code Button */}
-                    <button
-                        onClick={() => {
-                            setIsDetailsOpen(true);
-                            setIsPromoCodeOpen(true);
-                            setTimeout(() => promoInputRef.current?.focus(), 100);
-                        }}
-                        className="flex items-center gap-1.5 px-4 py-2.5 bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md text-sm mb-8"
-                    >
-                        Add code
-                        <ChevronDown className="h-4 w-4 opacity-70" />
-                    </button>
-                </div>
-
-                {/* Mobile Details Dropdown */}
-                <AnimatePresence>
-                    {isDetailsOpen && (
-                        <>
-                            {/* Backdrop */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                onClick={() => setIsDetailsOpen(false)}
-                                className="lg:hidden fixed inset-0 bg-black/20 z-30"
-                            />
-                            {/* Content */}
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-[#121317] overflow-hidden"
-                            >
-                                <div className="p-4 space-y-4">
-                                    {/* Product Info */}
-                                    <div className="flex items-start gap-3 border-b border-gray-800 pb-4">
-                                        <div className="w-16 h-16 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
-                                            {((checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || '') ? (
-                                                <img
-                                                    src={(checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || ''}
-                                                    alt="Product"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ImageIcon className="h-6 w-6 text-gray-600" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="text-white font-medium">
-                                                {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
-                                            </div>
-                                            <div className="text-sm text-gray-400">
-                                                {checkoutData?.merchantProduct?.description || checkoutData?.subscriptionPlan?.description || checkoutData?.paymentLink?.public_description}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Price Breakdown */}
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-baseline">
-                                            <span className="text-gray-400">Subtotal</span>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
-                                                <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Fees */}
-                                        {checkoutData?.merchantProduct?.fees?.map((fee) => {
-                                            const basePrice = checkoutData.merchantProduct?.price || 0;
-                                            const feeAmount = basePrice * (fee.percentage / 100);
-                                            return (
-                                                <div key={fee.fee_type_id} className="flex justify-between items-baseline">
-                                                    <div className="flex items-baseline gap-1.5">
-                                                        <span className="text-gray-400">{fee.name}</span>
-                                                        <span className="text-xs text-gray-500">({fee.percentage}%)</span>
-                                                    </div>
-                                                    <div className="flex items-baseline gap-2">
-                                                        <span className="text-gray-400">{formatNumber(feeAmount)}</span>
-                                                        <span className="text-gray-500">{checkoutData?.paymentLink?.currency_code}</span>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-
-                                        {/* Promo Code */}
-                                        <div className="relative flex justify-start pt-3">
-                                            {!isPromoCodeOpen ? (
-                                                <button
-                                                    onClick={() => {
-                                                        setIsPromoCodeOpen(true)
-                                                        setTimeout(() => promoInputRef.current?.focus(), 0)
-                                                    }}
-                                                    className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
-                                                >
-                                                    Add promotion code
-                                                </button>
-                                            ) : (
-                                                <motion.div
-                                                    className="w-full"
-                                                    initial={{ width: "auto" }}
-                                                    animate={{ width: "100%" }}
-                                                    transition={{ duration: 0.3 }}
-                                                >
-                                                    <div className="relative h-[42px]">
-                                                        <Input
-                                                            ref={promoInputRef}
-                                                            value={promoCode}
-                                                            onChange={(e) => setPromoCode(e.target.value)}
-                                                            onBlur={handlePromoCodeBlur}
-                                                            placeholder="Enter promotion code"
-                                                            className="w-full h-full bg-[#1A1D23] border-gray-800 text-white placeholder:text-gray-500 rounded-md px-4"
-                                                            onKeyDown={(e) => {
-                                                                if (e.key === 'Enter') {
-                                                                    handlePromoCodeSubmit()
-                                                                }
-                                                            }}
-                                                        />
-                                                        {promoCode && (
-                                                            <button
-                                                                onClick={handlePromoCodeSubmit}
-                                                                className="absolute right-0 top-0 h-full px-4 text-red-500 hover:text-red-400 transition-colors bg-transparent"
-                                                            >
-                                                                Apply
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </div>
-
-                                        {/* Total */}
-                                        <div className="flex justify-between items-baseline pt-3 border-t border-gray-800">
-                                            <span className="text-white font-medium">Total due today</span>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-lg font-medium">
-                                                    {(() => {
-                                                        if (!checkoutData) return formatNumber(0);
-                                                        const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
-                                                        const fees = checkoutData.merchantProduct?.fees || [];
-                                                        const feeAmount = fees.reduce((total, fee) => {
-                                                            return total + (basePrice * (fee.percentage / 100));
-                                                        }, 0);
-                                                        return formatNumber(basePrice + feeAmount);
-                                                    })()}
-                                                </span>
-                                                <span className="text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            {/* Right side - Checkout form */}
-            <div className="w-full lg:w-1/2 bg-white p-4 lg:p-8">
-                <div className="max-w-[448px] lg:pl-8 w-full mx-auto px-4">
-                    {/* Mobile Money Options */}
-                    <div className="flex overflow-x-auto pb-4 space-x-4">
-                        {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
-                            provider !== 'ECOBANK' && (
-                                <div
-                                    key={provider}
-                                    onClick={() => handleProviderClick(provider)}
-                                    className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 ${selectedProvider === provider
-                                        ? 'bg-gray-50/80'
-                                        : 'hover:bg-gray-50/50'
-                                        }`}
-                                    style={{ width: '100px', height: '100px', padding: '0' }}
-                                >
-                                    <img
-                                        src={`/payment_channels/${provider.toLowerCase()}.webp`}
-                                        alt={provider}
-                                        className="w-full h-full object-contain rounded-lg"
-                                    />
-                                </div>
-                            )
-                        ))}
-                    </div>
-
-                    <Dialog open={isCheckoutModalOpen} onOpenChange={setIsCheckoutModalOpen}>
-                        <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                                <DialogTitle>Secure Checkout</DialogTitle>
-                                <DialogDescription>
-                                    Complete your payment securely with {selectedProvider || 'selected provider'}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between py-4">
-                                    <div className="flex items-center space-x-4">
-                                        {selectedProvider && (
-                                            <img
-                                                src={`/payment_channels/${selectedProvider.toLowerCase()}.webp`}
-                                                alt={selectedProvider}
-                                                className="w-12 h-12 object-contain"
+                                                className="rounded-md absolute inset-0 w-full h-full object-cover"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.1 }}
                                             />
                                         )}
-                                        <div>
-                                            <p className="font-medium">Amount</p>
-                                            <p className="text-2xl font-bold">
-                                                {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)} {checkoutData?.paymentLink?.currency_code}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Button
-                                    onClick={handleCheckoutSubmit}
-                                    className="w-full rounded-md"
-                                    disabled={isProcessing}
-                                >
-                                    {isProcessing ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        `Pay with ${selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange Money' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}`
-                                    )}
-                                </Button>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-
-                    <div className="relative flex items-center mb-4">
-                        <div className="flex-grow border-t border-gray-300"></div>
-                        <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
-                        <div className="flex-grow border-t border-gray-300"></div>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-3">
-                        {/* Cardholder Information */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Cardholder information</label>
-                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                <Input
-                                    name="fullName"
-                                    value={`${customerDetails.firstName} ${customerDetails.lastName}`.trim()}
-                                    onChange={(e) => {
-                                        const fullName = e.target.value;
-                                        const [firstName = '', lastName = ''] = fullName.split(' ');
-                                        setCustomerDetails(prev => ({
-                                            ...prev,
-                                            firstName,
-                                            lastName
-                                        }));
-                                    }}
-                                    placeholder="Full name on card"
-                                    className="rounded-b-none w-full bg-white text-gray-900 border-gray-300"
-                                    required
-                                />
-                                <div className="flex -mt-px">
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        name="email"
-                                        value={customerDetails.email}
-                                        onChange={handleCustomerInputChange}
-                                        placeholder="Email address"
-                                        className="rounded-none rounded-b-lg w-full bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Card Information */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Card information</label>
-                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                <Input
-                                    id="number"
-                                    name="number"
-                                    value={cardDetails.number}
-                                    onChange={handleInputChange}
-                                    placeholder="1234 1234 1234 1234"
-                                    className="rounded-b-none bg-white text-gray-900 border-gray-300"
-                                    required
-                                />
-                                <div className="flex -mt-px">
-                                    <Input
-                                        id="expiry"
-                                        name="expiry"
-                                        value={cardDetails.expiry}
-                                        onChange={handleInputChange}
-                                        placeholder="MM / YY"
-                                        className="rounded-none rounded-bl-lg w-1/2 bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                    <Input
-                                        id="cvc"
-                                        name="cvc"
-                                        value={cardDetails.cvc}
-                                        onChange={handleInputChange}
-                                        placeholder="CVC"
-                                        className="rounded-none rounded-br-lg w-1/2 bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Billing Address */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">Billing address</label>
-                            <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                <div className="relative">
-                                    <select
-                                        name="country"
-                                        value={customerDetails.country}
-                                        onChange={handleCustomerInputChange}
-                                        className="flex h-10 w-full border border-gray-300 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none bg-white text-gray-900"
-                                        required
-                                    >
-                                        <option value="" className="text-gray-400">Select country</option>
-                                        {countries.map((country) => (
-                                            <option key={country} value={country}>
-                                                {country}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                                </div>
-                                <div className="flex -mt-px">
-                                    <Input
-                                        name="city"
-                                        value={customerDetails.city}
-                                        onChange={handleCustomerInputChange}
-                                        placeholder="City"
-                                        className="rounded-none w-full border-x bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                </div>
-                                <div className="flex -mt-px">
-                                    <Input
-                                        name="address"
-                                        value={customerDetails.address}
-                                        onChange={handleCustomerInputChange}
-                                        placeholder="Address"
-                                        className="rounded-none rounded-bl-lg w-[70%] bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                    <Input
-                                        name="postalCode"
-                                        value={customerDetails.postalCode}
-                                        onChange={handleCustomerInputChange}
-                                        placeholder="Postal code"
-                                        className="rounded-none rounded-br-lg w-[30%] bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Phone Numbers - Show both for subscription plans */}
-                        {checkoutData?.subscriptionPlan ? (
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Contact information</label>
-                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                    <div className="rounded-t-lg">
-                                        <PhoneNumberInput
-                                            value={customerDetails.phoneNumber}
-                                            onChange={(value) => {
-                                                setCustomerDetails(prev => ({
-                                                    ...prev,
-                                                    phoneNumber: value || '',
-                                                    whatsappNumber: isDifferentWhatsApp ? prev.whatsappNumber : value || ''
-                                                }));
-                                            }}
-                                        />
-                                    </div>
-                                    <AnimatePresence mode="wait">
-                                        {!isDifferentWhatsApp ? (
+                                        {isHovered && (
                                             <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="border-t border-gray-200 mt-2"
+                                                key="text"
+                                                className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.1 }}
                                             >
-                                                <div
-                                                    onClick={() => setIsDifferentWhatsApp(true)}
-                                                    className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
-                                                >
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
-                                                        My WhatsApp number is different
-                                                    </span>
-                                                </div>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="border-t border-gray-200 mt-2"
-                                            >
-                                                <WhatsAppNumberInput
-                                                    value={customerDetails.whatsappNumber}
-                                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
-                                                />
+                                                Back
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
                                 </div>
                             </div>
-                        ) : null}
+                        </div>
+                        <div className="pl-[28px]">
+                            <div className="mb-12">
+                                {!checkoutData?.merchantProduct && !checkoutData?.subscriptionPlan && (
+                                    <>
+                                        <h2 className="text-xl text-gray-300 mb-4">Complete your payment</h2>
+                                        <div className="flex items-baseline gap-2 mb-4">
+                                            <span className="text-4xl font-bold">{formatNumber(checkoutData?.paymentLink?.price || 0)}</span>
+                                            <span className="text-4xl">{checkoutData?.paymentLink?.currency_code}</span>
+                                        </div>
+                                        {organization.logoUrl && (
+                                            <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                                <img
+                                                    src={organization.logoUrl}
+                                                    alt="Organization Logo"
+                                                    className="w-12 h-12 rounded-md"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className="text-white font-medium">{checkoutData?.paymentLink?.title}</div>
+                                                    <div className="text-sm text-gray-400">{checkoutData?.paymentLink?.public_description}</div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                                {checkoutData?.subscriptionPlan && (
+                                    <>
+                                        <h2 className="text-xl text-gray-300 mb-4">Subscribe to {checkoutData.subscriptionPlan.name}</h2>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <div className="flex items-center">
+                                                <span className="text-4xl font-bold">{formatNumber(checkoutData.subscriptionPlan.amount)}</span>
+                                                <span className="text-4xl ml-2">{checkoutData.subscriptionPlan.currency_code}</span>
+                                            </div>
+                                            <div className="text-gray-400 text-lg ml-2 h-[2.2rem] flex flex-col justify-between leading-none">
+                                                <span>per</span>
+                                                <span>{checkoutData.subscriptionPlan.billingFrequency.toLowerCase()
+                                                    .replace('weekly', 'week')
+                                                    .replace('bi-weekly', 'two weeks')
+                                                    .replace('monthly', 'month')
+                                                    .replace('bi-monthly', 'two months')
+                                                    .replace('quarterly', 'quarter')
+                                                    .replace('semi-annual', 'six months')
+                                                    .replace('yearly', 'year')
+                                                    .replace('one-time', 'payment')}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                            <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                                {checkoutData.subscriptionPlan.image_url ? (
+                                                    <img
+                                                        src={checkoutData.subscriptionPlan.image_url}
+                                                        alt={checkoutData.subscriptionPlan.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ImageIcon className="h-6 w-6 text-gray-400" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-white font-medium">{checkoutData.subscriptionPlan.name}</div>
+                                                <div className="text-sm text-gray-400">{checkoutData.subscriptionPlan.description}</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                                {checkoutData?.merchantProduct && (
+                                    <>
+                                        <h2 className="text-xl text-gray-300 mb-4">Pay for {checkoutData.merchantProduct.name}</h2>
+                                        <div className="flex items-baseline gap-2 mb-4">
+                                            <span className="text-4xl font-bold">{formatNumber(checkoutData.merchantProduct.price)}</span>
+                                            <span className="text-4xl">{checkoutData.merchantProduct.currency_code}</span>
+                                        </div>
+                                        <div className="flex items-start gap-3 border-t border-gray-800 pt-4">
+                                            <div className="w-12 h-12 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                                {checkoutData.merchantProduct.image_url ? (
+                                                    <img
+                                                        src={checkoutData.merchantProduct.image_url}
+                                                        alt={checkoutData.merchantProduct.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ImageIcon className="h-6 w-6 text-gray-400" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-white font-medium">{checkoutData.merchantProduct.name}</div>
+                                                <div className="text-sm text-gray-400">{checkoutData.merchantProduct.description}</div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
 
-                        {/* Submit Button */}
-                        <div className="flex justify-center pt-2">
-                            <Button
-                                type="submit"
-                                className="w-full h-12 bg-[#074367] text-white font-semibold rounded-md hover:bg-[#063352] transition duration-300 shadow-md text-lg"
-                                disabled={!isPaymentFormValid()}
-                            >
-                                {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
-                            </Button>
+                            <div className="pl-[60px] space-y-4">
+                                <div className="border-t border-gray-800 pt-4">
+                                    <div className="flex justify-between items-baseline">
+                                        <span className="text-gray-400">Subtotal</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                            <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Fees Section */}
+                                    {checkoutData?.merchantProduct?.fees?.map((fee) => {
+                                        const basePrice = checkoutData.merchantProduct?.price || 0;
+                                        const feeAmount = basePrice * (fee.percentage / 100);
+                                        return (
+                                            <div key={fee.fee_type_id} className="flex justify-between items-baseline pt-2">
+                                                <div className="flex items-baseline gap-1.5">
+                                                    <span className="text-gray-400">{fee.name}</span>
+                                                    <span className="text-xs text-gray-500">({fee.percentage}%)</span>
+                                                </div>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-gray-400">{formatNumber(feeAmount)}</span>
+                                                    <span className="text-gray-500">{checkoutData.paymentLink.currency_code}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="relative flex justify-start">
+                                    {!isPromoCodeOpen ? (
+                                        <button
+                                            onClick={() => {
+                                                setIsPromoCodeOpen(true)
+                                                setTimeout(() => promoInputRef.current?.focus(), 0)
+                                            }}
+                                            className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
+                                        >
+                                            Add promotion code
+                                        </button>
+                                    ) : (
+                                        <motion.div
+                                            className="w-full"
+                                            initial={{ width: "auto" }}
+                                            animate={{ width: "100%" }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            <div className="relative h-[42px] promo-input">
+                                                <Input
+                                                    ref={promoInputRef}
+                                                    value={promoCode}
+                                                    onChange={(e) => setPromoCode(e.target.value)}
+                                                    onBlur={handlePromoCodeBlur}
+                                                    placeholder="Enter promotion code"
+                                                    className="w-full h-full rounded-md px-4"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handlePromoCodeSubmit()
+                                                        }
+                                                    }}
+                                                />
+                                                {promoCode && (
+                                                    <button
+                                                        onClick={handlePromoCodeSubmit}
+                                                        className="absolute right-0 top-0 h-full px-4 text-gray-700 hover:text-gray-900 transition-colors bg-transparent"
+                                                    >
+                                                        Apply
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </div>
+
+                                {appliedPromoCode && (
+                                    <div className="flex items-center justify-end">
+                                        <div className="relative flex items-center bg-red-100/10 text-red-400 px-3 py-2 text-sm rounded-md">
+                                            <span className="font-medium">{appliedPromoCode}</span>
+                                            <button
+                                                onClick={() => setAppliedPromoCode(null)}
+                                                className="ml-3 text-red-400 hover:text-red-300 transition-colors"
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="border-t border-gray-800 pt-4">
+                                    <div className="flex justify-between items-baseline">
+                                        <span className="text-white font-medium">Total due today</span>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-lg font-medium">
+                                                {(() => {
+                                                    if (!checkoutData) return formatNumber(0);
+                                                    const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
+                                                    const fees = checkoutData.merchantProduct?.fees || [];
+                                                    const feeAmount = fees.reduce((total, fee) => {
+                                                        return total + (basePrice * (fee.percentage / 100));
+                                                    }, 0);
+                                                    return formatNumber(basePrice + feeAmount);
+                                                })()}
+                                            </span>
+                                            <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile View - Add top padding to account for fixed header */}
+                    <div className="lg:hidden flex flex-col items-center px-2 mt-14">
+                        {/* Product Image */}
+                        <div className="w-36 h-36 mb-5 rounded-lg overflow-hidden bg-gray-800">
+                            {(() => {
+                                if (checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) {
+                                    return (
+                                        <img
+                                            src={checkoutData.merchantProduct?.image_url || checkoutData.subscriptionPlan?.image_url || ''}
+                                            alt="Product"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    );
+                                }
+
+                                if (organization.logoUrl) {
+                                    return (
+                                        <img
+                                            src={organization.logoUrl}
+                                            alt="Organization Logo"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    );
+                                }
+
+                                return (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <ImageIcon className="h-12 w-12 text-gray-600" />
+                                    </div>
+                                );
+                            })()}
                         </div>
 
-                        {/* Subscription Confirmation Text */}
-                        {checkoutData?.subscriptionPlan && (
-                            <div className="w-full text-sm text-center text-gray-600 mt-4 mb-2">
-                                <p>
-                                    By confirming your subscription, you authorize {checkoutData.paymentLink?.organizationName || 'the merchant'} to charge you for future payments in accordance with their terms. You can always cancel your subscription.
-                                </p>
+                        {/* Product Title & Price */}
+                        <div className="text-center mb-5">
+                            <h2 className="text-base text-gray-400 mb-1.5">
+                                {checkoutData?.subscriptionPlan ? 'Subscribe to ' : 'Pay for '}
+                                {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
+                            </h2>
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="text-3xl font-bold">
+                                    {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}
+                                </span>
+                                <span className="text-3xl">{checkoutData?.paymentLink?.currency_code}</span>
                             </div>
-                        )}
-                    </form>
+                        </div>
 
-                    <div className="mt-6 select-none">
-                        <div className="border-t border-gray-200 pt-4"></div>
-                        <div className="flex items-center justify-center gap-3 text-xs text-gray-400 mt-2">
-                            <span className="inline-flex items-center">
-                                <ShieldIcon className="w-4 h-4 mr-1" />
-                                Powered by{' '}
-                                <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer" className="text-gray-400 font-bold flex items-baseline ml-1">
-                                    <span className="text-sm">lomi</span>
-                                    <div className="w-[2px] h-[2px] bg-current ml-[1px] mb-[1px]"></div>
-                                </a>
-                            </span>
-                            <div className="text-gray-300 h-4 w-[1px] bg-gray-300"></div>
-                            <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Terms</a>
-                            <span className="text-gray-300">|</span>
-                            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Privacy</a>
+                        {/* Add Code Button */}
+                        <button
+                            onClick={() => {
+                                setIsDetailsOpen(true);
+                                setIsPromoCodeOpen(true);
+                                setTimeout(() => promoInputRef.current?.focus(), 100);
+                            }}
+                            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md text-sm mb-8"
+                        >
+                            Add code
+                            <ChevronDown className="h-4 w-4 opacity-70" />
+                        </button>
+                    </div>
+
+                    {/* Mobile Details Dropdown */}
+                    <AnimatePresence>
+                        {isDetailsOpen && (
+                            <>
+                                {/* Backdrop */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onClick={() => setIsDetailsOpen(false)}
+                                    className="lg:hidden fixed inset-0 bg-black/20 z-30"
+                                />
+                                {/* Content */}
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="lg:hidden fixed top-14 left-0 right-0 z-40 bg-[#121317] overflow-hidden"
+                                >
+                                    <div className="p-4 space-y-4">
+                                        {/* Product Info */}
+                                        <div className="flex items-start gap-3 border-b border-gray-800 pb-4">
+                                            <div className="w-16 h-16 rounded-md bg-gray-800 flex-shrink-0 overflow-hidden">
+                                                {((checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || '') ? (
+                                                    <img
+                                                        src={(checkoutData?.merchantProduct?.image_url || checkoutData?.subscriptionPlan?.image_url) || ''}
+                                                        alt="Product"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ImageIcon className="h-6 w-6 text-gray-600" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="text-white font-medium">
+                                                    {checkoutData?.merchantProduct?.name || checkoutData?.subscriptionPlan?.name || checkoutData?.paymentLink?.title}
+                                                </div>
+                                                <div className="text-sm text-gray-400">
+                                                    {checkoutData?.merchantProduct?.description || checkoutData?.subscriptionPlan?.description || checkoutData?.paymentLink?.public_description}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Price Breakdown */}
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-baseline">
+                                                <span className="text-gray-400">Subtotal</span>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg">{formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)}</span>
+                                                    <span className="text-lg text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Fees */}
+                                            {checkoutData?.merchantProduct?.fees?.map((fee) => {
+                                                const basePrice = checkoutData.merchantProduct?.price || 0;
+                                                const feeAmount = basePrice * (fee.percentage / 100);
+                                                return (
+                                                    <div key={fee.fee_type_id} className="flex justify-between items-baseline">
+                                                        <div className="flex items-baseline gap-1.5">
+                                                            <span className="text-gray-400">{fee.name}</span>
+                                                            <span className="text-xs text-gray-500">({fee.percentage}%)</span>
+                                                        </div>
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="text-gray-400">{formatNumber(feeAmount)}</span>
+                                                            <span className="text-gray-500">{checkoutData?.paymentLink?.currency_code}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+
+                                            {/* Promo Code */}
+                                            <div className="relative flex justify-start pt-3">
+                                                {!isPromoCodeOpen ? (
+                                                    <button
+                                                        onClick={() => {
+                                                            setIsPromoCodeOpen(true)
+                                                            setTimeout(() => promoInputRef.current?.focus(), 0)
+                                                        }}
+                                                        className="inline-flex px-4 h-[42px] items-center bg-[#1A1D23] text-gray-300 hover:bg-[#22262F] transition-all duration-300 rounded-md"
+                                                    >
+                                                        Add promotion code
+                                                    </button>
+                                                ) : (
+                                                    <motion.div
+                                                        className="w-full"
+                                                        initial={{ width: "auto" }}
+                                                        animate={{ width: "100%" }}
+                                                        transition={{ duration: 0.3 }}
+                                                    >
+                                                        <div className="relative h-[42px] promo-input">
+                                                            <Input
+                                                                ref={promoInputRef}
+                                                                value={promoCode}
+                                                                onChange={(e) => setPromoCode(e.target.value)}
+                                                                onBlur={handlePromoCodeBlur}
+                                                                placeholder="Enter promotion code"
+                                                                className="w-full h-full rounded-md px-4"
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        handlePromoCodeSubmit()
+                                                                    }
+                                                                }}
+                                                            />
+                                                            {promoCode && (
+                                                                <button
+                                                                    onClick={handlePromoCodeSubmit}
+                                                                    className="absolute right-0 top-0 h-full px-4 text-gray-700 hover:text-gray-900 transition-colors bg-transparent"
+                                                                >
+                                                                    Apply
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </div>
+
+                                            {/* Total */}
+                                            <div className="flex justify-between items-baseline pt-3 border-t border-gray-800">
+                                                <span className="text-white font-medium">Total due today</span>
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg font-medium">
+                                                        {(() => {
+                                                            if (!checkoutData) return formatNumber(0);
+                                                            const basePrice = checkoutData.merchantProduct?.price || checkoutData.subscriptionPlan?.amount || checkoutData.paymentLink?.price || 0;
+                                                            const fees = checkoutData.merchantProduct?.fees || [];
+                                                            const feeAmount = fees.reduce((total, fee) => {
+                                                                return total + (basePrice * (fee.percentage / 100));
+                                                            }, 0);
+                                                            return formatNumber(basePrice + feeAmount);
+                                                        })()}
+                                                    </span>
+                                                    <span className="text-gray-400">{checkoutData?.paymentLink?.currency_code}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Right side - Checkout form */}
+                <div className="w-full lg:w-1/2 bg-white p-4 lg:p-8">
+                    <div className="max-w-[448px] lg:pl-8 w-full mx-auto px-4">
+                        {/* Mobile Money Options */}
+                        <div className="flex overflow-x-auto pb-4 space-x-4">
+                            {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
+                                provider !== 'ECOBANK' && (
+                                    <div
+                                        key={provider}
+                                        onClick={() => {
+                                            if (!areRequiredFieldsFilled()) {
+                                                toast({
+                                                    variant: "destructive",
+                                                    title: "Required Information",
+                                                    description: "Please fill in your full name and email first."
+                                                });
+
+                                                // Focus on the name input
+                                                if (nameInputRef.current) {
+                                                    nameInputRef.current.focus();
+                                                }
+                                            } else {
+                                                handleProviderClick(provider);
+                                            }
+                                        }}
+                                        className={`flex-shrink-0 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200 ${!areRequiredFieldsFilled()
+                                            ? 'opacity-50'
+                                            : selectedProvider === provider
+                                                ? 'bg-gray-50/80'
+                                                : 'hover:bg-gray-50/50'
+                                            }`}
+                                        style={{ width: '100px', height: '100px', padding: '0' }}
+                                    >
+                                        <img
+                                            src={`/payment_channels/${provider.toLowerCase()}.webp`}
+                                            alt={provider}
+                                            className={`w-full h-full object-contain rounded-lg ${!areRequiredFieldsFilled() ? 'grayscale' : ''}`}
+                                        />
+                                    </div>
+                                )
+                            ))}
+                        </div>
+
+                        <Dialog open={isCheckoutModalOpen} onOpenChange={setIsCheckoutModalOpen}>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Secure Checkout</DialogTitle>
+                                    <DialogDescription>
+                                        Complete your payment securely with {selectedProvider || 'selected provider'}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between py-4">
+                                        <div className="flex items-center space-x-4">
+                                            {selectedProvider && (
+                                                <img
+                                                    src={`/payment_channels/${selectedProvider.toLowerCase()}.webp`}
+                                                    alt={selectedProvider}
+                                                    className="w-12 h-12 object-contain"
+                                                />
+                                            )}
+                                            <div>
+                                                <p className="font-medium">Amount</p>
+                                                <p className="text-2xl font-bold">
+                                                    {formatNumber(checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0)} {checkoutData?.paymentLink?.currency_code}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={handleCheckoutSubmit}
+                                        className="w-full rounded-md"
+                                        disabled={isProcessing || !areRequiredFieldsFilled()}
+                                    >
+                                        {isProcessing ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            `Pay with ${selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange Money' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}`
+                                        )}
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+
+                        <div className="relative flex items-center mb-4">
+                            <div className="flex-grow border-t border-gray-300"></div>
+                            <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
+                            <div className="flex-grow border-t border-gray-300"></div>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-3">
+                            {/* Cardholder Information */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Cardholder information</label>
+                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                    <Input
+                                        ref={nameInputRef}
+                                        name="fullName"
+                                        value={rawNameInput}
+                                        onChange={(e) => {
+                                            const inputValue = e.target.value;
+                                            setRawNameInput(inputValue);
+
+                                            // Now handle the firstName/lastName split
+                                            const trimmedValue = inputValue.trim();
+                                            const lastSpaceIndex = trimmedValue.lastIndexOf(' ');
+
+                                            if (lastSpaceIndex === -1) {
+                                                // No space found, all is first name
+                                                setCustomerDetails(prev => ({
+                                                    ...prev,
+                                                    firstName: trimmedValue,
+                                                    lastName: ''
+                                                }));
+                                            } else {
+                                                // Split at the last space
+                                                const firstName = trimmedValue.substring(0, lastSpaceIndex);
+                                                const lastName = trimmedValue.substring(lastSpaceIndex + 1);
+                                                setCustomerDetails(prev => ({
+                                                    ...prev,
+                                                    firstName,
+                                                    lastName
+                                                }));
+                                            }
+                                        }}
+                                        placeholder="Full name on card"
+                                        className="rounded-b-none w-full bg-white text-gray-900 border-gray-300 focus:bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300 dark:focus:bg-white dark:placeholder:text-gray-500 input-checkout"
+                                        required
+                                    />
+                                    <div className="flex -mt-px">
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            name="email"
+                                            value={customerDetails.email}
+                                            onChange={handleCustomerInputChange}
+                                            placeholder="Email address"
+                                            className="rounded-none rounded-b-lg w-full bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Card Information */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Card information</label>
+                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                    <Input
+                                        id="number"
+                                        name="number"
+                                        value={cardDetails.number}
+                                        onChange={handleInputChange}
+                                        placeholder="1234 1234 1234 1234"
+                                        className="rounded-b-none bg-white text-gray-900 border-gray-300"
+                                        required
+                                    />
+                                    <div className="flex -mt-px">
+                                        <Input
+                                            id="expiry"
+                                            name="expiry"
+                                            value={cardDetails.expiry}
+                                            onChange={handleInputChange}
+                                            placeholder="MM / YY"
+                                            className="rounded-none rounded-bl-lg w-1/2 bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                        <Input
+                                            id="cvc"
+                                            name="cvc"
+                                            value={cardDetails.cvc}
+                                            onChange={handleInputChange}
+                                            placeholder="CVC"
+                                            className="rounded-none rounded-br-lg w-1/2 bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Billing Address */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Billing address</label>
+                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                    <div className="relative">
+                                        <select
+                                            name="country"
+                                            value={customerDetails.country}
+                                            onChange={handleCustomerInputChange}
+                                            className="flex h-10 w-full border border-gray-300 bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 rounded-b-none appearance-none bg-white text-gray-900"
+                                            required
+                                        >
+                                            <option value="" className="text-gray-400">Select country</option>
+                                            {countries.map((country) => (
+                                                <option key={country} value={country}>
+                                                    {country}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                                    </div>
+                                    <div className="flex -mt-px">
+                                        <Input
+                                            name="city"
+                                            value={customerDetails.city}
+                                            onChange={handleCustomerInputChange}
+                                            placeholder="City"
+                                            className="rounded-none w-full border-x bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="flex -mt-px">
+                                        <Input
+                                            name="address"
+                                            value={customerDetails.address}
+                                            onChange={handleCustomerInputChange}
+                                            placeholder="Address"
+                                            className="rounded-none rounded-bl-lg w-[70%] bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                        <Input
+                                            name="postalCode"
+                                            value={customerDetails.postalCode}
+                                            onChange={handleCustomerInputChange}
+                                            placeholder="Postal code"
+                                            className="rounded-none rounded-br-lg w-[30%] bg-white text-gray-900 border-gray-300"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Phone Numbers - Show both for subscription plans */}
+                            {checkoutData?.subscriptionPlan ? (
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">Contact information</label>
+                                    <div className="rounded-lg shadow-sm shadow-black/[.04]">
+                                        <div className="rounded-t-lg">
+                                            <PhoneNumberInput
+                                                value={customerDetails.phoneNumber}
+                                                onChange={(value) => {
+                                                    setCustomerDetails(prev => ({
+                                                        ...prev,
+                                                        phoneNumber: value || '',
+                                                        whatsappNumber: isDifferentWhatsApp ? prev.whatsappNumber : value || ''
+                                                    }));
+                                                }}
+                                            />
+                                        </div>
+                                        <AnimatePresence mode="wait">
+                                            {!isDifferentWhatsApp ? (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="border-t border-gray-200 mt-2"
+                                                >
+                                                    <div
+                                                        onClick={() => setIsDifferentWhatsApp(true)}
+                                                        className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
+                                                    >
+                                                        <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
+                                                            My WhatsApp number is different
+                                                        </span>
+                                                    </div>
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="border-t border-gray-200 mt-2"
+                                                >
+                                                    <WhatsAppNumberInput
+                                                        value={customerDetails.whatsappNumber}
+                                                        onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            {/* Submit Button */}
+                            <div className="flex justify-center pt-2">
+                                <Button
+                                    type="submit"
+                                    className="w-full h-12 bg-[#074367] text-white font-semibold rounded-md hover:bg-[#063352] transition duration-300 shadow-md text-lg"
+                                    disabled={!isPaymentFormValid()}
+                                >
+                                    {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
+                                </Button>
+                            </div>
+
+                            {/* Subscription Confirmation Text */}
+                            {checkoutData?.subscriptionPlan && (
+                                <div className="w-full text-sm text-center text-gray-600 mt-4 mb-2">
+                                    <p>
+                                        By confirming your subscription, you authorize {checkoutData.paymentLink?.organizationName || 'the merchant'} to charge you for future payments in accordance with their terms. You can always cancel your subscription.
+                                    </p>
+                                </div>
+                            )}
+                        </form>
+
+                        <div className="mt-6 select-none">
+                            <div className="border-t border-gray-200 pt-4"></div>
+                            <div className="flex items-center justify-center gap-3 text-xs text-gray-400 mt-2">
+                                <span className="inline-flex items-center">
+                                    <ShieldIcon className="w-4 h-4 mr-1" />
+                                    Powered by{' '}
+                                    <a href="https://lomi.africa" target="_blank" rel="noopener noreferrer" className="text-gray-400 font-bold flex items-baseline ml-1">
+                                        <span className="text-sm">lomi</span>
+                                        <div className="w-[2px] h-[2px] bg-current ml-[1px] mb-[1px]"></div>
+                                    </a>
+                                </span>
+                                <div className="text-gray-300 h-4 w-[1px] bg-gray-300"></div>
+                                <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Terms</a>
+                                <span className="text-gray-300">|</span>
+                                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Privacy</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
