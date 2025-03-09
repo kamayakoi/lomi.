@@ -84,6 +84,7 @@ const AppRouter = () => {
             <Route path="/product/:linkId" element={<CheckoutPage />} />
             <Route path="/plan/:linkId" element={<CheckoutPage />} />
             <Route path="/instant/:linkId" element={<CheckoutPage />} />
+            <Route path="/checkout/:sessionId" element={<CheckoutPage />} />
             <Route path="*" element={
                 <SessionCheck>
                     <Routes>

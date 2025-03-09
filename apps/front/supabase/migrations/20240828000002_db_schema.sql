@@ -107,6 +107,7 @@ CREATE TYPE permission_category AS ENUM ('payments', 'accounts', 'products', 'su
 CREATE TYPE permission_action AS ENUM ('view', 'create', 'edit', 'delete', 'approve');
 CREATE TYPE reconciliation_status AS ENUM ('pending', 'matched', 'partial_match', 'mismatch', 'resolved');
 CREATE TYPE conversion_type AS ENUM ('payment', 'withdrawal', 'refund', 'manual');
+CREATE TYPE checkout_session_status AS ENUM ('open', 'completed', 'expired');
 
 --------------- TABLES ---------------
 
@@ -1029,6 +1030,40 @@ CREATE INDEX idx_payment_links_merchant_id ON payment_links(merchant_id);
 CREATE INDEX idx_payment_links_organization_id ON payment_links(organization_id);
 CREATE INDEX idx_payment_links_plan_id ON payment_links(plan_id);
 CREATE INDEX idx_payment_links_product_id ON payment_links(product_id);
+
+-- Checkout Sessions table
+CREATE TABLE checkout_sessions (
+    checkout_session_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL REFERENCES organizations(organization_id),
+    merchant_id UUID NOT NULL REFERENCES merchants(merchant_id),
+    payment_link_id UUID REFERENCES payment_links(link_id),
+    customer_id UUID REFERENCES customers(customer_id),
+    amount NUMERIC(10,2) NOT NULL CHECK (amount >= 0),
+    currency_code currency_code NOT NULL REFERENCES currencies(code),
+    status checkout_session_status NOT NULL DEFAULT 'open',
+    metadata JSONB,
+    product_id UUID REFERENCES merchant_products(product_id),
+    subscription_id UUID REFERENCES merchant_subscriptions(subscription_id),
+    plan_id UUID REFERENCES subscription_plans(plan_id),
+    success_url VARCHAR(2048),
+    cancel_url VARCHAR(2048),
+    customer_email VARCHAR(255),
+    customer_name VARCHAR(255),
+    customer_phone VARCHAR(50),
+    allowed_providers provider_code[],
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE checkout_sessions IS 'Stores secure checkout sessions with expiration for payment processing';
+
+CREATE INDEX idx_checkout_sessions_organization_id ON checkout_sessions(organization_id);
+CREATE INDEX idx_checkout_sessions_merchant_id ON checkout_sessions(merchant_id);
+CREATE INDEX idx_checkout_sessions_payment_link_id ON checkout_sessions(payment_link_id);
+CREATE INDEX idx_checkout_sessions_customer_id ON checkout_sessions(customer_id);
+CREATE INDEX idx_checkout_sessions_status ON checkout_sessions(status);
+CREATE INDEX idx_checkout_sessions_expires_at ON checkout_sessions(expires_at);
 
 -- Create a table for payment requests
 CREATE TABLE payment_requests (

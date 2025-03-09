@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useParams } from 'react-router-dom'
-import { fetchDataForCheckout, fetchOrganizationDetails, createOrUpdateCustomer } from './SupportCheckout'
+import { fetchDataForCheckout, createOrUpdateCustomer } from './SupportCheckout'
 import { CheckoutData } from './types'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
@@ -28,7 +28,8 @@ const formatNumber = (num: number | string) => {
 };
 
 export default function CheckoutPage() {
-    const { linkId } = useParams<{ linkId?: string }>()
+    const { sessionId, linkId } = useParams<{ sessionId?: string; linkId?: string }>();
+
     const [organization, setOrganization] = useState<{ organizationId: string | null; logoUrl: string | undefined }>({ organizationId: null, logoUrl: undefined })
     const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null)
     const [selectedProvider, setSelectedProvider] = useState<string | undefined>()
@@ -54,6 +55,8 @@ export default function CheckoutPage() {
     const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
     const [isDetailsOpen, setIsDetailsOpen] = useState(false)
     const [customerId, setCustomerId] = useState<string | null>(null);
+    const [sessionError, setSessionError] = useState<string | null>(null);
+    const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
 
     useEffect(() => {
         // Get user's country using their IP
@@ -79,85 +82,187 @@ export default function CheckoutPage() {
     }, []);
 
     useEffect(() => {
-        const fetchOrganization = async () => {
-            if (checkoutData?.paymentLink?.organizationId) {
-                const orgDetails = await fetchOrganizationDetails(checkoutData.paymentLink.organizationId);
-                setOrganization({ ...orgDetails, logoUrl: orgDetails.logoUrl || undefined });
+        const fetchData = async () => {
+            if (linkId) {
+                try {
+                    // Get the original payment link data
+                    const data = await fetchDataForCheckout(linkId);
+                    setCheckoutData(data);
+
+                    // Create a checkout session from this payment link
+                    const { data: sessionData, error } = await supabase.rpc(
+                        'create_checkout_session_from_payment_link',
+                        {
+                            p_payment_link_id: linkId,
+                            p_expiration_minutes: 60 // 1 hour expiration
+                        }
+                    );
+
+                    if (error) {
+                        console.error('Error creating checkout session:', error);
+                        setSessionError("We couldn't create your checkout session at this time");
+                        return;
+                    }
+
+                    console.log('Checkout session created:', sessionData);
+                    // Store the checkout session ID
+                    setCheckoutSessionId(sessionData.checkout_session_id);
+
+                    // Continue with the rest of the function - logo handling etc.
+                    if (data?.paymentLink?.organizationLogoUrl) {
+                        const logoPath = data.paymentLink.organizationLogoUrl
+                        const { data: logoData, error: logoError } = await supabase
+                            .storage
+                            .from('logos')
+                            .download(logoPath)
+
+                        if (logoError) {
+                            console.error('Error downloading logo:', logoError)
+                        } else {
+                            const logoUrl = URL.createObjectURL(logoData)
+                            setOrganization(prevOrg => ({ ...prevOrg, logoUrl }))
+
+                            // Update favicons
+                            let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+                            let appleTouchIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
+
+                            // Create favicon link if it doesn't exist
+                            if (!favicon) {
+                                favicon = document.createElement('link');
+                                favicon.rel = 'icon';
+                                document.head.appendChild(favicon);
+                            }
+
+                            // Create apple touch icon link if it doesn't exist
+                            if (!appleTouchIcon) {
+                                appleTouchIcon = document.createElement('link');
+                                appleTouchIcon.rel = 'apple-touch-icon';
+                                document.head.appendChild(appleTouchIcon);
+                            }
+
+                            // Remove any existing lomi favicon
+                            const existingFavicons = document.querySelectorAll("link[rel*='icon']");
+                            existingFavicons.forEach(icon => icon.remove());
+
+                            // Set new favicon
+                            favicon = document.createElement('link');
+                            favicon.rel = 'icon';
+                            favicon.href = logoUrl;
+                            document.head.appendChild(favicon);
+
+                            // Set new apple touch icon
+                            appleTouchIcon = document.createElement('link');
+                            appleTouchIcon.rel = 'apple-touch-icon';
+                            appleTouchIcon.href = logoUrl;
+                            document.head.appendChild(appleTouchIcon);
+                        }
+                    }
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                    console.error('Error fetching checkout data:', errorMessage);
+                    toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to load payment information"
+                    });
+                }
+            } else if (sessionId) {
+                // Handle direct checkout session access
+                try {
+                    const { data, error } = await supabase.rpc(
+                        'get_checkout_session',
+                        { p_checkout_session_id: sessionId }
+                    );
+
+                    if (error) throw error;
+
+                    if (!data) {
+                        toast({
+                            variant: "destructive",
+                            title: "Not Found",
+                            description: "Checkout session not found"
+                        });
+                        return;
+                    }
+
+                    if (data.status === 'expired' || data.is_expired) {
+                        setSessionError("This checkout session has expired");
+                        return;
+                    }
+
+                    // Store the checkout session ID
+                    setCheckoutSessionId(sessionId);
+
+                    console.log('Retrieved checkout session:', data);
+                    // Would need to convert session data to CheckoutData format
+                    // to maintain compatibility with existing UI
+
+                    // For now, just show the organization logo if available
+                    if (data.organization_logo) {
+                        setOrganization({
+                            organizationId: data.organization_id,
+                            logoUrl: data.organization_logo
+                        });
+                    }
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                    console.error('Error loading checkout session:', errorMessage);
+                    toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to load checkout session"
+                    });
+                }
             }
         };
 
-        const fetchData = async () => {
-            if (linkId) {
-                const data = await fetchDataForCheckout(linkId);
-                setCheckoutData(data);
-
-                if (data?.paymentLink?.organizationLogoUrl) {
-                    const logoPath = data.paymentLink.organizationLogoUrl
-                    const { data: logoData, error: logoError } = await supabase
-                        .storage
-                        .from('logos')
-                        .download(logoPath)
-
-                    if (logoError) {
-                        console.error('Error downloading logo:', logoError)
-                    } else {
-                        const logoUrl = URL.createObjectURL(logoData)
-                        setOrganization(prevOrg => ({ ...prevOrg, logoUrl }))
-
-                        // Update favicons
-                        let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-                        let appleTouchIcon = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
-
-                        // Create favicon link if it doesn't exist
-                        if (!favicon) {
-                            favicon = document.createElement('link');
-                            favicon.rel = 'icon';
-                            document.head.appendChild(favicon);
-                        }
-
-                        // Create apple touch icon link if it doesn't exist
-                        if (!appleTouchIcon) {
-                            appleTouchIcon = document.createElement('link');
-                            appleTouchIcon.rel = 'apple-touch-icon';
-                            document.head.appendChild(appleTouchIcon);
-                        }
-
-                        // Remove any existing lomi favicon
-                        const existingFavicons = document.querySelectorAll("link[rel*='icon']");
-                        existingFavicons.forEach(icon => icon.remove());
-
-                        // Set new favicon
-                        favicon = document.createElement('link');
-                        favicon.rel = 'icon';
-                        favicon.href = logoUrl;
-                        document.head.appendChild(favicon);
-
-                        // Set new apple touch icon
-                        appleTouchIcon = document.createElement('link');
-                        appleTouchIcon.rel = 'apple-touch-icon';
-                        appleTouchIcon.href = logoUrl;
-                        document.head.appendChild(appleTouchIcon);
-                    }
-                }
-            }
-        }
-
         fetchData();
-        fetchOrganization();
-    }, [linkId, checkoutData?.paymentLink?.organizationId]);
+    }, [linkId, sessionId]);
 
+    // Add a new effect to periodically check the checkout session status
     useEffect(() => {
-        if (checkoutData?.paymentLink?.organizationName) {
-            // Update page title
-            document.title = `${checkoutData.paymentLink.organizationName} | Checkout`;
+        let intervalId: number | undefined;
 
-            // Update meta description
-            const metaDescription = document.querySelector("meta[name='description']") as HTMLMetaElement;
-            if (metaDescription) {
-                metaDescription.content = `Secure checkout page for ${checkoutData.paymentLink.organizationName}`;
+        const checkSessionStatus = async () => {
+            if (!checkoutSessionId) return;
+
+            try {
+                const { data, error } = await supabase.rpc(
+                    'get_checkout_session',
+                    { p_checkout_session_id: checkoutSessionId }
+                );
+
+                if (error) {
+                    console.error('Error checking session status:', error);
+                    return;
+                }
+
+                if (!data) {
+                    setSessionError("Checkout session not found");
+                    return;
+                }
+
+                if (data.status === 'expired' || data.is_expired) {
+                    setSessionError("This checkout session has expired");
+                    clearInterval(intervalId);
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking session status:', error);
             }
+        };
+
+        if (checkoutSessionId) {
+            // Check status every 30 seconds
+            intervalId = window.setInterval(checkSessionStatus, 30000);
         }
-    }, [checkoutData?.paymentLink?.organizationName]);
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [checkoutSessionId]);
 
     const handleProviderClick = async (provider: string) => {
         setSelectedProvider(provider)
@@ -201,8 +306,9 @@ export default function CheckoutPage() {
 
                 // Redirect to Wave payment page
                 window.location.href = checkoutUrl;
-            } catch (error) {
-                console.error('Error creating Wave checkout session:', error);
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                console.error('Error creating Wave checkout session:', errorMessage);
                 toast({
                     variant: "destructive",
                     title: "Payment Error",
@@ -275,8 +381,9 @@ export default function CheckoutPage() {
                 }
 
                 setCustomerId(newCustomerId);
-            } catch (error) {
-                console.error('Error creating/updating customer:', error);
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                console.error('Error creating/updating customer:', errorMessage);
             }
         }
     };
@@ -310,6 +417,51 @@ export default function CheckoutPage() {
         await new Promise(resolve => setTimeout(resolve, 2000))
         setIsProcessing(false)
         // Handle success/error
+    }
+
+    // Render the error state when session creation fails
+    if (sessionError) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background dark:bg-[#121317] p-4">
+                <div className="max-w-xs w-full rounded-[5px] border border-border dark:border-zinc-800 bg-card text-card-foreground dark:bg-[#1A1D23] shadow-sm p-5 flex flex-col items-center">
+                    {organization.logoUrl ? (
+                        <img
+                            src={organization.logoUrl}
+                            alt="Organization Logo"
+                            className="w-14 h-14 object-contain mb-3"
+                        />
+                    ) : (
+                        <div className="w-12 h-12 bg-amber-500/10 dark:bg-amber-900/20 rounded-full flex items-center justify-center mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 dark:text-amber-500">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                        </div>
+                    )}
+
+                    <h1 className="text-lg font-semibold mb-2 text-foreground dark:text-white">Payment unavailable</h1>
+                    <p className="text-muted-foreground dark:text-gray-400 text-center text-sm mb-5">
+                        We&apos;re unable to process your payment at this time. The payment link may have expired or is temporarily unavailable.
+                    </p>
+
+                    <div className="w-full">
+                        <Button
+                            onClick={() => {
+                                if (checkoutData?.paymentLink?.cancel_url) {
+                                    window.location.href = checkoutData.paymentLink.cancel_url;
+                                } else {
+                                    window.location.href = 'https://lomi.africa';
+                                }
+                            }}
+                            className="w-full h-10 rounded-[5px] flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100"
+                        >
+                            Back to website
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (

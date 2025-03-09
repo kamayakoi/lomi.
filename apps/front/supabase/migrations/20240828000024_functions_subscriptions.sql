@@ -149,7 +149,8 @@ RETURNS TABLE (
     created_at TIMESTAMPTZ,
     updated_at TIMESTAMPTZ,
     display_on_storefront BOOLEAN,
-    image_url TEXT
+    image_url TEXT,
+    is_active BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -166,7 +167,8 @@ BEGIN
         sp.created_at,
         sp.updated_at,
         COALESCE((sp.metadata->>'display_on_storefront')::boolean, true) as display_on_storefront,
-        sp.image_url
+        sp.image_url,
+        sp.is_active
     FROM
         subscription_plans sp
     WHERE
@@ -217,7 +219,8 @@ CREATE OR REPLACE FUNCTION public.update_subscription_plan(
     p_charge_day INT,
     p_metadata JSONB,
     p_display_on_storefront BOOLEAN DEFAULT NULL,
-    p_image_url TEXT DEFAULT NULL
+    p_image_url TEXT DEFAULT NULL,
+    p_is_active BOOLEAN DEFAULT NULL
 )
 RETURNS VOID AS $$
 DECLARE
@@ -250,20 +253,22 @@ BEGIN
         charge_day = COALESCE(p_charge_day, charge_day),
         metadata = v_metadata,
         image_url = p_image_url,
+        is_active = COALESCE(p_is_active, is_active),
         updated_at = NOW()
     WHERE plan_id = p_plan_id;
 
     -- Log plan update with image change info
     PERFORM public.log_event(
         p_merchant_id := (SELECT merchant_id FROM subscription_plans WHERE plan_id = p_plan_id),
-        p_event := 'update_subscription_plan'::event_type,
+        p_event := 'update_product'::event_type,
         p_details := jsonb_build_object(
             'plan_id', p_plan_id,
             'name', p_name,
             'old_image_url', v_old_image_url,
             'new_image_url', p_image_url,
             'image_changed', (v_old_image_url IS DISTINCT FROM p_image_url),
-            'display_on_storefront', p_display_on_storefront
+            'display_on_storefront', p_display_on_storefront,
+            'is_active', p_is_active
         ),
         p_severity := 'NOTICE'
     );
@@ -284,5 +289,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 -- Grant execute permissions to authenticated users
 GRANT EXECUTE ON FUNCTION public.create_subscription_plan(UUID, UUID, VARCHAR, TEXT, frequency, NUMERIC, currency_code, failed_payment_action, INT, JSONB, first_payment_type, BOOLEAN, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.fetch_subscription_plans(UUID, INTEGER, INTEGER) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.update_subscription_plan(UUID, VARCHAR, TEXT, frequency, NUMERIC, failed_payment_action, INT, JSONB, BOOLEAN, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.update_subscription_plan(UUID, VARCHAR, TEXT, frequency, NUMERIC, failed_payment_action, INT, JSONB, BOOLEAN, TEXT, BOOLEAN) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.delete_subscription_plan(UUID) TO authenticated;

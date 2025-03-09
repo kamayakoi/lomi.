@@ -125,40 +125,52 @@ function PaymentLinksPage() {
     { title: 'Settings', href: 'settings', isActive: false },
   ]
 
-  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, fetchNextPage, refetch } = useInfiniteQuery({
+  const { data: paymentLinksData, isLoading: isPaymentLinksLoading, refetch } = useInfiniteQuery({
     queryKey: ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus] as const,
-    queryFn: ({ pageParam = 1 }) =>
-      fetchPaymentLinks(
-        user?.id || '',
-        selectedLinkType,
-        selectedCurrency,
-        selectedStatus,
-        pageParam,
-        pageSize
-      ),
+    queryFn: async ({ pageParam = 1 }) => {
+      try {
+        const result = await fetchPaymentLinks(
+          user?.id || '',
+          selectedLinkType,
+          selectedCurrency,
+          selectedStatus,
+          pageParam,
+          pageSize,
+          false
+        )
+        // Ensure we always return an array
+        return Array.isArray(result) ? result : []
+      } catch (error) {
+        console.error('Error in useInfiniteQuery:', error)
+        return []
+      }
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || !Array.isArray(lastPage) || lastPage.length === 0) return undefined
       const nextPage = allPages.length + 1
       return lastPage.length !== 0 ? nextPage : undefined
     },
     enabled: !!user?.id
   })
 
-  const paymentLinks = paymentLinksData?.pages?.flatMap((page: PaymentLink[]) => page) || []
+  const handleRefresh = async () => {
+    await refetch()
+  }
 
   const sortPaymentLinks = (paymentLinks: PaymentLink[]) => {
-    if (!sortColumn) return paymentLinks
+    if (!paymentLinks || !sortColumn) return paymentLinks || []
 
-    return paymentLinks.sort((a, b) => {
-      const aValue = a[sortColumn]
-      const bValue = b[sortColumn]
+    return [...paymentLinks].sort((a, b) => {
+      const aValue = a?.[sortColumn]
+      const bValue = b?.[sortColumn]
 
       if (sortColumn === 'price') {
-        const aPrice = a.link_type === 'instant' ? a.price : a.link_type === 'product' ? a.product_price : a.plan_amount
-        const bPrice = b.link_type === 'instant' ? b.price : b.link_type === 'product' ? b.product_price : b.plan_amount
+        const aPrice = a?.link_type === 'instant' ? a?.price : a?.link_type === 'product' ? a?.product_price : a?.plan_amount
+        const bPrice = b?.link_type === 'instant' ? b?.price : b?.link_type === 'product' ? b?.product_price : b?.plan_amount
         return sortDirection === 'asc' ? (aPrice || 0) - (bPrice || 0) : (bPrice || 0) - (aPrice || 0)
       } else if (sortColumn === 'is_active') {
-        return sortDirection === 'asc' ? Number(a.is_active) - Number(b.is_active) : Number(b.is_active) - Number(a.is_active)
+        return sortDirection === 'asc' ? Number(a?.is_active) - Number(b?.is_active) : Number(b?.is_active) - Number(a?.is_active)
       } else if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
       } else if (typeof aValue === 'number' && typeof bValue === 'number') {
@@ -177,10 +189,6 @@ function PaymentLinksPage() {
   const handleEditClick = (paymentLink: PaymentLink) => {
     setSelectedPaymentLink(paymentLink)
     setIsEditLinkOpen(true)
-  }
-
-  const handleRefresh = async () => {
-    await fetchNextPage()
   }
 
   if (isUserLoading) {
@@ -258,8 +266,8 @@ function PaymentLinksPage() {
                         </div>
                       ))}
                     </div>
-                  ) : paymentLinks.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12">
+                  ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 mt-4">
                       <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
                         <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                       </div>
@@ -271,7 +279,7 @@ function PaymentLinksPage() {
                       </p>
                     </div>
                   ) : (
-                    sortPaymentLinks(paymentLinks).map((link: PaymentLink) => (
+                    sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
                       <div
                         key={link.link_id}
                         className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
@@ -354,7 +362,7 @@ function PaymentLinksPage() {
                         <Skeleton className="w-full h-24" />
                       </div>
                     ))
-                  ) : paymentLinks.length === 0 ? (
+                  ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
                     <div className="py-24 text-center">
                       <div className="flex flex-col items-center justify-center space-y-4">
                         <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
@@ -369,7 +377,7 @@ function PaymentLinksPage() {
                       </div>
                     </div>
                   ) : (
-                    sortPaymentLinks(paymentLinks).map((link: PaymentLink) => (
+                    sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
                       <PaymentLinkCard
                         key={link.link_id}
                         paymentLink={link}

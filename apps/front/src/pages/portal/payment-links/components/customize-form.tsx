@@ -18,6 +18,9 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import { provider_code } from './types'
 
+// Add custom styles for the datepicker to support dark mode
+import "./datepicker-dark-mode.css"
+
 interface PaymentMethod {
     id: string
     name: string
@@ -188,19 +191,16 @@ const ExpirationDateInput: React.FC<ExpirationDateInputProps> = ({ value, onChan
                     className="w-full rounded-none bg-background text-foreground px-3 py-2 text-sm
                         border border-input hover:bg-accent hover:text-accent-foreground
                         focus:outline-none focus:ring-0 focus:border-input focus:border-black dark:focus:border-white
-                        disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled:cursor-not-allowed disabled:opacity-50
+                        dark:bg-[#1F2937] dark:text-white dark:border-gray-700"
                     wrapperClassName="w-full"
                     popperClassName="shadow-lg rounded-none border border-border bg-background text-foreground z-50"
-                    calendarClassName="!bg-background !border-none !rounded-none !font-sans"
+                    calendarClassName="dark:!text-white"
                     dayClassName={date =>
                         `!rounded-none hover:!bg-accent hover:!text-accent-foreground 
-                        ${date?.toDateString() === value?.toDateString() ? '!bg-primary !text-primary-foreground' : '!bg-background'}`
+                        ${date?.toDateString() === value?.toDateString() ? '!bg-primary !text-primary-foreground' : '!bg-background dark:!bg-[#1F2937] dark:!text-white'}`
                     }
-                    monthClassName={() => "!text-foreground"}
-                    weekDayClassName={() => "!text-muted-foreground"}
                     showPopperArrow={false}
-                    popperPlacement="bottom-start"
-                    placeholderText="Select expiration date"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     <svg

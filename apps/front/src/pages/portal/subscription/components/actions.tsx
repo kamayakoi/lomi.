@@ -95,7 +95,8 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                 charge_day: plan.charge_day,
                 metadata: plan.metadata,
                 display_on_storefront: plan.display_on_storefront,
-                image_url: plan.image_url
+                image_url: plan.image_url,
+                is_active: newValue
             })
             onUpdate?.()
         } catch (error) {

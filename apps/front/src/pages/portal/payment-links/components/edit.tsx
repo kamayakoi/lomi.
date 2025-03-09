@@ -7,9 +7,13 @@ import { PaymentLink, provider_code } from './types'
 import { supabase } from '@/utils/supabase/client'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
+import "./datepicker-dark-mode.css"
 import { Badge } from "@/components/ui/badge"
 import { useUser } from '@/lib/hooks/use-user'
 import InputRightAddon from "@/components/ui/input-right-addon"
+import { toast } from '@/lib/hooks/use-toast'
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from '@/components/ui/alert-dialog'
+import { safeDeletePaymentLink } from './support'
 
 interface EditPaymentLinkFormProps {
     paymentLink: PaymentLink
@@ -38,6 +42,8 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     );
     const [connectedProviders, setConnectedProviders] = useState<string[]>([])
     const { user } = useUser()
+    const [isDeleting, setIsDeleting] = useState(false)
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
 
     const paymentMethods: PaymentMethod[] = [
         { id: 'CARDS', name: 'Cards', icon: '/payment_channels/cards.webp' },
@@ -70,6 +76,18 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
 
         fetchData()
     }, [user?.id])
+
+    useEffect(() => {
+        if (expirationDate && expirationDate > new Date()) {
+            if (!isActive) {
+                setIsActive(true);
+            }
+        } else if (expirationDate && expirationDate <= new Date()) {
+            if (isActive) {
+                setIsActive(false);
+            }
+        }
+    }, [expirationDate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -109,24 +127,38 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     }
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this payment link?')) {
-            try {
-                const { data, error } = await supabase.rpc('delete_payment_link', {
-                    p_link_id: paymentLink.link_id,
-                })
+        try {
+            setIsDeleting(true);
 
-                if (error) {
-                    console.error('Error deleting payment link:', error)
-                } else {
-                    console.log('Payment link deleted:', data)
-                    onSuccess()
-                    await onRefresh()
-                }
-            } catch (error) {
-                console.error('Error deleting payment link:', error)
+            const result = await safeDeletePaymentLink(paymentLink.link_id);
+
+            if (result.success) {
+                toast({
+                    title: "Success",
+                    description: "Payment link deleted successfully",
+                    variant: "default",
+                });
+                onSuccess();
+                await onRefresh();
+            } else {
+                toast({
+                    title: "Error",
+                    description: result.message || "Failed to delete payment link",
+                    variant: "destructive",
+                });
             }
+        } catch (error) {
+            console.error('Error deleting payment link:', error);
+            toast({
+                title: "Error",
+                description: "An error occurred while deleting the payment link",
+                variant: "destructive",
+            });
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteConfirmOpen(false);
         }
-    }
+    };
 
     const togglePaymentMethod = (methodId: string | provider_code) => {
         setAllowedPaymentMethods(prev => {
@@ -229,10 +261,19 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                         id="expirationDate"
                         selected={expirationDate}
                         onChange={(date: Date | null) => setExpirationDate(date)}
-                        className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300"
+                        className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300 dark:bg-[#1F2937] dark:text-white dark:border-gray-700"
                         dateFormat="dd/MM/yyyy"
+                        minDate={new Date()}
+                        placeholderText="Select future date"
+                        isClearable={true}
+                        showPopperArrow={false}
                     />
                 </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                    {expirationDate && expirationDate < new Date() ?
+                        "⚠️ Past dates will make this link inactive" :
+                        "Setting a future date will automatically activate the link"}
+                </p>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="successUrl">Success URL</Label>
@@ -242,7 +283,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                 <Button
                     type="button"
                     variant="destructive"
-                    onClick={handleDelete}
+                    onClick={() => setIsDeleteConfirmOpen(true)}
                     className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
                 >
                     Delete
@@ -254,6 +295,28 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                     Save
                 </Button>
             </div>
+
+            <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the payment link
+                            and any related data.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-red-500 text-white hover:bg-red-600"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "Deleting..." : "Delete"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </form>
     )
 }

@@ -113,6 +113,7 @@ export async function updateSubscriptionPlan(planId: string, data: {
     metadata?: Record<string, unknown>
     display_on_storefront?: boolean
     image_url?: string | null
+    is_active?: boolean
 }): Promise<void> {
     const { error } = await supabase.rpc('update_subscription_plan', {
         p_plan_id: planId,
@@ -124,7 +125,8 @@ export async function updateSubscriptionPlan(planId: string, data: {
         p_charge_day: data.charge_day,
         p_metadata: data.metadata || {},
         p_display_on_storefront: data.display_on_storefront ?? true,
-        p_image_url: data.image_url
+        p_image_url: data.image_url,
+        p_is_active: data.is_active
     })
 
     if (error) throw error

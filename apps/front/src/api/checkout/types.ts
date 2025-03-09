@@ -103,3 +103,28 @@ export interface Checkout {
   providerTransactionId: string;
   providerPaymentStatus: string;
 }
+
+// not used
+export interface CheckoutSession {
+    checkout_session_id: string;
+    organization_id: string;
+    merchant_id: string;
+    payment_link_id?: string;
+    customer_id?: string;
+    amount: number;
+    currency_code: string;
+    status: 'open' | 'completed' | 'expired';
+    is_expired: boolean;
+    product_id?: string;
+    plan_id?: string;
+    success_url?: string;
+    cancel_url?: string;
+    customer_email?: string;
+    customer_name?: string;
+    customer_phone?: string;
+    allowed_providers?: string[];
+    expires_at: string;
+    created_at: string;
+    updated_at: string;
+    metadata?: Record<string, unknown>;
+}
