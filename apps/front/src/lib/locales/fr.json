@@ -58,8 +58,8 @@
         "cta": "Soutenez-nous !"
     },
     "actions": {
-        "talk": "Contactez-nous",
-        "connect": "Se connecter"
+        "talk": "Talk to us",
+        "connect": "Connect"
     },
     "auth": {
         "sign_in": {

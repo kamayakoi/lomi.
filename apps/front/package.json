@@ -135,6 +135,7 @@
     "otplib": "12.0.1",
     "path-to-regexp": "0.1.12",
     "qrcode": "1.5.4",
+    "qrcode.react": "4.2.0",
     "react": "18.2.0",
     "react-aria-components": "1.6.0",
     "react-circle-flags": "0.0.22",

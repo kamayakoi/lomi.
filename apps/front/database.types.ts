@@ -4304,6 +4304,7 @@ export type Database = {
           updated_at: string
           display_on_storefront: boolean
           image_url: string
+          is_active: boolean
         }[]
       }
       fetch_subscription_transactions: {
@@ -5325,21 +5326,38 @@ export type Database = {
         }
         Returns: undefined
       }
-      update_subscription_plan: {
-        Args: {
-          p_plan_id: string
-          p_name: string
-          p_description: string
-          p_billing_frequency: Database["public"]["Enums"]["frequency"]
-          p_amount: number
-          p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
-          p_charge_day: number
-          p_metadata: Json
-          p_display_on_storefront?: boolean
-          p_image_url?: string
-        }
-        Returns: undefined
-      }
+      update_subscription_plan:
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+              p_display_on_storefront?: boolean
+              p_image_url?: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_plan_id: string
+              p_name: string
+              p_description: string
+              p_billing_frequency: Database["public"]["Enums"]["frequency"]
+              p_amount: number
+              p_failed_payment_action: Database["public"]["Enums"]["failed_payment_action"]
+              p_charge_day: number
+              p_metadata: Json
+              p_display_on_storefront?: boolean
+              p_image_url?: string
+              p_is_active?: boolean
+            }
+            Returns: undefined
+          }
       update_team_member_role: {
         Args: {
           p_organization_id: string
