@@ -25,15 +25,21 @@ DECLARE
     v_net_amount NUMERIC;
     v_fee_reference TEXT;
 BEGIN
-    -- Calculate fee
+    -- Calculate fee using the get_transaction_fee function
     SELECT name, COALESCE(fixed_amount, 0) + (p_amount * percentage / 100)
     INTO v_fee_reference, v_fee_amount
-    FROM fees 
-    WHERE transaction_type = 'payment'
-    AND payment_method_code = 'MOBILE_MONEY'
-    AND provider_code = 'WAVE'
-    AND currency_code = p_currency_code
-    LIMIT 1;
+    FROM get_transaction_fee(
+        'payment'::transaction_type,
+        'WAVE'::provider_code,
+        'E_WALLET'::payment_method_code,
+        p_currency_code
+    );
+
+    -- If for some reason we still don't have a fee (shouldn't happen with the get_transaction_fee function)
+    IF v_fee_amount IS NULL THEN
+        v_fee_amount := 0;
+        v_fee_reference := 'Default Wave Fee';
+    END IF;
 
     -- Calculate net amount
     v_net_amount := p_amount - v_fee_amount;
@@ -47,7 +53,6 @@ BEGIN
         subscription_id,
         transaction_type,
         description,
-        reference_id,
         metadata,
         gross_amount,
         fee_amount,
@@ -65,7 +70,6 @@ BEGIN
         p_subscription_id,
         'payment',
         p_description,
-        SUBSTRING(MD5(RANDOM()::TEXT) FOR 8),
         p_metadata,
         p_amount,
         v_fee_amount,
@@ -73,7 +77,7 @@ BEGIN
         v_fee_reference,
         p_currency_code,
         'WAVE',
-        'MOBILE_MONEY'
+        'E_WALLET'
     )
     RETURNING transaction_id INTO v_transaction_id;
 
@@ -194,57 +198,57 @@ BEGIN
 END;
 $$;
 
--- Function to update merchant account balance after successful transaction
-CREATE OR REPLACE FUNCTION update_merchant_account_after_transaction()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public, pg_temp
-AS $$
-DECLARE
-    v_merchant_id UUID;
-    v_net_amount NUMERIC;
-    v_currency_code currency_code;
-BEGIN
-    -- Only process completed transactions
-    IF NEW.status = 'completed' AND OLD.status != 'completed' THEN
-        -- Get transaction details
-        SELECT merchant_id, net_amount, currency_code
-        INTO v_merchant_id, v_net_amount, v_currency_code
-        FROM transactions
-        WHERE transaction_id = NEW.transaction_id;
+-- -- Function to update merchant account balance after successful transaction
+-- CREATE OR REPLACE FUNCTION update_merchant_account_after_transaction()
+-- RETURNS TRIGGER
+-- LANGUAGE plpgsql
+-- SECURITY DEFINER
+-- SET search_path = public, pg_temp
+-- AS $$
+-- DECLARE
+--     v_merchant_id UUID;
+--     v_net_amount NUMERIC;
+--     v_currency_code currency_code;
+-- BEGIN
+--     -- Only process completed transactions
+--     IF NEW.status = 'completed' AND OLD.status != 'completed' THEN
+--         -- Get transaction details
+--         SELECT merchant_id, net_amount, currency_code
+--         INTO v_merchant_id, v_net_amount, v_currency_code
+--         FROM transactions
+--         WHERE transaction_id = NEW.transaction_id;
 
-        -- Update merchant account balance
-        UPDATE merchant_accounts
-        SET balance = balance + v_net_amount,
-            updated_at = NOW()
-        WHERE merchant_id = v_merchant_id
-        AND currency_code = v_currency_code;
+--         -- Update merchant account balance
+--         UPDATE merchant_accounts
+--         SET balance = balance + v_net_amount,
+--             updated_at = NOW()
+--         WHERE merchant_id = v_merchant_id
+--         AND currency_code = v_currency_code;
 
-        -- If no account exists for this currency, create one
-        IF NOT FOUND THEN
-            INSERT INTO merchant_accounts (
-                merchant_id,
-                currency_code,
-                balance
-            )
-            VALUES (
-                v_merchant_id,
-                v_currency_code,
-                v_net_amount
-            );
-        END IF;
-    END IF;
+--         -- If no account exists for this currency, create one
+--         IF NOT FOUND THEN
+--             INSERT INTO merchant_accounts (
+--                 merchant_id,
+--                 currency_code,
+--                 balance
+--             )
+--             VALUES (
+--                 v_merchant_id,
+--                 v_currency_code,
+--                 v_net_amount
+--             );
+--         END IF;
+--     END IF;
 
-    RETURN NEW;
-END;
-$$;
+--     RETURN NEW;
+-- END;
+-- $$;
 
--- Create trigger for merchant account updates
-CREATE TRIGGER trg_update_merchant_account
-    AFTER UPDATE ON transactions
-    FOR EACH ROW
-    EXECUTE FUNCTION update_merchant_account_after_transaction();
+-- -- Create trigger for merchant account updates
+-- CREATE TRIGGER trg_update_merchant_account
+--     AFTER UPDATE ON transactions
+--     FOR EACH ROW
+--     EXECUTE FUNCTION update_merchant_account_after_transaction();
 
 -- Function to get Wave payment status
 CREATE OR REPLACE FUNCTION get_wave_payment_status(
@@ -274,26 +278,65 @@ BEGIN
 END;
 $$;
 
--- Function to update provider settings metadata
-CREATE OR REPLACE FUNCTION update_provider_settings_metadata(
-    p_organization_id UUID,
-    p_provider_code provider_code,
-    p_provider_merchant_id VARCHAR,
-    p_metadata JSONB
+-- Function to fetch Wave provider settings securely
+CREATE OR REPLACE FUNCTION fetch_wave_provider_settings(
+    p_organization_id UUID
 )
-RETURNS VOID
+RETURNS TABLE (
+    organization_id UUID,
+    provider_code provider_code,
+    provider_merchant_id VARCHAR,
+    is_connected BOOLEAN,
+    metadata JSONB
+)
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 BEGIN
-    UPDATE organization_providers_settings
-    SET 
-        provider_merchant_id = p_provider_merchant_id,
-        metadata = p_metadata,
-        updated_at = NOW()
-    WHERE 
-        organization_id = p_organization_id 
-        AND provider_code = p_provider_code;
+    RETURN QUERY
+    SELECT 
+        ops.organization_id,
+        ops.provider_code,
+        ops.provider_merchant_id,
+        ops.is_connected,
+        ops.metadata
+    FROM organization_providers_settings ops
+    WHERE ops.organization_id = p_organization_id
+    AND ops.provider_code = 'WAVE';
+END;
+$$;
+
+-- Function to fetch provider settings for any provider by organization_id
+CREATE OR REPLACE FUNCTION fetch_organization_provider_settings(
+    p_organization_id UUID,
+    p_provider_code provider_code DEFAULT NULL
+)
+RETURNS TABLE (
+    organization_id UUID,
+    provider_code provider_code,
+    provider_merchant_id VARCHAR,
+    is_connected BOOLEAN,
+    phone_number VARCHAR,
+    is_phone_verified BOOLEAN,
+    metadata JSONB
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        ops.organization_id,
+        ops.provider_code,
+        ops.provider_merchant_id,
+        ops.is_connected,
+        ops.phone_number,
+        ops.is_phone_verified,
+        ops.metadata
+    FROM organization_providers_settings ops
+    WHERE ops.organization_id = p_organization_id
+    AND (p_provider_code IS NULL OR ops.provider_code = p_provider_code);
 END;
 $$;

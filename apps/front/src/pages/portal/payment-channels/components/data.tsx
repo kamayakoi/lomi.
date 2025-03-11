@@ -76,21 +76,20 @@ export const paymentMethods: PaymentMethod[] = [
 
   // Mobile Money Section
   {
-    code: 'MTN',
-    name: 'MTN',
-    description: 'Leverage MTN "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
-    logo: <img src="/payment_channels/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
-    provider_code: 'MTN',
-    type: 'Mobile Money',
-    status: 'coming_soon',
-    category: 'Mobile Money'
-  },
-  {
     code: 'ORANGE',
     name: 'Orange',
     description: 'Enable Orange Money payments for your customers. Widely used in West Africa, the French carrier mobile money service allows for easy transfers and payments.',
     logo: <img src="/payment_channels/orange.webp" alt="Orange Money" className="w-full h-full object-contain" />,
     provider_code: 'ORANGE',
+    type: 'Mobile Money',
+    category: 'Mobile Money'
+  },
+  {
+    code: 'MTN',
+    name: 'MTN',
+    description: 'Leverage MTN "momo" payments, a widely used service in West and Central Africa. Perfect for reaching customers in these regions.',
+    logo: <img src="/payment_channels/mtn.webp" alt="MTN" className="w-full h-full object-contain" />,
+    provider_code: 'MTN',
     type: 'Mobile Money',
     status: 'coming_soon',
     category: 'Mobile Money'

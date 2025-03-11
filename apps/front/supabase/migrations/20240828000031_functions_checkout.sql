@@ -27,7 +27,9 @@ RETURNS TABLE (
     plan_billing_frequency frequency,
     plan_image_url TEXT,
     organization_logo_url VARCHAR,
-    organization_name VARCHAR
+    organization_name VARCHAR,
+    merchant_id UUID,
+    organization_id UUID
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -56,7 +58,9 @@ BEGIN
         sp.billing_frequency AS plan_billing_frequency,
         sp.image_url AS plan_image_url,
         CAST(REGEXP_REPLACE(o.logo_url, '^.*\/logos\/', '') AS VARCHAR) AS organization_logo_url,
-        o.name AS organization_name
+        o.name AS organization_name,
+        pl.merchant_id,
+        pl.organization_id
     FROM
         payment_links pl
         LEFT JOIN merchant_products mp ON pl.product_id = mp.product_id
@@ -67,34 +71,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to fetch organization ID for checkout
-CREATE OR REPLACE FUNCTION public.fetch_organization_id(p_merchant_id UUID)
-RETURNS TABLE (
-    organization_id UUID
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        mol.organization_id
-    FROM 
-        merchant_organization_links mol
-    WHERE 
-        mol.merchant_id = p_merchant_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
 -- Function to create or update customer
 CREATE OR REPLACE FUNCTION public.create_or_update_customer(
     p_merchant_id UUID,
     p_organization_id UUID,
     p_name TEXT,
-    p_email TEXT DEFAULT NULL,
-    p_phone_number TEXT DEFAULT NULL,
-    p_whatsapp_number TEXT DEFAULT NULL,
-    p_country TEXT DEFAULT NULL,
-    p_city TEXT DEFAULT NULL,
-    p_address TEXT DEFAULT NULL,
-    p_postal_code TEXT DEFAULT NULL
+    p_email TEXT,
+    p_city TEXT,
+    p_address TEXT,
+    p_country TEXT,
+    p_phone_number TEXT,
+    p_postal_code TEXT,
+    p_whatsapp_number TEXT
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -159,4 +147,4 @@ BEGIN
 
     RETURN v_customer_id;
 END;
-$$;
+$$; 

@@ -12,6 +12,11 @@ export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData
 
         const paymentLink = checkoutData[0];
 
+        console.log('Raw payment link data:', {
+            merchantId: paymentLink.merchant_id,
+            organizationId: paymentLink.organization_id
+        });
+
         // Download product image if exists
         let productImageUrl = null;
         if (paymentLink?.product_image_url) {
@@ -79,9 +84,19 @@ export async function fetchDataForCheckout(linkId: string): Promise<CheckoutData
             firstPaymentType: '',
         } : null;
 
+        // Add debug logging to verify properties
+        console.log('Payment link data before return:', {
+            merchant_id: paymentLink.merchant_id,
+            organization_id: paymentLink.organization_id,
+            converted_merchantId: paymentLink.merchant_id,
+            converted_organizationId: paymentLink.organization_id
+        });
+
         return {
             paymentLink: {
                 ...paymentLink,
+                merchantId: paymentLink.merchant_id,
+                organizationId: paymentLink.organization_id,
                 organizationLogoUrl: paymentLink.organization_logo_url,
                 organizationName: paymentLink.organization_name
             },
@@ -130,26 +145,49 @@ export const createOrUpdateCustomer = async (
     }
 ): Promise<string | null> => {
     try {
-        const { data, error } = await supabase.rpc('create_or_update_customer', {
-            p_merchant_id: merchantId,
-            p_organization_id: organizationId,
-            p_name: customerDetails.name || `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
-            p_email: customerDetails.email,
-            p_phone_number: customerDetails.countryCode
-                ? customerDetails.countryCode + customerDetails.phoneNumber
-                : customerDetails.phoneNumber,
-            p_whatsapp_number: customerDetails.whatsappNumber,
-            p_country: customerDetails.country,
-            p_city: customerDetails.city,
-            p_address: customerDetails.address,
-            p_postal_code: customerDetails.postalCode,
-        });
-
-        if (error) {
-            console.error('Error creating or updating customer:', error);
+        // Check for required parameters
+        if (!merchantId || !organizationId) {
+            console.error('Missing required parameters:', { merchantId, organizationId });
             return null;
         }
 
+        // Construct the full name if not provided
+        const fullName = customerDetails.name ||
+            `${customerDetails.firstName || ''} ${customerDetails.lastName || ''}`.trim();
+
+        // Format phone number with country code if available
+        const formattedPhone = customerDetails.countryCode
+            ? customerDetails.countryCode + customerDetails.phoneNumber
+            : customerDetails.phoneNumber;
+
+        console.log('Creating customer with RPC call:', {
+            merchantId,
+            organizationId,
+            name: fullName,
+            email: customerDetails.email,
+            phone: formattedPhone,
+        });
+
+        // Call the SQL function directly via RPC with parameters in the exact order expected
+        const { data, error } = await supabase.rpc('create_or_update_customer', {
+            p_merchant_id: merchantId,
+            p_organization_id: organizationId,
+            p_name: fullName,
+            p_email: customerDetails.email || null,
+            p_city: customerDetails.city || null,
+            p_address: customerDetails.address || null,
+            p_country: customerDetails.country || null,
+            p_phone_number: formattedPhone || null,
+            p_postal_code: customerDetails.postalCode || null,
+            p_whatsapp_number: customerDetails.whatsappNumber || null
+        });
+
+        if (error) {
+            console.error('Error creating or updating customer via RPC:', error);
+            return null;
+        }
+
+        console.log('Customer created or updated successfully via RPC:', data);
         return data;
     } catch (error) {
         console.error('Error creating or updating customer:', error);

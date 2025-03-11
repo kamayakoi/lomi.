@@ -29,11 +29,9 @@ export interface WavePaymentError {
 export interface CreateWaveCheckoutSessionParams {
     amount: number;
     currency: string;
-    merchant_reference_id: string;
-    merchant_id: string;
     success_url: string;
-    cancel_url: string;
-    error_url?: string;
+    error_url: string;
+    merchant_id?: string;
     client_reference?: string;
     restrict_payer_mobile?: string;
     aggregated_merchant_id?: string;

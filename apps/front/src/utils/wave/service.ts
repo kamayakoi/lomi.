@@ -27,14 +27,26 @@ interface TransactionMetadata {
     [key: string]: unknown;
 }
 
-// Define an interface for the provider settings
-interface ProviderSetting {
+// Define an interface for Wave provider settings
+interface WaveProviderSettings {
+    organization_id: string;
     provider_code: string;
+    provider_merchant_id: string;
     is_connected: boolean;
-    phone_number?: string;
-    is_phone_verified?: boolean;
-    provider_merchant_id?: string;
+    metadata: Record<string, unknown>;
 }
+
+// Define an interface for full provider settings
+interface ProviderSettings {
+    organization_id: string;
+    provider_code: string;
+    provider_merchant_id: string;
+    is_connected: boolean;
+    phone_number: string;
+    is_phone_verified: boolean;
+    metadata: Record<string, unknown>;
+}
+
 
 export class WaveService {
     /**
@@ -44,14 +56,15 @@ export class WaveService {
         try {
             // 1. Check if merchant already has Wave merchant ID
             const { data: merchant } = await supabase
-                .from('organization_providers_settings')
-                .select('provider_merchant_id, organization_id')
-                .eq('provider_code', 'WAVE')
-                .eq('merchant_id', merchantId)
+                .rpc('fetch_wave_provider_settings', {
+                    p_organization_id: merchantId
+                })
                 .single();
 
-            if (merchant?.provider_merchant_id) {
-                return merchant.provider_merchant_id;
+            const waveSettings = merchant as WaveProviderSettings;
+            
+            if (waveSettings?.provider_merchant_id) {
+                return waveSettings.provider_merchant_id;
             }
 
             // 2. Get merchant details
@@ -90,7 +103,7 @@ export class WaveService {
                 .from('organization_providers_settings')
                 .upsert({
                     merchant_id: merchantId,
-                    organization_id: merchant?.organization_id,
+                    organization_id: waveSettings?.organization_id,
                     provider_code: 'WAVE',
                     provider_merchant_id: waveAggregatedMerchant.id,
                     is_active: true,
@@ -138,17 +151,25 @@ export class WaveService {
         checkoutUrl: string;
     }> {
         try {
-            // 1. Get Wave merchant ID from settings
+            // 1. Get Wave merchant ID from settings - use organizationId for the lookup
             const { data: settings, error: settingsError } = await supabase
-                .from('organization_providers_settings')
-                .select('provider_merchant_id')
-                .eq('provider_code', 'WAVE')
-                .eq('merchant_id', merchantId)
+                .rpc('fetch_wave_provider_settings', {
+                    p_organization_id: organizationId
+                })
                 .single();
 
-            if (settingsError || !settings?.provider_merchant_id) {
-                throw new Error('Merchant not registered with Wave');
+            if (settingsError) {
+                console.error('Error fetching Wave provider settings:', settingsError);
+                throw new Error('Failed to retrieve Wave merchant settings');
             }
+
+            const waveSettings = settings as WaveProviderSettings;
+
+            if (!waveSettings?.provider_merchant_id) {
+                throw new Error('Merchant not registered with Wave or missing provider_merchant_id');
+            }
+
+            console.log('Found Wave aggregated merchant ID:', waveSettings.provider_merchant_id);
 
             // 2. Create Wave checkout session
             const checkoutParams: CreateWaveCheckoutSessionParams = {
@@ -156,14 +177,13 @@ export class WaveService {
                 currency,
                 success_url: successUrl,
                 error_url: errorUrl,
-                merchant_reference_id: merchantId,
-                merchant_id: settings.provider_merchant_id,
-                cancel_url: errorUrl,
-                aggregated_merchant_id: settings.provider_merchant_id,
+                aggregated_merchant_id: waveSettings.provider_merchant_id,
                 client_reference: metadata?.linkId
             };
 
+            console.log('Creating Wave checkout session with params:', checkoutParams);
             const waveSession = await waveClient.createCheckoutSession(checkoutParams);
+            console.log('Wave checkout session created successfully:', waveSession.id);
 
             // 3. Create transaction record using RPC function
             const { data: transactionId, error: transactionError } = await supabase.rpc(
@@ -176,8 +196,8 @@ export class WaveService {
                     p_currency_code: currency,
                     p_provider_checkout_id: waveSession.id,
                     p_checkout_url: waveSession.wave_launch_url,
-                    p_error_url: errorUrl,
-                    p_success_url: successUrl,
+                    p_error_url: waveClient.ensureHttpsUrl(errorUrl),
+                    p_success_url: waveClient.ensureHttpsUrl(successUrl),
                     p_product_id: productId,
                     p_subscription_id: subscriptionId,
                     p_description: description,
@@ -196,6 +216,7 @@ export class WaveService {
             );
 
             if (transactionError) {
+                console.error('Error creating Wave transaction record:', transactionError);
                 throw new Error(`Failed to create transaction: ${transactionError.message}`);
             }
 
@@ -344,18 +365,17 @@ export class WaveService {
         try {
             // 1. Get provider settings to retrieve the Wave merchant ID and registered phone number
             const { data: providerSettings, error: providerError } = await supabase
-                .rpc('fetch_organization_providers_settings', {
-                    p_organization_id: organizationId
+                .rpc('fetch_organization_provider_settings', {
+                    p_organization_id: organizationId,
+                    p_provider_code: 'WAVE'
                 });
                 
-            if (providerError || !providerSettings) {
+            if (providerError || !providerSettings || providerSettings.length === 0) {
                 throw new Error('Error fetching payment providers configuration');
             }
             
-            // Find the Wave provider
-            const waveProvider = Array.isArray(providerSettings) 
-                ? providerSettings.find((p: ProviderSetting) => p.provider_code === 'WAVE')
-                : null;
+            // Get the Wave provider settings
+            const waveProvider = providerSettings[0] as ProviderSettings;
             
             if (!waveProvider || !waveProvider.is_connected || !waveProvider.phone_number) {
                 throw new Error('Wave provider not configured or not connected');
@@ -410,13 +430,18 @@ export class WaveService {
 
             // 6. Get provider merchant ID using RPC to get full provider settings
             const { data: fullProviderSettings, error: fullProviderError } = await supabase
-                .from('organization_providers_settings')
-                .select('provider_merchant_id, phone_number')
-                .eq('organization_id', organizationId)
-                .eq('provider_code', 'WAVE')
-                .single();
+                .rpc('fetch_organization_provider_settings', {
+                    p_organization_id: organizationId,
+                    p_provider_code: 'WAVE'
+                });
                 
-            if (fullProviderError || !fullProviderSettings?.provider_merchant_id) {
+            if (fullProviderError || !fullProviderSettings || fullProviderSettings.length === 0) {
+                throw new Error('Wave merchant ID not found');
+            }
+            
+            const waveProviderSettings = fullProviderSettings[0] as ProviderSettings;
+            
+            if (!waveProviderSettings.provider_merchant_id) {
                 throw new Error('Wave merchant ID not found');
             }
 
@@ -426,7 +451,7 @@ export class WaveService {
                 amount: amount.toString(),
                 currency,
                 client_reference: clientReference,
-                aggregated_merchant_id: fullProviderSettings.provider_merchant_id,
+                aggregated_merchant_id: waveProviderSettings.provider_merchant_id,
                 reason: reason || 'Merchant withdrawal'
             });
 
@@ -448,7 +473,7 @@ export class WaveService {
                             client_reference: clientReference,
                             transaction_id: wavePayout.transaction_id,
                             when_created: wavePayout.when_created,
-                            aggregated_merchant_id: fullProviderSettings.provider_merchant_id,
+                            aggregated_merchant_id: waveProviderSettings.provider_merchant_id,
                             ...metadata
                         },
                         fees: {

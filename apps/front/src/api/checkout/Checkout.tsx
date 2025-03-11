@@ -18,90 +18,15 @@ import {
 } from "@/components/ui/dialog"
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
 import { countries } from '@/lib/data/onboarding'
-import WaveService from '@/utils/wave/service'
 import { toast } from "@/lib/hooks/use-toast"
+import { initiateWaveCheckout } from '@/api/checkout/WaveCheckout'
+import { checkoutStyles } from './CheckoutStyles'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
     if (typeof num === 'string') num = parseFloat(num);
     return num.toLocaleString('fr-FR').replace(/\s/g, '.');
 };
-
-// Add a comprehensive style override at the top of the file
-const checkoutLightModeStyles = `
-  /* Global checkout container styles */
-  .checkout-container {
-    color-scheme: light !important;
-  }
-
-  /* Override ALL input styles within checkout */
-  .checkout-container input,
-  .checkout-container select,
-  .checkout-container .react-phone-number-input__input,
-  .checkout-container .react-phone-number-input__country-select {
-    background-color: white !important;
-    color: #1f2937 !important;
-    border-color: #d1d5db !important;
-  }
-
-  /* Override focus, hover & active states */
-  .checkout-container input:focus,
-  .checkout-container input:hover,
-  .checkout-container input:active,
-  .checkout-container select:focus,
-  .checkout-container select:hover,
-  .checkout-container select:active,
-  .checkout-container .react-phone-number-input__input:focus,
-  .checkout-container .react-phone-number-input__input:hover,
-  .checkout-container .react-phone-number-input__input:active {
-    background-color: white !important;
-    color: #1f2937 !important;
-    border-color: #d1d5db !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
-
-  /* Phone input specific styles */
-  .checkout-container .react-phone-number-input,
-  .checkout-container .react-phone-number-input * {
-    background-color: white !important;
-    color: #1f2937 !important;
-  }
-
-  .checkout-container .react-phone-number-input__country {
-    background-color: white !important;
-    border-color: #d1d5db !important;
-  }
-
-  /* Placeholder text */
-  .checkout-container input::placeholder,
-  .checkout-container .react-phone-number-input__input::placeholder {
-    color: #9ca3af !important;
-  }
-
-  /* Ensure consistent border styles */
-  .checkout-container .rounded-lg,
-  .checkout-container .rounded-md,
-  .checkout-container .rounded-sm,
-  .checkout-container .rounded {
-    border-color: #d1d5db !important;
-  }
-
-  /* Fix for flags and UI elements */
-  .checkout-container .flag,
-  .checkout-container .react-phone-number-input__icon,
-  .checkout-container .react-phone-number-input__country-icon {
-    background-color: transparent !important;
-  }
-
-  /* Fix any promo code inputs */
-  .checkout-container .promo-input input,
-  .checkout-container .promo-input button {
-    background-color: white !important;
-    color: #1f2937 !important;
-    border-color: #d1d5db !important;
-  }
-`;
 
 export default function CheckoutPage() {
     const { sessionId, linkId } = useParams<{ sessionId?: string; linkId?: string }>();
@@ -137,24 +62,58 @@ export default function CheckoutPage() {
     const [rawNameInput, setRawNameInput] = useState('');
 
     useEffect(() => {
-        // Get user's country using their IP
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
+        // First check if we have a cached country code in localStorage
+        const cachedCountryName = localStorage.getItem('user_country_name');
+        if (cachedCountryName) {
+            setCustomerDetails(prev => ({
+                ...prev,
+                country: cachedCountryName
+            }));
+            return;
+        }
+
+        // Add a timeout for the fetch to avoid long waits
+        const timeoutPromise = new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), 2000)
+        );
+
+        // Try to get user's country using ipapi.co
+        Promise.race([
+            fetch('https://ipapi.co/json/', {
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }),
+            timeoutPromise
+        ])
             .then(data => {
                 // Find the country name from our countries list
                 const countryName = countries.find(country =>
                     country.toLowerCase() === data.country_name.toLowerCase()
-                );
+                ) || 'Côte d\'Ivoire';
+
+                // Cache the result in localStorage for future use
+                localStorage.setItem('user_country_name', countryName);
+
                 setCustomerDetails(prev => ({
                     ...prev,
-                    country: countryName || 'Côte d\'Ivoire'
+                    country: countryName
                 }));
             })
             .catch(() => {
                 // Fallback to Côte d'Ivoire if geolocation fails
+                const defaultCountry = 'Côte d\'Ivoire';
+                localStorage.setItem('user_country_name', defaultCountry);
                 setCustomerDetails(prev => ({
                     ...prev,
-                    country: 'Côte d\'Ivoire'
+                    country: defaultCountry
                 }));
             });
     }, []);
@@ -364,7 +323,7 @@ export default function CheckoutPage() {
             toast({
                 variant: "destructive",
                 title: "Required Information",
-                description: "Please fill in your full name and email first."
+                description: "Please fill in your full name, email, and phone number first."
             });
 
             // Focus on the name input
@@ -378,9 +337,65 @@ export default function CheckoutPage() {
             try {
                 setIsProcessing(true);
 
-                if (!customerId || !checkoutData) {
+                if (!checkoutData) {
+                    console.error('Checkout data missing');
                     throw new Error('Missing required data for checkout');
                 }
+
+                // Check for required merchant and organization IDs
+                if (!checkoutData.paymentLink?.merchantId || !checkoutData.paymentLink?.organizationId) {
+                    console.error('Missing merchant ID or organization ID:', {
+                        merchantId: checkoutData.paymentLink?.merchantId,
+                        organizationId: checkoutData.paymentLink?.organizationId,
+                        paymentLink: checkoutData.paymentLink
+                    });
+                    toast({
+                        variant: "destructive",
+                        title: "Configuration Error",
+                        description: "Payment configuration is incomplete. Please contact support."
+                    });
+                    throw new Error('Missing merchant or organization ID');
+                }
+
+                console.log('Checkout data structure check:', {
+                    merchantId: checkoutData.paymentLink.merchantId,
+                    organizationId: checkoutData.paymentLink.organizationId,
+                    merchant_id: checkoutData.paymentLink.merchantId,
+                    organization_id: checkoutData.paymentLink.organizationId,
+                    paymentLinkType: typeof checkoutData.paymentLink,
+                    checkoutDataType: typeof checkoutData,
+                    fullPaymentLink: checkoutData.paymentLink
+                });
+
+                // First, ensure we have a customer ID by creating/updating the customer
+                const newCustomerId = await createOrUpdateCustomer(
+                    checkoutData.paymentLink.merchantId,
+                    checkoutData.paymentLink.organizationId,
+                    {
+                        firstName: customerDetails.firstName,
+                        lastName: customerDetails.lastName,
+                        email: customerDetails.email,
+                        phoneNumber: customerDetails.phoneNumber,
+                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                        country: customerDetails.country,
+                        city: customerDetails.city,
+                        address: customerDetails.address,
+                        postalCode: customerDetails.postalCode
+                    }
+                );
+
+                if (!newCustomerId) {
+                    console.error('Failed to create/update customer');
+                    toast({
+                        variant: "destructive",
+                        title: "Customer Creation Failed",
+                        description: "Could not create customer record. Please check your information and try again."
+                    });
+                    throw new Error('Could not create customer record');
+                }
+
+                // Set the customer ID for future use
+                setCustomerId(newCustomerId);
 
                 // Calculate total amount including fees
                 const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
@@ -390,15 +405,21 @@ export default function CheckoutPage() {
                 }, 0);
                 const totalAmount = basePrice + feeAmount;
 
-                // Use the WaveCheckout component
-                const { checkoutUrl } = await WaveService.createCheckoutSession({
+                // Success and error URLs - use merchant-specified URLs or default to our pages
+                const successUrl = checkoutData.paymentLink.success_url || `${window.location.origin}/checkout/success`;
+                const errorUrl = checkoutData.paymentLink.cancel_url || `${window.location.origin}/checkout/error`;
+
+                console.log('Creating Wave checkout with customer ID:', newCustomerId);
+
+                // Use the initiateWaveCheckout helper function
+                const { checkoutUrl } = await initiateWaveCheckout({
                     merchantId: checkoutData.paymentLink.merchantId,
                     organizationId: checkoutData.paymentLink.organizationId,
-                    customerId,
+                    customerId: newCustomerId,
                     amount: totalAmount,
                     currency: checkoutData.paymentLink.currency_code,
-                    successUrl: checkoutData.paymentLink.success_url || window.location.origin + '/success',
-                    errorUrl: checkoutData.paymentLink.cancel_url || window.location.origin + '/error',
+                    successUrl,
+                    errorUrl,
                     productId: checkoutData.merchantProduct?.product_id,
                     subscriptionId: checkoutData.subscriptionPlan?.planId,
                     description: checkoutData.paymentLink.title,
@@ -408,6 +429,17 @@ export default function CheckoutPage() {
                         customerPhone: customerDetails.phoneNumber,
                         customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
                         whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber
+                    },
+                    onSuccess: (result) => {
+                        console.log('Wave checkout session created successfully:', result);
+                    },
+                    onError: (error) => {
+                        console.error('Error creating Wave checkout session:', error);
+                        toast({
+                            variant: "destructive",
+                            title: "Payment Error",
+                            description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
+                        });
                     }
                 });
 
@@ -419,7 +451,7 @@ export default function CheckoutPage() {
                 toast({
                     variant: "destructive",
                     title: "Payment Error",
-                    description: "Failed to initiate Wave payment. Please try again."
+                    description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
                 });
             } finally {
                 setIsProcessing(false);
@@ -528,7 +560,10 @@ export default function CheckoutPage() {
 
     // 1. First, let's add a function to check if required fields are filled
     const areRequiredFieldsFilled = () => {
-        return rawNameInput.trim().includes(' ') && customerDetails.email && customerDetails.email.includes('@');
+        return rawNameInput.trim().includes(' ') &&
+            customerDetails.email &&
+            customerDetails.email.includes('@') &&
+            customerDetails.phoneNumber;
     };
 
     // Render the error state when session creation fails
@@ -578,7 +613,7 @@ export default function CheckoutPage() {
 
     return (
         <>
-            <style>{checkoutLightModeStyles}</style>
+            <style>{checkoutStyles}</style>
             <div className="min-h-screen flex flex-col lg:flex-row bg-white checkout-container">
                 {/* Left side - Product details */}
                 <div className={`w-full lg:w-1/2 bg-[#121317] text-white p-4 lg:p-8 flex flex-col relative`}>
@@ -1093,7 +1128,7 @@ export default function CheckoutPage() {
                                                 toast({
                                                     variant: "destructive",
                                                     title: "Required Information",
-                                                    description: "Please fill in your full name and email first."
+                                                    description: "Please fill in your full name, email, and phone number first."
                                                 });
 
                                                 // Focus on the name input
@@ -1219,10 +1254,57 @@ export default function CheckoutPage() {
                                             value={customerDetails.email}
                                             onChange={handleCustomerInputChange}
                                             placeholder="Email address"
-                                            className="rounded-none rounded-b-lg w-full bg-white text-gray-900 border-gray-300"
+                                            className="rounded-none w-full bg-white text-gray-900 border-gray-300"
                                             required
                                         />
                                     </div>
+                                    <div className="flex -mt-px">
+                                        <div className="w-full rounded-none rounded-b-lg">
+                                            <PhoneNumberInput
+                                                value={customerDetails.phoneNumber}
+                                                onChange={(value) => {
+                                                    setCustomerDetails(prev => ({
+                                                        ...prev,
+                                                        phoneNumber: value || '',
+                                                        whatsappNumber: isDifferentWhatsApp ? prev.whatsappNumber : value || ''
+                                                    }));
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <AnimatePresence mode="wait">
+                                        {!isDifferentWhatsApp ? (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="border-t border-gray-200 mt-2"
+                                            >
+                                                <div
+                                                    onClick={() => setIsDifferentWhatsApp(true)}
+                                                    className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
+                                                >
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
+                                                        My WhatsApp number is different
+                                                    </span>
+                                                </div>
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="border-t border-gray-200 mt-2"
+                                            >
+                                                <WhatsAppNumberInput
+                                                    value={customerDetails.whatsappNumber}
+                                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
 
@@ -1313,60 +1395,6 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Phone Numbers - Show both for subscription plans */}
-                            {checkoutData?.subscriptionPlan ? (
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700">Contact information</label>
-                                    <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                        <div className="rounded-t-lg">
-                                            <PhoneNumberInput
-                                                value={customerDetails.phoneNumber}
-                                                onChange={(value) => {
-                                                    setCustomerDetails(prev => ({
-                                                        ...prev,
-                                                        phoneNumber: value || '',
-                                                        whatsappNumber: isDifferentWhatsApp ? prev.whatsappNumber : value || ''
-                                                    }));
-                                                }}
-                                            />
-                                        </div>
-                                        <AnimatePresence mode="wait">
-                                            {!isDifferentWhatsApp ? (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.2 }}
-                                                    className="border-t border-gray-200 mt-2"
-                                                >
-                                                    <div
-                                                        onClick={() => setIsDifferentWhatsApp(true)}
-                                                        className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
-                                                    >
-                                                        <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
-                                                            My WhatsApp number is different
-                                                        </span>
-                                                    </div>
-                                                </motion.div>
-                                            ) : (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.2 }}
-                                                    className="border-t border-gray-200 mt-2"
-                                                >
-                                                    <WhatsAppNumberInput
-                                                        value={customerDetails.whatsappNumber}
-                                                        onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
-                                                    />
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                </div>
-                            ) : null}
 
                             {/* Submit Button */}
                             <div className="flex justify-center pt-2">

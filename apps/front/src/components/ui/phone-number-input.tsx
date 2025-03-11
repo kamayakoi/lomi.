@@ -13,15 +13,47 @@ export default function PhoneNumberInput({ value, onChange }: PhoneNumberInputPr
     const [defaultCountry, setDefaultCountry] = useState<RPNInput.Country>();
 
     useEffect(() => {
-        // Get user's country using their IP
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
+        // First check if we have a cached country code in localStorage
+        const cachedCountryCode = localStorage.getItem('user_country_code');
+        if (cachedCountryCode) {
+            setDefaultCountry(cachedCountryCode as RPNInput.Country);
+            return;
+        }
+
+        // Add a timeout for the fetch to avoid long waits
+        const timeoutPromise = new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), 2000)
+        );
+
+        // Try to get user's country using ipapi.co
+        Promise.race([
+            fetch('https://ipapi.co/json/', {
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }),
+            timeoutPromise
+        ])
             .then(data => {
-                setDefaultCountry(data.country_code as RPNInput.Country);
+                if (data && data.country_code) {
+                    // Cache the result in localStorage for future use
+                    localStorage.setItem('user_country_code', data.country_code);
+                    setDefaultCountry(data.country_code as RPNInput.Country);
+                } else {
+                    throw new Error('Invalid data received');
+                }
             })
             .catch(() => {
-                // Fallback to SN if geolocation fails
+                // If ipapi.co fails, try a fallback to CI (Côte d'Ivoire)
                 setDefaultCountry('CI');
+                localStorage.setItem('user_country_code', 'CI');
             });
     }, []);
 
