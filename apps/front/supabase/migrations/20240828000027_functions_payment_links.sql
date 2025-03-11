@@ -619,89 +619,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
--- Function to create or update a customer
-CREATE OR REPLACE FUNCTION public.create_or_update_customer(
-    p_organization_id UUID,
-    p_merchant_id UUID,
-    p_first_name VARCHAR(100),
-    p_last_name VARCHAR(100),
-    p_email VARCHAR(255),
-    p_phone VARCHAR(50),
-    p_address VARCHAR(255) DEFAULT NULL,
-    p_city VARCHAR(100) DEFAULT NULL,
-    p_state VARCHAR(100) DEFAULT NULL,
-    p_postal_code VARCHAR(20) DEFAULT NULL,
-    p_country VARCHAR(100) DEFAULT NULL,
-    p_whatsapp_number VARCHAR(50) DEFAULT NULL
-)
-RETURNS JSON AS $$
-DECLARE
-    v_customer_id UUID;
-    v_existing_customer UUID;
-BEGIN
-    -- Check if customer exists by email or phone
-    SELECT customer_id INTO v_existing_customer
-    FROM customers
-    WHERE (email = p_email OR phone = p_phone)
-    AND merchant_id = p_merchant_id
-    LIMIT 1;
-    
-    IF v_existing_customer IS NOT NULL THEN
-        -- Update existing customer
-        UPDATE customers
-        SET
-            first_name = p_first_name,
-            last_name = p_last_name,
-            email = p_email,
-            phone = p_phone,
-            address = COALESCE(p_address, address),
-            city = COALESCE(p_city, city),
-            state = COALESCE(p_state, state),
-            postal_code = COALESCE(p_postal_code, postal_code),
-            country = COALESCE(p_country, country),
-            whatsapp_number = COALESCE(p_whatsapp_number, whatsapp_number),
-            updated_at = NOW()
-        WHERE customer_id = v_existing_customer;
-        
-        v_customer_id := v_existing_customer;
-    ELSE
-        -- Create new customer
-        INSERT INTO customers (
-            organization_id,
-            merchant_id,
-            first_name,
-            last_name,
-            email,
-            phone,
-            address,
-            city,
-            state,
-            postal_code,
-            country,
-            whatsapp_number
-        ) VALUES (
-            p_organization_id,
-            p_merchant_id,
-            p_first_name,
-            p_last_name,
-            p_email,
-            p_phone,
-            p_address,
-            p_city,
-            p_state,
-            p_postal_code,
-            p_country,
-            p_whatsapp_number
-        ) RETURNING customer_id INTO v_customer_id;
-    END IF;
-    
-    RETURN jsonb_build_object(
-        'customer_id', v_customer_id,
-        'is_new', v_existing_customer IS NULL
-    );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
-
 -- Function to soft-delete expired payment links
 CREATE OR REPLACE FUNCTION public.cleanup_expired_payment_links()
 RETURNS INTEGER AS $$
@@ -748,7 +665,7 @@ EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Error in handle_payment_link_expiration_changes: %', SQLERRM;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Create a trigger to apply the function before any update
 DROP TRIGGER IF EXISTS payment_link_expiration_trigger ON payment_links;

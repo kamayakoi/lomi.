@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -8,7 +7,6 @@ const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function CheckoutSuccess() {
-    const router = useRouter();
     const [organizationName, setOrganizationName] = useState('');
     const [logoUrl, setLogoUrl] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +14,8 @@ export default function CheckoutSuccess() {
     useEffect(() => {
         const getSessionDetails = async () => {
             // We could get the checkout session ID from the URL if passed by Wave
-            // const { id } = router.query;
+            // const urlParams = new URLSearchParams(window.location.search);
+            // const sessionId = urlParams.get('id');
 
             try {
                 // Get the most recent completed checkout session for this browser session
@@ -45,14 +44,12 @@ export default function CheckoutSuccess() {
             }
         };
 
-        if (router.isReady) {
-            getSessionDetails();
-        }
-    }, [router.isReady, router.query]);
+        getSessionDetails();
+    }, []);
 
     const handleContinue = () => {
         // Redirect to home or order confirmation page
-        window.location.href = 'https://lomi.africa';
+        window.location.href = '/';
     };
 
     if (isLoading) {

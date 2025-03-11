@@ -53,7 +53,7 @@ BEGIN
     FROM merchant_accounts
     WHERE account_id = v_account_id;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Create function to check available balance for a merchant
 CREATE OR REPLACE FUNCTION public.check_merchant_available_balance(
@@ -71,4 +71,4 @@ BEGIN
     
     RETURN COALESCE(v_available_balance, 0);
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER; 
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp; 

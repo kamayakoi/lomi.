@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -8,7 +7,6 @@ const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] || '';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function CheckoutError() {
-    const router = useRouter();
     const [organizationName, setOrganizationName] = useState('');
     const [logoUrl, setLogoUrl] = useState('');
     const [errorCode, setErrorCode] = useState('');
@@ -18,13 +16,17 @@ export default function CheckoutError() {
     useEffect(() => {
         const getErrorDetails = async () => {
             try {
-                // Get error details from the URL if available
-                if (router.query['error']) {
-                    setErrorCode(router.query['error'] as string);
+                // Parse URL parameters to get error details
+                const urlParams = new URLSearchParams(window.location.search);
+                const errorParam = urlParams.get('error');
+                const messageParam = urlParams.get('message');
+
+                if (errorParam) {
+                    setErrorCode(errorParam);
                 }
 
-                if (router.query['message']) {
-                    setErrorMessage(router.query['message'] as string);
+                if (messageParam) {
+                    setErrorMessage(messageParam);
                 }
 
                 // Try to get organization details from the most recent checkout session
@@ -46,10 +48,8 @@ export default function CheckoutError() {
             }
         };
 
-        if (router.isReady) {
-            getErrorDetails();
-        }
-    }, [router.isReady, router.query]);
+        getErrorDetails();
+    }, []);
 
     const handleRetry = () => {
         // Redirect back to checkout page or homepage
@@ -105,7 +105,7 @@ export default function CheckoutError() {
                         </button>
 
                         <button
-                            onClick={() => window.location.href = 'https://lomi.africa'}
+                            onClick={() => window.location.href = '/'}
                             className="w-full bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 text-foreground font-medium py-2 px-4 rounded-[5px] transition-colors border border-border dark:border-zinc-700"
                         >
                             Go to Homepage
