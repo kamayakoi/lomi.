@@ -386,8 +386,6 @@ function formatBillingFrequency(frequency: string | undefined): string {
             return 'Semi-annual';
         case 'yearly':
             return 'Yearly';
-        case 'one-time':
-            return 'One-time';
         default:
             return frequency;
     }

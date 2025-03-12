@@ -6,7 +6,7 @@ CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
 CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'PAYPAL', 'OZOW', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
-CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time');
+CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly');
 CREATE TYPE subscription_status AS ENUM ('pending', 'active', 'paused', 'cancelled', 'expired', 'past_due', 'trial');
 CREATE TYPE kyc_status AS ENUM ('not_submitted', 'pending', 'not_authorized', 'approved', 'rejected');
 CREATE TYPE payment_method_code AS ENUM ('CARDS', 'MOBILE_MONEY', 'E_WALLET', 'APPLE_PAY', 'GOOGLE_PAY', 'USSD', 'QR_CODE', 'BANK_TRANSFER', 'CRYPTO', 'PAYPAL', 'OTHER');
@@ -1169,6 +1169,8 @@ CREATE TABLE organization_checkout_settings (
         "payment_reminders": {"email": true, "whatsapp": false},
         "successful_payment_attempts": {"email": true, "whatsapp": false}
     }'::jsonb,
+    default_success_url VARCHAR(2048),
+    default_cancel_url VARCHAR(2048),
     merchant_recipients JSONB NOT NULL DEFAULT '[]'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

@@ -7,6 +7,8 @@ RETURNS TABLE (
     payment_link_duration INTEGER,
     customer_notifications JSONB,
     merchant_recipients JSONB,
+    default_success_url VARCHAR,
+    default_cancel_url VARCHAR,
     fee_types JSONB
 ) AS $$
 BEGIN
@@ -18,6 +20,8 @@ BEGIN
         ocs.payment_link_duration,
         ocs.customer_notifications,
         ocs.merchant_recipients,
+        ocs.default_success_url,
+        ocs.default_cancel_url,
         COALESCE(
             (
                 SELECT to_jsonb(json_agg(json_build_object(
@@ -50,6 +54,8 @@ BEGIN
         payment_link_duration,
         customer_notifications,
         merchant_recipients,
+        default_success_url,
+        default_cancel_url,
         updated_at
     )
     VALUES (
@@ -63,6 +69,8 @@ BEGIN
             "successful_payment_attempts": {"email": false, "whatsapp": false}
         }'::jsonb),
         COALESCE(p_settings->'merchant_recipients', '[]'::jsonb),
+        COALESCE(p_settings->>'default_success_url', ''),
+        COALESCE(p_settings->>'default_cancel_url', ''),
         NOW()
     )
     ON CONFLICT (organization_id) DO UPDATE SET
@@ -85,6 +93,14 @@ BEGIN
         merchant_recipients = CASE 
             WHEN p_settings->'merchant_recipients' IS NOT NULL THEN p_settings->'merchant_recipients' 
             ELSE organization_checkout_settings.merchant_recipients 
+        END,
+        default_success_url = CASE
+            WHEN p_settings->>'default_success_url' IS NOT NULL THEN p_settings->>'default_success_url'
+            ELSE organization_checkout_settings.default_success_url
+        END,
+        default_cancel_url = CASE
+            WHEN p_settings->>'default_cancel_url' IS NOT NULL THEN p_settings->>'default_cancel_url'
+            ELSE organization_checkout_settings.default_cancel_url
         END,
         updated_at = NOW();
 END;

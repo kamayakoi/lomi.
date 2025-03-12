@@ -41,7 +41,7 @@ interface SubscriptionPlanFormData {
     image_url: string
 }
 
-const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time']
+const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly']
 const fixedChargesOptions: number[] = [3, 6, 9, 12, 18, 24, 36, 48, 60, 72, 84, 96]
 const collectionDayOptions: number[] = Array.from({ length: 31 }, (_, i) => i + 1)
 
@@ -64,9 +64,6 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
 
     const subscriptionLength = watch('subscription_length')
     const collectionDateType = watch('collection_date_type')
-    const billingFrequency = watch('billing_frequency')
-
-    const isOneTimeFrequency = billingFrequency === 'one-time'
 
     const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -267,52 +264,48 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 {errors.billing_frequency && <p className="text-sm text-red-500">{errors.billing_frequency.message}</p>}
                             </div>
 
-                            {!isOneTimeFrequency && (
-                                <>
-                                    <div className="space-y-3">
-                                        <Label>Subscription length</Label>
-                                        <RadioGroup
-                                            defaultValue="automatic"
-                                            onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
-                                            className="rounded-none space-y-3"
-                                        >
-                                            <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="automatic" id="automatic" />
-                                                <Label htmlFor="automatic">Automatic renewal</Label>
-                                            </div>
-                                            <div className="flex items-center space-x-3">
-                                                <RadioGroupItem value="fixed" id="fixed" />
-                                                <Label htmlFor="fixed">End after specific charges</Label>
-                                            </div>
-                                        </RadioGroup>
+                            <div className="space-y-3">
+                                <Label>Subscription length</Label>
+                                <RadioGroup
+                                    defaultValue="automatic"
+                                    onValueChange={(value: SubscriptionLength) => setValue('subscription_length', value)}
+                                    className="rounded-none space-y-3"
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="automatic" id="automatic" />
+                                        <Label htmlFor="automatic">Automatic renewal</Label>
                                     </div>
+                                    <div className="flex items-center space-x-3">
+                                        <RadioGroupItem value="fixed" id="fixed" />
+                                        <Label htmlFor="fixed">End after specific charges</Label>
+                                    </div>
+                                </RadioGroup>
+                            </div>
 
-                                    {subscriptionLength === 'fixed' && (
-                                        <div className="space-y-2">
-                                            <Label htmlFor="fixed_charges">Number of charges</Label>
-                                            <Controller
-                                                name="fixed_charges"
-                                                control={control}
-                                                rules={{ required: 'Number of charges is required' }}
-                                                render={({ field }) => (
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
-                                                        <SelectTrigger className="w-full rounded-none">
-                                                            <SelectValue placeholder="Select number of charges" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="max-h-60 overflow-y-auto rounded-none">
-                                                            {fixedChargesOptions.map((option) => (
-                                                                <SelectItem key={option} value={option.toString()}>
-                                                                    End after {option} charges
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                )}
-                                            />
-                                            {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
-                                        </div>
-                                    )}
-                                </>
+                            {subscriptionLength === 'fixed' && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="fixed_charges">Number of charges</Label>
+                                    <Controller
+                                        name="fixed_charges"
+                                        control={control}
+                                        rules={{ required: 'Number of charges is required' }}
+                                        render={({ field }) => (
+                                            <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                                <SelectTrigger className="w-full rounded-none">
+                                                    <SelectValue placeholder="Select number of charges" />
+                                                </SelectTrigger>
+                                                <SelectContent className="max-h-60 overflow-y-auto rounded-none">
+                                                    {fixedChargesOptions.map((option) => (
+                                                        <SelectItem key={option} value={option.toString()}>
+                                                            End after {option} charges
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        )}
+                                    />
+                                    {errors.fixed_charges && <p className="text-sm text-red-500">{errors.fixed_charges.message}</p>}
+                                </div>
                             )}
 
                             <div className="space-y-2">
@@ -330,7 +323,7 @@ export function CreatePlanForm({ onClose, onSuccess, merchantId }: CreatePlanFor
                                 </button>
                             </div>
 
-                            {showAdvancedSettings && !isOneTimeFrequency && (
+                            {showAdvancedSettings && (
                                 <div className="space-y-6">
                                     <div className="space-y-3">
                                         <Label>Collection Date</Label>

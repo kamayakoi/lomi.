@@ -46,7 +46,7 @@ interface PlanFormData {
     image: FileList;
 }
 
-const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly', 'one-time']
+const frequencyOptions: frequency[] = ['weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly']
 
 export const EditPlanForm: React.FC<EditPlanFormProps> = ({ plan, onClose, onSuccess }) => {
     const [isUploading, setIsUploading] = useState(false)

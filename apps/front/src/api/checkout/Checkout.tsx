@@ -55,7 +55,6 @@ export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false)
     const [isDifferentWhatsApp, setIsDifferentWhatsApp] = useState(false)
     const [isDetailsOpen, setIsDetailsOpen] = useState(false)
-    const [customerId, setCustomerId] = useState<string | null>(null);
     const [sessionError, setSessionError] = useState<string | null>(null);
     const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
     const nameInputRef = useRef<HTMLInputElement>(null);
@@ -394,8 +393,11 @@ export default function CheckoutPage() {
                     throw new Error('Could not create customer record');
                 }
 
-                // Set the customer ID for future use
-                setCustomerId(newCustomerId);
+                // Store the customer ID in the customerDetails object instead of a separate state
+                setCustomerDetails(prev => ({
+                    ...prev,
+                    customerId: newCustomerId
+                }));
 
                 // Calculate total amount including fees
                 const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
@@ -524,7 +526,11 @@ export default function CheckoutPage() {
                     return;
                 }
 
-                setCustomerId(newCustomerId);
+                // Store the customer ID in the customerDetails object instead of a separate state
+                setCustomerDetails(prev => ({
+                    ...prev,
+                    customerId: newCustomerId
+                }));
             } catch (error: unknown) {
                 const errorMessage = error instanceof Error ? error.message : 'An error occurred';
                 console.error('Error creating/updating customer:', errorMessage);
@@ -744,8 +750,7 @@ export default function CheckoutPage() {
                                                     .replace('bi-monthly', 'two months')
                                                     .replace('quarterly', 'quarter')
                                                     .replace('semi-annual', 'six months')
-                                                    .replace('yearly', 'year')
-                                                    .replace('one-time', 'payment')}</span>
+                                                    .replace('yearly', 'year')}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-3 border-t border-gray-800 pt-4">

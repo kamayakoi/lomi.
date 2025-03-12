@@ -1,5 +1,5 @@
 export type subscription_status = 'pending' | 'active' | 'paused' | 'cancelled' | 'expired' | 'past_due' | 'trial';
-export type frequency = 'weekly' | 'bi-weekly' | 'monthly' | 'bi-monthly' | 'quarterly' | 'semi-annual' | 'yearly' | 'one-time';
+export type frequency = 'weekly' | 'bi-weekly' | 'monthly' | 'bi-monthly' | 'quarterly' | 'semi-annual' | 'yearly';
 export type currency_code = 'XOF' | 'USD' | 'EUR';
 export type failed_payment_action = 'cancel' | 'pause' | 'continue';
 export type FirstPaymentType = 'initial' | 'non_initial';
@@ -13,7 +13,6 @@ export const frequencyColors: Record<frequency, string> = {
   'quarterly': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
   'semi-annual': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
   'yearly': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-  'one-time': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
 } as const;
 
 export interface SubscriptionPlan {

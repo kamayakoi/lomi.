@@ -18,6 +18,7 @@ DECLARE
     v_fee_amount NUMERIC;
     v_net_amount NUMERIC;
     v_fee_name TEXT;
+    v_transaction_type transaction_type;
 BEGIN
     -- Get fee calculation based on provider and payment method
     SELECT name, percentage, fixed_amount 
@@ -32,6 +33,12 @@ BEGIN
     v_fee_amount := (p_amount * v_fee_data.percentage / 100) + v_fee_data.fixed_amount;
     v_net_amount := p_amount - v_fee_amount;
     v_fee_name := v_fee_data.name;
+
+    -- Determine the transaction type based on whether it's a subscription payment
+    v_transaction_type := CASE 
+        WHEN p_subscription_id IS NOT NULL THEN 'instalment'::transaction_type
+        ELSE 'payment'::transaction_type
+    END;
 
     -- Insert transaction
     INSERT INTO transactions (
@@ -56,7 +63,7 @@ BEGIN
         p_customer_id,
         p_product_id,
         p_subscription_id,
-        'payment',
+        v_transaction_type,
         p_description,
         p_metadata,
         p_amount,
@@ -149,3 +156,144 @@ BEGIN
     RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+
+-- Function to expire pending transactions
+CREATE OR REPLACE FUNCTION public.expire_pending_transactions(expiry_hours INTEGER DEFAULT 24)
+RETURNS INTEGER AS $$
+DECLARE
+  rows_updated INTEGER;
+BEGIN
+  WITH expired_transactions AS (
+    SELECT 
+      t.transaction_id,
+      t.merchant_id,
+      t.organization_id
+    FROM transactions t
+    LEFT JOIN providers_transactions pt ON t.transaction_id = pt.transaction_id
+    WHERE 
+      t.status = 'pending' AND
+      (
+        -- Expired based on creation time (fallback)
+        t.created_at < (NOW() - (expiry_hours || ' hours')::interval) OR
+        -- Expired based on Wave session expiration time if available
+        (
+          t.metadata->'wave_session'->>'when_expires' IS NOT NULL AND
+          (t.metadata->'wave_session'->>'when_expires')::timestamptz < NOW()
+        )
+      )
+  ),
+  updated_transactions AS (
+    UPDATE transactions t
+    SET 
+      status = 'failed',
+      metadata = jsonb_set(
+        COALESCE(t.metadata, '{}'::jsonb),
+        '{expiration_info}',
+        jsonb_build_object(
+          'expired_at', now(),
+          'reason', 'Transaction expired after ' || expiry_hours || ' hours'
+        )
+      ),
+      updated_at = NOW()
+    FROM expired_transactions et
+    WHERE t.transaction_id = et.transaction_id
+    RETURNING t.transaction_id, et.merchant_id, et.organization_id
+  )
+  -- Also update the provider_transactions table
+  UPDATE providers_transactions pt
+  SET 
+    provider_payment_status = 'failed',
+    error_code = 'expired',
+    error_message = 'Transaction expired after ' || expiry_hours || ' hours',
+    updated_at = NOW()
+  FROM updated_transactions ut
+  WHERE pt.transaction_id = ut.transaction_id;
+  
+  -- Count how many rows were updated
+  GET DIAGNOSTICS rows_updated = ROW_COUNT;
+  
+  -- Log the action
+  IF rows_updated > 0 THEN
+    INSERT INTO system_logs (
+      log_type,
+      message,
+      details,
+      severity
+    ) VALUES (
+      'transaction_expiration',
+      'Expired ' || rows_updated || ' pending transactions',
+      jsonb_build_object(
+        'expiry_hours', expiry_hours,
+        'executed_at', NOW()
+      ),
+      'INFO'
+    );
+  END IF;
+  
+  RETURN rows_updated;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to create a cron job that runs the expiration function
+CREATE OR REPLACE FUNCTION public.setup_transaction_expiration_cron()
+RETURNS TEXT AS $$
+DECLARE
+  cron_exists BOOLEAN;
+BEGIN
+  -- Check if extension exists
+  SELECT EXISTS (
+    SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
+  ) INTO cron_exists;
+  
+  IF NOT cron_exists THEN
+    RETURN 'pg_cron extension not available. Please install the extension to enable scheduled jobs.';
+  END IF;
+  
+  -- Remove job if it already exists (for idempotence)
+  PERFORM cron.unschedule('expire_pending_transactions_job');
+  
+  -- Schedule job to run every hour
+  PERFORM cron.schedule(
+    'expire_pending_transactions_job',
+    '0 * * * *',  -- Run hourly (at minute 0)
+    $$SELECT public.expire_pending_transactions(24)$$
+  );
+  
+  RETURN 'Transaction expiration job scheduled successfully';
+EXCEPTION WHEN OTHERS THEN
+  RETURN 'Error setting up transaction expiration job: ' || SQLERRM;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to manually trigger transaction expiration (for testing or manual cleanup)
+CREATE OR REPLACE FUNCTION public.manually_expire_transactions(expiry_hours INTEGER DEFAULT 24)
+RETURNS TEXT AS $$
+DECLARE
+  rows_updated INTEGER;
+BEGIN
+  SELECT public.expire_pending_transactions(expiry_hours) INTO rows_updated;
+  
+  RETURN 'Expired ' || rows_updated || ' pending transactions';
+EXCEPTION WHEN OTHERS THEN
+  RETURN 'Error expiring transactions: ' || SQLERRM;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Comment explaining the migration
+COMMENT ON FUNCTION public.expire_pending_transactions IS 
+'Expires pending transactions that are older than a specified number of hours or have passed their Wave expiration time.';
+
+COMMENT ON FUNCTION public.setup_transaction_expiration_cron IS
+'Sets up a scheduled job to run the expire_pending_transactions function hourly.';
+
+COMMENT ON FUNCTION public.manually_expire_transactions IS
+'Manually triggers the transaction expiration process for testing or immediate cleanup.';
+
+-- Call the setup function (wrapped in DO block to handle errors gracefully)
+DO $$
+BEGIN
+  PERFORM public.setup_transaction_expiration_cron();
+EXCEPTION WHEN OTHERS THEN
+  RAISE NOTICE 'Could not set up scheduled job: %. You may need to manually configure pg_cron or run the setup_transaction_expiration_cron function when the extension is available.', SQLERRM;
+END $$; 

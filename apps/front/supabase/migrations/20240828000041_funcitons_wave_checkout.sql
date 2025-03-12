@@ -74,6 +74,7 @@ DECLARE
     v_net_amount NUMERIC;
     v_fee_reference TEXT;
     v_subscription_id UUID := p_subscription_id;
+    v_transaction_type transaction_type;
 BEGIN
     -- Calculate fee with special handling for small amounts
     IF p_amount < 2000 AND p_currency_code = 'XOF' THEN
@@ -130,6 +131,12 @@ BEGIN
         END IF;
     END IF;
 
+    -- Determine the transaction type based on whether it's a subscription payment
+    v_transaction_type := CASE 
+        WHEN v_subscription_id IS NOT NULL THEN 'instalment'::transaction_type
+        ELSE 'payment'::transaction_type
+    END;
+
     -- Create transaction record
     INSERT INTO transactions (
         merchant_id,
@@ -154,7 +161,7 @@ BEGIN
         p_customer_id,
         p_product_id,
         v_subscription_id,
-        'payment',
+        v_transaction_type,
         p_description,
         p_metadata,
         p_amount,

@@ -19,6 +19,8 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
     const [defaultLanguage, setDefaultLanguage] = useState(settings?.default_language || 'en')
     const [displayCurrency, setDisplayCurrency] = useState(settings?.display_currency || 'XOF')
     const [paymentLinkDuration, setPaymentLinkDuration] = useState(settings?.payment_link_duration || 1)
+    const [defaultSuccessUrl, setDefaultSuccessUrl] = useState(settings?.default_success_url || '')
+    const [defaultCancelUrl, setDefaultCancelUrl] = useState(settings?.default_cancel_url || '')
     const [isSaving, setIsSaving] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -39,6 +41,8 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                     setDefaultLanguage(data[0].default_language)
                     setDisplayCurrency(data[0].display_currency)
                     setPaymentLinkDuration(data[0].payment_link_duration)
+                    setDefaultSuccessUrl(data[0].default_success_url || '')
+                    setDefaultCancelUrl(data[0].default_cancel_url || '')
                 }
             } catch (error) {
                 console.error('Error fetching payment settings:', error)
@@ -72,7 +76,9 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                 p_settings: {
                     default_language: defaultLanguage,
                     display_currency: displayCurrency,
-                    payment_link_duration: paymentLinkDuration
+                    payment_link_duration: paymentLinkDuration,
+                    default_success_url: defaultSuccessUrl,
+                    default_cancel_url: defaultCancelUrl
                 }
             })
 
@@ -81,7 +87,9 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
             await onUpdate({
                 default_language: defaultLanguage,
                 display_currency: displayCurrency,
-                payment_link_duration: paymentLinkDuration
+                payment_link_duration: paymentLinkDuration,
+                default_success_url: defaultSuccessUrl,
+                default_cancel_url: defaultCancelUrl
             })
 
             toast({
@@ -175,6 +183,63 @@ export function PaymentSettings({ settings, onUpdate }: PaymentSettingsProps) {
                         className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-none"
                         placeholder="Enter days (1-30)"
                     />
+                </div>
+
+                <div className="border-t pt-4">
+                    <h3 className="text-lg font-medium mb-3">Redirect URLs</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        Set the default URLs where customers will be redirected after payments. These will be used if specific URLs aren&apos;t provided when creating payment links.
+                    </p>
+
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <Label htmlFor="defaultSuccessUrl">Default Success URL</Label>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Info className="h-4 w-4 text-muted-foreground" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-sm">
+                                            <p>Where customers will be sent after successful payments if no specific URL is provided. Can be a full URL (https://...) or just the domain and path.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <Input
+                                id="defaultSuccessUrl"
+                                type="text"
+                                value={defaultSuccessUrl}
+                                onChange={(e) => setDefaultSuccessUrl(e.target.value)}
+                                className="rounded-none"
+                                placeholder="https://yourdomain.com/success or yourdomain.com/success"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <Label htmlFor="defaultCancelUrl">Default Cancel URL</Label>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Info className="h-4 w-4 text-muted-foreground" />
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-sm">
+                                            <p>Where customers will be sent if they cancel the payment process. If not specified, lomi&apos;s default cancel page will be used.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <Input
+                                id="defaultCancelUrl"
+                                type="text"
+                                value={defaultCancelUrl}
+                                onChange={(e) => setDefaultCancelUrl(e.target.value)}
+                                className="rounded-none"
+                                placeholder="https://yourdomain.com/cancel or yourdomain.com/cancel"
+                            />
+                        </div>
+                    </div>
                 </div>
             </CardContent>
             <CardFooter>

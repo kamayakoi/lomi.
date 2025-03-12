@@ -24,4 +24,6 @@ export interface CheckoutSettings {
     fee_types: FeeType[];
     customer_notifications: CustomerNotifications;
     merchant_recipients: MerchantRecipient[];
+    default_success_url: string;
+    default_cancel_url: string;
 } 
