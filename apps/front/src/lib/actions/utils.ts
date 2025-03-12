@@ -59,7 +59,6 @@ export function formatProvider(provider: string): string {
         MOOV: 'Moov',
         AIRTEL: 'Airtel',
         MPESA: 'M-Pesa',
-        WIZALL: 'Wizall',
         OPAY: 'OPay',
         OTHER: 'Other'
     }

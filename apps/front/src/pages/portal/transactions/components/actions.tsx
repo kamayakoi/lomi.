@@ -346,8 +346,6 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Airtel'
         case 'MPESA':
             return 'M-Pesa'
-        case 'WIZALL':
-            return 'Wizall'
         case 'OPAY':
             return 'OPay'
         case 'OTHER':

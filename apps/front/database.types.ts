@@ -5430,7 +5430,6 @@ export type Database = {
         | "MOOV"
         | "AIRTEL"
         | "MPESA"
-        | "WIZALL"
         | "OPAY"
         | "PAYPAL"
         | "OZOW"

@@ -15,6 +15,7 @@ interface PaymentMethod {
     number: string | null;
     logo: string;
     provider_code: string;
+    status?: 'active' | 'coming_soon';
 }
 
 interface ProviderSetting {
@@ -25,11 +26,16 @@ interface ProviderSetting {
 }
 
 const paymentMethods: PaymentMethod[] = [
-    { channel: 'Visa', type: 'Card', number: null, logo: '/payment_channels/visa.webp', provider_code: 'ECOBANK' },
-    { channel: 'Mastercard', type: 'Card', number: null, logo: '/payment_channels/mastercard.webp', provider_code: 'ECOBANK' },
+    // Mobile Money
     { channel: 'Orange', type: 'Mobile Money', number: null, logo: '/payment_channels/orange.webp', provider_code: 'ORANGE' },
-    { channel: 'MTN', type: 'Mobile Money', number: null, logo: '/payment_channels/mtn.webp', provider_code: 'MTN' },
+    { channel: 'MTN', type: 'Mobile Money', number: null, logo: '/payment_channels/mtn.webp', provider_code: 'MTN', status: 'coming_soon' },
+    { channel: 'Moov Money', type: 'Mobile Money', number: null, logo: '/payment_channels/moov.webp', provider_code: 'MOOV', status: 'coming_soon' },
+    { channel: 'Airtel', type: 'Mobile Money', number: null, logo: '/payment_channels/airtel.webp', provider_code: 'AIRTEL', status: 'coming_soon' },
+    { channel: 'M-Pesa', type: 'Mobile Money', number: null, logo: '/payment_channels/mpesa.webp', provider_code: 'MPESA', status: 'coming_soon' },
+
+    // E-Wallets
     { channel: 'Wave', type: 'E-Wallet', number: null, logo: '/payment_channels/wave.webp', provider_code: 'WAVE' },
+    { channel: 'OPay', type: 'E-Wallet', number: null, logo: '/payment_channels/opay.webp', provider_code: 'OPAY', status: 'coming_soon' },
 ]
 
 export default function PaymentMethods() {
@@ -113,6 +119,7 @@ export default function PaymentMethods() {
                                         <SelectItem value="card">Card</SelectItem>
                                         <SelectItem value="e-wallet">E-Wallet</SelectItem>
                                         <SelectItem value="mobile money">Mobile Money</SelectItem>
+                                        <SelectItem value="crypto">Crypto</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <div className="relative w-full sm:w-auto">

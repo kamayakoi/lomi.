@@ -2,7 +2,7 @@ export type currency_code = 'XOF' | 'USD' | 'EUR';
 export type payment_method_code = 'CARDS' | 'MOBILE_MONEY' | 'E_WALLET' | 'APPLE_PAY' | 'GOOGLE_PAY' | 'USSD' | 'QR_CODE' | 'BANK_TRANSFER' | 'CRYPTO' | 'OTHER' | 'PAYPAL';
 export type transaction_status = 'pending' | 'completed' | 'failed'| 'refunded';
 export type transaction_type = 'payment' | 'instalment';
-export type provider_code = 'ORANGE' | 'WAVE' | 'ECOBANK' | 'MTN' | 'NOWPAYMENTS' | 'APPLE' | 'GOOGLE' | 'MOOV' | 'AIRTEL' | 'MPESA' | 'WIZALL' | 'OPAY' | 'PAYPAL' | 'OTHER';
+export type provider_code = 'ORANGE' | 'WAVE' | 'ECOBANK' | 'MTN' | 'NOWPAYMENTS' | 'APPLE' | 'GOOGLE' | 'MOOV' | 'AIRTEL' | 'MPESA' | 'OPAY' | 'PAYPAL' | 'OTHER';
 export type refund_status = 'pending' | 'completed' | 'failed';
 export type subscription_status = 'pending' | 'active' | 'paused' | 'cancelled' | 'expired' | 'past_due' | 'trial';
 

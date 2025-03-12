@@ -33,7 +33,6 @@ const providerColors: Record<provider_code, string> = {
     'MOOV': 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white',
     'AIRTEL': 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white',
     'MPESA': 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white',
-    'WIZALL': 'bg-[#FF6B00] text-white dark:bg-[#FF6B00] dark:text-white',
     'OPAY': 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white',
     'PAYPAL': 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white',
     'OTHER': 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
@@ -217,8 +216,6 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Airtel'
         case 'MPESA':
             return 'Mpesa'
-        case 'WIZALL':
-            return 'Wizall'
         case 'OPAY':
             return 'Opay'
         case 'OTHER':

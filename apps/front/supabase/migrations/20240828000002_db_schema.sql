@@ -3,7 +3,7 @@
 CREATE TYPE transaction_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
 CREATE TYPE transaction_type AS ENUM ('payment', 'instalment');
 CREATE TYPE organization_status AS ENUM ('active', 'inactive', 'suspended');
-CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'WIZALL', 'OPAY', 'PAYPAL', 'OZOW', 'OTHER');
+CREATE TYPE provider_code AS ENUM ('ORANGE', 'WAVE', 'ECOBANK', 'MTN', 'NOWPAYMENTS', 'APPLE', 'GOOGLE', 'MOOV', 'AIRTEL', 'MPESA', 'OPAY', 'PAYPAL', 'OZOW', 'OTHER');
 CREATE TYPE refund_status AS ENUM ('pending', 'completed', 'failed');
 CREATE TYPE invoice_status AS ENUM ('sent', 'paid', 'overdue', 'cancelled');
 CREATE TYPE frequency AS ENUM ('weekly', 'bi-weekly', 'monthly', 'bi-monthly', 'quarterly', 'semi-annual', 'yearly');

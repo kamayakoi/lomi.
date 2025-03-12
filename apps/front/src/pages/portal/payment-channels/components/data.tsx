@@ -136,16 +136,6 @@ export const paymentMethods: PaymentMethod[] = [
     category: 'E-Wallets'
   },
   {
-    code: 'WIZALL',
-    name: 'Wizall',
-    description: 'Accept Wizall payments to tap into a vast network of users in Senegal.',
-    logo: <img src="/payment_channels/wizall.webp" alt="Wizall" className="w-full h-full object-contain" />,
-    provider_code: 'WIZALL',
-    type: 'e-Wallets',
-    status: 'coming_soon',
-    category: 'E-Wallets'
-  },
-  {
     code: 'OPAY',
     name: 'OPay',
     description: 'Unlock OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',

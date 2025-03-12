@@ -874,7 +874,6 @@ function TransactionsPage() {
                                                                         ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'WIZALL' ? 'bg-[#FF6B00] text-white dark:bg-[#FF6B00] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
                                                                         ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
@@ -969,8 +968,6 @@ function formatProviderCode(providerCode: provider_code): string {
             return 'Airtel'
         case 'MPESA':
             return 'M-Pesa'
-        case 'WIZALL':
-            return 'Wizall'
         case 'OPAY':
             return 'OPay'
         case 'OTHER':

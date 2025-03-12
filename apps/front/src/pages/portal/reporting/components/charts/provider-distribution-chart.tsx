@@ -34,7 +34,6 @@ const PROVIDER_COLORS = {
     'Moov': '#0093DD',
     'Airtel': '#FF0000',
     'M-Pesa': '#4CAF50',
-    'Wizall': '#FF6B00',
     'OPay': '#14B55A',
     'PayPal': '#003087',
     'Activity': '#2563eb'
