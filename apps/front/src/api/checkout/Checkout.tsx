@@ -428,7 +428,12 @@ export default function CheckoutPage() {
                         customerEmail: customerDetails.email,
                         customerPhone: customerDetails.phoneNumber,
                         customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
-                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber
+                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                        ...(checkoutData.subscriptionPlan && {
+                            planId: checkoutData.subscriptionPlan.planId,
+                            subscriptionName: checkoutData.subscriptionPlan.name,
+                            billingFrequency: checkoutData.subscriptionPlan.billingFrequency
+                        })
                     },
                     onSuccess: (result) => {
                         console.log('Wave checkout session created successfully:', result);

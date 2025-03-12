@@ -3,6 +3,7 @@
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS http WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Function to update the updated_at column
 CREATE OR REPLACE FUNCTION update_updated_at_column()

@@ -1,3 +1,52 @@
+-- Function to create a subscription from a plan
+CREATE OR REPLACE FUNCTION create_subscription_from_plan(
+    p_merchant_id UUID,
+    p_organization_id UUID,
+    p_customer_id UUID,
+    p_plan_id UUID,
+    p_metadata JSONB DEFAULT NULL
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    v_subscription_id UUID;
+BEGIN
+    -- Generate a new subscription ID without using uuid_generate_v4()
+    -- Use a random UUID with MD5 hash as fallback
+    SELECT md5(random()::text || clock_timestamp()::text)::uuid INTO v_subscription_id;
+    
+    -- Insert subscription record
+    INSERT INTO merchant_subscriptions (
+        subscription_id,
+        merchant_id,
+        organization_id,
+        plan_id,
+        customer_id,
+        status,
+        start_date,
+        metadata,
+        created_at,
+        updated_at
+    ) VALUES (
+        v_subscription_id,
+        p_merchant_id,
+        p_organization_id,
+        p_plan_id,
+        p_customer_id,
+        'pending',
+        CURRENT_DATE,
+        p_metadata,
+        NOW(),
+        NOW()
+    );
+    
+    RETURN v_subscription_id;
+END;
+$$;
+
 -- Function to create a Wave checkout transaction
 CREATE OR REPLACE FUNCTION create_wave_checkout_transaction(
     p_merchant_id UUID,
@@ -24,6 +73,7 @@ DECLARE
     v_fee_amount NUMERIC;
     v_net_amount NUMERIC;
     v_fee_reference TEXT;
+    v_subscription_id UUID := p_subscription_id;
 BEGIN
     -- Calculate fee using the get_transaction_fee function
     SELECT name, COALESCE(fixed_amount, 0) + (p_amount * percentage / 100)
@@ -43,6 +93,47 @@ BEGIN
 
     -- Calculate net amount
     v_net_amount := p_amount - v_fee_amount;
+    
+    -- For subscription payment links, we need to create a subscription first
+    -- This handles the case where p_subscription_id is provided but doesn't exist yet
+    -- Or the plan ID is in the metadata and we need to create a subscription
+    IF (p_subscription_id IS NOT NULL OR (p_metadata IS NOT NULL AND p_metadata->>'planId' IS NOT NULL)) THEN
+        -- If subscription_id is provided, check if it exists
+        IF p_subscription_id IS NOT NULL THEN
+            -- Check if this subscription_id already exists
+            PERFORM 1 FROM merchant_subscriptions WHERE subscription_id = p_subscription_id;
+            
+            IF NOT FOUND THEN
+                -- If it doesn't exist and we have a planId in metadata, create it
+                IF p_metadata IS NOT NULL AND p_metadata->>'planId' IS NOT NULL THEN
+                    v_subscription_id := create_subscription_from_plan(
+                        p_merchant_id,
+                        p_organization_id,
+                        p_customer_id,
+                        (p_metadata->>'planId')::UUID,
+                        jsonb_build_object(
+                            'checkout_id', p_provider_checkout_id,
+                            'initial_payment', p_amount,
+                            'currency_code', p_currency_code
+                        )
+                    );
+                END IF;
+            END IF;
+        -- If no subscription_id is provided but planId is in metadata, create a new subscription
+        ELSIF p_metadata IS NOT NULL AND p_metadata->>'planId' IS NOT NULL THEN
+            v_subscription_id := create_subscription_from_plan(
+                p_merchant_id,
+                p_organization_id,
+                p_customer_id,
+                (p_metadata->>'planId')::UUID,
+                jsonb_build_object(
+                    'checkout_id', p_provider_checkout_id,
+                    'initial_payment', p_amount,
+                    'currency_code', p_currency_code
+                )
+            );
+        END IF;
+    END IF;
 
     -- Create transaction record
     INSERT INTO transactions (
@@ -67,7 +158,7 @@ BEGIN
         p_organization_id,
         p_customer_id,
         p_product_id,
-        p_subscription_id,
+        v_subscription_id,
         'payment',
         p_description,
         p_metadata,

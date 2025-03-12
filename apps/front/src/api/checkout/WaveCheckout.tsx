@@ -17,6 +17,7 @@ interface WaveCheckoutProps {
         customerPhone?: string;
         customerName?: string;
         whatsappNumber?: string;
+        planId?: string;
         [key: string]: unknown;
     };
     onError: (error: Error) => void;
@@ -43,6 +44,23 @@ export const WaveCheckout = async ({
     onSuccess
 }: WaveCheckoutProps) => {
     try {
+        // Add planId to metadata if it's a subscription checkout
+        const enhancedMetadata = { ...metadata };
+
+        // For subscription checkouts, ensure planId is in metadata
+        if (subscriptionId) {
+            console.log('Processing subscription checkout:', {
+                subscriptionId,
+                planId: metadata?.planId
+            });
+
+            // Make sure planId is in metadata, even if it's the same as subscriptionId
+            if (!enhancedMetadata.planId && subscriptionId) {
+                enhancedMetadata.planId = subscriptionId;
+                console.log('Adding planId to metadata for subscription checkout:', subscriptionId);
+            }
+        }
+
         // Process the Wave checkout
         const result = await WaveService.createCheckoutSession({
             merchantId,
@@ -55,7 +73,7 @@ export const WaveCheckout = async ({
             productId,
             subscriptionId,
             description,
-            metadata
+            metadata: enhancedMetadata
         });
 
         onSuccess(result);
