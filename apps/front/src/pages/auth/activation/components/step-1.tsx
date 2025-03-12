@@ -1,7 +1,7 @@
 import React from 'react';
-import { CheckCircle, ChevronRight } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { CheckCircle, ChevronRight, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ButtonExpand } from '@/components/design/button-expand';
 
 interface ActivationStep1Props {
     onNext: (data: Record<string, never>) => void;
@@ -38,9 +38,15 @@ const ActivationStep1: React.FC<ActivationStep1Props> = ({ onNext }) => {
                 </p>
             </div>
             <div className="flex justify-end">
-                <Button onClick={() => onNext({})} className="bg-green-500 hover:bg-green-600 text-white">
-                    {t('common.next')}
-                </Button>
+                <ButtonExpand
+                    text={t('common.next')}
+                    icon={ArrowRight}
+                    onClick={() => onNext({})}
+                    bgColor="bg-green-500 dark:bg-green-600"
+                    hoverBgColor="hover:bg-green-600 dark:hover:bg-green-700"
+                    textColor="text-white"
+                    hoverTextColor="hover:text-white"
+                />
             </div>
         </div>
     );

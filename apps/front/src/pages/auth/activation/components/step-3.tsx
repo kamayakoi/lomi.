@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,11 +6,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { countryCodes } from '@/lib/data/onboarding';
 import { ActivationData } from "../activation";
-import { Button } from "@/components/ui/button";
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/design/language-switcher';
+import { ButtonExpand } from '@/components/design/button-expand';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const phoneRegex = /^(\+\d{1,3}[- ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{6})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{8})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{5})$|^(\+\d{1,3}[- ]?)?([0-9]{5})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$|^(\+\d{1,3}[- ]?)?([0-9]{4})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{3})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{1})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{2})[-. ]?([0-9]{2})$|^(\+\d{1,3}[- ]?)?([0-9]{3})[-. ]?([0-9]{4})[-. ]?([0-9]{4})$|^(\+\d{1,3}[- ]?)?([0-9]{2})[-. ]?([0-9]{2})[-. ]?([0-9]{3})[-. ]?([0-9]{3})$/;
+
+// Add this function for phone number formatting
+const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const numbers = value.replace(/\D/g, '');
+
+    // Format based on length and potential patterns
+    if (numbers.length <= 2) {
+        return numbers;
+    } else if (numbers.length <= 4) {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2)}`;
+    } else if (numbers.length <= 7) {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4)}`;
+    } else {
+        return `${numbers.slice(0, 2)} ${numbers.slice(2, 4)} ${numbers.slice(4, 7)} ${numbers.slice(7)}`;
+    }
+};
 
 const activationStep3Schema = z.object({
     fullName: z.string().min(1, 'activation.step3.full_name.error'),
@@ -29,7 +47,7 @@ interface ActivationStep3Props {
 
 const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, data }) => {
     const { t } = useTranslation();
-    const { control, handleSubmit, formState: { errors } } = useForm<ActivationStep3Data>({
+    const { control, handleSubmit, formState: { errors }, setValue, getValues } = useForm<ActivationStep3Data>({
         resolver: zodResolver(activationStep3Schema),
         mode: 'onChange',
         defaultValues: {
@@ -41,7 +59,12 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
     });
 
     const onSubmit = (data: ActivationStep3Data) => {
-        onNext(data);
+        // Clean up spacing before submitting
+        const cleanedData = {
+            ...data,
+            mobileNumber: data.mobileNumber.replace(/\s/g, '')
+        };
+        onNext(cleanedData);
     };
 
     const getErrorMessage = (error: { message?: string }) => {
@@ -49,15 +72,28 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
         return t(error.message);
     };
 
-    const [countryCodeSearch, setCountryCodeSearch] = useState('');
+    const [countryCodeSearch, setCountryCodeSearch] = useState(data.countryCode || '+225');
     const [isCountryCodeDropdownOpen, setIsCountryCodeDropdownOpen] = useState(false);
 
-    const filteredCountryCodes = React.useMemo(() => {
+    const filteredCountryCodes = useMemo(() => {
         const lowercaseSearch = countryCodeSearch.toLowerCase();
         return Array.from(new Set(countryCodes.filter(code =>
             code.toLowerCase().includes(lowercaseSearch)
-        ))).slice(0, 2);
+        ))).slice(0, 5); // Limit to 5 results
     }, [countryCodeSearch]);
+
+    // Handle phone number formatting
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formattedValue = formatPhoneNumber(e.target.value);
+        e.target.value = formattedValue;
+        setValue("mobileNumber", formattedValue, { shouldValidate: true });
+
+        // Prevent country code from being modified by autofill
+        const currentCountryCode = getValues("countryCode");
+        if (currentCountryCode && currentCountryCode !== countryCodeSearch) {
+            setCountryCodeSearch(currentCountryCode);
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -110,13 +146,17 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                                     <Input
                                         id="countryCode"
                                         type="text"
+                                        autoComplete="tel-country-code"
                                         placeholder={t('activation.step3.mobile.country_code.placeholder')}
                                         value={countryCodeSearch}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setCountryCodeSearch(value);
-                                            field.onChange(value);
-                                            setIsCountryCodeDropdownOpen(true);
+                                            // Only update if it's a valid country code format
+                                            if (value.startsWith('+') || value === '') {
+                                                setCountryCodeSearch(value);
+                                                field.onChange(value);
+                                                setIsCountryCodeDropdownOpen(true);
+                                            }
                                         }}
                                         onFocus={() => setIsCountryCodeDropdownOpen(true)}
                                         onBlur={() => setTimeout(() => setIsCountryCodeDropdownOpen(false), 200)}
@@ -151,9 +191,21 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                             render={({ field }) => (
                                 <Input
                                     id="mobileNumber"
+                                    type="tel"
+                                    autoComplete="tel-national"
                                     placeholder={t('activation.step3.mobile.number.placeholder')}
                                     className="rounded-none"
                                     {...field}
+                                    onChange={(e) => {
+                                        handlePhoneNumberChange(e);
+                                    }}
+                                    onInput={() => {
+                                        // Extra protection against autofill overwriting country code
+                                        const currentCountryCode = getValues("countryCode");
+                                        if (currentCountryCode && currentCountryCode !== countryCodeSearch) {
+                                            setCountryCodeSearch(currentCountryCode);
+                                        }
+                                    }}
                                 />
                             )}
                         />
@@ -162,12 +214,26 @@ const ActivationStep3: React.FC<ActivationStep3Props> = ({ onNext, onPrevious, d
                 </div>
             </div>
             <div className="flex justify-between">
-                <Button type="button" variant="outline" onClick={onPrevious}>
-                    {t('common.back')}
-                </Button>
-                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
-                    {t('common.next')}
-                </Button>
+                <ButtonExpand
+                    text={t('common.back')}
+                    icon={ArrowLeft}
+                    iconPlacement="left"
+                    onClick={onPrevious}
+                    bgColor="bg-white dark:bg-gray-800"
+                    hoverBgColor="hover:bg-gray-100 dark:hover:bg-gray-700"
+                    textColor="text-gray-700 dark:text-gray-300"
+                    hoverTextColor="hover:text-gray-900 dark:hover:text-gray-100"
+                    className="border border-gray-300 dark:border-gray-600"
+                />
+                <ButtonExpand
+                    text={t('common.next')}
+                    icon={ArrowRight}
+                    type="submit"
+                    bgColor="bg-green-500 dark:bg-green-600"
+                    hoverBgColor="hover:bg-green-600 dark:hover:bg-green-700"
+                    textColor="text-white"
+                    hoverTextColor="hover:text-white"
+                />
             </div>
         </form>
     )

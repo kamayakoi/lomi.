@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { ActivationData } from "../activation";
-import { Button } from "@/components/ui/button";
 import KYCFileUploader from "@/components/auth/kyc-file-uploader";
 import { useUser } from '@/lib/hooks/use-user';
 import {
@@ -14,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from '@/lib/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { ButtonExpand } from '@/components/design/button-expand';
+import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 
 type ActivationStep4Data = {
     identityProof: string;
@@ -123,12 +124,26 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious,
                 <p>{t('activation.step4.file_requirements')}</p>
             </div>
             <div className="flex justify-between">
-                <Button type="button" variant="outline" onClick={onPrevious}>
-                    {t('common.back')}
-                </Button>
-                <Button onClick={handleSubmitClick} className="bg-green-500 hover:bg-green-600 text-white">
-                    {t('common.submit')}
-                </Button>
+                <ButtonExpand
+                    text={t('common.back')}
+                    icon={ArrowLeft}
+                    iconPlacement="left"
+                    onClick={onPrevious}
+                    bgColor="bg-white dark:bg-gray-800"
+                    hoverBgColor="hover:bg-gray-100 dark:hover:bg-gray-700"
+                    textColor="text-gray-700 dark:text-gray-300"
+                    hoverTextColor="hover:text-gray-900 dark:hover:text-gray-100"
+                    className="border border-gray-300 dark:border-gray-600"
+                />
+                <ButtonExpand
+                    text={t('common.submit')}
+                    icon={ArrowRight}
+                    onClick={handleSubmitClick}
+                    bgColor="bg-green-500 dark:bg-green-600"
+                    hoverBgColor="hover:bg-green-600 dark:hover:bg-green-700"
+                    textColor="text-white"
+                    hoverTextColor="hover:text-white"
+                />
             </div>
 
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
@@ -140,12 +155,25 @@ const ActivationStep4: React.FC<ActivationStep4Props> = ({ onSubmit, onPrevious,
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="flex space-x-2">
-                        <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-                            {t('common.cancel')}
-                        </Button>
-                        <Button onClick={handleConfirmedSubmit} className="bg-green-500 hover:bg-green-600 text-white">
-                            {t('common.submit')}
-                        </Button>
+                        <ButtonExpand
+                            text={t('common.cancel')}
+                            icon={X}
+                            onClick={() => setShowConfirmDialog(false)}
+                            bgColor="bg-white dark:bg-gray-800"
+                            hoverBgColor="hover:bg-gray-100 dark:hover:bg-gray-700"
+                            textColor="text-gray-700 dark:text-gray-300"
+                            hoverTextColor="hover:text-gray-900 dark:hover:text-gray-100"
+                            className="border border-gray-300 dark:border-gray-600"
+                        />
+                        <ButtonExpand
+                            text={t('common.submit')}
+                            icon={ArrowRight}
+                            onClick={handleConfirmedSubmit}
+                            bgColor="bg-green-500 dark:bg-green-600"
+                            hoverBgColor="hover:bg-green-600 dark:hover:bg-green-700"
+                            textColor="text-white"
+                            hoverTextColor="hover:text-white"
+                        />
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

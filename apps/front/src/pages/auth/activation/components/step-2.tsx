@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ActivationData } from "../activation";
 import { countries } from "@/lib/data/onboarding";
-import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { ButtonExpand } from "@/components/design/button-expand";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const activationStep2Schema = z.object({
     legalName: z.string().min(1, "activation.step2.legal_name.error"),
@@ -241,12 +242,26 @@ const ActivationStep2: React.FC<ActivationStep2Props> = ({ onNext, onPrevious, d
             </div>
 
             <div className="flex justify-between">
-                <Button type="button" variant="outline" onClick={onPrevious}>
-                    {t('common.back')}
-                </Button>
-                <Button type="submit" className="bg-green-500 hover:bg-green-600 text-white">
-                    {t('common.next')}
-                </Button>
+                <ButtonExpand
+                    text={t('common.back')}
+                    icon={ArrowLeft}
+                    iconPlacement="left"
+                    onClick={onPrevious}
+                    bgColor="bg-white dark:bg-gray-800"
+                    hoverBgColor="hover:bg-gray-100 dark:hover:bg-gray-700"
+                    textColor="text-gray-700 dark:text-gray-300"
+                    hoverTextColor="hover:text-gray-900 dark:hover:text-gray-100"
+                    className="border border-gray-300 dark:border-gray-600"
+                />
+                <ButtonExpand
+                    text={t('common.next')}
+                    icon={ArrowRight}
+                    type="submit"
+                    bgColor="bg-green-500 dark:bg-green-600"
+                    hoverBgColor="hover:bg-green-600 dark:hover:bg-green-700"
+                    textColor="text-white"
+                    hoverTextColor="hover:text-white"
+                />
             </div>
 
             <button type="submit" className="hidden">Submit</button>
