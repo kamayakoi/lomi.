@@ -1178,6 +1178,9 @@ CREATE TABLE organization_checkout_settings (
 
 COMMENT ON TABLE organization_checkout_settings IS 'Stores checkout settings for organizations';
 
+-- Grant access permissions to authenticated users on this table
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.organization_checkout_settings TO authenticated;
+
 -- Organization Fees table
 CREATE TABLE organization_fees (
     fee_type_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

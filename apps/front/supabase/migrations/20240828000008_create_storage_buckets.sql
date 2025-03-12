@@ -135,3 +135,24 @@ FOR DELETE TO authenticated USING (
     bucket_id = 'plan_images' 
     AND auth.uid()::text = (storage.foldername(name))[1]
 );
+
+-- Create the 'platform-invoices' bucket
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('platform-invoices', 'platform-invoices', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Policy for selecting (reading) platform invoices
+CREATE POLICY "Allow authenticated users to read platform invoices" ON storage.objects
+FOR SELECT TO authenticated USING (bucket_id = 'platform-invoices');
+
+-- Policy for inserting (uploading) platform invoices
+CREATE POLICY "Allow service role to upload platform invoices" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'platform-invoices');
+
+-- Policy for updating platform invoices
+CREATE POLICY "Allow service role to update platform invoices" ON storage.objects
+FOR UPDATE USING (bucket_id = 'platform-invoices');
+
+-- Policy for deleting platform invoices
+CREATE POLICY "Allow service role to delete platform invoices" ON storage.objects
+FOR DELETE USING (bucket_id = 'platform-invoices');
