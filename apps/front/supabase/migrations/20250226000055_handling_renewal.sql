@@ -83,7 +83,7 @@ BEGIN
   -- Get subscription details
   SELECT 
     s.merchant_id, 
-    s.organization_id,
+    s.organization_id, 
     s.customer_id,
     s.plan_id,
     p.name AS plan_name, 
@@ -91,7 +91,7 @@ BEGIN
     p.currency_code
   INTO 
     v_merchant_id, 
-    v_organization_id,
+    v_organization_id, 
     v_customer_id,
     v_plan_id,
     v_plan_name,
@@ -480,7 +480,7 @@ BEGIN
     p.currency_code,
     s.next_billing_date,
     (s.next_billing_date - CURRENT_DATE) AS days_until_renewal
-  INTO 
+  INTO
     v_merchant_id,
     v_organization_id,
     v_customer_id,
@@ -495,7 +495,7 @@ BEGIN
     JOIN subscription_plans p ON s.plan_id = p.plan_id
   WHERE 
     s.subscription_id = p_subscription_id;
-
+  
   -- Get customer and merchant details
   SELECT 
     c.email,
@@ -522,7 +522,7 @@ BEGIN
       RETURN FALSE;
     END IF;
   END IF;
-
+  
   -- Set urgency styling and messages based on template type
   CASE p_template_type
     WHEN 'final_day_template' THEN
@@ -585,7 +585,7 @@ BEGIN
       </ul>
       
       <div style="text-align: center; margin: 30px 0;">
-        <a href="%s" class="button">Renew Subscription</a>
+      <a href="%s" class="button">Renew Subscription</a>
       </div>
       
       <p>If you have any questions or need assistance, please contact us.</p>
@@ -614,7 +614,7 @@ BEGIN
     v_checkout_url,
     v_business_name
   );
-
+  
   -- Get the Resend API key
   BEGIN
     resend_api_key := secrets.get_resend_api_key();
@@ -633,18 +633,18 @@ BEGIN
       response_json
     FROM 
       extensions.http((
-        'POST',
-        'https://api.resend.com/emails',
-        ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
-        'application/json',
-        jsonb_build_object(
+      'POST',
+      'https://api.resend.com/emails',
+      ARRAY[('Authorization', 'Bearer ' || resend_api_key)::extensions.http_header],
+      'application/json',
+      jsonb_build_object(
           'from', format('%s <no-reply@updates.lomi.africa>', v_business_name),
-          'to', ARRAY[v_customer_email],
+        'to', ARRAY[v_customer_email],
           'subject', v_email_subject,
           'html', v_email_html,
           'reply_to', format('%s <no-reply@updates.lomi.africa>', v_business_name)
-        )::text
-      ));
+      )::text
+    ));
 
     -- Check response
     IF http_response_code >= 400 THEN
@@ -747,7 +747,7 @@ BEGIN
           
           IF v_email_status THEN
             -- Update notification attempt count
-            UPDATE merchant_subscriptions
+    UPDATE merchant_subscriptions
             SET 
               metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object(
                 'renewal_notification_attempts', v_attempt_count + 1,
