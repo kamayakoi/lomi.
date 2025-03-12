@@ -1,6 +1,11 @@
 import type { WaveCheckoutSession, WaveAggregatedMerchant, CreateWaveAggregatedMerchantParams, WaveAggregatedMerchantResponse, WavePayout } from './types';
 import { supabase } from '../supabase/client';
 
+export interface WaveCheckoutResponse {
+  checkout_url: string;
+  checkout_session_id: string;
+}
+
 export class WaveClient {
     /**
      * Makes a request to our Wave API Edge Function
@@ -51,9 +56,12 @@ export class WaveClient {
         client_reference?: string;
         restrict_payer_mobile?: string;
     }): Promise<WaveCheckoutSession> {
+        // Ensure XOF currency has no decimal places
+        const formattedAmount = this.formatCurrencyAmount(params.amount, params.currency);
+        
         // Make sure we convert parameters to what Wave API expects
         const requestBody = {
-            amount: params.amount.toString(), // Wave API expects amount as string
+            amount: formattedAmount, // Wave API expects amount as string
             currency: params.currency,
             // Ensure URLs use HTTPS - convert localhost URLs to use a dummy https domain for testing
             success_url: this.ensureHttpsUrl(params.success_url),
@@ -70,6 +78,20 @@ export class WaveClient {
             method: 'POST',
             body: JSON.stringify(requestBody)
         });
+    }
+
+    /**
+     * Formats currency amounts according to currency-specific rules
+     * For XOF currency, removes decimal places as they're not supported
+     */
+    formatCurrencyAmount(amount: number, currency: string): string {
+        if (currency === 'XOF') {
+            // For XOF, round to the nearest integer
+            return Math.round(amount).toString();
+        }
+        
+        // For other currencies, keep as is
+        return amount.toString();
     }
 
     /**

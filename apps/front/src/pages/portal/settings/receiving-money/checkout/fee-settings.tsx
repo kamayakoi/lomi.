@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
-import { PlusCircle } from "lucide-react"
+import { PlusCircle, Trash2 } from "lucide-react"
 import { toast } from "@/lib/hooks/use-toast"
 import { type CheckoutSettings, type FeeType } from '@/lib/types/checkout-settings'
 import { supabase } from '@/utils/supabase/client'
@@ -81,14 +81,12 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
     }
 
     const handleToggleFeeType = (id: string | null) => {
-        if (id === null) return; // Don't toggle new fees
         setFeeTypes(feeTypes.map(fee =>
             fee.id === id ? { ...fee, enabled: !fee.enabled } : fee
         ))
     }
 
     const handlePercentageChange = (id: string | null, value: string) => {
-        if (id === null) return; // Don't change new fees
         const numValue = value === '' ? '' : parseInt(value)
         setFeeTypes(feeTypes.map(fee => {
             if (fee.id !== id) return fee
@@ -105,13 +103,61 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
     }
 
     const handlePercentageBlur = (id: string | null) => {
-        if (id === null) return; // Don't handle blur for new fees
         setFeeTypes(feeTypes.map(fee => {
             if (fee.id === id && fee.percentage < 1) {
                 return { ...fee, percentage: 1 }
             }
             return fee
         }))
+    }
+
+    const handleDeleteFee = async (id: string | null) => {
+        // If the fee hasn't been saved yet (id is null), just remove it from the state
+        if (id === null) {
+            setFeeTypes(feeTypes.filter(fee => fee.id !== id))
+            return
+        }
+
+        // For saved fees, call the database function to delete
+        try {
+            if (!settings?.organization_id) {
+                toast({
+                    title: "Error",
+                    description: "Organization ID is required",
+                    variant: "destructive",
+                })
+                return
+            }
+
+            const { error, data } = await supabase.rpc('delete_organization_fee_type', {
+                p_organization_id: settings.organization_id,
+                p_fee_type_id: id
+            })
+
+            if (error) throw error
+
+            if (data) {
+                // Remove the fee from the state
+                setFeeTypes(feeTypes.filter(fee => fee.id !== id))
+                toast({
+                    title: "Success",
+                    description: "Fee type deleted successfully",
+                })
+
+                // Update parent component
+                await onUpdate({
+                    organization_id: settings.organization_id,
+                    fee_types: feeTypes.filter(fee => fee.id !== id)
+                })
+            }
+        } catch (error) {
+            console.error('Error deleting fee type:', error)
+            toast({
+                title: "Error",
+                description: error instanceof Error ? error.message : "Failed to delete fee type",
+                variant: "destructive",
+            })
+        }
     }
 
     const handleSave = async () => {
@@ -190,7 +236,7 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                         value={newFeeType}
                         onChange={(e) => setNewFeeType(e.target.value)}
                         className="flex-grow rounded-none"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault()
                                 handleAddFeeType()
@@ -208,17 +254,17 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                 <div className="space-y-2 max-h-[170px] overflow-y-auto pr-1">
                     {feeTypes.map((fee) => (
                         <div
-                            key={fee.id}
+                            key={fee.id || fee.name}
                             className="flex items-center justify-between space-x-2 py-2 px-3 border rounded-none hover:bg-muted/50 transition-colors"
                         >
                             <div className="flex items-center space-x-2">
                                 <Switch
-                                    id={`toggle-${fee.id}`}
+                                    id={`toggle-${fee.id || fee.name}`}
                                     checked={fee.enabled}
                                     onCheckedChange={() => handleToggleFeeType(fee.id)}
                                 />
                                 <Label
-                                    htmlFor={`toggle-${fee.id}`}
+                                    htmlFor={`toggle-${fee.id || fee.name}`}
                                     className="text-sm font-medium cursor-pointer"
                                 >
                                     {fee.name}
@@ -235,6 +281,14 @@ export function FeeSettings({ settings, onUpdate }: FeeSettingsProps) {
                                     disabled={!fee.enabled}
                                 />
                                 <span className="text-sm text-muted-foreground">%</span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteFee(fee.id)}
+                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                >
+                                    <Trash2 size={16} />
+                                </Button>
                             </div>
                         </div>
                     ))}

@@ -13,7 +13,7 @@ import {
   IconLinkPlus,
   IconPackage,
   IconFlag,
-  IconBuildingStore
+  // IconBuildingStore
 } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
@@ -79,11 +79,11 @@ export function useSidelinks(): SidebarItem[] {
       href: `/${organizationId}/payment-links`,
       icon: <IconLinkPlus className="text-indigo-500" size={18} />,
     },
-    {
-      title: t('sidebar.links.storefront'),
-      href: `/${organizationId}/storefront`,
-      icon: <IconBuildingStore className="text-orange-500" size={18} />,
-    },
+    // {
+    //   title: t('sidebar.links.storefront'),
+    //   href: `/${organizationId}/storefront`,
+    //   icon: <IconBuildingStore className="text-orange-500" size={18} />,
+    // },
     {
       title: t('sidebar.links.products'),
       href: `/${organizationId}/product`,

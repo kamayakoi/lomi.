@@ -75,24 +75,19 @@ DECLARE
     v_fee_reference TEXT;
     v_subscription_id UUID := p_subscription_id;
 BEGIN
-    -- Calculate fee using the get_transaction_fee function
-    SELECT name, COALESCE(fixed_amount, 0) + (p_amount * percentage / 100)
-    INTO v_fee_reference, v_fee_amount
-    FROM get_transaction_fee(
-        'payment'::transaction_type,
-        'WAVE'::provider_code,
-        'E_WALLET'::payment_method_code,
-        p_currency_code
-    );
-
-    -- If for some reason we still don't have a fee (shouldn't happen with the get_transaction_fee function)
-    IF v_fee_amount IS NULL THEN
-        v_fee_amount := 0;
-        v_fee_reference := 'Default Wave Fee';
+    -- Calculate fee with special handling for small amounts
+    IF p_amount < 2000 AND p_currency_code = 'XOF' THEN
+        -- For small transactions, use percentage only (no fixed fee)
+        v_fee_amount := LEAST(p_amount * 0.045, p_amount * 0.99);
+        v_fee_reference := 'Wave Small Transaction Fee';
+    ELSE
+        -- For normal transactions, use standard fee but cap it
+        v_fee_amount := LEAST(ROUND(p_amount * 0.032 + 200, 2), p_amount * 0.99);
+        v_fee_reference := 'Wave Processing Fee';
     END IF;
 
-    -- Calculate net amount
-    v_net_amount := p_amount - v_fee_amount;
+    -- Ensure positive net amount
+    v_net_amount := GREATEST(p_amount - v_fee_amount, 0);
     
     -- For subscription payment links, we need to create a subscription first
     -- This handles the case where p_subscription_id is provided but doesn't exist yet

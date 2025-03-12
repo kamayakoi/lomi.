@@ -9,6 +9,7 @@ VALUES
     
     -- Mobile Money providers
     ('Wave Processing Fee', 'payment', 'processing', 3.2, 200, 'XOF', 'WAVE', 'E_WALLET'),
+    ('Wave Small Transaction Fee', 'payment', 'processing', 4.0, 0, 'XOF', 'WAVE', 'E_WALLET'),
     ('Orange Processing Fee', 'payment', 'processing', 3.2, 200, 'XOF', 'ORANGE', 'MOBILE_MONEY'),
     ('MTN Processing Fee', 'payment', 'processing', 3.2, 200, 'XOF', 'MTN', 'MOBILE_MONEY'),
     ('Moov Processing Fee', 'payment', 'processing', 3.2, 200, 'XOF', 'MOOV', 'MOBILE_MONEY'),
