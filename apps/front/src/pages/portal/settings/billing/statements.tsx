@@ -83,9 +83,66 @@ function Statements() {
             const statement = statements.find(s => s.platform_invoice_id === statementId)
             if (!statement) throw new Error('Statement not found')
 
-            // Here you would generate and download the invoice PDF
-            // For now, we'll just simulate a delay
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            // Try to download the PDF directly first
+            try {
+                const { data, error } = await supabase
+                    .storage
+                    .from('platform-invoices')
+                    .download(`${statementId}.pdf`)
+
+                if (error) throw error
+
+                // If we got the data, create a download link
+                const url = URL.createObjectURL(data)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `Platform_Statement_${format(new Date(statement.invoice_date || statement.created_at), 'yyyy-MM')}.pdf`
+                document.body.appendChild(a)
+                a.click()
+                URL.revokeObjectURL(url)
+                document.body.removeChild(a)
+
+                toast({
+                    title: "Success",
+                    description: "Statement downloaded successfully.",
+                })
+                return
+            } catch (downloadError) {
+                console.log('PDF not found, trying to generate it...', downloadError)
+                // If download fails, try to generate the PDF
+            }
+
+            // Generate PDF first since it doesn't exist
+            const { error: genError } = await supabase
+                .rpc('generate_statement_pdf', {
+                    p_invoice_id: statementId
+                })
+
+            if (genError) {
+                console.error('Error generating PDF:', genError)
+                throw new Error(genError.message || 'Failed to generate PDF')
+            }
+
+            // Try downloading again after generation
+            const { data: newData, error: dlError } = await supabase
+                .storage
+                .from('platform-invoices')
+                .download(`${statementId}.pdf`)
+
+            if (dlError) {
+                console.error('Error downloading PDF after generation:', dlError)
+                throw dlError
+            }
+
+            // Download the file
+            const url = URL.createObjectURL(newData)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `Platform_Statement_${format(new Date(statement.invoice_date || statement.created_at), 'yyyy-MM')}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            URL.revokeObjectURL(url)
+            document.body.removeChild(a)
 
             toast({
                 title: "Success",
@@ -95,7 +152,7 @@ function Statements() {
             console.error('Error downloading statement:', error)
             toast({
                 title: "Error",
-                description: "Failed to download statement. Please try again.",
+                description: error instanceof Error ? error.message : "Failed to download statement. Please try again.",
                 variant: "destructive",
             })
         } finally {
@@ -228,7 +285,8 @@ function Statements() {
                                     <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
                                     <h3 className="mt-4 text-lg font-semibold">No statements yet</h3>
                                     <p className="mt-2 text-sm text-muted-foreground">
-                                        Your monthly statements will be generated on the 25th of each month
+                                        Your monthly statements are automatically generated on the 25th of each month.
+                                        The first statement will be available after the next billing cycle.
                                     </p>
                                 </div>
                             ) : (
@@ -300,6 +358,7 @@ function Statements() {
                         title="Need help?"
                         type="info"
                     >
+                        Monthly statements are automatically generated and can be downloaded for your records.
                         Contact <a href="mailto:hello@lomi.africa" className="underline">hello@lomi.africa</a> for any questions about your platform fees, statements, or balance.
                     </InfoBox>
                 </div>

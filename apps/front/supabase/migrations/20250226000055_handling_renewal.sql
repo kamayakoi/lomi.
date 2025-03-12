@@ -232,22 +232,9 @@ BEGIN
     WHERE 
       subscription_id = p_subscription_id;
     
-    -- Log the completion
-    INSERT INTO system_logs (
-      log_type,
-      message,
-      details,
-      severity
-    ) VALUES (
-      'subscription_completed',
-      format('Subscription %s completed after reaching maximum charges', p_subscription_id),
-      jsonb_build_object(
-        'subscription_id', p_subscription_id,
-        'fixed_charges', v_fixed_charges,
-        'current_charges', v_current_charges
-      ),
-      'INFO'
-    );
+    -- Log the completion with RAISE NOTICE instead of INSERT
+    RAISE NOTICE 'Subscription % completed after reaching maximum charges (% of %)', 
+      p_subscription_id, v_current_charges, v_fixed_charges;
     
     RETURN NULL; -- No next billing date as subscription is completed
   END IF;
@@ -356,22 +343,9 @@ BEGIN
       WHERE 
         subscription_id = p_subscription_id;
       
-      -- Log the cancellation
-      INSERT INTO system_logs (
-        log_type,
-        message,
-        details,
-        severity
-      ) VALUES (
-        'subscription_cancelled',
-        format('Subscription %s cancelled due to payment failure', p_subscription_id),
-        jsonb_build_object(
-          'subscription_id', p_subscription_id,
-          'merchant_id', v_merchant_id,
-          'customer_id', v_customer_id
-        ),
-        'INFO'
-      );
+      -- Log the cancellation with RAISE NOTICE instead of INSERT
+      RAISE NOTICE 'Subscription % cancelled due to payment failure (merchant_id: %, customer_id: %)', 
+        p_subscription_id, v_merchant_id, v_customer_id;
       
       RETURN 'Subscription cancelled';
       
@@ -393,43 +367,16 @@ BEGIN
       WHERE 
         subscription_id = p_subscription_id;
       
-      -- Log the pause
-      INSERT INTO system_logs (
-        log_type,
-        message,
-        details,
-        severity
-      ) VALUES (
-        'subscription_paused',
-        format('Subscription %s paused due to payment failure', p_subscription_id),
-        jsonb_build_object(
-          'subscription_id', p_subscription_id,
-          'merchant_id', v_merchant_id,
-          'customer_id', v_customer_id
-        ),
-        'INFO'
-      );
+      -- Log the pause with RAISE NOTICE instead of INSERT
+      RAISE NOTICE 'Subscription % paused due to payment failure (merchant_id: %, customer_id: %)',
+        p_subscription_id, v_merchant_id, v_customer_id;
       
       RETURN 'Subscription paused';
       
     WHEN 'continue' THEN
-      -- Keep subscription active but log the failure
-      INSERT INTO system_logs (
-        log_type,
-        message,
-        details,
-        severity
-      ) VALUES (
-        'subscription_payment_failed',
-        format('Subscription %s payment failed but subscription remains active', p_subscription_id),
-        jsonb_build_object(
-          'subscription_id', p_subscription_id,
-          'merchant_id', v_merchant_id,
-          'customer_id', v_customer_id,
-          'action_taken', 'none'
-        ),
-        'WARNING'
-      );
+      -- Keep subscription active but log the failure with RAISE NOTICE instead of INSERT
+      RAISE NOTICE 'Subscription % payment failed but subscription remains active (merchant_id: %, customer_id: %)',
+        p_subscription_id, v_merchant_id, v_customer_id;
       
       RETURN 'Subscription continues despite payment failure';
       
@@ -763,43 +710,14 @@ BEGIN
         END IF;
       END IF;
 
-      -- Log activity
-      INSERT INTO system_logs (
-        log_type,
-        message,
-        details,
-        severity
-      ) VALUES (
-        'subscription_renewal_notification',
-        format('Processed renewal notification for subscription %s', v_subscription.subscription_id),
-        jsonb_build_object(
-          'subscription_id', v_subscription.subscription_id,
-          'customer_id', v_subscription.customer_id,
-          'next_billing_date', v_subscription.next_billing_date,
-          'days_until_renewal', v_subscription.days_until_renewal,
-          'attempt_count', v_attempt_count + 1,
-          'checkout_url_generated', v_checkout_url IS NOT NULL,
-          'email_sent', v_email_status
-        ),
-        'INFO'
-      );
+      -- Log activity with RAISE NOTICE instead of INSERT
+      RAISE NOTICE 'Processed renewal notification for subscription % (customer: %, next billing: %, days until: %, attempt: %, email sent: %)',
+        v_subscription.subscription_id, v_subscription.customer_id, v_subscription.next_billing_date, 
+        v_subscription.days_until_renewal, v_attempt_count + 1, v_email_status;
     EXCEPTION WHEN OTHERS THEN
-      -- Log error but continue with other subscriptions
-      INSERT INTO system_logs (
-        log_type,
-        message,
-        details,
-        severity
-      ) VALUES (
-        'subscription_renewal_error',
-        format('Error processing renewal for subscription %s: %s', v_subscription.subscription_id, SQLERRM),
-        jsonb_build_object(
-          'subscription_id', v_subscription.subscription_id,
-          'error', SQLERRM,
-          'stack', pg_exception_context()
-        ),
-        'ERROR'
-      );
+      -- Log error with RAISE NOTICE instead of INSERT
+      RAISE WARNING 'Error processing renewal for subscription %: %', 
+        v_subscription.subscription_id, SQLERRM;
       CONTINUE;
     END;
   END LOOP;
@@ -823,27 +741,10 @@ BEGIN
       'SELECT process_subscription_renewal_notifications()'
     );
     
-    -- Log the cron job creation
-    INSERT INTO system_logs (
-      event_type, 
-      description
-    ) VALUES (
-      'subscription_renewal_cron_scheduled',
-      'Scheduled daily subscription renewal notification job at 8:00 AM UTC'
-    );
+    -- Log the cron job creation using RAISE NOTICE instead of INSERT
+    RAISE NOTICE 'Scheduled daily subscription renewal notification job at 8:00 AM UTC';
   ELSE
     RAISE NOTICE 'pg_cron extension not available. Scheduled job not created.';
-    
-    -- Log that cron job couldn't be created
-    INSERT INTO system_logs (
-      event_type, 
-      description,
-      severity
-    ) VALUES (
-      'subscription_renewal_cron_error',
-      'Failed to schedule subscription renewal job: pg_cron extension not available',
-      'warning'
-    );
   END IF;
 END;
 $$;
@@ -883,4 +784,4 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN
   RETURN format('Error sending renewal notification: %s', SQLERRM);
 END;
-$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = '';
+$$ LANGUAGE plpgsql SECURITY INVOKER SET search_path = public, pg_temp;

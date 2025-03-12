@@ -257,7 +257,7 @@ BEGIN
   PERFORM cron.schedule(
     'expire_pending_transactions_job',
     '0 * * * *',  -- Run hourly (at minute 0)
-    $$SELECT public.expire_pending_transactions(24)$$
+    $CRONCOMMAND$SELECT public.expire_pending_transactions(24)$CRONCOMMAND$
   );
   
   RETURN 'Transaction expiration job scheduled successfully';

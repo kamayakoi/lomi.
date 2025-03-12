@@ -672,36 +672,3 @@ CREATE TRIGGER ensure_checkout_session_urls_trigger
 BEFORE INSERT OR UPDATE ON checkout_sessions
 FOR EACH ROW
 EXECUTE FUNCTION public.ensure_checkout_session_urls();
-
--- Add 'one-time' to the frequency enum if not already present
-DO $$
-BEGIN
-  -- Check if 'one-time' exists in the enum
-  IF NOT EXISTS (
-    SELECT 1 
-    FROM pg_type 
-    JOIN pg_enum ON pg_enum.enumtypid = pg_type.oid 
-    WHERE pg_type.typname = 'frequency' 
-    AND pg_enum.enumlabel = 'one-time'
-  ) THEN
-    -- Following the user's request, we are NOT adding 'one-time' to the frequency enum
-    -- as a subscription paid once is considered a product/service, not a subscription
-    
-    -- Log that we're honoring the request to not add 'one-time'
-    INSERT INTO system_logs (
-      log_type,
-      message,
-      details,
-      severity
-    ) VALUES (
-      'system_update',
-      'One-time frequency not added to subscription frequencies as requested',
-      jsonb_build_object(
-        'reason', 'One-time payments are considered products, not subscriptions',
-        'executed_at', NOW()
-      ),
-      'INFO'
-    );
-  END IF;
-END;
-$$;

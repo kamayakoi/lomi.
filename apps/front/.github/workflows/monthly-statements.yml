@@ -1,0 +1,19 @@
+name: Generate Monthly Statements
+
+on:
+  schedule:
+    # Runs at 00:00 UTC on the 25th of each month
+    - cron: '0 0 25 * *'
+  workflow_dispatch:
+    # Allows manual triggering
+
+jobs:
+  generate-statements:
+    runs-on: ubuntu-latest
+    steps:    
+      # Alternative method using service role key (uncomment if CRON_SECRET is not accessible)
+      - name: Invoke monthly statements function
+        run: |
+          curl -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/monthly-statements" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Content-Type: application/json" 
