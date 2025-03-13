@@ -1,0 +1,19 @@
+name: Generate Monthly Platform Invoices
+
+on:
+  schedule:
+    # Runs at 00:01 UTC on the 25th of every month
+    - cron: '1 0 25 * *'
+  workflow_dispatch:
+    # Allows manual triggering
+
+jobs:
+  generate-invoices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invoke RPC function to generate invoices
+        run: |
+          curl -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/rest/v1/rpc/generate_monthly_statements_for_all_merchants" \
+          -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -H "Content-Type: application/json" 
