@@ -1,7 +1,7 @@
 import { sendEmail } from '@/utils/resend/client';
-import { sendWhatsAppMessage, createTextMessage, createTemplateMessage } from '@/utils/whatsapp/client';
+import { sendWhatsAppMessage, createTextMessage, createTemplateMessage } from '@/utils/infobip/client';
 import type { EmailOptions } from '@/utils/resend/types';
-import type { WhatsAppMessage } from '@/utils/whatsapp/types';
+import type { WhatsAppMessage } from '@/utils/infobip/types';
 
 interface NotificationPayload {
   to: string;
