@@ -332,7 +332,7 @@ function LogsPage() {
                                             {isLogsLoading ? (
                                                 <TableRow>
                                                     <TableCell colSpan={4}>
-                                                        <div className="flex items-center justify-center h-[65vh]">
+                                                        <div className="flex items-center justify-center h-[58vh]">
                                                             <Spinner />
                                                         </div>
                                                     </TableCell>
@@ -362,7 +362,7 @@ function LogsPage() {
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell colSpan={4} className="h-[65vh]">
+                                                    <TableCell colSpan={4} className="h-[58vh]">
                                                         <div className="flex flex-col items-center justify-center">
                                                             <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
                                                                 <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />

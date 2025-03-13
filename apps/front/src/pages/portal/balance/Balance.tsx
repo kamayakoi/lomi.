@@ -503,9 +503,9 @@ function BalancePage() {
 
             <Separator className='my-0' />
 
-            <Layout.Body>
-                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8 max-w-full">
+            <Layout.Body className="overflow-hidden">
+                <div className="overflow-hidden max-w-full">
+                    <div className="space-y-4">
                         <div className="flex justify-between items-center mb-4">
                             <h1 className="text-2xl font-bold tracking-tight">Balance</h1>
                             {/* Currency Converter button commented out temporarily
@@ -955,8 +955,7 @@ function BalancePage() {
                             <CardContent className="p-0">
                                 <div
                                     id="balance-table-container"
-                                    className="h-[47vh] overflow-hidden"
-                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                    className={`h-[47vh] relative ${payouts.length > 0 ? 'overflow-auto' : 'overflow-hidden'}`}
                                 >
                                     <InfiniteScroll
                                         dataLength={payouts.length}
@@ -967,7 +966,7 @@ function BalancePage() {
                                         className="overflow-visible"
                                     >
                                         <Table className="w-full">
-                                            <TableHeader>
+                                            <TableHeader className="sticky top-0 z-10">
                                                 <TableRow className="hover:bg-transparent border-b bg-muted/50">
                                                     {columns.includes('Payout ID') && (
                                                         <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
@@ -1029,15 +1028,15 @@ function BalancePage() {
                                                     </TableRow>
                                                 ) : payouts.length === 0 ? (
                                                     <TableRow>
-                                                        <TableCell colSpan={columns.length} className="text-center py-4">
-                                                            <div className="flex flex-col items-center justify-center space-y-4 mt-8">
-                                                                <div className="bg-transparent dark:bg-transparent p-4">
-                                                                    <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                                        <TableCell colSpan={columns.length} className="text-center py-0 h-[47vh]">
+                                                            <div className="flex flex-col items-center justify-center h-full">
+                                                                <div className="mb-2">
+                                                                    <FcfaIcon className="h-32 w-32 text-gray-400 dark:text-gray-500" />
                                                                 </div>
-                                                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
                                                                     No payout history found
                                                                 </p>
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mb-4">
                                                                     Make some withdrawals to see your payout history.
                                                                 </p>
                                                             </div>
@@ -1095,9 +1094,8 @@ function BalancePage() {
                         </Card>
                     </div>
                 </div>
-                <SupportForm />
             </Layout.Body>
-
+            <SupportForm />
             <PayoutActions payout={selectedPayout} isOpen={!!selectedPayout} onClose={() => setSelectedPayout(null)} />
         </Layout>
     )

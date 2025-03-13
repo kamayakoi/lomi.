@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon } from 'lucide-react'
@@ -133,6 +133,66 @@ function TransactionsPage() {
         return sortTransactions(searched)
     }, [transactions, selectedDateRange, customDateRange, searchTerm, sortTransactions])
 
+    // Calculate analytics based on filtered transactions when search is active
+    const calculatedAnalytics = React.useMemo(() => {
+        // Only recalculate if there's a search term
+        if (!searchTerm || searchTerm.trim() === '') return null
+
+        // Get all filtered transactions (before sorting)
+        const filteredTransactions = applySearch(
+            applyDateFilter(transactions, selectedDateRange, customDateRange),
+            searchTerm
+        )
+
+        // Calculate total incoming amount
+        const totalIncoming = filteredTransactions.reduce((sum, tx) =>
+            tx.status === 'completed' ? sum + tx.net_amount : sum, 0)
+
+        // Calculate transaction count
+        const count = filteredTransactions.length
+
+        // Calculate completion stats
+        const completed = filteredTransactions.filter(tx => tx.status === 'completed').length
+        const refunded = filteredTransactions.filter(tx => tx.status === 'refunded').length
+        const failed = filteredTransactions.filter(tx => tx.status === 'failed').length
+
+        // Calculate gross amount
+        const gross = filteredTransactions.reduce((sum, tx) =>
+            tx.status === 'completed' ? sum + tx.gross_amount : sum, 0)
+
+        // Calculate fee amount
+        const fees = gross - totalIncoming
+
+        // Calculate average transaction value
+        const avgValue = completed > 0 ? totalIncoming / completed : 0
+
+        // Calculate unique customers
+        const uniqueCustomers = new Set(filteredTransactions.map(tx => tx.customer_email)).size
+
+        // Calculate average customer lifetime value
+        const avgLifetimeValue = uniqueCustomers > 0 ? totalIncoming / uniqueCustomers : 0
+
+        // Calculate retention rate (simplified)
+        const uniqueEmails = filteredTransactions.map(tx => tx.customer_email)
+        const emailCounts = uniqueEmails.reduce((acc, email) => {
+            acc[email] = (acc[email] || 0) + 1
+            return acc
+        }, {} as Record<string, number>)
+        const returningCustomers = Object.values(emailCounts).filter(count => count > 1).length
+        const retentionRate = uniqueCustomers > 0 ? (returningCustomers / uniqueCustomers) * 100 : 0
+
+        return {
+            totalIncomingAmount: totalIncoming,
+            transactionCount: count,
+            completionRate: { completed, refunded, failed },
+            grossAmount: gross,
+            feeAmount: fees,
+            averageTransactionValue: avgValue,
+            averageCustomerLifetimeValue: avgLifetimeValue,
+            averageRetentionRate: retentionRate
+        }
+    }, [transactions, selectedDateRange, customDateRange, searchTerm])
+
     const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
         user?.id || '',
         selectedDateRange,
@@ -142,6 +202,10 @@ function TransactionsPage() {
             enabled: !!user?.id
         }
     ) as QueryResult<number>
+
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedTotalIncomingAmount = searchTerm && calculatedAnalytics ? calculatedAnalytics.totalIncomingAmount : totalIncomingAmount
+    const isTotalIncomingAmountLoadingFinal = searchTerm ? false : isTotalIncomingAmountLoading
 
     const { data: transactionCount = 0, isLoading: isTransactionCountLoading } = useTransactionCount(
         user?.id || '',
@@ -153,6 +217,10 @@ function TransactionsPage() {
         }
     ) as QueryResult<number>
 
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedTransactionCount = searchTerm && calculatedAnalytics ? calculatedAnalytics.transactionCount : transactionCount
+    const isTransactionCountLoadingFinal = searchTerm ? false : isTransactionCountLoading
+
     const { data: completionRate = { completed: 0, refunded: 0, failed: 0 }, isLoading: isCompletionRateLoading } = useCompletionRate(
         user?.id || '',
         selectedDateRange,
@@ -162,6 +230,10 @@ function TransactionsPage() {
             enabled: !!user?.id
         }
     ) as QueryResult<CompletionRate>
+
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedCompletionRate = searchTerm && calculatedAnalytics ? calculatedAnalytics.completionRate : completionRate
+    const isCompletionRateLoadingFinal = searchTerm ? false : isCompletionRateLoading
 
     const { data: grossAmount = 0, isLoading: isGrossAmountLoading } = useGrossAmount(
         user?.id || '',
@@ -173,6 +245,10 @@ function TransactionsPage() {
         }
     ) as QueryResult<number>
 
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedGrossAmount = searchTerm && calculatedAnalytics ? calculatedAnalytics.grossAmount : grossAmount
+    const isGrossAmountLoadingFinal = searchTerm ? false : isGrossAmountLoading
+
     const { data: feeAmount = 0, isLoading: isFeeAmountLoading } = useFeeAmount(
         user?.id || '',
         selectedDateRange,
@@ -182,6 +258,10 @@ function TransactionsPage() {
             enabled: !!user?.id
         }
     ) as QueryResult<number>
+
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedFeeAmount = searchTerm && calculatedAnalytics ? calculatedAnalytics.feeAmount : feeAmount
+    const isFeeAmountLoadingFinal = searchTerm ? false : isFeeAmountLoading
 
     const { data: averageTransactionValue = 0, isLoading: isAverageTransactionValueLoading } = useAverageTransactionValue(
         user?.id || '',
@@ -193,6 +273,10 @@ function TransactionsPage() {
         }
     ) as QueryResult<number>
 
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedAverageTransactionValue = searchTerm && calculatedAnalytics ? calculatedAnalytics.averageTransactionValue : averageTransactionValue
+    const isAverageTransactionValueLoadingFinal = searchTerm ? false : isAverageTransactionValueLoading
+
     const { data: averageCustomerLifetimeValue = 0, isLoading: isAverageCustomerLifetimeValueLoading } = useAverageCustomerLifetimeValue(
         user?.id || '',
         selectedDateRange,
@@ -203,6 +287,10 @@ function TransactionsPage() {
         }
     ) as QueryResult<number>
 
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedAverageCustomerLifetimeValue = searchTerm && calculatedAnalytics ? calculatedAnalytics.averageCustomerLifetimeValue : averageCustomerLifetimeValue
+    const isAverageCustomerLifetimeValueLoadingFinal = searchTerm ? false : isAverageCustomerLifetimeValueLoading
+
     const { data: averageRetentionRate = 0, isLoading: isAverageRetentionRateLoading } = useAverageRetentionRate(
         user?.id || '',
         selectedDateRange,
@@ -212,6 +300,10 @@ function TransactionsPage() {
             enabled: !!user?.id
         }
     ) as QueryResult<number>
+
+    // Get the actual values to display, preferring calculated values when filtering
+    const displayedAverageRetentionRate = searchTerm && calculatedAnalytics ? calculatedAnalytics.averageRetentionRate : averageRetentionRate
+    const isAverageRetentionRateLoadingFinal = searchTerm ? false : isAverageRetentionRateLoading
 
     const handleSort = (column: keyof Transaction) => {
         if (sortColumn === column) {
@@ -291,107 +383,6 @@ function TransactionsPage() {
         setIsRefreshing(false)
     }
 
-    // Global scroll lock implementation
-    useEffect(() => {
-        // Store original styles to restore them later
-        const originalStyle = window.getComputedStyle(document.body).overflow;
-        const originalHTMLStyle = window.getComputedStyle(document.documentElement).overflow;
-
-        // Lock scrolling on body and html
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-
-        // Prevent wheel events on the document
-        const preventWheel = (e: WheelEvent) => {
-            // Only allow wheel events in the table container
-            const tableContainer = document.getElementById('table-container');
-            if (tableContainer && !tableContainer.contains(e.target as Node)) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        };
-
-        // Prevent touchmove events that might cause scrolling
-        const preventTouch = (e: TouchEvent) => {
-            const tableContainer = document.getElementById('table-container');
-            if (tableContainer && !tableContainer.contains(e.target as Node)) {
-                e.preventDefault();
-            }
-        };
-
-        // Prevent scrolling with keyboard
-        const preventKeyScroll = (e: KeyboardEvent) => {
-            // Prevent the default action for keys that can scroll the page
-            if (['Space', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
-                // Allow keyboard navigation within the table container
-                const tableContainer = document.getElementById('table-container');
-                const activeElement = document.activeElement;
-
-                // Check if we're in an input, textarea, or other form element where space is needed
-                const isFormElement = activeElement && (
-                    activeElement.tagName === 'INPUT' ||
-                    activeElement.tagName === 'TEXTAREA' ||
-                    activeElement.tagName === 'SELECT' ||
-                    activeElement.getAttribute('contenteditable') === 'true'
-                );
-
-                // Only prevent if we're not inside the table container or a form element
-                if (!(tableContainer && tableContainer.contains(activeElement as Node)) && !isFormElement) {
-                    e.preventDefault();
-                }
-            }
-        };
-
-        // Add event listeners with passive: false to ensure preventDefault works
-        document.addEventListener('wheel', preventWheel, { passive: false });
-        document.addEventListener('touchmove', preventTouch, { passive: false });
-        document.addEventListener('keydown', preventKeyScroll, { passive: false });
-
-        // Cleanup function
-        return () => {
-            // Restore original styles
-            document.body.style.overflow = originalStyle;
-            document.documentElement.style.overflow = originalHTMLStyle;
-
-            // Remove event listeners
-            document.removeEventListener('wheel', preventWheel);
-            document.removeEventListener('touchmove', preventTouch);
-            document.removeEventListener('keydown', preventKeyScroll);
-        };
-    }, []);
-
-    // Add a style tag for global CSS
-    useEffect(() => {
-        // Create a style element
-        const style = document.createElement('style');
-        style.id = 'no-scroll-style';
-
-        // Define CSS to prevent scrolling
-        style.innerHTML = `
-            html, body {
-                overflow: hidden !important;
-                height: 100% !important;
-                position: fixed !important;
-                width: 100% !important;
-            }
-            #__next {
-                height: 100% !important;
-                overflow: hidden !important;
-            }
-        `;
-
-        // Append style to head
-        document.head.appendChild(style);
-
-        // Cleanup function
-        return () => {
-            const styleElement = document.getElementById('no-scroll-style');
-            if (styleElement) {
-                styleElement.remove();
-            }
-        };
-    }, []);
-
     if (isUserLoading) {
         return <AnimatedLogoLoader />
     }
@@ -400,8 +391,34 @@ function TransactionsPage() {
         return <div><AnimatedLogoLoader /> User data not available.</div>
     }
 
+    // Define better styles for container and layout
+    const pageLayoutStyles = {
+        container: {
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column' as const,
+            overflow: 'hidden',
+        },
+        content: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column' as const,
+            overflow: 'auto', // This allows the main content area to scroll
+            position: 'relative' as const
+        },
+        tableWrapper: {
+            height: '47vh',
+            position: 'relative' as const,
+            overflow: 'hidden'
+        },
+        table: {
+            height: '100%',
+            overflow: 'auto',
+        }
+    };
+
     return (
-        <Layout fixed className="h-screen overflow-hidden">
+        <Layout className="h-screen" style={pageLayoutStyles.container}>
             <Layout.Header>
                 <div className='hidden md:block'>
                     <TopNav links={topNav} />
@@ -422,480 +439,477 @@ function TransactionsPage() {
 
             <Separator className='my-0' />
 
-            <Layout.Body>
-                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <div className="space-y-4 pb-8 max-w-full">
-                        <h1 className="text-2xl font-bold tracking-tight mb-4">Transactions</h1>
+            <Layout.Body style={pageLayoutStyles.content}>
+                <div className="space-y-4">
+                    <h1 className="text-2xl font-bold tracking-tight">Transactions</h1>
 
-                        <div className="grid gap-4 md:grid-cols-3 mb-6">
-                            <Card className="cursor-pointer rounded-none" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                                    <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <AnimatePresence mode="wait">
-                                        {!showTotalBreakdown ? (
-                                            <motion.div
-                                                key="total"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="text-2xl font-bold">
-                                                    {isTotalIncomingAmountLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `XOF ${formatAmount(totalIncomingAmount)}`
-                                                    )}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground">
-                                                    {isTransactionCountLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `${transactionCount} transactions`
-                                                    )}
-                                                </div>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                key="breakdown"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="space-y-2">
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm">Gross</span>
-                                                        <span className="text-sm font-medium">
-                                                            {isGrossAmountLoading ? (
-                                                                ""
-                                                            ) : (
-                                                                `XOF ${formatAmount(grossAmount)}`
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm">Fees</span>
-                                                        <span className="text-sm font-medium">
-                                                            {isFeeAmountLoading ? (
-                                                                ""
-                                                            ) : (
-                                                                `XOF ${formatAmount(feeAmount)}`
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm">Net</span>
-                                                        <span className="text-sm font-medium">
-                                                            {isTotalIncomingAmountLoading ? (
-                                                                ""
-                                                            ) : (
-                                                                `XOF ${formatAmount(totalIncomingAmount)}`
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageValue(!showAverageValue)}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">
-                                        {showAverageValue ? "Avg. Order Value" : "Completion Rate"}
-                                    </CardTitle>
-                                    {showAverageValue ? (
-                                        <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
-                                    ) : (
-                                        <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                </CardHeader>
-                                <CardContent>
-                                    <AnimatePresence mode="wait">
-                                        {!showAverageValue ? (
-                                            <motion.div
-                                                key="completion"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="text-2xl font-bold">
-                                                    {isCompletionRateLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
-                                                    )}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground">
-                                                    {isCompletionRateLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        <>
-                                                            {completionRate.completed > 0 && (
-                                                                <>
-                                                                    {completionRate.completed} completed
-                                                                    {(completionRate.refunded > 0 || completionRate.failed > 0) && ', '}
-                                                                </>
-                                                            )}
-                                                            {completionRate.refunded > 0 && (
-                                                                <>
-                                                                    {completionRate.refunded} refunded
-                                                                    {completionRate.failed > 0 && ', '}
-                                                                </>
-                                                            )}
-                                                            {completionRate.failed > 0 && `${completionRate.failed} failed`}
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                key="average"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="text-2xl font-bold">
-                                                    {isAverageTransactionValueLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `XOF ${averageTransactionValue ? averageTransactionValue.toFixed(2) : '0.00'}`
-                                                    )}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground">
-                                                    Per transaction
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">
-                                        {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Lifetime Value"}
-                                    </CardTitle>
-                                    {showAverageRetentionRate ? (
-                                        <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
-                                    ) : (
-                                        <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
-                                    )}
-                                </CardHeader>
-                                <CardContent>
-                                    <AnimatePresence mode="wait">
-                                        {!showAverageRetentionRate ? (
-                                            <motion.div
-                                                key="lifetime"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="text-2xl font-bold">
-                                                    {isAverageCustomerLifetimeValueLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `XOF ${formatAmount(averageCustomerLifetimeValue)}`
-                                                    )}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground">Per customer</div>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                key="retention"
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -20 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <div className="text-2xl font-bold">
-                                                    {isAverageRetentionRateLoading ? (
-                                                        ""
-                                                    ) : (
-                                                        `${averageRetentionRate ? averageRetentionRate.toFixed(2) : '0.00'}%`
-                                                    )}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground">of returning customers</div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <TransactionFilters
-                            searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm}
-                            selectedProvider={selectedProvider}
-                            setSelectedProvider={setSelectedProvider}
-                            selectedDateRange={selectedDateRange}
-                            setSelectedDateRange={setSelectedDateRange}
-                            customDateRange={customDateRange}
-                            setCustomDateRange={setCustomDateRange}
-                            handleCustomDateRangeApply={handleCustomDateRangeApply}
-                            selectedStatuses={selectedStatuses}
-                            setSelectedStatuses={setSelectedStatuses}
-                            selectedTypes={selectedTypes}
-                            setSelectedTypes={setSelectedTypes}
-                            selectedCurrencies={selectedCurrencies}
-                            setSelectedCurrencies={setSelectedCurrencies}
-                            selectedPaymentMethods={selectedPaymentMethods}
-                            setSelectedPaymentMethods={setSelectedPaymentMethods}
-                            columns={columns}
-                            setColumns={setColumns}
-                            isDownloadOpen={isDownloadOpen}
-                            setIsDownloadOpen={setIsDownloadOpen}
-                            handleDownload={handleDownload}
-                            copyAsJSON={copyAsJSON}
-                            refetch={refetch}
-                            isRefreshing={isRefreshing}
-                        />
-
-                        <Card className="rounded-none border shadow-sm">
-                            <CardContent className="p-0">
-                                <div
-                                    id="table-container"
-                                    className="h-[47vh] overflow-hidden"
-                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                                >
-                                    <InfiniteScroll
-                                        dataLength={transactions.length}
-                                        next={() => fetchNextPage()}
-                                        hasMore={hasNextPage}
-                                        loader={<div className="p-4"></div>}
-                                        scrollableTarget="table-container"
-                                        className="overflow-visible"
-                                    >
-                                        <Table className="w-full">
-                                            <TableHeader>
-                                                <TableRow className="hover:bg-transparent border-b bg-muted/50">
-                                                    {columns.includes('Transaction ID') && (
-                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Transaction ID
-                                                                {sortColumn === 'transaction_id' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Customer') && (
-                                                        <TableHead className="text-left w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('customer_name')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Customer
-                                                                {sortColumn === 'customer_name' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Gross Amount') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('gross_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Gross Amount
-                                                                {sortColumn === 'gross_amount' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Net Amount') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('net_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Net Amount
-                                                                {sortColumn === 'net_amount' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Currency') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('currency')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Currency
-                                                                {sortColumn === 'currency' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Payment Method') && (
-                                                        <TableHead className="text-center w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('payment_method')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Payment Method
-                                                                {sortColumn === 'payment_method' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Status') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Status
-                                                                {sortColumn === 'status' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Type') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('type')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Type
-                                                                {sortColumn === 'type' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Date') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('date')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Date
-                                                                {sortColumn === 'date' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                    {columns.includes('Provider') && (
-                                                        <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                            <Button variant="ghost" onClick={() => handleSort('provider_code')} className="whitespace-nowrap px-2 md:px-4 h-full">
-                                                                Provider
-                                                                {sortColumn === 'provider_code' && (
-                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                                )}
-                                                            </Button>
-                                                        </TableHead>
-                                                    )}
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {isFetchingNextPage ? (
-                                                    <TableRow>
-                                                        <TableCell colSpan={columns.length} className="text-center p-4">
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ) : transactions.length === 0 ? (
-                                                    <TableRow>
-                                                        <TableCell colSpan={columns.length} className="text-center py-8">
-                                                            <div className="flex flex-col items-center justify-center space-y-4">
-                                                                <div className="bg-transparent dark:bg-transparent p-4">
-                                                                    <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
-                                                                </div>
-                                                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
-                                                                    No transaction history found
-                                                                </p>
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
-                                                                    Start processing transactions to see your transaction history here.
-                                                                </p>
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
+                    <div className="grid gap-4 md:grid-cols-3 mb-6">
+                        <Card className="cursor-pointer rounded-none" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+                                <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <AnimatePresence mode="wait">
+                                    {!showTotalBreakdown ? (
+                                        <motion.div
+                                            key="total"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="text-2xl font-bold">
+                                                {isTotalIncomingAmountLoadingFinal ? (
+                                                    ""
                                                 ) : (
-                                                    filteredAndSortedTransactions.map((transaction: Transaction) => (
-                                                        <TableRow
-                                                            key={transaction.transaction_id}
-                                                            className="cursor-pointer border-b hover:bg-muted/30"
-                                                            onClick={() => setSelectedTransaction(transaction)}
-                                                        >
-                                                            {columns.includes('Transaction ID') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <span className="font-mono text-xs">{shortenTransactionId(transaction.transaction_id)}</span>
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Customer') && (
-                                                                <TableCell className="text-left py-4 font-medium">
-                                                                    {transaction.customer_name}
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Gross Amount') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <span className="font-medium">{formatAmount(transaction.gross_amount)}</span>
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Net Amount') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <span className="font-medium">{formatAmount(transaction.net_amount)}</span>
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Currency') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    {transaction.currency}
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Payment Method') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    {formatPaymentMethod(transaction.payment_method)}
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Status') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <div className="flex justify-center">
-                                                                        <span
-                                                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${transaction.status === 'completed'
-                                                                                ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
-                                                                                : transaction.status === 'failed'
-                                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
-                                                                                    : transaction.status === 'refunded'
-                                                                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
-                                                                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
-                                                                                }`}
-                                                                        >
-                                                                            {formatTransactionStatus(transaction.status)}
-                                                                        </span>
-                                                                    </div>
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Type') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    {formatTransactionType(transaction.type)}
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Date') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <span className="text-sm text-muted-foreground">{formatDate(transaction.date)}</span>
-                                                                </TableCell>
-                                                            )}
-                                                            {columns.includes('Provider') && (
-                                                                <TableCell className="text-center py-4">
-                                                                    <span className={`
-                                                                        inline-block px-2 py-1 text-xs font-semibold rounded-none
-                                                                        ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
-                                                                        ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
-                                                                        ${transaction.provider_code === 'NOWPAYMENTS' ? 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
-                                                                        ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
-                                                                    `}>
-                                                                        {formatProviderCode(transaction.provider_code)}
-                                                                    </span>
-                                                                </TableCell>
-                                                            )}
-                                                        </TableRow>
-                                                    ))
+                                                    `XOF ${formatAmount(displayedTotalIncomingAmount)}`
                                                 )}
-                                            </TableBody>
-                                        </Table>
-                                    </InfiniteScroll>
-                                </div>
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {isTransactionCountLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    `${displayedTransactionCount} transactions`
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="breakdown"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm">Gross</span>
+                                                    <span className="text-sm font-medium">
+                                                        {isGrossAmountLoadingFinal ? (
+                                                            ""
+                                                        ) : (
+                                                            `XOF ${formatAmount(displayedGrossAmount)}`
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm">Fees</span>
+                                                    <span className="text-sm font-medium">
+                                                        {isFeeAmountLoadingFinal ? (
+                                                            ""
+                                                        ) : (
+                                                            `XOF ${formatAmount(displayedFeeAmount)}`
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm">Net</span>
+                                                    <span className="text-sm font-medium">
+                                                        {isTotalIncomingAmountLoadingFinal ? (
+                                                            ""
+                                                        ) : (
+                                                            `XOF ${formatAmount(displayedTotalIncomingAmount)}`
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageValue(!showAverageValue)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">
+                                    {showAverageValue ? "Avg. Order Value" : "Completion Rate"}
+                                </CardTitle>
+                                {showAverageValue ? (
+                                    <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                    <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                <AnimatePresence mode="wait">
+                                    {!showAverageValue ? (
+                                        <motion.div
+                                            key="completion"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="text-2xl font-bold">
+                                                {isCompletionRateLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    `${calculateCompletionRate(displayedCompletionRate.completed, displayedCompletionRate.refunded, displayedCompletionRate.failed)}%`
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                {isCompletionRateLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    <>
+                                                        {displayedCompletionRate.completed > 0 && (
+                                                            <>
+                                                                {displayedCompletionRate.completed} completed
+                                                                {(displayedCompletionRate.refunded > 0 || displayedCompletionRate.failed > 0) && ', '}
+                                                            </>
+                                                        )}
+                                                        {displayedCompletionRate.refunded > 0 && (
+                                                            <>
+                                                                {displayedCompletionRate.refunded} refunded
+                                                                {displayedCompletionRate.failed > 0 && ', '}
+                                                            </>
+                                                        )}
+                                                        {displayedCompletionRate.failed > 0 && `${displayedCompletionRate.failed} failed`}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="average"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="text-2xl font-bold">
+                                                {isAverageTransactionValueLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    `XOF ${displayedAverageTransactionValue ? displayedAverageTransactionValue.toFixed(2) : '0.00'}`
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                                Per transaction
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">
+                                    {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Lifetime Value"}
+                                </CardTitle>
+                                {showAverageRetentionRate ? (
+                                    <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
+                                ) : (
+                                    <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                <AnimatePresence mode="wait">
+                                    {!showAverageRetentionRate ? (
+                                        <motion.div
+                                            key="lifetime"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="text-2xl font-bold">
+                                                {isAverageCustomerLifetimeValueLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    `XOF ${formatAmount(displayedAverageCustomerLifetimeValue)}`
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">Per customer</div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="retention"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <div className="text-2xl font-bold">
+                                                {isAverageRetentionRateLoadingFinal ? (
+                                                    ""
+                                                ) : (
+                                                    `${displayedAverageRetentionRate ? displayedAverageRetentionRate.toFixed(2) : '0.00'}%`
+                                                )}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">of returning customers</div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </CardContent>
                         </Card>
                     </div>
+
+                    <TransactionFilters
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        selectedProvider={selectedProvider}
+                        setSelectedProvider={setSelectedProvider}
+                        selectedDateRange={selectedDateRange}
+                        setSelectedDateRange={setSelectedDateRange}
+                        customDateRange={customDateRange}
+                        setCustomDateRange={setCustomDateRange}
+                        handleCustomDateRangeApply={handleCustomDateRangeApply}
+                        selectedStatuses={selectedStatuses}
+                        setSelectedStatuses={setSelectedStatuses}
+                        selectedTypes={selectedTypes}
+                        setSelectedTypes={setSelectedTypes}
+                        selectedCurrencies={selectedCurrencies}
+                        setSelectedCurrencies={setSelectedCurrencies}
+                        selectedPaymentMethods={selectedPaymentMethods}
+                        setSelectedPaymentMethods={setSelectedPaymentMethods}
+                        columns={columns}
+                        setColumns={setColumns}
+                        isDownloadOpen={isDownloadOpen}
+                        setIsDownloadOpen={setIsDownloadOpen}
+                        handleDownload={handleDownload}
+                        copyAsJSON={copyAsJSON}
+                        refetch={refetch}
+                        isRefreshing={isRefreshing}
+                    />
+
+                    <Card className="rounded-none border shadow-sm">
+                        <CardContent className="p-0">
+                            <div
+                                id="table-container"
+                                className="h-[47vh] overflow-auto"
+                            >
+                                <InfiniteScroll
+                                    dataLength={transactions.length}
+                                    next={() => fetchNextPage()}
+                                    hasMore={hasNextPage}
+                                    loader={<div className="p-4"></div>}
+                                    scrollableTarget="table-container"
+                                    className="overflow-visible"
+                                >
+                                    <Table className="w-full">
+                                        <TableHeader>
+                                            <TableRow className="hover:bg-transparent border-b bg-muted/50">
+                                                {columns.includes('Transaction ID') && (
+                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('transaction_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Transaction ID
+                                                            {sortColumn === 'transaction_id' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Customer') && (
+                                                    <TableHead className="text-left w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('customer_name')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Customer
+                                                            {sortColumn === 'customer_name' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Gross Amount') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('gross_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Gross Amount
+                                                            {sortColumn === 'gross_amount' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Net Amount') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('net_amount')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Net Amount
+                                                            {sortColumn === 'net_amount' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Currency') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('currency')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Currency
+                                                            {sortColumn === 'currency' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Payment Method') && (
+                                                    <TableHead className="text-center w-[20%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('payment_method')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Payment Method
+                                                            {sortColumn === 'payment_method' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Status') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('status')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Status
+                                                            {sortColumn === 'status' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Type') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('type')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Type
+                                                            {sortColumn === 'type' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Date') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('date')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Date
+                                                            {sortColumn === 'date' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                                {columns.includes('Provider') && (
+                                                    <TableHead className="text-center w-[15%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                        <Button variant="ghost" onClick={() => handleSort('provider_code')} className="whitespace-nowrap px-2 md:px-4 h-full">
+                                                            Provider
+                                                            {sortColumn === 'provider_code' && (
+                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                            )}
+                                                        </Button>
+                                                    </TableHead>
+                                                )}
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {isFetchingNextPage ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={columns.length} className="text-center p-4">
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : transactions.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={columns.length} className="text-center py-8">
+                                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                                            <div className="bg-transparent dark:bg-transparent p-4">
+                                                                <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
+                                                            </div>
+                                                            <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                                                No transaction history found
+                                                            </p>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                                                Start processing transactions to see your transaction history here.
+                                                            </p>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                filteredAndSortedTransactions.map((transaction: Transaction) => (
+                                                    <TableRow
+                                                        key={transaction.transaction_id}
+                                                        className="cursor-pointer border-b hover:bg-muted/30"
+                                                        onClick={() => setSelectedTransaction(transaction)}
+                                                    >
+                                                        {columns.includes('Transaction ID') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <span className="font-mono text-xs">{shortenTransactionId(transaction.transaction_id)}</span>
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Customer') && (
+                                                            <TableCell className="text-left py-4 font-medium">
+                                                                {transaction.customer_name}
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Gross Amount') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <span className="font-medium">{formatAmount(transaction.gross_amount)}</span>
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Net Amount') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <span className="font-medium">{formatAmount(transaction.net_amount)}</span>
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Currency') && (
+                                                            <TableCell className="text-center py-4">
+                                                                {transaction.currency}
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Payment Method') && (
+                                                            <TableCell className="text-center py-4">
+                                                                {formatPaymentMethod(transaction.payment_method)}
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Status') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <div className="flex justify-center">
+                                                                    <span
+                                                                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${transaction.status === 'completed'
+                                                                            ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                                                            : transaction.status === 'failed'
+                                                                                ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
+                                                                                : transaction.status === 'refunded'
+                                                                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                                                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                                                                            }`}
+                                                                    >
+                                                                        {formatTransactionStatus(transaction.status)}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Type') && (
+                                                            <TableCell className="text-center py-4">
+                                                                {formatTransactionType(transaction.type)}
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Date') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <span className="text-sm text-muted-foreground">{formatDate(transaction.date)}</span>
+                                                            </TableCell>
+                                                        )}
+                                                        {columns.includes('Provider') && (
+                                                            <TableCell className="text-center py-4">
+                                                                <span className={`
+                                                                    inline-block px-2 py-1 text-xs font-semibold rounded-none
+                                                                    ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
+                                                                    ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
+                                                                    ${transaction.provider_code === 'NOWPAYMENTS' ? 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
+                                                                    ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
+                                                                `}>
+                                                                    {formatProviderCode(transaction.provider_code)}
+                                                                </span>
+                                                            </TableCell>
+                                                        )}
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </InfiniteScroll>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
                 <SupportForm />
             </Layout.Body>
