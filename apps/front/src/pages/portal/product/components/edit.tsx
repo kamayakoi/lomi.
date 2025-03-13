@@ -242,35 +242,6 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
         <>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="name">Product Name</Label>
-                    <Input
-                        id="name"
-                        placeholder="Enter product name"
-                        {...register('name')}
-                        className="rounded-none"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="description">Product Description</Label>
-                    <Textarea
-                        id="description"
-                        placeholder="Enter product description"
-                        value={watch("description") || ""}
-                        onChange={(e) => setValue("description", e.target.value)}
-                        className="rounded-none"
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="price">Price</Label>
-                    <InputRightAddon
-                        id="price"
-                        type="text"
-                        placeholder="Enter amount"
-                        value={formatAmount(watch("price"))}
-                        onChange={(value) => setValue("price", parseAmount(value))}
-                    />
-                </div>
-                <div className="space-y-2">
                     <Label htmlFor="image">Product Image</Label>
                     <div className="mt-1.5">
                         <div className="flex items-center gap-4">
@@ -313,6 +284,35 @@ export const EditProductForm: React.FC<EditProductFormProps> = ({ product, onClo
                             </label>
                         </div>
                     </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="name">Product Name</Label>
+                    <Input
+                        id="name"
+                        placeholder="Enter product name"
+                        {...register('name')}
+                        className="rounded-none"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="description">Product Description</Label>
+                    <Textarea
+                        id="description"
+                        placeholder="Enter product description"
+                        value={watch("description") || ""}
+                        onChange={(e) => setValue("description", e.target.value)}
+                        className="rounded-none"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="price">Price</Label>
+                    <InputRightAddon
+                        id="price"
+                        type="text"
+                        placeholder="Enter amount"
+                        value={formatAmount(watch("price"))}
+                        onChange={(value) => setValue("price", parseAmount(value))}
+                    />
                 </div>
                 <div className="space-y-4">
                     <Label>Additional Fees</Label>

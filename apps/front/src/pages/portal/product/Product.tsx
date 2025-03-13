@@ -307,7 +307,7 @@ function ProductsPage() {
                                         Fill in the details to create a new product.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="p-6 pt-4 overflow-y-auto flex-grow">
+                                <div className="p-6 pt-0 overflow-y-auto flex-grow">
                                     <CreateProductForm onClose={() => setIsCreateProductOpen(false)} onSuccess={handleCreateProductSuccess} />
                                 </div>
                             </DialogContent>
@@ -322,207 +322,209 @@ function ProductsPage() {
                     />
 
                     <Card className="rounded-none">
-                        <CardContent className="p-4 rounded-none">
-                            {isProductsLoading ? (
-                                <div className="space-y-4">
-                                    {Array.from({ length: itemsPerPage }).map((_, index) => (
-                                        <div key={index} className="p-4 border border-border">
-                                            <div className="flex gap-4">
-                                                <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
-                                                <div className="flex-grow space-y-2">
-                                                    <Skeleton className="w-1/3 h-6" />
-                                                    <Skeleton className="w-2/3 h-4" />
-                                                    <Skeleton className="w-24 h-4" />
+                        <CardContent className="p-0">
+                            <div id="products-table-container" className="h-[72vh] overflow-auto">
+                                {isProductsLoading ? (
+                                    <div className="space-y-4 p-4">
+                                        {Array.from({ length: 5 }).map((_, index) => (
+                                            <div key={index} className="p-4 border border-border">
+                                                <div className="flex gap-4">
+                                                    <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
+                                                    <div className="flex-grow space-y-2">
+                                                        <Skeleton className="w-1/3 h-6" />
+                                                        <Skeleton className="w-2/3 h-4" />
+                                                        <Skeleton className="w-24 h-4" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : products.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-12">
-                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                        <ClipboardList className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                        ))}
                                     </div>
-                                    <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
-                                        No products found
-                                    </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
-                                        Try changing your filter or create a new product.
-                                    </p>
-                                </div>
-                            ) : (
-                                <>
-                                    {/* Desktop View */}
-                                    <div className="hidden md:block space-y-4">
-                                        {sortedProducts.map((product: Product) => (
-                                            <div
-                                                key={product.product_id}
-                                                className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
-                                                onClick={() => handleProductClick(product)}
-                                            >
-                                                <div className="flex gap-6">
-                                                    <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
-                                                        {product.image_url ? (
-                                                            <img
-                                                                src={product.image_url}
-                                                                alt={product.name}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center">
-                                                                <ImageIcon className="h-12 w-12 text-gray-400" />
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    <div className="flex-grow min-h-[128px] flex flex-col">
-                                                        <div className="flex items-start justify-between mb-2">
-                                                            <h3 className="font-medium text-foreground text-lg leading-tight">{product.name}</h3>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className={cn(
-                                                                    "px-3 py-1 text-xs font-medium",
-                                                                    product.is_active
-                                                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                                                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                                                )}>
-                                                                    {product.is_active ? 'Active' : 'Inactive'}
-                                                                </span>
-                                                                <span className={cn(
-                                                                    "px-3 py-1 text-xs font-medium",
-                                                                    product.display_on_storefront
-                                                                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                                                                        : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                                                )}>
-                                                                    Storefront
-                                                                </span>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation()
-                                                                        handleEditClick(product)
-                                                                    }}
-                                                                    className="text-blue-500 hover:text-blue-600 p-1.5"
-                                                                >
-                                                                    <Edit className="h-4.5 w-4.5" />
-                                                                </button>
-                                                            </div>
+                                ) : products.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-[65vh]">
+                                        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                                            <ClipboardList className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+                                        </div>
+                                        <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                                            No products found
+                                        </h3>
+                                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
+                                            Try changing your filter or create a new product.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Desktop View */}
+                                        <div className="hidden md:block">
+                                            {sortedProducts.map((product: Product) => (
+                                                <div
+                                                    key={product.product_id}
+                                                    className="p-6 border-b last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
+                                                    onClick={() => handleProductClick(product)}
+                                                >
+                                                    <div className="flex gap-6">
+                                                        <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
+                                                            {product.image_url ? (
+                                                                <img
+                                                                    src={product.image_url}
+                                                                    alt={product.name}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <ImageIcon className="h-12 w-12 text-gray-400" />
+                                                                </div>
+                                                            )}
                                                         </div>
 
-                                                        <div className="flex flex-col flex-grow justify-between">
-                                                            {product.description && (
-                                                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                                                    {product.description}
-                                                                </p>
-                                                            )}
-
-                                                            <div className="flex items-center gap-2 mt-auto pt-2">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-lg font-semibold tracking-tight">
-                                                                        {product.price.toLocaleString('en-US', {
-                                                                            minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                            maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
-                                                                        })}
-                                                                        <span className="text-sm text-muted-foreground ml-1">
-                                                                            {product.currency_code}
-                                                                        </span>
+                                                        <div className="flex-grow min-h-[128px] flex flex-col">
+                                                            <div className="flex items-start justify-between mb-2">
+                                                                <h3 className="font-medium text-foreground text-lg leading-tight">{product.name}</h3>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className={cn(
+                                                                        "px-3 py-1 text-xs font-medium",
+                                                                        product.is_active
+                                                                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                                                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                                                    )}>
+                                                                        {product.is_active ? 'Active' : 'Inactive'}
                                                                     </span>
-                                                                    {product.fees && product.fees.length > 0 && (
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            {calculateTotalPrice(product).toLocaleString('en-US', {
-                                                                                minimumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
-                                                                                maximumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
-                                                                            })} {product.currency_code} incl. tax
+                                                                    <span className={cn(
+                                                                        "px-3 py-1 text-xs font-medium",
+                                                                        product.display_on_storefront
+                                                                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                                                            : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                                                    )}>
+                                                                        Storefront
+                                                                    </span>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation()
+                                                                            handleEditClick(product)
+                                                                        }}
+                                                                        className="text-blue-500 hover:text-blue-600 p-1.5"
+                                                                    >
+                                                                        <Edit className="h-4.5 w-4.5" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex flex-col flex-grow justify-between">
+                                                                {product.description && (
+                                                                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                                                        {product.description}
+                                                                    </p>
+                                                                )}
+
+                                                                <div className="flex items-center gap-2 mt-auto pt-2">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-lg font-semibold tracking-tight">
+                                                                            {product.price.toLocaleString('en-US', {
+                                                                                minimumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                                maximumFractionDigits: product.price % 1 !== 0 ? 2 : 0,
+                                                                            })}
+                                                                            <span className="text-sm text-muted-foreground ml-1">
+                                                                                {product.currency_code}
+                                                                            </span>
                                                                         </span>
-                                                                    )}
+                                                                        {product.fees && product.fees.length > 0 && (
+                                                                            <span className="text-xs text-muted-foreground">
+                                                                                {calculateTotalPrice(product).toLocaleString('en-US', {
+                                                                                    minimumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                                                                    maximumFractionDigits: calculateTotalPrice(product) % 1 !== 0 ? 2 : 0,
+                                                                                })} {product.currency_code} incl. tax
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Mobile View */}
-                                    <div className="md:hidden border rounded-none">
-                                        {sortedProducts.map((product: Product) => (
-                                            <ProductCard
-                                                key={product.product_id}
-                                                product={product}
-                                                onEditClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleEditClick(product);
-                                                }}
-                                                onClick={() => handleProductClick(product)}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    {/* Pagination */}
-                                    {totalPages > 1 && (
-                                        <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6 mt-4">
-                                            <div className="flex flex-1 justify-between sm:hidden">
-                                                <Button
-                                                    onClick={() => handlePageChange(currentPage - 1)}
-                                                    disabled={currentPage === 1}
-                                                    variant="outline"
-                                                >
-                                                    Previous
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handlePageChange(currentPage + 1)}
-                                                    disabled={currentPage === totalPages}
-                                                    variant="outline"
-                                                >
-                                                    Next
-                                                </Button>
-                                            </div>
-                                            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                                                <div>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
-                                                        <span className="font-medium">
-                                                            {Math.min(currentPage * itemsPerPage, totalProducts)}
-                                                        </span>{' '}
-                                                        of <span className="font-medium">{totalProducts}</span> products
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                                                        <Button
-                                                            variant="outline"
-                                                            className="rounded-l-md"
-                                                            onClick={() => handlePageChange(currentPage - 1)}
-                                                            disabled={currentPage === 1}
-                                                        >
-                                                            <span className="sr-only">Previous</span>
-                                                            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-                                                        </Button>
-                                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                                            <Button
-                                                                key={page}
-                                                                variant={page === currentPage ? "default" : "outline"}
-                                                                onClick={() => handlePageChange(page)}
-                                                                className="px-4 py-2"
-                                                            >
-                                                                {page}
-                                                            </Button>
-                                                        ))}
-                                                        <Button
-                                                            variant="outline"
-                                                            className="rounded-r-md"
-                                                            onClick={() => handlePageChange(currentPage + 1)}
-                                                            disabled={currentPage === totalPages}
-                                                        >
-                                                            <span className="sr-only">Next</span>
-                                                            <ChevronRight className="h-5 w-5" aria-hidden="true" />
-                                                        </Button>
-                                                    </nav>
-                                                </div>
-                                            </div>
+                                            ))}
                                         </div>
-                                    )}
-                                </>
-                            )}
+
+                                        {/* Mobile View */}
+                                        <div className="md:hidden">
+                                            {sortedProducts.map((product: Product) => (
+                                                <ProductCard
+                                                    key={product.product_id}
+                                                    product={product}
+                                                    onEditClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEditClick(product);
+                                                    }}
+                                                    onClick={() => handleProductClick(product)}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        {/* Pagination */}
+                                        {totalPages > 1 && (
+                                            <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-6 mt-4">
+                                                <div className="flex flex-1 justify-between sm:hidden">
+                                                    <Button
+                                                        onClick={() => handlePageChange(currentPage - 1)}
+                                                        disabled={currentPage === 1}
+                                                        variant="outline"
+                                                    >
+                                                        Previous
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => handlePageChange(currentPage + 1)}
+                                                        disabled={currentPage === totalPages}
+                                                        variant="outline"
+                                                    >
+                                                        Next
+                                                    </Button>
+                                                </div>
+                                                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                                                    <div>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to{' '}
+                                                            <span className="font-medium">
+                                                                {Math.min(currentPage * itemsPerPage, totalProducts)}
+                                                            </span>{' '}
+                                                            of <span className="font-medium">{totalProducts}</span> products
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                                            <Button
+                                                                variant="outline"
+                                                                className="rounded-l-md"
+                                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                                disabled={currentPage === 1}
+                                                            >
+                                                                <span className="sr-only">Previous</span>
+                                                                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                                                            </Button>
+                                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                                                <Button
+                                                                    key={page}
+                                                                    variant={page === currentPage ? "default" : "outline"}
+                                                                    onClick={() => handlePageChange(page)}
+                                                                    className="px-4 py-2"
+                                                                >
+                                                                    {page}
+                                                                </Button>
+                                                            ))}
+                                                            <Button
+                                                                variant="outline"
+                                                                className="rounded-r-md"
+                                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                                disabled={currentPage === totalPages}
+                                                            >
+                                                                <span className="sr-only">Next</span>
+                                                                <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                                                            </Button>
+                                                        </nav>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

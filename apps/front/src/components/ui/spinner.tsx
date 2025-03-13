@@ -1,11 +1,15 @@
-export default function Loader() {
+interface SpinnerProps {
+    className?: string;
+}
+
+export default function Spinner({ className = "" }: SpinnerProps) {
     return (
         <div className="flex items-center justify-center">
             <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
-                className="animate-spin"
+                className={`animate-spin ${className}`}
             >
                 {[...Array(8)].map((_, i) => (
                     <line
@@ -14,7 +18,7 @@ export default function Loader() {
                         y1="3"
                         x2="12"
                         y2="7"
-                        className="stroke-foreground"
+                        className="stroke-gray-800"
                         style={{
                             opacity: Math.max(0.2, 1 - (i * 0.1))
                         }}

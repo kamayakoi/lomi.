@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { supabase } from '@/utils/supabase/client'
+import { SidebarContext } from '@/lib/contexts/sidebar-context'
 
 interface CreateProductFormProps {
     onClose: () => void
@@ -37,6 +38,8 @@ interface ProductFormData {
 
 export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, onSuccess }) => {
     const { user } = useUser()
+    const sidebarContext = useContext(SidebarContext)
+    const organizationId = sidebarContext?.sidebarData?.organizationId
     const [isUploading, setIsUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const { register, handleSubmit, setValue, watch } = useForm<ProductFormData>()
@@ -177,6 +180,50 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
+                <Label htmlFor="image">Image</Label>
+                <div className="mt-1.5">
+                    <div className="flex items-center gap-4">
+                        {previewUrl && (
+                            <div className="relative w-56 h-36 overflow-hidden border border-border">
+                                <img
+                                    src={previewUrl}
+                                    alt="Product preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <button
+                                    onClick={handleRemoveImage}
+                                    className="absolute top-1 right-1 p-1 bg-red-500/90 hover:bg-red-500 text-white transition-colors"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        )}
+                        <label
+                            htmlFor="image"
+                            className="flex flex-col items-center justify-center w-full h-36 cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50"
+                        >
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                <Upload className="h-8 w-8 text-gray-400 mb-3" />
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    <span className="font-medium">Click to upload</span> or drag and drop
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    PNG, JPG up to 3MB
+                                </p>
+                            </div>
+                            <Input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                {...register('image')}
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
                 <Input
                     id="name"
@@ -223,7 +270,9 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-muted-foreground">No fees available. Create fees in the checkout settings.</p>
+                    <p className="text-sm text-muted-foreground">
+                        No fees available. <a href={`/${organizationId}/settings/receiving-money/checkout`} className="text-blue-500 hover:text-blue-600">Create fees in the checkout settings</a>.
+                    </p>
                 )}
             </div>
 
@@ -255,51 +304,7 @@ export const CreateProductForm: React.FC<CreateProductFormProps> = ({ onClose, o
                     </div>
                 </Card>
             )}
-            <div className="space-y-2">
-                <Label htmlFor="image">Image</Label>
-                <div className="mt-1.5">
-                    <div className="flex items-center gap-4">
-                        {previewUrl && (
-                            <div className="relative w-56 h-36 overflow-hidden border border-border">
-                                <img
-                                    src={previewUrl}
-                                    alt="Product preview"
-                                    className="w-full h-full object-cover"
-                                />
-                                <button
-                                    onClick={handleRemoveImage}
-                                    className="absolute top-1 right-1 p-1 bg-red-500/90 hover:bg-red-500 text-white transition-colors"
-                                >
-                                    <X className="h-3.5 w-3.5" />
-                                </button>
-                            </div>
-                        )}
-                        <label
-                            htmlFor="image"
-                            className="flex flex-col items-center justify-center w-full h-36 cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50"
-                        >
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className="h-8 w-8 text-gray-400 mb-3" />
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="font-medium">Click to upload</span> or drag and drop
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    PNG, JPG up to 3MB
-                                </p>
-                            </div>
-                            <Input
-                                id="image"
-                                type="file"
-                                accept="image/*"
-                                {...register('image')}
-                                onChange={handleImageChange}
-                                className="hidden"
-                            />
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-4 mt-6">
                 <Button
                     type="button"
                     variant="outline"

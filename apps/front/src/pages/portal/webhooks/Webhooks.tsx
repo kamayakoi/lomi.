@@ -111,7 +111,7 @@ function WebhookCard({ webhook, onEditClick, onClick }: {
 }) {
     return (
         <div
-            className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
             onClick={onClick}
         >
             <div className="space-y-3">
@@ -365,7 +365,7 @@ function WebhooksPage() {
                                 <div className="md:hidden">
                                     {isWebhooksLoading ? (
                                         Array.from({ length: 3 }).map((_, index) => (
-                                            <div key={index} className="p-4 border-b last:border-b-0">
+                                            <div key={index} className="p-4 border-b">
                                                 <Skeleton className="w-full h-24" />
                                             </div>
                                         ))

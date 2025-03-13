@@ -49,7 +49,7 @@ function PaymentLinkCard({ paymentLink, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -249,146 +249,148 @@ function PaymentLinksPage() {
           />
 
           <Card className="rounded-none">
-            <CardContent className="p-4">
-              <div className="border">
-                <div className="hidden md:block space-y-4">
-                  {isPaymentLinksLoading ? (
-                    <div className="space-y-4">
-                      {Array.from({ length: 5 }).map((_, index) => (
-                        <div key={index} className="p-4 border border-border">
-                          <div className="flex gap-4">
-                            <div className="flex-grow space-y-2">
-                              <Skeleton className="w-1/3 h-6" />
-                              <Skeleton className="w-2/3 h-4" />
-                              <Skeleton className="w-24 h-4" />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 mt-4">
-                      <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                        <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
-                      </div>
-                      <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
-                        No payment links found
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
-                        Try changing your filter or create a new payment link.
-                      </p>
-                    </div>
-                  ) : (
-                    sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
-                      <div
-                        key={link.link_id}
-                        className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
-                        onClick={() => handlePaymentLinkClick(link)}
-                      >
-                        <div className="flex gap-6">
-                          <div className="flex-grow">
-                            <div className="flex items-start justify-between mb-2">
-                              <h3 className="font-medium text-foreground text-lg leading-tight">{link.title}</h3>
-                              <div className="flex items-center gap-1.5">
-                                <span className={cn(
-                                  "px-3 py-1 text-xs font-medium",
-                                  link.is_active
-                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                )}>
-                                  {link.is_active ? 'Active' : 'Inactive'}
-                                </span>
-                                <span className={`
-                                  inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
-                                  ${linkTypeColors[link.link_type]}
-                                `}>
-                                  {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
-                                </span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEditClick(link);
-                                  }}
-                                  className="text-blue-500 hover:text-blue-600 p-1.5"
-                                >
-                                  <Edit className="h-4.5 w-4.5" />
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col flex-grow justify-between">
-                              {link.public_description && (
-                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                  {link.public_description}
-                                </p>
-                              )}
-
-                              <div className="flex items-center justify-between mt-4">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-lg font-semibold tracking-tight">
-                                    {link.link_type === 'instant' && link.price ? (
-                                      `${formatPrice(link.price)} ${link.currency_code}`
-                                    ) : link.link_type === 'product' && link.product_price ? (
-                                      `${formatPrice(link.product_price)} ${link.currency_code}`
-                                    ) : link.link_type === 'plan' && link.plan_amount ? (
-                                      `${formatPrice(link.plan_amount)} ${link.currency_code}`
-                                    ) : (
-                                      '-'
-                                    )}
-                                  </span>
-                                </div>
-                                <a
-                                  href={link.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-500 hover:underline"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  View Link
-                                </a>
+            <CardContent className="p-0">
+              <div id="payment-links-table-container" className="h-[72vh] overflow-auto">
+                <div className="border-0">
+                  <div className="hidden md:block">
+                    {isPaymentLinksLoading ? (
+                      <div className="space-y-4 p-4">
+                        {Array.from({ length: 5 }).map((_, index) => (
+                          <div key={index} className="p-4 border border-border">
+                            <div className="flex gap-4">
+                              <div className="flex-grow space-y-2">
+                                <Skeleton className="w-1/3 h-6" />
+                                <Skeleton className="w-2/3 h-4" />
+                                <Skeleton className="w-24 h-4" />
                               </div>
                             </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))
-                  )}
-                </div>
-
-                <div className="md:hidden">
-                  {isPaymentLinksLoading ? (
-                    Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="p-4 border-b last:border-b-0">
-                        <Skeleton className="w-full h-24" />
-                      </div>
-                    ))
-                  ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
-                    <div className="py-24 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-4">
-                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                          <Link2Icon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                    ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-[65vh]">
+                        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                          <Link2Icon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                        <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
                           No payment links found
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                        </h3>
+                        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
                           Try changing your filter or create a new payment link.
                         </p>
                       </div>
-                    </div>
-                  ) : (
-                    sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
-                      <PaymentLinkCard
-                        key={link.link_id}
-                        paymentLink={link}
-                        onEditClick={(e) => {
-                          e.stopPropagation();
-                          handleEditClick(link);
-                        }}
-                        onClick={() => handlePaymentLinkClick(link)}
-                      />
-                    ))
-                  )}
+                    ) : (
+                      sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
+                        <div
+                          key={link.link_id}
+                          className="p-6 border-b hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors duration-200 cursor-pointer"
+                          onClick={() => handlePaymentLinkClick(link)}
+                        >
+                          <div className="flex gap-6">
+                            <div className="flex-grow">
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="font-medium text-foreground text-lg leading-tight">{link.title}</h3>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={cn(
+                                    "px-3 py-1 text-xs font-medium",
+                                    link.is_active
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                  )}>
+                                    {link.is_active ? 'Active' : 'Inactive'}
+                                  </span>
+                                  <span className={`
+                                    inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
+                                    ${linkTypeColors[link.link_type]}
+                                  `}>
+                                    {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
+                                  </span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditClick(link);
+                                    }}
+                                    className="text-blue-500 hover:text-blue-600 p-1.5"
+                                  >
+                                    <Edit className="h-4.5 w-4.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-col flex-grow justify-between">
+                                {link.public_description && (
+                                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                    {link.public_description}
+                                  </p>
+                                )}
+
+                                <div className="flex items-center justify-between mt-4">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg font-semibold tracking-tight">
+                                      {link.link_type === 'instant' && link.price ? (
+                                        `${formatPrice(link.price)} ${link.currency_code}`
+                                      ) : link.link_type === 'product' && link.product_price ? (
+                                        `${formatPrice(link.product_price)} ${link.currency_code}`
+                                      ) : link.link_type === 'plan' && link.plan_amount ? (
+                                        `${formatPrice(link.plan_amount)} ${link.currency_code}`
+                                      ) : (
+                                        '-'
+                                      )}
+                                    </span>
+                                  </div>
+                                  <a
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    View Link
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="md:hidden">
+                    {isPaymentLinksLoading ? (
+                      Array.from({ length: 3 }).map((_, index) => (
+                        <div key={index} className="p-4 border-b">
+                          <Skeleton className="w-full h-24" />
+                        </div>
+                      ))
+                    ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
+                      <div className="h-[65vh] flex items-center justify-center">
+                        <div className="flex flex-col items-center">
+                          <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                            <Link2Icon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+                          </div>
+                          <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                            No payment links found
+                          </h3>
+                          <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
+                            Try changing your filter or create a new payment link.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
+                        <PaymentLinkCard
+                          key={link.link_id}
+                          paymentLink={link}
+                          onEditClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(link);
+                          }}
+                          onClick={() => handlePaymentLinkClick(link)}
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>

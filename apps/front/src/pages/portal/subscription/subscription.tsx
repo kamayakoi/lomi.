@@ -47,7 +47,7 @@ function PlanCard({ plan, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -111,7 +111,7 @@ function SubscriptionCard({ subscription, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -332,148 +332,150 @@ function SubscriptionsPage() {
               />
 
               <TabsContent value="plans">
-                <Card className="rounded-none">
-                  <CardContent className="p-4 rounded-none">
-                    {isSubscriptionPlansLoading ? (
-                      <div className="space-y-4">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <div key={index} className="p-4 border border-border">
-                            <div className="flex gap-4">
-                              <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
-                              <div className="flex-grow space-y-2">
-                                <Skeleton className="w-1/3 h-6" />
-                                <Skeleton className="w-2/3 h-4" />
-                                <Skeleton className="w-24 h-4" />
+                <Card className="mt-4 rounded-none">
+                  <CardContent className="p-0">
+                    <div id="plans-table-container" className="h-[72vh] overflow-auto">
+                      {isSubscriptionPlansLoading ? (
+                        <div className="space-y-4 p-4">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <div key={index} className="p-4 border border-border">
+                              <div className="flex gap-4">
+                                <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
+                                <div className="flex-grow space-y-2">
+                                  <Skeleton className="w-1/3 h-6" />
+                                  <Skeleton className="w-2/3 h-4" />
+                                  <Skeleton className="w-24 h-4" />
+                                </div>
                               </div>
                             </div>
+                          ))}
+                        </div>
+                      ) : subscriptionPlans.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-[65vh]">
+                          <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                            <ClipboardList className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                           </div>
-                        ))}
-                      </div>
-                    ) : subscriptionPlans.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12">
-                        <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                          <ClipboardList className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                          <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                            No subscription plans found
+                          </h3>
+                          <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
+                            Try changing your filter or create a new subscription plan.
+                          </p>
                         </div>
-                        <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
-                          No subscription plans found
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mt-2">
-                          Try changing your filter or create a new subscription plan.
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Desktop View */}
-                        <div className="hidden md:block space-y-4">
-                          {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
-                            <div
-                              key={plan.plan_id}
-                              className="p-6 border border-border hover:border-border-hover transition-colors duration-200 cursor-pointer bg-background hover:bg-gray-50/50 dark:hover:bg-gray-900/50"
-                              onClick={() => handlePlanClick(plan)}
-                            >
-                              <div className="flex gap-6">
-                                <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0 shadow-sm">
-                                  {plan.image_url ? (
-                                    <img
-                                      src={plan.image_url}
-                                      alt={plan.name}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                      <ImageIcon className="h-12 w-12 text-gray-400" />
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="flex-grow min-h-[128px] flex flex-col">
-                                  <div className="flex items-start justify-between mb-2">
-                                    <h3 className="font-medium text-foreground text-lg leading-tight">{plan.name}</h3>
-                                    <div className="flex items-center gap-1.5">
-                                      <span className={cn(
-                                        "px-3 py-1 text-xs font-medium",
-                                        plan.is_active
-                                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                      )}>
-                                        {plan.is_active ? 'Active' : 'Inactive'}
-                                      </span>
-                                      <span className={cn(
-                                        "px-3 py-1 text-xs font-medium",
-                                        plan.display_on_storefront
-                                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                                          : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-                                      )}>
-                                        Storefront
-                                      </span>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          handleEditPlanClick(plan)
-                                        }}
-                                        className="text-blue-500 hover:text-blue-600 p-1.5"
-                                      >
-                                        <Edit className="h-4.5 w-4.5" />
-                                      </button>
-                                    </div>
+                      ) : (
+                        <>
+                          {/* Desktop View */}
+                          <div className="hidden md:block">
+                            {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                              <div
+                                key={plan.plan_id}
+                                className="p-6 border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                                onClick={() => handlePlanClick(plan)}
+                              >
+                                <div className="flex gap-6">
+                                  <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                    {plan.image_url ? (
+                                      <img
+                                        src={plan.image_url}
+                                        alt={plan.name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <ImageIcon className="h-12 w-12 text-gray-400" />
+                                      </div>
+                                    )}
                                   </div>
 
-                                  <div className="flex flex-col flex-grow justify-between">
-                                    {plan.description && (
-                                      <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                        {plan.description}
-                                      </p>
-                                    )}
+                                  <div className="flex-grow min-h-[128px] flex flex-col">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <h3 className="font-medium text-foreground text-lg leading-tight">{plan.name}</h3>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className={cn(
+                                          "px-3 py-1 text-xs font-medium",
+                                          plan.is_active
+                                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                        )}>
+                                          {plan.is_active ? 'Active' : 'Inactive'}
+                                        </span>
+                                        <span className={cn(
+                                          "px-3 py-1 text-xs font-medium",
+                                          plan.display_on_storefront
+                                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                            : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
+                                        )}>
+                                          Storefront
+                                        </span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEditPlanClick(plan)
+                                          }}
+                                          className="text-blue-500 hover:text-blue-600 p-1.5"
+                                        >
+                                          <Edit className="h-4.5 w-4.5" />
+                                        </button>
+                                      </div>
+                                    </div>
 
-                                    <div className="flex items-center gap-2 mt-auto pt-2">
-                                      <span className="text-lg font-semibold tracking-tight">
-                                        {formatCurrency(plan.amount, plan.currency_code)}
-                                      </span>
-                                      <span className={cn(
-                                        "px-3 py-1 text-xs font-medium",
-                                        frequencyColors[plan.billing_frequency]
-                                      )}>
-                                        {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
-                                      </span>
+                                    <div className="flex flex-col flex-grow justify-between">
+                                      {plan.description && (
+                                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                          {plan.description}
+                                        </p>
+                                      )}
+
+                                      <div className="flex items-center gap-2 mt-auto pt-2">
+                                        <span className="text-lg font-semibold tracking-tight">
+                                          {formatCurrency(plan.amount, plan.currency_code)}
+                                        </span>
+                                        <span className={cn(
+                                          "px-3 py-1 text-xs font-medium",
+                                          frequencyColors[plan.billing_frequency]
+                                        )}>
+                                          {plan.billing_frequency.charAt(0).toUpperCase() + plan.billing_frequency.slice(1)}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
 
-                        {/* Mobile View */}
-                        <div className="md:hidden border rounded-none">
-                          {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
-                            <PlanCard
-                              key={plan.plan_id}
-                              plan={plan}
-                              onEditClick={(e) => {
-                                e.stopPropagation();
-                                handleEditPlanClick(plan);
-                              }}
-                              onClick={() => handlePlanClick(plan)}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    )}
+                          {/* Mobile View */}
+                          <div className="md:hidden">
+                            {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                              <PlanCard
+                                key={plan.plan_id}
+                                plan={plan}
+                                onEditClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditPlanClick(plan);
+                                }}
+                                onClick={() => handlePlanClick(plan)}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
               <TabsContent value="subscriptions">
-                <Card className="rounded-none">
-                  <CardContent className="p-4">
-                    <div className="border">
+                <Card className="mt-4 rounded-none">
+                  <CardContent className="p-0">
+                    <div id="subscriptions-table-container" className="h-[72vh] overflow-auto">
                       {/* Desktop View */}
                       <div className="hidden md:block">
                         <Table>
                           <TableHeader>
-                            <TableRow>
+                            <TableRow className="hover:bg-transparent border-b bg-muted/50">
                               <TableHead className="text-center">
-                                <Button variant="ghost" onClick={() => handleSort('customer_name')} className="rounded-none">
+                                <Button variant="ghost" onClick={() => handleSort('customer_name')}>
                                   Customer
                                   {sortColumn === 'customer_name' && (
                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -481,7 +483,7 @@ function SubscriptionsPage() {
                                 </Button>
                               </TableHead>
                               <TableHead className="text-center">
-                                <Button variant="ghost" onClick={() => handleSort('plan_name')} className="rounded-none">
+                                <Button variant="ghost" onClick={() => handleSort('plan_name')}>
                                   Plan
                                   {sortColumn === 'plan_name' && (
                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -489,7 +491,7 @@ function SubscriptionsPage() {
                                 </Button>
                               </TableHead>
                               <TableHead className="text-center">
-                                <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none">
+                                <Button variant="ghost" onClick={() => handleSort('amount')}>
                                   Price
                                   {sortColumn === 'amount' && (
                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -497,7 +499,7 @@ function SubscriptionsPage() {
                                 </Button>
                               </TableHead>
                               <TableHead className="text-center">
-                                <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none">
+                                <Button variant="ghost" onClick={() => handleSort('status')}>
                                   Status
                                   {sortColumn === 'status' && (
                                     <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
@@ -511,21 +513,21 @@ function SubscriptionsPage() {
                               Array.from({ length: 5 }).map((_, index) => (
                                 <TableRow key={index}>
                                   <TableCell colSpan={4}>
-                                    <Skeleton className="w-full h-8 rounded-none" />
+                                    <Skeleton className="w-full h-8" />
                                   </TableCell>
                                 </TableRow>
                               ))
                             ) : subscriptions.length === 0 ? (
                               <TableRow>
-                                <TableCell colSpan={4} className="text-center py-8">
-                                  <div className="flex flex-col items-center justify-center space-y-4">
-                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                      <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                                <TableCell colSpan={4} className="h-[65vh]">
+                                  <div className="flex flex-col items-center justify-center">
+                                    <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                                      <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                                     </div>
-                                    <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                                    <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
                                       No subscriptions found
-                                    </p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                                    </h3>
+                                    <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
                                       Try changing your filter or create a new subscription.
                                     </p>
                                   </div>
@@ -535,19 +537,19 @@ function SubscriptionsPage() {
                               sortSubscriptions(subscriptions).map((subscription: Subscription) => (
                                 <TableRow
                                   key={subscription.subscription_id}
-                                  className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                  className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                                   onClick={() => handleSubscriptionClick(subscription)}
                                 >
                                   <TableCell className="text-center">{subscription.customer_name}</TableCell>
                                   <TableCell className="text-center">{subscription.plan_name}</TableCell>
                                   <TableCell className="text-center">{formatCurrency(subscription.amount, subscription.currency_code)}</TableCell>
                                   <TableCell className="text-center">
-                                    <span className={`
-                                      inline-block px-2 py-1 text-xs font-normal rounded-none
-                                      ${subscription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : ''}
-                                      ${subscription.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                      ${subscription.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                    `}>
+                                    <span className={cn(
+                                      "inline-block px-2 py-1 text-xs font-normal",
+                                      subscription.status === 'active' && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+                                      subscription.status === 'pending' && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+                                      subscription.status === 'cancelled' && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                    )}>
                                       {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                                     </span>
                                   </TableCell>
@@ -567,15 +569,15 @@ function SubscriptionsPage() {
                             </div>
                           ))
                         ) : subscriptions.length === 0 ? (
-                          <div className="py-24 text-center">
-                            <div className="flex flex-col items-center justify-center space-y-4">
-                              <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">
-                                <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400 dark:text-gray-500" />
+                          <div className="h-[65vh] flex items-center justify-center">
+                            <div className="flex flex-col items-center">
+                              <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                                <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                               </div>
-                              <p className="text-xl font-semibold text-gray-500 dark:text-gray-400">
+                              <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
                                 No subscriptions found
-                              </p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center">
+                              </h3>
+                              <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
                                 Try changing your filter or create a new subscription.
                               </p>
                             </div>

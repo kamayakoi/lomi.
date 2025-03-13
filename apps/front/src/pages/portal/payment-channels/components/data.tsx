@@ -36,7 +36,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'MASTERCARD',
     name: 'Mastercard',
-    description: 'Accept Mastercard payments globally. Ideal for businesses looking to expand internationally with reliable card processing and fraud protection.',
+    description: 'Accept Mastercard payments globally. Ideal for businesses looking to expand internationally with reliable card processing and strong security.',
     logo: <img src="/payment_channels/mastercard.webp" alt="Mastercard" className="w-full h-full object-contain" />,
     provider_code: 'ECOBANK',
     type: 'Digital Payments',
@@ -73,6 +73,27 @@ export const paymentMethods: PaymentMethod[] = [
   //   status: 'coming_soon',
   //   category: 'Cards'
   // },
+
+  // E-Wallet Section
+  {
+    code: 'WAVE',
+    name: 'Wave',
+    description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
+    logo: <img src="/payment_channels/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
+    provider_code: 'WAVE',
+    type: 'e-Wallets',
+    category: 'E-Wallets'
+  },
+  {
+    code: 'OPAY',
+    name: 'OPay',
+    description: 'Unlock OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
+    logo: <img src="/payment_channels/opay.webp" alt="OPay" className="w-full h-full object-contain" />,
+    provider_code: 'OPAY',
+    type: 'e-Wallets',
+    status: 'coming_soon',
+    category: 'E-Wallets'
+  },
 
   // Mobile Money Section
   {
@@ -125,27 +146,6 @@ export const paymentMethods: PaymentMethod[] = [
     category: 'Mobile Money'
   },
 
-  // E-Wallet Section
-  {
-    code: 'WAVE',
-    name: 'Wave',
-    description: 'Known for its low fees and user-friendly interface, it\'s the preferred payment method in Sénégal and Côte d\'Ivoire.',
-    logo: <img src="/payment_channels/wave.webp" alt="Wave" className="w-full h-full object-contain" />,
-    provider_code: 'WAVE',
-    type: 'e-Wallets',
-    category: 'E-Wallets'
-  },
-  {
-    code: 'OPAY',
-    name: 'OPay',
-    description: 'Unlock OPay, a fast-growing mobile payment platform in Nigeria. Benefit from their innovative technology, and extensive agent network.',
-    logo: <img src="/payment_channels/opay.webp" alt="OPay" className="w-full h-full object-contain" />,
-    provider_code: 'OPAY',
-    type: 'e-Wallets',
-    status: 'coming_soon',
-    category: 'E-Wallets'
-  },
-
   // Crypto Section
   {
     code: 'BTC',
@@ -170,7 +170,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'BNB',
     name: 'BNB',
-    description: 'Support BNB transactions via the BNB Smart Chain, ensuring lightning-fast payments with minimal fees within the Binance ecosystem',
+    description: 'Support BNB transactions via the BNB Smart Chain, ensuring lightning-fast payments with minimal fees within the Binance ecosystem.',
     logo: <img src="/crypto/bnb.webp" alt="BNB" className="w-8 h-8" />,
     provider_code: 'NOWPAYMENTS',
     type: 'Crypto',
@@ -180,7 +180,7 @@ export const paymentMethods: PaymentMethod[] = [
   {
     code: 'CRYPTO_MORE',
     name: 'More cryptocurrencies',
-    description: 'We support a wide range of cryptocurrencies including stablecoins and major tokens. Connect once to enable all supported cryptocurrencies on your platform.',
+    description: 'We have built-in support for a wide range of cryptocurrencies including stablecoins and major tokens. Connect once to enable all our supported cryptocurrencies on your platform.',
     logo: <div className="relative w-full">
       <div className="flex items-center -space-x-3">
         <div className="relative">
@@ -190,22 +190,16 @@ export const paymentMethods: PaymentMethod[] = [
           <img src="/crypto/eth.webp" alt="ETH" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/dai.webp" alt="DAI" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/sol.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/solana.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/ton.webp" alt="TON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/xrp.webp" alt="XRP" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/ada.webp" alt="ADA" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/zcash.webp" alt="LTC" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
-        </div>
-        <div className="relative">
-          <img src="/crypto/doge.webp" alt="DOGE" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
-        </div>
-        <div className="relative">
-          <img src="/crypto/tron.webp" alt="TRON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/fil.webp" alt="FIL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
         </div>
       </div>
     </div>,

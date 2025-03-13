@@ -422,7 +422,9 @@ export default function PaymentChannels() {
                 </div>
                 <div className="flex space-x-4">
                   <a
-                    href="mailto:hello@lomi.africa?subject=New Payment Channel Request"
+                    href="https://github.com/lomiafrica/lomi./issues/new?labels=enhancement"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="bg-blue-500/90 hover:bg-blue-600 text-white px-3 py-2 rounded-sm inline-flex items-center transition-all duration-200"
                   >
                     <IconPlus className="mr-2 h-4 w-4" />

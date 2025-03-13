@@ -102,9 +102,22 @@ export class NOWPaymentsService {
                 return [
                     { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
                     { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-                    { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
                     { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-                    { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
+                    { id: "usdc", code: "usdc", name: "USD Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "dai", code: "dai", name: "Dai", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "sol", code: "sol", name: "Solana", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
+                    { id: "bnb", code: "bnb", name: "Binance Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" },
+                    { id: "matic", code: "matic", name: "Polygon", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+                    { id: "ada", code: "ada", name: "Cardano", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "xrp", code: "xrp", name: "Ripple", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "trx", code: "trx", name: "TRON", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+                    { id: "fil", code: "fil", name: "Filecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.5" },
+                    { id: "ton", code: "ton", name: "Toncoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+                    { id: "xtz", code: "xtz", name: "Tezos", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+                    { id: "ftm", code: "ftm", name: "Fantom", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                    { id: "link", code: "link", name: "Chainlink", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "1" },
+                    { id: "zec", code: "zec", name: "Zcash", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" }
                 ];
             }
 
@@ -120,9 +133,22 @@ export class NOWPaymentsService {
             return [
                 { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
                 { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-                { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
                 { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-                { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
+                { id: "usdc", code: "usdc", name: "USD Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "dai", code: "dai", name: "Dai", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "sol", code: "sol", name: "Solana", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
+                { id: "bnb", code: "bnb", name: "Binance Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" },
+                { id: "matic", code: "matic", name: "Polygon", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+                { id: "ada", code: "ada", name: "Cardano", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "xrp", code: "xrp", name: "Ripple", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "trx", code: "trx", name: "TRON", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+                { id: "fil", code: "fil", name: "Filecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.5" },
+                { id: "ton", code: "ton", name: "Toncoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+                { id: "xtz", code: "xtz", name: "Tezos", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+                { id: "ftm", code: "ftm", name: "Fantom", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+                { id: "link", code: "link", name: "Chainlink", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "1" },
+                { id: "zec", code: "zec", name: "Zcash", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" }
             ];
         }
     }

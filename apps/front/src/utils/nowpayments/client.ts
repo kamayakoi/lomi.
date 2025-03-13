@@ -7,6 +7,13 @@ import type {
     NOWPaymentsCurrency
 } from './types';
 
+// Define types for merchant coins response
+type MerchantCoinsResponse = 
+    | string[] 
+    | { currencies: string[] }
+    | { currency_list: string[] }
+    | { [currencyCode: string]: { enabled?: boolean } };
+
 export class NOWPaymentsClient {
     /**
      * Makes a request to our NOWPayments API Edge Function
@@ -120,9 +127,22 @@ export class NOWPaymentsClient {
         return [
             { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
             { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-            { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
             { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-            { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
+            { id: "usdc", code: "usdc", name: "USD Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "dai", code: "dai", name: "Dai", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "sol", code: "sol", name: "Solana", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
+            { id: "bnb", code: "bnb", name: "Binance Coin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" },
+            { id: "matic", code: "matic", name: "Polygon", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+            { id: "ada", code: "ada", name: "Cardano", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "xrp", code: "xrp", name: "Ripple", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "trx", code: "trx", name: "TRON", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" },
+            { id: "fil", code: "fil", name: "Filecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.5" },
+            { id: "ton", code: "ton", name: "Toncoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+            { id: "xtz", code: "xtz", name: "Tezos", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "5" },
+            { id: "ftm", code: "ftm", name: "Fantom", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
+            { id: "link", code: "link", name: "Chainlink", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "1" },
+            { id: "zec", code: "zec", name: "Zcash", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.05" }
         ];
     }
 
@@ -132,7 +152,7 @@ export class NOWPaymentsClient {
     async getMerchantCoins(): Promise<string[]> {
         try {
             console.log('Fetching merchant enabled coins from NOWPayments');
-            const response = await this.request<{ currencies: string[] } | string[] | Record<string, any>>('/v1/merchant/coins');
+            const response = await this.request<MerchantCoinsResponse>('/v1/merchant/coins');
             
             // Log the raw response for debugging
             console.log('Raw merchant/coins response:', response);
@@ -154,8 +174,9 @@ export class NOWPaymentsClient {
                     // Check if we got 'selectedcurrencies' which is not a valid currency code
                     if (currencies.length === 1 && currencies[0] === 'selectedcurrencies') {
                         console.warn("Received 'selectedcurrencies' placeholder instead of actual currency codes");
-                        currencies = ['btc', 'eth', 'ltc', 'usdt', 'doge'];
-                        console.log('Using default currencies instead:', currencies);
+                        // Use our expanded list of cryptocurrencies instead of just the basic 5
+                        currencies = ['btc', 'eth', 'usdt', 'usdc', 'dai', 'sol', 'bnb', 'matic', 'doge', 'ada', 'xrp', 'trx', 'fil', 'ton', 'xtz', 'ftm', 'link', 'zec'];
+                        console.log('Using expanded default currencies instead:', currencies);
                     }
                 } else if ('currency_list' in response && Array.isArray(response['currency_list'])) {
                     // Some API versions might return currency_list instead
@@ -185,14 +206,14 @@ export class NOWPaymentsClient {
 
             if (currencies.length === 0) {
                 console.warn('No valid enabled coins found in merchant account, using default cryptocurrencies');
-                currencies = ['btc', 'eth', 'ltc', 'usdt', 'doge'];
-                console.log('Using default currencies:', currencies);
+                currencies = ['btc', 'eth', 'usdt', 'usdc', 'dai', 'sol', 'bnb', 'matic', 'doge', 'ada', 'xrp', 'trx', 'fil', 'ton', 'xtz', 'ftm', 'link', 'zec'];
+                console.log('Using expanded default currencies:', currencies);
             }
 
             return currencies;
         } catch (error) {
             console.error('Failed to fetch merchant coins:', error);
-            return ['btc', 'eth', 'ltc', 'usdt', 'doge'];
+            return ['btc', 'eth', 'usdt', 'usdc', 'dai', 'sol', 'bnb', 'matic', 'doge', 'ada', 'xrp', 'trx', 'fil', 'ton', 'xtz', 'ftm', 'link', 'zec'];
         }
     }
 
@@ -209,7 +230,7 @@ export class NOWPaymentsClient {
             } catch (error) {
                 console.error('Failed to fetch merchant coins, falling back to hardcoded currencies:', error);
                 // Fallback to a list of common cryptocurrencies
-                enabledCoins = ['btc', 'eth', 'ltc', 'usdt', 'doge'];
+                enabledCoins = ['btc', 'eth', 'usdt', 'usdc', 'dai', 'sol', 'bnb', 'matic', 'doge', 'ada', 'xrp', 'trx'];
                 console.log('Using fallback currencies:', enabledCoins);
             }
 
@@ -278,42 +299,28 @@ export class NOWPaymentsClient {
             });
 
             // If we're using default currencies but filtering reduced the count, skip filtering
-            const defaultCurrencies = ['btc', 'eth', 'ltc', 'usdt', 'doge'];
-            const usingDefaultCurrencies = JSON.stringify(enabledCoins.sort()) === JSON.stringify(defaultCurrencies.sort());
+            const defaultCurrencies = ['btc', 'eth', 'usdt', 'usdc', 'dai', 'sol', 'bnb', 'matic', 'doge', 'ada', 'xrp', 'trx', 'fil', 'ton', 'xtz', 'ftm', 'link', 'zec'];
+            
+            // Check if we're using our default currencies list, or the old basic list
+            const usingOldDefaultCurrencies = JSON.stringify(['btc', 'eth', 'ltc', 'usdt', 'doge'].sort()) === JSON.stringify(enabledCoins.sort());
+            const usingExpandedDefaultCurrencies = JSON.stringify(defaultCurrencies.sort()) === JSON.stringify(enabledCoins.sort());
+            const usingDefaultCurrencies = usingOldDefaultCurrencies || usingExpandedDefaultCurrencies;
             
             if (usingDefaultCurrencies && filteredCurrencies.length < enabledCoins.length) {
                 console.warn('Using default currencies but some were filtered out - returning all defaults');
-                return [
-                    { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
-                    { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-                    { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
-                    { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-                    { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
-                ];
+                return this.getDefaultCurrencies();
             }
             
             // If no matching currencies found at all, return default set
             if (!filteredCurrencies.length) {
                 console.warn('No matching currencies found, using default set of cryptocurrencies');
-                return [
-                    { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
-                    { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-                    { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
-                    { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-                    { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
-                ];
+                return this.getDefaultCurrencies();
             }
 
             return filteredCurrencies;
         } catch (error) {
             console.error('Failed to get available currencies:', error);
-            return [
-                { id: "btc", code: "btc", name: "Bitcoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.001" },
-                { id: "eth", code: "eth", name: "Ethereum", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.01" },
-                { id: "ltc", code: "ltc", name: "Litecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "0.1" },
-                { id: "usdt", code: "usdt", name: "Tether USD", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "10" },
-                { id: "doge", code: "doge", name: "Dogecoin", enabled: true, is_base_currency: true, is_quote_currency: true, minimum_amount: "100" }
-            ];
+            return this.getDefaultCurrencies();
         }
     }
 
@@ -322,29 +329,22 @@ export class NOWPaymentsClient {
         const currencyNames: Record<string, string> = {
             'btc': 'Bitcoin',
             'eth': 'Ethereum',
-            'ltc': 'Litecoin',
-            'xrp': 'Ripple',
-            'doge': 'Dogecoin',
-            'bnb': 'Binance Coin',
             'usdt': 'Tether USD',
             'usdc': 'USD Coin',
+            'dai': 'Dai',
             'sol': 'Solana',
-            'ada': 'Cardano',
-            'dot': 'Polkadot',
-            'trx': 'TRON',
+            'bnb': 'Binance Coin',
             'matic': 'Polygon',
-            'shib': 'Shiba Inu',
-            'avax': 'Avalanche',
-            'uni': 'Uniswap',
+            'doge': 'Dogecoin',
+            'ada': 'Cardano',
+            'xrp': 'Ripple',
+            'trx': 'TRON',
+            'fil': 'Filecoin',
+            'ton': 'Toncoin',
+            'xtz': 'Tezos',
+            'ftm': 'Fantom',
             'link': 'Chainlink',
-            'xmr': 'Monero',
-            'atom': 'Cosmos',
-            'etc': 'Ethereum Classic',
-            'bch': 'Bitcoin Cash',
-            'algo': 'Algorand',
-            'near': 'NEAR Protocol',
-            'xlm': 'Stellar',
-            'ftm': 'Fantom'
+            'zec': 'Zcash'
         };
 
         return currencyNames[code.toLowerCase()] || code.toUpperCase();

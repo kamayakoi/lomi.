@@ -89,7 +89,12 @@ export default function Providers() {
                   <h2 className='mb-2 text-lg font-semibold'>{integration.title}</h2>
                   <p className='text-gray-500' dangerouslySetInnerHTML={{ __html: integration.description }}></p>
                   {integration.link && (
-                    <a href={integration.link} className='text-blue-600 dark:text-blue-400 font-semibold mt-4 flex items-center'>
+                    <a
+                      href={integration.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className='text-blue-600 dark:text-blue-400 font-semibold mt-4 flex items-center'
+                    >
                       <span>Learn more</span>
                     </a>
                   )}
@@ -107,7 +112,9 @@ export default function Providers() {
                   We&apos;re constantly working on new ways to help you get started very quickly with our solutions. If there&apos;s an integration you need, let us know.
                 </p>
                 <a
-                  href="mailto:hello@lomi.africa?subject=Integration Request"
+                  href="https://github.com/lomiafrica/lomi./issues/new?labels=enhancement"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-amber-500 text-white px-4 py-2 rounded-none inline-flex items-center transition-transform transform hover:scale-105 hover:shadow-lg"
                 >
                   <IconPlus className="mr-2 h-4 w-4" />

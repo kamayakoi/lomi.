@@ -607,7 +607,7 @@ function formatBrowser(browser: string | null): string {
 
 function LogCard({ log }: { log: Log }) {
     return (
-        <div className="p-4 border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+        <div className="p-4 border-b hover:bg-gray-50 dark:hover:bg-gray-800">
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <div className="font-medium">{formatEventName(log.event)}</div>

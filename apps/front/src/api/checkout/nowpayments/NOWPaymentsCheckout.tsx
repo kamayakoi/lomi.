@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NOWPaymentsQRModal } from '@/components/NOWPaymentsQRModal';
+import { NOWPaymentsQRModal } from './NOWPaymentsQRModal';
 
 // No-op function that satisfies the linter
 const noop = () => undefined;
@@ -78,21 +78,23 @@ export default function NOWPaymentsCheckout({
 
     // For page mode, use a full page layout
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white">
             <div className="w-full max-w-md">
                 <Button
                     variant="ghost"
-                    className="mb-4"
+                    className="mb-4 text-gray-600 hover:text-gray-900"
                     onClick={handleCancel}
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     {t('portal.crypto_checkout.back')}
                 </Button>
 
-                <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle>{t('portal.crypto_checkout.crypto_payment')}</CardTitle>
-                        <CardDescription>
+                <Card className="w-full border border-gray-200 shadow-sm">
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-xl font-semibold text-gray-900">
+                            {t('portal.crypto_checkout.crypto_payment')}
+                        </CardTitle>
+                        <CardDescription className="text-gray-600">
                             {t('portal.crypto_checkout.scan_qr_or_copy')}
                         </CardDescription>
                     </CardHeader>

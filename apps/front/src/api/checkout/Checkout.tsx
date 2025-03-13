@@ -25,6 +25,7 @@ import { initiateOrangeCheckout } from './orange/orangeCheckoutUtils'
 import nowPaymentsService from '@/utils/nowpayments/service'
 import NOWPaymentsCheckout from '@/api/checkout/nowpayments/NOWPaymentsCheckout'
 import { ButtonExpand } from '@/components/design/button-expand'
+import AvatarCircles from '@/components/ui/avatar-circles'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
@@ -1511,31 +1512,43 @@ export default function CheckoutPage() {
                         {/* Crypto payment option (NOWPAYMENTS) */}
                         {checkoutData?.paymentLink?.allowed_providers?.includes('NOWPAYMENTS') && (
                             <div className="mb-4 mt-1">
-                                <ButtonExpand
-                                    text="Pay with crypto using lomi."
-                                    icon={ArrowRight}
-                                    bgColor="bg-blue-900 dark:bg-blue-800"
-                                    textColor="text-white dark:text-white"
-                                    hoverBgColor="hover:bg-blue-800 dark:hover:bg-blue-700"
-                                    hoverTextColor="hover:text-white dark:hover:text-white"
-                                    className="w-full justify-end rounded-md h-10 font-normal text-sm tracking-wide border border-blue-700 dark:border-blue-700 shadow-sm"
-                                    onClick={() => {
-                                        if (!areRequiredFieldsFilled()) {
-                                            toast({
-                                                variant: "destructive",
-                                                title: "Required Information",
-                                                description: "Please fill in your full name, email, and phone number first."
-                                            });
+                                <div className="relative group">
+                                    <AvatarCircles
+                                        className="absolute -left-4 top-1/2 -translate-y-1/2 -space-x-2 scale-[0.6] transition-all duration-300 group-hover:translate-x-1"
+                                        avatarUrls={[
+                                            '/crypto/btc.webp',
+                                            '/crypto/usdt.webp',
+                                            '/crypto/usdc.webp',
+                                            '/crypto/sol.webp',
+                                            '/crypto/fil.webp',
+                                        ]}
+                                    />
+                                    <ButtonExpand
+                                        text="Pay in crypto with lomi."
+                                        icon={ArrowRight}
+                                        bgColor="bg-blue-900 dark:bg-blue-800"
+                                        textColor="text-white dark:text-white"
+                                        hoverBgColor="hover:bg-blue-800 dark:hover:bg-blue-700"
+                                        hoverTextColor="hover:text-white dark:hover:text-white"
+                                        className="w-full justify-end rounded-md h-10 font-normal text-sm tracking-wide pl-16 border border-blue-700 dark:border-blue-700 shadow-sm"
+                                        onClick={() => {
+                                            if (!areRequiredFieldsFilled()) {
+                                                toast({
+                                                    variant: "destructive",
+                                                    title: "Required Information",
+                                                    description: "Please fill in your full name, email, and phone number first."
+                                                });
 
-                                            // Focus on the name input
-                                            if (nameInputRef.current) {
-                                                nameInputRef.current.focus();
+                                                // Focus on the name input
+                                                if (nameInputRef.current) {
+                                                    nameInputRef.current.focus();
+                                                }
+                                            } else {
+                                                handleProviderClick('NOWPAYMENTS');
                                             }
-                                        } else {
-                                            handleProviderClick('NOWPAYMENTS');
-                                        }
-                                    }}
-                                />
+                                        }}
+                                    />
+                                </div>
                             </div>
                         )}
 
