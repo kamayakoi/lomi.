@@ -662,6 +662,7 @@ CREATE TABLE providers_transactions (
     notif_token VARCHAR(255),
     pay_currency VARCHAR(50),
     pay_amount NUMERIC(20,8),
+    pay_address VARCHAR(255),
     ipn_callback_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -677,12 +678,13 @@ COMMENT ON COLUMN providers_transactions.ipn_callback_url IS 'The callback URL f
 COMMENT ON COLUMN providers_transactions.pay_token IS 'The payment token returned by payment providers (like Orange Money pay_token)';
 COMMENT ON COLUMN providers_transactions.notif_token IS 'The notification token used to verify webhook callbacks (like Orange Money notif_token)';
 COMMENT ON COLUMN providers_transactions.provider_checkout_id IS 'Unique identifier for the checkout session (equivalent to pay_token for some providers)'; 
-
+COMMENT ON COLUMN providers_transactions.pay_address IS 'The cryptocurrency payment address where funds should be sent';
 
 CREATE INDEX idx_providers_transactions_pay_currency ON providers_transactions(pay_currency); 
 CREATE INDEX idx_providers_transactions_merchant_id ON providers_transactions(merchant_id);
 CREATE INDEX idx_providers_transactions_pay_token ON providers_transactions(pay_token);
 CREATE INDEX idx_providers_transactions_notif_token ON providers_transactions(notif_token);
+CREATE INDEX idx_providers_transactions_pay_address ON providers_transactions(pay_address); 
 
 -- Refunds table
 CREATE TABLE refunds (

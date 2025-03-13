@@ -78,7 +78,7 @@ import Blog from './pages/blog/blog';
 import BlogPost from './pages/blog/blog-post';
 
 // NOWPayments
-const NOWPaymentsCheckout = lazy(() => import('./components/NOWPaymentsCheckout'));
+const NOWPaymentsCheckout = lazy(() => import('./api/checkout/nowpayments/NOWPaymentsCheckout'));
 
 const AppRouter = () => {
     return (

@@ -23,7 +23,7 @@ import { initiateWaveCheckout } from '@/api/checkout/wave/WaveCheckout'
 import { checkoutStyles } from './CheckoutStyles'
 import { initiateOrangeCheckout } from './orange/orangeCheckoutUtils'
 import nowPaymentsService from '@/utils/nowpayments/service'
-import NOWPaymentsCheckout from '@/components/NOWPaymentsCheckout'
+import NOWPaymentsCheckout from '@/api/checkout/nowpayments/NOWPaymentsCheckout'
 import { ButtonExpand } from '@/components/design/button-expand'
 
 // Helper function to format numbers with separators

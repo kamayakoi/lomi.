@@ -1,9 +1,16 @@
+-- Add crypto payment fees if they don't exist
+INSERT INTO public.fees (name, transaction_type, fee_type, percentage, fixed_amount, currency_code, provider_code, payment_method_code) 
+VALUES 
+    ('Crypto Processing Fee XOF', 'payment', 'processing', 3.2, 200, 'XOF', 'NOWPAYMENTS', 'CRYPTO'),
+    ('Crypto Processing Fee USD', 'payment', 'processing', 3.2, 0.30, 'USD', 'NOWPAYMENTS', 'CRYPTO')
+ON CONFLICT (name) DO NOTHING;
+
 -- Fetch NOWPayments provider settings
 CREATE OR REPLACE FUNCTION public.fetch_nowpayments_provider_settings(p_organization_id UUID)
 RETURNS TABLE (
     organization_id UUID,
     provider_code text,
-    provider_merchant_id text,
+    provider_merchant_id character varying(255),
     is_connected boolean,
     metadata jsonb
 )
@@ -25,6 +32,17 @@ BEGIN
         AND ops.provider_code = 'NOWPAYMENTS';
 END;
 $$ LANGUAGE plpgsql;
+
+-- Grant permissions to authenticated users
+GRANT EXECUTE ON FUNCTION public.fetch_nowpayments_provider_settings(UUID) TO authenticated;
+GRANT SELECT ON public.organization_providers_settings TO authenticated;
+GRANT SELECT ON public.fees TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.transactions TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.providers_transactions TO authenticated;
+GRANT SELECT ON public.merchant_subscriptions TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.merchant_accounts TO authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.logs TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_nowpayments_payment_status(VARCHAR) TO authenticated;
 
 -- Create a new NOWPayments checkout transaction - UPDATED with dedicated columns
 CREATE OR REPLACE FUNCTION public.create_nowpayments_checkout_transaction(
@@ -54,7 +72,18 @@ DECLARE
     v_fee_name VARCHAR;
     v_fee_amount NUMERIC;
     v_net_amount NUMERIC;
+    v_valid_subscription_id UUID := NULL;
 BEGIN
+    -- Check if subscription ID exists in merchant_subscriptions table
+    IF p_subscription_id IS NOT NULL THEN
+        SELECT subscription_id INTO v_valid_subscription_id
+        FROM public.merchant_subscriptions
+        WHERE subscription_id = p_subscription_id;
+    END IF;
+    
+    -- If p_metadata contains planId but not an existing subscription, we're creating a new subscription
+    -- In this case, don't use the subscription_id for the transaction yet
+    
     -- Calculate fees
     SELECT 
         f.name, 
@@ -103,7 +132,7 @@ BEGIN
         p_organization_id,
         p_customer_id,
         p_product_id,
-        p_subscription_id,
+        v_valid_subscription_id, -- Use validated subscription ID or NULL
         'payment',
         'pending',
         p_description,
@@ -149,10 +178,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Update NOWPayments payment status - UPDATED to use dedicated columns
+-- Update NOWPayments payment status - UPDATED to use dedicated columns and accept provider status
 CREATE OR REPLACE FUNCTION public.update_nowpayments_payment_status(
     p_provider_checkout_id VARCHAR, -- payment_id
     p_payment_status TEXT, -- NOWPayments status
+    p_provider_status provider_payment_status DEFAULT 'processing', -- Mapped provider status as enum type
     p_metadata JSONB DEFAULT NULL
 )
 RETURNS VOID
@@ -169,6 +199,7 @@ DECLARE
     v_currency_code public.currency_code;
     v_pay_currency VARCHAR;
     v_pay_amount NUMERIC;
+    v_net_amount NUMERIC;
 BEGIN
     -- Get transaction ID from provider checkout ID
     SELECT 
@@ -176,6 +207,7 @@ BEGIN
         t.merchant_id,
         t.organization_id,
         t.gross_amount,
+        t.net_amount,
         t.currency_code,
         t.metadata
     INTO 
@@ -183,6 +215,7 @@ BEGIN
         v_merchant_id,
         v_organization_id,
         v_amount,
+        v_net_amount,
         v_currency_code,
         v_current_metadata
     FROM 
@@ -226,13 +259,10 @@ BEGIN
         transaction_id = v_transaction_id;
     
     -- Update provider transaction with both status and crypto payment details
+    -- Now using the passed p_provider_status for the enum column
     UPDATE public.providers_transactions
     SET 
-        provider_payment_status = CASE
-            WHEN v_transaction_status = 'completed' THEN 'succeeded'
-            WHEN v_transaction_status = 'failed' THEN 'cancelled'
-            ELSE 'processing'
-        END,
+        provider_payment_status = p_provider_status,
         pay_currency = COALESCE(pay_currency, v_pay_currency),  -- Update if available
         pay_amount = COALESCE(pay_amount, v_pay_amount),        -- Update if available
         updated_at = NOW()
@@ -241,11 +271,33 @@ BEGIN
     
     -- If transaction is completed, update merchant account balance
     IF v_transaction_status = 'completed' THEN
-        -- Update merchant balance
+        -- Update merchant balance by calling the shared function
         PERFORM public.update_merchant_account_balance(
-            p_merchant_id := v_merchant_id,
-            p_amount := (SELECT net_amount FROM public.transactions WHERE transaction_id = v_transaction_id),
+            p_merchant_id := v_merchant_id, 
+            p_organization_id := v_organization_id,
+            p_amount := v_net_amount, 
             p_currency_code := v_currency_code
+        );
+        
+        -- Log transaction completion event
+        INSERT INTO public.logs (
+            merchant_id,
+            event,
+            details,
+            severity
+        ) VALUES (
+            v_merchant_id,
+            'payment_status_change',
+            jsonb_build_object(
+                'transaction_id', v_transaction_id,
+                'provider', 'NOWPAYMENTS',
+                'status', 'completed',
+                'amount', v_amount,
+                'currency', v_currency_code,
+                'crypto_amount', v_pay_amount,
+                'crypto_currency', v_pay_currency
+            ),
+            'NOTICE'
         );
     END IF;
 END;
@@ -267,16 +319,22 @@ DECLARE
     v_payment_id VARCHAR;
     v_payment_status VARCHAR;
 BEGIN
-    -- Get IPN secret from organization settings
-    SELECT 
-        (ops.metadata->>'ipn_secret')::VARCHAR
-    INTO 
-        v_ipn_secret
-    FROM 
-        public.organization_providers_settings ops
-    WHERE 
-        ops.organization_id = p_organization_id
-        AND ops.provider_code = 'NOWPAYMENTS';
+    -- Get IPN secret from environment variable via Supabase (available in SQL functions)
+    -- For a payment aggregator, we use a single platform-wide configuration
+    SELECT current_setting('app.settings.nowpayments_ipn_secret', true) INTO v_ipn_secret;
+    
+    IF v_ipn_secret IS NULL THEN
+        -- Fallback to looking up in the organization settings
+        SELECT 
+            (ops.metadata->>'ipn_secret')::VARCHAR
+        INTO 
+            v_ipn_secret
+        FROM 
+            public.organization_providers_settings ops
+        WHERE 
+            ops.organization_id = p_organization_id
+            AND ops.provider_code = 'NOWPAYMENTS';
+    END IF;
     
     IF v_ipn_secret IS NULL THEN
         RETURN FALSE;
@@ -346,3 +404,174 @@ BEGIN
     RETURN v_result;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Create or update the merchant_account_balance function with organization_id parameter
+CREATE OR REPLACE FUNCTION public.update_merchant_account_balance(
+    p_merchant_id UUID,
+    p_organization_id UUID,
+    p_amount NUMERIC,
+    p_currency_code public.currency_code
+) RETURNS VOID
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+DECLARE
+    v_account_id UUID;
+BEGIN
+    -- Get the account ID for the merchant and currency
+    SELECT account_id INTO v_account_id 
+    FROM public.merchant_accounts 
+    WHERE merchant_id = p_merchant_id 
+    AND currency_code = p_currency_code
+    LIMIT 1;
+    
+    -- If no account exists, create one
+    IF v_account_id IS NULL THEN
+        INSERT INTO public.merchant_accounts (
+            merchant_id,
+            organization_id,
+            balance,
+            currency_code
+        ) VALUES (
+            p_merchant_id,
+            p_organization_id,
+            p_amount,
+            p_currency_code
+        )
+        RETURNING account_id INTO v_account_id;
+    ELSE
+        -- Update the account balance
+        UPDATE public.merchant_accounts
+        SET 
+            balance = balance + p_amount,
+            updated_at = NOW()
+        WHERE account_id = v_account_id;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission for the balance function
+GRANT EXECUTE ON FUNCTION public.update_merchant_account_balance(UUID, UUID, NUMERIC, public.currency_code) TO authenticated;
+
+-- New function to get NOWPayments payment status by internal transaction_id
+CREATE OR REPLACE FUNCTION public.get_nowpayments_payment_status_by_transaction_id(
+    p_transaction_id UUID
+)
+RETURNS JSONB
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+DECLARE
+    v_result JSONB;
+BEGIN
+    SELECT 
+        jsonb_build_object(
+            'transaction_id', t.transaction_id,
+            'provider_checkout_id', pt.provider_checkout_id,
+            'status', t.status,
+            'provider_status', pt.provider_payment_status,
+            'amount', t.gross_amount,
+            'currency', t.currency_code,
+            'pay_amount', pt.pay_amount,
+            'pay_currency', pt.pay_currency,
+            'created_at', t.created_at,
+            'updated_at', t.updated_at,
+            'metadata', t.metadata
+        ) INTO v_result
+    FROM 
+        public.transactions t
+    JOIN 
+        public.providers_transactions pt ON t.transaction_id = pt.transaction_id
+    WHERE 
+        t.transaction_id = p_transaction_id
+        AND pt.provider_code = 'NOWPAYMENTS';
+    
+    RETURN v_result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission for the new function
+GRANT EXECUTE ON FUNCTION public.get_nowpayments_payment_status_by_transaction_id(UUID) TO authenticated;
+
+-- Debugging function to find all NOWPayments transactions
+CREATE OR REPLACE FUNCTION public.debug_list_nowpayments_transactions()
+RETURNS TABLE (
+    transaction_id UUID,
+    provider_checkout_id VARCHAR,
+    provider_status VARCHAR,
+    pay_currency VARCHAR,
+    pay_amount NUMERIC,
+    created_at TIMESTAMPTZ
+)
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        t.transaction_id,
+        pt.provider_checkout_id,
+        pt.provider_payment_status::VARCHAR,
+        pt.pay_currency,
+        pt.pay_amount,
+        t.created_at
+    FROM 
+        public.transactions t
+    JOIN 
+        public.providers_transactions pt ON t.transaction_id = pt.transaction_id
+    WHERE 
+        pt.provider_code = 'NOWPAYMENTS'
+    ORDER BY t.created_at DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission for the debug function
+GRANT EXECUTE ON FUNCTION public.debug_list_nowpayments_transactions() TO authenticated;
+
+-- Update NOWPayments payment currency
+CREATE OR REPLACE FUNCTION public.update_nowpayments_payment_currency(
+    p_transaction_id UUID,
+    p_provider_checkout_id VARCHAR,
+    p_pay_currency VARCHAR,
+    p_pay_amount NUMERIC,
+    p_pay_address VARCHAR
+)
+RETURNS VOID
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+BEGIN
+    -- Update provider transaction with new payment details
+    UPDATE public.providers_transactions
+    SET 
+        provider_checkout_id = p_provider_checkout_id,
+        pay_currency = p_pay_currency,
+        pay_amount = p_pay_amount,
+        pay_address = p_pay_address,
+        updated_at = NOW()
+    WHERE
+        transaction_id = p_transaction_id
+        AND provider_code = 'NOWPAYMENTS';
+
+    -- Update transaction metadata
+    UPDATE public.transactions
+    SET 
+        metadata = jsonb_set(
+            metadata,
+            '{nowpayments_session}',
+            jsonb_build_object(
+                'payment_id', p_provider_checkout_id,
+                'pay_address', p_pay_address,
+                'pay_amount', p_pay_amount,
+                'pay_currency', p_pay_currency,
+                'updated_at', NOW()
+            )
+        ),
+        updated_at = NOW()
+    WHERE 
+        transaction_id = p_transaction_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission for the update currency function
+GRANT EXECUTE ON FUNCTION public.update_nowpayments_payment_currency(UUID, VARCHAR, VARCHAR, NUMERIC, VARCHAR) TO authenticated;
