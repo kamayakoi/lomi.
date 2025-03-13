@@ -6,6 +6,8 @@ import { Search, RefreshCw } from 'lucide-react'
 interface ProductFiltersProps {
     selectedStatus: 'active' | 'inactive' | 'all' | null
     setSelectedStatus: (status: 'active' | 'inactive' | 'all' | null) => void
+    searchTerm: string
+    setSearchTerm: (term: string) => void
     refetch: () => void
     isRefreshing: boolean
 }
@@ -13,6 +15,8 @@ interface ProductFiltersProps {
 export const ProductFilters: React.FC<ProductFiltersProps> = ({
     selectedStatus,
     setSelectedStatus,
+    searchTerm,
+    setSearchTerm,
     refetch,
     isRefreshing,
 }) => {
@@ -23,7 +27,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                     <Input
                         placeholder='Search products...'
                         className='w-full pl-10 pr-4 py-2 rounded-none'
-                        type="search"
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 </div>

@@ -8,7 +8,6 @@ import { Layout } from '@/components/custom/layout'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/use-user'
 import { Product } from './components/products'
-import { Skeleton } from '@/components/ui/skeleton'
 import { CreateProductForm } from './components/form'
 import { ProductFilters } from './components/filters'
 import SupportForm from '@/components/portal/support-form'
@@ -29,6 +28,7 @@ import { fetchProducts, fetchProductFees } from './components/support'
 import { cn } from '@/lib/actions/utils'
 import React from 'react'
 import mixpanelService from '@/utils/mixpanel/mixpanel'
+import Spinner from '@/components/ui/spinner'
 
 // Utility functions
 function calculateTotalPrice(product: Product): number {
@@ -48,7 +48,7 @@ function ProductCard({ product, onEditClick, onClick }: {
 }) {
     return (
         <div
-            className="p-4 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="p-4 border-b cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
             onClick={onClick}
         >
             <div className="space-y-3">
@@ -124,6 +124,7 @@ function ProductsPage() {
     const [sortColumn] = useState<keyof Product | null>(null)
     const [sortDirection] = useState<'asc' | 'desc'>('asc')
     const [currentPage, setCurrentPage] = useState(1)
+    const [searchTerm, setSearchTerm] = useState('')
     const itemsPerPage = 10
 
     const topNav = [
@@ -173,12 +174,23 @@ function ProductsPage() {
 
     // Memoize the products array
     const products = React.useMemo(() => productsData?.products || [], [productsData?.products]) as Product[]
-    const totalProducts = productsData?.totalCount || 0
-    const totalPages = Math.ceil(totalProducts / itemsPerPage)
 
-    // Memoize the sorted products
+    // Memoize the sorted and filtered products
     const sortedProducts = React.useMemo(() => {
         if (!products.length) return []
+
+        // First filter by search term
+        let filteredProducts = products;
+        if (searchTerm) {
+            const searchLower = searchTerm.toLowerCase();
+            filteredProducts = products.filter(product =>
+                product.name.toLowerCase().includes(searchLower) ||
+                product.description?.toLowerCase().includes(searchLower) ||
+                product.currency_code.toLowerCase().includes(searchLower) ||
+                // Search by price/amount
+                product.price.toString().includes(searchLower)
+            );
+        }
 
         // Move sortProducts logic inside useMemo to avoid dependency issues
         const sortProductsInner = (items: Product[]) => {
@@ -200,8 +212,11 @@ function ProductsPage() {
             })
         }
 
-        return sortProductsInner([...products])
-    }, [products, sortColumn, sortDirection])
+        return sortProductsInner([...filteredProducts])
+    }, [products, sortColumn, sortDirection, searchTerm])
+
+    const totalProducts = sortedProducts.length
+    const totalPages = Math.ceil(totalProducts / itemsPerPage)
 
     const handleCreateProductSuccess = () => {
         setIsCreateProductOpen(false);
@@ -317,6 +332,8 @@ function ProductsPage() {
                     <ProductFilters
                         selectedStatus={selectedStatus}
                         setSelectedStatus={setSelectedStatus}
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
                         refetch={handleRefresh}
                         isRefreshing={isRefreshing}
                     />
@@ -325,19 +342,8 @@ function ProductsPage() {
                         <CardContent className="p-0">
                             <div id="products-table-container" className="h-[72vh] overflow-auto">
                                 {isProductsLoading ? (
-                                    <div className="space-y-4 p-4">
-                                        {Array.from({ length: 5 }).map((_, index) => (
-                                            <div key={index} className="p-4 border border-border">
-                                                <div className="flex gap-4">
-                                                    <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
-                                                    <div className="flex-grow space-y-2">
-                                                        <Skeleton className="w-1/3 h-6" />
-                                                        <Skeleton className="w-2/3 h-4" />
-                                                        <Skeleton className="w-24 h-4" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                    <div className="flex items-center justify-center h-full">
+                                        <Spinner />
                                     </div>
                                 ) : products.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-[65vh]">
@@ -358,7 +364,7 @@ function ProductsPage() {
                                             {sortedProducts.map((product: Product) => (
                                                 <div
                                                     key={product.product_id}
-                                                    className="p-6 border-b last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
+                                                    className="p-6 border-b hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
                                                     onClick={() => handleProductClick(product)}
                                                 >
                                                     <div className="flex gap-6">
@@ -445,17 +451,19 @@ function ProductsPage() {
 
                                         {/* Mobile View */}
                                         <div className="md:hidden">
-                                            {sortedProducts.map((product: Product) => (
-                                                <ProductCard
-                                                    key={product.product_id}
-                                                    product={product}
-                                                    onEditClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleEditClick(product);
-                                                    }}
-                                                    onClick={() => handleProductClick(product)}
-                                                />
-                                            ))}
+                                            <div className="border-b">
+                                                {sortedProducts.map((product: Product) => (
+                                                    <ProductCard
+                                                        key={product.product_id}
+                                                        product={product}
+                                                        onEditClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEditClick(product);
+                                                        }}
+                                                        onClick={() => handleProductClick(product)}
+                                                    />
+                                                ))}
+                                            </div>
                                         </div>
 
                                         {/* Pagination */}

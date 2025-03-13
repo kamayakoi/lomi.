@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 import { supabase } from '@/utils/supabase/client'
-import { Transaction, FetchedTransaction } from './types'
+import { Transaction, FetchedTransaction, payment_method_code, provider_code } from './types'
 import { DateRange } from 'react-day-picker'
 import { useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
 import { Database } from 'database.types'
@@ -313,11 +313,208 @@ export const fetchAverageTransactionValue = async (merchantId: string, selectedD
 export const applySearch = (transactions: Transaction[], searchTerm: string) => {
     if (!searchTerm) return transactions
 
-    return transactions.filter(transaction =>
-        Object.values(transaction).some(value =>
-            value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
+    // Only trim when checking against terms, but maintain spaces for actual search
+    const lowerCaseSearchTerm = searchTerm.toLowerCase()
+    const trimmedLowerCaseSearchTerm = lowerCaseSearchTerm.trim()
+
+    // If after trimming, there's nothing to search for, return all transactions
+    if (!trimmedLowerCaseSearchTerm) return transactions
+
+    // Special case for searching by status with case-insensitivity
+    const statusTerms = {
+        'completed': 'completed',
+        'failed': 'failed',
+        'processing': 'processing',
+        'pending': 'pending',
+        'refunded': 'refunded'
+    }
+
+    // Check if searching for a specific status
+    const matchedStatus = Object.entries(statusTerms).find(([key]) =>
+        trimmedLowerCaseSearchTerm === key || trimmedLowerCaseSearchTerm.includes(key)
     )
+
+    if (matchedStatus) {
+        return transactions.filter(transaction =>
+            transaction.status === matchedStatus[1]
+        )
+    }
+
+    // Check for payment method searches
+    const paymentMethodTerms = {
+        'card': 'CARDS',
+        'cards': 'CARDS',
+        'credit card': 'CARDS',
+        'mobile money': 'MOBILE_MONEY',
+        'mobile': 'MOBILE_MONEY',
+        'ewallet': 'E_WALLET',
+        'wallet': 'E_WALLET',
+        'e-wallet': 'E_WALLET',
+        'bank': 'BANK_TRANSFER',
+        'bank transfer': 'BANK_TRANSFER',
+        'transfer': 'BANK_TRANSFER',
+        'apple pay': 'APPLE_PAY',
+        'apple': 'APPLE_PAY',
+        'google pay': 'GOOGLE_PAY',
+        'google': 'GOOGLE_PAY',
+        'ussd': 'USSD',
+        'qr': 'QR_CODE',
+        'qr code': 'QR_CODE'
+    }
+
+    const matchedPaymentMethod = Object.entries(paymentMethodTerms).find(([key]) =>
+        trimmedLowerCaseSearchTerm === key || trimmedLowerCaseSearchTerm.includes(key)
+    )
+
+    if (matchedPaymentMethod) {
+        return transactions.filter(transaction =>
+            transaction.payment_method === matchedPaymentMethod[1]
+        )
+    }
+
+    // Check for provider searches
+    const providerTerms = {
+        'orange': 'ORANGE',
+        'wave': 'WAVE',
+        'ecobank': 'ECOBANK',
+        'mtn': 'MTN',
+        'now': 'NOWPAYMENTS',
+        'nowpayments': 'NOWPAYMENTS',
+        'moov': 'MOOV',
+        'airtel': 'AIRTEL',
+        'mpesa': 'MPESA',
+        'm-pesa': 'MPESA',
+        'opay': 'OPAY',
+        'paypal': 'PAYPAL'
+    }
+
+    const matchedProvider = Object.entries(providerTerms).find(([key]) =>
+        trimmedLowerCaseSearchTerm === key || trimmedLowerCaseSearchTerm.includes(key)
+    )
+
+    if (matchedProvider) {
+        return transactions.filter(transaction =>
+            transaction.provider_code === matchedProvider[1]
+        )
+    }
+
+    // Check for transaction type searches
+    const typeTerms = {
+        'payment': 'payment',
+        'subscription': 'subscription',
+        'refund': 'refund',
+        'payout': 'payout'
+    }
+
+    const matchedType = Object.entries(typeTerms).find(([key]) =>
+        trimmedLowerCaseSearchTerm === key || trimmedLowerCaseSearchTerm.includes(key)
+    )
+
+    if (matchedType) {
+        return transactions.filter(transaction =>
+            transaction.type === matchedType[1]
+        )
+    }
+
+    // Check for amount ranges
+    const amountMatch = trimmedLowerCaseSearchTerm.match(/(\d+)(?:\s*[-–]\s*(\d+))?/)
+    if (amountMatch) {
+        const minAmount = parseInt(amountMatch[1] || '0', 10)
+        const maxAmount = amountMatch[2] ? parseInt(amountMatch[2], 10) : null
+
+        if (!isNaN(minAmount)) {
+            if (maxAmount !== null && !isNaN(maxAmount)) {
+                // Range search
+                return transactions.filter(transaction =>
+                    transaction.gross_amount >= minAmount && transaction.gross_amount <= maxAmount
+                )
+            } else {
+                // Single amount search
+                return transactions.filter(transaction => {
+                    // Allow some flexibility in amount searches
+                    const amountString = transaction.gross_amount.toString()
+                    return amountString.includes(minAmount.toString()) ||
+                        Math.abs(transaction.gross_amount - minAmount) < 1
+                })
+            }
+        }
+    }
+
+    // General search across all fields
+    return transactions.filter(transaction => {
+        // Search in basic fields
+        const basicFieldsMatch =
+            transaction.transaction_id.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.customer_name.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.customer_email.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.customer_phone.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.currency.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.status.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            transaction.type.toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            (transaction.date ? formatDate(transaction.date).toLowerCase().includes(trimmedLowerCaseSearchTerm) : false) ||
+            formatPaymentMethod(transaction.payment_method).toLowerCase().includes(trimmedLowerCaseSearchTerm) ||
+            formatProviderCode(transaction.provider_code).toLowerCase().includes(trimmedLowerCaseSearchTerm)
+
+        // Search in numeric values
+        const numericMatch =
+            (transaction.gross_amount !== null && transaction.gross_amount !== undefined ? transaction.gross_amount.toString().includes(trimmedLowerCaseSearchTerm) : false) ||
+            (transaction.net_amount !== null && transaction.net_amount !== undefined ? transaction.net_amount.toString().includes(trimmedLowerCaseSearchTerm) : false) ||
+            (transaction.product_price !== null && transaction.product_price !== undefined ? transaction.product_price.toString().includes(trimmedLowerCaseSearchTerm) : false)
+
+        // Search in product fields
+        const productFieldsMatch =
+            (transaction.product_name ? transaction.product_name.toLowerCase().includes(trimmedLowerCaseSearchTerm) : false) ||
+            (transaction.product_description ? transaction.product_description.toLowerCase().includes(trimmedLowerCaseSearchTerm) : false)
+
+        // Search in subscription fields if they exist
+        const subscriptionFieldsMatch =
+            (transaction.subscription_id ? transaction.subscription_id.toLowerCase().includes(trimmedLowerCaseSearchTerm) : false) ||
+            (transaction.plan_name ? transaction.plan_name.toLowerCase().includes(trimmedLowerCaseSearchTerm) : false) ||
+            (transaction.plan_description ? transaction.plan_description.toLowerCase().includes(trimmedLowerCaseSearchTerm) : false)
+
+        return basicFieldsMatch || numericMatch || productFieldsMatch || subscriptionFieldsMatch
+    })
+}
+
+// Helper function to format dates for display
+function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+// Helper function to format payment method for display
+function formatPaymentMethod(method: payment_method_code): string {
+    switch (method) {
+        case 'CARDS': return 'Cards'
+        case 'MOBILE_MONEY': return 'Mobile Money'
+        case 'E_WALLET': return 'E-Wallet'
+        case 'BANK_TRANSFER': return 'Bank Transfer'
+        case 'APPLE_PAY': return 'Apple Pay'
+        case 'GOOGLE_PAY': return 'Google Pay'
+        case 'USSD': return 'USSD'
+        case 'QR_CODE': return 'QR Code'
+        default: return method
+    }
+}
+
+// Helper function to format provider code for display
+function formatProviderCode(provider: provider_code): string {
+    switch (provider) {
+        case 'ORANGE': return 'Orange'
+        case 'WAVE': return 'Wave'
+        case 'ECOBANK': return 'Ecobank'
+        case 'MTN': return 'MTN'
+        case 'NOWPAYMENTS': return 'Nowpayments'
+        case 'PAYPAL': return 'Paypal'
+        case 'APPLE': return 'Apple'
+        case 'GOOGLE': return 'Google'
+        case 'MOOV': return 'Moov'
+        case 'AIRTEL': return 'Airtel'
+        case 'MPESA': return 'M-Pesa'
+        case 'OPAY': return 'OPay'
+        case 'OTHER': return 'Other'
+        default: return provider
+    }
 }
 
 export const applyDateFilter = (transactions: Transaction[], selectedDateRange: string | null, customDateRange?: DateRange) => {

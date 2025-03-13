@@ -12,7 +12,6 @@ import { DateRange } from 'react-day-picker'
 import { payment_method_code, provider_code, transaction_status, transaction_type, Transaction as TransactionType } from './components/types'
 import { fetchTransactions, useTotalIncomingAmount, useTransactionCount, applySearch, applyDateFilter, useCompletionRate, useGrossAmount, useFeeAmount, useAverageTransactionValue, useAverageCustomerLifetimeValue, useAverageRetentionRate } from './components/support'
 import { useUser } from '@/lib/hooks/use-user'
-import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import AnimatedLogoLoader from '@/components/portal/loader'
@@ -22,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { FcfaIcon } from '@/components/custom/cfa'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
+import React from 'react'
 
 
 type Transaction = TransactionType
@@ -98,7 +98,40 @@ function TransactionsPage() {
         enabled: !!user?.id,
     })
 
-    const transactions = data?.pages.flat() || []
+    // Memoize the transactions to prevent recreating on every render
+    const transactions = React.useMemo(() => data?.pages.flat() || [], [data?.pages])
+
+    // Memoize the sortTransactions function with useCallback
+    const sortTransactions = React.useCallback((items: Transaction[]) => {
+        if (!sortColumn) return items
+
+        return items.sort((a, b) => {
+            const aValue = a[sortColumn]
+            const bValue = b[sortColumn]
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+            } else {
+                return 0
+            }
+        })
+    }, [sortColumn, sortDirection])
+
+    // Create a memoized filtered and sorted transactions array for better performance
+    const filteredAndSortedTransactions = React.useMemo(() => {
+        if (!transactions.length) return []
+
+        // First apply date filtering
+        const dateFiltered = applyDateFilter(transactions, selectedDateRange, customDateRange)
+
+        // Then apply search
+        const searched = applySearch(dateFiltered, searchTerm)
+
+        // Finally sort the results
+        return sortTransactions(searched)
+    }, [transactions, selectedDateRange, customDateRange, searchTerm, sortTransactions])
 
     const { data: totalIncomingAmount = 0, isLoading: isTotalIncomingAmountLoading } = useTotalIncomingAmount(
         user?.id || '',
@@ -187,23 +220,6 @@ function TransactionsPage() {
             setSortColumn(column)
             setSortDirection('asc')
         }
-    }
-
-    const sortTransactions = (transactions: Transaction[]) => {
-        if (!sortColumn) return transactions
-
-        return transactions.sort((a, b) => {
-            const aValue = a[sortColumn]
-            const bValue = b[sortColumn]
-
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
-            } else {
-                return 0
-            }
-        })
     }
 
     const handleCustomDateRangeApply = () => {
@@ -311,8 +327,16 @@ function TransactionsPage() {
                 const tableContainer = document.getElementById('table-container');
                 const activeElement = document.activeElement;
 
-                // Only prevent if we're not inside the table container
-                if (!(tableContainer && tableContainer.contains(activeElement as Node))) {
+                // Check if we're in an input, textarea, or other form element where space is needed
+                const isFormElement = activeElement && (
+                    activeElement.tagName === 'INPUT' ||
+                    activeElement.tagName === 'TEXTAREA' ||
+                    activeElement.tagName === 'SELECT' ||
+                    activeElement.getAttribute('contenteditable') === 'true'
+                );
+
+                // Only prevent if we're not inside the table container or a form element
+                if (!(tableContainer && tableContainer.contains(activeElement as Node)) && !isFormElement) {
                     e.preventDefault();
                 }
             }
@@ -421,14 +445,14 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isTotalIncomingAmountLoading ? (
-                                                        <Skeleton className="w-32 h-8 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `XOF ${formatAmount(totalIncomingAmount)}`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {isTransactionCountLoading ? (
-                                                        <Skeleton className="w-20 h-4 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `${transactionCount} transactions`
                                                     )}
@@ -447,7 +471,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Gross</span>
                                                         <span className="text-sm font-medium">
                                                             {isGrossAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 rounded-none" />
+                                                                ""
                                                             ) : (
                                                                 `XOF ${formatAmount(grossAmount)}`
                                                             )}
@@ -457,7 +481,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Fees</span>
                                                         <span className="text-sm font-medium">
                                                             {isFeeAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 rounded-none" />
+                                                                ""
                                                             ) : (
                                                                 `XOF ${formatAmount(feeAmount)}`
                                                             )}
@@ -467,7 +491,7 @@ function TransactionsPage() {
                                                         <span className="text-sm">Net</span>
                                                         <span className="text-sm font-medium">
                                                             {isTotalIncomingAmountLoading ? (
-                                                                <Skeleton className="w-20 h-4 rounded-none" />
+                                                                ""
                                                             ) : (
                                                                 `XOF ${formatAmount(totalIncomingAmount)}`
                                                             )}
@@ -503,14 +527,14 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isCompletionRateLoading ? (
-                                                        <Skeleton className="w-32 h-8 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `${calculateCompletionRate(completionRate.completed, completionRate.refunded, completionRate.failed)}%`
                                                     )}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">
                                                     {isCompletionRateLoading ? (
-                                                        <Skeleton className="w-20 h-4 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         <>
                                                             {completionRate.completed > 0 && (
@@ -540,7 +564,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageTransactionValueLoading ? (
-                                                        <Skeleton className="w-32 h-8 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `XOF ${averageTransactionValue ? averageTransactionValue.toFixed(2) : '0.00'}`
                                                     )}
@@ -577,7 +601,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageCustomerLifetimeValueLoading ? (
-                                                        <Skeleton className="w-32 h-8 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `XOF ${formatAmount(averageCustomerLifetimeValue)}`
                                                     )}
@@ -594,7 +618,7 @@ function TransactionsPage() {
                                             >
                                                 <div className="text-2xl font-bold">
                                                     {isAverageRetentionRateLoading ? (
-                                                        <Skeleton className="w-32 h-8 rounded-none" />
+                                                        ""
                                                     ) : (
                                                         `${averageRetentionRate ? averageRetentionRate.toFixed(2) : '0.00'}%`
                                                     )}
@@ -639,30 +663,14 @@ function TransactionsPage() {
                             <CardContent className="p-0">
                                 <div
                                     id="table-container"
-                                    className="h-[47vh] overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
-                                    onWheel={(e) => {
-                                        // When scrolled at the boundaries, prevent default to avoid page scrolling
-                                        const container = e.currentTarget;
-                                        const { scrollTop, scrollHeight, clientHeight } = container;
-
-                                        // Check if we're at the top or bottom boundary
-                                        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
-                                        const isAtTop = scrollTop <= 0;
-
-                                        // If at boundaries and trying to scroll further, prevent default
-                                        if ((isAtBottom && e.deltaY > 0) || (isAtTop && e.deltaY < 0)) {
-                                            e.preventDefault();
-                                        }
-
-                                        // In any case, stop propagation to contain scroll within this element
-                                        e.stopPropagation();
-                                    }}
+                                    className="h-[47vh] overflow-hidden"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                 >
                                     <InfiniteScroll
                                         dataLength={transactions.length}
                                         next={() => fetchNextPage()}
                                         hasMore={hasNextPage}
-                                        loader={<div className="p-4"><Skeleton className="w-full h-8 rounded-none" /></div>}
+                                        loader={<div className="p-4"></div>}
                                         scrollableTarget="table-container"
                                         className="overflow-visible"
                                     >
@@ -775,7 +783,6 @@ function TransactionsPage() {
                                                 {isFetchingNextPage ? (
                                                     <TableRow>
                                                         <TableCell colSpan={columns.length} className="text-center p-4">
-                                                            <Skeleton className="w-full h-8 rounded-none" />
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : transactions.length === 0 ? (
@@ -795,10 +802,7 @@ function TransactionsPage() {
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : (
-                                                    applySearch(
-                                                        applyDateFilter(sortTransactions(transactions), selectedDateRange, customDateRange),
-                                                        searchTerm
-                                                    ).map((transaction: Transaction) => (
+                                                    filteredAndSortedTransactions.map((transaction: Transaction) => (
                                                         <TableRow
                                                             key={transaction.transaction_id}
                                                             className="cursor-pointer border-b hover:bg-muted/30"

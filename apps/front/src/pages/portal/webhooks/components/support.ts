@@ -47,16 +47,34 @@ export async function createWebhook(data: CreateWebhookData): Promise<Webhook> {
 export async function fetchWebhooks(
     merchant_id: string,
     event?: webhook_event | 'all',
-    status?: 'active' | 'inactive' | 'all'
+    status?: 'active' | 'inactive' | 'all',
+    searchTerm = ''
 ): Promise<Webhook[]> {
-    const { data: webhooks, error } = await supabase.rpc('fetch_organization_webhooks', {
-        p_merchant_id: merchant_id,
-        p_event: event === 'all' ? undefined : event as webhook_event,
-        p_is_active: status === 'all' ? undefined : status === 'active'
-    });
+    try {
+        const { data: webhooks, error } = await supabase.rpc('fetch_organization_webhooks', {
+            p_merchant_id: merchant_id,
+            p_event: event === 'all' ? undefined : event as webhook_event,
+            p_is_active: status === 'all' ? undefined : status === 'active',
+            p_search_term: searchTerm || undefined
+        });
 
-    if (error) throw error;
-    return webhooks || [];
+        if (error) {
+            console.error('Error fetching webhooks:', error);
+            
+            // Check if it's a 404 error (function not found)
+            if (error.code === '404' || error.message?.includes('404')) {
+                console.warn('The RPC function fetch_organization_webhooks might not exist in your Supabase instance.');
+                throw new Error('The RPC function fetch_organization_webhooks does not exist in your Supabase instance.');
+            }
+            
+            throw error;
+        }
+        
+        return webhooks || [];
+    } catch (error) {
+        console.error('Exception when fetching webhooks:', error);
+        throw error;
+    }
 }
 
 export async function updateWebhookDeliveryStatus(

@@ -45,7 +45,7 @@ export function PaymentLinkFilters({
                     <Input
                         placeholder='Search payment links...'
                         className='w-full pl-10 pr-4 py-2 rounded-none'
-                        type="search"
+                        type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />

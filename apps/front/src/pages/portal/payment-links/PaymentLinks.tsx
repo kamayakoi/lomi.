@@ -11,7 +11,6 @@ import Notifications from '@/components/portal/notifications'
 import FeedbackForm from '@/components/portal/feedback-form'
 import PaymentCustomizerWithCheckout from './components/customize-form'
 import { useUser } from '@/lib/hooks/use-user'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import AnimatedLogoLoader from '@/components/portal/loader'
 import { PaymentLinkFilters } from './components/filters'
@@ -22,6 +21,8 @@ import SupportForm from '@/components/portal/support-form'
 import PaymentLinkActions from './components/actions'
 import { EditPaymentLinkForm } from './components/edit'
 import { cn } from '@/lib/actions/utils'
+import React from 'react'
+import Spinner from '@/components/ui/spinner'
 
 const linkTypeColors: Record<link_type, string> = {
   'instant': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -49,7 +50,7 @@ function PaymentLinkCard({ paymentLink, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -126,7 +127,7 @@ function PaymentLinksPage() {
   ]
 
   const { data: paymentLinksData, isLoading: isPaymentLinksLoading, refetch } = useInfiniteQuery({
-    queryKey: ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus] as const,
+    queryKey: ['paymentLinks', user?.id || '', selectedLinkType, selectedCurrency, selectedStatus, searchTerm] as const,
     queryFn: async ({ pageParam = 1 }) => {
       try {
         const result = await fetchPaymentLinks(
@@ -157,6 +158,27 @@ function PaymentLinksPage() {
   const handleRefresh = async () => {
     await refetch()
   }
+
+  const paymentLinks = React.useMemo(() =>
+    paymentLinksData?.pages?.flatMap(page => page).filter(Boolean) || [],
+    [paymentLinksData?.pages]
+  );
+
+  const filteredPaymentLinks = React.useMemo(() => {
+    if (!searchTerm) return paymentLinks;
+
+    const search = searchTerm.toLowerCase();
+    return paymentLinks.filter(link =>
+      link.title.toLowerCase().includes(search) ||
+      link.public_description?.toLowerCase().includes(search) ||
+      link.currency_code.toLowerCase().includes(search) ||
+      link.link_type.toLowerCase().includes(search) ||
+      // Search by price/amount
+      (link.link_type === 'instant' && link.price?.toString().includes(search)) ||
+      (link.link_type === 'product' && link.product_price?.toString().includes(search)) ||
+      (link.link_type === 'plan' && link.plan_amount?.toString().includes(search))
+    );
+  }, [paymentLinks, searchTerm]);
 
   const sortPaymentLinks = (paymentLinks: PaymentLink[]) => {
     if (!paymentLinks || !sortColumn) return paymentLinks || []
@@ -254,20 +276,10 @@ function PaymentLinksPage() {
                 <div className="border-0">
                   <div className="hidden md:block">
                     {isPaymentLinksLoading ? (
-                      <div className="space-y-4 p-4">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <div key={index} className="p-4 border border-border">
-                            <div className="flex gap-4">
-                              <div className="flex-grow space-y-2">
-                                <Skeleton className="w-1/3 h-6" />
-                                <Skeleton className="w-2/3 h-4" />
-                                <Skeleton className="w-24 h-4" />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="flex items-center justify-center h-[65vh]">
+                        <Spinner />
                       </div>
-                    ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
+                    ) : !filteredPaymentLinks.length ? (
                       <div className="flex flex-col items-center justify-center h-[65vh]">
                         <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
                           <Link2Icon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
@@ -280,90 +292,90 @@ function PaymentLinksPage() {
                         </p>
                       </div>
                     ) : (
-                      sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
-                        <div
-                          key={link.link_id}
-                          className="p-6 border-b hover:bg-gray-50/50 dark:hover:bg-gray-900/50 transition-colors duration-200 cursor-pointer"
-                          onClick={() => handlePaymentLinkClick(link)}
-                        >
-                          <div className="flex gap-6">
-                            <div className="flex-grow">
-                              <div className="flex items-start justify-between mb-2">
-                                <h3 className="font-medium text-foreground text-lg leading-tight">{link.title}</h3>
-                                <div className="flex items-center gap-1.5">
-                                  <span className={cn(
-                                    "px-3 py-1 text-xs font-medium",
-                                    link.is_active
-                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
-                                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                                  )}>
-                                    {link.is_active ? 'Active' : 'Inactive'}
-                                  </span>
-                                  <span className={`
-                                    inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
-                                    ${linkTypeColors[link.link_type]}
-                                  `}>
-                                    {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
-                                  </span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEditClick(link);
-                                    }}
-                                    className="text-blue-500 hover:text-blue-600 p-1.5"
-                                  >
-                                    <Edit className="h-4.5 w-4.5" />
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col flex-grow justify-between">
-                                {link.public_description && (
-                                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                                    {link.public_description}
-                                  </p>
-                                )}
-
-                                <div className="flex items-center justify-between mt-4">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-lg font-semibold tracking-tight">
-                                      {link.link_type === 'instant' && link.price ? (
-                                        `${formatPrice(link.price)} ${link.currency_code}`
-                                      ) : link.link_type === 'product' && link.product_price ? (
-                                        `${formatPrice(link.product_price)} ${link.currency_code}`
-                                      ) : link.link_type === 'plan' && link.plan_amount ? (
-                                        `${formatPrice(link.plan_amount)} ${link.currency_code}`
-                                      ) : (
-                                        '-'
-                                      )}
+                      <div className="border-b">
+                        {sortPaymentLinks(filteredPaymentLinks).map((link: PaymentLink) => (
+                          <div
+                            key={link.link_id}
+                            className="p-6 border-b hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
+                            onClick={() => handlePaymentLinkClick(link)}
+                          >
+                            <div className="flex gap-6">
+                              <div className="flex-grow">
+                                <div className="flex items-start justify-between mb-2">
+                                  <h3 className="font-medium text-foreground text-lg leading-tight">{link.title}</h3>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className={cn(
+                                      "px-3 py-1 text-xs font-medium",
+                                      link.is_active
+                                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+                                        : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                    )}>
+                                      {link.is_active ? 'Active' : 'Inactive'}
                                     </span>
+                                    <span className={`
+                                      inline-flex items-center px-2 h-5 text-xs font-medium rounded-none
+                                      ${linkTypeColors[link.link_type]}
+                                    `}>
+                                      {link.link_type.charAt(0).toUpperCase() + link.link_type.slice(1)}
+                                    </span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditClick(link);
+                                      }}
+                                      className="text-blue-500 hover:text-blue-600 p-1.5"
+                                    >
+                                      <Edit className="h-4.5 w-4.5" />
+                                    </button>
                                   </div>
-                                  <a
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    View Link
-                                  </a>
+                                </div>
+
+                                <div className="flex flex-col flex-grow justify-between">
+                                  {link.public_description && (
+                                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                                      {link.public_description}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between mt-4">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-lg font-semibold tracking-tight">
+                                        {link.link_type === 'instant' && link.price ? (
+                                          `${formatPrice(link.price)} ${link.currency_code}`
+                                        ) : link.link_type === 'product' && link.product_price ? (
+                                          `${formatPrice(link.product_price)} ${link.currency_code}`
+                                        ) : link.link_type === 'plan' && link.plan_amount ? (
+                                          `${formatPrice(link.plan_amount)} ${link.currency_code}`
+                                        ) : (
+                                          '-'
+                                        )}
+                                      </span>
+                                    </div>
+                                    <a
+                                      href={link.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-500 hover:underline"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      View Link
+                                    </a>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </div>
                     )}
                   </div>
 
                   <div className="md:hidden">
                     {isPaymentLinksLoading ? (
-                      Array.from({ length: 3 }).map((_, index) => (
-                        <div key={index} className="p-4 border-b">
-                          <Skeleton className="w-full h-24" />
-                        </div>
-                      ))
-                    ) : !paymentLinksData || !paymentLinksData.pages || !paymentLinksData.pages[0] || paymentLinksData.pages[0].length === 0 ? (
+                      <div className="flex items-center justify-center h-24">
+                        <Spinner />
+                      </div>
+                    ) : !filteredPaymentLinks.length ? (
                       <div className="h-[65vh] flex items-center justify-center">
                         <div className="flex flex-col items-center">
                           <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
@@ -378,17 +390,19 @@ function PaymentLinksPage() {
                         </div>
                       </div>
                     ) : (
-                      sortPaymentLinks((paymentLinksData?.pages?.flatMap(page => page) || []).filter(Boolean)).map((link: PaymentLink) => (
-                        <PaymentLinkCard
-                          key={link.link_id}
-                          paymentLink={link}
-                          onEditClick={(e) => {
-                            e.stopPropagation();
-                            handleEditClick(link);
-                          }}
-                          onClick={() => handlePaymentLinkClick(link)}
-                        />
-                      ))
+                      <div className="border-b">
+                        {sortPaymentLinks(filteredPaymentLinks).map((link: PaymentLink) => (
+                          <PaymentLinkCard
+                            key={link.link_id}
+                            paymentLink={link}
+                            onEditClick={(e) => {
+                              e.stopPropagation();
+                              handleEditClick(link);
+                            }}
+                            onClick={() => handlePaymentLinkClick(link)}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

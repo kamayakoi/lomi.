@@ -83,6 +83,7 @@ export function applySearch(payouts: Payout[], searchTerm: string): Payout[] {
         'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
     ]
 
+    // Extended keyword search section - handling date-related searches
     const keywordSearches: [string, (payout: Payout) => boolean][] = [
         ['2 derniers jours', (payout) => {
             const twoDaysAgo = subDays(new Date(), 2)
@@ -113,6 +114,25 @@ export function applySearch(payouts: Payout[], searchTerm: string): Payout[] {
             const yesterday = subDays(new Date(), 1)
             return new Date(payout.created_at).toDateString() === yesterday.toDateString()
         }],
+        // Add English variants for better accessibility
+        ['today', (payout) => {
+            const today = new Date()
+            return new Date(payout.created_at).toDateString() === today.toDateString()
+        }],
+        ['yesterday', (payout) => {
+            const yesterday = subDays(new Date(), 1)
+            return new Date(payout.created_at).toDateString() === yesterday.toDateString()
+        }],
+        ['this month', (payout) => {
+            const thisMonth = new Date()
+            return new Date(payout.created_at).getMonth() === thisMonth.getMonth() &&
+                new Date(payout.created_at).getFullYear() === thisMonth.getFullYear()
+        }],
+        ['last month', (payout) => {
+            const lastMonth = subMonths(new Date(), 1)
+            return new Date(payout.created_at).getMonth() === lastMonth.getMonth() &&
+                new Date(payout.created_at).getFullYear() === lastMonth.getFullYear()
+        }],
     ]
 
     const keywordSearch = keywordSearches.find(([keyword]) =>
@@ -123,6 +143,7 @@ export function applySearch(payouts: Payout[], searchTerm: string): Payout[] {
         return payouts.filter(keywordSearch[1])
     }
 
+    // Special date format searches
     const dateSearch = lowerCaseSearchTerm.match(/(\d{1,2})\s+(janv\.|févr\.|mars|avr\.|mai|juin|juil\.|août|sept\.|oct\.|nov\.|déc\.)\s+(\d{4})/i)
     if (dateSearch) {
         const [, day, month, year] = dateSearch
@@ -144,22 +165,90 @@ export function applySearch(payouts: Payout[], searchTerm: string): Payout[] {
         })
     }
 
+    // Standard field-based search with enhancements
     return payouts.filter((payout) => {
-        const { payout_id, amount, currency_code, status, created_at } = payout
+        // Get all the basic payout properties
+        const { 
+            payout_id, 
+            amount, 
+            currency_code, 
+            status, 
+            created_at, 
+            metadata,
+            bank_account_id
+        } = payout
+        
+        // Format dates in multiple formats for better searchability
         const lowerCaseStatus = formatPayoutStatus(status).toLowerCase()
         const formattedDate = format(new Date(created_at), 'MMM d, yyyy').toLowerCase()
         const frenchFormattedDate = format(new Date(created_at), 'd MMM yyyy', { locale: fr }).toLowerCase()
-
+        const numericDate = format(new Date(created_at), 'yyyy-MM-dd').toLowerCase()
+        const dayMonth = format(new Date(created_at), 'd MMM').toLowerCase()
+        const monthYear = format(new Date(created_at), 'MMM yyyy').toLowerCase()
+        
+        // Basic amount formatting variations 
+        const amountString = amount.toString()
+        const amountFormatted = amount.toLocaleString()
+        
+        // Handle numeric ranges for amount searches
+        const isAmountSearch = !isNaN(Number(lowerCaseSearchTerm))
+        const searchAmount = isAmountSearch ? Number(lowerCaseSearchTerm) : 0
+        const amountMatch = isAmountSearch ? (
+            Math.abs(amount - searchAmount) < 1 || // Exact or very close match
+            amountString.includes(lowerCaseSearchTerm) || // Partial match
+            amountFormatted.includes(lowerCaseSearchTerm) // Formatted match
+        ) : false
+        
+        // Check for bank account info if available
+        const bankAccountMatch = bank_account_id ? bank_account_id.toLowerCase().includes(lowerCaseSearchTerm) : false
+        
+        // Check metadata if available - recursive function to search nested objects
+        const metadataMatch = metadata ? searchInObject(metadata, lowerCaseSearchTerm) : false
+        
         return (
             payout_id.toLowerCase().includes(lowerCaseSearchTerm) ||
-            amount.toString().includes(lowerCaseSearchTerm) ||
+            amountMatch ||
             currency_code.toLowerCase().includes(lowerCaseSearchTerm) ||
             lowerCaseStatus.includes(lowerCaseSearchTerm) ||
             formattedDate.includes(lowerCaseSearchTerm) ||
             frenchFormattedDate.includes(lowerCaseSearchTerm) ||
-            frenchMonths.some(month => frenchFormattedDate.includes(month) && month.includes(lowerCaseSearchTerm))
+            numericDate.includes(lowerCaseSearchTerm) ||
+            dayMonth.includes(lowerCaseSearchTerm) ||
+            monthYear.includes(lowerCaseSearchTerm) ||
+            frenchMonths.some(month => frenchFormattedDate.includes(month) && month.includes(lowerCaseSearchTerm)) ||
+            bankAccountMatch ||
+            metadataMatch
         )
     })
+}
+
+// Helper function to search deeply within nested objects
+function searchInObject(obj: unknown, searchTerm: string): boolean {
+    if (!obj) return false
+    
+    if (typeof obj === 'string') {
+        return obj.toLowerCase().includes(searchTerm)
+    }
+    
+    if (typeof obj === 'number') {
+        return obj.toString().includes(searchTerm)
+    }
+    
+    if (typeof obj === 'boolean') {
+        return obj.toString().toLowerCase().includes(searchTerm)
+    }
+    
+    if (Array.isArray(obj)) {
+        return obj.some(item => searchInObject(item, searchTerm))
+    }
+    
+    if (typeof obj === 'object' && obj !== null) {
+        return Object.values(obj as Record<string, unknown>).some(value => 
+            searchInObject(value, searchTerm)
+        )
+    }
+    
+    return false
 }
 
 function formatPayoutStatus(status: payout_status): string {

@@ -27,12 +27,13 @@ import { Separator } from '@/components/ui/separator'
 import { useUser } from '@/lib/hooks/use-user'
 import { fetchLogs } from './components/support'
 import { Log } from './components/types'
-import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 import { useQuery } from '@tanstack/react-query'
+import React from 'react'
+import Spinner from '@/components/ui/spinner'
 
 function LogsPage() {
     const { user } = useUser()
@@ -42,6 +43,7 @@ function LogsPage() {
     const [sortColumn, setSortColumn] = useState<keyof Log | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
     const [offset, setOffset] = useState(0)
+    const [searchTerm, setSearchTerm] = useState("")
 
     const topNav = [
         { title: 'Logs', href: '/portal/logs', isActive: true },
@@ -49,13 +51,14 @@ function LogsPage() {
     ]
 
     const { data: logsData, isLoading: isLogsLoading, refetch } = useQuery({
-        queryKey: ['logs', user?.id || '', selectedEvent, selectedSeverity, offset] as const,
+        queryKey: ['logs', user?.id || '', selectedEvent, selectedSeverity, offset, searchTerm] as const,
         queryFn: () => fetchLogs({
             userId: user?.id || '',
             event: selectedEvent,
             severity: selectedSeverity,
             offset,
-            limit: 50
+            limit: 50,
+            searchTerm
         }),
         enabled: !!user?.id,
         placeholderData: (previousData) => previousData
@@ -76,22 +79,43 @@ function LogsPage() {
         }
     }
 
-    const sortLogs = (logs: Log[]) => {
-        if (!sortColumn) return logs
+    // Filter logs by search term
+    const filteredLogs = React.useMemo(() => {
+        if (!logsData?.data || logsData.data.length === 0) return [];
 
-        return logs.sort((a, b) => {
-            const aValue = a[sortColumn]
-            const bValue = b[sortColumn]
+        // Define sortLogs function inside the useMemo callback
+        const sortLogs = (logs: Log[]) => {
+            if (!sortColumn) return logs
 
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
-            } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-                return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
-            } else {
-                return 0
-            }
-        })
-    }
+            return logs.sort((a, b) => {
+                const aValue = a[sortColumn]
+                const bValue = b[sortColumn]
+
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue)
+                } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+                } else {
+                    return 0
+                }
+            })
+        }
+
+        // First apply sorting
+        const sortedLogs = sortLogs([...logsData.data] as Log[]);
+
+        // Then apply search filtering
+        if (!searchTerm) return sortedLogs;
+
+        const search = searchTerm.toLowerCase();
+        return sortedLogs.filter(log =>
+            Object.entries(log).some(([, value]) =>
+                value &&
+                typeof value === 'string' &&
+                value.toLowerCase().includes(search)
+            )
+        );
+    }, [logsData?.data, searchTerm, sortColumn, sortDirection]);
 
     return (
         <Layout fixed>
@@ -127,7 +151,9 @@ function LogsPage() {
                                 <Input
                                     placeholder='Search logs...'
                                     className='w-full pl-10 pr-4 py-2 rounded-none'
-                                    type="search"
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                                 <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                             </div>
@@ -267,51 +293,35 @@ function LogsPage() {
                                 <div className="hidden md:block">
                                     <Table className="w-full">
                                         <TableHeader>
-                                            <TableRow className="hover:bg-transparent border-b bg-muted/50">
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('created_at')}>
+                                            <TableRow className="border-b border-border hover:bg-transparent bg-muted/50">
+                                                <TableHead className="text-center">
+                                                    <Button variant="ghost" onClick={() => handleSort('created_at')}>
                                                         Date
                                                         {sortColumn === 'created_at' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                         )}
                                                     </Button>
                                                 </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('event')}>
+                                                <TableHead className="text-center">
+                                                    <Button variant="ghost" onClick={() => handleSort('event')}>
                                                         Event
                                                         {sortColumn === 'event' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                         )}
                                                     </Button>
                                                 </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('severity')}>
+                                                <TableHead className="text-center">
+                                                    <Button variant="ghost" onClick={() => handleSort('severity')}>
                                                         Severity
                                                         {sortColumn === 'severity' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                         )}
                                                     </Button>
                                                 </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('ip_address')}>
+                                                <TableHead className="text-center">
+                                                    <Button variant="ghost" onClick={() => handleSort('ip_address')}>
                                                         IP Address
                                                         {sortColumn === 'ip_address' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('operating_system')}>
-                                                        Operating System
-                                                        {sortColumn === 'operating_system' && (
-                                                            <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                        )}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead className="text-center whitespace-nowrap">
-                                                    <Button variant="ghost" className="hover:bg-transparent px-0 w-full justify-center" onClick={() => handleSort('browser')}>
-                                                        Browser
-                                                        {sortColumn === 'browser' && (
                                                             <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
                                                         )}
                                                     </Button>
@@ -320,67 +330,53 @@ function LogsPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {isLogsLoading ? (
-                                                Array.from({ length: 10 }).map((_, index) => (
-                                                    <TableRow key={index} className="border-b border-border">
-                                                        <TableCell colSpan={6}>
-                                                            <Skeleton className="w-full h-8" />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
-                                            ) : !logsData?.data?.length ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={6} className="h-[65vh]">
-                                                        <div className="flex flex-col items-center justify-center h-full py-10">
-                                                            <div className="flex justify-center mb-8">
-                                                                <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-6">
-                                                                    <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-                                                                </div>
-                                                            </div>
-                                                            <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mb-3">
-                                                                No logs found
-                                                            </h3>
-                                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center">
-                                                                Start performing actions to see your activity logs here.
-                                                            </p>
+                                                    <TableCell colSpan={4}>
+                                                        <div className="flex items-center justify-center h-[65vh]">
+                                                            <Spinner />
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ) : logsData && logsData.data ? (
-                                                sortLogs(logsData.data as Log[]).map((log: Log) => (
+                                                filteredLogs.map((log) => (
                                                     <TableRow key={log.log_id} className="border-b border-border hover:bg-muted/20">
                                                         <TableCell className="font-medium text-center">
-                                                            <span>{formatDate(log.created_at)}</span>
+                                                            {formatDate(log.created_at)}
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className="font-medium">{formatEventName(log.event)}</span>
+                                                            {formatEventName(log.event)}
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={`
-                                                                inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
-                                                                ${log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' : ''}
-                                                                ${log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' : ''}
-                                                                ${log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                                ${log.severity === 'CRITICAL' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : ''}
-                                                            `}>
-                                                                {log.severity.charAt(0).toUpperCase() + log.severity.slice(1).toLowerCase()}
+                                                            <span className={
+                                                                `inline-block px-2 py-1 text-xs font-medium rounded-none ` +
+                                                                (log.severity === 'NOTICE' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
+                                                                    log.severity === 'WARNING' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                                                                        log.severity === 'ERROR' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' :
+                                                                            'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300')
+                                                            }>
+                                                                {log.severity}
                                                             </span>
                                                         </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <code className="text-sm">{log.ip_address}</code>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {formatUserAgent(log.operating_system)}
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell className="text-center">
-                                                            <div className="text-sm text-muted-foreground">
-                                                                {formatBrowser(log.browser)}
-                                                            </div>
-                                                        </TableCell>
+                                                        <TableCell className="text-center">{log.ip_address}</TableCell>
                                                     </TableRow>
                                                 ))
-                                            ) : null}
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={4} className="h-[65vh]">
+                                                        <div className="flex flex-col items-center justify-center">
+                                                            <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                                                                <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+                                                            </div>
+                                                            <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                                                                No logs found
+                                                            </h3>
+                                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
+                                                                Try changing your filter or try again later.
+                                                            </p>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </div>
@@ -388,32 +384,26 @@ function LogsPage() {
                                 {/* Mobile Card View */}
                                 <div className="md:hidden">
                                     {isLogsLoading ? (
-                                        Array.from({ length: 3 }).map((_, index) => (
-                                            <div key={index} className="p-4 border-b last:border-b-0">
-                                                <Skeleton className="w-full h-24" />
-                                            </div>
-                                        ))
-                                    ) : !logsData?.data?.length ? (
-                                        <div className="h-[65vh] flex items-center justify-center">
-                                            <div className="flex flex-col items-center justify-center py-10">
-                                                <div className="flex justify-center mb-8">
-                                                    <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-6">
-                                                        <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
-                                                    </div>
-                                                </div>
-                                                <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mb-3">
-                                                    No logs found
-                                                </h3>
-                                                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center">
-                                                    Start performing actions to see your activity logs here.
-                                                </p>
-                                            </div>
+                                        <div className="flex items-center justify-center h-[65vh]">
+                                            <Spinner />
                                         </div>
                                     ) : logsData && logsData.data ? (
-                                        sortLogs(logsData.data as Log[]).map((log: Log) => (
+                                        filteredLogs.map((log: Log) => (
                                             <LogCard key={log.log_id} log={log} />
                                         ))
-                                    ) : null}
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full py-10">
+                                            <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-full">
+                                                <ClipboardDocumentListIcon className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+                                            </div>
+                                            <h3 className="text-2xl font-semibold text-gray-500 dark:text-gray-400 mt-4">
+                                                No logs found
+                                            </h3>
+                                            <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto text-center mt-2">
+                                                Try changing your filter or try again later.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             {logsData && logsData.totalCount > 0 && (

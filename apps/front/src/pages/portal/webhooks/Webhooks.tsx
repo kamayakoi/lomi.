@@ -9,7 +9,6 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/use-user'
 import { fetchWebhooks } from './components/support'
 import { Webhook, webhook_event, webhookCategories } from './components/types'
-import { Skeleton } from '@/components/ui/skeleton'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreateWebhookForm } from './components/form'
 import { WebhookFilters } from './components/filters'
@@ -37,6 +36,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import WebhookView from './components/actions'
+import Spinner from '@/components/ui/spinner'
 
 function getEventCategoryColor(categoryName: string): string {
     switch (categoryName) {
@@ -160,6 +160,8 @@ function WebhooksPage() {
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
     const [selectedWebhookForView, setSelectedWebhookForView] = useState<Webhook | null>(null)
     const [isViewOpen, setIsViewOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState("")
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     const topNav = [
         { title: 'Webhooks', href: '/portal/webhooks', isActive: true },
@@ -167,9 +169,31 @@ function WebhooksPage() {
     ]
 
     const { data: webhooksData, isLoading: isWebhooksLoading, refetch } = useQuery<Webhook[]>({
-        queryKey: ['webhooks', user?.id || '', selectedEvent, selectedStatus] as const,
-        queryFn: () => fetchWebhooks(user?.id || '', selectedEvent, selectedStatus),
-        enabled: !!user?.id
+        queryKey: ['webhooks', user?.id || '', selectedEvent, selectedStatus, searchTerm] as const,
+        queryFn: async () => {
+            try {
+                return await fetchWebhooks(user?.id || '', selectedEvent, selectedStatus, searchTerm);
+            } catch (error) {
+                console.error('Error fetching webhooks:', error);
+                // Store the error message for displaying to the user
+                setErrorMessage(error instanceof Error ? error.message : 'Failed to fetch webhooks. The RPC function might not exist.');
+                // Return empty array to prevent component from crashing
+                return [];
+            }
+        },
+        enabled: !!user?.id,
+        // Add retry configuration to prevent multiple retries for 404 errors
+        retry: (failureCount, error: Error | unknown) => {
+            // Don't retry if it's a 404 error (missing RPC function)
+            if (
+                (error as { code?: string })?.code === '404' ||
+                (error instanceof Error && error.message?.includes('404'))
+            ) {
+                return false;
+            }
+            // Otherwise retry up to 3 times
+            return failureCount < 3;
+        }
     })
 
     const webhooks = webhooksData || []
@@ -271,7 +295,36 @@ function WebhooksPage() {
                         setSelectedStatus={setSelectedStatus}
                         refetch={handleRefresh}
                         isRefreshing={isRefreshing}
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
                     />
+
+                    {errorMessage && (
+                        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 mb-4 rounded-none dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+                            <div className="flex items-start">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <h3 className="text-sm font-medium">Error</h3>
+                                    <div className="mt-1 text-sm">
+                                        {errorMessage}
+                                    </div>
+                                    <div className="mt-2">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => setErrorMessage(null)}
+                                        >
+                                            Dismiss
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <Card className="mt-4 rounded-none">
                         <CardContent className="p-0">
@@ -310,13 +363,13 @@ function WebhooksPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {isWebhooksLoading ? (
-                                                Array.from({ length: 5 }).map((_, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell colSpan={4}>
-                                                            <Skeleton className="w-full h-8" />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
+                                                <TableRow>
+                                                    <TableCell colSpan={4}>
+                                                        <div className="flex items-center justify-center h-[65vh]">
+                                                            <Spinner />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
                                             ) : webhooks.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell colSpan={4} className="h-[65vh]">
@@ -364,13 +417,11 @@ function WebhooksPage() {
                                 {/* Mobile Card View */}
                                 <div className="md:hidden">
                                     {isWebhooksLoading ? (
-                                        Array.from({ length: 3 }).map((_, index) => (
-                                            <div key={index} className="p-4 border-b">
-                                                <Skeleton className="w-full h-24" />
-                                            </div>
-                                        ))
+                                        <div className="flex items-center justify-center h-[65vh]">
+                                            <Spinner />
+                                        </div>
                                     ) : webhooks.length === 0 ? (
-                                        <div className="h-[65vh] flex items-center justify-center">
+                                        <div className="h-[65vh]">
                                             <EmptyState />
                                         </div>
                                     ) : (

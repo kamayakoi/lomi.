@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Search } from 'lucide-react'
 import { webhook_event, webhookCategories } from './types'
+import { Input } from "@/components/ui/input"
 
 interface WebhookFiltersProps {
     selectedEvent: webhook_event | 'all'
@@ -10,6 +11,8 @@ interface WebhookFiltersProps {
     setSelectedStatus: (status: 'active' | 'inactive' | 'all') => void
     refetch: () => void
     isRefreshing: boolean
+    searchTerm: string
+    setSearchTerm: (term: string) => void
 }
 
 export function WebhookFilters({
@@ -18,7 +21,9 @@ export function WebhookFilters({
     selectedStatus,
     setSelectedStatus,
     refetch,
-    isRefreshing
+    isRefreshing,
+    searchTerm,
+    setSearchTerm
 }: WebhookFiltersProps) {
     // Flatten all events for the dropdown
     const allEvents = webhookCategories.reduce<Array<{ id: webhook_event; label: string }>>((acc, category) => {
@@ -28,6 +33,17 @@ export function WebhookFilters({
     return (
         <div className='my-4 flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0'>
             <div className='flex flex-wrap items-center gap-4'>
+                <div className='relative w-full sm:w-60'>
+                    <Input
+                        placeholder='Search webhooks...'
+                        className='w-full pl-10 pr-4 py-2 rounded-none'
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                </div>
+
                 <Select value={selectedEvent} onValueChange={(value) => setSelectedEvent(value as webhook_event | 'all')}>
                     <SelectTrigger className="w-full sm:w-[200px] rounded-none">
                         <SelectValue placeholder="Filter by event" />
@@ -52,18 +68,18 @@ export function WebhookFilters({
                         <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                 </Select>
+            </div>
 
-                <div className="hidden sm:flex items-center space-x-2">
-                    <Button
-                        variant="outline"
-                        onClick={refetch}
-                        className="border-border text-card-foreground px-2 h-10 rounded-none"
-                        disabled={isRefreshing}
-                    >
-                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        <span className="sr-only">Refresh</span>
-                    </Button>
-                </div>
+            <div className="flex flex-row">
+                <Button
+                    variant="outline"
+                    onClick={refetch}
+                    className="border-border bg-background text-card-foreground flex-1 md:flex-none px-3.5 h-10 rounded-none"
+                    disabled={isRefreshing}
+                >
+                    <RefreshCw className={`h-5 w-5 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    Refresh
+                </Button>
             </div>
         </div>
     )

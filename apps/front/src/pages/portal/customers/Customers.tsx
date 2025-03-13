@@ -21,7 +21,6 @@ import { useUser } from '@/lib/hooks/use-user'
 import AnimatedLogoLoader from '@/components/portal/loader'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/utils/supabase/client'
-import { Skeleton } from '@/components/ui/skeleton'
 import FeedbackForm from '@/components/portal/feedback-form'
 import { UsersIcon } from '@heroicons/react/24/outline'
 import { Customer } from './components/types'
@@ -42,6 +41,7 @@ import SupportForm from '@/components/portal/support-form'
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/lib/hooks/use-toast"
 import PhoneNumberInput from "@/components/ui/phone-number-input"
+import Spinner from '@/components/ui/spinner'
 
 function CustomerCard({ customer, onEditClick, onClick }: {
     customer: Customer,
@@ -457,16 +457,13 @@ function CustomersPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {isCustomersLoading ? (
-                                                Array.from({ length: 5 }).map((_, index) => (
-                                                    <TableRow key={index}>
-                                                        <TableCell colSpan={6}>
-                                                            <div className="flex flex-col items-center justify-center space-y-2 py-2 text-center">
-                                                                <Skeleton className="h-2 w-48 rounded-none" />
-                                                                <Skeleton className="h-2 w-32 rounded-none" />
-                                                            </div>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))
+                                                <TableRow>
+                                                    <TableCell colSpan={6}>
+                                                        <div className="flex items-center justify-center h-[65vh]">
+                                                            <Spinner />
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
                                             ) : customers.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell colSpan={6}>
@@ -512,11 +509,9 @@ function CustomersPage() {
                                 {/* Mobile Card View */}
                                 <div className="md:hidden">
                                     {isCustomersLoading ? (
-                                        Array.from({ length: 3 }).map((_, index) => (
-                                            <div key={index} className="p-4 border-b last:border-b-0">
-                                                <Skeleton className="w-full h-24" />
-                                            </div>
-                                        ))
+                                        <div className="flex items-center justify-center h-[65vh]">
+                                            <Spinner />
+                                        </div>
                                     ) : customers.length === 0 ? (
                                         <div className="flex flex-col items-center justify-center space-y-6 py-12 text-center">
                                             <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-4">

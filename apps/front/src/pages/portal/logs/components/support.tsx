@@ -10,6 +10,7 @@ interface FetchLogsParams {
     severity?: string | null
     limit?: number
     offset?: number
+    searchTerm?: string
 }
 
 interface FetchLogsResponse {
@@ -26,7 +27,8 @@ export async function fetchLogs({
     event,
     severity,
     limit = 50,
-    offset = 0
+    offset = 0,
+    searchTerm = ''
 }: FetchLogsParams): Promise<FetchLogsResponse> {
     try {
         const { data, error } = await supabase
@@ -34,6 +36,7 @@ export async function fetchLogs({
                 p_merchant_id: userId,
                 p_event: event === 'all' ? undefined : event as event_type,
                 p_severity: severity === 'all' ? undefined : severity as string,
+                p_search_term: searchTerm || undefined,
                 p_limit: limit,
                 p_offset: offset
             })

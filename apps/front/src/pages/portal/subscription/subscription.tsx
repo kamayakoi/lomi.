@@ -10,7 +10,6 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import { useUser } from '@/lib/hooks/use-user'
 import { fetchSubscriptionPlans, fetchSubscriptions } from './components/support'
 import { SubscriptionPlan, Subscription, frequencyColors } from './components/types'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ClipboardDocumentListIcon } from '@heroicons/react/24/outline'
 import { CreatePlanForm } from './components/form'
@@ -29,6 +28,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card"
 import { ClipboardList, ImageIcon } from 'lucide-react'
 import { cn } from '@/lib/actions/utils'
+import React from 'react'
+import Spinner from '@/components/ui/spinner'
 
 function formatCurrency(amount: number | undefined, currency: string | undefined): string {
   if (amount === undefined || amount === null || currency === undefined) {
@@ -47,7 +48,7 @@ function PlanCard({ plan, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -111,7 +112,7 @@ function SubscriptionCard({ subscription, onEditClick, onClick }: {
 }) {
   return (
     <div
-      className="p-4 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+      className="p-4 border-b cursor-pointer hover:bg-gray-50/50 dark:hover:bg-gray-800/50"
       onClick={onClick}
     >
       <div className="space-y-3">
@@ -152,6 +153,7 @@ function SubscriptionsPage() {
   const { user } = useUser()
   const [isCreatePlanOpen, setIsCreatePlanOpen] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<SubscriptionStatus>('all')
+  const [searchTerm, setSearchTerm] = useState('')
   const pageSize = 50
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -202,8 +204,15 @@ function SubscriptionsPage() {
     enabled: !!user?.id
   })
 
-  const subscriptionPlans = subscriptionPlansData?.pages?.flatMap((page: SubscriptionPlan[]) => page) || []
-  const subscriptions = subscriptionsData?.pages?.flatMap((page: Subscription[]) => page) || []
+  const subscriptionPlans = React.useMemo(() =>
+    subscriptionPlansData?.pages?.flatMap((page: SubscriptionPlan[]) => page) || [],
+    [subscriptionPlansData?.pages]
+  );
+
+  const subscriptions = React.useMemo(() =>
+    subscriptionsData?.pages?.flatMap((page: Subscription[]) => page) || [],
+    [subscriptionsData?.pages]
+  );
 
   const handleCreatePlanSuccess = () => {
     refetchPlans()
@@ -273,6 +282,32 @@ function SubscriptionsPage() {
     })
   }
 
+  const filteredSubscriptionPlans = React.useMemo(() => {
+    if (!searchTerm) return subscriptionPlans;
+    const search = searchTerm.toLowerCase();
+    return subscriptionPlans.filter(plan =>
+      plan.name.toLowerCase().includes(search) ||
+      plan.description?.toLowerCase().includes(search) ||
+      plan.billing_frequency.toLowerCase().includes(search) ||
+      // Search by price
+      (plan.amount !== undefined && plan.amount.toString().includes(search)) ||
+      (plan.currency_code && plan.currency_code.toLowerCase().includes(search))
+    );
+  }, [subscriptionPlans, searchTerm]);
+
+  const filteredSubscriptions = React.useMemo(() => {
+    if (!searchTerm) return subscriptions;
+    const search = searchTerm.toLowerCase();
+    return subscriptions.filter(sub =>
+      sub.customer_name.toLowerCase().includes(search) ||
+      sub.plan_name.toLowerCase().includes(search) ||
+      sub.status.toLowerCase().includes(search) ||
+      // Search by price
+      (sub.amount !== undefined && sub.amount.toString().includes(search)) ||
+      (sub.currency_code && sub.currency_code.toLowerCase().includes(search))
+    );
+  }, [subscriptions, searchTerm]);
+
   return (
     <Layout fixed>
       <Layout.Header>
@@ -323,6 +358,8 @@ function SubscriptionsPage() {
                 setSelectedStatus={setSelectedStatus}
                 refetch={handleRefresh}
                 isRefreshing={isRefreshing}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
                 tabsList={
                   <TabsList className="rounded-none h-[40px]">
                     <TabsTrigger value="plans" className="rounded-none h-[35px]">Plans</TabsTrigger>
@@ -336,19 +373,8 @@ function SubscriptionsPage() {
                   <CardContent className="p-0">
                     <div id="plans-table-container" className="h-[72vh] overflow-auto">
                       {isSubscriptionPlansLoading ? (
-                        <div className="space-y-4 p-4">
-                          {Array.from({ length: 5 }).map((_, index) => (
-                            <div key={index} className="p-4 border border-border">
-                              <div className="flex gap-4">
-                                <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
-                                <div className="flex-grow space-y-2">
-                                  <Skeleton className="w-1/3 h-6" />
-                                  <Skeleton className="w-2/3 h-4" />
-                                  <Skeleton className="w-24 h-4" />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
+                        <div className="flex items-center justify-center h-[65vh]">
+                          <Spinner />
                         </div>
                       ) : subscriptionPlans.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-[65vh]">
@@ -366,10 +392,10 @@ function SubscriptionsPage() {
                         <>
                           {/* Desktop View */}
                           <div className="hidden md:block">
-                            {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
+                            {sortSubscriptionPlans(filteredSubscriptionPlans).map((plan) => (
                               <div
                                 key={plan.plan_id}
-                                className="p-6 border-b last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                                className="p-6 border-b hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
                                 onClick={() => handlePlanClick(plan)}
                               >
                                 <div className="flex gap-6">
@@ -446,17 +472,19 @@ function SubscriptionsPage() {
 
                           {/* Mobile View */}
                           <div className="md:hidden">
-                            {sortSubscriptionPlans(subscriptionPlans).map((plan) => (
-                              <PlanCard
-                                key={plan.plan_id}
-                                plan={plan}
-                                onEditClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditPlanClick(plan);
-                                }}
-                                onClick={() => handlePlanClick(plan)}
-                              />
-                            ))}
+                            <div className="border-b">
+                              {sortSubscriptionPlans(filteredSubscriptionPlans).map((plan) => (
+                                <PlanCard
+                                  key={plan.plan_id}
+                                  plan={plan}
+                                  onEditClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditPlanClick(plan);
+                                  }}
+                                  onClick={() => handlePlanClick(plan)}
+                                />
+                              ))}
+                            </div>
                           </div>
                         </>
                       )}
@@ -471,7 +499,7 @@ function SubscriptionsPage() {
                     <div id="subscriptions-table-container" className="h-[72vh] overflow-auto">
                       {/* Desktop View */}
                       <div className="hidden md:block">
-                        <Table>
+                        <Table className="border-b">
                           <TableHeader>
                             <TableRow className="hover:bg-transparent border-b bg-muted/50">
                               <TableHead className="text-center">
@@ -510,13 +538,13 @@ function SubscriptionsPage() {
                           </TableHeader>
                           <TableBody>
                             {isSubscriptionsLoading ? (
-                              Array.from({ length: 5 }).map((_, index) => (
-                                <TableRow key={index}>
-                                  <TableCell colSpan={4}>
-                                    <Skeleton className="w-full h-8" />
-                                  </TableCell>
-                                </TableRow>
-                              ))
+                              <TableRow>
+                                <TableCell colSpan={4}>
+                                  <div className="flex items-center justify-center h-24">
+                                    <Spinner />
+                                  </div>
+                                </TableCell>
+                              </TableRow>
                             ) : subscriptions.length === 0 ? (
                               <TableRow>
                                 <TableCell colSpan={4} className="h-[65vh]">
@@ -534,10 +562,10 @@ function SubscriptionsPage() {
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              sortSubscriptions(subscriptions).map((subscription: Subscription) => (
+                              sortSubscriptions(filteredSubscriptions).map((subscription: Subscription) => (
                                 <TableRow
                                   key={subscription.subscription_id}
-                                  className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                                  className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 cursor-pointer"
                                   onClick={() => handleSubscriptionClick(subscription)}
                                 >
                                   <TableCell className="text-center">{subscription.customer_name}</TableCell>
@@ -563,11 +591,9 @@ function SubscriptionsPage() {
                       {/* Mobile View */}
                       <div className="md:hidden">
                         {isSubscriptionsLoading ? (
-                          Array.from({ length: 3 }).map((_, index) => (
-                            <div key={index} className="p-4 border-b last:border-b-0">
-                              <Skeleton className="w-full h-24" />
-                            </div>
-                          ))
+                          <div className="flex items-center justify-center h-24">
+                            <Spinner />
+                          </div>
                         ) : subscriptions.length === 0 ? (
                           <div className="h-[65vh] flex items-center justify-center">
                             <div className="flex flex-col items-center">
@@ -583,17 +609,19 @@ function SubscriptionsPage() {
                             </div>
                           </div>
                         ) : (
-                          sortSubscriptions(subscriptions).map((subscription: Subscription) => (
-                            <SubscriptionCard
-                              key={subscription.subscription_id}
-                              subscription={subscription}
-                              onEditClick={(e) => {
-                                e.stopPropagation();
-                                handleSubscriptionClick(subscription);
-                              }}
-                              onClick={() => handleSubscriptionClick(subscription)}
-                            />
-                          ))
+                          <div className="border-b">
+                            {sortSubscriptions(filteredSubscriptions).map((subscription: Subscription) => (
+                              <SubscriptionCard
+                                key={subscription.subscription_id}
+                                subscription={subscription}
+                                onEditClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSubscriptionClick(subscription);
+                                }}
+                                onClick={() => handleSubscriptionClick(subscription)}
+                              />
+                            ))}
+                          </div>
                         )}
                       </div>
                     </div>

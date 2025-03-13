@@ -11,6 +11,8 @@ interface SubscriptionFiltersProps {
     refetch: () => void;
     isRefreshing: boolean;
     tabsList: React.ReactNode;
+    searchTerm: string;
+    onSearchChange: (value: string) => void;
 }
 
 export function SubscriptionFilters({
@@ -19,6 +21,8 @@ export function SubscriptionFilters({
     refetch,
     isRefreshing,
     tabsList,
+    searchTerm,
+    onSearchChange,
 }: SubscriptionFiltersProps) {
     return (
         <div className='w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full'>
@@ -31,7 +35,9 @@ export function SubscriptionFilters({
                         <Input
                             placeholder='Search subscriptions...'
                             className='w-full pl-10 pr-4 py-2 rounded-none'
-                            type="search"
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => onSearchChange(e.target.value)}
                         />
                         <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                     </div>

@@ -15,7 +15,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DateRange } from 'react-day-picker'
 import { payout_status, Payout, BankAccount, BalanceBreakdown, currency_code } from './components/types'
 import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiateWithdrawal } from './components/support'
-import { Skeleton } from '@/components/ui/skeleton'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
@@ -539,7 +538,6 @@ function BalancePage() {
                                         <CardTitle className="text-sm font-medium">Balance</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <Skeleton className="w-32 h-8 rounded-none" />
                                     </CardContent>
                                 </Card>
                             ) : getSortedBalances().length === 0 ? (
@@ -957,30 +955,14 @@ function BalancePage() {
                             <CardContent className="p-0">
                                 <div
                                     id="balance-table-container"
-                                    className="h-[47vh] overflow-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600"
-                                    onWheel={(e) => {
-                                        // When scrolled at the boundaries, prevent default to avoid page scrolling
-                                        const container = e.currentTarget;
-                                        const { scrollTop, scrollHeight, clientHeight } = container;
-
-                                        // Check if we're at the top or bottom boundary
-                                        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
-                                        const isAtTop = scrollTop <= 0;
-
-                                        // If at boundaries and trying to scroll further, prevent default
-                                        if ((isAtBottom && e.deltaY > 0) || (isAtTop && e.deltaY < 0)) {
-                                            e.preventDefault();
-                                        }
-
-                                        // In any case, stop propagation to contain scroll within this element
-                                        e.stopPropagation();
-                                    }}
+                                    className="h-[47vh] overflow-hidden"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                 >
                                     <InfiniteScroll
                                         dataLength={payouts.length}
                                         next={() => fetchNextPage()}
                                         hasMore={payoutsData?.pages?.[payoutsData.pages.length - 1]?.length === pageSize}
-                                        loader={<div className="p-4"><Skeleton className="w-full h-8 rounded-none" /></div>}
+                                        loader={<div className="p-4"></div>}
                                         scrollableTarget="balance-table-container"
                                         className="overflow-visible"
                                     >
@@ -1043,13 +1025,12 @@ function BalancePage() {
                                                 {isPayoutsLoading ? (
                                                     <TableRow>
                                                         <TableCell colSpan={columns.length} className="text-center p-4">
-                                                            <Skeleton className="w-full h-8 rounded-none" />
                                                         </TableCell>
                                                     </TableRow>
                                                 ) : payouts.length === 0 ? (
                                                     <TableRow>
-                                                        <TableCell colSpan={columns.length} className="text-center py-8">
-                                                            <div className="flex flex-col items-center justify-center space-y-4">
+                                                        <TableCell colSpan={columns.length} className="text-center py-4">
+                                                            <div className="flex flex-col items-center justify-center space-y-4 mt-8">
                                                                 <div className="bg-transparent dark:bg-transparent p-4">
                                                                     <FcfaIcon className="h-40 w-40 text-gray-400 dark:text-gray-500" />
                                                                 </div>

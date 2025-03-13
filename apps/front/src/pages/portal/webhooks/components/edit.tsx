@@ -48,7 +48,7 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
         if (selectedEvents.length === 0) {
             toast({
                 title: "Error",
-                description: "Please select at least one event",
+                description: "Please select at least one event to listen for",
                 variant: "destructive",
             })
             return
@@ -59,7 +59,7 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
             await updateWebhook(webhook.webhook_id, {
                 url,
                 authorized_events: selectedEvents,
-                is_active: isActive,
+                is_active: isActive
             })
             toast({
                 title: "Success",
@@ -68,10 +68,10 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
             onSuccess()
             onClose()
         } catch (error) {
-            console.error('Error updating webhook:', error)
+            console.error('Failed to update webhook:', error)
             toast({
                 title: "Error",
-                description: "Failed to update webhook",
+                description: error instanceof Error ? error.message : "Failed to update webhook. The RPC function might not exist.",
                 variant: "destructive",
             })
         } finally {
@@ -84,18 +84,18 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
         setIsSubmitting(true)
         try {
             await deleteWebhook(webhook.webhook_id)
-            setShowDeleteDialog(false)
-            onSuccess()
-            onClose()
             toast({
                 title: "Success",
                 description: "Webhook deleted successfully",
             })
+            setShowDeleteDialog(false)
+            onSuccess()
+            onClose()
         } catch (error) {
-            console.error('Error deleting webhook:', error)
+            console.error('Failed to delete webhook:', error)
             toast({
                 title: "Error",
-                description: "Failed to delete webhook",
+                description: error instanceof Error ? error.message : "Failed to delete webhook. The RPC function might not exist.",
                 variant: "destructive",
             })
         } finally {
@@ -105,6 +105,7 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
 
     const handleTest = async () => {
         if (!webhook) return
+        setIsSubmitting(true)
         try {
             await testWebhook(webhook.webhook_id)
             toast({
@@ -112,12 +113,14 @@ export default function WebhookActions({ webhook, isOpen, onClose, onSuccess }: 
                 description: "Test webhook sent successfully",
             })
         } catch (error) {
-            console.error('Error testing webhook:', error)
+            console.error('Failed to test webhook:', error)
             toast({
                 title: "Error",
-                description: "Failed to send test webhook",
+                description: error instanceof Error ? error.message : "Failed to test webhook. The RPC function might not exist.",
                 variant: "destructive",
             })
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
