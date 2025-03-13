@@ -6,13 +6,68 @@ on:
     - cron: '0 1 25 * *'
   workflow_dispatch:
     # Allows manual triggering
+    inputs:
+      start_date:
+        description: 'Start date in YYYY-MM-DD format (default: first day of previous month)'
+        required: false
+        type: string
+      end_date:
+        description: 'End date in YYYY-MM-DD format (default: last day of previous month)'
+        required: false
+        type: string
 
 jobs:
   generate-statements:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Generate monthly statements
+      - name: Check out repository
+        uses: actions/checkout@v2
+      
+      - name: Set default dates if not provided
+        id: dates
         run: |
-          curl -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/generate-monthly-statements" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-          -H "Content-Type: application/json" 
+          if [ -z "${{ github.event.inputs.start_date }}" ] || [ -z "${{ github.event.inputs.end_date }}" ]; then
+            # Calculate first and last day of previous month
+            LAST_MONTH=$(date -d "last month" +%Y-%m)
+            DAYS_IN_MONTH=$(date -d "$LAST_MONTH-01 + 1 month - 1 day" +%d)
+            echo "Using date range for last month: $LAST_MONTH-01 to $LAST_MONTH-$DAYS_IN_MONTH"
+            echo "start_date=$LAST_MONTH-01" >> $GITHUB_OUTPUT
+            echo "end_date=$LAST_MONTH-$DAYS_IN_MONTH" >> $GITHUB_OUTPUT
+          else
+            echo "Using provided date range: ${{ github.event.inputs.start_date }} to ${{ github.event.inputs.end_date }}"
+            echo "start_date=${{ github.event.inputs.start_date }}" >> $GITHUB_OUTPUT
+            echo "end_date=${{ github.event.inputs.end_date }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate monthly statements
+        id: generate-statements
+        run: |
+          echo "Generating monthly statements for period: ${{ steps.dates.outputs.start_date }} to ${{ steps.dates.outputs.end_date }}"
+          
+          response=$(curl -s -w "\n%{http_code}" -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/rest/v1/rpc/generate_monthly_statements_for_all_merchants" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            --data "{\"p_start_date\":\"${{ steps.dates.outputs.start_date }}\",\"p_end_date\":\"${{ steps.dates.outputs.end_date }}\"}")
+          
+          status_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | sed '$ d')
+          
+          echo "Status code: $status_code"
+          
+          if [ "$status_code" -ne 200 ]; then
+            echo "Error: Received status code $status_code"
+            echo "Response: $response_body"
+            exit 1
+          fi
+          
+          echo "Statement generation completed successfully"
+          
+          # Parse results
+          successful=$(echo "$response_body" | grep -o "success\":true" | wc -l)
+          failed=$(echo "$response_body" | grep -o "success\":false" | wc -l)
+          total=$((successful + failed))
+          
+          echo "Generated $successful statements successfully, $failed failed (total: $total)"
