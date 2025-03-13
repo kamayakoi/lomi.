@@ -258,6 +258,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
         { id: 'WAVE', name: 'Wave', icon: '/payment_channels/wave.webp' },
         { id: 'MTN', name: 'MTN', icon: '/payment_channels/mtn.webp' },
         { id: 'ORANGE', name: 'Orange', icon: '/payment_channels/orange.webp' },
+        { id: 'NOWPAYMENTS', name: 'Crypto', icon: '/crypto/btc.webp' },
     ]
 
     useEffect(() => {
@@ -622,6 +623,8 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                 return 'bg-[#F7CE46] hover:bg-[#F7CE46] text-black';
             case 'CARDS':
                 return 'bg-[#074367] hover:bg-[#074367] text-white';
+            case 'NOWPAYMENTS':
+                return 'bg-[#F7931A] hover:bg-[#F7931A] text-white';
             default:
                 return '';
         }

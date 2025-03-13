@@ -781,6 +781,28 @@
             "transactions": "Transactions",
             "documentation": "Documentation"
         },
+        "crypto_checkout": {
+            "loading_payment": "Loading payment details...",
+            "payment_error": "Payment Error",
+            "payment_not_found": "Payment not found",
+            "return_to_merchant": "Return to merchant",
+            "back": "Back",
+            "crypto_payment": "Cryptocurrency Payment",
+            "send_exactly": "Send exactly",
+            "amount": "Amount",
+            "original_amount": "Original Amount",
+            "address": "Address",
+            "address_copied": "Address copied to clipboard",
+            "copy_failed": "Failed to copy address",
+            "status": "Status",
+            "waiting_for_payment": "Waiting for payment",
+            "confirmed": "Confirmed",
+            "completed": "Completed",
+            "payment_auto_check": "Payment status is checked automatically",
+            "pay_with_app": "Pay with wallet app",
+            "cancel_payment": "Cancel payment",
+            "powered_by_nowpayments": "Powered by lomi."
+        },
         "support_form": {
             "title": "Contact support",
             "category": {

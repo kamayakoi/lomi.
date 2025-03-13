@@ -77,6 +77,12 @@ export default function PaymentChannels() {
 
     const method = paymentMethods.find(m => m.provider_code === providerCode)
 
+    // Skip phone number verification for NOWPAYMENTS/CRYPTO
+    if (providerCode === 'NOWPAYMENTS') {
+      await connectProvider(providerCode)
+      return
+    }
+
     // All mobile money and e-wallet providers need phone number
     if (method && (method.type === 'Mobile Money' || method.type === 'e-Wallets')) {
       setConnectingProvider(providerCode)
@@ -120,7 +126,9 @@ export default function PaymentChannels() {
 
         toast({
           title: "Success",
-          description: `Successfully connected to ${method?.name}`,
+          description: providerCode === 'NOWPAYMENTS'
+            ? "Successfully enabled crypto payments"
+            : `Successfully connected to ${method?.name}`,
         })
       }
     }

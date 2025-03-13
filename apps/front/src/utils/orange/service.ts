@@ -108,7 +108,7 @@ export class OrangeService {
                 reference: reference || `${merchantId}_${Date.now()}`
             });
 
-            // 4. Create transaction record
+            // 4. Create transaction record with the updated function signature
             const { data: transactionId, error: transactionError } = await supabase.rpc(
                 'create_orange_checkout_transaction',
                 {
@@ -121,14 +121,12 @@ export class OrangeService {
                     p_checkout_url: webPaymentResponse.payment_url,
                     p_error_url: cancelUrl,
                     p_success_url: successUrl,
+                    p_notif_token: webPaymentResponse.notif_token, // Pass notif_token as separate parameter
                     p_product_id: productId,
                     p_subscription_id: subscriptionId,
                     p_description: description,
                     p_metadata: {
                         orange_session: {
-                            pay_token: webPaymentResponse.pay_token,
-                            notif_token: webPaymentResponse.notif_token,
-                            payment_url: webPaymentResponse.payment_url,
                             status: 'INITIATED',
                             order_id: orderId
                         },
@@ -167,8 +165,8 @@ export class OrangeService {
         try {
             const { error } = await supabase.rpc('update_orange_payment_status', {
                 p_provider_checkout_id: payToken,
-                p_provider_transaction_id: txnid,
                 p_payment_status: status,
+                p_provider_transaction_id: txnid,
                 p_error_code: errorCode,
                 p_error_message: errorMessage,
                 p_metadata: metadata

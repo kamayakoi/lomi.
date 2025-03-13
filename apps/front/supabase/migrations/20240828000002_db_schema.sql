@@ -658,15 +658,31 @@ CREATE TABLE providers_transactions (
     success_url TEXT,
     error_code VARCHAR(100),
     error_message TEXT,
+    pay_token VARCHAR(255),
+    notif_token VARCHAR(255),
+    pay_currency VARCHAR(50),
+    pay_amount NUMERIC(20,8),
+    ipn_callback_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (provider_code, provider_checkout_id),
     UNIQUE (provider_code, provider_transaction_id)
 );
 
-COMMENT ON TABLE providers_transactions IS 'Stores provider-specific transaction data including Wave checkout sessions';
 
+COMMENT ON TABLE providers_transactions IS 'Stores provider-specific transaction data including Wave checkout sessions';
+COMMENT ON COLUMN providers_transactions.pay_currency IS 'The cryptocurrency used for payment (BTC, ETH, etc.)';
+COMMENT ON COLUMN providers_transactions.pay_amount IS 'The amount in cryptocurrency that was paid (differs from the base currency amount)';
+COMMENT ON COLUMN providers_transactions.ipn_callback_url IS 'The callback URL for Instant Payment Notifications';
+COMMENT ON COLUMN providers_transactions.pay_token IS 'The payment token returned by payment providers (like Orange Money pay_token)';
+COMMENT ON COLUMN providers_transactions.notif_token IS 'The notification token used to verify webhook callbacks (like Orange Money notif_token)';
+COMMENT ON COLUMN providers_transactions.provider_checkout_id IS 'Unique identifier for the checkout session (equivalent to pay_token for some providers)'; 
+
+
+CREATE INDEX idx_providers_transactions_pay_currency ON providers_transactions(pay_currency); 
 CREATE INDEX idx_providers_transactions_merchant_id ON providers_transactions(merchant_id);
+CREATE INDEX idx_providers_transactions_pay_token ON providers_transactions(pay_token);
+CREATE INDEX idx_providers_transactions_notif_token ON providers_transactions(notif_token);
 
 -- Refunds table
 CREATE TABLE refunds (

@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 
 // Routes pages
 import { ProtectedRoute } from './lib/routes/ProtectedRoute';
@@ -77,6 +77,9 @@ import AnimatedLogoLoader from './components/portal/loader';
 import Blog from './pages/blog/blog';
 import BlogPost from './pages/blog/blog-post';
 
+// NOWPayments
+const NOWPaymentsCheckout = lazy(() => import('./components/NOWPaymentsCheckout'));
+
 const AppRouter = () => {
     return (
         <Routes>
@@ -85,6 +88,11 @@ const AppRouter = () => {
             <Route path="/plan/:linkId" element={<CheckoutPage />} />
             <Route path="/instant/:linkId" element={<CheckoutPage />} />
             <Route path="/checkout/:sessionId" element={<CheckoutPage />} />
+            <Route path="/nowpayments-checkout/:transactionId" element={
+                <Suspense fallback={<AnimatedLogoLoader />}>
+                    <NOWPaymentsCheckout />
+                </Suspense>
+            } />
             <Route path="*" element={
                 <SessionCheck>
                     <Routes>

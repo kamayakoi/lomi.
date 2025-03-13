@@ -29,7 +29,7 @@ import { useToast } from "@/lib/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
-import { formatCurrency } from '@/utils/fees/currency-converter'
+import { formatCurrency } from '@/utils/currency-utils'
 import { supabase } from '@/utils/supabase/client'
 // import CurrencyConverter from './components/CurrencyConverter'
 

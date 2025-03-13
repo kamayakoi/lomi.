@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +8,7 @@ import { CheckoutData } from './types'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
 import WhatsAppNumberInput from '@/components/portal/whatsapp-number-input'
-import { ArrowLeft, ImageIcon, Loader2, ChevronDown, ArrowRightLeft } from 'lucide-react'
+import { ArrowLeft, ImageIcon, Loader2, ChevronDown, ArrowRightLeft, ArrowRight } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -19,14 +19,30 @@ import {
 import { ShieldIcon } from '@/components/icons/ShieldIcon'
 import { countries } from '@/lib/data/onboarding'
 import { toast } from "@/lib/hooks/use-toast"
-import { initiateWaveCheckout } from '@/api/checkout/WaveCheckout'
+import { initiateWaveCheckout } from '@/api/checkout/wave/WaveCheckout'
 import { checkoutStyles } from './CheckoutStyles'
+import { initiateOrangeCheckout } from './orange/orangeCheckoutUtils'
+import nowPaymentsService from '@/utils/nowpayments/service'
+import NOWPaymentsCheckout from '@/components/NOWPaymentsCheckout'
+import { ButtonExpand } from '@/components/design/button-expand'
 
 // Helper function to format numbers with separators
 const formatNumber = (num: number | string) => {
     if (typeof num === 'string') num = parseFloat(num);
     return num.toLocaleString('fr-FR').replace(/\s/g, '.');
 };
+
+// Create a more comprehensive type-safe mixpanel check
+declare global {
+    interface Window {
+        mixpanel?: {
+            track: (event: string, properties?: Record<string, unknown>) => void;
+        };
+    }
+}
+
+// Add this check for mixpanel availability
+const mixpanelAvailable = typeof window !== 'undefined' && window.mixpanel !== undefined;
 
 export default function CheckoutPage() {
     const { sessionId, linkId } = useParams<{ sessionId?: string; linkId?: string }>();
@@ -59,6 +75,8 @@ export default function CheckoutPage() {
     const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
     const nameInputRef = useRef<HTMLInputElement>(null);
     const [rawNameInput, setRawNameInput] = useState('');
+    const [isNowPaymentsModalOpen, setIsNowPaymentsModalOpen] = useState(false);
+    const [nowPaymentsTransactionId, setNowPaymentsTransactionId] = useState<string | null>(null);
 
     useEffect(() => {
         // First check if we have a cached country code in localStorage
@@ -336,158 +354,413 @@ export default function CheckoutPage() {
     }, [checkoutData]);
 
     const handleProviderClick = async (provider: string) => {
-        setSelectedProvider(provider)
+        try {
+            setSelectedProvider(provider);
 
-        // Check if required fields are filled, if not, focus the name field
-        if (!areRequiredFieldsFilled()) {
-            toast({
-                variant: "destructive",
-                title: "Required Information",
-                description: "Please fill in your full name, email, and phone number first."
-            });
-
-            // Focus on the name input
-            if (nameInputRef.current) {
-                nameInputRef.current.focus();
-            }
-            return;
-        }
-
-        if (provider === 'WAVE') {
-            try {
-                setIsProcessing(true);
-
-                if (!checkoutData) {
-                    console.error('Checkout data missing');
-                    throw new Error('Missing required data for checkout');
-                }
-
-                // Check for required merchant and organization IDs
-                if (!checkoutData.paymentLink?.merchantId || !checkoutData.paymentLink?.organizationId) {
-                    console.error('Missing merchant ID or organization ID:', {
-                        merchantId: checkoutData.paymentLink?.merchantId,
-                        organizationId: checkoutData.paymentLink?.organizationId,
-                        paymentLink: checkoutData.paymentLink
-                    });
-                    toast({
-                        variant: "destructive",
-                        title: "Configuration Error",
-                        description: "Payment configuration is incomplete. Please contact support."
-                    });
-                    throw new Error('Missing merchant or organization ID');
-                }
-
-                console.log('Checkout data structure check:', {
-                    merchantId: checkoutData.paymentLink.merchantId,
-                    organizationId: checkoutData.paymentLink.organizationId,
-                    merchant_id: checkoutData.paymentLink.merchantId,
-                    organization_id: checkoutData.paymentLink.organizationId,
-                    paymentLinkType: typeof checkoutData.paymentLink,
-                    checkoutDataType: typeof checkoutData,
-                    fullPaymentLink: checkoutData.paymentLink
-                });
-
-                // First, ensure we have a customer ID by creating/updating the customer
-                const newCustomerId = await createOrUpdateCustomer(
-                    checkoutData.paymentLink.merchantId,
-                    checkoutData.paymentLink.organizationId,
-                    {
-                        firstName: customerDetails.firstName,
-                        lastName: customerDetails.lastName,
-                        email: customerDetails.email,
-                        phoneNumber: customerDetails.phoneNumber,
-                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
-                        country: customerDetails.country,
-                        city: customerDetails.city,
-                        address: customerDetails.address,
-                        postalCode: customerDetails.postalCode
-                    }
-                );
-
-                if (!newCustomerId) {
-                    console.error('Failed to create/update customer');
-                    toast({
-                        variant: "destructive",
-                        title: "Customer Creation Failed",
-                        description: "Could not create customer record. Please check your information and try again."
-                    });
-                    throw new Error('Could not create customer record');
-                }
-
-                // Store the customer ID in the customerDetails object instead of a separate state
-                setCustomerDetails(prev => ({
-                    ...prev,
-                    customerId: newCustomerId
-                }));
-
-                // Calculate total amount including fees
-                const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
-                const fees = checkoutData?.merchantProduct?.fees || [];
-                const feeAmount = fees.reduce((total, fee) => {
-                    return total + (basePrice * (fee.percentage / 100));
-                }, 0);
-                const totalAmount = basePrice + feeAmount;
-
-                // Success and error URLs - use merchant-specified URLs or default to our pages
-                const successUrl = checkoutData.paymentLink.success_url || `${window.location.origin}/checkout/success`;
-                const errorUrl = checkoutData.paymentLink.cancel_url || `${window.location.origin}/checkout/error`;
-
-                console.log('Creating Wave checkout with customer ID:', newCustomerId);
-
-                // Use the initiateWaveCheckout helper function
-                const { checkoutUrl } = await initiateWaveCheckout({
-                    merchantId: checkoutData.paymentLink.merchantId,
-                    organizationId: checkoutData.paymentLink.organizationId,
-                    customerId: newCustomerId,
-                    amount: totalAmount,
-                    currency: checkoutData.paymentLink.currency_code,
-                    successUrl,
-                    errorUrl,
-                    productId: checkoutData.merchantProduct?.product_id,
-                    subscriptionId: checkoutData.subscriptionPlan?.planId,
-                    description: checkoutData.paymentLink.title,
-                    metadata: {
-                        linkId: checkoutData.paymentLink.linkId,
-                        customerEmail: customerDetails.email,
-                        customerPhone: customerDetails.phoneNumber,
-                        customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
-                        whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
-                        ...(checkoutData.subscriptionPlan && {
-                            planId: checkoutData.subscriptionPlan.planId,
-                            subscriptionName: checkoutData.subscriptionPlan.name,
-                            billingFrequency: checkoutData.subscriptionPlan.billingFrequency
-                        })
-                    },
-                    onSuccess: (result) => {
-                        console.log('Wave checkout session created successfully:', result);
-                    },
-                    onError: (error) => {
-                        console.error('Error creating Wave checkout session:', error);
-                        toast({
-                            variant: "destructive",
-                            title: "Payment Error",
-                            description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
-                        });
-                    }
-                });
-
-                // Redirect to Wave payment page
-                window.location.href = checkoutUrl;
-            } catch (error: unknown) {
-                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-                console.error('Error creating Wave checkout session:', errorMessage);
+            // Check if required fields are filled, if not, focus the name field
+            if (!areRequiredFieldsFilled()) {
                 toast({
                     variant: "destructive",
-                    title: "Payment Error",
-                    description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
+                    title: "Required Information",
+                    description: "Please fill in your full name, email, and phone number first."
                 });
-            } finally {
-                setIsProcessing(false);
+
+                // Focus on the name input
+                if (nameInputRef.current) {
+                    nameInputRef.current.focus();
+                }
+                return;
             }
-        } else {
-            setIsCheckoutModalOpen(true);
+
+            if (provider === 'WAVE') {
+                try {
+                    setIsProcessing(true);
+
+                    if (!checkoutData) {
+                        console.error('Checkout data missing');
+                        throw new Error('Missing required data for checkout');
+                    }
+
+                    // Check for required merchant and organization IDs
+                    if (!checkoutData.paymentLink?.merchantId || !checkoutData.paymentLink?.organizationId) {
+                        console.error('Missing merchant ID or organization ID:', {
+                            merchantId: checkoutData.paymentLink?.merchantId,
+                            organizationId: checkoutData.paymentLink?.organizationId,
+                            paymentLink: checkoutData.paymentLink
+                        });
+                        toast({
+                            variant: "destructive",
+                            title: "Configuration Error",
+                            description: "Payment configuration is incomplete. Please contact support."
+                        });
+                        throw new Error('Missing merchant or organization ID');
+                    }
+
+                    console.log('Checkout data structure check:', {
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        merchant_id: checkoutData.paymentLink.merchantId,
+                        organization_id: checkoutData.paymentLink.organizationId,
+                        paymentLinkType: typeof checkoutData.paymentLink,
+                        checkoutDataType: typeof checkoutData,
+                        fullPaymentLink: checkoutData.paymentLink
+                    });
+
+                    // First, ensure we have a customer ID by creating/updating the customer
+                    const newCustomerId = await createOrUpdateCustomer(
+                        checkoutData.paymentLink.merchantId,
+                        checkoutData.paymentLink.organizationId,
+                        {
+                            firstName: customerDetails.firstName,
+                            lastName: customerDetails.lastName,
+                            email: customerDetails.email,
+                            phoneNumber: customerDetails.phoneNumber,
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            country: customerDetails.country,
+                            city: customerDetails.city,
+                            address: customerDetails.address,
+                            postalCode: customerDetails.postalCode
+                        }
+                    );
+
+                    if (!newCustomerId) {
+                        console.error('Failed to create/update customer');
+                        toast({
+                            variant: "destructive",
+                            title: "Customer Creation Failed",
+                            description: "Could not create customer record. Please check your information and try again."
+                        });
+                        throw new Error('Could not create customer record');
+                    }
+
+                    // Store the customer ID in the customerDetails object instead of a separate state
+                    setCustomerDetails(prev => ({
+                        ...prev,
+                        customerId: newCustomerId
+                    }));
+
+                    // Calculate total amount including fees
+                    const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
+                    const fees = checkoutData?.merchantProduct?.fees || [];
+                    const feeAmount = fees.reduce((total, fee) => {
+                        return total + (basePrice * (fee.percentage / 100));
+                    }, 0);
+                    const totalAmount = basePrice + feeAmount;
+
+                    // Success and error URLs - use merchant-specified URLs or default to our pages
+                    const successUrl = checkoutData.paymentLink.success_url || `${window.location.origin}/checkout/success`;
+                    const errorUrl = checkoutData.paymentLink.cancel_url || `${window.location.origin}/checkout/error`;
+
+                    console.log('Creating Wave checkout with customer ID:', newCustomerId);
+
+                    // Use the initiateWaveCheckout helper function
+                    const { checkoutUrl } = await initiateWaveCheckout({
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        customerId: newCustomerId,
+                        amount: totalAmount,
+                        currency: checkoutData.paymentLink.currency_code,
+                        successUrl,
+                        errorUrl,
+                        productId: checkoutData.merchantProduct?.product_id,
+                        subscriptionId: checkoutData.subscriptionPlan?.planId,
+                        description: checkoutData.paymentLink.title,
+                        metadata: {
+                            linkId: checkoutData.paymentLink.linkId,
+                            customerEmail: customerDetails.email,
+                            customerPhone: customerDetails.phoneNumber,
+                            customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            ...(checkoutData.subscriptionPlan && {
+                                planId: checkoutData.subscriptionPlan.planId,
+                                subscriptionName: checkoutData.subscriptionPlan.name,
+                                billingFrequency: checkoutData.subscriptionPlan.billingFrequency
+                            })
+                        },
+                        onSuccess: (result) => {
+                            console.log('Wave checkout session created successfully:', result);
+                        },
+                        onError: (error) => {
+                            console.error('Error creating Wave checkout session:', error);
+                            toast({
+                                variant: "destructive",
+                                title: "Payment Error",
+                                description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
+                            });
+                        }
+                    });
+
+                    // Redirect to Wave payment page
+                    window.location.href = checkoutUrl;
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                    console.error('Error creating Wave checkout session:', errorMessage);
+                    toast({
+                        variant: "destructive",
+                        title: "Payment Error",
+                        description: "Failed to initiate Wave payment. Please ensure your phone number is correct and try again."
+                    });
+                } finally {
+                    setIsProcessing(false);
+                }
+            } else if (provider === 'ORANGE') {
+                try {
+                    setIsProcessing(true);
+
+                    if (!checkoutData) {
+                        console.error('Checkout data missing');
+                        throw new Error('Missing required data for checkout');
+                    }
+
+                    // Check for required merchant and organization IDs
+                    if (!checkoutData.paymentLink?.merchantId || !checkoutData.paymentLink?.organizationId) {
+                        console.error('Missing merchant ID or organization ID:', {
+                            merchantId: checkoutData.paymentLink?.merchantId,
+                            organizationId: checkoutData.paymentLink?.organizationId,
+                            paymentLink: checkoutData.paymentLink
+                        });
+                        toast({
+                            variant: "destructive",
+                            title: "Configuration Error",
+                            description: "Payment configuration is incomplete. Please contact support."
+                        });
+                        throw new Error('Missing merchant or organization ID');
+                    }
+
+                    console.log('Checkout data structure check for Orange:', {
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        paymentLinkType: typeof checkoutData.paymentLink,
+                        checkoutDataType: typeof checkoutData,
+                        fullPaymentLink: checkoutData.paymentLink
+                    });
+
+                    // First, ensure we have a customer ID by creating/updating the customer
+                    const newCustomerId = await createOrUpdateCustomer(
+                        checkoutData.paymentLink.merchantId,
+                        checkoutData.paymentLink.organizationId,
+                        {
+                            firstName: customerDetails.firstName,
+                            lastName: customerDetails.lastName,
+                            email: customerDetails.email,
+                            phoneNumber: customerDetails.phoneNumber,
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            country: customerDetails.country,
+                            city: customerDetails.city,
+                            address: customerDetails.address,
+                            postalCode: customerDetails.postalCode
+                        }
+                    );
+
+                    if (!newCustomerId) {
+                        console.error('Failed to create/update customer');
+                        toast({
+                            variant: "destructive",
+                            title: "Customer Creation Failed",
+                            description: "Could not create customer record. Please check your information and try again."
+                        });
+                        throw new Error('Could not create customer record');
+                    }
+
+                    // Store the customer ID in the customerDetails object instead of a separate state
+                    setCustomerDetails(prev => ({
+                        ...prev,
+                        customerId: newCustomerId
+                    }));
+
+                    // Calculate total amount including fees
+                    const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
+                    const fees = checkoutData?.merchantProduct?.fees || [];
+                    const feeAmount = fees.reduce((total, fee) => {
+                        return total + (basePrice * (fee.percentage / 100));
+                    }, 0);
+                    const totalAmount = basePrice + feeAmount;
+
+                    // Success and error URLs - use merchant-specified URLs or default to our pages
+                    const successUrl = checkoutData.paymentLink.success_url || `${window.location.origin}/checkout/success`;
+                    const errorUrl = checkoutData.paymentLink.cancel_url || `${window.location.origin}/checkout/error`;
+
+                    console.log('Creating Orange checkout with customer ID:', newCustomerId);
+
+                    // Use the initiateOrangeCheckout helper function
+                    const { checkoutUrl } = await initiateOrangeCheckout({
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        customerId: newCustomerId,
+                        amount: totalAmount,
+                        currency: checkoutData.paymentLink.currency_code,
+                        successUrl,
+                        cancelUrl: errorUrl,
+                        notificationUrl: `${window.location.origin}/api/orange/webhook`,
+                        productId: checkoutData.merchantProduct?.product_id,
+                        subscriptionId: checkoutData.subscriptionPlan?.planId,
+                        description: checkoutData.paymentLink.title,
+                        metadata: {
+                            linkId: checkoutData.paymentLink.linkId,
+                            customerEmail: customerDetails.email,
+                            customerPhone: customerDetails.phoneNumber,
+                            customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            ...(checkoutData.subscriptionPlan && {
+                                planId: checkoutData.subscriptionPlan.planId,
+                                subscriptionName: checkoutData.subscriptionPlan.name,
+                                billingFrequency: checkoutData.subscriptionPlan.billingFrequency
+                            })
+                        }
+                    });
+
+                    // Redirect to Orange payment page
+                    window.location.href = checkoutUrl;
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                    console.error('Error creating Orange checkout session:', errorMessage);
+                    toast({
+                        variant: "destructive",
+                        title: "Payment Error",
+                        description: "Failed to initiate Orange Money payment. Please try again or use a different payment method."
+                    });
+                } finally {
+                    setIsProcessing(false);
+                }
+            } else if (provider === 'NOWPAYMENTS') {
+                try {
+                    setIsProcessing(true);
+
+                    if (!checkoutData) {
+                        console.error('Checkout data missing');
+                        throw new Error('Missing required data for checkout');
+                    }
+
+                    // Check for required merchant and organization IDs
+                    if (!checkoutData.paymentLink?.merchantId || !checkoutData.paymentLink?.organizationId) {
+                        console.error('Missing merchant ID or organization ID:', {
+                            merchantId: checkoutData.paymentLink?.merchantId,
+                            organizationId: checkoutData.paymentLink?.organizationId,
+                            paymentLink: checkoutData.paymentLink
+                        });
+                        toast({
+                            variant: "destructive",
+                            title: "Configuration Error",
+                            description: "Payment configuration is incomplete. Please contact support."
+                        });
+                        throw new Error('Missing merchant or organization ID');
+                    }
+
+                    console.log('Checkout data structure check for NOWPayments:', {
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        paymentLinkType: typeof checkoutData.paymentLink,
+                        checkoutDataType: typeof checkoutData,
+                        fullPaymentLink: checkoutData.paymentLink
+                    });
+
+                    // First, ensure we have a customer ID by creating/updating the customer
+                    const newCustomerId = await createOrUpdateCustomer(
+                        checkoutData.paymentLink.merchantId,
+                        checkoutData.paymentLink.organizationId,
+                        {
+                            firstName: customerDetails.firstName,
+                            lastName: customerDetails.lastName,
+                            email: customerDetails.email,
+                            phoneNumber: customerDetails.phoneNumber,
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            country: customerDetails.country,
+                            city: customerDetails.city,
+                            address: customerDetails.address,
+                            postalCode: customerDetails.postalCode
+                        }
+                    );
+
+                    if (!newCustomerId) {
+                        console.error('Failed to create/update customer');
+                        toast({
+                            variant: "destructive",
+                            title: "Customer Creation Failed",
+                            description: "Could not create customer record. Please check your information and try again."
+                        });
+                        throw new Error('Could not create customer record');
+                    }
+
+                    // Store the customer ID in the customerDetails object instead of a separate state
+                    setCustomerDetails(prev => ({
+                        ...prev,
+                        customerId: newCustomerId
+                    }));
+
+                    // Calculate total amount including fees
+                    const basePrice = checkoutData?.merchantProduct?.price || checkoutData?.subscriptionPlan?.amount || checkoutData?.paymentLink?.price || 0;
+                    const fees = checkoutData?.merchantProduct?.fees || [];
+                    const feeAmount = fees.reduce((total, fee) => {
+                        return total + (basePrice * (fee.percentage / 100));
+                    }, 0);
+                    const totalAmount = basePrice + feeAmount;
+
+                    // Success and error URLs - use merchant-specified URLs or default to our pages
+                    const successUrl = checkoutData.paymentLink.success_url || `${window.location.origin}/checkout/success`;
+                    const cancelUrl = checkoutData.paymentLink.cancel_url || `${window.location.origin}/checkout/error`;
+
+                    console.log('Creating NOWPayments checkout with customer ID:', newCustomerId);
+
+                    // Use the initiateNOWPaymentsCheckout helper function
+                    const result = await nowPaymentsService.initiateCheckout({
+                        merchantId: checkoutData.paymentLink.merchantId,
+                        organizationId: checkoutData.paymentLink.organizationId,
+                        customerId: newCustomerId,
+                        amount: totalAmount,
+                        currency: checkoutData.paymentLink.currency_code,
+                        payCurrency: 'btc', // Default to BTC, this could be made selectable
+                        successUrl,
+                        cancelUrl,
+                        productId: checkoutData.merchantProduct?.product_id,
+                        subscriptionId: checkoutData.subscriptionPlan?.planId,
+                        description: checkoutData.paymentLink.title,
+                        metadata: {
+                            linkId: checkoutData.paymentLink.linkId,
+                            customerEmail: customerDetails.email,
+                            customerPhone: customerDetails.phoneNumber,
+                            customerName: `${customerDetails.firstName} ${customerDetails.lastName}`.trim(),
+                            whatsappNumber: isDifferentWhatsApp ? customerDetails.whatsappNumber : customerDetails.phoneNumber,
+                            ...(checkoutData.subscriptionPlan && {
+                                planId: checkoutData.subscriptionPlan.planId,
+                                subscriptionName: checkoutData.subscriptionPlan.name,
+                                billingFrequency: checkoutData.subscriptionPlan.billingFrequency
+                            })
+                        }
+                    });
+
+                    // For modal approach, store the transaction ID and open modal instead of redirecting
+                    setNowPaymentsTransactionId(result.transactionId);
+                    setIsNowPaymentsModalOpen(true);
+
+                    // Optional: Track with mixpanel if available
+                    if (mixpanelAvailable && window.mixpanel) {
+                        window.mixpanel.track('Payment Method Selected', {
+                            method: 'Crypto (NOWPayments)',
+                            amount: totalAmount,
+                            currency: checkoutData?.paymentLink?.currency_code || 'Unknown'
+                        });
+                    }
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                    console.error('Error creating NOWPayments checkout session:', errorMessage);
+                    toast({
+                        variant: "destructive",
+                        title: "Payment Error",
+                        description: "Failed to initiate crypto payment. Please try again or use a different payment method."
+                    });
+                } finally {
+                    setIsProcessing(false);
+                }
+            } else {
+                setIsCheckoutModalOpen(true);
+            }
+        } catch (error) {
+            console.error(`Error handling provider ${provider}:`, error);
+            setSessionError(
+                error instanceof Error ? error.message : 'Failed to process payment'
+            );
         }
-    }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -630,6 +903,20 @@ export default function CheckoutPage() {
             customerDetails.email.includes('@') &&
             customerDetails.phoneNumber;
     };
+
+    // Add handlers for modal success and error
+    const handleNowPaymentsSuccess = useCallback(() => {
+        // Redirect to success page
+        const successUrl = checkoutData?.paymentLink?.success_url ||
+            `${window.location.origin}/checkout/success`;
+        window.location.href = successUrl;
+    }, [checkoutData]);
+
+    const handleNowPaymentsError = useCallback((error?: string) => {
+        console.error('NOWPayments payment error:', error);
+        setSessionError(error || 'Payment failed or was cancelled');
+        setIsNowPaymentsModalOpen(false);
+    }, []);
 
     // Render the error state when session creation fails
     if (sessionError) {
@@ -1100,7 +1387,7 @@ export default function CheckoutPage() {
                                                         </div>
                                                         <div className="flex items-baseline gap-2">
                                                             <span className="text-gray-400">{formatNumber(feeAmount)}</span>
-                                                            <span className="text-gray-500">{checkoutData?.paymentLink?.currency_code}</span>
+                                                            <span className="text-gray-500">{checkoutData.paymentLink.currency_code}</span>
                                                         </div>
                                                     </div>
                                                 );
@@ -1184,7 +1471,7 @@ export default function CheckoutPage() {
                         {/* Mobile Money Options */}
                         <div className="flex overflow-x-auto pb-4 space-x-4">
                             {checkoutData?.paymentLink?.allowed_providers?.map((provider) => (
-                                provider !== 'ECOBANK' && (
+                                provider !== 'ECOBANK' && provider !== 'NOWPAYMENTS' && (
                                     <div
                                         key={provider}
                                         onClick={() => {
@@ -1221,6 +1508,37 @@ export default function CheckoutPage() {
                             ))}
                         </div>
 
+                        {/* Crypto payment option (NOWPAYMENTS) */}
+                        {checkoutData?.paymentLink?.allowed_providers?.includes('NOWPAYMENTS') && (
+                            <div className="mb-4 mt-1">
+                                <ButtonExpand
+                                    text="Pay with crypto using lomi."
+                                    icon={ArrowRight}
+                                    bgColor="bg-blue-900 dark:bg-blue-800"
+                                    textColor="text-white dark:text-white"
+                                    hoverBgColor="hover:bg-blue-800 dark:hover:bg-blue-700"
+                                    hoverTextColor="hover:text-white dark:hover:text-white"
+                                    className="w-full justify-end rounded-md h-10 font-normal text-sm tracking-wide border border-blue-700 dark:border-blue-700 shadow-sm"
+                                    onClick={() => {
+                                        if (!areRequiredFieldsFilled()) {
+                                            toast({
+                                                variant: "destructive",
+                                                title: "Required Information",
+                                                description: "Please fill in your full name, email, and phone number first."
+                                            });
+
+                                            // Focus on the name input
+                                            if (nameInputRef.current) {
+                                                nameInputRef.current.focus();
+                                            }
+                                        } else {
+                                            handleProviderClick('NOWPAYMENTS');
+                                        }
+                                    }}
+                                />
+                            </div>
+                        )}
+
                         <Dialog open={isCheckoutModalOpen} onOpenChange={setIsCheckoutModalOpen}>
                             <DialogContent className="sm:max-w-md">
                                 <DialogHeader>
@@ -1234,7 +1552,7 @@ export default function CheckoutPage() {
                                         <div className="flex items-center space-x-4">
                                             {selectedProvider && (
                                                 <img
-                                                    src={`/payment_channels/${selectedProvider.toLowerCase()}.webp`}
+                                                    src={`${selectedProvider === 'NOWPAYMENTS' ? '/company/lomi_icon.png' : `/payment_channels/${selectedProvider.toLowerCase()}.webp`}`}
                                                     alt={selectedProvider}
                                                     className="w-12 h-12 object-contain"
                                                 />
@@ -1259,7 +1577,7 @@ export default function CheckoutPage() {
                                                 Processing...
                                             </>
                                         ) : (
-                                            `Pay with ${selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange Money' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider}`
+                                            `Pay with ${selectedProvider === 'MTN' ? 'Momo' : selectedProvider === 'ORANGE' ? 'Orange Money' : selectedProvider === 'WAVE' ? 'Wave' : selectedProvider === 'NOWPAYMENTS' ? 'Crypto' : selectedProvider}`
                                         )}
                                     </Button>
                                 </div>
@@ -1526,6 +1844,16 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </div>
+            {isNowPaymentsModalOpen && nowPaymentsTransactionId && (
+                <NOWPaymentsCheckout
+                    isOpen={isNowPaymentsModalOpen}
+                    onClose={() => setIsNowPaymentsModalOpen(false)}
+                    transactionId={nowPaymentsTransactionId}
+                    onPaymentSuccess={handleNowPaymentsSuccess}
+                    onPaymentError={handleNowPaymentsError}
+                    isModal={true}
+                />
+            )}
         </>
     )
 }
