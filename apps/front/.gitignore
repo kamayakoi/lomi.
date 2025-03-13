@@ -54,3 +54,4 @@ src/utils/prompts
 # Supabase
 *_secrets.sql
 /supabase/functions
+/supabase/queries

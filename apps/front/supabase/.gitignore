@@ -7,3 +7,6 @@
 /supabase/migrations/20240828000000_drop_all_tables.sql
 /supabase/migrations/20240828000001_set_up.sql
 /supabase/migrations/20240828000002_db_schema.sql
+
+# Supabase queries
+/queries/
