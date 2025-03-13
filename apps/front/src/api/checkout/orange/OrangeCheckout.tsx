@@ -1,15 +1,18 @@
-import { WaveService } from '../../utils/wave/service';
+import { OrangeService } from '@/utils/orange/service';
 
-interface WaveCheckoutProps {
+interface OrangeCheckoutProps {
     merchantId: string;
     organizationId: string;
     customerId: string;
     amount: number;
     currency: string;
     successUrl: string;
-    errorUrl: string;
+    cancelUrl: string;
+    notificationUrl: string;
     productId?: string;
     subscriptionId?: string;
+    language?: string;
+    reference?: string;
     description?: string;
     metadata?: {
         linkId?: string;
@@ -21,28 +24,31 @@ interface WaveCheckoutProps {
         [key: string]: unknown;
     };
     onError: (error: Error) => void;
-    onSuccess: (data: { transactionId: string; checkoutUrl: string }) => void;
+    onSuccess: (data: { transactionId: string; checkoutUrl: string; payToken: string }) => void;
 }
 
 /**
- * WaveCheckout Component for handling Wave payment processing
- * This component doesn't render anything; it just processes the Wave payment
+ * OrangeCheckout Component for handling Orange Money payment processing
+ * This component doesn't render anything; it just processes the Orange Money payment
  */
-export const WaveCheckout = async ({
+const OrangeCheckout = async ({
     merchantId,
     organizationId,
     customerId,
     amount,
     currency,
     successUrl,
-    errorUrl,
+    cancelUrl,
+    notificationUrl,
     productId,
     subscriptionId,
+    language,
+    reference,
     description,
     metadata,
     onError,
     onSuccess
-}: WaveCheckoutProps) => {
+}: OrangeCheckoutProps) => {
     try {
         // Add planId to metadata if it's a subscription checkout
         const enhancedMetadata = { ...metadata };
@@ -61,17 +67,20 @@ export const WaveCheckout = async ({
             }
         }
 
-        // Process the Wave checkout
-        const result = await WaveService.createCheckoutSession({
+        // Process the Orange Money checkout
+        const result = await OrangeService.createCheckoutSession({
             merchantId,
             organizationId,
             customerId,
             amount,
             currency,
             successUrl,
-            errorUrl,
+            cancelUrl,
+            notificationUrl,
             productId,
             subscriptionId,
+            language,
+            reference,
             description,
             metadata: enhancedMetadata
         });
@@ -79,23 +88,10 @@ export const WaveCheckout = async ({
         onSuccess(result);
         return null;
     } catch (error) {
-        console.error('Wave checkout error:', error);
-        onError(error instanceof Error ? error : new Error('Failed to process Wave payment'));
+        console.error('Orange Money checkout error:', error);
+        onError(error instanceof Error ? error : new Error('Failed to process Orange Money payment'));
         return null;
     }
 };
 
-/**
- * Helper function to initiate a Wave checkout
- */
-export const initiateWaveCheckout = async (props: WaveCheckoutProps): Promise<{ transactionId: string; checkoutUrl: string }> => {
-    return new Promise((resolve, reject) => {
-        WaveCheckout({
-            ...props,
-            onSuccess: (result) => resolve(result),
-            onError: (error) => reject(error)
-        });
-    });
-};
-
-export default WaveCheckout; 
+export default OrangeCheckout; 

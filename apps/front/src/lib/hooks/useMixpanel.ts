@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import mixpanelService from '../../utils/mixpanel/mixpanel';
+import mixpanelService from '@/utils/mixpanel/mixpanel';
 
 /**
  * Hook to use Mixpanel in components
