@@ -8,6 +8,7 @@ export default function TermsPage() {
     const [mounted, setMounted] = useState(false);
     const [activeSection, setActiveSection] = useState('interpretation');
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [isFromCheckout, setIsFromCheckout] = useState(false);
     const { theme, setTheme } = useTheme();
 
     // Handle hydration mismatch
@@ -15,6 +16,12 @@ export default function TermsPage() {
         setMounted(true);
         // Scroll to top on mount
         window.scrollTo(0, 0);
+
+        // Check if the page was opened from checkout
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            setIsFromCheckout(params.get('from') === 'checkout');
+        }
     }, []);
 
     const scrollToSection = useCallback((id: string) => {
@@ -31,6 +38,7 @@ export default function TermsPage() {
             setActiveSection(id);
         }
     }, []);
+
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -106,6 +114,7 @@ export default function TermsPage() {
                 items={navItems}
                 activeSection={activeSection}
                 onSectionClick={scrollToSection}
+                showCloseButton={isFromCheckout}
             />
 
             {/* Main Content */}

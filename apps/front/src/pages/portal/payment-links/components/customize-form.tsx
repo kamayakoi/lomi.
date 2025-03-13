@@ -238,7 +238,7 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
     })
     const [prices, setPrices] = useState<PriceEntry[]>([{ amount: '', currency: 'XOF' }]);
     const [expirationDate, setExpirationDate] = useState<Date | null>(null);
-    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState(['CARDS'])
+    const [allowedPaymentMethods, setAllowedPaymentMethods] = useState<string[]>([])
     const [redirectToCustomPage, setRedirectToCustomPage] = useState(false)
     const [customSuccessUrl, setCustomSuccessUrl] = useState('')
     const [activeTab, setActiveTab] = useState('checkout')
@@ -284,6 +284,11 @@ export default function PaymentCustomizerWithCheckout({ setIsCreateLinkOpen, ref
                         return acc
                     }, [])
                     setConnectedProviders(mappedProviders)
+
+                    // Initialize allowedPaymentMethods with connected providers
+                    if (mappedProviders.length > 0) {
+                        setAllowedPaymentMethods(mappedProviders)
+                    }
                 }
             }
         }

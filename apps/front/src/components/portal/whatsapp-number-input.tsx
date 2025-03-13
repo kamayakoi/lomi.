@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { ChevronDown } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import * as RPNInput from "react-phone-number-input";
 import flags from "react-phone-number-input/flags";
 import { WhatsappIcon } from "@/components/icons/WhatsappIcon";
@@ -11,20 +11,66 @@ interface WhatsAppNumberInputProps {
 }
 
 export default function WhatsAppNumberInput({ value, onChange }: WhatsAppNumberInputProps) {
+    const [defaultCountry, setDefaultCountry] = useState<RPNInput.Country>();
+
+    useEffect(() => {
+        // First check if we have a cached country code in localStorage
+        const cachedCountryCode = localStorage.getItem('user_country_code');
+        if (cachedCountryCode) {
+            setDefaultCountry(cachedCountryCode as RPNInput.Country);
+            return;
+        }
+
+        // Add a timeout for the fetch to avoid long waits
+        const timeoutPromise = new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Request timed out')), 2000)
+        );
+
+        // Try to get user's country using ipapi.co
+        Promise.race([
+            fetch('https://ipapi.co/json/', {
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }),
+            timeoutPromise
+        ])
+            .then(data => {
+                if (data && data.country_code) {
+                    // Cache the result in localStorage for future use
+                    localStorage.setItem('user_country_code', data.country_code);
+                    setDefaultCountry(data.country_code as RPNInput.Country);
+                } else {
+                    throw new Error('Invalid data received');
+                }
+            })
+            .catch(() => {
+                // If ipapi.co fails, try a fallback to CI (Côte d'Ivoire)
+                setDefaultCountry('CI');
+                localStorage.setItem('user_country_code', 'CI');
+            });
+    }, []);
+
     return (
-        <div className="space-y-2">
-            <div className="shadow-sm shadow-black/[.04]">
-                <RPNInput.default
-                    className="flex rounded-none"
-                    international
-                    flagComponent={FlagComponent}
-                    countrySelectComponent={CountrySelect}
-                    inputComponent={PhoneInput}
-                    placeholder="WhatsApp number**"
-                    value={value}
-                    onChange={onChange}
-                />
-            </div>
+        <div className="whatsapp-input-container">
+            <RPNInput.default
+                className="flex w-full !rounded-none !border-0"
+                international
+                defaultCountry={defaultCountry}
+                flagComponent={FlagComponent}
+                countrySelectComponent={CountrySelect}
+                inputComponent={PhoneInput}
+                placeholder="WhatsApp number"
+                value={value}
+                onChange={onChange}
+            />
         </div>
     );
 }
@@ -35,7 +81,7 @@ const PhoneInput = React.forwardRef<HTMLInputElement, InputProps>(
     ({ ...props }, ref) => {
         return (
             <Input
-                className="!border-gray-300 !border-l border-input shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
+                className="!border-gray-300 !border-l border-input shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 !rounded-none"
                 ref={ref}
                 {...props}
             />
@@ -58,7 +104,7 @@ const CountrySelect = ({ disabled, value, onChange, options }: CountrySelectProp
     };
 
     return (
-        <div className="relative inline-flex items-center self-stretch bg-transparent py-2 pe-2 ps-3 text-foreground transition-colors !border-gray-300 border-y border-l border-input">
+        <div className="relative inline-flex items-center self-stretch bg-transparent py-2 pe-2 ps-3 text-foreground transition-colors !border-gray-300 border-y border-l border-input !rounded-none">
             <div className="inline-flex items-center gap-1" aria-hidden="true">
                 <FlagComponent country={value} countryName={value} aria-hidden="true" />
                 <span className="text-muted-foreground/80">

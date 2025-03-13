@@ -70,6 +70,12 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                         return acc
                     }, [])
                     setConnectedProviders(mappedProviders)
+
+                    // Sync allowedPaymentMethods with connectedProviders
+                    // Remove any payment methods that aren't connected
+                    setAllowedPaymentMethods(prev =>
+                        prev.filter(method => mappedProviders.includes(method))
+                    )
                 }
             }
         }
@@ -87,7 +93,7 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                 setIsActive(false);
             }
         }
-    }, [expirationDate]);
+    }, [expirationDate, isActive]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -200,101 +206,103 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="publicDescription">Public Description</Label>
-                <Input id="publicDescription" value={publicDescription} onChange={(e) => setPublicDescription(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="privateDescription">Private Description</Label>
-                <Input id="privateDescription" value={privateDescription} onChange={(e) => setPrivateDescription(e.target.value)} />
-            </div>
-            {paymentLink.link_type === 'instant' && (
+        <div className="max-h-[70vh] overflow-y-auto pr-1">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="price">Price</Label>
-                    <InputRightAddon
-                        id="price"
-                        type="text"
-                        placeholder="Enter amount"
-                        value={formatAmount(parseFloat(price))}
-                        onChange={(value) => setPrice(parseAmount(value).toString())}
-                    />
+                    <Label htmlFor="title">Title</Label>
+                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
                 </div>
-            )}
-            <div className="space-y-4">
-                <Label className="block">Payment methods</Label>
-                <div className="flex flex-wrap gap-2">
-                    {paymentMethods
-                        .filter((method) => connectedProviders.includes(method.id))
-                        .map((method) => {
-                            const isSelected = allowedPaymentMethods.includes(method.id as provider_code | 'CARDS')
+                <div className="space-y-2">
+                    <Label htmlFor="publicDescription">Public Description</Label>
+                    <Input id="publicDescription" value={publicDescription} onChange={(e) => setPublicDescription(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="privateDescription">Private Description</Label>
+                    <Input id="privateDescription" value={privateDescription} onChange={(e) => setPrivateDescription(e.target.value)} />
+                </div>
+                {paymentLink.link_type === 'instant' && (
+                    <div className="space-y-2">
+                        <Label htmlFor="price">Price</Label>
+                        <InputRightAddon
+                            id="price"
+                            type="text"
+                            placeholder="Enter amount"
+                            value={formatAmount(parseFloat(price))}
+                            onChange={(value) => setPrice(parseAmount(value).toString())}
+                        />
+                    </div>
+                )}
+                <div className="space-y-4">
+                    <Label className="block">Payment methods</Label>
+                    <div className="flex flex-wrap gap-2">
+                        {paymentMethods
+                            .filter((method) => connectedProviders.includes(method.id))
+                            .map((method) => {
+                                const isSelected = allowedPaymentMethods.includes(method.id as provider_code | 'CARDS')
 
-                            return (
-                                <Badge
-                                    key={method.id}
-                                    variant={isSelected ? "default" : "outline"}
-                                    className={`cursor-pointer rounded-none px-4 py-2 ${isSelected
-                                        ? getBadgeColor(method.id)
-                                        : 'bg-transparent hover:bg-transparent'
-                                        }`}
-                                    onClick={() => togglePaymentMethod(method.id)}
-                                >
-                                    {method.name}
-                                </Badge>
-                            )
-                        })
-                    }
+                                return (
+                                    <Badge
+                                        key={method.id}
+                                        variant={isSelected ? "default" : "outline"}
+                                        className={`cursor-pointer rounded-none px-4 py-2 ${isSelected
+                                            ? getBadgeColor(method.id)
+                                            : 'bg-transparent hover:bg-transparent'
+                                            }`}
+                                        onClick={() => togglePaymentMethod(method.id)}
+                                    >
+                                        {method.name}
+                                    </Badge>
+                                )
+                            })
+                        }
+                    </div>
                 </div>
-            </div>
-            <div className="flex items-center space-x-4">
-                <Label htmlFor="isActive">Status</Label>
-                <Switch id="isActive" checked={isActive} onCheckedChange={setIsActive} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="expirationDate">Expiration Date</Label>
-                <div>
-                    <DatePicker
-                        id="expirationDate"
-                        selected={expirationDate}
-                        onChange={(date: Date | null) => setExpirationDate(date)}
-                        className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300 dark:bg-[#1F2937] dark:text-white dark:border-gray-700"
-                        dateFormat="dd/MM/yyyy"
-                        minDate={new Date()}
-                        placeholderText="Select future date"
-                        isClearable={true}
-                        showPopperArrow={false}
-                    />
+                <div className="flex items-center space-x-4">
+                    <Label htmlFor="isActive">Status</Label>
+                    <Switch id="isActive" checked={isActive} onCheckedChange={setIsActive} />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                    {expirationDate && expirationDate < new Date() ?
-                        "⚠️ Past dates will make this link inactive" :
-                        "Setting a future date will automatically activate the link"}
-                </p>
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="successUrl">Success URL</Label>
-                <Input id="successUrl" value={successUrl} onChange={(e) => setSuccessUrl(e.target.value)} />
-            </div>
-            <div className="flex justify-end space-x-2">
-                <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={() => setIsDeleteConfirmOpen(true)}
-                    className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
-                >
-                    Delete
-                </Button>
-                <Button
-                    type="submit"
-                    className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
-                >
-                    Save
-                </Button>
-            </div>
+                <div className="space-y-2">
+                    <Label htmlFor="expirationDate">Expiration Date</Label>
+                    <div>
+                        <DatePicker
+                            id="expirationDate"
+                            selected={expirationDate}
+                            onChange={(date: Date | null) => setExpirationDate(date)}
+                            className="w-full rounded-none bg-background text-foreground p-2 border border-gray-300 dark:bg-[#1F2937] dark:text-white dark:border-gray-700"
+                            dateFormat="dd/MM/yyyy"
+                            minDate={new Date()}
+                            placeholderText="Select future date"
+                            isClearable={true}
+                            showPopperArrow={false}
+                        />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        {expirationDate && expirationDate < new Date() ?
+                            "⚠️ Past dates will make this link inactive" :
+                            "Setting a future date will automatically activate the link"}
+                    </p>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="successUrl">Success URL</Label>
+                    <Input id="successUrl" value={successUrl} onChange={(e) => setSuccessUrl(e.target.value)} />
+                </div>
+                <div className="flex justify-end space-x-2">
+                    <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => setIsDeleteConfirmOpen(true)}
+                        className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 h-10"
+                    >
+                        Delete
+                    </Button>
+                    <Button
+                        type="submit"
+                        className="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 h-10"
+                    >
+                        Save
+                    </Button>
+                </div>
+            </form>
 
             <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
                 <AlertDialogContent>
@@ -317,6 +325,6 @@ export function EditPaymentLinkForm({ paymentLink, onSuccess, onRefresh }: EditP
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </form>
+        </div>
     )
 }

@@ -8,7 +8,7 @@ import { CheckoutData } from './types'
 import { supabase } from '@/utils/supabase/client'
 import PhoneNumberInput from '@/components/ui/phone-number-input'
 import WhatsAppNumberInput from '@/components/portal/whatsapp-number-input'
-import { ArrowLeft, ImageIcon, Loader2, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ImageIcon, Loader2, ChevronDown, ArrowRightLeft } from 'lucide-react'
 import {
     Dialog,
     DialogContent,
@@ -302,17 +302,38 @@ export default function CheckoutPage() {
 
     // Add a new effect to update the page title and meta description when checkout data is loaded
     useEffect(() => {
-        if (checkoutData?.paymentLink?.organizationName) {
+        if (checkoutData) {
+            // Find the organization name from any available source or use fallbacks
+            let titleText = checkoutData.paymentLink?.organizationName;
+
+            // If payment link doesn't have organization name but we have product or subscription info
+            if (!titleText) {
+                if (checkoutData.merchantProduct) {
+                    titleText = checkoutData.merchantProduct.name
+                        ? `${checkoutData.merchantProduct.name}`
+                        : 'Product Checkout';
+                } else if (checkoutData.subscriptionPlan) {
+                    titleText = checkoutData.subscriptionPlan.name
+                        ? `${checkoutData.subscriptionPlan.name}`
+                        : 'Subscription Checkout';
+                } else if (checkoutData.paymentLink?.title) {
+                    // Use payment link title as fallback
+                    titleText = checkoutData.paymentLink.title;
+                } else {
+                    titleText = 'Secure Checkout';
+                }
+            }
+
             // Update page title
-            document.title = `${checkoutData.paymentLink.organizationName} | Checkout`;
+            document.title = `${titleText} | Checkout`;
 
             // Update meta description
             const metaDescription = document.querySelector("meta[name='description']") as HTMLMetaElement;
             if (metaDescription) {
-                metaDescription.content = `Secure checkout page for ${checkoutData.paymentLink.organizationName}`;
+                metaDescription.content = `Secure checkout page for ${titleText}`;
             }
         }
-    }, [checkoutData?.paymentLink?.organizationName]);
+    }, [checkoutData]);
 
     const handleProviderClick = async (provider: string) => {
         setSelectedProvider(provider)
@@ -497,7 +518,21 @@ export default function CheckoutPage() {
     };
 
     const isPaymentFormValid = () => {
-        return cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== ''
+        const basicInfoValid = customerDetails.firstName !== '' &&
+            customerDetails.lastName !== '' &&
+            customerDetails.email !== '' &&
+            customerDetails.phoneNumber !== '' &&
+            customerDetails.country !== '' &&
+            customerDetails.city !== '' &&
+            customerDetails.address !== '';
+
+        // Only validate card details if ECOBANK is an allowed provider
+        if (checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK')) {
+            return basicInfoValid && cardDetails.number !== '' && cardDetails.expiry !== '' && cardDetails.cvc !== '';
+        }
+
+        // For other payment methods, just validate basic info
+        return basicInfoValid;
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -531,6 +566,25 @@ export default function CheckoutPage() {
                     ...prev,
                     customerId: newCustomerId
                 }));
+
+                // If ECOBANK is not in allowed providers or a mobile money provider is explicitly selected,
+                // show the mobile payment selection dialog
+                if (!checkoutData.paymentLink.allowed_providers.includes('ECOBANK') || selectedProvider) {
+                    if (selectedProvider) {
+                        handleProviderClick(selectedProvider);
+                    } else {
+                        // Show toast message to select a payment method
+                        toast({
+                            title: "Select Payment Method",
+                            description: "Please select a payment method to continue.",
+                        });
+                    }
+                    return;
+                }
+
+                // Continue with card payment (ECOBANK)
+                // Rest of the card payment processing code here...
+
             } catch (error: unknown) {
                 const errorMessage = error instanceof Error ? error.message : 'An error occurred';
                 console.error('Error creating/updating customer:', errorMessage);
@@ -1194,9 +1248,10 @@ export default function CheckoutPage() {
                                         </div>
                                     </div>
                                     <Button
+                                        type="button"
+                                        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 h-10"
+                                        disabled={isProcessing}
                                         onClick={handleCheckoutSubmit}
-                                        className="w-full rounded-md"
-                                        disabled={isProcessing || !areRequiredFieldsFilled()}
                                     >
                                         {isProcessing ? (
                                             <>
@@ -1211,16 +1266,21 @@ export default function CheckoutPage() {
                             </DialogContent>
                         </Dialog>
 
+                        {/* Plain divider line - Always visible without text */}
                         <div className="relative flex items-center mb-4">
-                            <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
                             <div className="flex-grow border-t border-gray-300"></div>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-3">
+                        {/* Customer Information Form - Always visible */}
+                        <form onSubmit={handleSubmit} className="space-y-3 [&_*]:!rounded-none">
                             {/* Cardholder Information */}
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Cardholder information</label>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK')
+                                        ? "Cardholder information"
+                                        : "Personal information"
+                                    }
+                                </label>
                                 <div className="rounded-lg shadow-sm shadow-black/[.04]">
                                     <Input
                                         ref={nameInputRef}
@@ -1252,7 +1312,10 @@ export default function CheckoutPage() {
                                                 }));
                                             }
                                         }}
-                                        placeholder="Full name on card"
+                                        placeholder={checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK')
+                                            ? "Full name on card"
+                                            : "Full name"
+                                        }
                                         className="rounded-b-none w-full bg-white text-gray-900 border-gray-300 focus:bg-white dark:bg-white dark:text-gray-900 dark:border-gray-300 dark:focus:bg-white dark:placeholder:text-gray-500 input-checkout"
                                         required
                                     />
@@ -1269,7 +1332,7 @@ export default function CheckoutPage() {
                                         />
                                     </div>
                                     <div className="flex -mt-px">
-                                        <div className="w-full rounded-none rounded-b-lg">
+                                        <div className="w-full rounded-none box-border">
                                             <PhoneNumberInput
                                                 value={customerDetails.phoneNumber}
                                                 onChange={(value) => {
@@ -1282,80 +1345,94 @@ export default function CheckoutPage() {
                                             />
                                         </div>
                                     </div>
-                                    <AnimatePresence mode="wait">
-                                        {!isDifferentWhatsApp ? (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="border-t border-gray-200 mt-2"
-                                            >
+
+                                    {!isDifferentWhatsApp ? (
+                                        <div className="flex -mt-px">
+                                            <div className="w-full rounded-none box-border bg-white border border-gray-300">
                                                 <div
                                                     onClick={() => setIsDifferentWhatsApp(true)}
-                                                    className="group py-2.5 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all duration-200"
+                                                    className="group py-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-all duration-200 px-3"
                                                 >
-                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200">
-                                                        My WhatsApp number is different
+                                                    <span className="text-xs text-gray-500">My WhatsApp number is different</span>
+                                                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors duration-200 flex items-center">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                        </svg>
                                                     </span>
                                                 </div>
-                                            </motion.div>
-                                        ) : (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: "auto", opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="border-t border-gray-200 mt-2"
-                                            >
-                                                <WhatsAppNumberInput
-                                                    value={customerDetails.whatsappNumber}
-                                                    onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
-                                                />
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex -mt-px bg-transparent">
+                                                <div className="w-full rounded-none bg-transparent relative">
+                                                    <WhatsAppNumberInput
+                                                        value={customerDetails.whatsappNumber}
+                                                        onChange={(value) => setCustomerDetails(prev => ({ ...prev, whatsappNumber: value || '' }))}
+                                                    />
+                                                    <div
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-blue-100 hover:bg-blue-200 transition-colors p-1.5"
+                                                        onClick={() => setIsDifferentWhatsApp(false)}
+                                                        title="Switch to using phone number"
+                                                    >
+                                                        <ArrowRightLeft className="h-3.5 w-3.5 text-blue-600" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Card Information */}
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">Card information</label>
-                                <div className="rounded-lg shadow-sm shadow-black/[.04]">
-                                    <Input
-                                        id="number"
-                                        name="number"
-                                        value={cardDetails.number}
-                                        onChange={handleInputChange}
-                                        placeholder="1234 1234 1234 1234"
-                                        className="rounded-b-none bg-white text-gray-900 border-gray-300"
-                                        required
-                                    />
-                                    <div className="flex -mt-px">
+                            {/* "Or pay with card" divider - Only when ECOBANK is active */}
+                            {checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK') && (
+                                <div className="relative flex items-center mb-4">
+                                    <div className="flex-grow border-t border-gray-300"></div>
+                                    <span className="flex-shrink mx-4 text-gray-400">Or pay with card</span>
+                                    <div className="flex-grow border-t border-gray-300"></div>
+                                </div>
+                            )}
+
+                            {/* Card Information - Only show if ECOBANK is in allowed providers */}
+                            {checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK') && (
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700">Card information</label>
+                                    <div className="rounded-lg shadow-sm shadow-black/[.04]">
                                         <Input
-                                            id="expiry"
-                                            name="expiry"
-                                            value={cardDetails.expiry}
+                                            id="number"
+                                            name="number"
+                                            value={cardDetails.number}
                                             onChange={handleInputChange}
-                                            placeholder="MM / YY"
-                                            className="rounded-none rounded-bl-lg w-1/2 bg-white text-gray-900 border-gray-300"
+                                            placeholder="1234 1234 1234 1234"
+                                            className="rounded-b-none bg-white text-gray-900 border-gray-300"
                                             required
                                         />
-                                        <Input
-                                            id="cvc"
-                                            name="cvc"
-                                            value={cardDetails.cvc}
-                                            onChange={handleInputChange}
-                                            placeholder="CVC"
-                                            className="rounded-none rounded-br-lg w-1/2 bg-white text-gray-900 border-gray-300"
-                                            required
-                                        />
+                                        <div className="flex -mt-px">
+                                            <Input
+                                                id="expiry"
+                                                name="expiry"
+                                                value={cardDetails.expiry}
+                                                onChange={handleInputChange}
+                                                placeholder="MM / YY"
+                                                className="rounded-none w-1/2 bg-white text-gray-900 border-gray-300 border-r-0"
+                                                required
+                                            />
+                                            <Input
+                                                id="cvc"
+                                                name="cvc"
+                                                value={cardDetails.cvc}
+                                                onChange={handleInputChange}
+                                                placeholder="CVC"
+                                                className="rounded-none w-1/2 bg-white text-gray-900 border-gray-300"
+                                                required
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
 
                             {/* Billing Address */}
-                            <div className="space-y-2">
+                            <div className="space-y-2 billing-address-section">
                                 <label className="block text-sm font-medium text-gray-700">Billing address</label>
                                 <div className="rounded-lg shadow-sm shadow-black/[.04]">
                                     <div className="relative">
@@ -1391,7 +1468,7 @@ export default function CheckoutPage() {
                                             value={customerDetails.address}
                                             onChange={handleCustomerInputChange}
                                             placeholder="Address"
-                                            className="rounded-none rounded-bl-lg w-[70%] bg-white text-gray-900 border-gray-300"
+                                            className="rounded-none rounded-bl w-[70%] bg-white text-gray-900 border-gray-300 border-r-0"
                                             required
                                         />
                                         <Input
@@ -1399,23 +1476,25 @@ export default function CheckoutPage() {
                                             value={customerDetails.postalCode}
                                             onChange={handleCustomerInputChange}
                                             placeholder="Postal code"
-                                            className="rounded-none rounded-br-lg w-[30%] bg-white text-gray-900 border-gray-300"
+                                            className="rounded-none rounded-br w-[30%] bg-white text-gray-900 border-gray-300"
                                             required
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
-                            <div className="flex justify-center pt-2">
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 bg-[#074367] text-white font-semibold rounded-md hover:bg-[#063352] transition duration-300 shadow-md text-lg"
-                                    disabled={!isPaymentFormValid()}
-                                >
-                                    {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
-                                </Button>
-                            </div>
+                            {/* Submit Button - Only show for card payments */}
+                            {checkoutData?.paymentLink?.allowed_providers?.includes('ECOBANK') && (
+                                <div className="flex justify-center pt-2">
+                                    <Button
+                                        type="submit"
+                                        className="w-full h-12 bg-[#074367] text-white font-semibold allow-rounded hover:bg-[#063352] transition duration-300 shadow-md text-lg"
+                                        disabled={!isPaymentFormValid()}
+                                    >
+                                        {checkoutData?.subscriptionPlan ? 'Subscribe' : 'Pay'}
+                                    </Button>
+                                </div>
+                            )}
 
                             {/* Subscription Confirmation Text */}
                             {checkoutData?.subscriptionPlan && (
@@ -1439,9 +1518,9 @@ export default function CheckoutPage() {
                                     </a>
                                 </span>
                                 <div className="text-gray-300 h-4 w-[1px] bg-gray-300"></div>
-                                <a href="/terms" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Terms</a>
+                                <a href="/terms?from=checkout" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Terms</a>
                                 <span className="text-gray-300">|</span>
-                                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Privacy</a>
+                                <a href="/privacy?from=checkout" target="_blank" rel="noopener noreferrer" className="hover:underline text-gray-400">Privacy</a>
                             </div>
                         </div>
                     </div>

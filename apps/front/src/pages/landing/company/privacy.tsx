@@ -8,6 +8,7 @@ const Privacy = () => {
     const [mounted, setMounted] = useState(false);
     const [activeSection, setActiveSection] = useState('introduction');
     const [scrollProgress, setScrollProgress] = useState(0);
+    const [isFromCheckout, setIsFromCheckout] = useState(false);
     const { theme, setTheme } = useTheme();
 
     // Handle hydration mismatch
@@ -15,6 +16,12 @@ const Privacy = () => {
         setMounted(true);
         // Scroll to top on mount
         window.scrollTo(0, 0);
+
+        // Check if the page was opened from checkout
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            setIsFromCheckout(params.get('from') === 'checkout');
+        }
     }, []);
 
     const handleSectionClick = useCallback((sectionId: string) => {
@@ -103,6 +110,7 @@ const Privacy = () => {
                 items={sections}
                 activeSection={activeSection}
                 onSectionClick={handleSectionClick}
+                showCloseButton={isFromCheckout}
             />
 
             <main className="container mx-auto max-w-6xl px-4 pb-32 pt-12 lg:pl-72">

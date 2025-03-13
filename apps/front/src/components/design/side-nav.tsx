@@ -1,6 +1,6 @@
 import { cn } from '@/lib/actions/utils';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface NavItem {
@@ -12,23 +12,35 @@ interface SideNavProps {
     items: NavItem[];
     activeSection: string;
     onSectionClick: (id: string) => void;
+    showCloseButton?: boolean;
 }
 
-export default function SideNav({ items, activeSection, onSectionClick }: SideNavProps) {
+export default function SideNav({ items, activeSection, onSectionClick, showCloseButton = false }: SideNavProps) {
     const navigate = useNavigate();
+
+    const handleClose = () => {
+        if (typeof window !== 'undefined') {
+            window.close();
+        }
+    };
 
     return (
         <div className="fixed left-0 bottom-25 hidden h-screen w-80 lg:block">
             <div className="flex h-full flex-col overflow-hidden">
-                {/* Back button */}
+                {/* Back or Close button */}
                 <div className="absolute top-15 left-15">
                     <Button
                         variant="ghost"
                         size="icon"
                         className="absolute top-10 left-10 inline-flex items-center justify-center bg-gray-100 hover:bg-gray-200 dark:bg-black/50 text-gray-700 hover:text-gray-900 dark:text-sage-100 dark:hover:text-sage-200 dark:hover:bg-zinc-900 dark:border-zinc-800 border border-gray-200 h-10 w-10 rounded-none transition-colors"
-                        onClick={() => navigate(-1)}
+                        onClick={showCloseButton ? handleClose : () => navigate(-1)}
+                        aria-label={showCloseButton ? "Close page" : "Go back"}
                     >
-                        <ChevronLeft className="h-5 w-5" />
+                        {showCloseButton ? (
+                            <X className="h-5 w-5" />
+                        ) : (
+                            <ChevronLeft className="h-5 w-5" />
+                        )}
                     </Button>
                 </div>
 
