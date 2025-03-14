@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/front && bun run build",
+  "buildCommand": "bun run build",
   "outputDirectory": "apps/front/dist",
-  "installCommand": "cd apps/front && bun install",
+  "installCommand": "bun install",
   "git": {
     "deploymentEnabled": {
       "main": true
