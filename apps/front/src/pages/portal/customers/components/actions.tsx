@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Customer, Transaction } from './types'
@@ -10,7 +9,7 @@ import { cn } from '@/lib/actions/utils'
 import { Input } from "@/components/ui/input"
 import { toast } from "@/lib/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
-
+import { ButtonExpand } from "@/components/design/button-expand"
 type CustomerActionsProps = {
     customer: Customer | null
     isOpen: boolean
@@ -262,10 +261,16 @@ export default function CustomerActions({ customer, isOpen, onClose, onUpdate }:
                             <Separator />
 
                             <div className="flex justify-end">
-                                <Button variant="outline" className="w-full sm:w-auto rounded-none" onClick={handleContactSupport}>
-                                    <LifeBuoy className="mr-2 h-4 w-4" />
-                                    Contact Support
-                                </Button>
+                                <ButtonExpand
+                                    text="Contact Support"
+                                    icon={LifeBuoy}
+                                    onClick={handleContactSupport}
+                                    bgColor="bg-purple-50 dark:bg-purple-900/30"
+                                    textColor="text-purple-700 dark:text-purple-300"
+                                    hoverBgColor="hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                                    hoverTextColor="hover:text-purple-800 dark:hover:text-purple-200"
+                                    className="rounded-none w-full sm:w-auto"
+                                />
                             </div>
                         </CardContent>
                     </Card>

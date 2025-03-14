@@ -189,7 +189,8 @@ RETURNS TABLE (
     description TEXT,
     gross_amount NUMERIC,
     currency_code currency_code,
-    created_at TIMESTAMPTZ
+    created_at TIMESTAMPTZ,
+    status TEXT
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -198,7 +199,13 @@ BEGIN
         t.description,
         t.gross_amount,
         t.currency_code,
-        t.created_at
+        t.created_at,
+        CASE
+            WHEN t.description ILIKE '%refund%' OR t.description ILIKE '%(refunded)%' THEN 'refunded'
+            WHEN t.description ILIKE '%fail%' OR t.description ILIKE '%(failed)%' THEN 'failed'
+            WHEN t.description ILIKE '%pending%' OR t.description ILIKE '%(pending)%' THEN 'pending'
+            ELSE 'completed'
+        END AS status
     FROM
         transactions t
     WHERE

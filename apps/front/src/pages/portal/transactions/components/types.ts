@@ -29,10 +29,13 @@ export type FetchedTransaction = {
     product_name: string
     product_description: string
     product_price: number
+    provider_transaction_id?: string
+    provider_checkout_id?: string
 }
 
 export type Transaction = {
     transaction_id: string
+    merchant_id: string
     customer_name: string
     customer_email: string
     customer_phone: string
@@ -43,6 +46,7 @@ export type Transaction = {
     gross_amount: number
     net_amount: number
     currency: currency_code
+    currency_code: currency_code
     payment_method: payment_method_code
     status: transaction_status
     type: transaction_type
@@ -59,4 +63,6 @@ export type Transaction = {
     subscription_end_date?: string
     subscription_next_billing_date?: string
     subscription_status?: subscription_status
+    provider_transaction_id?: string
+    provider_checkout_id?: string
 }

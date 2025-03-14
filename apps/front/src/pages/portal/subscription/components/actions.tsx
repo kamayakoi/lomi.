@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Subscription, Transaction, SubscriptionPlan, frequencyColors } from './types'
@@ -11,6 +10,7 @@ import { cn } from '@/lib/actions/utils'
 import { ImageIcon } from 'lucide-react'
 import { toast } from "@/lib/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
+import { ButtonExpand } from "@/components/design/button-expand"
 
 type SubscriptionActionsProps = {
     subscription?: Subscription | null
@@ -329,7 +329,29 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                                                 <div className="space-y-2">
                                                     {transactions.map((transaction) => (
                                                         <div key={transaction.transaction_id} className="border rounded-none p-2 space-y-1">
-                                                            <div className="font-medium text-sm">{transaction.description}</div>
+                                                            <div className="flex items-center justify-between font-medium text-sm">
+                                                                <span>{transaction.description}</span>
+                                                                {transaction.status === 'refunded' && (
+                                                                    <Badge className="text-xs rounded-none bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                                                                        Refunded
+                                                                    </Badge>
+                                                                )}
+                                                                {transaction.status === 'completed' && (
+                                                                    <Badge className="text-xs rounded-none bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                                        Completed
+                                                                    </Badge>
+                                                                )}
+                                                                {transaction.status === 'failed' && (
+                                                                    <Badge className="text-xs rounded-none bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                                                        Failed
+                                                                    </Badge>
+                                                                )}
+                                                                {transaction.status === 'pending' && (
+                                                                    <Badge className="text-xs rounded-none bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                                        Pending
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
                                                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                                                                 <span>{formatDate(transaction.created_at)}</span>
                                                                 <span>{formatCurrency(transaction.gross_amount, transaction.currency_code)}</span>
@@ -346,10 +368,24 @@ export default function SubscriptionActions({ subscription, plan, isOpen, onClos
                             <Separator />
 
                             <div className="flex justify-end">
-                                <Button variant="outline" className="w-full sm:w-auto rounded-none">
-                                    <LifeBuoy className="mr-2 h-4 w-4" />
-                                    Contact Support
-                                </Button>
+                                <ButtonExpand
+                                    text="Contact Support"
+                                    icon={LifeBuoy}
+                                    onClick={() => {
+                                        const subject = subscription
+                                            ? encodeURIComponent(`[Support] — Subscription Issue: ${subscription.subscription_id}`)
+                                            : plan
+                                                ? encodeURIComponent(`[Support] — Plan Issue: ${plan.plan_id}`)
+                                                : encodeURIComponent(`[Support] — Subscription/Plan Issue`);
+                                        const mailtoLink = `mailto:hello@lomi.africa?subject=${subject}`;
+                                        window.location.href = mailtoLink;
+                                    }}
+                                    bgColor="bg-purple-50 dark:bg-purple-900/30"
+                                    textColor="text-purple-700 dark:text-purple-300"
+                                    hoverBgColor="hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                                    hoverTextColor="hover:text-purple-800 dark:hover:text-purple-200"
+                                    className="rounded-none w-full sm:w-auto"
+                                />
                             </div>
                         </CardContent>
                     </Card>

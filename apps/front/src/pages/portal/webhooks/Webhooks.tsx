@@ -370,7 +370,7 @@ function WebhooksPage() {
                                                 <TableHead className="w-[100px]"></TableHead>
                                             </TableRow>
                                         </TableHeader>
-                                        <TableBody>
+                                        <TableBody className="border-b">
                                             {isWebhooksLoading ? (
                                                 <TableRow>
                                                     <TableCell colSpan={4}>

@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Webhook, webhookCategories } from './types'
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
+import { LifeBuoy, X } from "lucide-react"
+import { ButtonExpand } from "@/components/design/button-expand"
 
 type WebhookViewProps = {
   webhook: Webhook | null
@@ -35,6 +36,12 @@ function getEventCategoryColor(eventId: string): string {
 
 export default function WebhookView({ webhook, isOpen, onClose }: WebhookViewProps) {
   if (!webhook) return null
+
+  const handleContactSupport = () => {
+    const subject = encodeURIComponent(`[Support] — Webhook Issue: ${webhook.webhook_id}`)
+    const mailtoLink = `mailto:hello@lomi.africa?subject=${subject}`
+    window.location.href = mailtoLink
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -123,6 +130,21 @@ export default function WebhookView({ webhook, isOpen, onClose }: WebhookViewPro
                   </div>
                 </div>
               </div>
+            </div>
+
+            <Separator />
+
+            <div className="flex justify-end">
+              <ButtonExpand
+                text="Contact Support"
+                icon={LifeBuoy}
+                onClick={handleContactSupport}
+                bgColor="bg-purple-50 dark:bg-purple-900/30"
+                textColor="text-purple-700 dark:text-purple-300"
+                hoverBgColor="hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                hoverTextColor="hover:text-purple-800 dark:hover:text-purple-200"
+                className="rounded-none w-full sm:w-auto"
+              />
             </div>
           </CardContent>
         </Card>

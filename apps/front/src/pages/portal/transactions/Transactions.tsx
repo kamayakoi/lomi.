@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon, RefreshCw } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, RefreshCw, Users, LineChart, Activity } from 'lucide-react'
 import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
@@ -444,12 +444,14 @@ function TransactionsPage() {
                     <h1 className="text-2xl font-bold tracking-tight">Transactions</h1>
 
                     <div className="grid gap-4 md:grid-cols-3 mb-6">
-                        <Card className="cursor-pointer rounded-none" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-                                <ArrowDownIcon className="h-4 w-4 text-muted-foreground" />
+                        <Card className="cursor-pointer rounded-none overflow-hidden relative" onClick={() => setShowTotalBreakdown(!showTotalBreakdown)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
+                                <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Revenue</CardTitle>
+                                <div className="rounded-sm bg-blue-500/10 p-1.5 -mr-3">
+                                    <ArrowDownIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-3">
                                 <AnimatePresence mode="wait">
                                     {!showTotalBreakdown ? (
                                         <motion.div
@@ -459,7 +461,7 @@ function TransactionsPage() {
                                             exit={{ opacity: 0, y: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <div className="text-2xl font-bold">
+                                            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
                                                 {isTotalIncomingAmountLoadingFinal ? (
                                                     ""
                                                 ) : (
@@ -484,7 +486,7 @@ function TransactionsPage() {
                                         >
                                             <div className="space-y-2">
                                                 <div className="flex justify-between">
-                                                    <span className="text-sm">Gross</span>
+                                                    <span className="text-sm text-muted-foreground">Gross</span>
                                                     <span className="text-sm font-medium">
                                                         {isGrossAmountLoadingFinal ? (
                                                             ""
@@ -494,7 +496,7 @@ function TransactionsPage() {
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <span className="text-sm">Fees</span>
+                                                    <span className="text-sm text-muted-foreground">Fees</span>
                                                     <span className="text-sm font-medium">
                                                         {isFeeAmountLoadingFinal ? (
                                                             ""
@@ -504,7 +506,7 @@ function TransactionsPage() {
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <span className="text-sm">Net</span>
+                                                    <span className="text-sm text-muted-foreground">Net</span>
                                                     <span className="text-sm font-medium">
                                                         {isTotalIncomingAmountLoadingFinal ? (
                                                             ""
@@ -520,18 +522,20 @@ function TransactionsPage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageValue(!showAverageValue)}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
+                        <Card className="cursor-pointer rounded-none overflow-hidden relative" onClick={() => setShowAverageValue(!showAverageValue)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
+                                <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">
                                     {showAverageValue ? "Avg. Order Value" : "Completion Rate"}
                                 </CardTitle>
-                                {showAverageValue ? (
-                                    <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                    <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
-                                )}
+                                <div className="rounded-sm bg-green-500/10 p-1.5 -mr-3">
+                                    {showAverageValue ? (
+                                        <Activity className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    ) : (
+                                        <BarChart3Icon className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    )}
+                                </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-3">
                                 <AnimatePresence mode="wait">
                                     {!showAverageValue ? (
                                         <motion.div
@@ -541,11 +545,11 @@ function TransactionsPage() {
                                             exit={{ opacity: 0, y: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <div className="text-2xl font-bold">
+                                            <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                                                 {isCompletionRateLoadingFinal ? (
                                                     ""
                                                 ) : (
-                                                    `${calculateCompletionRate(displayedCompletionRate.completed, displayedCompletionRate.refunded, displayedCompletionRate.failed)}%`
+                                                    `${formatPercentage(calculateCompletionRate(displayedCompletionRate.completed, displayedCompletionRate.refunded, displayedCompletionRate.failed))}%`
                                                 )}
                                             </div>
                                             <div className="text-xs text-muted-foreground">
@@ -555,17 +559,17 @@ function TransactionsPage() {
                                                     <>
                                                         {displayedCompletionRate.completed > 0 && (
                                                             <>
-                                                                {displayedCompletionRate.completed} completed
+                                                                <span className="text-green-600 dark:text-green-400">{displayedCompletionRate.completed} completed</span>
                                                                 {(displayedCompletionRate.refunded > 0 || displayedCompletionRate.failed > 0) && ', '}
                                                             </>
                                                         )}
                                                         {displayedCompletionRate.refunded > 0 && (
                                                             <>
-                                                                {displayedCompletionRate.refunded} refunded
+                                                                <span className="text-amber-600 dark:text-amber-400">{displayedCompletionRate.refunded} refunded</span>
                                                                 {displayedCompletionRate.failed > 0 && ', '}
                                                             </>
                                                         )}
-                                                        {displayedCompletionRate.failed > 0 && `${displayedCompletionRate.failed} failed`}
+                                                        {displayedCompletionRate.failed > 0 && <span className="text-red-600 dark:text-red-400">{displayedCompletionRate.failed} failed</span>}
                                                     </>
                                                 )}
                                             </div>
@@ -578,11 +582,11 @@ function TransactionsPage() {
                                             exit={{ opacity: 0, y: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <div className="text-2xl font-bold">
+                                            <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                                                 {isAverageTransactionValueLoadingFinal ? (
                                                     ""
                                                 ) : (
-                                                    `XOF ${displayedAverageTransactionValue ? displayedAverageTransactionValue.toFixed(2) : '0.00'}`
+                                                    `XOF ${formatAmount(displayedAverageTransactionValue)}`
                                                 )}
                                             </div>
                                             <div className="text-xs text-muted-foreground">
@@ -594,18 +598,20 @@ function TransactionsPage() {
                             </CardContent>
                         </Card>
 
-                        <Card className="cursor-pointer rounded-none" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">
-                                    {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Lifetime Value"}
+                        <Card className="cursor-pointer rounded-none overflow-hidden relative" onClick={() => setShowAverageRetentionRate(!showAverageRetentionRate)}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
+                                <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                    {showAverageRetentionRate ? "Retention Rate" : "Avg. Customer Value"}
                                 </CardTitle>
-                                {showAverageRetentionRate ? (
-                                    <BarChart3Icon className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                    <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
-                                )}
+                                <div className="rounded-sm bg-purple-500/10 p-1.5 -mr-3">
+                                    {showAverageRetentionRate ? (
+                                        <Users className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                    ) : (
+                                        <LineChart className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                    )}
+                                </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-3">
                                 <AnimatePresence mode="wait">
                                     {!showAverageRetentionRate ? (
                                         <motion.div
@@ -615,14 +621,16 @@ function TransactionsPage() {
                                             exit={{ opacity: 0, y: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <div className="text-2xl font-bold">
+                                            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                                                 {isAverageCustomerLifetimeValueLoadingFinal ? (
                                                     ""
                                                 ) : (
                                                     `XOF ${formatAmount(displayedAverageCustomerLifetimeValue)}`
                                                 )}
                                             </div>
-                                            <div className="text-xs text-muted-foreground">Per customer</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                Per customer
+                                            </div>
                                         </motion.div>
                                     ) : (
                                         <motion.div
@@ -632,14 +640,16 @@ function TransactionsPage() {
                                             exit={{ opacity: 0, y: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <div className="text-2xl font-bold">
+                                            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                                                 {isAverageRetentionRateLoadingFinal ? (
                                                     ""
                                                 ) : (
-                                                    `${displayedAverageRetentionRate ? displayedAverageRetentionRate.toFixed(2) : '0.00'}%`
+                                                    `${formatPercentage(displayedAverageRetentionRate ? parseFloat(displayedAverageRetentionRate.toFixed(2)) : 0)}%`
                                                 )}
                                             </div>
-                                            <div className="text-xs text-muted-foreground">of returning customers</div>
+                                            <div className="text-xs text-muted-foreground">
+                                                of returning customers
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -844,12 +854,12 @@ function TransactionsPage() {
                                                         )}
                                                         {columns.includes('Gross Amount') && (
                                                             <TableCell className="text-center py-4">
-                                                                <span className="font-medium">{formatAmount(transaction.gross_amount)}</span>
+                                                                <span className="font-medium">XOF {formatAmount(transaction.gross_amount)}</span>
                                                             </TableCell>
                                                         )}
                                                         {columns.includes('Net Amount') && (
                                                             <TableCell className="text-center py-4">
-                                                                <span className="font-medium">{formatAmount(transaction.net_amount)}</span>
+                                                                <span className="font-medium">XOF {formatAmount(transaction.net_amount)}</span>
                                                             </TableCell>
                                                         )}
                                                         {columns.includes('Currency') && (
@@ -1033,22 +1043,26 @@ function calculateCompletionRate(completed: number, refunded: number, failed: nu
     return total > 0 ? Math.round((completed / total) * 100) : 0
 }
 
-// Formats a number as a currency amount with appropriate decimal places
+// Formats a number as a currency amount with appropriate formatting: 12 400,57 XOF
 function formatAmount(amount: number): string {
-    const formatter = new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    })
+    // Return simple "0" for zero values
+    if (amount === 0) return "0"
 
-    const formattedAmount = formatter.format(amount)
-    const decimalIndex = formattedAmount.indexOf('.')
+    // Format with thousands separators as spaces and decimal as comma
+    const integerPart = Math.floor(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
 
-    if (decimalIndex !== -1) {
-        const decimalPart = formattedAmount.slice(decimalIndex + 1)
-        if (decimalPart.length === 2 && decimalPart[1] === '0') {
-            return formattedAmount.slice(0, decimalIndex + 2)
-        }
+    // Get decimal part if it exists and format with comma
+    const decimalPart = (amount % 1).toFixed(2).substring(2)
+
+    // Only show decimal part if it's not .00
+    if (decimalPart === "00") {
+        return integerPart
     }
 
-    return formattedAmount
+    return `${integerPart},${decimalPart}`
+}
+
+// Let's add this function to format percentages consistently
+function formatPercentage(value: number): string {
+    return value.toString().replace('.', ',')
 }

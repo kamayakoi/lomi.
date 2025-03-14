@@ -4,6 +4,7 @@ export type currency_code = 'XOF' | 'USD' | 'EUR';
 export type failed_payment_action = 'cancel' | 'pause' | 'continue';
 export type FirstPaymentType = 'initial' | 'non_initial';
 export type SubscriptionLength = 'automatic' | 'fixed';
+export type transaction_status = 'pending' | 'completed' | 'failed' | 'refunded';
 
 export const frequencyColors: Record<frequency, string> = {
   'weekly': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -55,6 +56,7 @@ export interface Transaction {
     gross_amount: number;
     currency_code: currency_code;
     created_at: string;
+    status?: transaction_status;
 }
 
 export interface SubscriptionPlanFormData {

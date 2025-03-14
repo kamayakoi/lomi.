@@ -18,7 +18,7 @@ import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiate
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
-import { ArrowUpDown, ArrowDownIcon, RefreshCw } from 'lucide-react'
+import { ArrowUpDown, RefreshCw, Zap, ArrowDownIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -30,6 +30,8 @@ import FeedbackForm from '@/components/portal/feedback-form'
 import SupportForm from '@/components/portal/support-form'
 import { formatCurrency } from '@/utils/currency-utils'
 import { supabase } from '@/utils/supabase/client'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { formatAmountForDisplay, formatPayoutStatus, formatDate, shortenPayoutId } from '@/utils/currency-utils'
 // import CurrencyConverter from './components/CurrencyConverter'
 
 type PayoutsResponse = Payout[]
@@ -43,6 +45,29 @@ interface ProviderSetting {
     is_connected: boolean;
     phone_number?: string;
     is_phone_verified?: boolean;
+}
+
+export function ExpressPayoutButton({ onClick, disabled }: { onClick: () => void, disabled: boolean }) {
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        variant="default"
+                        onClick={onClick}
+                        disabled={disabled}
+                        className="rounded-sm bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1.5"
+                    >
+                        <Zap className="h-4 w-4" />
+                        Express Payout
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Express payout will be processed immediately with a 2% fee</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
 }
 
 function BalancePage() {
@@ -497,32 +522,41 @@ function BalancePage() {
                     <div className="grid gap-6 mb-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
                         {isBalanceBreakdownLoading || isRefreshing ? (
                             <Card className="rounded-none col-span-full md:col-span-1">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
                                     <CardTitle className="text-sm font-medium">Balance</CardTitle>
+                                    <div className="rounded-sm bg-blue-500/10 p-1.5 -mr-3">
+                                        <ArrowDownIcon className="h-4 w-4" />
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
+                                    <div className="h-8 animate-pulse bg-muted rounded"></div>
                                 </CardContent>
                             </Card>
                         ) : getSortedBalances().length === 0 ? (
                             <Card className="rounded-none col-span-full md:col-span-1">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
                                     <CardTitle className="text-sm font-medium">Balance</CardTitle>
+                                    <div className="rounded-sm bg-blue-500/10 p-1.5 -mr-3">
+                                        <ArrowDownIcon className="h-4 w-4" />
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold">XOF 0</div>
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                        No balance available
+                                    </div>
                                 </CardContent>
                             </Card>
                         ) : (
                             getSortedBalances().map((balance) => (
-                                <Card key={balance.currency_code} className="rounded-none shadow-sm">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                <Card key={balance.currency_code} className="rounded-none shadow-sm cursor-pointer min-h-[138px]" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-2">
+                                        <CardTitle className="text-sm font-medium">
                                             {balance.currency_code} Balance
                                         </CardTitle>
-                                        <ArrowDownIcon
-                                            className={`h-4 w-4 text-muted-foreground cursor-pointer transition-transform duration-200 ${showBalanceBreakdown[balance.currency_code] ? 'rotate-180' : ''}`}
-                                            onClick={() => toggleBalanceBreakdown(balance.currency_code)}
-                                        />
+                                        <div className="rounded-sm bg-blue-500/10 p-1.5 -mr-3">
+                                            <ArrowDownIcon className={`h-4 w-4 transition-transform duration-200 ${showBalanceBreakdown[balance.currency_code] ? 'rotate-180' : ''}`} />
+                                        </div>
                                     </CardHeader>
                                     <CardContent>
                                         <AnimatePresence mode="wait">
@@ -535,13 +569,13 @@ function BalancePage() {
                                                     transition={{ duration: 0.2 }}
                                                     className="flex justify-between items-center"
                                                 >
-                                                    <div className="group w-full" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                                    <div className="group w-full">
                                                         <div className="text-2xl font-bold cursor-pointer group-hover:text-primary transition-colors">
-                                                            {formatCurrency(balance.available_balance, balance.currency_code)}
+                                                            {balance.currency_code} {formatAmountForDisplay(balance.available_balance)}
                                                         </div>
                                                         {balance.currency_code !== preferredCurrency && (
-                                                            <div className="text-sm text-muted-foreground">
-                                                                ≈ {formatCurrency(
+                                                            <div className="text-sm text-muted-foreground mt-1">
+                                                                ≈ {preferredCurrency} {formatAmountForDisplay(
                                                                     balance.currency_code === 'USD'
                                                                         ? balance.available_balance * (
                                                                             conversionRates?.find(rate =>
@@ -552,159 +586,192 @@ function BalancePage() {
                                                                             conversionRates?.find(rate =>
                                                                                 rate.from_currency === 'XOF' && rate.to_currency === 'USD'
                                                                             )?.rate || 0.00165
-                                                                        ),
-                                                                    preferredCurrency
+                                                                        )
                                                                 )}
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                                        <DialogTrigger asChild>
-                                                            <Button
-                                                                variant="default"
-                                                                className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none"
-                                                                onClick={() => setSelectedWithdrawalCurrency(balance.currency_code)}
-                                                            >
-                                                                Withdraw
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-[425px] rounded-none">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
-                                                                <DialogDescription>
-                                                                    Select withdrawal method and enter amount
-                                                                </DialogDescription>
-                                                            </DialogHeader>
-                                                            <div className="grid gap-4 py-4">
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="currency" className="text-right">Currency</Label>
-                                                                    <Select
-                                                                        value={selectedWithdrawalCurrency}
-                                                                        onValueChange={(value) => {
-                                                                            setSelectedWithdrawalCurrency(value as currency_code);
-                                                                            // Reset withdrawal method to 'bank' if not XOF
-                                                                            if (value !== 'XOF') {
-                                                                                setWithdrawalMethod('bank');
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        <SelectTrigger className="col-span-3 rounded-none">
-                                                                            <SelectValue placeholder="Select currency" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent className="rounded-none">
-                                                                            {getSortedBalances().map((balance) => (
-                                                                                <SelectItem
-                                                                                    key={balance.currency_code}
-                                                                                    value={balance.currency_code}
-                                                                                    className="rounded-none"
-                                                                                >
-                                                                                    {balance.currency_code} - Available: {getBalanceValue(balance.available_balance)}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
-                                                                    <Select
-                                                                        value={withdrawalMethod}
-                                                                        onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
-                                                                    >
-                                                                        <SelectTrigger className="col-span-3 rounded-none">
-                                                                            <SelectValue placeholder="Select withdrawal method" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent className="rounded-none">
-                                                                            <SelectItem value="bank" className="rounded-none">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
-                                                                                        <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
-                                                                                    </svg>
-                                                                                    <span>Bank Account</span>
-                                                                                </div>
-                                                                            </SelectItem>
-                                                                            {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
-                                                                                <SelectItem value="mobile_money" className="rounded-none">
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
-                                                                                        <span>Wave</span>
-                                                                                    </div>
-                                                                                </SelectItem>
-                                                                            ) : null}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-
-                                                                {withdrawalMethod === 'bank' && (
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                                                            setTimeout(() => {
+                                                                setIsDialogOpen(open);
+                                                            }, 0);
+                                                        }}>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    variant="default"
+                                                                    className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none mt-5"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedWithdrawalCurrency(balance.currency_code);
+                                                                    }}
+                                                                >
+                                                                    Withdraw
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="sm:max-w-[425px] rounded-none" onPointerDownOutside={(e) => e.preventDefault()}>
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Select withdrawal method and enter amount
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="grid gap-4 py-4">
                                                                     <div className="grid grid-cols-4 items-center gap-4">
-                                                                        <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
-                                                                        <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                        <Label htmlFor="currency" className="text-right">Currency</Label>
+                                                                        <Select
+                                                                            value={selectedWithdrawalCurrency}
+                                                                            onValueChange={(value) => {
+                                                                                setSelectedWithdrawalCurrency(value as currency_code);
+                                                                                // Reset withdrawal method to 'bank' if not XOF
+                                                                                if (value !== 'XOF') {
+                                                                                    setWithdrawalMethod('bank');
+                                                                                }
+                                                                            }}
+                                                                        >
                                                                             <SelectTrigger className="col-span-3 rounded-none">
-                                                                                <SelectValue placeholder="Select a bank account" />
+                                                                                <SelectValue placeholder="Select currency" />
                                                                             </SelectTrigger>
                                                                             <SelectContent className="rounded-none">
-                                                                                {bankAccounts.map((account) => (
-                                                                                    <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
-                                                                                        <div className="flex items-center">
-                                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
-                                                                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
-                                                                                                <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
-                                                                                            </svg>
-                                                                                            {account.bank_name} - {account.account_number}
-                                                                                        </div>
+                                                                                {getSortedBalances().map((balance) => (
+                                                                                    <SelectItem
+                                                                                        key={balance.currency_code}
+                                                                                        value={balance.currency_code}
+                                                                                        className="rounded-none"
+                                                                                    >
+                                                                                        {balance.currency_code} - Available: {getBalanceValue(balance.available_balance)}
                                                                                     </SelectItem>
                                                                                 ))}
                                                                             </SelectContent>
                                                                         </Select>
                                                                     </div>
-                                                                )}
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
+                                                                        <Select
+                                                                            value={withdrawalMethod}
+                                                                            onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
+                                                                        >
+                                                                            <SelectTrigger className="col-span-3 rounded-none">
+                                                                                <SelectValue placeholder="Select withdrawal method" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="rounded-none">
+                                                                                <SelectItem value="bank" className="rounded-none">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
+                                                                                            <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
+                                                                                        </svg>
+                                                                                        <span>Bank Account</span>
+                                                                                    </div>
+                                                                                </SelectItem>
+                                                                                {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
+                                                                                    <SelectItem value="mobile_money" className="rounded-none">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
+                                                                                            <span>Wave</span>
+                                                                                        </div>
+                                                                                    </SelectItem>
+                                                                                ) : null}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
 
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="amount" className="text-right">Amount</Label>
-                                                                    <Input
-                                                                        id="amount"
-                                                                        type="text"
-                                                                        value={withdrawalAmount}
-                                                                        onChange={(e) => {
-                                                                            const value = e.target.value;
-                                                                            if (/^\d*\.?\d*$/.test(value)) {
-                                                                                setWithdrawalAmount(value);
-                                                                            }
-                                                                        }}
-                                                                        className="col-span-3 rounded-none"
-                                                                        placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
-                                                                    />
-                                                                </div>
+                                                                    {withdrawalMethod === 'bank' && (
+                                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                                            <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                                            <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                                <SelectTrigger className="col-span-3 rounded-none">
+                                                                                    <SelectValue placeholder="Select a bank account" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent className="rounded-none">
+                                                                                    {bankAccounts.map((account) => (
+                                                                                        <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
+                                                                                            <div className="flex items-center">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
+                                                                                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
+                                                                                                    <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
+                                                                                                </svg>
+                                                                                                {account.bank_name} - {account.account_number}
+                                                                                            </div>
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </div>
+                                                                    )}
 
-                                                                <div className="flex justify-end mt-4 space-x-2">
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        onClick={() => {
-                                                                            setIsDialogOpen(false);
-                                                                            setWithdrawalAmount("");
-                                                                            setSelectedBankAccount("");
-                                                                        }}
-                                                                        className="rounded-sm"
-                                                                    >
-                                                                        Cancel
-                                                                    </Button>
-                                                                    <Button
-                                                                        onClick={handleWithdraw}
-                                                                        disabled={isWithdrawing}
-                                                                        className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
-                                                                    >
-                                                                        {isWithdrawing ? (
-                                                                            <>
-                                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                                Processing...
-                                                                            </>
-                                                                        ) : (
-                                                                            'Withdraw'
-                                                                        )}
-                                                                    </Button>
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="amount" className="text-right">Amount</Label>
+                                                                        <Input
+                                                                            id="amount"
+                                                                            type="text"
+                                                                            value={withdrawalAmount}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value;
+                                                                                if (/^\d*\.?\d*$/.test(value)) {
+                                                                                    setWithdrawalAmount(value);
+                                                                                }
+                                                                            }}
+                                                                            className="col-span-3 rounded-none"
+                                                                            placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
+                                                                        />
+                                                                    </div>
+
+                                                                    <div className="flex justify-end mt-4 space-x-2">
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setIsDialogOpen(false);
+                                                                                setWithdrawalAmount("");
+                                                                                setSelectedBankAccount("");
+                                                                            }}
+                                                                            className="rounded-sm bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200 flex items-center gap-1.5"
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <TooltipProvider>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="default"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleWithdraw();
+                                                                                        }}
+                                                                                        disabled={isWithdrawing}
+                                                                                        className="rounded-sm bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1.5"
+                                                                                    >
+                                                                                        <Zap className="h-4 w-4" />
+                                                                                        Express Payout
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                    <p>Express payout will be processed immediately with a 2% fee</p>
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
+                                                                        </TooltipProvider>
+                                                                        <Button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleWithdraw();
+                                                                            }}
+                                                                            disabled={isWithdrawing}
+                                                                            className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
+                                                                        >
+                                                                            {isWithdrawing ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Processing...
+                                                                                </>
+                                                                            ) : (
+                                                                                'Withdraw'
+                                                                            )}
+                                                                        </Button>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
                                                 </motion.div>
                                             ) : (
                                                 <motion.div
@@ -717,177 +784,211 @@ function BalancePage() {
                                                 >
                                                     <div className="space-y-1 w-4/5 pr-4">
                                                         <div className="flex justify-between">
-                                                            <span className="text-sm cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                                            <span className="text-sm cursor-pointer">
                                                                 Total
                                                             </span>
                                                             <span className="text-sm font-medium">
-                                                                {formatCurrency(balance.total_balance, balance.currency_code)}
+                                                                {balance.currency_code} {formatAmountForDisplay(balance.total_balance)}
                                                             </span>
                                                         </div>
                                                         <div className="flex justify-between">
-                                                            <span className="text-sm text-blue-500 dark:text-yellow-500 cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                                            <span className="text-sm text-amber-500 dark:text-amber-400 cursor-pointer">
                                                                 Pending
                                                             </span>
-                                                            <span className="text-sm font-medium text-blue-500 dark:text-yellow-500">
-                                                                {formatCurrency(balance.pending_balance, balance.currency_code)}
+                                                            <span className="text-sm font-medium text-amber-500 dark:text-amber-400">
+                                                                {balance.currency_code} {formatAmountForDisplay(balance.pending_balance)}
                                                             </span>
                                                         </div>
                                                         <div className="flex justify-between">
-                                                            <span className="text-sm text-green-500 cursor-pointer" onClick={() => toggleBalanceBreakdown(balance.currency_code)}>
+                                                            <span className="text-sm text-blue-500 dark:text-blue-400 cursor-pointer">
                                                                 Available
                                                             </span>
-                                                            <span className="text-sm font-medium text-green-500">
-                                                                {formatCurrency(balance.available_balance, balance.currency_code)}
+                                                            <span className="text-sm font-medium text-blue-500 dark:text-blue-400">
+                                                                {balance.currency_code} {formatAmountForDisplay(balance.available_balance)}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                                        <DialogTrigger asChild>
-                                                            <Button
-                                                                variant="default"
-                                                                className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none"
-                                                                onClick={() => setSelectedWithdrawalCurrency(balance.currency_code)}
-                                                            >
-                                                                Withdraw
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-[425px] rounded-none">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
-                                                                <DialogDescription>
-                                                                    Select withdrawal method and enter amount
-                                                                </DialogDescription>
-                                                            </DialogHeader>
-                                                            <div className="grid gap-4 py-4">
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="currency" className="text-right">Currency</Label>
-                                                                    <Select
-                                                                        value={selectedWithdrawalCurrency}
-                                                                        onValueChange={(value) => {
-                                                                            setSelectedWithdrawalCurrency(value as currency_code);
-                                                                            // Reset withdrawal method to 'bank' if not XOF
-                                                                            if (value !== 'XOF') {
-                                                                                setWithdrawalMethod('bank');
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        <SelectTrigger className="col-span-3 rounded-none">
-                                                                            <SelectValue placeholder="Select currency" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent className="rounded-none">
-                                                                            {getSortedBalances().map((balance) => (
-                                                                                <SelectItem
-                                                                                    key={balance.currency_code}
-                                                                                    value={balance.currency_code}
-                                                                                    className="rounded-none"
-                                                                                >
-                                                                                    {balance.currency_code} - Available: {getBalanceValue(balance.available_balance)}
-                                                                                </SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
-                                                                    <Select
-                                                                        value={withdrawalMethod}
-                                                                        onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
-                                                                    >
-                                                                        <SelectTrigger className="col-span-3 rounded-none">
-                                                                            <SelectValue placeholder="Select withdrawal method" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent className="rounded-none">
-                                                                            <SelectItem value="bank" className="rounded-none">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
-                                                                                        <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
-                                                                                    </svg>
-                                                                                    <span>Bank Account</span>
-                                                                                </div>
-                                                                            </SelectItem>
-                                                                            {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
-                                                                                <SelectItem value="mobile_money" className="rounded-none">
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
-                                                                                        <span>Wave</span>
-                                                                                    </div>
-                                                                                </SelectItem>
-                                                                            ) : null}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-
-                                                                {withdrawalMethod === 'bank' && (
+                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                                                            setTimeout(() => {
+                                                                setIsDialogOpen(open);
+                                                            }, 0);
+                                                        }}>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    variant="default"
+                                                                    className="bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700 dark:text-white rounded-none mt-5"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setSelectedWithdrawalCurrency(balance.currency_code);
+                                                                    }}
+                                                                >
+                                                                    Withdraw
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="sm:max-w-[425px] rounded-none" onPointerDownOutside={(e) => e.preventDefault()}>
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Withdraw {selectedWithdrawalCurrency}</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Select withdrawal method and enter amount
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="grid gap-4 py-4">
                                                                     <div className="grid grid-cols-4 items-center gap-4">
-                                                                        <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
-                                                                        <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                        <Label htmlFor="currency" className="text-right">Currency</Label>
+                                                                        <Select
+                                                                            value={selectedWithdrawalCurrency}
+                                                                            onValueChange={(value) => {
+                                                                                setSelectedWithdrawalCurrency(value as currency_code);
+                                                                                // Reset withdrawal method to 'bank' if not XOF
+                                                                                if (value !== 'XOF') {
+                                                                                    setWithdrawalMethod('bank');
+                                                                                }
+                                                                            }}
+                                                                        >
                                                                             <SelectTrigger className="col-span-3 rounded-none">
-                                                                                <SelectValue placeholder="Select a bank account" />
+                                                                                <SelectValue placeholder="Select currency" />
                                                                             </SelectTrigger>
                                                                             <SelectContent className="rounded-none">
-                                                                                {bankAccounts.map((account) => (
-                                                                                    <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
-                                                                                        <div className="flex items-center">
-                                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
-                                                                                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
-                                                                                                <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
-                                                                                            </svg>
-                                                                                            {account.bank_name} - {account.account_number}
-                                                                                        </div>
+                                                                                {getSortedBalances().map((balance) => (
+                                                                                    <SelectItem
+                                                                                        key={balance.currency_code}
+                                                                                        value={balance.currency_code}
+                                                                                        className="rounded-none"
+                                                                                    >
+                                                                                        {balance.currency_code} - Available: {getBalanceValue(balance.available_balance)}
                                                                                     </SelectItem>
                                                                                 ))}
                                                                             </SelectContent>
                                                                         </Select>
                                                                     </div>
-                                                                )}
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="withdrawal-method" className="text-right">Method</Label>
+                                                                        <Select
+                                                                            value={withdrawalMethod}
+                                                                            onValueChange={(value) => setWithdrawalMethod(value as 'bank' | 'mobile_money')}
+                                                                        >
+                                                                            <SelectTrigger className="col-span-3 rounded-none">
+                                                                                <SelectValue placeholder="Select withdrawal method" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="rounded-none">
+                                                                                <SelectItem value="bank" className="rounded-none">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bank" viewBox="0 0 16 16">
+                                                                                            <path d="M8 0l6.61 3h.89a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5H15v7a.5.5 0 0 1 .485.38l.5 2a.498.498 0 0 1-.485.62H.5a.498.498 0 0 1-.485-.62l.5-2A.501.501 0 0 1 1 13V6H.5a.5.5 0 0 1-.5-.5v-2A.5.5 0 0 1 .5 3h.89L8 0ZM3.777 3h8.447L8 1 3.777 3ZM2 6v7h1V6H2Zm2 0v7h2.5V6H4Zm3.5 0v7h1V6h-1Zm2 0v7H12V6H9.5ZM13 6v7h1V6h-1Zm2-1V4H1v1h14Zm-.39 9H1.39l-.25 1h13.72l-.25-1Z" />
+                                                                                        </svg>
+                                                                                        <span>Bank Account</span>
+                                                                                    </div>
+                                                                                </SelectItem>
+                                                                                {waveEnabled && selectedWithdrawalCurrency === 'XOF' ? (
+                                                                                    <SelectItem value="mobile_money" className="rounded-none">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <img src="/payment_channels/wave.webp" alt="Wave" className="h-4 w-4 object-contain rounded-xs" />
+                                                                                            <span>Wave</span>
+                                                                                        </div>
+                                                                                    </SelectItem>
+                                                                                ) : null}
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
 
-                                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                                    <Label htmlFor="amount" className="text-right">Amount</Label>
-                                                                    <Input
-                                                                        id="amount"
-                                                                        type="text"
-                                                                        value={withdrawalAmount}
-                                                                        onChange={(e) => {
-                                                                            const value = e.target.value;
-                                                                            if (/^\d*\.?\d*$/.test(value)) {
-                                                                                setWithdrawalAmount(value);
-                                                                            }
-                                                                        }}
-                                                                        className="col-span-3 rounded-none"
-                                                                        placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
-                                                                    />
-                                                                </div>
+                                                                    {withdrawalMethod === 'bank' && (
+                                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                                            <Label htmlFor="bank-account" className="text-right">Bank Account</Label>
+                                                                            <Select onValueChange={setSelectedBankAccount} value={selectedBankAccount}>
+                                                                                <SelectTrigger className="col-span-3 rounded-none">
+                                                                                    <SelectValue placeholder="Select a bank account" />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent className="rounded-none">
+                                                                                    {bankAccounts.map((account) => (
+                                                                                        <SelectItem key={account.bank_account_id} value={account.bank_account_id} className="rounded-none">
+                                                                                            <div className="flex items-center">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" className="bi bi-credit-card mr-2" viewBox="0 0 16 16">
+                                                                                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v1h14V4a1 1 0 0 0-1-1H2zm13 4H1v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7z" />
+                                                                                                    <path d="M2 10a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-1z" />
+                                                                                                </svg>
+                                                                                                {account.bank_name} - {account.account_number}
+                                                                                            </div>
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        </div>
+                                                                    )}
 
-                                                                <div className="flex justify-end mt-4 space-x-2">
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        onClick={() => {
-                                                                            setIsDialogOpen(false);
-                                                                            setWithdrawalAmount("");
-                                                                            setSelectedBankAccount("");
-                                                                        }}
-                                                                        className="rounded-sm"
-                                                                    >
-                                                                        Cancel
-                                                                    </Button>
-                                                                    <Button
-                                                                        onClick={handleWithdraw}
-                                                                        disabled={isWithdrawing}
-                                                                        className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
-                                                                    >
-                                                                        {isWithdrawing ? (
-                                                                            <>
-                                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                                Processing...
-                                                                            </>
-                                                                        ) : (
-                                                                            'Withdraw'
-                                                                        )}
-                                                                    </Button>
+                                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                                        <Label htmlFor="amount" className="text-right">Amount</Label>
+                                                                        <Input
+                                                                            id="amount"
+                                                                            type="text"
+                                                                            value={withdrawalAmount}
+                                                                            onChange={(e) => {
+                                                                                const value = e.target.value;
+                                                                                if (/^\d*\.?\d*$/.test(value)) {
+                                                                                    setWithdrawalAmount(value);
+                                                                                }
+                                                                            }}
+                                                                            className="col-span-3 rounded-none"
+                                                                            placeholder={`Enter amount in ${selectedWithdrawalCurrency}`}
+                                                                        />
+                                                                    </div>
+
+                                                                    <div className="flex justify-end mt-4 space-x-2">
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setIsDialogOpen(false);
+                                                                                setWithdrawalAmount("");
+                                                                                setSelectedBankAccount("");
+                                                                            }}
+                                                                            className="rounded-sm bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200 flex items-center gap-1.5"
+                                                                        >
+                                                                            Cancel
+                                                                        </Button>
+                                                                        <TooltipProvider>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger asChild>
+                                                                                    <Button
+                                                                                        variant="default"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleWithdraw();
+                                                                                        }}
+                                                                                        disabled={isWithdrawing}
+                                                                                        className="rounded-sm bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1.5"
+                                                                                    >
+                                                                                        <Zap className="h-4 w-4" />
+                                                                                        Express Payout
+                                                                                    </Button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                    <p>Express payout will be processed immediately with a 2% fee</p>
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
+                                                                        </TooltipProvider>
+                                                                        <Button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleWithdraw();
+                                                                            }}
+                                                                            disabled={isWithdrawing}
+                                                                            className="rounded-sm bg-blue-500 hover:bg-blue-600 text-white"
+                                                                        >
+                                                                            {isWithdrawing ? (
+                                                                                <>
+                                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                                    Processing...
+                                                                                </>
+                                                                            ) : (
+                                                                                'Withdraw'
+                                                                            )}
+                                                                        </Button>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </DialogContent>
-                                                    </Dialog>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    </div>
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
@@ -1028,7 +1129,7 @@ function BalancePage() {
                                                             )}
                                                             {columns.includes('Amount') && (
                                                                 <TableCell className="text-center py-4">
-                                                                    <span className="font-medium">{formatAmount(payout.amount)}</span>
+                                                                    <span className="font-medium">{payout.currency_code} {formatAmountForDisplay(payout.amount)}</span>
                                                                 </TableCell>
                                                             )}
                                                             {columns.includes('Currency') && (
@@ -1075,34 +1176,6 @@ function BalancePage() {
             <PayoutActions payout={selectedPayout} isOpen={!!selectedPayout} onClose={() => setSelectedPayout(null)} />
         </Layout>
     )
-}
-
-function shortenPayoutId(payoutId: string): string {
-    return `${payoutId.slice(0, 6)}...${payoutId.slice(-4)}`
-}
-
-function formatPayoutStatus(status: payout_status): string {
-    switch (status) {
-        case 'pending':
-            return 'Pending'
-        case 'processing':
-            return 'Processing'
-        case 'completed':
-            return 'Completed'
-        case 'failed':
-            return 'Failed'
-        default:
-            return status
-    }
-}
-
-function formatDate(dateString: string): string {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-function formatAmount(amount: number): string {
-    return amount.toLocaleString('en-US', { minimumFractionDigits: 0 })
 }
 
 export default BalancePage;

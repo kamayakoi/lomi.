@@ -28,6 +28,7 @@ export interface Transaction {
     gross_amount: number
     currency_code: string
     created_at: string
+    status?: 'completed' | 'refunded' | 'pending' | 'failed' | string
 }
 
 export interface ProductsResponse {

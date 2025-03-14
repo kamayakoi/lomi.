@@ -69,6 +69,7 @@ export const fetchTransactions = async (
 
     const transactions = data.map((transaction: FetchedTransaction) => ({
         transaction_id: transaction.transaction_id,
+        merchant_id: params.p_merchant_id,
         customer_name: transaction.customer_name,
         customer_email: transaction.customer_email,
         customer_phone: transaction.customer_phone,
@@ -79,6 +80,7 @@ export const fetchTransactions = async (
         gross_amount: transaction.gross_amount,
         net_amount: transaction.net_amount,
         currency: transaction.currency_code,
+        currency_code: transaction.currency_code,
         payment_method: transaction.payment_method_code,
         status: transaction.status,
         type: transaction.transaction_type,
@@ -88,6 +90,8 @@ export const fetchTransactions = async (
         product_name: transaction.product_name,
         product_description: transaction.product_description,
         product_price: transaction.product_price,
+        provider_transaction_id: transaction.provider_transaction_id,
+        provider_checkout_id: transaction.provider_checkout_id,
     }))
 
     const transactionsWithSubscriptions = await Promise.all(

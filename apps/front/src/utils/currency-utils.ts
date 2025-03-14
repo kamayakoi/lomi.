@@ -408,4 +408,64 @@ export async function getSuggestedCrypto(
     console.error('Error getting suggested cryptocurrency:', error);
     throw error;
   }
+}
+
+// ============================================================================
+// BALANCE PAGE FORMATTING UTILITIES 
+// ============================================================================
+
+import { payout_status } from '@/pages/portal/balance/components/types';
+
+/**
+ * Format an amount for display with proper thousand separators and decimals
+ */
+export function formatAmountForDisplay(amount: number): string {
+    // Return simple "0" for zero values
+    if (amount === 0) return "0";
+
+    // Format with thousands separators as spaces and decimal as comma
+    const integerPart = Math.floor(amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+    // Get decimal part if it exists and format with comma
+    const decimalPart = (amount % 1).toFixed(2).substring(2);
+
+    // Only show decimal part if it's not .00
+    if (decimalPart === "00") {
+        return integerPart;
+    }
+
+    return `${integerPart},${decimalPart}`;
+}
+
+/**
+ * Format a payout status to a more readable format
+ */
+export function formatPayoutStatus(status: payout_status): string {
+    switch (status) {
+        case 'pending':
+            return 'Pending'
+        case 'processing':
+            return 'Processing'
+        case 'completed':
+            return 'Completed'
+        case 'failed':
+            return 'Failed'
+        default:
+            return status
+    }
+}
+
+/**
+ * Format a date string to a more readable format
+ */
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+/**
+ * Shorten a payout ID for display
+ */
+export function shortenPayoutId(payoutId: string): string {
+    return `${payoutId.slice(0, 6)}...${payoutId.slice(-4)}`
 } 

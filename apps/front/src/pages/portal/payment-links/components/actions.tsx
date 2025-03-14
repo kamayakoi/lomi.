@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PaymentLink, provider_code, link_type } from './types'
@@ -6,6 +5,7 @@ import { LifeBuoy, X } from 'lucide-react'
 import { toast } from "@/lib/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
 import React from 'react'
+import { ButtonExpand } from "@/components/design/button-expand"
 
 const linkTypeColors: Record<link_type, string> = {
     'instant': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -166,20 +166,119 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                                         paymentLink.allowed_providers.map((provider) => (
                                             provider === 'ECOBANK' ? (
                                                 <React.Fragment key={provider}>
-                                                    <span className="inline-block px-2 py-1 rounded-none text-xs font-semibold bg-[#0E1C69] text-white">
-                                                        Visa
-                                                    </span>
-                                                    <span className="inline-block px-2 py-1 rounded-none text-xs font-semibold bg-[#FFF8E7] text-black">
-                                                        Mastercard
-                                                    </span>
+                                                    <div className="inline-flex items-center justify-center rounded-sm">
+                                                        <img
+                                                            src="/payment_channels/visa.webp"
+                                                            alt="Visa"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    </div>
+                                                    <div className="inline-flex items-center justify-center rounded-sm">
+                                                        <img
+                                                            src="/payment_channels/mastercard.webp"
+                                                            alt="Mastercard"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    </div>
                                                 </React.Fragment>
                                             ) : (
-                                                <span
+                                                <div
                                                     key={provider}
-                                                    className={`inline-block px-2 py-1 rounded-none text-xs font-semibold ${providerColors[provider]}`}
+                                                    className="inline-flex items-center justify-center rounded-sm"
                                                 >
-                                                    {formatProviderCode(provider)}
-                                                </span>
+                                                    {provider === 'WAVE' && (
+                                                        <img
+                                                            src="/payment_channels/wave.webp"
+                                                            alt="Wave"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'ORANGE' && (
+                                                        <img
+                                                            src="/payment_channels/orange.webp"
+                                                            alt="Orange"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'MTN' && (
+                                                        <img
+                                                            src="/payment_channels/mtn.webp"
+                                                            alt="MTN"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'NOWPAYMENTS' && (
+                                                        <img
+                                                            src="/company/lomi_icon.webp"
+                                                            alt="lomi."
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'MOOV' && (
+                                                        <img
+                                                            src="/payment_channels/moov.webp"
+                                                            alt="Moov"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'AIRTEL' && (
+                                                        <img
+                                                            src="/payment_channels/airtel.webp"
+                                                            alt="Airtel"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'MPESA' && (
+                                                        <img
+                                                            src="/payment_channels/mpesa.webp"
+                                                            alt="M-Pesa"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'OPAY' && (
+                                                        <img
+                                                            src="/payment_channels/opay.webp"
+                                                            alt="OPay"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {provider === 'PAYPAL' && (
+                                                        <img
+                                                            src="/payment_channels/paypal.webp"
+                                                            alt="PayPal"
+                                                            width={55}
+                                                            height={55}
+                                                            className="rounded-sm"
+                                                        />
+                                                    )}
+                                                    {!['WAVE', 'ORANGE', 'MTN', 'NOWPAYMENTS', 'MOOV', 'AIRTEL', 'MPESA', 'OPAY', 'PAYPAL'].includes(provider) && (
+                                                        <span
+                                                            className={`inline-block px-2 py-1 rounded-none text-xs font-semibold ${providerColors[provider]}`}
+                                                        >
+                                                            {formatProviderCode(provider)}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             )
                                         ))
                                     ) : (
@@ -191,10 +290,16 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                             <Separator />
 
                             <div className="flex justify-end">
-                                <Button variant="outline" className="w-full sm:w-auto rounded-none" onClick={handleContactSupport}>
-                                    <LifeBuoy className="mr-2 h-4 w-4" />
-                                    Contact Support
-                                </Button>
+                                <ButtonExpand
+                                    text="Contact Support"
+                                    icon={LifeBuoy}
+                                    onClick={handleContactSupport}
+                                    bgColor="bg-purple-50 dark:bg-purple-900/30"
+                                    textColor="text-purple-700 dark:text-purple-300"
+                                    hoverBgColor="hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                                    hoverTextColor="hover:text-purple-800 dark:hover:text-purple-200"
+                                    className="rounded-none w-full sm:w-auto"
+                                />
                             </div>
                         </div>
                     </CardContent>

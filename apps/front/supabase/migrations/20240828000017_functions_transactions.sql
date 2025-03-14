@@ -31,7 +31,9 @@ RETURNS TABLE (
     product_id UUID,
     product_name VARCHAR,
     product_description TEXT,
-    product_price NUMERIC(10,2)
+    product_price NUMERIC(10,2),
+    provider_transaction_id VARCHAR,
+    provider_checkout_id VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -55,13 +57,17 @@ BEGIN
         t.product_id,
         mp.name AS product_name,
         mp.description AS product_description,
-        mp.price AS product_price
+        mp.price AS product_price,
+        pt.provider_transaction_id,
+        pt.provider_checkout_id
     FROM 
         transactions t
     JOIN
         customers c ON t.customer_id = c.customer_id
     LEFT JOIN
         merchant_products mp ON t.product_id = mp.product_id
+    LEFT JOIN
+        providers_transactions pt ON t.transaction_id = pt.transaction_id
     WHERE 
         t.merchant_id = p_merchant_id AND
         (p_provider_code IS NULL OR t.provider_code = p_provider_code) AND
@@ -362,11 +368,15 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Function to create a refund
+DROP FUNCTION IF EXISTS public.create_refund;
 CREATE OR REPLACE FUNCTION public.create_refund(
     p_merchant_id UUID,
     p_transaction_id UUID,
     p_amount NUMERIC,
     p_reason TEXT DEFAULT NULL,
+    p_provider_transaction_id VARCHAR DEFAULT NULL,
+    p_provider_merchant_id VARCHAR DEFAULT NULL,
+    p_provider_code provider_code DEFAULT NULL,
     p_metadata JSONB DEFAULT NULL
 )
 RETURNS UUID AS $$
@@ -374,12 +384,20 @@ DECLARE
     v_refund_id UUID;
     v_transaction_amount NUMERIC;
     v_fee_amount NUMERIC;
+    v_new_status transaction_status;
 BEGIN
     -- Get original transaction amount
-    SELECT amount, fee_amount 
+    SELECT gross_amount, fee_amount 
     INTO v_transaction_amount, v_fee_amount
     FROM transactions 
     WHERE transaction_id = p_transaction_id;
+    
+    -- Determine new transaction status based on refund amount
+    IF p_amount >= v_transaction_amount THEN
+        v_new_status := 'refunded';
+    ELSE
+        v_new_status := 'partially_refunded';
+    END IF;
 
     -- Create refund record
     INSERT INTO refunds (
@@ -388,15 +406,37 @@ BEGIN
         refunded_amount,
         fee_amount,
         reason,
-        metadata
+        provider_transaction_id,
+        metadata,
+        status
     ) VALUES (
         p_transaction_id,
         v_transaction_amount,
         p_amount,
         v_fee_amount,
         p_reason,
-        p_metadata
+        p_provider_transaction_id,
+        jsonb_build_object(
+            'provider_transaction_id', p_provider_transaction_id,
+            'provider_merchant_id', p_provider_merchant_id,
+            'provider_code', p_provider_code,
+            'refunded_by', 'merchant',
+            'additional_data', p_metadata
+        ),
+        'completed'
     ) RETURNING refund_id INTO v_refund_id;
+
+    -- Update transaction status
+    UPDATE transactions
+    SET status = v_new_status
+    WHERE transaction_id = p_transaction_id;
+    
+    -- Update provider transaction status if applicable
+    IF p_provider_transaction_id IS NOT NULL THEN
+        UPDATE providers_transactions
+        SET provider_payment_status = v_new_status
+        WHERE transaction_id = p_transaction_id;
+    END IF;
 
     -- Log refund creation
     PERFORM public.log_event(
@@ -406,11 +446,30 @@ BEGIN
             'refund_id', v_refund_id,
             'transaction_id', p_transaction_id,
             'amount', p_amount,
+            'provider_transaction_id', p_provider_transaction_id,
+            'provider_merchant_id', p_provider_merchant_id,
             'reason', p_reason
         ),
         p_severity := 'CRITICAL'
     );
 
     RETURN v_refund_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
+
+-- Function to get the provider merchant ID for a specific organization and provider code
+CREATE OR REPLACE FUNCTION public.get_provider_merchant_id(
+    p_organization_id UUID,
+    p_provider_code provider_code
+)
+RETURNS VARCHAR AS $$
+DECLARE
+    v_provider_merchant_id VARCHAR;
+BEGIN
+    SELECT provider_merchant_id INTO v_provider_merchant_id
+    FROM organization_providers_settings
+    WHERE organization_id = p_organization_id AND provider_code = p_provider_code;
+    
+    RETURN v_provider_merchant_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;

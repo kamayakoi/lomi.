@@ -137,7 +137,29 @@ export async function fetchProductTransactions(productId: string): Promise<Trans
         return []
     }
 
-    return data as Transaction[]
+    // Add status information if not already present in the data
+    return (data as Transaction[]).map(transaction => {
+        // If status is already in the data, use it
+        if (transaction.status) return transaction;
+        
+        // Otherwise, infer status from description if possible
+        // You may need to adjust this logic based on your actual data
+        const description = transaction.description.toLowerCase();
+        let status = 'completed'; // Default status
+        
+        if (description.includes('refund') || description.includes('refunded')) {
+            status = 'refunded';
+        } else if (description.includes('fail') || description.includes('failed')) {
+            status = 'failed';
+        } else if (description.includes('pending')) {
+            status = 'pending';
+        }
+        
+        return {
+            ...transaction,
+            status
+        };
+    });
 }
 
 export async function fetchProductFees(productId: string) {

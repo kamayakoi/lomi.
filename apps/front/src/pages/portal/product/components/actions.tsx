@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Product, Transaction } from './products'
@@ -11,6 +10,7 @@ import { cn } from '@/lib/actions/utils'
 import { toast } from "@/lib/hooks/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Badge } from "@/components/ui/badge"
+import { ButtonExpand } from "@/components/design/button-expand"
 
 type ProductActionsProps = {
     product: Product | null
@@ -355,25 +355,52 @@ export default function ProductActions({ product, isOpen, onClose, onUpdate }: P
                                         <p className="text-sm text-muted-foreground">No transactions found for this product.</p>
                                     ) : (
                                         <div className="space-y-2">
-                                            {transactions.map((transaction) => (
-                                                <div key={transaction.transaction_id} className="border rounded-none p-2 space-y-1">
-                                                    <div className="font-medium text-sm">{transaction.description}</div>
-                                                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                                        <span>{formatDate(transaction.created_at)}</span>
-                                                        <span>{formatCurrency(transaction.gross_amount, transaction.currency_code)}</span>
+                                            {transactions.map((transaction) => {
+                                                // Clean up description by removing redundant status text
+                                                let cleanDescription = transaction.description;
+                                                cleanDescription = cleanDescription.replace(/ \(Refunded\)$/i, "");
+                                                cleanDescription = cleanDescription.replace(/ \(Completed\)$/i, "");
+                                                cleanDescription = cleanDescription.replace(/ \(Failed\)$/i, "");
+                                                cleanDescription = cleanDescription.replace(/ \(Pending\)$/i, "");
+
+                                                return (
+                                                    <div key={transaction.transaction_id} className="border rounded-none p-2 space-y-1">
+                                                        <div className="flex items-center justify-between font-medium text-sm">
+                                                            <span>{cleanDescription}</span>
+                                                            {transaction.status === 'refunded' && (
+                                                                <Badge className="text-xs rounded-none bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                                                                    Refunded
+                                                                </Badge>
+                                                            )}
+                                                            {transaction.status === 'completed' && (
+                                                                <Badge className="text-xs rounded-none bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                                                    Completed
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                            <span>{formatDate(transaction.created_at)}</span>
+                                                            <span>{formatCurrency(transaction.gross_amount, transaction.currency_code)}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
                             <div className="flex justify-end">
-                                <Button variant="outline" className="w-full sm:w-auto rounded-none" onClick={handleContactSupport}>
-                                    <LifeBuoy className="mr-2 h-4 w-4" />
-                                    Contact Support
-                                </Button>
+                                <ButtonExpand
+                                    text="Contact Support"
+                                    icon={LifeBuoy}
+                                    onClick={handleContactSupport}
+                                    bgColor="bg-purple-50 dark:bg-purple-900/30"
+                                    textColor="text-purple-700 dark:text-purple-300"
+                                    hoverBgColor="hover:bg-purple-100 dark:hover:bg-purple-900/40"
+                                    hoverTextColor="hover:text-purple-800 dark:hover:text-purple-200"
+                                    className="rounded-none w-full sm:w-auto"
+                                />
                             </div>
                         </CardContent>
                     </Card>
