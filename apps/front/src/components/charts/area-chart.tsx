@@ -15,7 +15,9 @@ import { ChevronDown } from 'lucide-react'
 // Chart Configuration Constants
 const CHART_CONFIG = {
   height: 470,
+  mobileHeight: 350,
   margin: { top: 5, right: 5, left: 20, bottom: -30 },
+  mobileMargin: { top: 5, right: 0, left: 0, bottom: -20 },
   colors: {
     axis: '#6b7280',
     tooltip: {
@@ -153,6 +155,13 @@ export function AreaChart<T, C extends string = string>({
   const defaultChartType = chartTypes[0]
   const chartLabel = currentChartType?.label || defaultChartType?.label || title
 
+  // Detect if we're on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+
+  // Use appropriate height and margin based on device
+  const chartHeight = isMobile ? CHART_CONFIG.mobileHeight : CHART_CONFIG.height
+  const chartMargin = isMobile ? CHART_CONFIG.mobileMargin : CHART_CONFIG.margin
+
   if (isLoading) {
     return (
       <Card>
@@ -187,7 +196,7 @@ export function AreaChart<T, C extends string = string>({
             )}
           </div>
         </CardHeader>
-        <CardContent className="flex items-center justify-center" style={{ height: `${CHART_CONFIG.height}px` }}>
+        <CardContent className="flex items-center justify-center" style={{ height: `${chartHeight}px` }}>
           <Spinner />
         </CardContent>
       </Card>
@@ -229,10 +238,10 @@ export function AreaChart<T, C extends string = string>({
           </div>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={CHART_CONFIG.height}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <RechartsAreaChart
               data={[{ [xAxisDataKey]: new Date(), ...Object.fromEntries(areas.map(area => [area.dataKey, 0])) }]}
-              margin={CHART_CONFIG.margin}
+              margin={chartMargin}
             >
               <defs>
                 {areas.map((area) => (
@@ -319,10 +328,10 @@ export function AreaChart<T, C extends string = string>({
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={CHART_CONFIG.height}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <RechartsAreaChart
             data={data}
-            margin={CHART_CONFIG.margin}
+            margin={chartMargin}
           >
             <defs>
               {areas.map((area) => (

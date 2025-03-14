@@ -19,9 +19,9 @@ export const integrationOptions = [
   {
     title: "Next.js",
     description: "Jumpstart your development with our Next.js starter kit, complete with our pre-configured payment stack.",
-    link: "https://github.com/lomiafrica/nextjs.lomi.boilerplate",
+    link: "https://github.com/lomiafrica/store.lomi.africa/",
     logo: <img src="/integrations/nextjs.webp" alt="Next.js" className="w-12 h-12 object-contain" />,
-    installLink: "https://github.com/lomiafrica/nextjs.lomi.boilerplate",
+    installLink: "https://github.com/lomiafrica/store.lomi.africa/",
     status: 'available',
   },
   {

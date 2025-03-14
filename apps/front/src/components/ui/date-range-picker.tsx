@@ -19,14 +19,14 @@ export function DateRangePicker({ date, setDate }: DateRangePickerProps) {
                     variant={'outline'}
                     size="sm"
                     className={cn(
-                        "h-10 w-[180px] px-2 text-sm font-medium justify-start border-r",
+                        "h-10 w-[180px] px-2 text-sm font-medium justify-center",
                         "focus-visible:z-10 focus-visible:ring-1 focus-visible:ring-primary",
                         date?.from
                             ? "bg-[#10B981] text-white hover:bg-[#10B981]/90 border-[#10B981]"
                             : "bg-card text-card-foreground hover:bg-muted/50"
                     )}
                 >
-                    <CalendarIcon className="ml-1 mr-1 h-4 w-4" />
+                    <CalendarIcon className="mr-1 h-4 w-4" />
                     {date?.from ? (
                         date.to ? (
                             <>

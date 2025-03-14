@@ -104,10 +104,10 @@ function ReportingPage() {
             <Separator className='my-0' />
 
             <Layout.Body>
-                <div className="h-full overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <div className="h-full overflow-y-auto overflow-x-hidden">
                     <div className="space-y-4 pb-8 px-4 md:px-0 max-w-full">
                         <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">
-                            <h1 className="text-2xl font-bold tracking-tight">Reporting</h1>
+                            <h1 className="text-2xl font-bold tracking-tight mt-3">Reporting</h1>
                         </div>
 
                         <div className="w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full">

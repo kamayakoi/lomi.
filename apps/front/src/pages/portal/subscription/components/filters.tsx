@@ -1,7 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, RefreshCw } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 export type SubscriptionStatus = 'all' | 'active' | 'pending' | 'cancelled';
 
@@ -18,8 +17,6 @@ interface SubscriptionFiltersProps {
 export function SubscriptionFilters({
     selectedStatus,
     setSelectedStatus,
-    refetch,
-    isRefreshing,
     tabsList,
     searchTerm,
     onSearchChange,
@@ -52,15 +49,6 @@ export function SubscriptionFilters({
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button
-                        variant="outline"
-                        onClick={refetch}
-                        className="hidden sm:flex border-border text-card-foreground px-2 h-10 rounded-none"
-                        disabled={isRefreshing}
-                    >
-                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        <span className="sr-only">Refresh</span>
-                    </Button>
                 </div>
             </div>
         </div>
