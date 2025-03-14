@@ -214,7 +214,7 @@ BEGIN
   -- Also update the provider_transactions table
   UPDATE providers_transactions pt
   SET 
-    provider_payment_status = new_status::text,
+    provider_payment_status = 'expired'::provider_payment_status,
     error_code = 'expired',
     error_message = 'Transaction expired after ' || expiry_hours || ' hours',
     updated_at = NOW()
@@ -224,24 +224,9 @@ BEGIN
   -- Count how many rows were updated
   GET DIAGNOSTICS rows_updated = ROW_COUNT;
   
-  -- Log the action
-  IF rows_updated > 0 THEN
-    INSERT INTO system_logs (
-      log_type,
-      message,
-      details,
-      severity
-    ) VALUES (
-      'transaction_expiration',
-      'Expired ' || rows_updated || ' pending transactions',
-      jsonb_build_object(
-        'expiry_hours', expiry_hours,
-        'executed_at', NOW(),
-        'new_status', new_status
-      ),
-      'INFO'
-    );
-  END IF;
+  -- Log to console instead of system_logs
+  RAISE NOTICE 'Expired % pending transactions (expiry_hours: %, new_status: %)', 
+               rows_updated, expiry_hours, new_status;
   
   RETURN rows_updated;
 END;
@@ -292,7 +277,7 @@ BEGIN
   -- Also update the provider_transactions table
   UPDATE providers_transactions pt
   SET 
-    provider_payment_status = 'failed',
+    provider_payment_status = 'expired'::provider_payment_status,
     error_code = 'expired',
     error_message = 'Transaction expired after ' || expiry_hours || ' hours',
     updated_at = NOW()
@@ -302,23 +287,9 @@ BEGIN
   -- Count how many rows were updated
   GET DIAGNOSTICS rows_updated = ROW_COUNT;
   
-  -- Log the action
-  IF rows_updated > 0 THEN
-    INSERT INTO system_logs (
-      log_type,
-      message,
-      details,
-      severity
-    ) VALUES (
-      'transaction_expiration',
-      'Expired ' || rows_updated || ' pending transactions',
-      jsonb_build_object(
-        'expiry_hours', expiry_hours,
-        'executed_at', NOW()
-      ),
-      'INFO'
-    );
-  END IF;
+  -- Log to console instead of system_logs
+  RAISE NOTICE 'Expired % pending transactions (expiry_hours: %)', 
+               rows_updated, expiry_hours;
   
   RETURN rows_updated;
 END;

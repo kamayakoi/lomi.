@@ -5,6 +5,7 @@ import { PaymentLink, provider_code, link_type } from './types'
 import { LifeBuoy, X } from 'lucide-react'
 import { toast } from "@/lib/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
+import React from 'react'
 
 const linkTypeColors: Record<link_type, string> = {
     'instant': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
@@ -24,7 +25,7 @@ function formatPrice(price: number | undefined): string {
 
 const providerColors: Record<provider_code, string> = {
     'ORANGE': 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white',
-    'WAVE': 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white',
+    'WAVE': 'bg-[#73CFF5] text-blue-700 dark:bg-[#73CFF5] dark:text-white',
     'ECOBANK': 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white',
     'MTN': 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black',
     'NOWPAYMENTS': 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white',
@@ -163,12 +164,23 @@ export default function PaymentLinkActions({ paymentLink, isOpen, onClose }: Pay
                                 <div className="flex flex-wrap gap-2 mt-1">
                                     {paymentLink.allowed_providers.length > 0 ? (
                                         paymentLink.allowed_providers.map((provider) => (
-                                            <span
-                                                key={provider}
-                                                className={`inline-block px-2 py-1 rounded-none text-xs font-semibold ${providerColors[provider]}`}
-                                            >
-                                                {formatProviderCode(provider)}
-                                            </span>
+                                            provider === 'ECOBANK' ? (
+                                                <React.Fragment key={provider}>
+                                                    <span className="inline-block px-2 py-1 rounded-none text-xs font-semibold bg-[#0E1C69] text-white">
+                                                        Visa
+                                                    </span>
+                                                    <span className="inline-block px-2 py-1 rounded-none text-xs font-semibold bg-[#FFF8E7] text-black">
+                                                        Mastercard
+                                                    </span>
+                                                </React.Fragment>
+                                            ) : (
+                                                <span
+                                                    key={provider}
+                                                    className={`inline-block px-2 py-1 rounded-none text-xs font-semibold ${providerColors[provider]}`}
+                                                >
+                                                    {formatProviderCode(provider)}
+                                                </span>
+                                            )
                                         ))
                                     ) : (
                                         <span>-</span>
@@ -199,11 +211,11 @@ function formatProviderCode(providerCode: provider_code): string {
         case 'WAVE':
             return 'Wave'
         case 'ECOBANK':
-            return 'Ecobank'
+            return 'Visa / Mastercard'
         case 'MTN':
             return 'MTN'
         case 'NOWPAYMENTS':
-            return 'NowPayments'
+            return 'lomi.'
         case 'PAYPAL':
             return 'Paypal'
         case 'APPLE':

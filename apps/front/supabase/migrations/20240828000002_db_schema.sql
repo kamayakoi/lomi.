@@ -101,7 +101,7 @@ CREATE TYPE webhook_event AS ENUM (
 );
 CREATE TYPE failed_payment_action AS ENUM ('cancel', 'pause', 'continue');
 CREATE TYPE first_payment_type AS ENUM ('initial', 'non_initial');
-CREATE TYPE provider_payment_status AS ENUM ('processing', 'cancelled', 'succeeded');
+CREATE TYPE provider_payment_status AS ENUM ('processing', 'cancelled', 'succeeded', 'expired');
 CREATE TYPE provider_business_type AS ENUM ('fintech', 'other');
 CREATE TYPE permission_category AS ENUM ('payments', 'accounts', 'products', 'subscriptions', 'customers');
 CREATE TYPE permission_action AS ENUM ('view', 'create', 'edit', 'delete', 'approve');

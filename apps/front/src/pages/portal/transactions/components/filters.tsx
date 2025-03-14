@@ -195,7 +195,7 @@ export default function TransactionFilters({
                                 <div>
                                     <h4 className="mb-2 text-xs font-medium text-muted-foreground">Status</h4>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {['pending', 'completed', 'failed', 'refunded'].map((status) => (
+                                        {['pending', 'completed', 'failed', 'refunded', 'expired'].map((status) => (
                                             <div key={status} className="flex items-center">
                                                 <Checkbox
                                                     id={`status-${status}`}

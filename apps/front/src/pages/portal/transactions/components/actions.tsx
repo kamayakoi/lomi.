@@ -329,11 +329,11 @@ function formatProviderCode(providerCode: provider_code): string {
         case 'WAVE':
             return 'Wave'
         case 'ECOBANK':
-            return 'Ecobank'
+            return 'Visa / Mastercard'
         case 'MTN':
             return 'MTN'
         case 'NOWPAYMENTS':
-            return 'Nowpayments'
+            return 'lomi.'
         case 'PAYPAL':
             return 'Paypal'
         case 'APPLE':

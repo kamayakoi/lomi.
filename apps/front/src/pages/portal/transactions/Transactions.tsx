@@ -32,7 +32,7 @@ function TransactionsPage() {
     const [sortColumn, setSortColumn] = useState<keyof Transaction | null>(null)
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
     const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
-    const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
+    const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['pending', 'completed', 'failed', 'refunded'])
     const [selectedTypes, setSelectedTypes] = useState<string[]>([])
     const [selectedCurrencies, setSelectedCurrencies] = useState<string[]>([])
     const [selectedPaymentMethods, setSelectedPaymentMethods] = useState<string[]>([])
@@ -872,7 +872,9 @@ function TransactionsPage() {
                                                                                 ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
                                                                                 : transaction.status === 'refunded'
                                                                                     ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
-                                                                                    : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                                                                                    : transaction.status === ('expired' as transaction_status)
+                                                                                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-800/20 dark:text-purple-400'
+                                                                                        : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
                                                                             }`}
                                                                     >
                                                                         {formatTransactionStatus(transaction.status)}
@@ -892,22 +894,32 @@ function TransactionsPage() {
                                                         )}
                                                         {columns.includes('Provider') && (
                                                             <TableCell className="text-center py-4">
-                                                                <span className={`
-                                                                    inline-block px-2 py-1 text-xs font-semibold rounded-none
-                                                                    ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
-                                                                    ${transaction.provider_code === 'ECOBANK' ? 'bg-[#074367] text-white dark:bg-[#074367] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
-                                                                    ${transaction.provider_code === 'NOWPAYMENTS' ? 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
-                                                                    ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
-                                                                `}>
-                                                                    {formatProviderCode(transaction.provider_code)}
-                                                                </span>
+                                                                {transaction.provider_code === 'ECOBANK' ? (
+                                                                    <div className="flex justify-center gap-1">
+                                                                        <span className="inline-block px-2 py-1 text-xs font-semibold rounded-none bg-[#1A1F71] text-white">
+                                                                            Visa
+                                                                        </span>
+                                                                        <span className="inline-block px-2 py-1 text-xs font-semibold rounded-none bg-[#EB001B] text-white">
+                                                                            Mastercard
+                                                                        </span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className={`
+                                                                        inline-block px-2 py-1 text-xs font-semibold rounded-none
+                                                                        ${transaction.provider_code === 'ORANGE' ? 'bg-[#FC6307] text-white dark:bg-[#FC6307] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'WAVE' ? 'bg-[#71CDF4] text-blue-700 dark:bg-[#71CDF4] dark:text-white' : ''}  
+                                                                        ${transaction.provider_code === 'MTN' ? 'bg-[#F7CE46] text-black dark:bg-[#F7CE46] dark:text-black' : ''}
+                                                                        ${transaction.provider_code === 'NOWPAYMENTS' ? 'bg-[#037BFE] text-white dark:bg-[#037BFE] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'MOOV' ? 'bg-[#0093DD] text-white dark:bg-[#0093DD] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'AIRTEL' ? 'bg-[#FF0000] text-white dark:bg-[#FF0000] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'MPESA' ? 'bg-[#4CAF50] text-white dark:bg-[#4CAF50] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'OPAY' ? 'bg-[#14B55A] text-white dark:bg-[#14B55A] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'PAYPAL' ? 'bg-[#003087] text-white dark:bg-[#003087] dark:text-white' : ''}
+                                                                        ${transaction.provider_code === 'OTHER' ? 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : ''}
+                                                                    `}>
+                                                                        {formatProviderCode(transaction.provider_code)}
+                                                                    </span>
+                                                                )}
                                                             </TableCell>
                                                         )}
                                                     </TableRow>
@@ -982,7 +994,7 @@ function formatProviderCode(providerCode: provider_code): string {
         case 'MTN':
             return 'MTN'
         case 'NOWPAYMENTS':
-            return 'Nowpayments'
+            return 'lomi.'
         case 'PAYPAL':
             return 'Paypal'
         case 'APPLE':
