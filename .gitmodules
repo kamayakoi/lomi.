@@ -22,3 +22,6 @@
 [submodule "apps/jumbo"]
 	path = apps/jumbo
 	url = https://github.com/PrinceMuichkine/jumbo.git
+[submodule "apps/front"]
+	path = apps/front
+	url = https://github.com/lomiafrica/front.git
