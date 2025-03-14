@@ -184,22 +184,22 @@ export const paymentMethods: PaymentMethod[] = [
     logo: <div className="relative w-full">
       <div className="flex items-center -space-x-3">
         <div className="relative">
-          <img src="/crypto/usdt.webp" alt="USDT" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/usdt.webp" alt="USDT" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/eth.webp" alt="ETH" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/eth.webp" alt="ETH" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/sol.webp" alt="SOL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/sol.webp" alt="SOL" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/ton.webp" alt="TON" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/ton.webp" alt="TON" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/ada.webp" alt="ADA" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/ada.webp" alt="ADA" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
         <div className="relative">
-          <img src="/crypto/fil.webp" alt="FIL" className="relative w-12 h-12 rounded-full border-2 border-white bg-white" />
+          <img src="/crypto/fil.webp" alt="FIL" className="relative w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-white bg-white" />
         </div>
       </div>
     </div>,

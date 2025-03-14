@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon } from 'lucide-react'
+import { ArrowDownIcon, ArrowUpDown, BarChart3Icon, TrendingUpIcon, RefreshCw } from 'lucide-react'
 import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
@@ -679,8 +679,17 @@ function TransactionsPage() {
                         <CardContent className="p-0">
                             <div
                                 id="table-container"
-                                className="h-[47vh] overflow-auto"
+                                className="h-[47vh] overflow-auto relative"
                             >
+                                <Button
+                                    variant="ghost"
+                                    onClick={refetch}
+                                    className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
+                                    disabled={isRefreshing}
+                                >
+                                    <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    <span className="sr-only">Refresh</span>
+                                </Button>
                                 <InfiniteScroll
                                     dataLength={transactions.length}
                                     next={() => fetchNextPage()}

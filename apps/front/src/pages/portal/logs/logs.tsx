@@ -272,24 +272,21 @@ function LogsPage() {
                                     <SelectItem value="CRITICAL">Critical</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <div className="hidden sm:flex items-center space-x-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={handleRefresh}
-                                    className="border-border text-card-foreground px-2 h-10 rounded-none"
-                                    disabled={isRefreshing}
-                                >
-                                    <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                                    <span className="sr-only">Refresh</span>
-                                </Button>
-                            </div>
                         </div>
                     </div>
 
                     <Card className="rounded-none">
                         <CardContent className="p-0">
-                            <div id="logs-table-container" className="h-[65vh] overflow-auto">
-                                {/* Desktop Table View */}
+                            <div id="logs-table-container" className="h-[72vh] overflow-auto relative">
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleRefresh}
+                                    className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
+                                    disabled={isRefreshing}
+                                >
+                                    <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    <span className="sr-only">Refresh</span>
+                                </Button>
                                 <div className="hidden md:block">
                                     <Table className="w-full">
                                         <TableHeader>

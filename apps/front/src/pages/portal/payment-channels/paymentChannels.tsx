@@ -323,13 +323,20 @@ export default function PaymentChannels() {
                         <div className='mb-6 flex items-center justify-between'>
                           <div className={cn(
                             'flex items-center justify-center rounded-lg overflow-hidden',
-                            !method.isViewMore && 'size-12 bg-white'
+                            !method.isViewMore && 'size-12 bg-white',
+                            method.isViewMore && 'md:w-auto md:h-auto'
                           )}>
                             <div className={cn(
                               "w-full h-full flex items-center justify-center",
-                              method.isViewMore && "w-auto h-auto"
+                              method.isViewMore && "md:w-auto md:h-auto"
                             )}>
-                              {method.logo}
+                              {method.isViewMore ? (
+                                <div className="flex items-center -space-x-3 md:-space-x-3">
+                                  {method.logo}
+                                </div>
+                              ) : (
+                                method.logo
+                              )}
                             </div>
                           </div>
                           {method.type === 'Crypto' ? (

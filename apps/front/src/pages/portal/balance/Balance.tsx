@@ -18,7 +18,7 @@ import { fetchPayouts, applySearch, applyDateFilter, fetchBankAccounts, initiate
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FcfaIcon } from '@/components/custom/cfa'
-import { ArrowUpDown, ArrowDownIcon } from 'lucide-react'
+import { ArrowUpDown, ArrowDownIcon, RefreshCw } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -921,141 +921,151 @@ function BalancePage() {
                         <CardContent className="p-0">
                             <div
                                 id="balance-table-container"
-                                className="h-auto max-h-[47vh] relative overflow-auto"
-                                style={{ WebkitOverflowScrolling: 'touch' }}
+                                className="h-[65vh] overflow-auto relative"
                             >
-                                <InfiniteScroll
-                                    dataLength={payouts.length}
-                                    next={() => fetchNextPage()}
-                                    hasMore={payoutsData?.pages?.[payoutsData.pages.length - 1]?.length === pageSize}
-                                    loader={<div className="p-4"></div>}
-                                    scrollableTarget="balance-table-container"
-                                    className="overflow-visible"
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleRefresh}
+                                    className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
+                                    disabled={isRefreshing}
                                 >
-                                    <Table className="w-full">
-                                        <TableHeader className="sticky top-0 z-10">
-                                            <TableRow className="hover:bg-transparent border-b bg-muted/50">
-                                                {columns.includes('Payout ID') && (
-                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                        <Button variant="ghost" onClick={() => handleSort('payout_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                            Payout ID
-                                                            {sortColumn === 'payout_id' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                )}
-                                                {columns.includes('Amount') && (
-                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                        <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                            Amount
-                                                            {sortColumn === 'amount' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                )}
-                                                {columns.includes('Currency') && (
-                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                        <Button variant="ghost" onClick={() => handleSort('currency_code')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                            Currency
-                                                            {sortColumn === 'currency_code' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                )}
-                                                {columns.includes('Status') && (
-                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                        <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                            Status
-                                                            {sortColumn === 'status' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                )}
-                                                {columns.includes('Date') && (
-                                                    <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
-                                                        <Button variant="ghost" onClick={() => handleSort('created_at')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
-                                                            Date
-                                                            {sortColumn === 'created_at' && (
-                                                                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
-                                                            )}
-                                                        </Button>
-                                                    </TableHead>
-                                                )}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {isPayoutsLoading ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={columns.length} className="text-center p-4">
-                                                    </TableCell>
+                                    <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    <span className="sr-only">Refresh</span>
+                                </Button>
+                                <div className="hidden md:block">
+                                    <InfiniteScroll
+                                        dataLength={payouts.length}
+                                        next={() => fetchNextPage()}
+                                        hasMore={payoutsData?.pages?.[payoutsData.pages.length - 1]?.length === pageSize}
+                                        loader={<div className="p-4"></div>}
+                                        scrollableTarget="balance-table-container"
+                                        className="overflow-visible"
+                                    >
+                                        <Table className="w-full">
+                                            <TableHeader className="sticky top-0 z-10">
+                                                <TableRow className="hover:bg-transparent border-b bg-muted/50">
+                                                    {columns.includes('Payout ID') && (
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('payout_id')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                                Payout ID
+                                                                {sortColumn === 'payout_id' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Amount') && (
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('amount')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                                Amount
+                                                                {sortColumn === 'amount' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Currency') && (
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('currency_code')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                                Currency
+                                                                {sortColumn === 'currency_code' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Status') && (
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('status')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                                Status
+                                                                {sortColumn === 'status' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
+                                                    {columns.includes('Date') && (
+                                                        <TableHead className="text-center w-[25%] md:w-auto h-12 text-xs uppercase font-semibold text-muted-foreground">
+                                                            <Button variant="ghost" onClick={() => handleSort('created_at')} className="rounded-none whitespace-nowrap px-2 md:px-4 h-full">
+                                                                Date
+                                                                {sortColumn === 'created_at' && (
+                                                                    <ArrowUpDown className={`ml-2 h-4 w-4 ${sortDirection === 'asc' ? 'rotate-180' : ''}`} />
+                                                                )}
+                                                            </Button>
+                                                        </TableHead>
+                                                    )}
                                                 </TableRow>
-                                            ) : payouts.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={columns.length} className="text-center py-0 h-[47vh]">
-                                                        <div className="flex flex-col items-center justify-center h-full">
-                                                            <div className="mb-2">
-                                                                <FcfaIcon className="h-32 w-32 text-gray-400 dark:text-gray-500" />
-                                                            </div>
-                                                            <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
-                                                                No payout history found
-                                                            </p>
-                                                            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mb-4">
-                                                                Make some withdrawals to see your payout history.
-                                                            </p>
-                                                        </div>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : (
-                                                applySearch(applyDateFilter(sortPayouts(payouts), selectedDateRange, customDateRange), searchTerm).map((payout: Payout) => (
-                                                    <TableRow key={payout.payout_id} className="cursor-pointer border-b hover:bg-muted/30 transition-colors">
-                                                        {columns.includes('Payout ID') && (
-                                                            <TableCell className="text-center py-4">
-                                                                <span className="font-mono text-xs">{shortenPayoutId(payout.payout_id)}</span>
-                                                            </TableCell>
-                                                        )}
-                                                        {columns.includes('Amount') && (
-                                                            <TableCell className="text-center py-4">
-                                                                <span className="font-medium">{formatAmount(payout.amount)}</span>
-                                                            </TableCell>
-                                                        )}
-                                                        {columns.includes('Currency') && (
-                                                            <TableCell className="text-center py-4">
-                                                                {payout.currency_code}
-                                                            </TableCell>
-                                                        )}
-                                                        {columns.includes('Status') && (
-                                                            <TableCell className="text-center py-4">
-                                                                <div className="flex justify-center">
-                                                                    <span
-                                                                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${payout.status === 'completed'
-                                                                            ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
-                                                                            : payout.status === 'failed'
-                                                                                ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
-                                                                                : payout.status === 'pending' || payout.status === 'processing'
-                                                                                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
-                                                                                    : 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
-                                                                            }`}
-                                                                    >
-                                                                        {formatPayoutStatus(payout.status)}
-                                                                    </span>
-                                                                </div>
-                                                            </TableCell>
-                                                        )}
-                                                        {columns.includes('Date') && (
-                                                            <TableCell className="text-center py-4">
-                                                                <span className="text-sm text-muted-foreground">{formatDate(payout.created_at)}</span>
-                                                            </TableCell>
-                                                        )}
+                                            </TableHeader>
+                                            <TableBody>
+                                                {isPayoutsLoading ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={columns.length} className="text-center p-4">
+                                                        </TableCell>
                                                     </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </InfiniteScroll>
+                                                ) : payouts.length === 0 ? (
+                                                    <TableRow>
+                                                        <TableCell colSpan={columns.length} className="text-center py-0 h-[47vh]">
+                                                            <div className="flex flex-col items-center justify-center h-full">
+                                                                <div className="mb-2">
+                                                                    <FcfaIcon className="h-32 w-32 text-gray-400 dark:text-gray-500" />
+                                                                </div>
+                                                                <p className="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                                                    No payout history found
+                                                                </p>
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs text-center mb-4">
+                                                                    Make some withdrawals to see your payout history.
+                                                                </p>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ) : (
+                                                    applySearch(applyDateFilter(sortPayouts(payouts), selectedDateRange, customDateRange), searchTerm).map((payout: Payout) => (
+                                                        <TableRow key={payout.payout_id} className="cursor-pointer border-b hover:bg-muted/30 transition-colors">
+                                                            {columns.includes('Payout ID') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-mono text-xs">{shortenPayoutId(payout.payout_id)}</span>
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Amount') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="font-medium">{formatAmount(payout.amount)}</span>
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Currency') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    {payout.currency_code}
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Status') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <div className="flex justify-center">
+                                                                        <span
+                                                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${payout.status === 'completed'
+                                                                                ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                                                                                : payout.status === 'failed'
+                                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
+                                                                                    : payout.status === 'pending' || payout.status === 'processing'
+                                                                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                                                                                        : 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                                                                                }`}
+                                                                        >
+                                                                            {formatPayoutStatus(payout.status)}
+                                                                        </span>
+                                                                    </div>
+                                                                </TableCell>
+                                                            )}
+                                                            {columns.includes('Date') && (
+                                                                <TableCell className="text-center py-4">
+                                                                    <span className="text-sm text-muted-foreground">{formatDate(payout.created_at)}</span>
+                                                                </TableCell>
+                                                            )}
+                                                        </TableRow>
+                                                    ))
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </InfiniteScroll>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

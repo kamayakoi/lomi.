@@ -375,7 +375,7 @@ function SubscriptionsPage() {
                       <Button
                         variant="ghost"
                         onClick={handleRefresh}
-                        className="absolute top-0.5 right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600"
+                        className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
                         disabled={isRefreshing}
                       >
                         <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -509,7 +509,7 @@ function SubscriptionsPage() {
                       <Button
                         variant="ghost"
                         onClick={handleRefresh}
-                        className="absolute top-0.5 right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600"
+                        className="absolute top-0 right-0 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
                         disabled={isRefreshing}
                       >
                         <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />

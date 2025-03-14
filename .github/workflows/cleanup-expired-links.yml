@@ -11,6 +11,14 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - name: Check secret availability
+        run: |
+          if [ -n "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY is available"
+          else
+            echo "SUPABASE_SERVICE_ROLE_KEY is NOT available"
+          fi
+      
       - name: Invoke cleanup function
         run: |
           curl -X POST "https://mdswvokxrnfggrujsfjd.supabase.co/functions/v1/cleanup-expired-links" \

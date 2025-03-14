@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
-import { PlusCircle, Edit } from 'lucide-react'
+import { PlusCircle, Edit, RefreshCw } from 'lucide-react'
 import { Layout as DashboardLayout } from '@/components/custom/layout'
 import { Separator } from '@/components/ui/separator'
 import { TopNav } from '@/components/portal/top-nav'
@@ -272,7 +272,16 @@ function PaymentLinksPage() {
 
           <Card className="rounded-none">
             <CardContent className="p-0">
-              <div id="payment-links-table-container" className="h-[72vh] overflow-auto">
+              <div id="payment-links-table-container" className="h-[72vh] overflow-auto relative">
+                <Button
+                  variant="ghost"
+                  onClick={handleRefresh}
+                  className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
+                  disabled={isPaymentLinksLoading}
+                >
+                  <RefreshCw className={`h-3 w-3 ${isPaymentLinksLoading ? 'animate-spin' : ''}`} />
+                  <span className="sr-only">Refresh</span>
+                </Button>
                 <div className="border-0">
                   <div className="hidden md:block">
                     {isPaymentLinksLoading ? (

@@ -11,7 +11,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { PlusCircle, Edit, ArrowUpDown } from 'lucide-react'
+import { PlusCircle, Edit, ArrowUpDown, RefreshCw } from 'lucide-react'
 import { TopNav } from '@/components/portal/top-nav'
 import { UserNav } from '@/components/portal/user-nav'
 import Notifications from '@/components/portal/notifications'
@@ -406,7 +406,16 @@ function CustomersPage() {
 
                     <Card className="rounded-none">
                         <CardContent className="p-0">
-                            <div id="customers-table-container" className="h-[72vh] overflow-auto">
+                            <div id="customers-table-container" className="h-[72vh] overflow-auto relative">
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleRefresh}
+                                    className="absolute -top-0.5 -right-0.5 z-10 h-5 w-5 p-0 flex items-center justify-center bg-transparent text-blue-500 hover:bg-transparent hover:text-blue-600 border border-border rounded-none"
+                                    disabled={isRefreshing}
+                                >
+                                    <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                    <span className="sr-only">Refresh</span>
+                                </Button>
                                 {/* Desktop Table View */}
                                 <div className="hidden md:block">
                                     <Table className="w-full">

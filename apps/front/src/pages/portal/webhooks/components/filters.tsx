@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RefreshCw, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { webhook_event, webhookCategories } from './types'
 import { Input } from "@/components/ui/input"
 
@@ -20,8 +19,6 @@ export function WebhookFilters({
     setSelectedEvent,
     selectedStatus,
     setSelectedStatus,
-    refetch,
-    isRefreshing,
     searchTerm,
     setSearchTerm
 }: WebhookFiltersProps) {
@@ -68,18 +65,6 @@ export function WebhookFilters({
                         <SelectItem value="inactive">Inactive</SelectItem>
                     </SelectContent>
                 </Select>
-            </div>
-
-            <div className="flex flex-row">
-                <Button
-                    variant="outline"
-                    onClick={refetch}
-                    className="border-border bg-background text-card-foreground flex-1 md:flex-none px-3.5 h-10 rounded-none"
-                    disabled={isRefreshing}
-                >
-                    <RefreshCw className={`h-5 w-5 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    Refresh
-                </Button>
             </div>
         </div>
     )

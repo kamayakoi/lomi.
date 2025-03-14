@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Filter, Download, Calendar, Settings, RefreshCw } from 'lucide-react'
+import { Search, Filter, Download, Calendar, Settings } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -59,8 +59,6 @@ export default function TransactionFilters({
     setIsDownloadOpen,
     handleDownload,
     copyAsJSON,
-    refetch,
-    isRefreshing,
 }: TransactionFiltersProps) {
     const [isColumnsPopoverOpen, setIsColumnsPopoverOpen] = useState(false)
     const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false)
@@ -329,15 +327,6 @@ export default function TransactionFilters({
                             </Button>
                         </PopoverContent>
                     </Popover>
-                    <Button
-                        variant="outline"
-                        onClick={() => refetch()}
-                        className="border-border text-card-foreground px-2 h-10 rounded-none"
-                        disabled={isRefreshing}
-                    >
-                        <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        <span className="sr-only">Refresh</span>
-                    </Button>
                 </div>
             </div>
         </div>

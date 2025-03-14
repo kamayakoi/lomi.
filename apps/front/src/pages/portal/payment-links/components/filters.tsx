@@ -1,9 +1,7 @@
-import { Search, RefreshCw } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
 import { link_type, currency_code } from './types'
-import { useState } from 'react'
 
 interface PaymentLinkFiltersProps {
     searchTerm: string
@@ -27,17 +25,7 @@ export function PaymentLinkFilters({
     setSelectedCurrency,
     selectedStatus,
     setSelectedStatus,
-    isRefreshing,
-    onRefresh,
 }: PaymentLinkFiltersProps) {
-    const [isLoading, setIsLoading] = useState(false)
-
-    const handleRefresh = async () => {
-        setIsLoading(true)
-        await onRefresh()
-        setIsLoading(false)
-    }
-
     return (
         <div className='w-[calc(100%+2rem)] -ml-4 sm:ml-0 sm:w-full'>
             <div className='flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 sm:p-0'>
@@ -83,15 +71,6 @@ export function PaymentLinkFilters({
                             <SelectItem value="EUR" disabled>EUR</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button
-                        variant="outline"
-                        onClick={handleRefresh}
-                        className="hidden sm:flex border-border text-card-foreground px-2 h-10 rounded-none"
-                        disabled={isRefreshing || isLoading}
-                    >
-                        <RefreshCw className={`h-5 w-5 ${isRefreshing || isLoading ? 'animate-spin' : ''}`} />
-                        <span className="sr-only">Refresh</span>
-                    </Button>
                 </div>
             </div>
         </div>
