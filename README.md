@@ -1,11 +1,5 @@
 <p align="center">
-  <a href="https://lomi.africa">
-    <img src="https://res.cloudinary.com/dzrdlevfn/image/upload/v1742039364/cube_bglbtn.webp" width="450" />
-  </a>
-</p>
-
-<p align="center">
-	<img src="apps/website/public/company/transparent.webp" width="120" height="120" alt="lomi. icon">
+	<img src="https://res.cloudinary.com/dzrdlevfn/image/upload/v1742679490/lomi_icon_gtyyix.webp" width="120" height="120" alt="lomi. icon">
 	<h1 align="center"><b>lomi.</b></h1>
 <p align="center">
     Helping West African ventures sell online
