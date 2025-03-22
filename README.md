@@ -71,7 +71,17 @@ lomi. is a unified payment orchestration platform that integrates multiple payme
     <strong>🎨 Customizable Checkout</strong><br/>
     Create beautiful, branded checkout experiences that work across all devices.
   </p>
+
+  <p>
+     <strong>🎨 Recurrent Payment Processing</strong><br/> 
+     Automate subscription payments and recurring invoices with seamless support for mobile money (WhatsApp) and card payments via email.
+  </p>
   
+  <p>
+  <strong>🎯 Smart Retry Logic</strong><br/>
+  Automatically attempt failed payments using alternative payment methods or at optimal times to maximize successful transactions.
+  </p>
+
   <p>
     <strong>👤 End-Customer Portal</strong><br/>
     Provide customers with a self-service portal to manage their payment methods, view transaction history, request refunds, update subscription and account details.
@@ -94,13 +104,18 @@ lomi. is a unified payment orchestration platform that integrates multiple payme
   
   <p>
     <strong>🔒 Secure Tokenization</strong><br/>
-    Safely store payment details for future transactions without handling sensitive data.
+    Safely store customers payment details for future transactions without handling sensitive data.
   </p>
   
   <p>
     <strong>👥 Role-Based Access Control</strong><br/>
     Manage team permissions with granular control over who can access what.
   </p>
+
+  <p>
+  <strong>🏦 Instant Payouts for Merchants</strong><br/>
+  Enable businesses to access their funds instantly via mobile money or bank withdrawals.
+ </p>
 </div>
 
 ## Open Source Roadmap
@@ -112,15 +127,14 @@ We are progressively open-sourcing the entire lomi. project:
   - Documentation website: **[apps/developers](https://github.com/lomiafrica/developers.lomi.africa)**
 
 - **Opening Soon**:
-  - API service:  **[apps/api](https://github.com/lomiafrica/api.lomi.africa)** - API service – Node.js / TypeScript / Express
-  - Boilerplate templates: **[apps/store](https://github.com/lomiafrica/store.lomi.africa)** – Medusa + Next.js / TypeScript; **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)** – Boilerplate - Medusa + Vite / TypeScript
+  - API service:  **[apps/api](https://github.com/lomiafrica/api.lomi.africa)**
+  - Boilerplate Next.js + Medusa: **[apps/store](https://github.com/lomiafrica/store.lomi.africa)**
+  - Boilerplate Vite + Medusa: **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)**
+  - Shopify extension: **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)**
+  - CLI tool: **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** 
+  - Jumbo (Online IDE) * **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)**
 
-  - Shopify extension: **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)** – Vite / TypeScript
-  - CLI tool: **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** - Node.js
-
-  - Jumbo online IDE (Online IDE) * **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)** - Remix + Vite + Expo / TypeScript 
-
-Everything will be made available in the coming weeks and all separate repositories will be merge in the monorepo. Stay tuned for updates!
+Everything will be made available in the coming weeks and all separate repositories will be merged in the monorepo — stay tuned for updates!
 
 ## Core Infrastructure
 
