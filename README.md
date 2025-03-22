@@ -91,13 +91,13 @@ Everything will be made available in the coming weeks and all separate repositor
   </p>
 
   <p>
-     <strong>🎨 Recurrent Payment Processing</strong><br/> 
-     Automate subscription payments and recurring invoices with seamless support for mobile money (WhatsApp) and card payments via email.
+    <strong>🎨 Recurrent Payment Processing</strong><br/> 
+    Automate subscription payments and recurring invoices with seamless support for mobile money (WhatsApp) and card payments via email.
   </p>
   
   <p>
-  <strong>🎯 Smart Retry Logic</strong><br/>
-  Automatically attempt failed payments using alternative payment methods or at optimal times to maximize successful transactions.
+    <strong>🎯 Smart Retry Logic</strong><br/>
+    Automatically attempt failed payments using alternative payment methods or at optimal times to maximize successful transactions.
   </p>
 
   <p>
@@ -190,9 +190,16 @@ For comprehensive documentation, visit [developers.lomi.africa](https://develope
 
 ## Use Cases
 
-- **E-commerce and SaaS**: Accept payments on your website, application or online store with a customized checkout experience
-- **Subscription services**: Manage recurring payments with automated billing
-- **Mobile apps**: Integrate payment capabilities into your iOS and Android applications
+- **E-commerce**: Sell physical or digital products online through your website or platforms like Shopify or WooCommerce. Transactions are typically one-time purchases.
+- **SaaS (Software as a Service)**: Offer software on a subscription basis, with automated recurring billing for continuous access.
+- **Subscription services**: Manage recurring payments for memberships, content access, and digital products.
+- **Marketplaces**: Handle multi-vendor transactions for platforms like Yango.
+- **Crowdfunding & Donations**: Process payments for fundraising platforms, nonprofits, and charities.
+- **On-Demand Services**: Enable instant payments for ride-sharing, food delivery, and freelance platforms.
+- **B2B Payments**: Support invoicing, large transactions, and business-to-business billing. 
+- **Financial Services & Fintech**: Power embedded finance, payouts, and banking-as-a-service solutions.
+- **Education & Online Learning**: Collect payments for courses, e-learning platforms, and certifications.
+- **Events & Ticketing**: Sell tickets for concerts, conferences, and online events.
 
 ## License
 
