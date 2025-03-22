@@ -1,8 +1,8 @@
 <p align="center">
-	<img src="https://res.cloudinary.com/dzrdlevfn/image/upload/v1742679490/lomi_icon_gtyyix.webp" width="120" height="120" alt="lomi. icon">
+	<img src="https://res.cloudinary.com/dzrdlevfn/image/upload/v1742680937/transparent_g2ffjo.webp" width="200" height="200" alt="lomi. icon">
 	<h1 align="center"><b>lomi.</b></h1>
 <p align="center">
-    Helping West African ventures sell online
+    The open-source payment orchestration platform powering West African businesses.
     <br />
     <br />
     <a href="https://discord.gg/lomi">Discord</a>
