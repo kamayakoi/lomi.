@@ -24,6 +24,10 @@
 <a href="https://lomi.africa/blog">Blog</a>
 
 <p align="center">
+<p align="center">
+  <a href="https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
+  </a>
   <a href="https://discord.gg/yb4FnBmh">
     <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
   </a>
@@ -198,11 +202,29 @@ See the [LICENSE](https://github.com/lomiafrica/lomi.?tab=License-1-ov-file) fil
 
 ## Contributing
 
-We welcome contributions to the AGPL-licensed portions of this project! Before contributing, please:
+We welcome contributions to lomi. ! This document outlines how to submit changes and which conventions to follow.
 
-1. Read our [Code of Conduct](https://github.com/lomiafrica/lomi.?tab=coc-ov-file)
-2. Review our [Security Policy](https://github.com/lomiafrica/lomi.?tab=security-ov-file)
-3. Ensure your contribution doesn't modify files marked with `/* @proprietary license */`
+### Prerequisites
+- You're familiar with GitHub Issues and Pull Requests
+- You've read the [documentation](https://developers.lomi.africa)
+- You've already set up your local instance with `git clone https://github.com/lomiafrica/website` or via `bun install lomi.cli`
+
+### Contribution Process
+
+1. **Issues First**: Before working on a change, make sure there's an issue for it. Find an [existing issue](https://github.com/lomiafrica/lomi./issues) or [open a new one](https://github.com/lomiafrica/lomi./issues/new).
+
+2. **Fork & Branch**: Fork the repository and create a branch from `develop` with a descriptive prefix:
+   - `fix/` for bug fixes
+   - `feat/` for features
+   - `docs/` for documentation changes
+
+3. **Make Changes**: Keep your commits small and focused and ensure that your contribution doesn't modify files marked with `/* @proprietary license *
+
+4. **Submit PR**: Open a pull request against the `develop` branch. Include a clear description following the What-Why-How-Testing structure.
+
+5. **Code Review**: A team member will review your PR within a few hours/days.
+
+For detailed contribution guidelines, please see our [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md).
 
 ## Community & Support
 
