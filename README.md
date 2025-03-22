@@ -13,7 +13,6 @@
   </p>
 </p>
 
-<hr />
 <div align="center">
 
 <a href="https://lomi.africa">Website</a>
@@ -100,57 +99,38 @@ lomi. is a unified, scalable payment orchestration platform that integrates mult
   </p>
 </div>
 
-## Why lomi.?
-
-<div align="left">
-  <p>
-    <strong>🌍 Built for West Africa</strong><br/>
-    Specifically designed to address the unique challenges of payment processing in francophone West Africa.
-  </p>
-  
-  <p>
-    <strong>🔄 Single Integration</strong><br/>
-    Integrate once to access multiple payment providers instead of managing separate integrations.
-  </p>
-  
-  <p>
-    <strong>💻 Open Source</strong><br/>
-    Transparent, community-driven development with the option to self-host or use our managed service.
-  </p>
-  
-  <p>
-    <strong>🚀 Developer-First</strong><br/>
-    Comprehensive documentation, SDKs, and tools built with developers and non-developers experience in mind.
-  </p>
-</div>
-
 ## Open Source Roadmap
 
 We are progressively open-sourcing the entire lomi. project:
 
 - **Currently Open Source**:
-  - Merchant Dashboard
-  - Documentation Website
+  - Merchant dashboard
+  - Documentation website
 
 - **Opening Soon**:
-  - Boilerplate Templates (Medusa + Nextjs / Medusa / Vite)
-  - Shopify Extension
-  - WooCommerce Extension
-  - CLI Tool
-  - API Libraries
-  - Jumbo App (Online IDE)
+  - Boilerplate templates (Medusa + Nextjs / Medusa / Vite)
+  - Shopify extension
+  - WooCommerce extension
+  - CLI tool
+  - API service
+  - Jumbo online IDE (Online IDE)
 
 Everything will be made available in the coming weeks. Stay tuned for updates!
 
 ## Repository Structure
 
-* **[apps/api](./apps/api/README.md)** – Node.js / TypeScript / Express
-* **[apps/website](./apps/website/README.md)** – Merchant Dashboard – Vite / React / TypeScript
-* **[apps/developers](./apps/docs/README.md)** – Documentation Website – Nextjs / TypeScript
+* **[apps/api](https://github.com/lomiafrica/api.lomi.africa)** – Node.js / TypeScript / Express
+* **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** - Node.js
+* **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)** – Shopify Application – Vite / TypeScript
+* **[apps/website](https://github.com/lomiafrica/website)** – Merchant Dashboard – Vite / React / TypeScript
+* **[apps/developers](https://github.com/lomiafrica/developers.lomi.africa)** – Documentation Website – Nextjs / TypeScript
+* **[apps/store](https://github.com/lomiafrica/store.lomi.africa)** – Boilerplate - Medusa + Next.js / TypeScript
+* **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)** – Boilerplate - Medusa + Vite / TypeScript
+* **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)** – Online IDE - Remix + Vite + Expo / TypeScript
 
 ## Core Infrastructure
 
-- Microservices Architecture
+- Microservices architecture
 - TypeScript
 - Node.js
 - Vite
@@ -167,10 +147,12 @@ Everything will be made available in the coming weeks. Stay tuned for updates!
 
 ## Payment Infrastructure
 - Wave
-- Orange Money
-- MTN (in progress)
-- Stripe (in progress)
-- More coming soon!
+- Orange
+- Crypto via NP
+- MTN (upcoming)
+- Stripe (upcoming)
+- Airtel Money (upcoming)
+- More integration coming soon!
 
 ## Quick Start
 
