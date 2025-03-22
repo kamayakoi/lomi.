@@ -54,6 +54,24 @@
 
 lomi. is a unified payment orchestration platform that integrates multiple payment service providers and provides a seamless experience for merchants and their customers across West Africa and beyond. Our platform simplifies product and subscriptions billing while ensuring the highest levels of security, reliability, and compliance.
 
+## Open Source Roadmap
+
+We are progressively open-sourcing the entire lomi. project:
+
+- **Currently Open Source**:
+  - Merchant dashboard : **[apps/website](https://github.com/lomiafrica/website)**
+  - Documentation website: **[apps/developers](https://github.com/lomiafrica/developers.lomi.africa)**
+
+- **Opening Soon**:
+  - API service:  **[apps/api](https://github.com/lomiafrica/api.lomi.africa)**
+  - Boilerplate Next.js + Medusa: **[apps/store](https://github.com/lomiafrica/store.lomi.africa)**
+  - Boilerplate Vite + Medusa: **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)**
+  - Shopify extension: **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)**
+  - CLI tool: **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** 
+  - Jumbo (Online IDE) * **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)**
+
+Everything will be made available in the coming weeks and all separate repositories will be merged in the monorepo — stay tuned for updates!
+
 ## Features
 
 <div align="left">
@@ -117,24 +135,6 @@ lomi. is a unified payment orchestration platform that integrates multiple payme
   Enable businesses to access their funds instantly via mobile money or bank withdrawals.
  </p>
 </div>
-
-## Open Source Roadmap
-
-We are progressively open-sourcing the entire lomi. project:
-
-- **Currently Open Source**:
-  - Merchant dashboard : **[apps/website](https://github.com/lomiafrica/website)**
-  - Documentation website: **[apps/developers](https://github.com/lomiafrica/developers.lomi.africa)**
-
-- **Opening Soon**:
-  - API service:  **[apps/api](https://github.com/lomiafrica/api.lomi.africa)**
-  - Boilerplate Next.js + Medusa: **[apps/store](https://github.com/lomiafrica/store.lomi.africa)**
-  - Boilerplate Vite + Medusa: **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)**
-  - Shopify extension: **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)**
-  - CLI tool: **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** 
-  - Jumbo (Online IDE) * **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)**
-
-Everything will be made available in the coming weeks and all separate repositories will be merged in the monorepo — stay tuned for updates!
 
 ## Core Infrastructure
 
