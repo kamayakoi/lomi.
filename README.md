@@ -17,9 +17,9 @@
 
 <a href="https://lomi.africa">Website</a>
 <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-<a href="https://developers.lomi.africa">Developers documentation</a>
+<a href="https://developers.lomi.africa">Docs</a>
 <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-<a href="https://developers.lomi.africa/reference/core/overview">API reference</a>
+<a href="https://developers.lomi.africa/reference/core/overview">API</a>
 <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
 <a href="https://lomi.africa/blog">Blog</a>
 
@@ -39,7 +39,7 @@
   </a>
     </a>
     <a href="https://jumbo.lomi.africs">
-    <img src="https://img.shields.io/badge/Try_Jumbo-purple.svg?style=flat" alt="PRs welcome!" />
+    <img src="https://img.shields.io/badge/Try_-Jumbo-gold.svg?style=flat" alt="PRs welcome!" />
   </a>
 </p>
 
