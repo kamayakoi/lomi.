@@ -7,8 +7,6 @@
     <br />
     <a href="https://discord.gg/lomi">Discord</a>
     ·
-    <a href="https://lomi.africa">Website</a>
-    ·
     <a href="https://github.com/lomiafrica/website/issues">Issues</a>
   </p>
 </p>
@@ -156,6 +154,7 @@ Everything will be made available in the coming weeks and all separate repositor
 - Anthropic
 - Infobip
 - Tailwind CSS
+- Sanity
 
 ## Payment Service Providers (PSPs)
 - Wave
