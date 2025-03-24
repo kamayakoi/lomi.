@@ -2,7 +2,7 @@
 	<img src="https://res.cloudinary.com/dzrdlevfn/image/upload/v1742680937/transparent_g2ffjo.webp" width="200" height="200" alt="lomi. icon">
 	<h1 align="center"><b>lomi.</b></h1>
 <p align="center">
-    The open-source payment orchestration platform powering West African businesses.
+    Helping West African ventures sell online
     <br />
     <br />
     <a href="https://discord.gg/lomi">Discord</a>
@@ -70,9 +70,9 @@ We are progressively open-sourcing the entire lomi. project:
   - Boilerplate Vite + Medusa: **[apps/commerce](https://github.com/lomiafrica/commerce.lomi.africa)**
   - Shopify extension: **[apps/shopify](https://github.com/lomiafrica/shopify.lomi.africa)**
   - CLI tool: **[apps/cli](https://github.com/lomiafrica/cli.lomi.africa)** 
-  - Jumbo (Online IDE) * **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)**
+  - Jumbo (Online IDE) **[apps/jumbo](https://github.com/lomiafrica/jumbo.lomi.africa)**
 
-Everything will be made available in the coming weeks and all separate repositories will be merged in the monorepo — stay tuned for updates!
+Everything will be made available in the coming weeks and all separate repositories will be merged in the monorepo.
 
 ## Features
 
@@ -82,11 +82,11 @@ Everything will be made available in the coming weeks and all separate repositor
     Seamlessly integrate with various payment providers (Wave, MTN, Orange Money, Stripe) through a single API.
   </p>
   
-  <p>
+  <!-- <p>
     <strong>💱 Multi-Currency Support</strong><br/>
     Process transactions in multiple currencies with automatic conversion and settlement.
   </p>
-  
+   -->
   <p>
     <strong>🎨 Customizable Checkout</strong><br/>
     Create beautiful, branded checkout experiences that work across all devices.
@@ -97,11 +97,6 @@ Everything will be made available in the coming weeks and all separate repositor
     Automate subscription payments and recurring invoices with seamless support for mobile money (WhatsApp) and card payments via email.
   </p>
   
-  <p>
-    <strong>🎯 Smart Retry Logic</strong><br/>
-    Automatically attempt failed payments using alternative payment methods or at optimal times to maximize successful transactions.
-  </p>
-
   <p>
     <strong>👤 End-Customer Portal</strong><br/>
     Provide customers with a self-service portal to manage their payment methods, view transaction history, request refunds, update subscription and account details.
@@ -140,20 +135,22 @@ Everything will be made available in the coming weeks and all separate repositor
 
 ## Core Infrastructure
 
-- Microservices architecture
 - TypeScript
-- Node.js
+- Node.js/Bun
 - Vite
 - Nextjs
+- Remix
 - React
 - Shadcn UI
 - Radix UI
 - PostgreSQL via Supabase
 - Resend
-- Upstash (Redis)
+- Upstash
 - Anthropic
+- Huggingface
 - Infobip
 - Tailwind CSS
+- Mixpanel
 - Sanity
 
 ## Payment Service Providers (PSPs)
@@ -161,16 +158,11 @@ Everything will be made available in the coming weeks and all separate repositor
 - Orange
 - Crypto via NP
 - MTN (upcoming)
-- Stripe (upcoming)
+- Stripe CNT (upcoming)
 - Airtel Money (upcoming)
 - More integration coming soon!
 
 ## Quick Start
-
-### Prerequisites
-- Node.js 18+
-- Bun
-- Supabase
 
 ### Local development (via merchant dashboard)
 ```bash
@@ -181,7 +173,7 @@ git clone https://github.com/lomiafrica/website.git
 bun install
 
 # Set up environment variables
-cp .env.example .env.local
+cp .env.example .env
 
 # Start the development server
 bun run dev
