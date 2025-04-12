@@ -25,3 +25,9 @@
 [submodule "apps/sdk"]
 	path = apps/sdk
 	url = https://github.com/lomiafrica/sdk.git
+[submodule "apps/events"]
+	path = apps/events
+	url = https://github.com/lomiafrica/events.git
+[submodule "apps/jumbo"]
+	path = apps/jumbo
+	url = https://github.com/lomiafrica/jumbo.git
