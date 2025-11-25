@@ -1,0 +1,637 @@
+{
+  "blog": {
+    "backHome": "返回首页",
+    "backToBlog": "返回文章",
+    "byAuthor": "作者：{author}",
+    "categories": {
+      "case-study": "案例",
+      "news": "新闻",
+      "opinion": "意见",
+      "online-business": "在线业务",
+      "payments": "支付"
+    },
+    "copied": "已复制",
+    "copiedDesc": "链接已复制到您的剪贴板。",
+    "copyErrorDesc": "无法将链接复制到剪贴板。",
+    "copyErrorTitle": "复制失败",
+    "copyLink": "复制链接",
+    "description": "来自我们团队的最新见解、更新和故事。",
+    "heading": "博客",
+    "next": "下一页",
+    "noPosts": "未找到博客文章",
+    "noPostsDesc": "目前没有可用的博客文章。请稍后再查看。",
+    "notFound": "未找到文章",
+    "notFoundDesc": "您寻找的博客文章不存在或已被移动。",
+    "previous": "上一页",
+    "shareDescription": "在您喜欢的平台上分享此博客文章。",
+    "shareTitle": "分享此文章",
+    "subheading": "与我们团队的最新见解、产品更新和行业趋势保持同步。"
+  },
+  "careers": {
+    "join_us": "加入我们",
+    "title": "lomi. 是一个专注于消除支付障碍的软件公司。",
+    "title_page": "职业",
+    "description": "发现激动人心的机会，加入我们充满激情的工程师和企业家团队。",
+    "job_opportunity": "职位机会",
+    "apply_for_role": "申请 lomi 的 {{title}} 职位。",
+    "open_roles": "开放职位",
+    "all_teams": "所有团队",
+    "all_locations": "所有地点",
+    "apply": "申请",
+    "job_not_found": "未找到职位",
+    "job_does_not_exist": "您寻找的职位不存在。",
+    "failed_to_load_job": "加载职位详情失败。请稍后重试。"
+  },
+  "job_application": {
+    "apply_for_role": "申请此职位",
+    "name": "姓名",
+    "email": "邮箱",
+    "resume": "简历",
+    "linkedin": "LinkedIn",
+    "github": "GitHub",
+    "project_note": "请简要写下您引以为豪的一个项目",
+    "submitting": "提交中...",
+    "submit_application": "提交申请",
+    "application_submitted": "申请已提交！",
+    "thank_you_message": "感谢您申请 {{jobTitle}} 职位。我们将在尽快审核您的申请并与您联系。",
+    "file_too_large": "文件过大",
+    "file_too_large_desc": "请选择小于 5MB 的文件。",
+    "invalid_file_type": "无效的文件类型",
+    "invalid_file_type_desc": "请上传 PDF 或 Word 文档。",
+    "submission_failed": "提交失败",
+    "submission_failed_desc": "请稍后重试。"
+  },
+  "changelog": {
+    "description": "保持更新，了解我们产品的最新更新、改进和修复。",
+    "subtitle": "我们产品的最新更新、改进和修复。",
+    "title": "更新日志"
+  },
+  "components": {
+    "business_outreach": {
+      "dismiss": "关闭",
+      "message": "大型或快速增长的企业？获取专属定价和支持。",
+      "reach_out": "联系我们"
+    },
+    "tracking_cookie": {
+      "accept": "接受",
+      "decline": "拒绝",
+      "message": "我们使用跟踪 cookie 来了解您如何使用产品，并帮助我们改进它。"
+    }
+  },
+  "documentationDropdown": {
+    "billingDescription": "以您想要的方式计费和管理客户。",
+    "billingTitle": "计费",
+    "featuredDescription": "探索我们的指南和示例以集成 lomi。",
+    "featuredTitle": "专注于构建，而非计费。",
+    "moneyManagementDescription": "直接管理资金和财务，或在您的平台内管理。",
+    "moneyManagementTitle": "资金管理"
+  },
+  "earlyMemberPricing": {
+    "getStarted": "开始使用",
+    "learnMore": "了解更多"
+  },
+  "faq": {
+    "description": "回答关于lomi.支付处理服务的常见问题。",
+    "introduction": "找到关于使用lomi.支付的常见问题的答案。",
+    "items": {
+      "funds": {
+        "answer": "资金通常在完成支付后的2个工作日可提取。",
+        "question": "什么时候我可以收到我的资金？"
+      },
+      "international": {
+        "answer": "是的，lomi.支持国际交易。我们可以处理多种货币的支付，包括USD和XOF。",
+        "question": "我可以使用lomi.进行国际交易吗？"
+      },
+      "minimum_amount": {
+        "answer": "不，没有最低交易金额。您可以通过我们的平台处理任何规模的支付。",
+        "question": "是否有最低交易金额？"
+      },
+      "payment_methods": {
+        "answer": "我们支持主要的信用卡和借记卡，以及多个非洲国家的移动支付。",
+        "question": "您支持哪些支付方式？"
+      },
+      "pricing": {
+        "answer": "lomi.提供透明的定价，没有隐藏费用。我们按交易收取简单的2.9%费用，并根据货币收取小额固定费用。没有设置费用、月费或隐藏费用。",
+        "question": "lomi.的定价如何运作？"
+      },
+      "security": {
+        "answer": "lomi.使用行业标准的安全协议，并完全符合PCI DSS要求进行信用卡支付处理。我们使用加密、令牌化和其他安全措施来保护您的数据和客户信息。",
+        "question": "lomi.的安全性如何？"
+      }
+    },
+    "subtitle": "找到关于我们服务的常见问题的答案。",
+    "title": "常见问题"
+  },
+  "features": {
+    "card1": {
+      "crypto_description": "加密货币支付",
+      "description": "接受本地和国际支付方式，无需努力。",
+      "google_pay_description": "非接触式支付系统",
+      "paypal_description": "数字支付平台",
+      "spi_description": "统一支付系统",
+      "title": "满足您所有客户偏好的支付方式",
+      "visa_description": "全球电子支付网络"
+    },
+    "card2": {
+      "description": "创建快速、强大且安全的支付流程。",
+      "description_light": "增加收入并留住客户。",
+      "title": "高转化率的结账体验",
+      "title_light": "为性能而设计"
+    },
+    "card3": {
+      "description": "从产品到订阅再到按使用量计费，我们都能满足您的需求。",
+      "tab_checkout": "结账",
+      "tab_products": "产品",
+      "tab_subscriptions": "订阅",
+      "title": "您的想象力是唯一的限制"
+    },
+    "card4": {
+      "balance": "余额",
+      "description": "在几秒内将您的收入直接提取到您的移动货币或银行账户。",
+      "payout_bank": "或直接支付到您本地或国际银行账户",
+      "payout_phone": "按需支付到您的电话号码",
+      "title": "即时轻松的支付"
+    },
+    "card5": {
+      "description": "使用我们强大的仪表板监控收入，跟踪交易并规划您的下一步行动。",
+      "title": "通过强大的分析了解有效的方法"
+    },
+    "card6": {
+      "description": "开源，100%由热情和开源社区驱动。",
+      "documentation_button": "文档",
+      "open_source_note": "电池有保障。积极维护并开放贡献。",
+      "title": "由您成就"
+    },
+    "title": "释放您的商业潜力."
+  },
+  "footer": {
+    "bceao_accreditation": "lomi. 目前正在由 BCEAO 进行支付服务提供商认证程序。",
+    "company": {
+      "blog": "博客",
+      "careers": "职业",
+      "openSource": "开源",
+      "story": "故事",
+      "title": "公司"
+    },
+    "copyright": "版权 © 2025 — lomi.",
+    "description": "lomi. 是一套为西非在线支付处理和电子商务产品提供动力的API。轻松接受支付、发送付款并自动化金融工作流程。",
+    "features": {
+      "faq": "常见问题",
+      "overview": "概览",
+      "pricing": "定价",
+      "title": "功能"
+    },
+    "resources": {
+      "branding": "品牌资产",
+      "changelog": "更新日志",
+      "featureRequest": "请求功能",
+      "github": "Github",
+      "privacy": "隐私政策",
+      "review": "给我们留言",
+      "support": "支持",
+      "terms": "条款",
+      "title": "资源"
+    },
+    "status": "所有服务正常运行"
+  },
+  "header": {
+    "blog": "博客",
+    "connect": "连接",
+    "dashboard": "仪表板",
+    "documentation": "文档",
+    "pricing": "定价",
+    "products": "产品",
+    "talk": "联系我们"
+  },
+  "hero": {
+    "title": "专为让您盈利而设计，\nlomi. 是西非接受付款的最佳方式。"
+  },
+  "pricing": {
+    "calculator": {
+      "disclaimer": "估计基于您的平均交易金额和交易量。",
+      "fee_tooltip": "部分退款收取2%费用，用于覆盖处理成本。全额退款免费。",
+      "our_fee": "我们的费用",
+      "see_fees": "了解我们的费用如何适用。",
+      "transaction_amount": "平均交易金额",
+      "transaction_count": "交易次数",
+      "you_receive": "您收到"
+    },
+    "description": "透明费用，与竞争对手相比有20%的折扣。",
+    "introduction": "我们只在您盈利时盈利 — 没有意外，没有隐藏费用，没有月费。",
+    "title": "定价",
+    "transparency": "没有意外，没有隐藏费用，没有月费。"
+  },
+  "pricingDetails": {
+    "sections": {
+      "intro": "介绍",
+      "transaction": "交易费用",
+      "additional": "额外费用",
+      "example": "示例",
+      "refunds": "退款",
+      "dispute": "退款费用",
+      "payout": "支付费用",
+      "volume": "批量定价"
+    },
+    "content": {
+      "intro": {
+        "title": "介绍",
+        "sections": [
+          {
+            "subtitle": "市场上最便宜的MoR",
+            "items": [
+              {
+                "text": "lomi.的定价比法语西非的其他商家记录商便宜20%。移动货币每笔交易2%和200 F CFA。"
+              }
+            ]
+          },
+          {
+            "subtitle": "没有隐藏费用",
+            "items": [
+              {
+                "text": "没有隐藏费用或其他额外费用。我们涵盖所有基础设施成本，我们不添加额外费用或加价。"
+              }
+            ]
+          }
+        ]
+      },
+      "transaction": {
+        "title": "交易费用",
+        "sections": [
+          {
+            "subtitle": "每笔交易2% + 200 F CFA",
+            "items": [
+              {
+                "text": "lomi.目前建立在SPI之上用于移动货币支付处理，我们的定价结构旨在用我们的费用覆盖基础设施1%到1.5%的费用。"
+              },
+              {
+                "text": "对于信用卡支付处理，我们通过每笔交易收取3.5% + 0.40美元来覆盖底层处理费用。然而，对于某些交易可能适用额外费用，我们需要传递这些费用。"
+              }
+            ]
+          }
+        ]
+      },
+      "additional": {
+        "title": "额外费用",
+        "sections": [
+          {
+            "subtitle": "+1.5% 国际卡"
+          },
+          {
+            "subtitle": "+0.5% 订阅付款"
+          }
+        ]
+      },
+      "example": {
+        "title": "示例",
+        "sections": [
+          {
+            "subtitle": "科特迪瓦20 000 F CFA订阅的付款明细",
+            "items": [
+              {
+                "text": "让我们看看应用我们定价的示例明细。以下是使用移动货币在科特迪瓦支付的20 000 F CFA订阅。"
+              }
+            ],
+            "table": [
+              { "label": "产品价格", "value": "20 000 F CFA" },
+              { "label": "交易总价值", "value": "20 000 F CFA" },
+              { "label": "交易费用（2% + 200 XOF）", "value": "600 F CFA" },
+              { "label": "您收到的金额", "value": "19 400 F CFA" }
+            ]
+          },
+          {
+            "subtitle": "每月30美元订阅的付款明细",
+            "items": [
+              {
+                "text": "这里是使用信用卡在USD中支付的相同订阅。"
+              }
+            ],
+            "table": [
+              { "label": "产品价格", "value": "30 $" },
+              { "label": "增值税 (20%)", "value": "6 $" },
+              { "label": "交易总价值", "value": "36 $" },
+              { "label": "交易费用（3.5% + 0.40 $）", "value": "1.66 $" },
+              { "label": "订阅费用（0.5%）", "value": "0.18 $" },
+              { "label": "总费用", "value": "1.84 $" }
+            ]
+          }
+        ]
+      },
+      "refunds": {
+        "title": "退款",
+        "sections": [
+          {
+            "subtitle": "全额和部分退款",
+            "items": [
+              {
+                "text": "您可以在lomi.上向客户发放全额或部分退款。然而，初始交易费用不会退还给您，因为信用卡网络和PSP无论未来的退款如何都会收取这些费用。",
+                "bubble": "lomi.保留权利，在购买后最多60天内自行决定发放退款，作为我们持续主动减少退款成本的努力，这些退款每次争议要花费您15美元。我们只为此目的行使此权利，并为了减少您的退款和费用而这样做。"
+              }
+            ]
+          }
+        ]
+      },
+      "dispute": {
+        "title": "退款",
+        "sections": [
+          {
+            "subtitle": "移动货币没有退款",
+            "items": [
+              {
+                "text": "不可能对移动货币交易开启退款。"
+              }
+            ]
+          },
+          {
+            "subtitle": "争议处理",
+            "items": [
+              {
+                "text": "有时，客户可以通过银行对信用卡购买开启争议。争议无论结果如何都花费15美元，并直接从您的余额中扣除。这些费用由底层信用卡网络和PSP收取，因此我们无法退款。然而，我们持续主动工作以将退款率降低到行业标准以内或以下。",
+                "bubble": "信用卡网络对退款率高的卖家（~0.7%+）征收监控程序、处罚和更高的退款成本。由于lomi.充当记录商家，我们因此总是监控并主动防止我们的率接近这些阈值。在极少数情况下，我们可能需要干预甚至暂停您的账户，除非采取快速主动措施将退款降低到可接受水平。"
+              }
+            ]
+          }
+        ]
+      },
+      "payout": {
+        "title": "支付费用",
+        "sections": [
+          {
+            "subtitle": "虽然支付可能产生由支付提供商收取的费用，但lomi.不添加额外费用或加价。",
+            "items": [
+              {
+                "text": "lomi.在商家提款上没有任何收益，我们努力使它们完全免费。我们还提供移动货币和国际银行转账的即时提款，让您完全控制何时发放付款。"
+              }
+            ]
+          }
+        ]
+      },
+      "volume": {
+        "title": "自定义定价",
+        "sections": [
+          {
+            "subtitle": "成长中企业的自定义定价",
+            "items": [
+              {
+                "text": "大型或快速增长的企业？我们可以提供自定义定价以更好地满足您的需求。联系我们获取更多信息。"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "privacy": {
+    "description": "了解我们的隐私承诺",
+    "footer_date": "最后更新：2025年11月6日",
+    "introduction": "我们，<strong>lomi.africa S.A.R.L.</strong>（<strong>我们</strong>、<strong>我们的</strong>或<strong>lomi.</strong>），是一个支付系统运营商。我们优先考虑您的隐私和对您数据的保护，并致力于保护所有收集的个人和非个人数据。我们向客户提供支付和清算服务（<strong>服务</strong>）。在提供我们的<strong>服务</strong>时，我们处理有关我们客户、其授权代表和客户的个人信息（<strong>个人数据</strong>）。此处理受科特迪瓦适用的数据保护法律法规管辖。\n\n在某些情况下，我们与附属机构和第三方供应商合作提供我们的<strong>服务</strong>（例如，银行、卡获取合作伙伴、支付中心、电信公司和电子货币发行机构，统称为<strong>支付渠道合作伙伴</strong>）。每当存在此类合作时，我们与这些附属机构和<strong>支付渠道合作伙伴</strong>执行适当协议，规定他们与提供<strong>服务</strong>相关的处理范围，以及他们对<strong>lomi.</strong>处理的<strong>个人数据</strong>的义务。",
+    "sections": {
+      "consent": {
+        "additional_content": "在使用我们的任何<strong>服务</strong>时，我们还收集和汇总其他<strong>个人数据</strong>，来自各种来源。其中<strong>个人数据</strong>的来源包括我们的技术，这些技术记录我们网站支持的<strong>服务</strong>的使用，实现我们<strong>服务</strong>的网站，以及<strong>服务</strong>的一般使用。",
+        "content": "您始终可以选择授予或拒绝我们处理您的信息的权限。对于我们服务核心功能不重要的数据，例如用于营销目的的cookie，您可以选择不给予同意，而不会影响您对我们服务的访问。但是，如果您不提供我们服务所需的必要信息（例如，必要的cookie、电子邮件地址），我们将无法授予您访问依赖于这些信息的lomi的所有功能的权限。当您被要求提供信息或同意使用时，是否需要此类信息将清楚地指示。接受此隐私政策并向我们提供您的个人信息，即表示您同意我们按照本政策中所述处理您的信息。\n\n我们将<strong>个人数据</strong>称为任何识别，或可能合理用于识别<strong>数据主体</strong>作为个人的数据。我们以不同方式收集<strong>个人数据</strong>。例如，我们在企业注册账户时收集<strong>个人数据</strong>，或当客户通过我们的<strong>服务</strong>进行支付或进行交易时。我们还可以从我们的客户提交给我们的身份证件中收集<strong>个人数据</strong>，当我们在为客户建立业务关系之前进行客户尽职调查（KYC）和客户尽职调查（CDD）验证时。\n\n我们还从其他来源接收<strong>个人数据</strong>，例如我们的合作伙伴、金融服务提供商、身份验证服务和公开可用的来源。为清楚起见，<strong>个人数据</strong>不包括已聚合或匿名化的数据，以至于不再能够合理地与特定人员相关联。我们可能收集的<strong>个人数据</strong>包括：",
+        "other_data_content": "我们可能收集的其他<strong>个人数据</strong>包括浏览器和设备数据，如IP地址、设备类型、操作系统和浏览器类型、屏幕分辨率、设备制造商和型号、语言、插件以及正在使用的lomi版本、交易数据包括购买、金额、日期和支付方式，以及cookie和技术跟踪数据覆盖在<strong>服务</strong>上花费的时间、访问的页面、语言偏好和其他匿名流量数据。",
+        "personal_data_content": "<strong>数据主体</strong>的全名以及联系方式，如物理地址、电话号码和电子邮件地址、金融和交易信息包括信用卡或借记卡号码和银行账户信息，以及出生日期和地点以及政府颁发的标识符，如税务识别号、国家识别号和护照数据，我们收集和处理这些信息是为了满足我们在反洗钱和反恐怖融资法规下的义务，并履行我们与<strong>支付渠道合作伙伴</strong>的合同承诺。",
+        "title": "我们收集的个人数据"
+      },
+      "data_collection": {
+        "subsections": {
+          "data_disclosure": {
+            "additional_content": "出于安全、法律和执法目的，我们可能会根据适用法律或支付方法规则使用和披露我们客户的<strong>个人数据</strong>，以执行我们的条款和条件，保护我们的权利、隐私、安全或财产以及我们的附属公司和<strong>数据主体</strong>的权利，并响应来自法院、执法机构、监管机构和其他公共和政府当局的请求，这些请求可能包括<strong>数据主体</strong>居住国家以外的当局。我们在我们的组织内实施合理的组织、技术和管理措施来保护<strong>个人数据</strong>。如果您有理由相信我们对<strong>个人数据</strong>的处理不再安全，请立即联系我们。",
+            "content": "<strong>lomi.</strong> 不会向营销人员或非附属第三方出售或出租<strong>个人数据</strong>。除非必要提供我们的<strong>服务</strong>、遵守法律或保护我们的权利，否则我们不会与第三方共享用户数据。当第三方受雇代表我们处理用户数据时，他们在保密协议下这样做，并有义务遵守我们的隐私政策和数据保护法。\n\n我们可能会与可信赖的第三方共享数据，例如我们的附属公司和服务提供商，包括帮助支付处理、网站托管、数据分析、客户服务和审计的<strong>支付渠道合作伙伴</strong>、必要时为处理支付的我们的客户、我们的客户允许时的授权第三方，以及在商业重组、合并或销售中的其他第三方。",
+            "title": "数据披露和安全"
+          },
+          "data_storage": {
+            "content": "我们将在必要期间保留<strong>个人数据</strong>以实现本政策中概述的目的，除非法律要求或允许更长的保留期。作为金融机构，我们通常在<strong>服务</strong>终止后保留<strong>个人数据</strong>五年。\n\n同样需要强调的是，我们有各种义务保留我们处理的<strong>个人数据</strong>，包括确保交易能够适当处理、结算、退款或退款，以帮助识别欺诈，并遵守适用于我们和我们的金融服务提供商的反洗钱和其他法律和规则。因此，即使客户可能已终止<strong>服务</strong>，我们仍将保留某些<strong>个人数据</strong>以履行我们的义务。在我们的数据库和其他记录中也可能存在以匿名格式保留的残留<strong>个人数据</strong>，这些数据不会被删除。",
+            "title": "数据保留"
+          },
+          "data_subject_rights": {
+            "content": "作为您的信息所有者，并根据适用的数据保护法，您有权享有几项有关我们处理您数据的权利：\n\n<ul>\n<li><strong>访问权：</strong> 您有权获得我们已处理的与您相关的所有个人可识别信息的副本。</li>\n<li><strong>更正权：</strong> 如果您提供的任何个人可识别信息不正确，您有权要求更正或调整。</li>\n<li><strong>删除权：</strong> 您可以请求删除我们收集的关于您的一些或所有个人可识别信息。</li>\n<li><strong>限制处理权：</strong> 如果相关个人可识别信息不正确、非法处理、不再根据我们的隐私政策必要，或者如果您反对我们的处理，您有权要求我们停止处理。您的反对是有效的，除非我们有令人信服的理由继续处理。</li>\n<li><strong>数据可移植权：</strong> 您有权将我们处理的您的个人可识别信息转移到另一个实体。</li>\n</ul>\n\n<ul>\n<li><strong>选择退出接收我们的电子通信：</strong> 如果您不再希望从我们这里接收营销相关的电子邮件或通信，您可以通过此类电子邮件或通信中包含的取消订阅链接选择退出，或直接联系我们。我们将尽力尽快遵守您的请求。</li>\n<li><strong>如何访问或修改个人数据：</strong> 如果您希望审查、更正或更新您以前向我们披露的个人数据，您可以通过联系 <a href=\"mailto:hello@lomi.africa\" class=\"text-[#56A5F9] hover:text-[#52A1F8] dark:text-sky-300 dark:hover:text-sky-200\">hello@lomi.africa</a> 来这样做。</li>\n</ul>\n\n当您通过电子邮件向我们发送请求时，建议您在请求中明确说明您想要修改哪些个人数据。为了保护数据主体，我们可能仅处理与请求数据主体用于向我们发送请求的特定电子邮件地址或联系信息相关的个人数据，并且我们可能需要在采取行动之前验证您的身份。我们将尽力尽快遵守您的请求。",
+            "title": "数据主体权利"
+          },
+          "data_transfers": {
+            "content": "我们的<strong>服务</strong>是全球性的，<strong>个人数据</strong>可能存储和处理在我们有运营或聘请服务提供商的任何国家。我们可以将<strong>个人数据</strong>传输到科特迪瓦以外的国家，包括美国，这些国家的数据保护规则可能与<strong>数据主体</strong>国家的规则不同。\n\n但是，我们将采取适当措施确保任何此类传输符合适用的数据保护法，并且您的信息按照我们的隐私政策中描述的标准得到保护。在某些情况下，那些其他国家的法院、执法机构、监管机构或安全当局可能有权访问您的<strong>个人数据</strong>。\n\n当我们作为客户的提供商行事时，我们可能会收集、使用、披露和以其他方式处理有关客户的某些<strong>个人数据</strong>。我们的客户负责确保其客户的隐私权得到尊重，包括确保关于第三方数据收集、使用和处理的适当披露。在我们作为客户的个人信息处理者的情况下，我们将仅根据我们与客户的协议条款和客户的合法指示处理<strong>个人数据</strong>。",
+            "title": "司法管辖区和数据传输"
+          },
+          "data_we_collect": {
+            "content": "我们出于以下目的使用您的个人可识别信息：\n\n<ul>\n<li><strong>访问我们的服务：</strong> 为您提供对lomi的完整访问。</li>\n<li><strong>支付处理：</strong> 处理您的服务支付。</li>\n<li><strong>信息更新：</strong> 通知您有关lomi的重要信息，以及您选择接收的任何其他信息。</li>\n<li><strong>客户支持和通信：</strong> 联系您有关您的订单状态、解决问题、响应支持请求，或出于其他选择加入的原因。</li>\n<li><strong>数据分析：</strong> 分析匿名使用数据以改进我们的平台和服务。</li>\n</ul>\n\n我们和我们的<strong>支付渠道合作伙伴</strong>使用和处理<strong>个人数据</strong>来提供我们的<strong>服务</strong>、检测和防止欺诈、减轻对客户、其客户和<strong>lomi.</strong>的财务损失或其他损害、促进、分析和改进我们的<strong>产品</strong>、系统和工具，并完成提交给监管机构的报告。我们可能使用<strong>个人数据</strong>的方式示例包括：",
+            "purposes_content": "<ul>\n<li>验证身份并评估合规目的的申请</li>\n<li>进行欺诈监控并确保监管合规</li>\n<li>处理支付并提供客户支持</li>\n<li>开发新产品并改进我们的服务</li>\n<li>发送营销通信并执行业务分析</li>\n</ul>",
+            "title": "收集和处理您信息的目的"
+          },
+          "privacy_changes": {
+            "additional_info": "如果您对本政策有任何疑问或担忧，或对上述隐私通知和您的隐私有任何反馈，请联系：<a href=\"mailto:hello@lomi.africa\" class=\"text-[#56A5F9] hover:text-[#52A1F8] dark:text-sky-300 dark:hover:text-sky-200\">hello@lomi.africa</a>。",
+            "introduction": "我们可能会更改此隐私政策。本页面右下角的<em>最后更新</em>图例表明我们的隐私政策最后修订的时间。当我们在网站上发布修订的隐私政策时，任何更改都生效。",
+            "purposes_content": "我们可能会通过在我们的网站上发布通知，或在我们的客户及其客户的情况下，通过注册时提供的电子邮件地址和/或物理地址，向<strong>数据主体</strong>提供有关我们处理<strong>个人数据</strong>的任何变更的披露和警报。随着<strong>lomi.</strong>不断改进，我们也可能偶尔更新此政策，当由于服务改进而导致我们处理<strong>个人数据</strong>的方式发生变化时。如果我们修改我们的隐私政策，我们将在我们的网站上发布修订副本并更新日期。对于我们使用<strong>个人数据</strong>的重大变更，我们将通过在我们的网站上发布公告、发送电子邮件，或通过即时消息服务或短信通知客户及其客户。<strong>数据主体</strong>仍需负责定期审查我们的隐私政策，当此类变更发布后继续使用服务时，客户受任何变更的约束。",
+            "title": "隐私通知变更"
+          }
+        },
+        "title": "我们如何使用个人数据"
+      },
+      "notice": {
+        "content": "我们收集的<strong>个人数据</strong>取决于如何使用我们的<strong>服务</strong>。每当我们收集可能用于亲自识别您的数据时，我们会明确要求您提供并获得您的授权来使用它。此政策确保您完全了解并同意收集您的个人数据。当我们的系统需要明确确认您的权限以继续进行时，会发生此类信息请求。\n\n我们可能会直接从<strong>数据主体</strong>接收<strong>个人数据</strong>，例如当他们创建仪表板账户、通过电子邮件请求有关我们服务的相关信息，或通过我们的官方社交媒体平台。其他时候，我们通过记录与我们的<strong>服务</strong>的互动来获取<strong>个人数据</strong>，使用cookie和网络信标等技术。为某些服务，我们还从我们的<strong>支付渠道合作伙伴</strong>接收<strong>个人数据</strong>。",
+        "title": "概述和适用性"
+      }
+    },
+    "title": "隐私政策"
+  },
+  "productsDropdown": {
+    "featuresTitle": "功能",
+    "integrateTitle": "集成",
+    "nativeFeatures": {
+      "buildComplexWorkflows": "构建复杂的支付工作流程",
+      "manageBusinessFinances": "管理您的企业财务",
+      "manageCustomerBilling": "管理客户的计费和订阅",
+      "sellOnlineGlobally": "全球在线销售"
+    },
+    "products": {
+      "fraud": {
+        "description": "实时检测和防止欺诈交易。",
+        "name": "欺诈",
+        "useCases": {
+          "builtInFraudDetection": {
+            "description": "我们根据多个风险因素对交易进行评分，并标记可疑客户行为。",
+            "name": "使用内置欺诈检测工具消除风险"
+          },
+          "preventChargebacks": {
+            "description": "通过主动欺诈监控降低退款率。",
+            "name": "防止退款"
+          }
+        }
+      },
+      "payments": {
+        "description": "通过我们的托管结账表单或直接银行借记接受付款。",
+        "name": "支付",
+        "useCases": {
+          "ecommerceMarketplaces": {
+            "description": "通过自动付款拆分和托管保护，实现买家和卖家之间的安全交易。",
+            "name": "适用于电子商务和市场"
+          },
+          "invoicesPayments": {
+            "description": "让我们为您处理一次性付款和定期付款的开票和收取。",
+            "name": "发送发票并收集付款"
+          }
+        }
+      },
+      "payouts": {
+        "description": "向第三方发送资金。",
+        "name": "付款",
+        "useCases": {
+          "payVendorsProviders": {
+            "description": "自动支付您的供应商和服务提供商。",
+            "name": "支付您的供应商和服务提供商"
+          },
+          "payYourselfStaff": {
+            "description": "向UEMOA中的任何移动钱包和全球任何银行账户发送付款。",
+            "name": "给自己、员工和合作伙伴付款"
+          }
+        }
+      },
+      "refunds": {
+        "description": "以编程方式处理退款。",
+        "name": "退款",
+        "useCases": {
+          "customerSubscriptions": {
+            "description": "当客户取消订阅时发送按比例退款。",
+            "name": "管理客户订阅"
+          },
+          "returnsCancellations": {
+            "description": "即时处理退款和取消。",
+            "name": "处理退货和取消"
+          }
+        }
+      }
+    }
+  },
+  "sdks": {
+    "title": "始终领先.",
+    "frameworkAgnostic": "框架无关",
+    "sdksDescription": "Next.js、Sanity、Medusa、TypeScript、JavaScript、Go、Python 和 PHP 的官方支持和 SDK - 让它成为您的。"
+  },
+  "contributors": {
+    "loading": "正在加载贡献者...",
+    "error": "无法加载贡献者",
+    "subtitle": "开源，在 Github 上可用。"
+  },
+  "search": {
+    "all": "全部",
+    "apiReference": "API 参考",
+    "apiReferenceDescription": "完整的 API 文档",
+    "core": "核心",
+    "filter": "筛选",
+    "fundamentalsDescription": "基础知识和核心概念",
+    "search": "搜索"
+  },
+  "terms": {
+    "description": "lomi. 产品和服务条款和条件。",
+    "footer_date": "最后更新：2025年11月6日",
+    "introduction": "我们，<strong>lomi.africa S.A.R.L.</strong>（<strong>我们</strong>、<strong>我们的</strong>或<strong>lomi.</strong>），是一个支付系统运营商。我们向您，用户，提供lomi.（软件）及其相关产品和服务，条件是您接受我们所有的条款和条件，包括这些<strong>条款和条件</strong>。感谢您选择lomi.的支付处理服务（<strong>服务</strong>）。这些条款（<strong>协议</strong>）描述了您对数据处理、支付和其他重要事项的权利。我们鼓励您仔细阅读此文件。我们的隐私政策详细说明了我们如何处理您的数据，是本文件的组成部分。此<strong>协议</strong>在<strong>lomi.africa S.A.R.L.</strong>和接受这些条款的实体或个人（<strong>客户</strong>）之间签订，并规定客户对服务的访问和使用。",
+    "sections": {
+      "card_processing_services": {
+        "content": "由此<strong>lomi.</strong>代表客户执行或将执行的任何卡处理服务均受以下条件的约束：",
+        "methods_content": "<ul>\n<li><strong>聚合商方法：</strong><strong>lomi.</strong>可充当支付处理服务的聚合商。客户可通过<strong>lomi.</strong>与其指定承销商银行的商户账户和商户识别号码使用卡处理服务。</li>\n<li><strong>交换机方法：</strong><strong>lomi.</strong>协助客户从<strong>lomi.</strong>合作伙伴银行获得自己的商户ID。</li>\n</ul>",
+        "methods_title": "卡处理服务方法",
+        "subtitle": "我们如何处理信用卡和借记卡支付",
+        "title": "卡处理服务"
+      },
+      "collection_services": {
+        "configuration_content": "客户应通过通知<strong>lomi.</strong>的授权代表、员工、董事或行政人员选择通过零售网点或电子钱包执行收款来配置由此<strong>lomi.</strong>执行的收款方式，通过即时消息服务或其他书面方式。",
+        "configuration_title": "收款方式配置",
+        "content": "由此<strong>lomi.</strong>代表客户通过零售网点或电子钱包执行或将执行的任何收款均受以下条件的约束：",
+        "invoice_content": "客户应通过API或发票界面为客户与任何最终用户之间的每笔交易创建发票，以便由此<strong>lomi.</strong>代表客户执行收款。",
+        "invoice_title": "发票创建",
+        "subtitle": "我们如何处理支付收款",
+        "title": "收款服务"
+      },
+      "confidential_information": {
+        "content": "每一方（接收方）特此同意：\n\n<ul>\n<li>对另一方的机密信息严格保密，并采取合理预防措施保护此类机密信息。</li>\n<li>不得向任何第三方披露此类机密信息或从其中衍生出的任何信息，除非严格必要以提供或使用服务。</li>\n</ul>",
+        "subtitle": "敏感数据和信息的保护",
+        "title": "机密信息"
+      },
+      "disbursement_services": {
+        "content": "由此<strong>lomi.</strong>代表客户执行或将执行的任何付款均受以下条件的约束：\n\n<ul>\n<li><strong>付款指令</strong>只能通过API或仪表板手动上传交付给<strong>lomi.</strong>。所有此类指令必须按照<strong>lomi.</strong>在<strong>服务文档</strong>和/或<strong>服务协议</strong>中指定的表格或模板进行。</li>\n<li><strong>所有带有客户API密钥的付款指令</strong>在交付时被视为最终且不可撤销，当客户通过API提交付款创建请求时发生交付。</li>\n<li><strong>所有客户通过仪表板手动上传交付的付款指令</strong>在交付时被视为最终且不可撤销，当包含客户付款指令的.XLSX文档成功上传到仪表板时发生交付。</li>\n</ul>\n\n当客户指令中指定的资金（无论是通过API还是手动上传）从客户余额成功转移到指定接收资金的银行账户时，付款将被视为已执行。",
+        "subtitle": "我们如何处理资金转移和支付",
+        "title": "付款服务"
+      },
+      "disclaimers": {
+        "content": "除服务协议或这些条件中明确规定外，此处提供的服务和产品按\"原样\"提供，有所有缺陷，且无任何陈述或保证。客户承担全部风险，关于满意质量、性能、准确性和努力。",
+        "subtitle": "服务限制和保证",
+        "title": "免责声明"
+      },
+      "indemnification_liability": {
+        "content": "<strong>lomi.</strong>应以其费用为客户辩护、持有无害并赔偿客户及其各自的附属公司，以及各自的董事、行政人员、员工和继承人和受让人，对任何第三方法律诉讼、索赔、诉讼、程序或监管行动负责。",
+        "subtitle": "法律保护和责任",
+        "title": "赔偿和责任"
+      },
+      "interpretation": {
+        "affiliates": {
+          "content": "指母公司、子公司、姊妹公司，或任何其他公司或实体控制此<strong>lomi.</strong>或此<strong>lomi.</strong>控制或与其共同控制。",
+          "title": "附属公司"
+        },
+        "api": {
+          "content": "指应用程序编程接口，一套子例程定义、协议和工具，用于构建软件和应用程序接口，由此<strong>lomi.</strong>提供，可供客户用于访问服务。",
+          "title": "API"
+        },
+        "card_processing_services": {
+          "content": "指：\n\n<ul>\n<li><strong>处理服务，</strong>允许客户在网站或移动平台上接受信用卡和借记卡作为支付方式，并通过这些支付方式接收来自持卡人的入账支付，包括银行赞助的商户账户、欺诈保护工具、经常性账单功能、支付卡存储、外币接受、白手套客户支持，以及<strong>服务文档</strong>中描述的其他必要软件、API、服务和技术。</li>\n<li><strong>网关服务，</strong>为客户配备软件和连接，以允许网站或移动平台上的信用卡和借记卡支付的实时安全数据传输。</li>\n</ul>",
+          "title": "卡处理服务"
+        },
+        "cardholder": {
+          "content": "指持有由银行或授权发行此类卡的机构发行的借记卡或信用卡的自然人或法人。",
+          "title": "持卡人"
+        },
+        "charge": {
+          "content": "指授权或从持卡人维持在银行或其他金融机构账户中的资金捕获或借记指令，与持卡人与客户之间的交易相关。",
+          "title": "收费"
+        },
+        "chargeback": {
+          "content": "指最终用户直接向其信用卡或借记卡发行人提出的对客户支付的挑战。",
+          "title": "退款"
+        },
+        "confidential_information": {
+          "content": "指被视为机密的任何数据或信息，口头或书面，与任一方（或任一方有义务保护第三方信息的机密性，若任一方如此义务）的过去、现在或未来研究或开发活动相关，包括任何未公布的产品和服务、任何与开发相关的服务文档（以任何形式或媒体提供）、发明、流程、计划、金融或尽职调查信息、最终用户的个人可识别数据，在此范围内此类数据不以其他方式受双方之间的单独协议约束，以及服务协议的财务条款。",
+          "title": "机密信息"
+        },
+        "definitions_content": "就这些条件而言，除非上下文另有要求：",
+        "definitions_title": "定义：这些条件中未定义的所有大写术语将在此<strong>服务协议</strong>中赋予其含义。",
+        "subtitle": "了解关键定义和术语",
+        "title": "解释"
+      },
+      "invalid_payments": {
+        "content": "客户承认并同意<strong>lomi.</strong>及其附属公司不得以任何方式对<strong>lomi.</strong>因以下原因遭受的损失负责或承担责任：\n\n<ul>\n<li>客户或其最终用户造成的任何透支、支付错误、退款或其他无效支付。</li>\n<li>客户、其员工、董事、行政人员、代表或任何代表客户行事的人的任何错误、违约、疏忽、行为不当或欺诈。</li>\n</ul>",
+        "subtitle": "了解支付错误和责任",
+        "title": "无效付款和其他责任"
+      },
+      "license_ip": {
+        "license_content": "根据这些条件的条款，<strong>lomi.</strong>特此授予客户，并由客户接受<strong>lomi.</strong>，一项个人、有限、非独家、非转让的许可和权利，使用<strong>lomi.</strong>的API及其随附的服务文档，以下用途：\n\n<ul>\n<li>在合理必要的尽可能多的机器上安装和使用API。</li>\n<li>仅出于使用API和服务目的使用随附的服务文档。</li>\n</ul>",
+        "license_title": "许可授予",
+        "subtitle": "使用权利和知识产权条款",
+        "title": "许可和知识产权"
+      },
+      "miscellaneous": {
+        "content": "各方应作为独立承包商履行服务协议（包括这些条件）的所有义务。服务协议中的任何内容不得解释为赋予任何一方权力指挥或控制另一方的日常活动，或将各方构成委托人和代理人、雇主和雇员、特许人和受许人、伙伴、合资伙伴、共同所有者或其他参与合资企业的人。\n\n在服务协议和这些条件下执行任何服务时，从时间到时间，在法律允许的范围内，客户特此同意授权<strong>lomi.</strong>，由<strong>lomi.</strong>自行决定，将其在本协议下的任何义务和职责委托给其任何附属公司和/或受信任的第三方。",
+        "subtitle": "其他条款和规定",
+        "title": "杂项"
+      },
+      "representations_warranties": {
+        "first_party_content": "根据此处提供的服务应符合适用服务文档中规定的规格。\n\n<strong>lomi.</strong>进一步代表并保证其将维持对所有适用法律、规则和法规的遵守。",
+        "first_party_title": "陈述和保证",
+        "subtitle": "我们的承诺和保证",
+        "title": "陈述和保证"
+      },
+      "restricted_activities": {
+        "content": "客户承认<strong>lomi.</strong>禁止从事或提供科特迪瓦法律下的受限活动服务，包括反洗钱法（如经修订）和其实施规则和法规所定义的非法活动。",
+        "subtitle": "禁止活动和合规要求",
+        "title": "受限活动"
+      },
+      "security_fraud": {
+        "content": "客户代表并保证，在服务协议期限内，其将维持并遵守所有合理的安全措施，以保护其计算机系统及其包含的数据免受未经控制、篡改或任何未经访问。\n\n除非由<strong>lomi.</strong>的重大过失、欺诈或故意不当行为单独造成，否则当发生客户用户名或密码的泄露，或对其<strong>lomi.</strong>平台账户的任何其他未经授权的使用或修改时，客户应承担由此产生的任何损失。",
+        "subtitle": "保护您的数据和防止欺诈",
+        "title": "安全和欺诈"
+      },
+      "service_fees": {
+        "content": "除非双方另有书面协议，否则客户应向<strong>lomi.</strong>支付的服务费用（包括客户承担的任何适用外币或其他费用）应按照<strong>服务协议</strong>的费用表指定，该表通过引用并入此处。\n\n客户应按照<strong>服务协议</strong>中指定的条款向<strong>lomi.</strong>支付服务费用。",
+        "subtitle": "了解我们的定价和支付条款",
+        "title": "服务费用"
+      }
+    },
+    "title": "条款和条件"
+  }
+}

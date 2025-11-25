@@ -169,7 +169,7 @@ This command checks for the stored **CLI Token** and attempts to connect to the 
 
 ## Project configuration (SDK Keys via `lomi. init` and `.env`)\*\*
 
-When you initialize a project using [`lomi. init`](/core/lomi-cli/init), it sets up configuration specifically for the **lomi. Node.js SDK** to use _within your application code_.
+When you initialize a project using [`lomi. init`](/docs/core/lomi-cli/init), it sets up configuration specifically for the **lomi. Node.js SDK** to use _within your application code_.
 
 ```bash filename="Terminal"
 lomi. init
@@ -198,12 +198,12 @@ The **lomi. Node.js SDK** (as configured by `lomi. init` examples) relies on the
 
 - `LOMI_API_KEY`: **Required.** Your secret API key for authenticating SDK requests from your application.
 - `LOMI_WEBHOOK_SECRET`: **Required** if your application needs to verify webhook signatures.
-- `LOMI_API_URL`: Optional. Defaults to the production **lomi. API**. Set to `https://sandbox.api.lomi.africa` for the sandbox environment.
+- `LOMI_API_URL`: Optional. Defaults to the production **lomi. API**. Set to `https://sandbox.api.lomi.africa/v1` for the sandbox environment.
 
 Ensure your application code loads these variables (e.g., using `dotenv` or similar environment management tools) _before_ initializing the **lomi. SDK** client.
 
 ## Next steps\*\*
 
-- Learn about [Webhook development](/core/advanced-guides/handling-webhooks)
-- Explore our [Testing Guide](/core/advanced-guides/testing)
-- Set up [CI/CD Integration](/core/advanced-guides/ci-cd)
+- Learn about [Webhook development](/docs/core/advanced-guides/handling-webhooks)
+- Explore our [Testing Guide](/docs/core/advanced-guides/testing)
+- Set up [CI/CD Integration](/docs/core/advanced-guides/ci-cd)

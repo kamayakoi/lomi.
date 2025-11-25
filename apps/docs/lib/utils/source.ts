@@ -1,6 +1,6 @@
 /* @proprietary license */
 
-// import { createMDXSource } from 'fumadocs-mdx';
+import { createMDXSource } from 'fumadocs-mdx';
 import type { InferMetaType, InferPageType } from 'fumadocs-core/source';
 import { loader } from 'fumadocs-core/source';
 import { icons } from 'lucide-react';
@@ -18,8 +18,8 @@ export const source = loader({
   },
   source: docs.toFumadocsSource(),
   pageTree: {
-    // @ts-expect-error Fumadocs generic mismatch between generated source and transformer types.
-    transformers: [transformerOpenAPI()],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transformers: [transformerOpenAPI() as any],
   },
 });
 

@@ -3,7 +3,7 @@ title: 'Pricing'
 description: 'Transparent fees at a 20% discount vs. competition.'
 ---
 
-lomi. supports three pricing modes for organizations:
+All transactions on lomi. come with a flat fee of **2.9% + 200 XOF | 2.9% + $0.3** applied to the entire transaction amount. There are no other transaction fees — no subscription charges, no premium fees for WhatsApp communication or emails, and no extra charges for regular payouts.
 
 - **Dynamic (volume-tiered):** rates decrease automatically as your monthly processed volume grows.
 - **Fixed:** a stable fee schedule that does not change with monthly volume.
@@ -21,9 +21,37 @@ With dynamic pricing, your organization is assigned to a tier based on processed
 
 For current tier thresholds and live rates, use the pricing view in your dashboard or the public pricing page at [lomi.africa/pricing](https://lomi.africa/pricing).
 
+| **Category**         | **Method**    | **Fee**                  |
+| :------------------- | :------------ | :----------------------- |
+| **Cards**            | Local         | 4% + $0.30               |
+|                      | International | 4% + $0.30               |
+| **Mobile Money**     | Orange        | 2.9% + 200 XOF (+ $0.30) |
+|                      | MTN           | 2.9% + 200 XOF (+ $0.30) |
+|                      | Wave          | 2.9% + 200 XOF (+ $0.30) |
+|                      | Airtel        | 2.9% + 200 XOF (+ $0.30) |
+|                      | Moov          | 2.9% + 200 XOF (+ $0.30) |
+| **Cryptocurrencies** | Stablecoins   | 4% + $0.30               |
+|                      | Tokens        | 4% + $0.30               |
+
+### Breakdown
+
+A **30,000 XOF** subscription payment from Côte d'Ivoire (0% VAT):
+
+| **Item**                                     | **Amount** |
+| :------------------------------------------- | :--------- |
+| Subscription Price                           | 30,000 XOF |
+| Transaction Value (amount paid by customer)  | 30,000 XOF |
+| Transaction Fee (2.9% + 200 XOF)             | 1,070 XOF  |
+| Net amount (amount received by our merchant) | 28,930 XOF |
+
+You will receive 28,930 XOF directly into your account balance, while your customer pays 30,000 XOF in total.
+
+&nbsp;
+
 <Callout type="info">
-  Dynamic pricing is meant to reward growth. If your business scales quickly, your
-  effective take rate can improve without requiring a manual pricing migration.
+  You can add discounts or additional fees (like delivery, taxes, or even
+  'transaction fees') directly from the merchant dashboard to customize pricing
+  or absorb processing costs.
 </Callout>
 
 ## Fixed and custom pricing
@@ -35,9 +63,22 @@ Not every business should be on volume-tiered pricing:
 
 Custom pricing can include bespoke combinations of percentage and fixed components, and can vary by payment method and currency.
 
-Contact [hello@lomi.africa](mailto:hello@lomi.africa) if you need a custom setup.
+| **Item**                                                 | **Amount** |
+| :------------------------------------------------------- | :--------- |
+| Original Transaction Value                               | 30,000 XOF |
+| Transaction Fee (2.9% + 200 XOF)                         | 930 XOF    |
+| Refund Processing Fee (4% — charged to merchant)         | 1,200 XOF  |
+| Final Refund Amount to Customer (in case of full refund) | 30,000 XOF |
 
-## Transaction fees
+&nbsp;
+
+<Callout type="info">
+  lomi. reserves the right to issue refunds at our discretion within 60 days of
+  a purchase. This helps proactively reduce disputes and chargebacks, which cost
+  **$15 (10,000 XOF)** per dispute, charged directly to the merchant. We only
+  exercise this right to help minimize chargebacks, avoid unexpected charges,
+  and reduce associated fees on your behalf.
+</Callout>
 
 Transaction fees are calculated from:
 
@@ -45,9 +86,11 @@ Transaction fees are calculated from:
 
 Depending on your pricing mode and method, the fee can include:
 
-- base processing fee (Mobile Money, cards, POS where applicable)
-- provider or method-specific adjustments
-- optional add-ons (for example subscription payment add-on)
+**Important:**
+
+- Payment providers impose monitoring programs, penalties, and higher chargeback costs for sellers with high chargeback rates (~0.7%+).
+- We monitor and manage chargeback rates to prevent exceeding problematic thresholds.
+- If chargebacks increase, we may need to intervene or suspend accounts unless proactive measures are taken.
 
 In some low-amount flows, only the percentage component may apply based on your organization fee configuration.
 
@@ -62,9 +105,19 @@ Some fees are scenario-specific rather than charged on every payment:
 
 These are applied only when the relevant event occurs.
 
-## Refunds and disputes
+| **Method**                  | **Fee**                   | **Processing Time** |
+| :-------------------------- | :------------------------ | :------------------ |
+| International Bank Transfer | 1% + 3,500 XOF (or $5.00) | 1-2 business days   |
+| Local Bank Transfer         | Free                      | 1-2 business days   |
+| Mobile Money                | Free \| 1%                | Instant             |
 
-You can issue both full and partial refunds.
+&nbsp;
+
+<Callout type="info">
+  The 1% fee for a Mobile Money payouts is **not** a lomi. fee. It is a standard
+  fee charged directly by mobile money operators during the payout process,
+  which lomi. simply passes through.
+</Callout>
 
 - Original processing fees are generally non-refundable because providers charge them at payment time.
 - Refund-specific fees may apply depending on your active fee schedule.
@@ -72,34 +125,26 @@ You can issue both full and partial refunds.
 
 For the up-to-date fee values (XOF/USD/EUR and any add-ons), rely on your live pricing configuration in dashboard and on [lomi.africa/pricing](https://lomi.africa/pricing).
 
-## Payout fees
+| **Monthly Volume (in XOF)**       | **Discount**   | **Adjusted Fee** |
+| :-------------------------------- | :------------- | :--------------- |
+| **5M - 10M** ($8,000 - $16,000)   | 25%            | 2.9% → 1.8%      |
+| **10M - 50M** ($16,000 - $80,000) | 30%            | 2.9% → 1.68%     |
+| **50M+** ($80,000+)               | Custom pricing | Contact us       |
 
-lomi. aims to keep payout pricing transparent and provider-aligned:
+### Transaction fees
 
-- Some payout routes are free in specific contexts.
-- Some routes include percentage and/or fixed provider fees.
-- International payouts can have separate pricing from local payouts.
+| Monthly volume (in XOF) | Mobile Money | Cards       |
+| :---------------------- | :----------- | :---------- |
+| 200 - 9,999,999         | 2.9% + 200   | 3%          |
+| 10,000,000 - 99,999,999 | 1.75% + 200  | 2.75% + 200 |
+| 100,000,000+            | 1.5% + 200   | 2.5% + 200  |
 
-Processing times and availability can vary by payout rail, provider, and destination corridor.
+### Payout fees
 
-## Practical examples
+| Monthly volume (in XOF) | Mobile Money | Bank transfers |
+| :---------------------- | :----------- | :------------- |
+| 200 - 99,999,999        | Free         | Free           |
+| 10,000,000 - 99,999,999 | Free         | Free           |
+| 100,000,000+            | Free         | Free           |
 
-### Example A: Dynamic pricing (tiered)
-
-An organization on volume-tiered pricing processes more volume this month and moves to a better tier. New payments use the improved tier fee schedule automatically.
-
-### Example B: Fixed pricing
-
-An organization on fixed pricing keeps the same configured card/Mobile Money rates throughout the month, independent of volume changes.
-
-### Example C: Custom pricing
-
-An organization with custom pricing has negotiated rates for specific methods (for example separate handling for local cards, international cards, or selected payout routes).
-
-## Choosing the right mode
-
-- Use **dynamic** if you want automatic rate improvements as you grow.
-- Use **fixed** if you want consistency and easier forecasting.
-- Use **custom** if your business model needs negotiated terms.
-
-If you are unsure, start with dynamic and review your effective costs monthly.
+> Contact our [sales team](mailto:hello@lomi.africa) to discuss **custom options** tailored to your business needs.

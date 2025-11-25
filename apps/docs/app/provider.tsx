@@ -6,14 +6,9 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import dynamic from 'next/dynamic';
 import { useEffect, type ReactNode } from 'react';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import {
-  TranslationProvider,
-  useTranslation,
-} from '@/lib/utils/translation-context';
+import { TranslationProvider } from '@/lib/contexts/translation-context';
+import { GithubStarsProvider } from '@/lib/hooks/use-github-stars';
 import { Toaster } from 'sonner';
-import type { Language } from '@/lib/i18n/config';
-import { languages } from '@/lib/i18n/config';
-import { t as translate } from '@/lib/i18n/translations';
 
 const SearchDialog = dynamic(() => import('@/components/ui/search'), {
   ssr: false,
@@ -61,33 +56,20 @@ function RootProviderWithLanguage({ children }: { children: ReactNode }) {
       }}
       theme={{
         storageKey: 'lomi-theme',
-        defaultTheme: 'light',
-        disableTransitionOnChange: false,
-      }}
-      i18n={{
-        locale: currentLanguage,
-        locales: languages.map((lang) => ({
-          locale: lang.code,
-          name: lang.name,
-        })),
-        translations: {
-          search: t('search.search'),
-          searchNoResult: t('ui.searchNoResult'),
-          toc: t('ui.toc'),
-          tocNoHeadings: t('ui.tocNoHeadings'),
-          lastUpdate: t('ui.lastUpdate'),
-          chooseLanguage: t('ui.chooseLanguage'),
-          nextPage: t('ui.nextPage'),
-          previousPage: t('ui.previousPage'),
-          chooseTheme: t('ui.chooseTheme'),
-          editOnGithub: t('ui.editOnGithub'),
-        },
       }}
     >
-      <TooltipProvider>
-        {children}
-        <Toaster />
-      </TooltipProvider>
+      <TranslationProvider>
+        <GithubStarsProvider>
+          <TooltipProvider>
+            <script
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: inject }}
+            />
+            {children}
+            <Toaster />
+          </TooltipProvider>
+        </GithubStarsProvider>
+      </TranslationProvider>
     </RootProvider>
   );
 }

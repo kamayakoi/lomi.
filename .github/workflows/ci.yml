@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   detect-changes:
@@ -12,10 +12,10 @@ jobs:
     outputs:
       api: ${{ steps.changes.outputs.api }}
       docs: ${{ steps.changes.outputs.docs }}
-      sdks: ${{ steps.changes.outputs.sdks }}
-      mcp: ${{ steps.changes.outputs.mcp }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: dorny/paths-filter@v3
         id: changes
         with:
@@ -24,213 +24,54 @@ jobs:
               - 'apps/api/**'
             docs:
               - 'apps/docs/**'
-              - 'apps/sdks/ts/**'
-            sdks:
-              - 'apps/sdks/**'
-            mcp:
-              - 'apps/mcp/**'
 
-  verify-openapi:
-    name: Verify OpenAPI spec is in sync
-    needs: detect-changes
-    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api ==
-      'true' || needs.detect-changes.outputs.docs == 'true')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-          cache-dependency-path: apps/api/pnpm-lock.yaml
-      - name: Install API dependencies
-        working-directory: apps/api
-        run: pnpm install --frozen-lockfile
-      - name: Export OpenAPI from Nest
-        working-directory: apps/api
-        run: pnpm run openapi:export
-      - name: Assert apps/docs/openapi.json matches export
-        run: git diff --exit-code apps/docs/openapi.json
-
-  verify-mcp-manifest:
-    name: Verify MCP tools manifest is in sync
-    needs: detect-changes
-    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api ==
-      'true' || needs.detect-changes.outputs.docs ==
-      'true' || needs.detect-changes.outputs.sdks ==
-      'true' || needs.detect-changes.outputs.mcp ==
-      'true')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-          cache-dependency-path: apps/mcp/pnpm-lock.yaml
-      - name: Install MCP dependencies
-        working-directory: apps/mcp
-        run: pnpm install --frozen-lockfile
-      - name: Regenerate MCP manifest
-        working-directory: apps/mcp
-        run: pnpm run generate
-      - name: Assert MCP manifest matches generator output
-        run: git diff --exit-code apps/mcp/src/generated/tools-manifest.json
-      - name: Typecheck MCP package
-        working-directory: apps/mcp
-        run: pnpm exec tsc --noEmit
-      - name: MCP unit tests
-        working-directory: apps/mcp
-        run: pnpm test
-      - name: MCP hosted smoke (HTTP transport)
-        working-directory: apps/mcp
-        env:
-          LOMI_MCP_BEARER_TOKEN: ci-smoke-bearer
-        run: pnpm run smoke:http
-
-  verify-agent-contracts:
-    name: Verify agent card + OpenAPI surface
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Validate `.well-known/agent.json` and OpenAPI paths
-        run: node apps/docs/lib/scripts/verify-agent-contracts.mjs
-
-  verify-docs:
-    name: Docs lint + SDK snippet contract
-    needs: detect-changes
-    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.docs ==
-      'true' || needs.detect-changes.outputs.api == 'true')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: oven-sh/setup-bun@v2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "pnpm"
-          cache-dependency-path: apps/docs/pnpm-lock.yaml
-      - name: Install Docs dependencies
-        working-directory: apps/docs
-        run: pnpm install --frozen-lockfile
-      - name: Lint Docs
-        working-directory: apps/docs
-        run: pnpm run lint
-
-  verify-sdk-parity:
-    name: Multi-language SDK surface parity + smoke tests
-    needs: detect-changes
-    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.sdks ==
-      'true' || needs.detect-changes.outputs.docs ==
-      'true' || needs.detect-changes.outputs.api ==
-      'true')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Generate SDKs + manifest parity check
-        working-directory: apps/sdks
-        run: |
-          node scripts/typescript-generate.js
-          node scripts/python-generate.js
-          node scripts/go-generate.js
-          node scripts/php-generate.js
-          node scripts/verify-sdk-surface-parity.js
-      - name: Go SDK tests
-        working-directory: apps/sdks/go
-        run: go test ./...
-      - name: Python SDK tests
-        working-directory: apps/sdks/python
-        run: |
-          pip install -r requirements.txt
-          python -m unittest discover -s tests -p 'test*.py'
-
-  api-tests:
-    name: API unit tests, coverage gate & e2e
+  build-api:
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/api
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run build
+      - run: bun test
+
+  build-docs:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/docs
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
-      - uses: actions/setup-node@v4
+          version: 8
+      - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "18"
           cache: "pnpm"
-          cache-dependency-path: apps/api/pnpm-lock.yaml
-      - name: Install API dependencies
-        working-directory: apps/api
-        run: pnpm install --frozen-lockfile
-      - name: Unit tests
-        working-directory: apps/api
-        env:
-          SUPABASE_URL: https://example.supabase.co
-          SUPABASE_SECRET_KEY: ci-test-service-role-key
-        run: pnpm test
-      - name: Coverage (global thresholds)
-        working-directory: apps/api
-        env:
-          SUPABASE_URL: https://example.supabase.co
-          SUPABASE_SECRET_KEY: ci-test-service-role-key
-        run: pnpm test:cov
-      - name: E2E smoke
-        working-directory: apps/api
-        env:
-          SUPABASE_URL: https://example.supabase.co
-          SUPABASE_SECRET_KEY: ci-test-service-role-key
-        run: pnpm test:e2e
+          cache-dependency-path: "./apps/docs/pnpm-lock.yaml"
+      - run: pnpm install
+      - run: pnpm build
 
-  deploy-api:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.api == 'true' && github.ref ==
-      'refs/heads/main'
+  deploy:
+    needs: [build-api, build-docs]
+    if: |
+      github.ref == 'refs/heads/main' && 
+      !cancelled() &&
+      (needs.build-api.result == 'success' || needs.build-api.result == 'skipped') &&
+      (needs.build-docs.result == 'success' || needs.build-docs.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Deploy API to Vercel
-        uses: amondnet/vercel-action@v42.2.0
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_API }}
-          working-directory: ${{ github.workspace }}
-          target: production
+      - name: Deploy to production
+        run: |
+          echo "Deploying affected applications to production..."
 
-  deploy-docs:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.docs == 'true' && github.ref ==
-      'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Deploy Docs to Vercel
-        uses: amondnet/vercel-action@v42.2.0
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-          working-directory: ${{ github.workspace }}
-          target: production

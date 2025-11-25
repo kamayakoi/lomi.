@@ -1,30 +1,3 @@
 [submodule "apps/admin"]
 	path = apps/admin
 	url = https://github.com/lomiafrica/admin.lomi.africa
-[submodule "apps/dashboard"]
-	path = apps/dashboard
-	url = https://github.com/lomiafrica/dashboard.git
-[submodule "apps/sdks/php"]
-	path = apps/sdks/php
-	url = https://github.com/lomiafrica/lomi-php-sdk.git
-[submodule "apps/sdks/python"]
-	path = apps/sdks/python
-	url = https://github.com/lomiafrica/lomi-python-sdk.git
-[submodule "apps/storefront"]
-	path = apps/storefront
-	url = https://github.com/lomiafrica/storefront.git
-[submodule "apps/checkout"]
-	path = apps/checkout
-	url = https://github.com/lomiafrica/checkout.git
-[submodule "apps/website"]
-	path = apps/website
-	url = https://github.com/lomiafrica/website.git
-[submodule "apps/plugins"]
-	path = apps/plugins
-	url = https://github.com/lomiafrica/plugins.git
-[submodule "apps/jumbo"]
-	path = apps/jumbo
-	url = https://github.com/lomiafrica/jumbo.git
-[submodule "apps/customers"]
-	path = apps/customers
-	url = https://github.com/lomiafrica/customers.git

@@ -1,16 +1,22 @@
 # lomi. SDKs
 
-Official SDKs mirror the **same public merchant routes** as documented: they are generated from [`apps/docs/openapi.json`](../docs/openapi.json) and the strict allowlist [`apps/docs/lib/scripts/manual-api/_expected-public-operations.json`](../docs/lib/scripts/manual-api/_expected-public-operations.json).
+Official SDKs for the [lomi.](https://lomi.africa) payments API.
+
+We provide SDKs for multiple languages and frameworks to help you integrate with the lomi. API quickly and easily.
 
 | Language/Framework | Package | Installation | Directory |
 |-------------------|---------|--------------|-----------|
 | **TypeScript** | `@lomi./sdk` | `npm install @lomi./sdk` | [`ts/`](./ts) |
+| **JavaScript** | `@lomi./sdk-js` | `npm install @lomi./sdk-js` | [`js/`](./js) |
+| **Next.js** | `@lomi./sdk-next` | `npm install @lomi./sdk-next` | [`nextjs/`](./nextjs) |
 | **Python** | `lomi-sdk` | `pip install lomi-sdk` | [`python/`](./python) |
 | **Go** | `github.com/lomiafrica/lomi-go-sdk` | `go get github.com/lomiafrica/lomi-go-sdk` | [`go/`](./go) |
 
 ### PHP SDK
 
-Due to our monorepo structure, the PHP SDK is **not available on Packagist**. Install directly from GitHub:
+Due to our monorepo structure, the PHP SDK are **not available on Packagist**. You can install them directly from this GitHub repository.
+
+Add the following to your project's `composer.json`:
 
 ```json
 {
@@ -26,100 +32,64 @@ Due to our monorepo structure, the PHP SDK is **not available on Packagist**. In
 }
 ```
 
-Then run: `composer install`
+Then run:
+```bash
+composer install
+```
+
+**Directory:** [`php/`](./php)
 
 ## Quick Start
 
-### TypeScript / JavaScript
+Each SDK directory contains its own README with specific usage examples and documentation. Here's a quick overview:
 
+### TypeScript
 ```typescript
-import { LomiSDK } from '@lomi./sdk';
+import { LomiClient } from '@lomi./sdk';
 
-const lomi = new LomiSDK({
-  apiKey: 'your-api-key',
-  environment: 'live' // or 'test' for sandbox
+const client = new LomiClient({
+  apiKey: 'your-api-key'
 });
-
-// List customers
-const customers = await lomi.customers.list();
-
-// Create checkout session
-const session = await lomi.checkoutSessions.create({...});
-
-// Get transactions
-const transactions = await lomi.transactions.list();
 ```
 
+### JavaScript
+```javascript
+import { LomiClient } from '@lomi./sdk-js';
 
+const client = new LomiClient({
+  apiKey: 'your-api-key'
+});
+```
+
+### Next.js
+```typescript
+import { LomiClient } from '@lomi./sdk-next';
+
+const client = new LomiClient({
+  apiKey: 'your-api-key'
+});
+``` 
 
 ### Python
-
 ```python
 from lomi import LomiClient
 
 client = LomiClient(api_key='your-api-key')
-
-# List customers (optional filters)
-customers = client.customers.list(params={"page": "1"})
-
-# Checkout sessions (snake_case client attributes)
-sessions = client.checkout_sessions.list()
-
-# Wave charge
-result = client.charges.create_wave_charge(body={"amount": 5000})
 ```
 
 ### Go
-
 ```go
-import lomi "github.com/lomiafrica/lomi-go-sdk"
+import "github.com/lomiafrica/lomi-go-sdk"
 
 client := lomi.NewClient("your-api-key")
-
-customers, err := client.Customers.List(map[string]string{"page": "1"})
-if err != nil {
-	panic(err)
-}
-txn, err := client.Transactions.Get("txn_id")
-_, _ = txn, err
-
-_, err = client.Charges.CreateWaveCharge(map[string]interface{}{
-	"amount": 1000,
-})
 ```
 
 ### PHP
-
 ```php
-use Lomi\LomiClient;
+use LomiSDK\Client;
 
-$client = new LomiClient('your-api-key');
-
-$session = $client->checkoutSessions->create(['amount' => 5000]);
-$intent = $client->paymentIntents->create(['amount' => 1000]);
+$client = new Client('your-api-key');
 ```
-
-## Available services
-
-All SDKs provide access to these services:
-
-- `accounts` - Balance and account operations
-- `charges` - Direct charges (e.g. Wave)
-- `paymentIntents` - Payment intents API
-- `organizations` - Organization metrics (MRR, ARR, etc.)
-- `customers` - Customer management
-- `paymentRequests` - Payment requests
-- `transactions` - Transaction history
-- `refunds` - Refund processing
-- `products` - Product catalog
-- `subscriptions` - Subscription billing
-- `discountCoupons` - Coupon management
-- `checkoutSessions` - Checkout creation
-- `paymentLinks` - Payment links
-- `payouts` - Payout management (Platform withdrawals)
-- `beneficiaryPayouts` - Beneficiary payouts
-- `webhooks` - Webhook configuration
-- `webhookDeliveryLogs` - Webhook logs
 
 ## Documentation
 

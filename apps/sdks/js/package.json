@@ -1,0 +1,45 @@
+{
+  "name": "@lomi./sdk-js",
+  "version": "1.1.0",
+  "description": "Official JavaScript SDK for the lomi. API",
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "generate": "node ../scripts/javascript-generate.js",
+    "build": "tsc",
+    "prepublishOnly": "npm run generate && npm run build",
+    "publish:npm": "npm publish --access public"
+  },
+  "keywords": [
+    "lomi.",
+    "payments",
+    "sdk",
+    "api",
+    "javascript",
+    "west-africa",
+    "mobile-money"
+  ],
+  "author": "lomi. <hello@lomi.africa> (https://lomi.africa)",
+  "license": "MIT",
+  "homepage": "https://github.com/lomiafrica/lomi./",
+  "bugs": {
+    "url": "https://github.com/lomiafrica/lomi./issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lomiafrica/lomi./",
+    "directory": "apps/sdks/js"
+  },
+  "dependencies": {
+    "axios": "^1.13.2"
+  },
+  "devDependencies": {
+    "openapi-typescript-codegen": "^0.29.0",
+    "typescript": "^5.9.3"
+  }
+}

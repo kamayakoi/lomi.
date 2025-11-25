@@ -2,6 +2,7 @@
 
 export const Cookies = {
   PreferredSignInProvider: 'preferred-signin-provider',
+  SoundEnabled: 'sound-enabled',
   TrackingConsent: 'tracking-consent',
   Language: 'lomi.language',
 };

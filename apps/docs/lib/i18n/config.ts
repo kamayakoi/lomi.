@@ -1,8 +1,10 @@
 /* @proprietary license */
 
-export type Language = 'en' | 'fr';
+export const languages = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+];
 
-export const languages: readonly { code: Language; name: string }[] = [
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' },
-] as const;
+export type Language = (typeof languages)[number]['code'];

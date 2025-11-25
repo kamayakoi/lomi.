@@ -1,9 +1,4 @@
 @import 'tailwindcss';
-@plugin '@tailwindcss/container-queries';
-@plugin 'tailwindcss-animate';
-@import 'fumadocs-ui/css/neutral.css';
-@import 'fumadocs-ui/css/preset.css';
-@import 'fumadocs-openapi/css/preset.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,7 +44,7 @@
 }
 
 :root {
-  --radius: 0.3rem;
+  --radius: 0.675rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -407,23 +402,6 @@ button:active:focus {
   @apply hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
 }
 
-/* Docs sidebar spacing tweaks:
-   - tighten search <-> section selector gap
-   - tighten selector <-> section content gap */
-#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 {
-  gap: 0.4rem;
-  padding-bottom: 0;
-}
-
-/* Sidebar-specific radius overrides (fumadocs uses fixed rounded-* classes) */
-/* Normalize rounded-* classes so radius feels consistent everywhere */
-.rounded-sm,
-.rounded-md,
-.rounded-lg,
-.rounded-xl {
-  border-radius: var(--radius) !important;
-}
-
 /* Custom Blog Post Styling */
 
 /* Additional Typography Classes */
@@ -735,13 +713,10 @@ button:active:focus {
 /* Different appearance for code blocks */
 .prose pre {
   background-color: rgb(244, 244, 245);
-  padding: 0;
-  padding-top: 14px;
-  padding-bottom: 14px;
+  padding: 1rem;
   border-radius: 0.375rem;
   overflow-x: auto;
-  margin-top: -14px;
-  margin-bottom: -14px;
+  margin: 1.5rem 0;
 }
 
 .dark .prose pre {
@@ -771,6 +746,13 @@ article img + div.text-xs {
   text-align: center;
   padding: 0;
   margin-top: 0.5rem;
+}
+
+/* Ensure the content has proper width constraints */
+.prose {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Media queries for better scaling */
@@ -854,13 +836,8 @@ article p.text-zinc-600 {
 article .mt-auto {
   margin-top: 0.5rem;
 }
-
-/* Docs sidebar: bottom bar (border + theme slot) is only as wide as its contents and stays end-aligned, not full sidebar width. */
-#nd-sidebar div:has(> [data-sidebar-locale-theme]) {
-  width: fit-content;
-  max-width: 100%;
-  align-self: flex-start;
-}
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
 
 /*
 @import 'tailwindcss' source(none);

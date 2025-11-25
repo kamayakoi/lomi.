@@ -35,22 +35,22 @@ Learn more about the structure of success and error responses in the [Errors](/r
 
 This core reference section covers the following API resources:
 
-- **[Authentication](/reference/setup/authentication):** How to authenticate your API requests.
-- **[Errors](/reference/reference/errors):** Understanding API error responses.
-- **[Data Models](/reference/reference/data-models):** Structure of key API objects.
-- **[Merchants](/reference/platform/merchants):** Managing merchant account details and metrics.
-- **[Customers](/reference/platform/customers):** Creating and managing customer profiles.
-- **[Products](/reference/payments/products):** Managing product definitions.
-- **[Transactions](/reference/payments/transactions):** Retrieving payment transaction details.
-- **[Subscriptions](/reference/payments/subscriptions):** Listing and retrieving subscription instances (and related SDK helpers).
-- **[Customer Subscriptions](/reference/platform/customer-subscriptions):** Managing individual customer subscriptions.
-- **[Checkout Sessions](/reference/payments/checkout-sessions):** Creating sessions for online checkouts.
-- **[Payment Links](/reference/payments/payment-links):** Creating shareable payment pages.
-- **[Providers](/reference/reference/data-models#provider-object):** Retrieving connected payment provider information.
-- **[Webhooks](/reference/payments/webhooks):** Managing webhook endpoints for event notifications.
-- **[Refunds](/reference/payments/refunds):** Retrieving refund details (Beta).
-- **[Changelog](/reference/changelog/changelog):** Notable API changes and updates.
+- **[Authentication](/docs/reference/setup/authentication):** How to authenticate your API requests.
+- **[Errors](/docs/reference/reference/errors):** Understanding API error responses.
+- **[Data Models](/docs/reference/reference/data-models):** Structure of key API objects.
+- **[Merchants](/docs/reference/platform/merchants):** Managing merchant account details and metrics.
+- **[Customers](/docs/reference/platform/customers):** Creating and managing customer profiles.
+- **[Products](/docs/reference/payments/products):** Managing product definitions.
+- **[Transactions](/docs/reference/payments/transactions):** Retrieving payment transaction details.
+- **[Subscription Plans](/docs/reference/payments/subscriptions):** Managing reusable subscription plan definitions.
+- **[Customer Subscriptions](/docs/reference/platform/customer-subscriptions):** Managing individual customer subscriptions.
+- **[Checkout Sessions](/docs/reference/payments/checkout-sessions):** Creating sessions for online checkouts.
+- **[Payment Links](/docs/reference/payments/payment-links):** Creating shareable payment pages.
+- **[Providers](/docs/reference/platform/providers):** Retrieving connected payment provider information.
+- **[Webhooks](/docs/reference/payments/webhooks):** Managing webhook endpoints for event notifications.
+- **[Refunds](/docs/reference/payments/refunds):** Retrieving refund details (Beta).
+- **[Changelog](/docs/reference/changelog/changelog):** Notable API changes and updates.
 
 ## Versioning
 
-The API is versioned in documentation and client libraries (for example the OpenAPI **info.version** field), but **there is no `/v1` prefix** on HTTP paths. Breaking changes are communicated through the [Changelog](/reference/changelog/changelog) and migration notes; we avoid shipping incompatible changes without notice.
+The current API version is `` `v1` ``, included in the base URL path (`/v1/`). We strive to maintain backward compatibility for this version. Significant breaking changes would be introduced under a new version path.

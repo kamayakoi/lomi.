@@ -3,11 +3,6 @@
 import { createClient } from '@/lib/supabase/request';
 import { NextResponse, type NextRequest } from 'next/server';
 
-/**
- * Docs locale (EN/FR) is resolved in server components via `getDocsLocale()` from the
- * `lomi.language` cookie — not via Fumadocs `createI18nMiddleware`, so public URLs stay
- * unchanged (no `/{lang}/...` segment or internal rewrite).
- */
 export default async function proxy(request: NextRequest) {
   const { supabase, response } = createClient(request);
 

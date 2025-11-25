@@ -1,6 +1,6 @@
 ---
-title: Payment Links
-description: Create shareable payment links for products or custom amounts.
+title: 'Payment links'
+description: 'The Payment Links API allows you to create and manage shareable, hosted payment pages for collecting one-time payments or initiating subscriptions.'
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -19,7 +19,9 @@ End-to-end checkout rules (currency, coupons, sessions): **[Checkout behavior](/
 
 ## Create a payment link
 
-### Request Body
+- `` `instant` ``: Collects a specific, one-time amount.
+- `` `product` ``: Collects payment for a specific [Product](/docs/reference/payments/products).
+- `` `plan` ``: Initiates a [Subscription Plan](/docs/reference/payments/subscriptions) for a customer.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -59,15 +61,23 @@ const productLink = await lomi.paymentLinks.create({
   success_url: 'https://your-site.com/success',
 });
 
-// Instant link (custom amount)
-const instantLink = await lomi.paymentLinks.create({
-  link_type: 'instant',
-  title: 'Donation',
-  currency_code: 'XOF',
-  amount: 5000,
-  description: 'Support our cause',
-  success_url: 'https://your-site.com/thank-you',
-});
+| Parameter             | Type             | Required                         | Description                                                                                       |
+| --------------------- | ---------------- | -------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `link_type`           | string           | Yes                              | Type of link: `` `product` ``, `` `plan` ``, or `` `instant` ``.                                  |
+| `title`               | string           | Yes                              | Title displayed on the payment page.                                                              |
+| `currency_code`       | string           | Yes                              | 3-letter ISO currency code (e.g., `XOF`).                                                         |
+| `product_id`          | string (UUID)    | Yes, if `link_type` is `product` | ID of the [Product](/docs/reference/payments/products) to link.                                   |
+| `plan_id`             | string (UUID)    | Yes, if `link_type` is `plan`    | ID of the [Plan](/docs/reference/payments/subscriptions) to link.                                 |
+| `price`               | number           | Yes, if `link_type` is `instant` | Amount to collect (smallest currency unit) for an `instant` link.                                 |
+| `public_description`  | string           | No                               | Public description displayed on the payment page.                                                 |
+| `private_description` | string           | No                               | Internal description for merchant reference (not shown to customer).                              |
+| `allowed_providers`   | array (string)   | No                               | Array of payment provider codes (e.g., `["WAVE", "ORANGE"]`). If omitted, uses merchant defaults. |
+| `allow_coupon_code`   | boolean          | No                               | Allow coupon codes to be applied (default: `false`).                                              |
+| `is_active`           | boolean          | No                               | Set to `false` to create an inactive link (default: `true`).                                      |
+| `expires_at`          | string (ISO8601) | No                               | Optional timestamp for when the link automatically deactivates.                                   |
+| `success_url`         | string (URL)     | No                               | Custom URL to redirect to after successful payment.                                               |
+| `cancel_url`          | string (URL)     | No                               | Custom URL to redirect to after cancelled payment.                                                |
+| `metadata`            | object           | No                               | Key-value pairs for storing additional information.                                               |
 
 console.log(`Share this link: ${productLink.url}`);
 ```
@@ -78,15 +88,25 @@ console.log(`Share this link: ${productLink.url}`);
 from lomi import LomiClient
 import os
 
-client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
-    environment="test"
-)
-
-# Product link
-product_link = client.payment_links.create({
-    "link_type": "product",
-    "title": "Premium Subscription",
+```json filename="POST /payment-links response"
+{
+  "success": true,
+  "data": {
+    "link_id": "d7e8f0a1-b2c3-4d5e-8f9a-0b1c2d3e4f5a",
+    "merchant_id": "904d003c-3736-41d4-90a5-9de74d404fd7",
+    "organization_id": "0979ec77-9fb1-4c9a-8c55-d7fb6c182c9c",
+    "link_type": "instant",
+    "url": "https://pay.lomi.africa/instant/d7e8f0a1-b2c3-4d5e-8f9a-0b1c2d3e4f5a", // The shareable URL
+    "product_id": null,
+    "product_name": null,
+    "product_price": null,
+    "plan_id": null,
+    "plan_name": null,
+    "plan_amount": null,
+    "title": "Donation",
+    "public_description": "Support our cause!",
+    "private_description": null,
+    "price": 5000.0,
     "currency_code": "XOF",
     "product_id": "prod_abc123...",
     "allow_coupon_code": True,
@@ -106,19 +126,48 @@ print(f"Share this link: {product_link['url']}")
 ```
 </Tab>
 
-<Tab value="cURL">
-```bash
-curl -X POST "https://api.lomi.africa/payment-links" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "link_type": "product",
-    "title": "Premium Subscription",
-    "currency_code": "XOF",
-    "product_id": "prod_abc123...",
-    "allow_coupon_code": true,
-    "success_url": "https://your-site.com/success"
-  }'
+### List payment links
+
+Retrieves a list of payment links for your merchant account, with options for filtering and pagination.
+
+**Endpoint:** `` `GET /payment-links` ``
+
+**Query parameters:**
+
+| Parameter         | Type    | Required | Default | Description                                                             |
+| ----------------- | ------- | -------- | ------- | ----------------------------------------------------------------------- |
+| `link_type`       | string  | No       | (all)   | Filter by link type: `` `product` ``, `` `plan` ``, or `` `instant` ``. |
+| `currency_code`   | string  | No       | (all)   | Filter by 3-letter ISO currency code.                                   |
+| `is_active`       | boolean | No       | (all)   | Filter by active status (`true` or `false`).                            |
+| `page`            | number  | No       | 1       | Page number for pagination.                                             |
+| `page_size`       | number  | No       | 50      | Number of links per page (max: 100).                                    |
+| `include_expired` | boolean | No       | false   | Set to `true` to include expired links in the results.                  |
+
+**Example response (200 OK):**
+
+```json filename="GET /payment-links response"
+{
+  "success": true,
+  "data": [
+    {
+      "link_id": "d7e8f0a1-b2c3-4d5e-8f9a-0b1c2d3e4f5a",
+      "link_type": "instant",
+      "url": "https://pay.lomi.africa/instant/d7e8f0a1-b2c3-4d5e-8f9a-0b1c2d3e4f5a",
+      "title": "Donation",
+      "price": 5000.0,
+      "currency_code": "XOF",
+      "is_active": true,
+      "expires_at": null
+      // ... other fields
+    }
+    // ... more payment link objects
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 50,
+    "totalCount": 120 // Example
+  }
+}
 ```
 </Tab>
 
@@ -130,7 +179,9 @@ curl -X POST "https://api.lomi.africa/payment-links" \
 
 Retrieve all payment links with optional filtering.
 
-### Query Parameters
+| Parameter | Type          | Required | Description                                            |
+| --------- | ------------- | -------- | ------------------------------------------------------ |
+| `link_id` | string (UUID) | Yes      | The unique identifier of the payment link (`link_id`). |
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -139,25 +190,49 @@ Retrieve all payment links with optional filtering.
 | `limit` | `number` | Results per page (default: `20`) |
 | `offset` | `number` | Pagination offset (default: `0`) |
 
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const links = await lomi.paymentLinks.list({
-  linkType: 'product',
-  isActive: true,
-  limit: 20,
-});
+```json filename="GET /payment-links/{link_id} response"
+{
+  "success": true,
+  "data": {
+    "link_id": "d7e8f0a1-b2c3-4d5e-8f9a-0b1c2d3e4f5a"
+    // ... all other fields as shown in the create example
+  }
+}
 ```
 </Tab>
 
-<Tab value="Python">
-```python
-links = client.payment_links.list(
-    linkType="product",
-    isActive=True,
-    limit=20
-)
+### Update payment link
+
+Updates certain configurable fields of a specific payment link. Core details like the type, title, price/product/plan association, and active status cannot be changed after creation.
+
+**Endpoint:** `` `PATCH /payment-links/{link_id}` ``
+
+**Path parameters:**
+
+| Parameter | Type          | Required | Description                                            |
+| --------- | ------------- | -------- | ------------------------------------------------------ |
+| `link_id` | string (UUID) | Yes      | The unique identifier of the payment link (`link_id`). |
+
+**Request body parameters:**
+
+_(Include only the fields you want to update)_
+
+| Parameter           | Type             | Description                                                   |
+| ------------------- | ---------------- | ------------------------------------------------------------- |
+| `expires_at`        | string (ISO8601) | New expiration timestamp. Set to `null` to remove expiration. |
+| `success_url`       | string (URL)     | Update the success redirect URL.                              |
+| `cancel_url`        | string (URL)     | Update the cancellation redirect URL.                         |
+| `allowed_providers` | array (string)   | Replace the list of allowed payment provider codes.           |
+| `allow_coupon_code` | boolean          | Enable or disable coupon code usage.                          |
+| `metadata`          | object           | Replace the existing metadata object with the provided one.   |
+
+**Example request:**
+
+```json filename="PATCH /payment-links/{link_id} request"
+{
+  "allowed_providers": ["WAVE"],
+  "metadata": { "updated_via": "api" }
+}
 ```
 </Tab>
 
@@ -176,7 +251,9 @@ curl -X GET "https://api.lomi.africa/payment-links?linkType=product&isActive=tru
 
 Retrieve details of a specific payment link.
 
-<Tabs items={["TypeScript", "Python", "cURL"]}>
+| Parameter | Type          | Required | Description                                            |
+| --------- | ------------- | -------- | ------------------------------------------------------ |
+| `link_id` | string (UUID) | Yes      | The unique identifier of the payment link (`link_id`). |
 
 <Tab value="TypeScript">
 ```typescript
@@ -185,11 +262,7 @@ console.log(`URL: ${link.url}`);
 ```
 </Tab>
 
-<Tab value="Python">
-```python
-link = client.payment_links.get('pl_abc123...')
-```
-</Tab>
+_(No response body)_
 
 <Tab value="cURL">
 ```bash
@@ -198,33 +271,4 @@ curl -X GET "https://api.lomi.africa/payment-links/pl_abc123..." \
 ```
 </Tab>
 
-</Tabs>
-
----
-
-## Payment Link Object
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique identifier |
-| `url` | `string` | Shareable payment URL |
-| `link_type` | `string` | `product` or `instant` |
-| `title` | `string` | Link title |
-| `description` | `string` | Link description |
-| `amount` | `number` | Amount (instant links) |
-| `currency_code` | `string` | Currency code |
-| `product_id` | `string` | Associated product (product links) |
-| `is_active` | `boolean` | Active status |
-| `expires_at` | `string` | Expiration timestamp |
-| `metadata` | `object` | Custom metadata |
-| `created_at` | `string` | Creation timestamp |
-
----
-
-## Error Responses
-
-| Status | Description |
-|--------|-------------|
-| `400` | Invalid input (e.g., amount on product link) |
-| `401` | Invalid or missing API key |
-| `404` | Link not found or access denied |
+Common errors include `` `400 Bad Request` `` for validation failures (invalid type, missing conditional fields, invalid URL), `` `401 Unauthorized` ``, `` `404 Not Found` `` if the link ID or associated product/plan doesn't exist, and `` `500 Internal Server Error` ``. Refer to the [Errors](/docs/reference/reference/errors) guide for general structure and handling.

@@ -37,22 +37,18 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 
 | Event Enum                          | Description                                 | Data Payload Type       |
 | ----------------------------------- | ------------------------------------------- | ----------------------- |
-| `` `PAYMENT_CREATED` ``         | A new payment attempt has been initiated.   | `` `Transaction` ``     |
-| `` `PAYMENT_SUCCEEDED` ``       | A one-time payment is successful.           | `` `Transaction` ``     |
-| `` `PAYMENT_FAILED` ``          | A one-time payment attempt failed.          | `` `Transaction` ``     |
-| `` `SUBSCRIPTION_CREATED` ``    | A new subscription is created.              | `` `Subscription` ``    |
-| `` `SUBSCRIPTION_RENEWED` ``    | A subscription successfully renews.         | `` `Subscription` ``    |
-| `` `SUBSCRIPTION_CANCELLED` ``   | A subscription is cancelled.                 | `` `Subscription` ``    |
-| `` `REFUND_COMPLETED` ``        | A refund is successfully processed.         | `` `Refund` ``          |
-| `` `REFUND_FAILED` ``           | A refund attempt failed.                    | `` `Refund` ``          |
-| `` `REFUND_CREATED` ``         | A refund attempt was created.               | `` `Refund` ``          |
-| `` `test.webhook` ``            | A test event generated via the API.         | `` `TestPayload` ``     |
+| `` `PAYMENT_SUCCEEDED` ``           | A one-time payment is successful.           | `` `Transaction` ``     |
+| `` `PAYMENT_FAILED` ``              | A one-time payment attempt failed.          | `` `Transaction` ``     |
+| `` `CHECKOUT_COMPLETED` ``          | A checkout session was completed.           | `` `CheckoutSession` `` |
+| `` `SUBSCRIPTION_CREATED` ``        | A new subscription is created.              | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_RENEWED` ``        | A subscription successfully renews.         | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_PAYMENT_FAILED` `` | A scheduled subscription payment failed.    | `` `Subscription` ``    |
+| `` `SUBSCRIPTION_CANCELED` ``       | A subscription is canceled.                 | `` `Subscription` ``    |
+| `` `REFUND_COMPLETED` ``            | A refund is successfully processed.         | `` `Refund` ``          |
+| `` `PROVIDER_STATUS_CHANGED` ``     | The status of a connected provider changes. | `` `ProviderSetting` `` |
+| `` `test.webhook` ``                | A test event generated via the API.         | `` `TestPayload` ``     |
 
 _(Note: The specific structure of the data payload for each event type will be documented under the respective API resource, e.g., Transactions, Subscriptions.)_
-
-Webhook subscriptions and JSON payloads use **SCREAMING_SNAKE_CASE** event names (for example `PAYMENT_SUCCEEDED`). Some docs or OpenAPI tooling may show **dotted** names (for example `payment.succeeded`) as a human-readable alias for the same logical event—use the enum values above when configuring endpoints and when comparing `event` in request bodies.
-
-For operations guidance (retries, idempotency, delivery logs), see [Webhook reliability](/core/advanced-guides/webhook-reliability).
 
 ## API endpoints
 
@@ -294,9 +290,8 @@ Roughly speaking: **`4xx` client errors are usually terminal** for that automate
 
 ## Best practices
 
-- **Route without global API auth:** Apply `X-Lomi-Signature` verification on a dedicated webhook path; do not require `Authorization` / `X-API-Key` on the same POST ([why](/core/advanced-guides/handling-webhooks#webhook-signing-vs-authorization)).
 - **Verify signatures:** Always verify the `` `X-Lomi-Signature` `` to ensure the request is from lomi.
-- **Respond quickly:** Return `` `2xx` `` promptly — lomi waits only **about 4 seconds** per POST attempt before timing out. Offload heavier work after you respond.
+- **Respond quickly:** Your endpoint should return a `` `2xx` `` status code within a few seconds. Offload longer processing to background jobs.
 - **Handle retries:** Be prepared for lomi. to retry sending events if your endpoint fails or times out.
 - **Idempotency:** Design your event processing logic to handle duplicate events gracefully.
 - **Secure your secret:** Store your webhook secret securely using environment variables or a secrets manager.

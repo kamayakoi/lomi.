@@ -101,8 +101,8 @@ export function zoomImage(): ReactNode {
   return (
     <Wrapper>
       <ImageZoom
-        alt="lomi."
-        src="/lomi_d.webp"
+        alt="banner"
+        src={BannerImage}
         className="my-0! rounded-sm bg-fd-background"
         priority
       />

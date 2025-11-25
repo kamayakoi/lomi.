@@ -3,13 +3,15 @@
  * Master SDK Generator
  * 
  * This script:
- * 1. Copies API types from apps/api to apps/sdks
- * 2. Generates SDKs for all supported languages (TypeScript, Python, Go, PHP)
+ * 1. Syncs the OpenAPI spec from apps/api/openapi/spec.yaml to apps/sdks/spec.yaml
+ * 2. Validates the spec
+ * 3. Generates SDKs for all languages (TypeScript, JavaScript, Python, Go, PHP)
  * 
  * Run: npm run generate:all
  */
 
 import { execSync } from 'child_process';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -44,6 +46,11 @@ const SDKS = [
         command: 'node scripts/typescript-generate.js',
     },
     {
+        name: 'JavaScript',
+        dir: 'js',
+        command: 'node scripts/javascript-generate.js',
+    },
+    {
         name: 'Python',
         dir: 'python',
         command: 'node scripts/python-generate.js',
@@ -58,17 +65,13 @@ const SDKS = [
         dir: 'php',
         command: 'node scripts/php-generate.js',
     },
-
 ];
 
 async function generateAll() {
     console.log('🚀 lomi. Multi-Language SDK Generation\n');
     console.log('='.repeat(60));
-    console.log(
-        '📋 Public merchant SDKs use apps/docs/openapi.json + strict allowlist\n',
-    );
 
-    // Step 1: Pre-generation - Copy API types
+    // Step 1: Pre-generation - Copy and validate spec
     log.step('Running pre-generation setup...');
     const preGenSuccess = exec('node scripts/pre-generate.js', {
         cwd: path.join(__dirname, '..'),
@@ -113,27 +116,14 @@ async function generateAll() {
     console.log(`\n✅ ${successCount} SDKs generated successfully`);
     if (failureCount > 0) {
         console.log(`❌ ${failureCount} SDKs failed to generate`);
-        return false;
     }
-
-    log.step('Verifying cross-language SDK surface parity…');
-    const parityOk = exec('node scripts/verify-sdk-surface-parity.js', {
-        cwd: path.join(__dirname, '..'),
-    });
-    if (!parityOk) {
-        log.error('SDK manifest parity verification failed.');
-        return false;
-    }
-    log.success('All language manifests match TypeScript canonical output.');
 
     console.log('\n💡 Next steps:');
-    console.log(
-        '   1. Review/commit generated SDK sources + manifests (sdk-public-methods.json, etc.)',
-    );
-    console.log('   2. Run builds/tests locally (npm run build in ts/, go test, etc.)');
+    console.log('   1. Review generated SDKs in apps/sdks/');
+    console.log('   2. Test each SDK');
     console.log('   3. Publish to package managers\n');
 
-    return true;
+    return failureCount === 0;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

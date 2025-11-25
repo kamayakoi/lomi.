@@ -1,5 +1,7 @@
 /* @proprietary license */
 
+import { openapi } from '@/lib/openapi';
+
 import { cookies } from 'next/headers';
 import { createSecureOpenApiProxyHandlers } from '@/lib/openapi-secure-proxy';
 import { resolveTestSecretApiKey } from '@/lib/resolve-test-api-key';

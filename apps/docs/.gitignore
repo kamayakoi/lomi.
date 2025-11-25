@@ -1,6 +1,7 @@
 # deps
 /node_modules
 /dist
+.sanity
 
 # generated content
 .contentlayer
@@ -22,8 +23,5 @@
 # others
 .env
 lib/types/database.types.ts
+.env.production
 next-env.d.ts
-/lib/scripts/core
-
-# OpenAPI MDX (regenerated on each docs build)
-/content/docs/openapi/generated/

@@ -1,6 +1,6 @@
 ---
-title: Customers
-description: Manage customer profiles and track their payment history.
+title: 'Customers'
+description: 'The Customers API allows you to create, retrieve, update, list, and delete customer profiles associated with your merchant account.'
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -37,19 +37,30 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-const customer = await lomi.customers.create({
-  name: 'Amadou Ba',
-  email: 'amadou.ba@example.com',
-  phone_number: '+221771234567',
-  country: 'Senegal',
-  city: 'Dakar',
-  is_business: false,
-  metadata: {
-    internal_id: 'USER_123',
-  },
-});
+| Parameter               | Type            | Required | Description                                                              |
+| ----------------------- | --------------- | -------- | ------------------------------------------------------------------------ |
+| `` `name` ``            | `` `string` ``  | Yes      | Customer's full name.                                                    |
+| `` `email` ``           | `` `string` ``  | No       | Customer's email address.                                                |
+| `` `phone_number` ``    | `` `string` ``  | No       | Customer's phone number (preferably E.164 format).                       |
+| `` `whatsapp_number` `` | `` `string` ``  | No       | Customer's WhatsApp number (preferably E.164 format).                    |
+| `` `country` ``         | `` `string` ``  | No       | Customer's country name or code.                                         |
+| `` `city` ``            | `` `string` ``  | No       | Customer's city.                                                         |
+| `` `address` ``         | `` `string` ``  | No       | Customer's street address.                                               |
+| `` `postal_code` ``     | `` `string` ``  | No       | Customer's postal code.                                                  |
+| `` `is_business` ``     | `` `boolean` `` | No       | Set `` `true` `` if the customer is a business (default: `` `false` ``). |
+| `` `metadata` ``        | `` `object` ``  | No       | Key-value pairs for storing additional information.                      |
 
-console.log(`Customer created: ${customer.id}`);
+**Example request:**
+
+```json filename="Example request for POST /customers"
+{
+  "name": "Amadou Ba",
+  "email": "amadou.ba@example.com",
+  "phone_number": "+225021234567",
+  "country": "Senegal",
+  "city": "Dakar",
+  "is_business": false
+}
 ```
 </Tab>
 
@@ -85,7 +96,8 @@ curl -X POST "https://api.lomi.africa/customers" \
   -d '{
     "name": "Amadou Ba",
     "email": "amadou.ba@example.com",
-    "phone_number": "+221771234567",
+    "phone_number": "+225021234567",
+    "whatsapp_number": null,
     "country": "Senegal",
     "city": "Dakar",
     "is_business": false,
@@ -102,7 +114,9 @@ curl -X POST "https://api.lomi.africa/customers" \
 
 Retrieve all customers with optional filtering and pagination.
 
-### Query Parameters
+| Parameter  | Type           | Required | Description                                                  |
+| ---------- | -------------- | -------- | ------------------------------------------------------------ |
+| `` `id` `` | `` `string` `` | Yes      | The unique identifier of the customer (`` `customer_id` ``). |
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -112,17 +126,31 @@ Retrieve all customers with optional filtering and pagination.
 | `page` | `number` | Page number (default: `1`) |
 | `pageSize` | `number` | Items per page (default: `50`) |
 
-<Tabs items={["TypeScript", "Python", "cURL"]}>
+_(Response structure is the same as the `Create a customer` response)_
 
-<Tab value="TypeScript">
-```typescript
-const customers = await lomi.customers.list({
-  search: 'amadou',
-  type: 'individual',
-  status: 'active',
-  page: 1,
-  pageSize: 20,
-});
+### Update a customer
+
+Updates the details of a specific customer.
+
+**Endpoint:** `` `PATCH /customers/{id}` ``
+
+**Path parameters:**
+
+| Parameter  | Type           | Required | Description                                                  |
+| ---------- | -------------- | -------- | ------------------------------------------------------------ |
+| `` `id` `` | `` `string` `` | Yes      | The unique identifier of the customer (`` `customer_id` ``). |
+
+**Request body parameters:**
+
+_(Include only the fields you want to update. Parameters are the same as for `` `Create a customer` ``, none are required.)_
+
+**Example request:**
+
+```json filename="Example request for PATCH /customers/{id}"
+{
+  "phone_number": "+225779876543",
+  "address": "123 Main St"
+}
 ```
 </Tab>
 
@@ -147,16 +175,32 @@ curl -X GET "https://api.lomi.africa/customers?search=amadou&type=individual&pag
 
 </Tabs>
 
-### Response
+**Query parameters:**
+
+| Parameter            | Type           | Required | Description                                          |
+| -------------------- | -------------- | -------- | ---------------------------------------------------- |
+| `` `limit` ``        | `` `number` `` | No       | Maximum number of customers to return (default: 20). |
+| `` `page` ``         | `` `number` `` | No       | Page number for pagination (default: 1).             |
+| `` `email` ``        | `` `string` `` | No       | Filter customers by exact email address.             |
+| `` `phone_number` `` | `` `string` `` | No       | Filter customers by exact phone number.              |
+
+**Note:** By default, this endpoint only returns customers who have completed or refunded transactions. To see all customers, including newly created ones without transactions, you might need specific permissions or a different filter (check API updates for this behavior).
+
+**Example response (200 OK):**
 
 ```json
 {
-  "customers": [...],
-  "pagination": {
-    "page": 1,
-    "pageSize": 20,
-    "totalCount": 150,
-    "totalPages": 8
+  "data": [
+    {
+      "customer_id": "b78de3c9-7f76-4f43-9c5d-19d9f5c7c985"
+      // ... other customer fields
+    }
+    // ... more customer objects
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 20
+    // Potentially other pagination fields like total_count, total_pages
   }
 }
 ```
@@ -169,11 +213,9 @@ Retrieve details of a specific customer.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
-<Tab value="TypeScript">
-```typescript
-const customer = await lomi.customers.get('cus_abc123...');
-```
-</Tab>
+| Parameter  | Type           | Required | Description                                                  |
+| ---------- | -------------- | -------- | ------------------------------------------------------------ |
+| `` `id` `` | `` `string` `` | Yes      | The unique identifier of the customer (`` `customer_id` ``). |
 
 <Tab value="Python">
 ```python
@@ -309,88 +351,4 @@ curl -X GET "https://api.lomi.africa/customers/cus_abc123.../transactions" \
 
 ---
 
-## Create customer portal launch session
-
-Generate a one-time hosted customer portal URL for a customer in your organization.
-
-- Endpoint: `POST /customers/{id}/portal-launch-session`
-- Intended caller: merchant backend (API key auth)
-- Output: `launch_url` + `launch_token` + flow metadata
-
-Use this when you need a hosted handoff from your product to the customer portal.
-
-<Tabs items={["TypeScript", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-import axios from 'axios';
-
-const { data: launch } = await axios.post(
-  'https://api.lomi.africa/customers/cus_abc123.../portal-launch-session',
-  {
-    return_url: 'https://merchant.example.com/account',
-    flow_type: 'subscription_cancel',
-    flow_subscription_id: 'sub_abc123...',
-    flow_after_completion_url:
-      'https://merchant.example.com/account/subscription-cancelled',
-  },
-  {
-    headers: {
-      'X-API-KEY': process.env.LOMI_API_KEY!,
-      'Content-Type': 'application/json',
-    },
-  },
-);
-
-window.location.href = launch.launch_url;
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-session" \
-  -H "X-API-KEY: $LOMI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "return_url": "https://merchant.example.com/account",
-    "flow_type": "subscription_cancel",
-    "flow_subscription_id": "sub_abc123...",
-    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
-  }'
-```
-</Tab>
-
-</Tabs>
-
-See full flow and production guidance in [Customer Portal](/reference/payments/customer-portal).
-
----
-
-## Customer Object
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique customer identifier |
-| `organization_id` | `string` | Organization that owns this customer |
-| `name` | `string` | Customer full name |
-| `email` | `string` | Email address |
-| `phone_number` | `string` | Phone number |
-| `whatsapp_number` | `string` | WhatsApp number |
-| `country` | `string` | Country |
-| `city` | `string` | City |
-| `address` | `string` | Street address |
-| `postal_code` | `string` | Postal code |
-| `is_business` | `boolean` | Business customer flag |
-| `metadata` | `object` | Custom metadata |
-| `created_at` | `string` | Creation timestamp |
-| `updated_at` | `string` | Last update timestamp |
-
----
-
-## Error Responses
-
-| Status | Description |
-|--------|-------------|
-| `400` | Invalid input data |
-| `401` | Invalid or missing API key |
-| `404` | Customer not found or access denied |
+Common errors include `` `400 Bad Request` `` for invalid input, `` `401 Unauthorized` ``, `` `404 Not Found` `` if the customer ID doesn't exist, and `` `500 Internal Server Error` ``. Refer to the [Errors](/docs/reference/reference/errors) guide for general structure and handling.

@@ -34,9 +34,10 @@ import { LomiSDK, LomiError } from '@lomi./sdk'; // Assuming SDK exports error t
 const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
 
 try {
-  const session = await lomi.checkoutSessions.createCheckoutSession({
+  const session = await lomi.checkoutSessions.create({
     amount: -100, // Invalid: must be positive
     currency_code: 'INVALID', // Invalid enum value
+    allowed_providers: [], // Invalid: must not be empty
     // Missing required fields like success_url, cancel_url
   });
 } catch (error) {
@@ -142,7 +143,7 @@ These indicate a problem on lomi.'s side. These should be rare. It's generally s
         } catch (error: any) {
           attempts++;
           const isRetryable =
-            error instanceof LomiError &&
+            error instanceof LomiApiError &&
             (error.statusCode === 429 || error.statusCode >= 500);
 
           if (!isRetryable || attempts >= maxRetries) {
@@ -175,6 +176,6 @@ These indicate a problem on lomi.'s side. These should be rare. It's generally s
 
 ## Next steps
 
-- [Idempotency keys](/core/advanced-guides/idempotency-keys)
-- [Security best practices](/core/advanced-guides/security-best-practices)
-- [Error Reference](/reference/reference/errors)
+- [Idempotency keys](/docs/core/advanced-guides/idempotency-keys)
+- [Security best practices](/docs/core/advanced-guides/security-best-practices)
+- [Error Reference](/docs/reference/reference/errors)

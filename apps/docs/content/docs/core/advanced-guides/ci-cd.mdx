@@ -191,7 +191,7 @@ describe('Payment Integration', () => {
     }
     lomi = new LomiSDK({
       apiKey: process.env.LOMI_TEST_API_KEY,
-      baseUrl: 'https://sandbox.api.lomi.africa',
+      baseUrl: 'https://sandbox.api.lomi.africa/v1',
     });
     // await setupTestEnvironment(); // Your test setup
   });
@@ -413,6 +413,6 @@ async function automaticRollback(
 
 ## Next steps
 
-- [Testing guide](/core/advanced-guides/testing)
-- [Security best practices](/core/advanced-guides/security-best-practices)
-- [API Reference](/reference/setup/overview)
+- [Testing guide](/docs/core/advanced-guides/testing)
+- [Security best practices](/docs/core/advanced-guides/security-best-practices)
+- [API Reference](/docs/reference)
