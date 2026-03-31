@@ -12,6 +12,7 @@ jobs:
     outputs:
       api: ${{ steps.changes.outputs.api }}
       docs: ${{ steps.changes.outputs.docs }}
+      website: ${{ steps.changes.outputs.website }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
@@ -22,6 +23,8 @@ jobs:
               - 'apps/api/**'
             docs:
               - 'apps/docs/**'
+            website:
+              - 'apps/website/**'
 
   deploy-api:
     needs: detect-changes
@@ -35,6 +38,21 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_API }}
+          working-directory: ./
+          vercel-args: '--prod'
+
+  deploy-website:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.website == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Website to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_WEBSITE }}
           working-directory: ./
           vercel-args: '--prod'
 
