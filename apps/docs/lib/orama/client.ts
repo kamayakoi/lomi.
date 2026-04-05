@@ -18,8 +18,16 @@ if (!isConfigured) {
   // Client-side: errors will be handled in the component
 }
 
+/** Last path segment of `NEXT_PUBLIC_ORAMA_ENDPOINT` — used by legacy `@oramacloud/client` CloudManager indexing only. */
 export const DataSourceId = endpoint ? (endpoint.split('/').pop() ?? '') : '';
-export const isAdmin = !!process.env.ORAMA_PRIVATE_API_KEY;
+
+const hasOramaCoreIndex =
+  !!process.env.ORAMA_PROJECT_ID && !!process.env.ORAMA_DATASOURCE_ID;
+const hasLegacyCloudManagerIndex = !!endpoint && !!DataSourceId;
+
+export const isAdmin =
+  !!process.env.ORAMA_PRIVATE_API_KEY &&
+  (hasOramaCoreIndex || hasLegacyCloudManagerIndex);
 
 // Only create client if environment variables are configured
 // Otherwise, create a mock client that will throw helpful errors

@@ -2,19 +2,21 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "workspaces": {
     ".": {
-      "entry": ["index.html", "src/main.tsx", "src/App.tsx"],
-      "project": ["src/**/*.{ts,tsx,js,jsx}"],
+      "next": true,
+      "entry": [
+        "lib/scripts/core/generate_sitemap.ts",
+        "lib/scripts/update-orama-index.ts"
+      ],
+      "project": [
+        "app/**/*.{ts,tsx,js,jsx}",
+        "components/**/*.{ts,tsx,js,jsx}",
+        "lib/**/*.{ts,tsx,js,jsx}"
+      ],
       "paths": {
-        "@/*": ["src/*"],
-        "@/components/*": ["src/components/*"],
-        "@/lib/*": ["src/lib/*"],
-        "@/hooks/*": ["src/lib/hooks/*"],
-        "@/utils/*": ["src/utils/*"],
-        "@/types/*": ["src/lib/types/*"]
+        "@/*": ["./*"]
       },
       "ignore": [
         "**/*.d.ts",
-        "**/*.config.*",
         "**/node_modules/**",
         "**/dist/**",
         "**/build/**",

@@ -1,32 +1,72 @@
 /* @proprietary license */
 
 import * as fs from 'node:fs/promises';
+import { OramaCloud } from '@orama/core';
 import { CloudManager } from '@oramacloud/client';
-import { isAdmin, DataSourceId } from '@/lib/orama/client';
+import { DataSourceId, isAdmin } from '@/lib/orama/client';
 
-export async function updateSearchIndexes(): Promise<void> {
-  const apiKey = process.env.ORAMA_PRIVATE_API_KEY;
+const useOramaCoreIndex =
+  !!process.env.ORAMA_PROJECT_ID && !!process.env.ORAMA_DATASOURCE_ID;
 
-  if (!isAdmin) {
-    console.log('Orama private key not found, skipping index update.');
-    return;
+async function updateWithOramaCore(
+  records: unknown[],
+  projectId: string,
+  datasourceId: string,
+  apiKey: string,
+): Promise<void> {
+  const orama = new OramaCloud({ projectId, apiKey });
+  const datasource = orama.dataSource(datasourceId);
+  const temporary = await datasource.createTemporaryIndex();
+
+  const batchSize = 100;
+  for (let i = 0; i < records.length; i += batchSize) {
+    const batch = records.slice(i, i + batchSize) as Record<string, unknown>[];
+    await temporary.insertDocuments(batch);
   }
 
-  const content = await fs.readFile('.next/server/app/static.json.body');
-  const records = JSON.parse(content.toString()) as unknown[];
+  await temporary.swap();
+}
 
-  const manager = new CloudManager({ api_key: apiKey! });
-  const index = manager.index(DataSourceId);
+async function updateWithCloudManager(
+  records: unknown[],
+  apiKey: string,
+  indexId: string,
+): Promise<void> {
+  const manager = new CloudManager({ api_key: apiKey });
+  const index = manager.index(indexId);
 
-  // Insert documents in batches to avoid overwhelming the API
   const batchSize = 100;
   for (let i = 0; i < records.length; i += batchSize) {
     const batch = records.slice(i, i + batchSize);
     await index.insert(batch);
   }
 
-  // Deploy the changes
   await index.deploy();
+}
+
+export async function updateSearchIndexes(): Promise<void> {
+  const apiKey = process.env.ORAMA_PRIVATE_API_KEY;
+
+  if (!isAdmin) {
+    console.log(
+      'Orama index update skipped: set ORAMA_PRIVATE_API_KEY and either (ORAMA_PROJECT_ID + ORAMA_DATASOURCE_ID) or NEXT_PUBLIC_ORAMA_ENDPOINT.',
+    );
+    return;
+  }
+
+  const content = await fs.readFile('.next/server/app/static.json.body');
+  const records = JSON.parse(content.toString()) as unknown[];
+
+  if (useOramaCoreIndex) {
+    await updateWithOramaCore(
+      records,
+      process.env.ORAMA_PROJECT_ID!,
+      process.env.ORAMA_DATASOURCE_ID!,
+      apiKey!,
+    );
+  } else {
+    await updateWithCloudManager(records, apiKey!, DataSourceId);
+  }
 
   console.log(`search updated: ${records.length} records`);
 }
