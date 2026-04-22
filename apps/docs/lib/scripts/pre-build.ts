@@ -2,6 +2,7 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { buildRegistry } from '@/lib/scripts/build-registry';
 import * as OpenAPI from 'fumadocs-openapi';
@@ -46,8 +47,28 @@ function exportOpenApiFromNest(): void {
   }
 }
 
+async function normalizeOpenApiSecuritySchemes(): Promise<void> {
+  const openApiPath = path.resolve(process.cwd(), 'openapi.json');
+  if (!existsSync(openApiPath)) return;
+
+  const raw = await readFile(openApiPath, 'utf-8');
+  const spec = JSON.parse(raw) as {
+    components?: { securitySchemes?: Record<string, unknown> };
+  };
+  const schemes = spec.components?.securitySchemes;
+  if (!schemes) return;
+
+  const headerKey = 'X-API-KEY';
+  const requirementKey = 'api-key';
+  if (schemes[headerKey] && !schemes[requirementKey]) {
+    schemes[requirementKey] = schemes[headerKey];
+    await writeFile(openApiPath, `${JSON.stringify(spec, null, 2)}\n`, 'utf-8');
+  }
+}
+
 export async function generateDocs() {
   exportOpenApiFromNest();
+  await normalizeOpenApiSecuritySchemes();
   await rimraf(OPENAPI_OUTPUT);
 
   await OpenAPI.generateFiles({

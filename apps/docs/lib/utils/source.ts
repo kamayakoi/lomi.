@@ -4,7 +4,6 @@
 import type {
   InferMetaType,
   InferPageType,
-  Source,
 } from 'fumadocs-core/source';
 import { loader } from 'fumadocs-core/source';
 import { icons } from 'lucide-react';
@@ -18,8 +17,9 @@ export const source = loader({
     if (icon && icon in icons)
       return createElement(icons[icon as keyof typeof icons]);
   },
-  source: docs.toFumadocsSource() as Source,
+  source: docs.toFumadocsSource(),
   pageTree: {
+    // @ts-expect-error Fumadocs generic mismatch between generated source and transformer types.
     transformers: [transformerOpenAPI()],
   },
 });

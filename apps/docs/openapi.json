@@ -2926,6 +2926,11 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
+      },
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
       }
     },
     "schemas": {

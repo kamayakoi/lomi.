@@ -1,6 +1,5 @@
 /* @proprietary license */
 
-import React from 'react';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import * as FilesComponents from 'fumadocs-ui/components/files';
 import * as TabsComponents from 'fumadocs-ui/components/tabs';
@@ -28,17 +27,6 @@ export function getMDXComponents(components?: MDXComponents) {
     APIPage,
     ...components,
   } satisfies MDXComponents;
-}
-
-declare module 'mdx/types.js' {
-  // Augment the MDX types to make it understand React.
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace JSX {
-    type Element = React.JSX.Element;
-    type ElementClass = React.JSX.ElementClass;
-    type ElementType = React.JSX.ElementType;
-    type IntrinsicElements = React.JSX.IntrinsicElements;
-  }
 }
 
 declare global {
