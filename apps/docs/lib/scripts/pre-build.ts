@@ -1,6 +1,7 @@
 /* @proprietary license */
 
 import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { buildRegistry } from '@/lib/scripts/build-registry';
 import * as OpenAPI from 'fumadocs-openapi';
@@ -9,9 +10,40 @@ import { openapi } from '@/lib/openapi';
 
 const OPENAPI_OUTPUT = './content/docs/openapi/generated';
 
+function resolveApiRoot(): string | null {
+  const candidates = [
+    process.env.DOCS_API_ROOT,
+    path.resolve(process.cwd(), '..', 'api'),
+    path.resolve(process.cwd(), '..', '..', 'apps', 'api'),
+    path.resolve(process.cwd(), 'apps', 'api'),
+  ].filter((value): value is string => Boolean(value));
+
+  for (const candidate of candidates) {
+    if (existsSync(path.join(candidate, 'package.json'))) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 function exportOpenApiFromNest(): void {
-  const apiRoot = path.resolve(process.cwd(), '..', 'api');
-  execSync('pnpm run openapi:export', { cwd: apiRoot, stdio: 'inherit' });
+  const apiRoot = resolveApiRoot();
+  if (!apiRoot) {
+    console.warn(
+      'Could not locate apps/api; skipping OpenAPI export and using checked-in apps/docs/openapi.json.',
+    );
+    return;
+  }
+
+  try {
+    execSync('pnpm run openapi:export', { cwd: apiRoot, stdio: 'inherit' });
+  } catch (error) {
+    console.warn(
+      'OpenAPI export from apps/api failed; continuing with checked-in apps/docs/openapi.json:',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
 }
 
 export async function generateDocs() {
