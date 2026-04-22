@@ -47,6 +47,43 @@ jobs:
       - name: Assert apps/docs/openapi.json matches export
         run: git diff --exit-code apps/docs/openapi.json
 
+  api-tests:
+    name: API unit tests, coverage gate & e2e
+    needs: detect-changes
+    if: needs.detect-changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: apps/api/pnpm-lock.yaml
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: pnpm install --frozen-lockfile
+      - name: Unit tests
+        working-directory: apps/api
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SECRET_KEY: ci-test-service-role-key
+        run: pnpm test
+      - name: Coverage (global thresholds)
+        working-directory: apps/api
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SECRET_KEY: ci-test-service-role-key
+        run: pnpm test:cov
+      - name: E2E smoke
+        working-directory: apps/api
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SECRET_KEY: ci-test-service-role-key
+        run: pnpm test:e2e
+
   deploy-api:
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true' && github.ref == 'refs/heads/main'
@@ -59,7 +96,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_API }}
-          working-directory: ./
+          working-directory: ${{ github.workspace }}
           target: production
 
   deploy-docs:
@@ -74,5 +111,5 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
-          working-directory: ./
+          working-directory: ${{ github.workspace }}
           target: production
