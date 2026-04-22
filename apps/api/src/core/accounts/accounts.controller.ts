@@ -29,7 +29,8 @@ export class AccountsController {
   @ApiResponse({
     status: 200,
     description: 'List of accounts',
-    type: [AccountResponseDto],
+    type: AccountResponseDto,
+    isArray: true,
   })
   findAll(@CurrentUser() user: AuthContext) {
     return this.service.findAll(user);
@@ -50,7 +51,8 @@ export class AccountsController {
   @ApiResponse({
     status: 200,
     description: 'Account balance information',
-    type: [AccountBalanceResponseDto],
+    type: AccountBalanceResponseDto,
+    isArray: true,
   })
   getBalance(
     @CurrentUser() user: AuthContext,
@@ -74,7 +76,8 @@ export class AccountsController {
   @ApiResponse({
     status: 200,
     description: 'Detailed balance breakdown with conversion',
-    type: [BalanceBreakdownResponseDto],
+    type: BalanceBreakdownResponseDto,
+    isArray: true,
   })
   getBalanceBreakdown(
     @CurrentUser() user: AuthContext,

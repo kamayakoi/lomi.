@@ -18,9 +18,9 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
-import { ProductResponseDto } from './dto/product-response.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AddPriceDto } from './dto/add-price.dto';
+import { ProductResponseDto } from './dto/product-response.dto';
 import { PriceResponseDto } from './dto/price-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
@@ -64,7 +64,8 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'List of products with embedded prices',
-    type: [ProductResponseDto],
+    type: ProductResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,

@@ -16,15 +16,18 @@ describe('WebhooksService', () => {
     single: jest.fn(),
   };
 
+  const mockSupabaseService = {
+    getClient: jest.fn(() => mockSupabaseClient),
+    rpc: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WebhooksService,
         {
           provide: SupabaseService,
-          useValue: {
-            getClient: jest.fn(() => mockSupabaseClient),
-          },
+          useValue: mockSupabaseService,
         },
       ],
     }).compile();
@@ -87,24 +90,25 @@ describe('WebhooksService', () => {
 
   describe('findAll', () => {
     it('should return all webhooks for organization', async () => {
-      const user: AuthContext = { organizationId: 'org_123' } as any;
+      const user: AuthContext = {
+        organizationId: 'org_123',
+        merchantId: 'merch_123',
+      } as any;
       const expectedResult = [{ id: 'wh_123' }];
 
-      // select should return 'this' (the builder), not the result yet
-      mockSupabaseClient.select.mockReturnValue(mockSupabaseClient);
-      // eq should return the result promise
-      mockSupabaseClient.eq.mockResolvedValue({
+      mockSupabaseService.rpc.mockResolvedValue({
         data: expectedResult,
         error: null,
       });
 
       const result = await service.findAll(user);
 
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('webhooks');
-      expect(mockSupabaseClient.select).toHaveBeenCalledWith('*');
-      expect(mockSupabaseClient.eq).toHaveBeenCalledWith(
-        'organization_id',
-        user.organizationId,
+      expect(mockSupabaseService.rpc).toHaveBeenCalledWith(
+        'fetch_organization_webhooks',
+        expect.objectContaining({
+          p_merchant_id: user.merchantId,
+          p_organization_id: user.organizationId,
+        }),
       );
       expect(result).toEqual(expectedResult);
     });

@@ -16,6 +16,8 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { BeneficiaryPayoutsService } from './beneficiary-payouts.service';
 import { CreateBeneficiaryPayoutDto } from './dto/create-beneficiary-payout.dto';
@@ -28,6 +30,7 @@ import {
 
 @ApiTags('Beneficiary Payouts')
 @ApiSecurity('api-key')
+@ApiExtraModels(BeneficiaryPayoutResponseDto)
 @UseGuards(ApiKeyGuard)
 @Controller('beneficiary-payouts')
 export class BeneficiaryPayoutsController {
@@ -109,7 +112,17 @@ export class BeneficiaryPayoutsController {
   @ApiResponse({
     status: 200,
     description: 'List of beneficiary payouts with pagination',
-    type: [BeneficiaryPayoutResponseDto],
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: getSchemaPath(BeneficiaryPayoutResponseDto) },
+        },
+        limit: { type: 'number' },
+        offset: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,

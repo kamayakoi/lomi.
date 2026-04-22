@@ -27,7 +27,8 @@ export class CreateProductDto {
     example: ['https://example.com/image.png'],
     description: 'Product images URLs',
     required: false,
-    type: [String],
+    type: String,
+    isArray: true,
   })
   images?: string[];
 
@@ -48,7 +49,8 @@ export class CreateProductDto {
   display_on_storefront?: boolean;
 
   @ApiProperty({
-    type: [CreatePriceDto],
+    type: CreatePriceDto,
+    isArray: true,
     description: 'Product prices (at least one required)',
   })
   prices: CreatePriceDto[];

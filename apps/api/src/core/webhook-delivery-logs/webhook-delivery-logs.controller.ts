@@ -76,7 +76,8 @@ export class WebhookDeliveryLogsController {
   @ApiResponse({
     status: 200,
     description: 'List of webhook delivery logs',
-    type: [WebhookDeliveryLogResponseDto],
+    type: WebhookDeliveryLogResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,

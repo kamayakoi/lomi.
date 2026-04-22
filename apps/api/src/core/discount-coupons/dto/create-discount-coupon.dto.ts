@@ -162,7 +162,8 @@ export class CreateDiscountCouponDto {
     description:
       'Product IDs this coupon applies to (only used if scope_type is specific_products or specific_prices)',
     required: false,
-    type: [String],
+    type: String,
+    isArray: true,
   })
   @IsArray()
   @IsString({ each: true })

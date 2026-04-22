@@ -16,6 +16,9 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiBody,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { PaymentRequestsService } from './payment-requests.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
@@ -28,6 +31,7 @@ import {
 
 @ApiTags('Payment Requests')
 @ApiSecurity('api-key')
+@ApiExtraModels(PaymentRequestResponseDto)
 @UseGuards(ApiKeyGuard)
 @Controller('payment-requests')
 export class PaymentRequestsController {
@@ -51,6 +55,36 @@ export class PaymentRequestsController {
   @ApiResponse({
     status: 401,
     description: 'Invalid or missing API key',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['amount', 'currency_code', 'expiry_date'],
+      properties: {
+        amount: { type: 'number' },
+        currency_code: {
+          type: 'string',
+          enum: ['XOF', 'USD', 'EUR'],
+        },
+        description: { type: 'string' },
+        customer_id: { type: 'string', format: 'uuid' },
+        expiry_date: { type: 'string', format: 'date-time' },
+        payment_reference: { type: 'string' },
+        metadata: { type: 'object', additionalProperties: true },
+      },
+    },
+    examples: {
+      default: {
+        summary: 'Payment request with expiry',
+        value: {
+          amount: 25000,
+          currency_code: 'XOF',
+          description: 'Consulting fee — March',
+          expiry_date: '2026-12-31T23:59:59.000Z',
+          payment_reference: 'INV-2026-042',
+        },
+      },
+    },
   })
   create(
     @Body() createDto: CreatePaymentRequestDto,
@@ -94,7 +128,18 @@ export class PaymentRequestsController {
   @ApiResponse({
     status: 200,
     description: 'List of payment requests with pagination',
-    type: [PaymentRequestResponseDto],
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: getSchemaPath(PaymentRequestResponseDto) },
+        },
+        total: { type: 'number' },
+        limit: { type: 'number' },
+        offset: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,

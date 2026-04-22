@@ -20,7 +20,15 @@ export class ChargesController {
 
   @Post('wave')
   @ApiOperation({ summary: 'Initiate a Wave direct charge' })
-  @ApiResponse({ status: 201, description: 'Charge initiated successfully' })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Charge initiated successfully (JSON body from Wave edge function)',
+    schema: {
+      type: 'object',
+      additionalProperties: true,
+    },
+  })
   @ApiResponse({ status: 400, description: 'Invalid input or Wave API error' })
   async createWaveCharge(
     @Body() createChargeDto: CreateWaveChargeDto,

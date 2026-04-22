@@ -16,10 +16,11 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionResponseDto } from './dto/subscription-response.dto';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
+import { SubscriptionResponseDto } from './dto/subscription-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
   CurrentUser,
@@ -56,7 +57,8 @@ export class SubscriptionsController {
   @ApiResponse({
     status: 200,
     description: 'List of subscriptions',
-    type: [SubscriptionResponseDto],
+    type: SubscriptionResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,
@@ -85,7 +87,8 @@ export class SubscriptionsController {
   @ApiResponse({
     status: 200,
     description: 'List of customer subscriptions',
-    type: [SubscriptionResponseDto],
+    type: SubscriptionResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 404,
@@ -153,6 +156,22 @@ export class SubscriptionsController {
   @ApiResponse({
     status: 401,
     description: 'Invalid or missing API key',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        cancellation_reason: { type: 'string' },
+      },
+    },
+    examples: {
+      withReason: {
+        summary: 'Cancel with reason',
+        value: {
+          cancellation_reason: 'Customer requested cancellation',
+        },
+      },
+    },
   })
   cancel(
     @Param('id') id: string,

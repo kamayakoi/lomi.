@@ -40,7 +40,7 @@ export class CreateCheckoutSessionDto {
   @ApiProperty({
     example: 'XOF',
     description: 'Currency code',
-    enum: ['XOF', 'USD', 'EUR', 'GBP'],
+    enum: ['XOF', 'USD', 'EUR'],
   })
   currency_code: string;
 
@@ -201,7 +201,8 @@ export class CreateCheckoutSessionDto {
    * Each line item must have a price_id (which contains product reference and amount).
    */
   @ApiProperty({
-    type: [LineItemDto],
+    type: () => LineItemDto,
+    isArray: true,
     description: `Array of line items for multi-product checkout.
 When line_items is provided:
 - product_id, price_id, and quantity at the root level are ignored

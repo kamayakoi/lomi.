@@ -16,6 +16,7 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiBody,
 } from '@nestjs/swagger';
 import { CheckoutSessionsService } from './checkout-sessions.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
@@ -52,6 +53,76 @@ export class CheckoutSessionsController {
     status: 401,
     description: 'Invalid or missing API key',
   })
+  @ApiBody({
+    description:
+      'Checkout session payload. Either set `amount` (+ optional product fields) or `line_items` for multi-product carts.',
+    schema: {
+      type: 'object',
+      required: ['currency_code'],
+      properties: {
+        amount: { type: 'number', example: 10000 },
+        currency_code: {
+          type: 'string',
+          enum: ['XOF', 'USD', 'EUR'],
+          example: 'XOF',
+        },
+        title: { type: 'string' },
+        description: { type: 'string' },
+        customer_id: { type: 'string', format: 'uuid' },
+        customer_email: { type: 'string', format: 'email' },
+        customer_name: { type: 'string' },
+        customer_phone: { type: 'string' },
+        customer_city: { type: 'string' },
+        customer_country: { type: 'string' },
+        customer_address: { type: 'string' },
+        customer_postal_code: { type: 'string' },
+        product_id: { type: 'string', format: 'uuid' },
+        price_id: { type: 'string', format: 'uuid' },
+        subscription_id: { type: 'string', format: 'uuid' },
+        allow_quantity: { type: 'boolean' },
+        quantity: { type: 'number' },
+        success_url: { type: 'string', format: 'uri' },
+        cancel_url: { type: 'string', format: 'uri' },
+        allow_coupon_code: { type: 'boolean' },
+        require_billing_address: { type: 'boolean' },
+        payment_link_id: { type: 'string', format: 'uuid' },
+        metadata: { type: 'object', additionalProperties: true },
+        line_items: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['price_id'],
+            properties: {
+              price_id: { type: 'string', format: 'uuid' },
+              quantity: { type: 'number' },
+              metadata: { type: 'object', additionalProperties: true },
+            },
+          },
+        },
+      },
+    },
+    examples: {
+      amount: {
+        summary: 'Fixed amount checkout',
+        value: {
+          currency_code: 'XOF',
+          amount: 10000,
+          success_url: 'https://example.com/success',
+          cancel_url: 'https://example.com/cancel',
+        },
+      },
+      lineItems: {
+        summary: 'Multi-product (line items)',
+        value: {
+          currency_code: 'XOF',
+          line_items: [
+            { price_id: '123e4567-e89b-12d3-a456-426614174000', quantity: 2 },
+          ],
+          success_url: 'https://example.com/success',
+        },
+      },
+    },
+  })
   create(
     @Body() createDto: CreateCheckoutSessionDto,
     @CurrentUser() user: AuthContext,
@@ -68,8 +139,8 @@ export class CheckoutSessionsController {
   @ApiQuery({
     name: 'status',
     required: false,
-    description: 'Filter by session status',
-    enum: ['open', 'complete', 'expired'],
+    description: 'Filter by session status (matches checkout_session_status)',
+    enum: ['open', 'completed', 'expired'],
   })
   @ApiQuery({
     name: 'limit',
@@ -88,7 +159,8 @@ export class CheckoutSessionsController {
   @ApiResponse({
     status: 200,
     description: 'List of checkout sessions',
-    type: [CheckoutSessionResponseDto],
+    type: CheckoutSessionResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,

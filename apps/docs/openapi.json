@@ -1131,8 +1131,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/RefundResponseDto"
                 }
               }
             }
@@ -2343,8 +2342,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/PayoutResponseDto"
                 }
               }
             }
@@ -3819,6 +3817,93 @@
           "updated_at"
         ]
       },
+      "RefundResponseDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "fee_amount": {
+            "type": "number",
+            "example": 123
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "reason": {
+            "type": "string",
+            "example": "string"
+          },
+          "refund_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "refunded_amount": {
+            "type": "number",
+            "example": 123
+          },
+          "spi_account_number": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_end2end_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_retour_date_demande": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_retour_date_irrevocabilite": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_tx_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "string"
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "created_at",
+          "environment",
+          "fee_amount",
+          "metadata",
+          "reason",
+          "refund_id",
+          "refunded_amount",
+          "spi_account_number",
+          "spi_end2end_id",
+          "spi_retour_date_demande",
+          "spi_retour_date_irrevocabilite",
+          "spi_tx_id",
+          "status",
+          "transaction_id",
+          "updated_at"
+        ]
+      },
       "PriceResponseDto": {
         "type": "object",
         "properties": {
@@ -4675,6 +4760,78 @@
           "title",
           "updated_at",
           "url"
+        ]
+      },
+      "PayoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payout_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payout_method_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "provider_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "account_id",
+          "amount",
+          "created_at",
+          "created_by",
+          "currency_code",
+          "environment",
+          "metadata",
+          "organization_id",
+          "payout_id",
+          "payout_method_id",
+          "provider_code",
+          "status",
+          "updated_at"
         ]
       },
       "BeneficiaryPayoutResponseDto": {

@@ -1,0 +1,77 @@
+/* @proprietary license */
+
+/**
+ * Application graph used only by `openapi:export` — no BullMQ / Redis bootstrap.
+ */
+
+import { Module } from '@nestjs/common';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { SupabaseModule } from './utils/supabase/supabase.module';
+import { TransactionsModule } from './core/transactions/transactions.module';
+import { AccountsModule } from './core/accounts/accounts.module';
+import { OrganizationsModule } from './core/organizations/organizations.module';
+import { CustomersModule } from './core/customers/customers.module';
+import { PaymentRequestsModule } from './core/payment-requests/payment-requests.module';
+import { RefundsModule } from './core/refunds/refunds.module';
+import { ProductsModule } from './core/products/products.module';
+import { SubscriptionsModule } from './core/subscriptions/subscriptions.module';
+import { DiscountCouponsModule } from './core/discount-coupons/discount-coupons.module';
+import { CheckoutSessionsModule } from './core/checkout-sessions/checkout-sessions.module';
+import { PaymentLinksModule } from './core/payment-links/payment-links.module';
+import { PayoutsModule } from './core/payouts/payouts.module';
+import { BeneficiaryPayoutsModule } from './core/beneficiary-payouts/beneficiary-payouts.module';
+import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-delivery-logs.module';
+import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
+import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
+import { ChargesModule } from './core/charges/charges.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', '.env.local'],
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 900000,
+        limit: 5000,
+      },
+    ]),
+    EventEmitterModule.forRoot(),
+    SupabaseModule,
+    AccountsModule,
+    OrganizationsModule,
+    TransactionsModule,
+    CustomersModule,
+    PaymentRequestsModule,
+    RefundsModule,
+    ProductsModule,
+    SubscriptionsModule,
+    DiscountCouponsModule,
+    CheckoutSessionsModule,
+    PaymentLinksModule,
+    PayoutsModule,
+    BeneficiaryPayoutsModule,
+    WebhookDeliveryLogsModule,
+    WebhooksOpenApiModule,
+    ChargesModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ApiLoggingInterceptor,
+    },
+  ],
+})
+export class OpenApiExportModule {}

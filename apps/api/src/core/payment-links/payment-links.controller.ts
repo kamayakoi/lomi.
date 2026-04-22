@@ -16,6 +16,9 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiBody,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { PaymentLinksService } from './payment-links.service';
 import { CreatePaymentLinkDto } from './dto/create-payment-link.dto';
@@ -28,6 +31,7 @@ import {
 
 @ApiTags('Payment Links')
 @ApiSecurity('api-key')
+@ApiExtraModels(PaymentLinkResponseDto)
 @UseGuards(ApiKeyGuard)
 @Controller('payment-links')
 export class PaymentLinksController {
@@ -51,6 +55,51 @@ export class PaymentLinksController {
   @ApiResponse({
     status: 401,
     description: 'Invalid or missing API key',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['link_type', 'title', 'currency_code'],
+      properties: {
+        link_type: { type: 'string', enum: ['product', 'instant'] },
+        title: { type: 'string' },
+        currency_code: {
+          type: 'string',
+          enum: ['XOF', 'USD', 'EUR'],
+        },
+        description: { type: 'string' },
+        amount: { type: 'number' },
+        product_id: { type: 'string', format: 'uuid' },
+        price_id: { type: 'string', format: 'uuid' },
+        allow_coupon_code: { type: 'boolean' },
+        allow_quantity: { type: 'boolean' },
+        require_billing_address: { type: 'boolean' },
+        expires_at: { type: 'string', format: 'date-time' },
+        success_url: { type: 'string', format: 'uri' },
+        cancel_url: { type: 'string', format: 'uri' },
+        metadata: { type: 'object', additionalProperties: true },
+      },
+    },
+    examples: {
+      instant: {
+        summary: 'Instant (fixed amount) link',
+        value: {
+          link_type: 'instant',
+          title: 'Invoice INV-001',
+          currency_code: 'XOF',
+          amount: 15000,
+        },
+      },
+      product: {
+        summary: 'Product link',
+        value: {
+          link_type: 'product',
+          title: 'Premium plan',
+          currency_code: 'XOF',
+          product_id: '123e4567-e89b-12d3-a456-426614174000',
+        },
+      },
+    },
   })
   create(
     @Body() createDto: CreatePaymentLinkDto,
@@ -94,7 +143,18 @@ export class PaymentLinksController {
   @ApiResponse({
     status: 200,
     description: 'List of payment links with pagination',
-    type: [PaymentLinkResponseDto],
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: getSchemaPath(PaymentLinkResponseDto) },
+        },
+        total: { type: 'number' },
+        limit: { type: 'number' },
+        offset: { type: 'number' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,

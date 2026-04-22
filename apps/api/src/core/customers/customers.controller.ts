@@ -18,11 +18,15 @@ import {
   ApiSecurity,
   ApiQuery,
   ApiParam,
+  ApiBody,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { CustomersService } from './customers.service';
-import { CustomerResponseDto } from './dto/customer-response.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CustomerResponseDto } from './dto/customer-response.dto';
+import { TransactionResponseDto } from '../transactions/dto/transaction-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
   CurrentUser,
@@ -31,6 +35,7 @@ import {
 
 @ApiTags('Customers')
 @ApiSecurity('api-key')
+@ApiExtraModels(CustomerResponseDto, TransactionResponseDto)
 @UseGuards(ApiKeyGuard)
 @Controller('customers')
 export class CustomersController {
@@ -82,7 +87,7 @@ export class CustomersController {
       properties: {
         customers: {
           type: 'array',
-          items: { $ref: '#/components/schemas/CustomerResponseDto' },
+          items: { $ref: getSchemaPath(CustomerResponseDto) },
         },
         pagination: {
           type: 'object',
@@ -166,6 +171,33 @@ export class CustomersController {
     status: 401,
     description: 'Invalid or missing API key',
   })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['name'],
+      properties: {
+        name: { type: 'string', example: 'Jane Doe' },
+        email: { type: 'string', format: 'email' },
+        phone_number: { type: 'string' },
+        whatsapp_number: { type: 'string' },
+        country: { type: 'string' },
+        city: { type: 'string' },
+        address: { type: 'string' },
+        postal_code: { type: 'string' },
+        is_business: { type: 'boolean' },
+        metadata: { type: 'object', additionalProperties: true },
+      },
+    },
+    examples: {
+      minimal: {
+        summary: 'Minimal customer',
+        value: {
+          name: 'Jane Doe',
+          email: 'jane@example.com',
+        },
+      },
+    },
+  })
   create(
     @Body() createDto: CreateCustomerDto,
     @CurrentUser() user: AuthContext,
@@ -200,6 +232,23 @@ export class CustomersController {
   @ApiResponse({
     status: 401,
     description: 'Invalid or missing API key',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        email: { type: 'string', format: 'email' },
+        phone_number: { type: 'string' },
+        whatsapp_number: { type: 'string' },
+        country: { type: 'string' },
+        city: { type: 'string' },
+        address: { type: 'string' },
+        postal_code: { type: 'string' },
+        is_business: { type: 'boolean' },
+        metadata: { type: 'object', additionalProperties: true },
+      },
+    },
   })
   update(
     @Param('id') id: string,
@@ -257,19 +306,7 @@ export class CustomersController {
     description: 'List of customer transactions',
     schema: {
       type: 'array',
-      items: {
-        properties: {
-          transaction_id: {
-            type: 'string',
-            example: '123e4567-e89b-12d3-a456-426614174000',
-          },
-          description: { type: 'string', example: 'Payment for Product A' },
-          gross_amount: { type: 'number', example: 10000.0 },
-          currency_code: { type: 'string', example: 'XOF' },
-          created_at: { type: 'string', example: '2024-01-15T10:30:00Z' },
-          status: { type: 'string', example: 'completed' },
-        },
-      },
+      items: { $ref: getSchemaPath(TransactionResponseDto) },
     },
   })
   @ApiResponse({

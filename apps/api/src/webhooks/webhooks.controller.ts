@@ -4,6 +4,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiSecurity,
+  ApiBody,
 } from '@nestjs/swagger';
 import { WebhooksService } from './webhooks.service';
 import { UpdateWebhookDto } from './dto/update-webhook.dto';
@@ -26,7 +27,8 @@ export class WebhooksController {
   @ApiResponse({
     status: 200,
     description: 'List of webhooks',
-    type: [WebhookResponseDto],
+    type: WebhookResponseDto,
+    isArray: true,
   })
   findAll(@CurrentUser() user: AuthContext) {
     return this.service.findAll(user);
@@ -49,6 +51,29 @@ export class WebhooksController {
     status: 200,
     description: 'The webhook has been successfully updated.',
     type: WebhookResponseDto,
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', format: 'uri' },
+        is_active: { type: 'boolean' },
+        authorized_events: { type: 'string' },
+        spi_event_types: { type: 'string' },
+        supports_spi: { type: 'boolean' },
+        verification_token: { type: 'string' },
+        metadata: { type: 'object', additionalProperties: true },
+      },
+    },
+    examples: {
+      rotateUrl: {
+        summary: 'Update delivery URL',
+        value: {
+          url: 'https://example.com/webhooks/lomi',
+          is_active: true,
+        },
+      },
+    },
   })
   update(
     @Param('id') id: string,

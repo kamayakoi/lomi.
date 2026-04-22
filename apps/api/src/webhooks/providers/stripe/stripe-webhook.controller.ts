@@ -29,6 +29,13 @@ export class StripeWebhookController {
   @ApiResponse({
     status: 200,
     description: 'Webhook received and processed successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        received: { type: 'boolean', example: true },
+      },
+      additionalProperties: true,
+    },
   })
   @ApiResponse({
     status: 400,

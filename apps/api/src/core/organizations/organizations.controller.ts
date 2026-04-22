@@ -29,7 +29,8 @@ export class OrganizationsController {
   @ApiResponse({
     status: 200,
     description: 'Organization details',
-    type: [OrganizationResponseDto],
+    type: OrganizationResponseDto,
+    isArray: true,
   })
   findAll(@CurrentUser() user: AuthContext) {
     return this.service.findAll(user);

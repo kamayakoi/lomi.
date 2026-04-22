@@ -7,8 +7,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { DiscountCouponsService } from './discount-coupons.service';
-import { DiscountCouponResponseDto } from './dto/discount-coupon-response.dto';
 import { CreateDiscountCouponDto } from './dto/create-discount-coupon.dto';
+import { DiscountCouponResponseDto } from './dto/discount-coupon-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
   CurrentUser,
@@ -33,7 +33,8 @@ export class DiscountCouponsController {
   @ApiResponse({
     status: 200,
     description: 'List of discount coupons',
-    type: [DiscountCouponResponseDto],
+    type: DiscountCouponResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,

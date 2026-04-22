@@ -10,7 +10,7 @@ export class CreatePriceDto {
   @ApiProperty({
     example: 'XOF',
     description: 'Currency code',
-    enum: ['XOF', 'USD', 'EUR', 'GBP'],
+    enum: ['XOF', 'USD', 'EUR'],
   })
   currency_code: string;
 

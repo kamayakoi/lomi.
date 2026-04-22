@@ -23,32 +23,56 @@ jobs:
             docs:
               - 'apps/docs/**'
 
+  verify-openapi:
+    name: Verify OpenAPI spec is in sync
+    needs: detect-changes
+    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api == 'true' || needs.detect-changes.outputs.docs == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: apps/api/pnpm-lock.yaml
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: pnpm install --frozen-lockfile
+      - name: Export OpenAPI from Nest
+        working-directory: apps/api
+        run: pnpm run openapi:export
+      - name: Assert apps/docs/openapi.json matches export
+        run: git diff --exit-code apps/docs/openapi.json
+
   deploy-api:
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Deploy API to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v42.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_API }}
           working-directory: ./
-          vercel-args: '--prod'
+          target: production
 
   deploy-docs:
     needs: detect-changes
     if: needs.detect-changes.outputs.docs == 'true' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Deploy Docs to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v42.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DOCS }}
           working-directory: ./
-          vercel-args: '--prod'
+          target: production

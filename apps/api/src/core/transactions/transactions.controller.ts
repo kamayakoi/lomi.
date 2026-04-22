@@ -109,7 +109,8 @@ export class TransactionsController {
   @ApiResponse({
     status: 200,
     description: 'List of transactions',
-    type: [TransactionResponseDto],
+    type: TransactionResponseDto,
+    isArray: true,
   })
   @ApiResponse({
     status: 401,

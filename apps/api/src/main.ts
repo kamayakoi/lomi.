@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import { buildSwaggerDocumentBase } from './swagger.config';
 
 async function bootstrap() {
   const expressApp = express();
@@ -41,16 +42,7 @@ async function bootstrap() {
       'X-API-KEY,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('lomi. API')
-    .setDescription(
-      'Payment processing API for francophone West African businesses.',
-    )
-    .setVersion('1.1.0')
-    .addApiKey({ type: 'apiKey', name: 'X-API-KEY', in: 'header' }, 'X-API-KEY')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, buildSwaggerDocumentBase());
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
