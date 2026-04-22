@@ -4,10 +4,18 @@ export class BalanceBreakdownResponseDto {
   @ApiProperty({ example: 'XOF', description: 'Currency code', type: String })
   currency_code: string;
 
-  @ApiProperty({ example: 100000.0, description: 'Available balance', type: Number })
+  @ApiProperty({
+    example: 100000.0,
+    description: 'Available balance',
+    type: Number,
+  })
   available_balance: number;
 
-  @ApiProperty({ example: 5000.0, description: 'Pending balance', type: Number })
+  @ApiProperty({
+    example: 5000.0,
+    description: 'Pending balance',
+    type: Number,
+  })
   pending_balance: number;
 
   @ApiProperty({

@@ -42,7 +42,10 @@ async function bootstrap() {
       'X-API-KEY,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
   });
 
-  const document = SwaggerModule.createDocument(app, buildSwaggerDocumentBase());
+  const document = SwaggerModule.createDocument(
+    app,
+    buildSwaggerDocumentBase(),
+  );
   SwaggerModule.setup('api', app, document);
 
   await app.listen(process.env.PORT ?? 3000);

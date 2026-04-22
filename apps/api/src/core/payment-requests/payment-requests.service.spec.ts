@@ -175,7 +175,10 @@ describe('PaymentRequestsService', () => {
     });
 
     it('throws NotFound when missing', async () => {
-      mockFromChain.single.mockResolvedValue({ data: null, error: { message: 'nope' } });
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { message: 'nope' },
+      });
 
       await expect(service.findOne('missing', user)).rejects.toBeInstanceOf(
         NotFoundException,

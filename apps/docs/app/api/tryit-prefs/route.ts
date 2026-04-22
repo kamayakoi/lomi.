@@ -41,11 +41,7 @@ export async function POST(request: Request) {
   }
 
   if (organizationId) {
-    const ok = await userCanUseTestKeyForOrg(
-      supabase,
-      user.id,
-      organizationId,
-    );
+    const ok = await userCanUseTestKeyForOrg(supabase, user.id, organizationId);
     if (!ok) {
       return NextResponse.json(
         { error: 'Organization not allowed or no test secret key' },

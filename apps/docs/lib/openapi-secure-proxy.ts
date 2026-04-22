@@ -8,14 +8,7 @@
  * module duplicates its handler shape with an awaited injection step.
  */
 
-const METHODS = [
-  'GET',
-  'POST',
-  'PUT',
-  'DELETE',
-  'PATCH',
-  'HEAD',
-] as const;
+const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'] as const;
 
 export function getSandboxAllowedOrigins(): string[] {
   const defaults = ['https://sandbox.api.lomi.africa'];
@@ -63,7 +56,9 @@ export function createSecureOpenApiProxyHandlers(options: SecureProxyOptions) {
 
     const parsedUrl = URL.parse(urlParam);
     if (!parsedUrl) {
-      return Response.json('[Proxy] Invalid `url` parameter value.', { status: 400 });
+      return Response.json('[Proxy] Invalid `url` parameter value.', {
+        status: 400,
+      });
     }
 
     if (!allowedOrigins.includes(parsedUrl.origin)) {
@@ -96,8 +91,7 @@ export function createSecureOpenApiProxyHandlers(options: SecureProxyOptions) {
       const key = await options.resolveTestKey({ activeOrganizationId });
       if (key) {
         const headers = new Headers(proxied.headers);
-        const existing =
-          headers.get('X-API-Key') ?? headers.get('x-api-key');
+        const existing = headers.get('X-API-Key') ?? headers.get('x-api-key');
         if (!existing) {
           headers.set('X-API-Key', key);
         }

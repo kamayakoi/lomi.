@@ -7,7 +7,9 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 
 describe('PaymentLinksController', () => {
   let controller: PaymentLinksController;
-  let service: jest.Mocked<Pick<PaymentLinksService, 'create' | 'findAll' | 'findOne'>>;
+  let service: jest.Mocked<
+    Pick<PaymentLinksService, 'create' | 'findAll' | 'findOne'>
+  >;
 
   const user = {
     merchantId: 'merch_1',
@@ -67,7 +69,13 @@ describe('PaymentLinksController', () => {
     expect(service.findAll).toHaveBeenCalledWith(user, undefined, false, 20, 0);
 
     await controller.findAll(user, undefined, undefined, 20, 0);
-    expect(service.findAll).toHaveBeenCalledWith(user, undefined, undefined, 20, 0);
+    expect(service.findAll).toHaveBeenCalledWith(
+      user,
+      undefined,
+      undefined,
+      20,
+      0,
+    );
   });
 
   it('findOne delegates to service', async () => {

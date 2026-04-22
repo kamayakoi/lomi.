@@ -12,8 +12,7 @@ export async function buildRegistry(): Promise<void> {
   const outDir = path.join(process.cwd(), 'public/registry');
   await mkdir(outDir, { recursive: true });
 
-  const indexes: { name: string; title?: string; description?: string }[] =
-    [];
+  const indexes: { name: string; title?: string; description?: string }[] = [];
 
   for (const comp of registry.components) {
     indexes.push({

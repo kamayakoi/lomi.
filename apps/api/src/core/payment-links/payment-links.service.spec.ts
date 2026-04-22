@@ -94,7 +94,10 @@ describe('PaymentLinksService', () => {
       const row = { link_id: linkId };
 
       mockServiceRpc.mockResolvedValueOnce({ data: linkId, error: null });
-      mockClientRpc.mockResolvedValueOnce({ data: null, error: { message: 'nope' } });
+      mockClientRpc.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'nope' },
+      });
       mockFromChain.single.mockResolvedValueOnce({ data: row, error: null });
 
       const result = await service.create(dto, user);
@@ -156,7 +159,10 @@ describe('PaymentLinksService', () => {
     });
 
     it('throws NotFound when missing', async () => {
-      mockFromChain.single.mockResolvedValue({ data: null, error: { message: 'missing' } });
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { message: 'missing' },
+      });
 
       await expect(service.findOne('nope', user)).rejects.toBeInstanceOf(
         NotFoundException,

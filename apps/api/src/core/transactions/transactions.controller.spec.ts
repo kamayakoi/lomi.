@@ -24,7 +24,9 @@ describe('TransactionsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionsController],
-      providers: [{ provide: TransactionsService, useValue: transactionsService }],
+      providers: [
+        { provide: TransactionsService, useValue: transactionsService },
+      ],
     })
       .overrideGuard(ApiKeyGuard)
       .useValue({ canActivate: () => true })
@@ -90,7 +92,9 @@ describe('TransactionsController', () => {
   });
 
   it('findOne delegates to service', async () => {
-    transactionsService.findOne.mockResolvedValue({ transaction_id: 't1' } as any);
+    transactionsService.findOne.mockResolvedValue({
+      transaction_id: 't1',
+    } as any);
     const result = await controller.findOne('t1', user);
     expect(transactionsService.findOne).toHaveBeenCalledWith('t1', user);
     expect(result.transaction_id).toBe('t1');

@@ -22,9 +22,7 @@ const handlers = createSecureOpenApiProxyHandlers({
     const c = await cookies();
     const shouldInjectTestKey =
       c.get(COOKIE_TRYIT_USE_TEST_KEY)?.value === 'true';
-    const activeOrganizationId = parseOrgCookie(
-      c.get(COOKIE_TRYIT_ORG)?.value,
-    );
+    const activeOrganizationId = parseOrgCookie(c.get(COOKIE_TRYIT_ORG)?.value);
     return { shouldInjectTestKey, activeOrganizationId };
   },
   async resolveTestKey({ activeOrganizationId }) {

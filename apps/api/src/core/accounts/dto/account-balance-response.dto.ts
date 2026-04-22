@@ -4,7 +4,11 @@ export class AccountBalanceResponseDto {
   @ApiProperty({ example: 'XOF', description: 'Currency code', type: String })
   currency_code: string;
 
-  @ApiProperty({ example: 100000.0, description: 'Account balance', type: Number })
+  @ApiProperty({
+    example: 100000.0,
+    description: 'Account balance',
+    type: Number,
+  })
   balance: number;
 
   @ApiProperty({

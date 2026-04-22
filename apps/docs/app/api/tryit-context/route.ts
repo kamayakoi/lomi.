@@ -36,9 +36,7 @@ export async function GET() {
     .eq('is_active', true)
     .is('deleted_at', null);
 
-  const orgIds = [
-    ...new Set((keyRows ?? []).map((r) => r.organization_id)),
-  ];
+  const orgIds = [...new Set((keyRows ?? []).map((r) => r.organization_id))];
 
   if (orgIds.length === 0) {
     return NextResponse.json({

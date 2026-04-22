@@ -7,7 +7,9 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 
 describe('PaymentRequestsController', () => {
   let controller: PaymentRequestsController;
-  let service: jest.Mocked<Pick<PaymentRequestsService, 'create' | 'findAll' | 'findOne'>>;
+  let service: jest.Mocked<
+    Pick<PaymentRequestsService, 'create' | 'findAll' | 'findOne'>
+  >;
 
   const user = {
     merchantId: 'merch_1',

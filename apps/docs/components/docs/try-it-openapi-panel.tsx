@@ -58,7 +58,10 @@ export function TryItOpenApiPanel() {
     !hasTestKeys ||
     (ctx.organizations.length > 1 && !ctx.selectedOrganizationId);
 
-  const savePrefs = async (useTestKey: boolean, organizationId: string | null) => {
+  const savePrefs = async (
+    useTestKey: boolean,
+    organizationId: string | null,
+  ) => {
     setPending(true);
     try {
       const res = await fetch('/api/tryit-prefs', {
