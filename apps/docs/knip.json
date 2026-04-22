@@ -8,6 +8,7 @@
         "lib/scripts/update-orama-index.ts"
       ],
       "project": [
+        "proxy.ts",
         "app/**/*.{ts,tsx,js,jsx}",
         "components/**/*.{ts,tsx,js,jsx}",
         "lib/**/*.{ts,tsx,js,jsx}"
