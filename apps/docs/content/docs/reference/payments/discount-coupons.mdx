@@ -1,11 +1,33 @@
 ---
 title: Discount Coupons
-description: Create and manage promotional discount codes.
+description: Create, validate, stack, and track coupon discounts with the same rules used in checkout.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 
-The Discount Coupons API allows you to create and manage promotional codes that customers can apply at checkout.
+The Discount Coupons API supports strict server-side validation and usage tracking for checkout flows.
+
+Worked examples (stacking, eligibility edge cases, retries): **[Coupon logic examples](/reference/payments/coupon-logic-examples)**.
+
+This page documents the behavior implemented in the discount logic migrations, including:
+
+- creation-time validation
+- checkout-time validation (customer, scope, quantity, frequency)
+- single and multi-coupon application
+- deduped coupon usage reservation and transaction linking
+
+## How coupon logic works (end-to-end)
+
+At a high level, coupon handling follows this flow:
+
+1. Create coupon with constraints (`create_discount_coupon`).
+2. Validate at checkout (`validate_coupon_for_checkout` / `validate_coupon_for_frontend`).
+3. Compute discount (`calculate_coupon_discount`) and apply (`apply_coupon`), or apply multiple sequentially (`calculate_multi_coupon_discount`, `apply_coupons_to_checkout`).
+4. Reserve usage against checkout session in `coupon_usage`.
+5. Link reservation to final transaction (`link_or_insert_coupon_usage_for_transaction`).
+6. Increment coupon usage counters when transaction is completed (`increment_coupon_usage_for_completed_transaction`).
+
+This keeps coupon behavior deterministic between frontend preview and final transaction recording.
 
 ## Create a discount coupon
 
@@ -15,7 +37,7 @@ The Discount Coupons API allows you to create and manage promotional codes that 
 |-------|------|----------|-------------|
 | `code` | `string` | **Yes** | Unique coupon code (auto-uppercased) |
 | `discount_type` | `string` | No | `percentage` or `fixed` (default: `percentage`) |
-| `discount_percentage` | `number` | If percentage | Discount percentage (0-100) |
+| `discount_percentage` | `number` | If percentage | Discount percentage (`> 0` and `<= 100`) |
 | `discount_fixed_amount` | `number` | If fixed | Fixed discount amount |
 | `description` | `string` | No | Coupon description |
 | `is_active` | `boolean` | No | Active status (default: `true`) |
@@ -23,11 +45,21 @@ The Discount Coupons API allows you to create and manage promotional codes that 
 | `max_quantity_per_use` | `number` | No | Max quantity per use |
 | `valid_from` | `string` | No | Start date (ISO 8601) |
 | `expires_at` | `string` | No | Expiration date (ISO 8601) |
-| `customer_type` | `string` | No | `all`, `new`, `existing` |
-| `usage_frequency_limit` | `string` | No | `total`, `per_customer`, `per_customer_per_product` |
-| `usage_limit_value` | `number` | No | Limit value (if not `total`) |
+| `customer_type` | `string` | No | `all`, `new`, `returning` |
+| `usage_frequency_limit` | `string` | No | `total`, `per_customer`, `per_day`, `per_week`, `per_month` |
+| `usage_limit_value` | `number` | Conditionally | Required if `usage_frequency_limit != total` |
 | `scope_type` | `string` | No | `organization_wide`, `specific_products`, `specific_prices` |
 | `product_ids` | `array` | No | Product IDs (if scope is specific) |
+
+### Creation-time validation rules
+
+The API enforces these rules at creation:
+
+- coupon code is unique per organization
+- percentage and fixed discounts are mutually exclusive
+- `valid_from < expires_at` when both exist
+- `usage_limit_value` is required for non-`total` frequency modes
+- for `specific_products` / `specific_prices`, linked products must belong to the same organization
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -106,6 +138,66 @@ curl -X POST "https://api.lomi.africa/discount-coupons" \
 
 ---
 
+## Checkout validation behavior
+
+Checkout validation combines structural and business checks. A coupon must pass all checks below:
+
+1. **Exists and active** in the same organization.
+2. **Time window**: `valid_from` has started and `expires_at` has not passed.
+3. **Global cap**: `current_uses < max_uses` (if `max_uses` set).
+4. **Frequency cap** for the customer (when enabled): per customer/day/week/month.
+5. **Quantity cap**: checkout quantity must not exceed `max_quantity_per_use`.
+6. **Customer-type eligibility**:
+   - `new`: customer must have no completed payment/installment transactions in org
+   - `returning`: customer must have at least one completed payment/installment transaction
+   - `all`: no customer-history restriction
+7. **Scope check**:
+   - `organization_wide`: valid for all products
+   - `specific_products` / `specific_prices`: product must be linked in `coupon_product_links`
+
+If any check fails, the API returns a specific reason message.
+
+## Discount calculation behavior
+
+`calculate_coupon_discount` computes discount on the base amount excluding optional fees:
+
+- `base_price = p_base_amount - p_fees_amount`
+- percentage coupon: `discount = base_price * percentage`
+- fixed coupon: `discount = fixed_amount`
+- discount is multiplied by quantity when applicable
+- discount is clamped so it cannot exceed the eligible base price
+- final amount is recomputed as `(base_price - discount) + fees`
+
+This protects against negative totals and over-discounting.
+
+## Multi-coupon stacking (sequential)
+
+For multi-coupon flows, coupons are applied in order using a running amount:
+
+- coupon A applies to original current amount
+- coupon B applies to the reduced amount after A
+- and so on
+
+This is **sequential stacking**, not parallel summing.  
+The response includes a breakdown per coupon with:
+
+- original amount before this coupon
+- discount amount for this coupon
+- final amount after this coupon
+
+If any coupon in the array fails validation, the whole multi-coupon calculation fails.
+
+## Usage tracking and deduplication
+
+Coupon usage is recorded in `coupon_usage` with safeguards to prevent duplicate pending reservations:
+
+- a pending reservation is unique per `(coupon_id, checkout_session_id)` while `transaction_id IS NULL`
+- stale duplicates are cleaned before enforcing the partial unique index
+- when payment completes, reservation is linked to transaction (instead of inserting duplicates)
+- if no reservation exists, a new transaction-linked record is inserted
+
+This is the expected behavior for provider retries and webhook races.
+
 ## List discount coupons
 
 Retrieve all discount coupons for your organization.
@@ -166,7 +258,7 @@ curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123..." \
 
 ## Get coupon performance
 
-Retrieve usage statistics and revenue impact for a coupon.
+Retrieve usage statistics and revenue impact for a coupon (`completed` transactions only).
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -202,9 +294,10 @@ curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123.../performance" 
 ```json
 {
   "total_uses": 45,
-  "total_discount_amount": 25000,
+  "total_discounts": 25000,
   "total_revenue": 150000,
-  "average_order_value": 3333.33
+  "average_discount": 555.56,
+  "unique_customers": 38
 }
 ```
 
@@ -219,13 +312,40 @@ curl -X GET "https://api.lomi.africa/discount-coupons/dc_abc123.../performance" 
 | `discount_type` | `string` | `percentage` or `fixed` |
 | `discount_percentage` | `number` | Percentage value |
 | `discount_fixed_amount` | `number` | Fixed amount value |
+| `customer_type` | `string` | `all`, `new`, `returning` |
+| `usage_frequency_limit` | `string` | `total`, `per_customer`, `per_day`, `per_week`, `per_month` |
+| `usage_limit_value` | `number` | Frequency limit count where applicable |
 | `is_active` | `boolean` | Active status |
 | `max_uses` | `number` | Maximum uses |
 | `current_uses` | `number` | Current use count |
+| `max_quantity_per_use` | `number` | Max quantity allowed per redemption |
 | `valid_from` | `string` | Start date |
 | `expires_at` | `string` | Expiration date |
 | `scope_type` | `string` | Application scope |
+| `product_links` | `array` | Linked products where scope is specific |
+| `completed_redemptions` | `number` | Completed redemptions count |
+| `distinct_customers_completed` | `number` | Distinct customers with completed redemptions |
 | `created_at` | `string` | Creation timestamp |
+
+---
+
+## Common implementation patterns
+
+### Validate before applying
+
+For a clean UX:
+
+1. validate coupon first (frontend validation endpoint),
+2. show discount preview,
+3. apply coupon during checkout creation/confirmation.
+
+### Handle retries safely
+
+Payment providers may retry callbacks. The coupon reservation/linking logic is designed to be idempotent around checkout session + coupon pairs.
+
+### Prefer customer context when possible
+
+For `new` and `returning` restricted coupons, send `customer_id` so eligibility can be evaluated correctly.
 
 ---
 

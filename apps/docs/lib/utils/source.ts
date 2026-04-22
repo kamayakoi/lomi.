@@ -10,10 +10,10 @@ import { loader } from 'fumadocs-core/source';
 import { icons } from 'lucide-react';
 import { transformerOpenAPI } from 'fumadocs-openapi/server';
 import { createElement } from 'react';
-import { blog as blogPosts, docs } from '@/.source/server';
+import { docs } from '@/.source/server';
 
 export const source = loader({
-  baseUrl: '/docs',
+  baseUrl: '/',
   icon(icon) {
     if (icon && icon in icons)
       return createElement(icons[icon as keyof typeof icons]);
@@ -21,20 +21,6 @@ export const source = loader({
   source: docs.toFumadocsSource() as Source,
   pageTree: {
     transformers: [transformerOpenAPI()],
-  },
-});
-
-export const blog = loader({
-  baseUrl: '/blog',
-  source: {
-    files: blogPosts.map((post) => {
-      const entry = post as unknown as Record<string, unknown>;
-      return {
-        type: 'page' as const,
-        path: (entry.slug ?? entry.path ?? '') as string,
-        data: (entry.data ?? post) as Record<string, unknown>,
-      };
-    }),
   },
 });
 

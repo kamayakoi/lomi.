@@ -2,15 +2,33 @@
 
 import type { Metadata } from 'next/types';
 
+/** Public origin for this docs deployment (no trailing slash). */
+export function getDocsSiteOrigin(): string {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '');
+  if (fromEnv) return fromEnv;
+  if (process.env.VERCEL_URL)
+    return `https://${process.env.VERCEL_URL}`.replace(/\/$/, '');
+  if (
+    process.env.NODE_ENV === 'development' ||
+    !process.env.VERCEL_PROJECT_PRODUCTION_URL
+  )
+    return 'http://localhost:3000';
+  return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`.replace(
+    /\/$/,
+    '',
+  );
+}
+
 export function createMetadata(override: Metadata): Metadata {
+  const origin = getDocsSiteOrigin();
   return {
     ...override,
     openGraph: {
       title: override.title ?? undefined,
       description: override.description ?? undefined,
-      url: 'https://lomi.africa',
-      images: '/banner.webp',
-      siteName: 'lomi. / docs',
+      url: origin,
+      images: '/lomi_d.webp',
+      siteName: 'lomi. docs',
       ...override.openGraph,
     },
     twitter: {
@@ -18,18 +36,10 @@ export function createMetadata(override: Metadata): Metadata {
       creator: '@lomiafrica',
       title: override.title ?? undefined,
       description: override.description ?? undefined,
-      images: '/banner.webp',
+      images: '/lomi_d.webp',
       ...override.twitter,
     },
     alternates: {
-      types: {
-        'application/rss+xml': [
-          {
-            title: 'lomi. / blog',
-            url: 'https://lomi.africa/blog',
-          },
-        ],
-      },
       ...override.alternates,
     },
   };

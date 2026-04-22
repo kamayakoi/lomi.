@@ -8,7 +8,7 @@ import { Logo } from './logo';
  *
  * you can customise layouts individually from:
  * Home Layout: app/(home)/layout.tsx
- * Docs Layout: app/docs/layout.tsx
+ * Docs Layout: app/(docs)/layout.tsx
  */
 export const logo = <Logo />;
 
@@ -19,7 +19,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: logo,
     },
-    // see /docs/ui/navigation/links
+    // see fumadocs-ui navigation links
     links: linkItems,
   };
 }

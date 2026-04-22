@@ -63,7 +63,7 @@ NODE_ENV=development
 *.log
 ```
 
-Refer to the [API Environment documentation](/docs/core/fundamentals/api-keys) for managing API keys.
+Refer to the [API Environment documentation](/core/fundamentals/access-tokens) for managing API keys.
 
 ### Sensitive data handling
 
@@ -89,7 +89,7 @@ const sanitizeData = (data: any) => {
 ```
 
 Always validate and sanitize user input to prevent injection attacks.
-Consider practices like [Webhook Signature Verification](/docs/core/advanced-guides/handling-webhooks) to ensure data integrity.
+Consider practices like [Webhook Signature Verification](/core/advanced-guides/handling-webhooks) to ensure data integrity.
 
 ## Error Handling
 
@@ -187,7 +187,7 @@ git commit -m "feat(payments): implement Wave provider"
 git push origin feature/add-wave-provider
 ```
 
-See the full [Branching Strategy](/docs/core/contributing/branching-strategy) for details.
+See the full [Branching Strategy](/core/contributing/branching-strategy) for details.
 
 ### Commit messages
 
@@ -292,7 +292,7 @@ jobs:
 
 ### Version control
 
-Package versions are managed within their respective `package.json` files and updated according to our [Versioning](/docs/core/contributing/versioning) guide.
+Package versions are managed within their respective `package.json` files and updated according to our [Versioning](/core/contributing/versioning) guide.
 
 ```json filename="package.json Example"
 // Example: packages/api/package.json
@@ -308,6 +308,6 @@ Package versions are managed within their respective `package.json` files and up
 
 ## Next steps
 
-- [Code reviews](/docs/core/contributing/code-reviews)
-- [Best practices](/docs/core/contributing/best-practices)
-- [Getting support](/docs/core/support/contact)
+- [Code reviews](/core/contributing/code-reviews)
+- [Best practices](/core/contributing/best-practices)
+- [Getting support](/core/support/contact)

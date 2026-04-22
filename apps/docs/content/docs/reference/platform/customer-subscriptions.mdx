@@ -3,15 +3,15 @@ title: 'Customer subscriptions'
 description: 'Manage individual recurring payment subscriptions for customers.'
 ---
 
-The Customer subscriptions API allows you to manage the individual recurring payment subscriptions for your customers. Subscriptions link a specific customer to a [subscription plan](/docs/reference/payments/subscriptions) and track the lifecycle of their recurring payments.
+The Customer subscriptions API allows you to manage the individual recurring payment subscriptions for your customers. Subscriptions link a specific customer to a subscription plan and track the lifecycle of their recurring payments. Related list/get coverage also appears under [Subscriptions](/reference/payments/subscriptions) when your SDK namespaces those calls differently.
 
 ## Authentication
 
-Requests require authentication using your API key in the `` `X-API-Key` `` header. The associated Merchant ID is usually inferred from the key. See the [Authentication](/docs/reference/setup/authentication) guide.
+Requests require authentication using your API key in the `` `X-API-Key` `` header. The associated Merchant ID is usually inferred from the key. See the [Authentication](/reference/setup/authentication) guide.
 
 ## The customer subscription object
 
-Represents an active or past subscription for a specific customer to a specific plan. See [Data Models](/docs/reference/reference/data-models#customer-subscription-object) for the full structure (Note: This link assumes the object will be added to data-models.mdx).
+Represents an active or past subscription for a specific customer to a specific plan. Field-level shapes align with the subscription objects returned by the API; see also [Data models](/reference/reference/data-models) for shared conventions.
 
 ## Endpoints
 
@@ -192,4 +192,4 @@ Cancels a specific customer subscription by setting its status to `` `cancelled`
 
 ## Error handling
 
-Common errors include `` `400 Bad Request` `` for invalid input or missing fields, `` `401 Unauthorized` ``, `` `404 Not Found` `` if the subscription ID doesn't exist for the merchant, and `` `500 Internal Server Error` ``. Refer to the [Errors](/docs/reference/reference/errors) guide for general structure and handling.
+Common errors include `` `400 Bad Request` `` for invalid input or missing fields, `` `401 Unauthorized` ``, `` `404 Not Found` `` if the subscription ID doesn't exist for the merchant, and `` `500 Internal Server Error` ``. Refer to the [Errors](/reference/reference/errors) guide for general structure and handling.

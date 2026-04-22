@@ -62,10 +62,10 @@ Navigate to **Settings → Access tokens** in your dashboard to find your unique
 
 lomi. provides two types of keys for each environment:
 
-| Key type            | Prefix                        | Usage                                 |
-| ------------------- | ----------------------------- | ------------------------------------- |
-| **Publishable key** | `pk_test_...` / `pk_live_...` | Client-side safe. Limited operations. |
-| **Secret key**      | `sk_test_...` / `sk_live_...` | Server-side only. Full API access.    |
+| Key type            | Prefix                                    | Usage                                 |
+| ------------------- | ----------------------------------------- | ------------------------------------- |
+| **Publishable key** | `lomi_pk_test_...` / `lomi_pk_live_...` | Client-side safe. Limited operations. |
+| **Secret key**      | `lomi_sk_test_...` / `lomi_sk_live_...` | Server-side only. Full API access.    |
 
 <Callout type="warn">
 **Never expose secret keys** in client-side code. Use publishable keys for frontend web applications and mobile applications.
@@ -144,8 +144,8 @@ pnpm add @lomi./sdk-next
 Configure your API credentials:
 
 ```bash
-export LOMI_SECRET_KEY=sk_live_xxxxxxxxxxxxxxxxxxxxxx
-export LOMI_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxxxxxxxxxxxx
+export LOMI_SECRET_KEY=lomi_sk_live_xxxxxxxxxxxxxxxxxxxxxx
+export LOMI_PUBLISHABLE_KEY=lomi_pk_live_xxxxxxxxxxxxxxxxxxxxxx
 ````
 
 </Step>
@@ -548,9 +548,9 @@ echo json_encode(['received' => true]);
 
 ## Next steps
 
-- [Manage access tokens](/docs/core/fundamentals/access-tokens) - Understand secret vs publishable keys
-- [Configure webhooks](/docs/core/fundamentals/webhooks) - Handle payment events
-- [Process transactions](/docs/core/fundamentals/transactions) - View and manage payments
+- [Manage access tokens](/core/fundamentals/access-tokens) - Understand secret vs publishable keys
+- [Configure webhooks](/core/fundamentals/webhooks) - Handle payment events
+- [Process transactions](/core/fundamentals/transactions) - View and manage payments
 
 ---
 

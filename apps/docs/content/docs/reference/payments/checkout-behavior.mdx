@@ -1,0 +1,38 @@
+---
+title: Checkout behavior
+description: Sessions, payment links, amounts, coupons, and expiry rules for hosted checkout.
+---
+
+Checkout combines **checkout sessions**, **payment links**, **products/prices**, **coupons**, and **provider** flows. This page explains cross-cutting rules; endpoint details remain in each resource page.
+
+## Checkout sessions
+
+- Sessions are typically **time-bound** (default expiration window is documented on [Checkout Sessions](/reference/payments/checkout-sessions)).
+- Status progresses (e.g. open → completed/expired) as the customer pays or time runs out.
+- **`price_id`** on the session selects which product price applies; amount may be derived or validated against the product’s prices.
+
+## Payment links
+
+- **Product** links resolve amount from catalog prices (with optional locked price).
+- **Instant** links use a fixed amount you supply.
+- Multi-line flows may set **`has_line_items`** in session metadata; totals aggregate line items, optional shipping/tax, and product-linked fees where configured.
+
+## Coupons
+
+- Validation enforces **dates**, **usage limits**, **customer type** (new vs returning), **scope** (org-wide vs specific products), and **quantity** caps.
+- Multiple coupons (when supported) apply **sequentially** to a running amount — see [Discount Coupons](/reference/payments/discount-coupons) and [Coupon logic examples](/reference/payments/coupon-logic-examples).
+
+## Cross-currency
+
+When session currency differs from a product price currency, server logic may **convert** for validation so the paid amount matches the configured price in another currency.
+
+## Customer identity
+
+ Checkout may **auto-create or merge** customer records when contact fields are provided, so downstream webhooks and transactions always attach to a stable `customer_id` where possible.
+
+## Related pages
+
+- [Checkout Sessions](/reference/payments/checkout-sessions)
+- [Payment Links](/reference/payments/payment-links)
+- [Products](/reference/payments/products)
+- [Payment state machine](/reference/reference/payment-state-machine)

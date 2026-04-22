@@ -47,11 +47,18 @@ Create a new product with one or more prices. At least one price is required.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `amount` | `number` | **Yes** | Price amount |
-| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, etc.) |
-| `billing_interval` | `string` | No | `day`, `week`, `month`, `year` (recurring only) |
-| `interval_count` | `number` | No | Interval multiplier (default: `1`) |
+| `amount` | `number` | **Yes** | Price amount (smallest currency unit) |
+| `currency_code` | `string` | **Yes** | `XOF`, `USD`, `EUR` |
+| `billing_interval` | `string` | No | `day`, `week`, `month`, `year` (required for recurring products) |
+| `pricing_model` | `string` | No | `standard` (default), `pay_what_you_want`, or `tiered` |
+| `minimum_amount` | `number` | PWYW | Required when `pricing_model` is `pay_what_you_want` |
+| `maximum_amount` | `number` | No | Optional upper bound for `pay_what_you_want` |
 | `is_default` | `boolean` | No | Set as default price |
+| `metadata` | `object` | No | Optional metadata on the price |
+
+<Callout type="info">
+  `pay_what_you_want` requires `minimum_amount` (and may include `maximum_amount`). For `standard` and `tiered`, omit those unless your integration uses them.
+</Callout>
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -97,7 +104,7 @@ const subscription = await lomi.products.create({
   failed_payment_action: 'retry',
 });
 
-console.log(`Product created: ${product.id}`);
+console.log(`Product created: ${product.product_id}`);
 ```
 </Tab>
 
@@ -126,7 +133,7 @@ product = client.products.create({
     "display_on_storefront": True
 })
 
-print(f"Product created: {product['id']}")
+print(f"Product created: {product['product_id']}")
 ```
 </Tab>
 
@@ -243,7 +250,7 @@ const price = await lomi.products.addPrice('prod_abc123...', {
   billing_interval: 'year',
 });
 
-console.log(`New price added: ${price.id}`);
+console.log(`New price added: ${price.price_id}`);
 ```
 </Tab>
 
@@ -305,19 +312,31 @@ curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices/price_def45
 
 ## Product Object
 
+Returned shapes match the API product resource (see OpenAPI **Products**). Common fields:
+
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | `string` | Unique product identifier |
+| `product_id` | `string` | Unique product identifier |
 | `organization_id` | `string` | Owning organization |
 | `name` | `string` | Product name |
-| `description` | `string` | Product description |
+| `description` | `string` \| `null` | Product description |
 | `product_type` | `string` | `one_time`, `recurring`, `usage_based` |
-| `images` | `array` | Product image URLs |
+| `images` | `array` \| `null` | Product image URLs |
 | `is_active` | `boolean` | Active status |
 | `display_on_storefront` | `boolean` | Storefront visibility |
-| `prices` | `array` | Array of price objects |
-| `metadata` | `object` | Custom metadata |
+| `prices` | `array` | Price objects (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, timestamps) |
+| `fees` | `array` | Associated fee rows (when present) |
+| `environment` | `string` | `test` or `live` |
+| `failed_payment_action` | `string` \| `null` | Recurring: `pause`, `cancel`, `retry` |
+| `charge_day` | `number` \| `null` | Recurring charge day (1–31) |
+| `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
+| `trial_enabled` | `boolean` | Trial enabled |
+| `trial_period_days` | `number` \| `null` | Trial length |
+| `usage_aggregation` | `string` \| `null` | Usage-based products |
+| `usage_unit` | `string` \| `null` | Usage-based products |
+| `metadata` | `object` \| `null` | Custom metadata |
 | `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
 
 ---
 

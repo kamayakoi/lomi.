@@ -1,0 +1,4993 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/accounts": {
+      "get": {
+        "operationId": "AccountsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of accounts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all accounts",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/accounts/balance": {
+      "get": {
+        "description": "Fetch current account balance for all currencies or a specific currency",
+        "operationId": "AccountsController_getBalance",
+        "parameters": [
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by specific currency code (XOF, USD, EUR)",
+            "schema": {
+              "enum": [
+                "XOF",
+                "USD",
+                "EUR"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account balance information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountBalanceResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get account balance",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/accounts/balance/breakdown": {
+      "get": {
+        "description": "Fetch detailed balance breakdown including available, pending, and total balances. Optionally convert to a target currency.",
+        "operationId": "AccountsController_getBalanceBreakdown",
+        "parameters": [
+          {
+            "name": "target_currency",
+            "required": false,
+            "in": "query",
+            "description": "Target currency for conversion (XOF, USD, EUR)",
+            "schema": {
+              "enum": [
+                "XOF",
+                "USD",
+                "EUR"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detailed balance breakdown with conversion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BalanceBreakdownResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get detailed balance breakdown",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/accounts/balance/check/{currency}": {
+      "get": {
+        "description": "Check if merchant has sufficient available balance in specified currency",
+        "operationId": "AccountsController_checkAvailableBalance",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Available balance check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_sufficient_balance": {
+                      "type": "boolean",
+                      "description": "Whether merchant has funds available"
+                    },
+                    "available_balance": {
+                      "type": "number",
+                      "description": "Current available balance"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Check available balance",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/accounts/{id}": {
+      "get": {
+        "operationId": "AccountsController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Account not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get an account by ID",
+        "tags": [
+          "Accounts"
+        ]
+      }
+    },
+    "/organizations": {
+      "get": {
+        "description": "Returns the authenticated merchant's organization details",
+        "operationId": "OrganizationsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Organization details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get organization details",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/organizations/metrics": {
+      "get": {
+        "description": "Get comprehensive metrics including MRR, ARR, LTV, revenue, and customer counts. All metrics are pre-calculated and stored in the database.",
+        "operationId": "OrganizationsController_getMetrics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Organization metrics (pre-calculated values)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationMetricsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get organization metrics",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/organizations/{id}": {
+      "get": {
+        "description": "Returns organization details by ID (must match authenticated organization)",
+        "operationId": "OrganizationsController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The organization",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get organization by ID",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/transactions": {
+      "get": {
+        "description": "Returns all transactions for the authenticated merchant's organization with advanced filtering options. Transactions are created by the system when payments are processed.",
+        "operationId": "TransactionsController_findAll",
+        "parameters": [
+          {
+            "name": "isPos",
+            "required": false,
+            "in": "query",
+            "description": "Filter by POS transactions only",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter transactions up to this date (ISO 8601 format)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter transactions from this date (ISO 8601 format)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "paymentMethod",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payment method code (comma-separated for multiple)",
+            "schema": {
+              "example": "MOBILE_MONEY,CARDS",
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency code (comma-separated for multiple)",
+            "schema": {
+              "example": "XOF,USD",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction type (comma-separated for multiple)",
+            "schema": {
+              "example": "payment,refund",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by transaction status (comma-separated for multiple)",
+            "schema": {
+              "example": "completed,pending",
+              "type": "string"
+            }
+          },
+          {
+            "name": "provider",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payment provider code",
+            "schema": {
+              "example": "WAVE",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all transactions",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/transactions/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific transaction. Only accessible if the transaction belongs to your organization.",
+        "operationId": "TransactionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Transaction UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Transaction not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get transaction by ID",
+        "tags": [
+          "Transactions"
+        ]
+      }
+    },
+    "/customers": {
+      "get": {
+        "description": "Returns all customers for the authenticated merchant's organization. Supports filtering by search term, customer type, and activity status.",
+        "operationId": "CustomersController_findAll",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by activity status (active = has transactions, inactive = no transactions)",
+            "schema": {
+              "enum": [
+                "active",
+                "inactive",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by customer type",
+            "schema": {
+              "enum": [
+                "business",
+                "individual",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name or email",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customers with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "customers": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CustomerResponseDto"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "number",
+                          "example": 1
+                        },
+                        "pageSize": {
+                          "type": "number",
+                          "example": 50
+                        },
+                        "totalCount": {
+                          "type": "number",
+                          "example": 100
+                        },
+                        "totalPages": {
+                          "type": "number",
+                          "example": 2
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all customers",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "post": {
+        "description": "Creates a new customer in your organization. The customer will be automatically linked to your organization.",
+        "operationId": "CustomersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone_number": {
+                    "type": "string"
+                  },
+                  "whatsapp_number": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "postal_code": {
+                    "type": "string"
+                  },
+                  "is_business": {
+                    "type": "boolean"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "examples": {
+                "minimal": {
+                  "summary": "Minimal customer",
+                  "value": {
+                    "name": "Jane Doe",
+                    "email": "jane@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Customer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new customer",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific customer. Only accessible if the customer belongs to your organization.",
+        "operationId": "CustomersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Customer not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get customer by ID",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "patch": {
+        "description": "Updates an existing customer. Only customers belonging to your organization can be updated. All fields are optional.",
+        "operationId": "CustomersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone_number": {
+                    "type": "string"
+                  },
+                  "whatsapp_number": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "postal_code": {
+                    "type": "string"
+                  },
+                  "is_business": {
+                    "type": "boolean"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Customer updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Customer not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Update a customer",
+        "tags": [
+          "Customers"
+        ]
+      },
+      "delete": {
+        "description": "Soft deletes a customer. The customer will be marked as deleted but not removed from the database. Only customers belonging to your organization can be deleted.",
+        "operationId": "CustomersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Customer deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Customer not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Delete a customer",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/customers/{id}/transactions": {
+      "get": {
+        "description": "Returns all transactions for a specific customer. Only accessible if the customer belongs to your organization.",
+        "operationId": "CustomersController_getTransactions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customer transactions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Customer not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get customer transactions",
+        "tags": [
+          "Customers"
+        ]
+      }
+    },
+    "/payment-requests": {
+      "post": {
+        "description": "Creates a payment request for a customer. Payment requests have an expiration date and can be tracked until completion or expiry.",
+        "operationId": "PaymentRequestsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "currency_code",
+                  "expiry_date"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "currency_code": {
+                    "type": "string",
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "expiry_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "payment_reference": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "Payment request with expiry",
+                  "value": {
+                    "amount": 25000,
+                    "currency_code": "XOF",
+                    "description": "Consulting fee — March",
+                    "expiry_date": "2026-12-31T23:59:59.000Z",
+                    "payment_reference": "INV-2026-042"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment request created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequestResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new payment request",
+        "tags": [
+          "Payment Requests"
+        ]
+      },
+      "get": {
+        "description": "Returns all payment requests for your organization with pagination and optional filtering by status and customer.",
+        "operationId": "PaymentRequestsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "customerId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by customer ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payment status",
+            "schema": {
+              "enum": [
+                "pending",
+                "completed",
+                "failed",
+                "expired"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payment requests with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PaymentRequestResponseDto"
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "limit": {
+                      "type": "number"
+                    },
+                    "offset": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all payment requests",
+        "tags": [
+          "Payment Requests"
+        ]
+      }
+    },
+    "/payment-requests/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific payment request, including its current status and payment details.",
+        "operationId": "PaymentRequestsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment request UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment request details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequestResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Payment request not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a payment request by ID",
+        "tags": [
+          "Payment Requests"
+        ]
+      }
+    },
+    "/refund/wave": {
+      "post": {
+        "description": "Creates a refund via the Wave edge function. Response shape is provider JSON.",
+        "operationId": "RefundsController_createWaveRefund",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Refund result (JSON body from Wave edge function)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Refund processing failed"
+          }
+        },
+        "security": [
+          {
+            "X-API-KEY": []
+          }
+        ],
+        "summary": "Initiate a Wave refund",
+        "tags": [
+          "Refunds"
+        ]
+      }
+    },
+    "/products": {
+      "get": {
+        "description": "Returns all products for the authenticated merchant's organization. Products include embedded prices and fees. Use this to display your product catalog or integrate with external systems.",
+        "operationId": "ProductsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return",
+            "schema": {
+              "example": 15,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products with embedded prices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all products",
+        "tags": [
+          "Products"
+        ]
+      },
+      "post": {
+        "description": "Creates a new product with one or more prices. The product and all prices are created atomically - if any part fails, the entire operation is rolled back. At least one price is required. The first price (or the one marked as is_default) will be the default price.",
+        "operationId": "ProductsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new product",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific product, including all prices and fees. Only accessible if the product belongs to your organization.",
+        "operationId": "ProductsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details with embedded prices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Product not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get product by ID",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/prices": {
+      "post": {
+        "description": "Adds an additional price option to an existing product. Useful for offering multiple pricing tiers, currencies, or billing intervals. Note: A product can have a maximum of 3 active prices. You cannot modify existing prices - create a new one instead.",
+        "operationId": "ProductsController_addPrice",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Price added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or maximum prices exceeded"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Product not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Add a new price to a product",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/{id}/prices/{priceId}/set-default": {
+      "post": {
+        "description": "Sets a specific price as the default for a product. The default price is used when a customer doesn't specify a price ID in checkout. Only one price can be the default at a time - setting a new default automatically unsets the previous one.",
+        "operationId": "ProductsController_setDefaultPrice",
+        "parameters": [
+          {
+            "name": "priceId",
+            "required": true,
+            "in": "path",
+            "description": "Price UUID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Product UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default price updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Product or price not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Set a price as the default",
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/subscriptions": {
+      "get": {
+        "description": "Returns all subscriptions for the authenticated merchant's organization. Subscriptions are automatically created when customers make recurring payments.",
+        "operationId": "SubscriptionsController_findAll",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all subscriptions",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/customer/{customerId}": {
+      "get": {
+        "description": "Returns all subscriptions for a specific customer. Only accessible if the customer belongs to your organization.",
+        "operationId": "SubscriptionsController_findByCustomer",
+        "parameters": [
+          {
+            "name": "customerId",
+            "required": true,
+            "in": "path",
+            "description": "Customer UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of customer subscriptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Customer not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get subscriptions for a customer",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific subscription. Only accessible if the subscription belongs to your organization.",
+        "operationId": "SubscriptionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Subscription UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Subscription not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get subscription by ID",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/{id}/cancel": {
+      "post": {
+        "description": "Cancels an active subscription. This is the ONLY modification allowed on subscriptions. Price, billing dates, and other fields are system-managed and cannot be changed.",
+        "operationId": "SubscriptionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Subscription UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cancellation_reason": {
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "withReason": {
+                  "summary": "Cancel with reason",
+                  "value": {
+                    "cancellation_reason": "Customer requested cancellation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Subscription not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Cancel a subscription",
+        "tags": [
+          "Subscriptions"
+        ]
+      }
+    },
+    "/discount-coupons": {
+      "get": {
+        "description": "Returns all discount coupons for the authenticated merchant's organization.",
+        "operationId": "DiscountCouponsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of discount coupons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DiscountCouponResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all discount coupons",
+        "tags": [
+          "Discount Coupons"
+        ]
+      },
+      "post": {
+        "description": "Creates a new discount coupon in your organization. The coupon code will be automatically uppercased.",
+        "operationId": "DiscountCouponsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Discount coupon created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscountCouponResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data or coupon code already exists"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new discount coupon",
+        "tags": [
+          "Discount Coupons"
+        ]
+      }
+    },
+    "/discount-coupons/{id}/performance": {
+      "get": {
+        "description": "Returns performance metrics for a specific discount coupon, including usage statistics and revenue impact.",
+        "operationId": "DiscountCouponsController_getPerformance",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Coupon UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Coupon performance metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "total_uses": {
+                      "type": "number",
+                      "example": 45
+                    },
+                    "total_discount_amount": {
+                      "type": "number",
+                      "example": 25000
+                    },
+                    "total_revenue": {
+                      "type": "number",
+                      "example": 150000
+                    },
+                    "average_order_value": {
+                      "type": "number",
+                      "example": 3333.33
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Discount coupon not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get coupon performance metrics",
+        "tags": [
+          "Discount Coupons"
+        ]
+      }
+    },
+    "/discount-coupons/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific discount coupon. Only accessible if the coupon belongs to your organization.",
+        "operationId": "DiscountCouponsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Coupon UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Discount coupon details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscountCouponResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Discount coupon not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get discount coupon by ID",
+        "tags": [
+          "Discount Coupons"
+        ]
+      }
+    },
+    "/checkout-sessions": {
+      "post": {
+        "description": "Creates a hosted payment page for customers to complete their purchase. The checkout session expires after 60 minutes by default. Returns a session ID and URL to redirect your customer to.",
+        "operationId": "CheckoutSessionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Checkout session payload. Either set `amount` (+ optional product fields) or `line_items` for multi-product carts.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currency_code"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 10000
+                  },
+                  "currency_code": {
+                    "type": "string",
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ],
+                    "example": "XOF"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "customer_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "customer_email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "customer_name": {
+                    "type": "string"
+                  },
+                  "customer_phone": {
+                    "type": "string"
+                  },
+                  "customer_city": {
+                    "type": "string"
+                  },
+                  "customer_country": {
+                    "type": "string"
+                  },
+                  "customer_address": {
+                    "type": "string"
+                  },
+                  "customer_postal_code": {
+                    "type": "string"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "price_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "subscription_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "allow_quantity": {
+                    "type": "boolean"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "success_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancel_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "allow_coupon_code": {
+                    "type": "boolean"
+                  },
+                  "require_billing_address": {
+                    "type": "boolean"
+                  },
+                  "payment_link_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "line_items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "price_id"
+                      ],
+                      "properties": {
+                        "price_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "quantity": {
+                          "type": "number"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "examples": {
+                "amount": {
+                  "summary": "Fixed amount checkout",
+                  "value": {
+                    "currency_code": "XOF",
+                    "amount": 10000,
+                    "success_url": "https://example.com/success",
+                    "cancel_url": "https://example.com/cancel"
+                  }
+                },
+                "lineItems": {
+                  "summary": "Multi-product (line items)",
+                  "value": {
+                    "currency_code": "XOF",
+                    "line_items": [
+                      {
+                        "price_id": "123e4567-e89b-12d3-a456-426614174000",
+                        "quantity": 2
+                      }
+                    ],
+                    "success_url": "https://example.com/success"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Checkout session created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new checkout session",
+        "tags": [
+          "Checkout Sessions"
+        ]
+      },
+      "get": {
+        "description": "Returns all checkout sessions for your organization with pagination and optional status filtering.",
+        "operationId": "CheckoutSessionsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by session status (matches checkout_session_status)",
+            "schema": {
+              "enum": [
+                "open",
+                "completed",
+                "expired"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of checkout sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CheckoutSessionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all checkout sessions",
+        "tags": [
+          "Checkout Sessions"
+        ]
+      }
+    },
+    "/checkout-sessions/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific checkout session, including its current status and associated customer/product details.",
+        "operationId": "CheckoutSessionsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Checkout session UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Checkout session details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutSessionResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Checkout session not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a checkout session by ID",
+        "tags": [
+          "Checkout Sessions"
+        ]
+      }
+    },
+    "/payment-links": {
+      "post": {
+        "description": "Creates a shareable payment link. Can be for a specific product (product link) or a custom amount (instant link). Product links reference a product and optional price. Instant links have a fixed amount.",
+        "operationId": "PaymentLinksController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "link_type",
+                  "title",
+                  "currency_code"
+                ],
+                "properties": {
+                  "link_type": {
+                    "type": "string",
+                    "enum": [
+                      "product",
+                      "instant"
+                    ]
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "currency_code": {
+                    "type": "string",
+                    "enum": [
+                      "XOF",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "number"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "price_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "allow_coupon_code": {
+                    "type": "boolean"
+                  },
+                  "allow_quantity": {
+                    "type": "boolean"
+                  },
+                  "require_billing_address": {
+                    "type": "boolean"
+                  },
+                  "expires_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "success_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancel_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "examples": {
+                "instant": {
+                  "summary": "Instant (fixed amount) link",
+                  "value": {
+                    "link_type": "instant",
+                    "title": "Invoice INV-001",
+                    "currency_code": "XOF",
+                    "amount": 15000
+                  }
+                },
+                "product": {
+                  "summary": "Product link",
+                  "value": {
+                    "link_type": "product",
+                    "title": "Premium plan",
+                    "currency_code": "XOF",
+                    "product_id": "123e4567-e89b-12d3-a456-426614174000"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment link created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLinkResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation error"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Create a new payment link",
+        "tags": [
+          "Payment Links"
+        ]
+      },
+      "get": {
+        "description": "Returns all payment links for your organization with pagination and optional filtering by type and active status.",
+        "operationId": "PaymentLinksController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return",
+            "schema": {
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "linkType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by link type",
+            "schema": {
+              "enum": [
+                "product",
+                "instant"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payment links with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PaymentLinkResponseDto"
+                      }
+                    },
+                    "total": {
+                      "type": "number"
+                    },
+                    "limit": {
+                      "type": "number"
+                    },
+                    "offset": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all payment links",
+        "tags": [
+          "Payment Links"
+        ]
+      }
+    },
+    "/payment-links/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific payment link, including its URL, configuration, and status.",
+        "operationId": "PaymentLinksController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Payment link UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment link details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentLinkResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Payment link not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a payment link by ID",
+        "tags": [
+          "Payment Links"
+        ]
+      }
+    },
+    "/payout/wave": {
+      "post": {
+        "description": "Creates a payout via the Wave edge function. Response shape is provider JSON.",
+        "operationId": "PayoutsController_createWavePayout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Payout initiated (JSON body from Wave edge function)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or provider error"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "X-API-KEY": []
+          }
+        ],
+        "summary": "Initiate a Wave payout",
+        "tags": [
+          "Payouts"
+        ]
+      }
+    },
+    "/beneficiary-payouts": {
+      "post": {
+        "description": "Initiates a payout to a beneficiary (contractor, supplier, employee, etc.). Returns immediately with pending status. The actual payout is processed asynchronously by the payment provider (Wave, SPI). Status updates are sent via webhooks. Use this for paying external parties from your account balance.",
+        "operationId": "BeneficiaryPayoutsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Beneficiary payout initiated successfully with pending status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or insufficient balance"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Initiate a beneficiary payout",
+        "tags": [
+          "Beneficiary Payouts"
+        ]
+      },
+      "get": {
+        "description": "Returns all beneficiary payouts for your organization with pagination and optional filtering by status, date range, and currency.",
+        "operationId": "BeneficiaryPayoutsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset for pagination",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of results to return",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "currencyCode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency code",
+            "schema": {
+              "example": "XOF",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by end date (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by start date (ISO 8601)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "statuses",
+            "required": false,
+            "in": "query",
+            "description": "Filter by payout statuses (comma-separated)",
+            "schema": {
+              "example": "pending,completed,failed",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of beneficiary payouts with pagination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
+                      }
+                    },
+                    "limit": {
+                      "type": "number"
+                    },
+                    "offset": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all beneficiary payouts",
+        "tags": [
+          "Beneficiary Payouts"
+        ]
+      }
+    },
+    "/beneficiary-payouts/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific beneficiary payout, including its current status and provider details.",
+        "operationId": "BeneficiaryPayoutsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Beneficiary payout UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beneficiary payout details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeneficiaryPayoutResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Beneficiary payout not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a beneficiary payout by ID",
+        "tags": [
+          "Beneficiary Payouts"
+        ]
+      }
+    },
+    "/webhook-delivery-logs": {
+      "get": {
+        "description": "Returns delivery logs for a specific webhook. Logs are automatically created when webhooks are delivered. Use webhookId query parameter to filter by webhook.",
+        "operationId": "WebhookDeliveryLogsController_findAll",
+        "parameters": [
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Number of logs to skip (for pagination)",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of logs to return",
+            "schema": {
+              "example": 25,
+              "type": "number"
+            }
+          },
+          {
+            "name": "failedOnly",
+            "required": false,
+            "in": "query",
+            "description": "Show only failed deliveries",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "successOnly",
+            "required": false,
+            "in": "query",
+            "description": "Show only successful deliveries",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "webhookId",
+            "required": true,
+            "in": "query",
+            "description": "Filter by webhook ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of webhook delivery logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookDeliveryLogResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List webhook delivery logs",
+        "tags": [
+          "Webhook Delivery Logs"
+        ]
+      }
+    },
+    "/webhook-delivery-logs/{id}": {
+      "get": {
+        "description": "Returns detailed information about a specific webhook delivery log. Only accessible if the log belongs to your organization.",
+        "operationId": "WebhookDeliveryLogsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Log UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook delivery log details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookDeliveryLogResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Webhook delivery log not found or access denied"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get webhook delivery log by ID",
+        "tags": [
+          "Webhook Delivery Logs"
+        ]
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "operationId": "WebhooksController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of webhooks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List all webhooks",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/webhooks/{id}": {
+      "get": {
+        "operationId": "WebhooksController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The webhook",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get a webhook by ID",
+        "tags": [
+          "Webhooks"
+        ]
+      },
+      "patch": {
+        "operationId": "WebhooksController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "authorized_events": {
+                    "type": "string"
+                  },
+                  "spi_event_types": {
+                    "type": "string"
+                  },
+                  "supports_spi": {
+                    "type": "boolean"
+                  },
+                  "verification_token": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "examples": {
+                "rotateUrl": {
+                  "summary": "Update delivery URL",
+                  "value": {
+                    "url": "https://example.com/webhooks/lomi",
+                    "is_active": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The webhook has been successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Update a webhook",
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/webhooks/wave": {
+      "post": {
+        "description": "Endpoint for Wave to send payment notifications. Verifies signature and processes events.",
+        "operationId": "WaveWebhookController_handleWebhook",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "received": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid webhook signature"
+          },
+          "500": {
+            "description": "Internal server error processing webhook"
+          }
+        },
+        "summary": "Receive Wave webhook events",
+        "tags": [
+          "Webhooks - Providers"
+        ]
+      }
+    },
+    "/webhooks/stripe": {
+      "post": {
+        "description": "Endpoint for Stripe to send payment notifications. Verifies signature and processes events.",
+        "operationId": "StripeWebhookController_handleWebhook",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Webhook received and processed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "received": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid webhook signature"
+          },
+          "500": {
+            "description": "Internal server error processing webhook"
+          }
+        },
+        "summary": "Receive Stripe webhook events",
+        "tags": [
+          "Webhooks - Providers"
+        ]
+      }
+    },
+    "/charge/wave": {
+      "post": {
+        "operationId": "ChargesController_createWaveCharge",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Charge initiated successfully (JSON body from Wave edge function)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or Wave API error"
+          }
+        },
+        "security": [
+          {
+            "X-API-KEY": []
+          }
+        ],
+        "summary": "Initiate a Wave direct charge",
+        "tags": [
+          "Charges"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "lomi. API",
+    "description": "Payment processing API for francophone West African businesses.",
+    "version": "1.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://api.lomi.africa",
+      "description": "Live"
+    },
+    {
+      "url": "https://sandbox.api.lomi.africa",
+      "description": "Test"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "X-API-KEY": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY"
+      }
+    },
+    "schemas": {
+      "AccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique account identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174001",
+            "description": "Organization ID"
+          },
+          "balance": {
+            "type": "number",
+            "example": 100000,
+            "description": "Account balance in the specified currency"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "description": "Currency code"
+          },
+          "is_spi_account": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this is an SPI (UEMOA) account"
+          },
+          "spi_account_number": {
+            "type": "string",
+            "example": "SN00012345678901234567890",
+            "description": "SPI account number in the bank system"
+          },
+          "spi_account_type": {
+            "type": "string",
+            "example": "CACC",
+            "enum": [
+              "CACC",
+              "CARD",
+              "CASH",
+              "CHAR",
+              "CISH",
+              "CURR",
+              "DPST",
+              "SVGS",
+              "ULAA"
+            ],
+            "description": "SPI account type"
+          },
+          "spi_account_status": {
+            "type": "string",
+            "example": "OUVERT",
+            "enum": [
+              "OUVERT",
+              "BLOQUE",
+              "CLOTURE"
+            ],
+            "description": "SPI account status"
+          },
+          "spi_account_balance": {
+            "type": "number",
+            "example": 100000,
+            "description": "Actual balance in the SPI bank account"
+          },
+          "spi_account_balance_synced_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "When the SPI balance was last synced"
+          },
+          "spi_account_balance_sync_error": {
+            "type": "string",
+            "example": null,
+            "description": "Error message if SPI balance sync failed"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Account creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Account last update timestamp"
+          }
+        },
+        "required": [
+          "account_id",
+          "organization_id",
+          "balance",
+          "currency_code",
+          "is_spi_account",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "AccountBalanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code"
+          },
+          "balance": {
+            "type": "number",
+            "example": 100000,
+            "description": "Account balance"
+          },
+          "last_updated": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Last updated timestamp"
+          }
+        },
+        "required": [
+          "currency_code",
+          "balance",
+          "last_updated"
+        ]
+      },
+      "BalanceBreakdownResponseDto": {
+        "type": "object",
+        "properties": {
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code"
+          },
+          "available_balance": {
+            "type": "number",
+            "example": 100000,
+            "description": "Available balance"
+          },
+          "pending_balance": {
+            "type": "number",
+            "example": 5000,
+            "description": "Pending balance"
+          },
+          "total_balance": {
+            "type": "number",
+            "example": 105000,
+            "description": "Total balance (available + pending)"
+          },
+          "converted_available_balance": {
+            "type": "number",
+            "example": 165,
+            "description": "Converted available balance"
+          },
+          "converted_pending_balance": {
+            "type": "number",
+            "example": 8.25,
+            "description": "Converted pending balance"
+          },
+          "converted_total_balance": {
+            "type": "number",
+            "example": 173.25,
+            "description": "Converted total balance"
+          },
+          "target_currency": {
+            "type": "string",
+            "example": "USD",
+            "description": "Target currency for conversion"
+          }
+        },
+        "required": [
+          "currency_code",
+          "available_balance",
+          "pending_balance",
+          "total_balance",
+          "target_currency"
+        ]
+      },
+      "OrganizationResponseDto": {
+        "type": "object",
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique organization identifier"
+          },
+          "name": {
+            "type": "string",
+            "example": "Acme Inc",
+            "description": "Organization name"
+          },
+          "email": {
+            "type": "string",
+            "example": "contact@acme.com",
+            "description": "Organization email"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+221771234567",
+            "description": "Organization phone number"
+          },
+          "verification_status": {
+            "type": "string",
+            "example": "verified",
+            "enum": [
+              "unverified",
+              "starter",
+              "verified"
+            ],
+            "description": "KYC verification status"
+          },
+          "website_url": {
+            "type": "string",
+            "example": "https://acme.com",
+            "description": "Organization website"
+          },
+          "logo_url": {
+            "type": "string",
+            "example": "https://cdn.lomi.africa/logos/acme.png",
+            "description": "Organization logo URL"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "enum": [
+              "active",
+              "inactive",
+              "suspended"
+            ],
+            "description": "Organization status"
+          },
+          "default_currency": {
+            "type": "string",
+            "example": "XOF",
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "description": "Default currency"
+          },
+          "slug": {
+            "type": "string",
+            "example": "acme-inc",
+            "description": "URL-friendly slug"
+          },
+          "storefront_enabled": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether storefront is enabled"
+          },
+          "total_revenue": {
+            "type": "number",
+            "example": 250000,
+            "description": "Total revenue generated"
+          },
+          "total_transactions": {
+            "type": "number",
+            "example": 1234,
+            "description": "Total transaction count"
+          },
+          "total_merchants": {
+            "type": "number",
+            "example": 5,
+            "description": "Total merchant count"
+          },
+          "total_customers": {
+            "type": "number",
+            "example": 567,
+            "description": "Total customer count"
+          },
+          "mrr": {
+            "type": "number",
+            "example": 50000,
+            "description": "Monthly Recurring Revenue"
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000,
+            "description": "Annual Recurring Revenue"
+          },
+          "merchant_lifetime_value": {
+            "type": "number",
+            "example": 150000,
+            "description": "Average Customer Lifetime Value"
+          },
+          "employee_number": {
+            "type": "string",
+            "example": "10-50",
+            "description": "Number of employees"
+          },
+          "industry": {
+            "type": "string",
+            "example": "Technology",
+            "description": "Industry sector"
+          },
+          "pin_code": {
+            "type": "string",
+            "example": "1234",
+            "description": "Organization PIN code for sensitive operations"
+          },
+          "is_starter_business": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this is a starter business"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "custom_field": "value"
+            },
+            "description": "Additional metadata"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Organization creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "Last update timestamp"
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether organization is soft-deleted"
+          },
+          "deleted_at": {
+            "type": "string",
+            "example": null,
+            "description": "Deletion timestamp if deleted"
+          }
+        },
+        "required": [
+          "organization_id",
+          "name",
+          "email",
+          "phone_number",
+          "verification_status",
+          "status",
+          "default_currency",
+          "storefront_enabled",
+          "total_revenue",
+          "total_transactions",
+          "total_merchants",
+          "total_customers",
+          "mrr",
+          "arr",
+          "merchant_lifetime_value",
+          "is_starter_business",
+          "created_at",
+          "updated_at",
+          "is_deleted"
+        ]
+      },
+      "OrganizationMetricsResponseDto": {
+        "type": "object",
+        "properties": {
+          "mrr": {
+            "type": "number",
+            "example": 50000,
+            "description": "Monthly Recurring Revenue in default currency"
+          },
+          "arr": {
+            "type": "number",
+            "example": 600000,
+            "description": "Annual Recurring Revenue in default currency"
+          },
+          "total_revenue": {
+            "type": "number",
+            "example": 250000,
+            "description": "Total revenue generated"
+          },
+          "total_transactions": {
+            "type": "number",
+            "example": 1234,
+            "description": "Total number of transactions"
+          },
+          "total_customers": {
+            "type": "number",
+            "example": 567,
+            "description": "Total number of customers"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code for all monetary values"
+          },
+          "calculated_at": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "When these metrics were calculated"
+          }
+        },
+        "required": [
+          "mrr",
+          "arr",
+          "total_revenue",
+          "total_transactions",
+          "total_customers",
+          "currency_code",
+          "calculated_at"
+        ]
+      },
+      "TransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "transaction_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique transaction identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Customer ID"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "321e4567-e89b-12d3-a456-426614174000",
+            "description": "Product ID (if applicable)",
+            "nullable": true
+          },
+          "subscription_id": {
+            "type": "string",
+            "example": "654e7890-e89b-12d3-a456-426614174000",
+            "description": "Subscription ID (if applicable)",
+            "nullable": true
+          },
+          "price_id": {
+            "type": "string",
+            "example": "987e6543-e89b-12d3-a456-426614174000",
+            "description": "Price ID used for this transaction",
+            "nullable": true
+          },
+          "transaction_type": {
+            "type": "string",
+            "example": "payment",
+            "description": "Transaction type",
+            "enum": [
+              "payment",
+              "refund",
+              "payout"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "example": "completed",
+            "description": "Transaction status",
+            "enum": [
+              "pending",
+              "completed",
+              "failed",
+              "refunded",
+              "expired",
+              "cancelled"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "Payment for Premium Subscription",
+            "description": "Transaction description",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "description": "Quantity of items"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "order_number": "ORD-12345"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "gross_amount": {
+            "type": "number",
+            "example": 10000,
+            "description": "Gross amount (total including fees)"
+          },
+          "discount_amount": {
+            "type": "number",
+            "example": 500,
+            "description": "Total discount amount applied"
+          },
+          "fee_amount": {
+            "type": "number",
+            "example": 200,
+            "description": "Fee amount charged"
+          },
+          "net_amount": {
+            "type": "number",
+            "example": 9300,
+            "description": "Net amount (received after fees)"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code"
+          },
+          "provider_code": {
+            "type": "string",
+            "example": "WAVE",
+            "description": "Payment provider code"
+          },
+          "payment_method_code": {
+            "type": "string",
+            "example": "MOBILE_MONEY",
+            "description": "Payment method code"
+          },
+          "spi_tx_id": {
+            "type": "string",
+            "example": "SPI-TX-123456",
+            "description": "SPI transaction ID (if applicable)",
+            "nullable": true
+          },
+          "spi_account_number": {
+            "type": "string",
+            "example": "221771234567",
+            "description": "SPI account number used (if applicable)",
+            "nullable": true
+          },
+          "spi_payment_category": {
+            "type": "string",
+            "example": "000",
+            "description": "SPI payment category (if applicable)",
+            "nullable": true
+          },
+          "spi_payment_status": {
+            "type": "string",
+            "example": "IRREVOCABLE",
+            "description": "SPI payment status (if applicable)",
+            "nullable": true
+          },
+          "is_bnpl": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this is a Buy Now Pay Later transaction"
+          },
+          "is_pos": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether this is a POS (Point of Sale) transaction"
+          },
+          "spi_date_envoi": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "SPI payment sent date (if applicable)",
+            "nullable": true
+          },
+          "spi_date_irrevocabilite": {
+            "type": "string",
+            "example": "2024-01-15T10:35:00Z",
+            "description": "SPI payment irreversible date (if applicable)",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the transaction was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the transaction was last updated"
+          }
+        },
+        "required": [
+          "transaction_id",
+          "organization_id",
+          "customer_id",
+          "product_id",
+          "subscription_id",
+          "price_id",
+          "transaction_type",
+          "status",
+          "description",
+          "quantity",
+          "metadata",
+          "gross_amount",
+          "discount_amount",
+          "fee_amount",
+          "net_amount",
+          "currency_code",
+          "provider_code",
+          "payment_method_code",
+          "spi_tx_id",
+          "spi_account_number",
+          "spi_payment_category",
+          "spi_payment_status",
+          "is_bnpl",
+          "is_pos",
+          "spi_date_envoi",
+          "spi_date_irrevocabilite",
+          "environment",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CustomerResponseDto": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique customer identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID the customer belongs to"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Customer full name"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "Customer email address",
+            "nullable": true
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+221771234567",
+            "description": "Customer phone number",
+            "nullable": true
+          },
+          "whatsapp_number": {
+            "type": "string",
+            "example": "+221771234567",
+            "description": "Customer WhatsApp number",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "example": "Senegal",
+            "description": "Customer country",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "example": "Dakar",
+            "description": "Customer city",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "example": "123 Main Street",
+            "description": "Customer street address",
+            "nullable": true
+          },
+          "postal_code": {
+            "type": "string",
+            "example": "12345",
+            "description": "Customer postal code",
+            "nullable": true
+          },
+          "is_business": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether the customer is a business"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "custom_field": "value"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the customer was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the customer was last updated"
+          }
+        },
+        "required": [
+          "customer_id",
+          "organization_id",
+          "name",
+          "email",
+          "phone_number",
+          "whatsapp_number",
+          "country",
+          "city",
+          "address",
+          "postal_code",
+          "is_business",
+          "metadata",
+          "environment",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "PaymentRequestResponseDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "description": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "expiry_date": {
+            "type": "string",
+            "example": "string"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payment_link": {
+            "type": "string",
+            "example": "string"
+          },
+          "payment_reference": {
+            "type": "string",
+            "example": "string"
+          },
+          "request_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_account_number": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_bulk_instruction_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_confirmation": {
+            "type": "boolean",
+            "example": true
+          },
+          "spi_date_envoi": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_date_irrevocabilite": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_date_limite_paiement": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_date_limite_reponse": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_date_rejet": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_debit_differe": {
+            "type": "boolean",
+            "example": true
+          },
+          "spi_end2end_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_payeur_alias": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_payeur_nom": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_payeur_pays": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_ref_doc_numero": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_remise_amount": {
+            "type": "number",
+            "example": 123
+          },
+          "spi_remise_rate": {
+            "type": "number",
+            "example": 123
+          },
+          "spi_tx_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "created_at",
+          "created_by",
+          "currency_code",
+          "customer_id",
+          "description",
+          "environment",
+          "expiry_date",
+          "organization_id",
+          "payment_link",
+          "payment_reference",
+          "request_id",
+          "spi_account_number",
+          "spi_bulk_instruction_id",
+          "spi_confirmation",
+          "spi_date_envoi",
+          "spi_date_irrevocabilite",
+          "spi_date_limite_paiement",
+          "spi_date_limite_reponse",
+          "spi_date_rejet",
+          "spi_debit_differe",
+          "spi_end2end_id",
+          "spi_payeur_alias",
+          "spi_payeur_nom",
+          "spi_payeur_pays",
+          "spi_ref_doc_numero",
+          "spi_remise_amount",
+          "spi_remise_rate",
+          "spi_tx_id",
+          "status",
+          "updated_at"
+        ]
+      },
+      "PriceResponseDto": {
+        "type": "object",
+        "properties": {
+          "price_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique price identifier"
+          },
+          "amount": {
+            "type": "number",
+            "example": 10000,
+            "description": "Price amount"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code",
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
+          },
+          "billing_interval": {
+            "type": "string",
+            "example": "month",
+            "description": "Billing interval for recurring products",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "nullable": true
+          },
+          "pricing_model": {
+            "type": "string",
+            "example": "standard",
+            "description": "Pricing model",
+            "enum": [
+              "standard",
+              "pay_what_you_want",
+              "tiered"
+            ]
+          },
+          "minimum_amount": {
+            "type": "number",
+            "example": 5000,
+            "description": "Minimum amount (for pay_what_you_want)",
+            "nullable": true
+          },
+          "maximum_amount": {
+            "type": "number",
+            "example": 50000,
+            "description": "Maximum amount (for pay_what_you_want)",
+            "nullable": true
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether this price is active"
+          },
+          "is_default": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether this is the default price"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "notes": "Early bird pricing"
+            },
+            "description": "Additional metadata",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the price was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the price was last updated"
+          }
+        },
+        "required": [
+          "price_id",
+          "amount",
+          "currency_code",
+          "billing_interval",
+          "pricing_model",
+          "minimum_amount",
+          "maximum_amount",
+          "is_active",
+          "is_default",
+          "metadata",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ProductResponseDto": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique product identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "name": {
+            "type": "string",
+            "example": "Premium Subscription",
+            "description": "Product name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Access to all premium features",
+            "description": "Product description",
+            "nullable": true
+          },
+          "product_type": {
+            "type": "string",
+            "example": "recurring",
+            "description": "Product type",
+            "enum": [
+              "one_time",
+              "recurring",
+              "usage_based"
+            ]
+          },
+          "images": {
+            "example": [
+              "https://example.com/image.png"
+            ],
+            "description": "Product images URLs",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the product is active"
+          },
+          "display_on_storefront": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether to display on storefront"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "category": "subscription"
+            },
+            "description": "Additional metadata",
+            "nullable": true
+          },
+          "failed_payment_action": {
+            "type": "string",
+            "example": "pause",
+            "description": "Action to take on failed payment",
+            "enum": [
+              "pause",
+              "cancel",
+              "retry"
+            ],
+            "nullable": true
+          },
+          "charge_day": {
+            "type": "number",
+            "example": 1,
+            "description": "Day of month to charge (1-31)",
+            "nullable": true
+          },
+          "first_payment_type": {
+            "type": "string",
+            "example": "initial",
+            "description": "When to charge first payment",
+            "enum": [
+              "initial",
+              "non_initial",
+              "prorated"
+            ],
+            "nullable": true
+          },
+          "trial_enabled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Whether trial is enabled"
+          },
+          "trial_period_days": {
+            "type": "number",
+            "example": 14,
+            "description": "Trial period in days",
+            "nullable": true
+          },
+          "usage_aggregation": {
+            "type": "string",
+            "example": "sum",
+            "description": "Usage aggregation method",
+            "enum": [
+              "sum",
+              "max",
+              "last_during_period",
+              "last_ever"
+            ],
+            "nullable": true
+          },
+          "usage_unit": {
+            "type": "string",
+            "example": "api_calls",
+            "description": "Unit of usage measurement",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "prices": {
+            "description": "Product prices",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PriceResponseDto"
+            }
+          },
+          "fees": {
+            "example": [],
+            "description": "Associated fees",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the product was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the product was last updated"
+          }
+        },
+        "required": [
+          "product_id",
+          "organization_id",
+          "name",
+          "description",
+          "product_type",
+          "images",
+          "is_active",
+          "display_on_storefront",
+          "metadata",
+          "failed_payment_action",
+          "charge_day",
+          "first_payment_type",
+          "trial_enabled",
+          "trial_period_days",
+          "usage_aggregation",
+          "usage_unit",
+          "environment",
+          "prices",
+          "fees",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "SubscriptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "subscription_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique subscription identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Product ID (recurring product)"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "321e4567-e89b-12d3-a456-426614174000",
+            "description": "Price ID used for this subscription",
+            "nullable": true
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "654e7890-e89b-12d3-a456-426614174000",
+            "description": "Customer ID"
+          },
+          "status": {
+            "type": "string",
+            "example": "active",
+            "description": "Subscription status",
+            "enum": [
+              "pending",
+              "active",
+              "past_due",
+              "cancelled",
+              "trialing",
+              "paused"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "example": "2024-01-15",
+            "description": "Subscription start date"
+          },
+          "end_date": {
+            "type": "string",
+            "example": "2024-12-31",
+            "description": "Subscription end date (set when cancelled)",
+            "nullable": true
+          },
+          "next_billing_date": {
+            "type": "string",
+            "example": "2024-02-15",
+            "description": "Next billing date (system-managed)",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "example": {
+              "notes": "Premium plan"
+            },
+            "description": "Additional metadata as JSON",
+            "nullable": true
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the subscription was last updated"
+          }
+        },
+        "required": [
+          "subscription_id",
+          "organization_id",
+          "product_id",
+          "price_id",
+          "customer_id",
+          "status",
+          "start_date",
+          "end_date",
+          "next_billing_date",
+          "metadata",
+          "environment",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "DiscountCouponResponseDto": {
+        "type": "object",
+        "properties": {
+          "coupon_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique coupon identifier"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Organization ID the coupon belongs to"
+          },
+          "code": {
+            "type": "string",
+            "example": "SAVE20",
+            "description": "Unique coupon code"
+          },
+          "discount_type": {
+            "type": "string",
+            "example": "percentage",
+            "description": "Type of discount",
+            "enum": [
+              "percentage",
+              "fixed"
+            ]
+          },
+          "discount_percentage": {
+            "type": "number",
+            "example": 20,
+            "description": "Discount percentage (if discount_type is percentage)",
+            "nullable": true
+          },
+          "discount_fixed_amount": {
+            "type": "number",
+            "example": 1000,
+            "description": "Fixed discount amount (if discount_type is fixed)",
+            "nullable": true
+          },
+          "customer_type": {
+            "type": "string",
+            "example": "all",
+            "description": "Customer type this coupon applies to",
+            "enum": [
+              "all",
+              "new",
+              "existing"
+            ]
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the coupon is currently active"
+          },
+          "max_uses": {
+            "type": "number",
+            "example": 100,
+            "description": "Maximum number of times this coupon can be used",
+            "nullable": true
+          },
+          "max_quantity_per_use": {
+            "type": "number",
+            "example": 5,
+            "description": "Maximum quantity allowed per use",
+            "nullable": true
+          },
+          "current_uses": {
+            "type": "number",
+            "example": 25,
+            "description": "Current number of times this coupon has been used"
+          },
+          "usage_frequency_limit": {
+            "type": "string",
+            "example": "total",
+            "description": "Usage frequency limit type",
+            "enum": [
+              "total",
+              "per_customer",
+              "per_customer_per_product"
+            ]
+          },
+          "usage_limit_value": {
+            "type": "number",
+            "example": 1,
+            "description": "Usage limit value (for per_customer limits)",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "2024-12-31T23:59:59Z",
+            "description": "When the coupon expires",
+            "nullable": true
+          },
+          "valid_from": {
+            "type": "string",
+            "example": "2024-01-01T00:00:00Z",
+            "description": "When the coupon becomes valid",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "example": "20% off all products",
+            "description": "Coupon description",
+            "nullable": true
+          },
+          "scope_type": {
+            "type": "string",
+            "example": "organization_wide",
+            "description": "Scope of the coupon",
+            "enum": [
+              "organization_wide",
+              "specific_products",
+              "specific_prices"
+            ]
+          },
+          "applies_to_product_types": {
+            "example": [
+              "one_time",
+              "recurring"
+            ],
+            "description": "Product types this coupon applies to",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "environment": {
+            "type": "string",
+            "example": "live",
+            "description": "Environment (test or live)",
+            "enum": [
+              "test",
+              "live"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the coupon was created"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the coupon was last updated"
+          }
+        },
+        "required": [
+          "coupon_id",
+          "organization_id",
+          "code",
+          "discount_type",
+          "discount_percentage",
+          "discount_fixed_amount",
+          "customer_type",
+          "is_active",
+          "max_uses",
+          "max_quantity_per_use",
+          "current_uses",
+          "usage_frequency_limit",
+          "usage_limit_value",
+          "expires_at",
+          "valid_from",
+          "description",
+          "scope_type",
+          "applies_to_product_types",
+          "environment",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CheckoutSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "allow_coupon_code": {
+            "type": "boolean",
+            "example": true
+          },
+          "allow_quantity": {
+            "type": "boolean",
+            "example": true
+          },
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "cancel_url": {
+            "type": "string",
+            "example": "string"
+          },
+          "checkout_session_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "customer_email": {
+            "type": "string",
+            "example": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "customer_name": {
+            "type": "string",
+            "example": "string"
+          },
+          "customer_phone": {
+            "type": "string",
+            "example": "string"
+          },
+          "description": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "installment_plan_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "is_pos": {
+            "type": "boolean",
+            "example": true
+          },
+          "is_spi": {
+            "type": "boolean",
+            "example": true
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payment_link_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payment_request_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "qr_code_data": {
+            "type": "object",
+            "example": {}
+          },
+          "qr_code_type": {
+            "type": "string",
+            "example": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 123
+          },
+          "require_billing_address": {
+            "type": "boolean",
+            "example": true
+          },
+          "spi_account_number": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_qr_code_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "string"
+          },
+          "subscription_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "success_url": {
+            "type": "string",
+            "example": "string"
+          },
+          "title": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "allow_coupon_code",
+          "allow_quantity",
+          "amount",
+          "cancel_url",
+          "checkout_session_id",
+          "created_at",
+          "created_by",
+          "currency_code",
+          "customer_email",
+          "customer_id",
+          "customer_name",
+          "customer_phone",
+          "description",
+          "environment",
+          "expires_at",
+          "installment_plan_id",
+          "is_pos",
+          "is_spi",
+          "metadata",
+          "organization_id",
+          "payment_link_id",
+          "payment_request_id",
+          "price_id",
+          "product_id",
+          "qr_code_data",
+          "qr_code_type",
+          "quantity",
+          "require_billing_address",
+          "spi_account_number",
+          "spi_qr_code_id",
+          "status",
+          "subscription_id",
+          "success_url",
+          "title",
+          "updated_at"
+        ]
+      },
+      "PaymentLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "allow_coupon_code": {
+            "type": "boolean",
+            "example": true
+          },
+          "allow_quantity": {
+            "type": "boolean",
+            "example": true
+          },
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "cancel_url": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "description": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          },
+          "link_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "link_type": {
+            "type": "string",
+            "example": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "price_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 123
+          },
+          "require_billing_address": {
+            "type": "boolean",
+            "example": true
+          },
+          "success_url": {
+            "type": "string",
+            "example": "string"
+          },
+          "title": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "url": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "allow_coupon_code",
+          "allow_quantity",
+          "amount",
+          "cancel_url",
+          "created_at",
+          "created_by",
+          "currency_code",
+          "description",
+          "environment",
+          "expires_at",
+          "is_active",
+          "link_id",
+          "link_type",
+          "metadata",
+          "organization_id",
+          "price_id",
+          "product_id",
+          "quantity",
+          "require_billing_address",
+          "success_url",
+          "title",
+          "updated_at",
+          "url"
+        ]
+      },
+      "BeneficiaryPayoutResponseDto": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "amount": {
+            "type": "number",
+            "example": 123
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payout_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "payout_method_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "provider_code": {
+            "type": "string",
+            "example": "string"
+          },
+          "spi_bulk_instruction_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "status": {
+            "type": "string",
+            "example": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "account_id",
+          "amount",
+          "created_at",
+          "created_by",
+          "currency_code",
+          "metadata",
+          "organization_id",
+          "payout_id",
+          "payout_method_id",
+          "provider_code",
+          "spi_bulk_instruction_id",
+          "status",
+          "updated_at"
+        ]
+      },
+      "WebhookDeliveryLogResponseDto": {
+        "type": "object",
+        "properties": {
+          "log_id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "description": "Unique log identifier"
+          },
+          "webhook_id": {
+            "type": "string",
+            "example": "789e0123-e89b-12d3-a456-426614174000",
+            "description": "Webhook ID"
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "456e7890-e89b-12d3-a456-426614174000",
+            "description": "Organization ID"
+          },
+          "event_type": {
+            "type": "string",
+            "example": "transaction.completed",
+            "description": "Event type that triggered the webhook"
+          },
+          "payload": {
+            "type": "object",
+            "example": {
+              "transaction_id": "123e4567-e89b-12d3-a456-426614174000",
+              "amount": 10000
+            },
+            "description": "Webhook payload sent"
+          },
+          "response_status": {
+            "type": "number",
+            "example": 200,
+            "description": "HTTP response status code",
+            "nullable": true
+          },
+          "response_body": {
+            "type": "string",
+            "example": "{\"status\":\"success\"}",
+            "description": "Response body from the webhook endpoint",
+            "nullable": true
+          },
+          "attempt_number": {
+            "type": "number",
+            "example": 1,
+            "description": "Attempt number (for retries)"
+          },
+          "success": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the webhook delivery was successful"
+          },
+          "ip_address": {
+            "type": "string",
+            "example": "192.168.1.1",
+            "description": "IP address of the webhook endpoint",
+            "nullable": true
+          },
+          "user_agent": {
+            "type": "string",
+            "example": "Mozilla/5.0",
+            "description": "User agent from the webhook response",
+            "nullable": true
+          },
+          "headers": {
+            "type": "object",
+            "example": {
+              "content-type": "application/json"
+            },
+            "description": "Request headers sent with the webhook",
+            "nullable": true
+          },
+          "request_duration_ms": {
+            "type": "number",
+            "example": 150,
+            "description": "Request duration in milliseconds",
+            "nullable": true
+          },
+          "spi_tx_id": {
+            "type": "string",
+            "example": "SPI-TX-123456",
+            "description": "SPI transaction ID (for SPI webhooks)",
+            "nullable": true
+          },
+          "compte_payeur": {
+            "type": "string",
+            "example": "221771234567",
+            "description": "Payer account number (for SPI webhooks)",
+            "nullable": true
+          },
+          "compte_paye": {
+            "type": "string",
+            "example": "221779876543",
+            "description": "Payee account number (for SPI webhooks)",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "example": 1000000,
+            "description": "Transaction amount in centimes (for SPI webhooks)",
+            "nullable": true
+          },
+          "spi_event_code": {
+            "type": "string",
+            "example": "PAIEMENT_RECU",
+            "description": "SPI webhook event code (for SPI webhooks)",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2024-01-15T10:30:00Z",
+            "description": "When the webhook was delivered"
+          }
+        },
+        "required": [
+          "log_id",
+          "webhook_id",
+          "organization_id",
+          "event_type",
+          "payload",
+          "response_status",
+          "response_body",
+          "attempt_number",
+          "success",
+          "ip_address",
+          "user_agent",
+          "headers",
+          "request_duration_ms",
+          "spi_tx_id",
+          "compte_payeur",
+          "compte_paye",
+          "amount",
+          "spi_event_code",
+          "created_at"
+        ]
+      },
+      "WebhookResponseDto": {
+        "type": "object",
+        "properties": {
+          "authorized_events": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "example": "string"
+          },
+          "deleted_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "environment": {
+            "type": "string",
+            "example": "string"
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          },
+          "last_payload": {
+            "type": "object",
+            "example": {}
+          },
+          "last_response_body": {
+            "type": "string",
+            "example": "string"
+          },
+          "last_response_status": {
+            "type": "number",
+            "example": 123
+          },
+          "last_triggered_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "example": {}
+          },
+          "organization_id": {
+            "type": "string",
+            "example": "string"
+          },
+          "retry_count": {
+            "type": "number",
+            "example": 123
+          },
+          "spi_event_types": {
+            "type": "string",
+            "example": "string"
+          },
+          "supports_spi": {
+            "type": "boolean",
+            "example": true
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "string"
+          },
+          "url": {
+            "type": "string",
+            "example": "string"
+          },
+          "verification_token": {
+            "type": "string",
+            "example": "string"
+          },
+          "webhook_id": {
+            "type": "string",
+            "example": "string"
+          }
+        },
+        "required": [
+          "authorized_events",
+          "created_at",
+          "created_by",
+          "deleted_at",
+          "environment",
+          "is_active",
+          "last_payload",
+          "last_response_body",
+          "last_response_status",
+          "last_triggered_at",
+          "metadata",
+          "organization_id",
+          "retry_count",
+          "spi_event_types",
+          "supports_spi",
+          "updated_at",
+          "url",
+          "verification_token",
+          "webhook_id"
+        ]
+      }
+    }
+  }
+}

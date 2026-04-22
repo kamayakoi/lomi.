@@ -78,12 +78,6 @@ async function checkLinks() {
     ),
   );
 
-  const blogFiles = await Promise.all(
-    await glob('content/blog/**/*.mdx').then((files) =>
-      files.map(readFromPath),
-    ),
-  );
-
   const docs = docsFiles.map(async (file) => {
     const relativePath = path.relative('content/docs', file.path);
 
@@ -93,19 +87,9 @@ async function checkLinks() {
     };
   });
 
-  const blogs = blogFiles.map(async (file) => {
-    const relativePath = path.relative('content/blog', file.path);
-
-    return {
-      value: getSlugs(relativePath)[0],
-      hashes: await getHeadings(file.path, file.content),
-    };
-  });
-
   const scanned = await scanURLs({
     populate: {
-      '(home)/blog/[slug]': await Promise.all(blogs),
-      'docs/[...slug]': await Promise.all(docs),
+      '(docs)/[[...slug]]': await Promise.all(docs),
     },
   });
 
@@ -113,15 +97,16 @@ async function checkLinks() {
     `collected ${scanned.urls.size} URLs, ${scanned.fallbackUrls.length} fallbacks`,
   );
 
-  const getUrl = createGetUrl('/docs');
+  const getUrl = createGetUrl('/');
   printErrors(
-    await validateFiles([...docsFiles, ...blogFiles], {
+    await validateFiles(docsFiles, {
       scanned,
 
       pathToUrl(value) {
         const relativePath = path.relative('content/docs', value);
         return getUrl(getSlugs(relativePath));
       },
+      whitelist: (url) => url.startsWith('/openapi/generated'),
     }),
     true,
   );

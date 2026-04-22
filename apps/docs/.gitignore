@@ -24,3 +24,6 @@
 lib/types/database.types.ts
 next-env.d.ts
 /lib/scripts/core
+
+# OpenAPI MDX (regenerated on each docs build)
+/content/docs/openapi/generated/

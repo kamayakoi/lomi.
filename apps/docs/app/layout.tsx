@@ -7,7 +7,9 @@ import { Provider } from './provider';
 import type { ReactNode } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { StructuredData } from '@/components/home/structured-data';
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
+
+const docsOrigin = getDocsSiteOrigin();
 
 const title = 'lomi.';
 const description =
@@ -75,17 +77,17 @@ export const metadata: Metadata = {
     'paiement sans friction',
     'paiement sécurisé',
   ],
-  metadataBase: new URL('https://lomi.africa'),
+  metadataBase: new URL(`${docsOrigin}/`),
   verification: {
     google: 'fD_UOOSaZDjO5rdngNSUYtYQK-sfA5DhMyiUNW7GyAs',
   },
   robots: 'index, follow',
   authors: [{ name: 'Babacar Diop', url: 'https://github.com/lomiafrica/' }],
   alternates: {
-    canonical: 'https://lomi.africa',
+    canonical: docsOrigin,
     languages: {
-      en: 'https://lomi.africa',
-      'x-default': 'https://lomi.africa',
+      en: docsOrigin,
+      'x-default': docsOrigin,
     },
   },
   icons: [
@@ -100,7 +102,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    url: 'https://lomi.africa/',
+    url: `${docsOrigin}/`,
     title,
     description,
     siteName: 'lomi.',
@@ -160,9 +162,6 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${font.variable}`} suppressHydrationWarning>
-      <head>
-        <StructuredData />
-      </head>
       <Body>
         <Provider>{children}</Provider>
         <Analytics />

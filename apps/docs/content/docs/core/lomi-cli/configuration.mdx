@@ -17,7 +17,7 @@ Create a `lomi.config.json` in your project root for project-level CLI behavior 
   "webhook": {
     "url": "https://your-domain.com/webhook",
     "secret": "your_webhook_secret", // Note: Secrets here are often managed separately
-    "events": ["payment.success", "payment.failed"]
+    "events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"]
   },
   "dev": {
     "port": 3000,
@@ -136,7 +136,7 @@ Configuring the **lomi.** tools involves two distinct but related parts:
 
 ## CLI authentication (global via `lomi. login`)\*\*
 
-Most **lomi. CLI** commands (like `payments`, `webhook`, `status`, `dev`) need permission to interact with the **lomi. API**. This authentication is managed globally using the [`lomi. login`](/docs/core/lomi-cli/auth) command.
+Most **lomi. CLI** commands (like `payments`, `webhook`, `status`, `dev`) need permission to interact with the **lomi. API**. This authentication is managed globally using the [`lomi. login`](/core/lomi-cli/auth) command.
 
 ```bash filename="Terminal"
 lomi. login
@@ -169,7 +169,7 @@ This command checks for the stored **CLI Token** and attempts to connect to the 
 
 ## Project configuration (SDK Keys via `lomi. init` and `.env`)\*\*
 
-When you initialize a project using [`lomi. init`](/docs/core/lomi-cli/init), it sets up configuration specifically for the **lomi. Node.js SDK** to use _within your application code_.
+When you initialize a project using [`lomi. init`](/core/lomi-cli/init), it sets up configuration specifically for the **lomi. Node.js SDK** to use _within your application code_.
 
 ```bash filename="Terminal"
 lomi. init
@@ -204,6 +204,6 @@ Ensure your application code loads these variables (e.g., using `dotenv` or simi
 
 ## Next steps\*\*
 
-- Learn about [Webhook development](/docs/core/advanced-guides/handling-webhooks)
-- Explore our [Testing Guide](/docs/core/advanced-guides/testing)
-- Set up [CI/CD Integration](/docs/core/advanced-guides/ci-cd)
+- Learn about [Webhook development](/core/advanced-guides/handling-webhooks)
+- Explore our [Testing Guide](/core/advanced-guides/testing)
+- Set up [CI/CD Integration](/core/advanced-guides/ci-cd)

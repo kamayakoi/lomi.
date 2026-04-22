@@ -11,7 +11,7 @@ There are many ways to contribute:
 
 - **Reporting bugs**: If you find a bug, please report it on [GitHub Issues](https://github.com/lomiafrica/lomi./issues).
 - **Suggesting enhancements**: Have an idea for a new feature or improvement? Share it via [GitHub Issues](https://github.com/lomiafrica/lomi./issues).
-- **Writing code**: Contribute directly to the codebase by fixing bugs or implementing new features. See the [Best practices](/docs/core/contributing/best-practices) guide.
+- **Writing code**: Contribute directly to the codebase by fixing bugs or implementing new features. See the [Best practices](/core/contributing/best-practices) guide.
 - **Improving the docs**: Help us make our documentation clearer and more comprehensive.
 - **Community support**: Answer questions and help other users in the [Discord community](https://discord.gg/33syDfh9).
 
@@ -19,9 +19,9 @@ There are many ways to contribute:
 
 Before you start, please familiarize yourself with these important documents:
 
-- **[Code of Conduct](/docs/core/contributing/code-of-conduct)**: Our expectations for behavior within the community.
-- **[Best practices](/docs/core/contributing/best-practices)**: Detailed steps for contributing code and documentation.
-- **[Branching strategy](/docs/core/contributing/branching-strategy)**: How we manage branches for development and releases.
+- **[Code of Conduct](/core/contributing/code-of-conduct)**: Our expectations for behavior within the community.
+- **[Best practices](/core/contributing/best-practices)**: Detailed steps for contributing code and documentation.
+- **[Branching strategy](/core/contributing/branching-strategy)**: How we manage branches for development and releases.
 
 We appreciate your interest and look forward to hearing from you!
 
@@ -123,7 +123,7 @@ bun run lint:fix
 
 ### Create a branch
 
-Before making changes, create a new branch based on the `develop` branch. Follow our [Branching strategy](/docs/core/contributing/branching-strategy) for naming conventions.
+Before making changes, create a new branch based on the `develop` branch. Follow our [Branching strategy](/core/contributing/branching-strategy) for naming conventions.
 
 ```bash filename="Terminal"
 # Fetch the latest changes from upstream
@@ -145,7 +145,7 @@ git checkout -b <BRANCH_TYPE>/<SHORT_DESCRIPTION>
 
 Now you can start making your code or documentation changes within the appropriate package or app in the `packages/` or `apps/` directory.
 
-- **Code changes**: Write your code, ensuring it adheres to our [Code standards](/docs/core/contributing/best-practices#code-standards) and [Best practices](/docs/core/contributing/best-practices).
+- **Code changes**: Write your code, ensuring it adheres to our [Code standards](/core/contributing/best-practices#code-standards) and [Best practices](/core/contributing/best-practices).
 - **Documentation changes**: Update or add documentation in the relevant `apps/developers/src/pages/docs/` directory. Use Markdown (`.mdx`).
 
 **Keep your branch updated:**
@@ -184,11 +184,11 @@ bun test
 bun run test:coverage
 ```
 
-Write tests for your changes. See the [Code standards](/docs/core/contributing/best-practices#code-standards) section for an example.
+Write tests for your changes. See the [Code standards](/core/contributing/best-practices#code-standards) section for an example.
 
 ### Commit your changes
 
-Commit your changes using a descriptive message that follows our [Commit message guidelines](/docs/core/contributing/branching-strategy#commit-messages). Adhering to the format helps automate releases and changelogs.
+Commit your changes using a descriptive message that follows our [Commit message guidelines](/core/contributing/branching-strategy). Adhering to the format helps automate releases and changelogs.
 
 **Commit message format:**
 
@@ -208,7 +208,7 @@ git add .
 git commit -m "feat(payments): implement new payment provider"
 ```
 
-See [Best practices](/docs/core/contributing/best-practices#best-practices) for good vs. bad commit message examples.
+See [Best practices](/core/contributing/best-practices) for good vs. bad commit message examples.
 
 ### Push your changes
 
@@ -258,10 +258,10 @@ Your PR will be reviewed by maintainers.
 
 ## Next steps
 
-- Familiarize yourself with our [Code of conduct](/docs/core/contributing/code-of-conduct).
-- Understand our [Branching strategy](/docs/core/contributing/branching-strategy).
-- Learn about the [Code review](/docs/core/contributing/code-reviews) process in more detail.
+- Familiarize yourself with our [Code of conduct](/core/contributing/code-of-conduct).
+- Understand our [Branching strategy](/core/contributing/branching-strategy).
+- Learn about the [Code review](/core/contributing/code-reviews) process in more detail.
 
-Your PR will be reviewed by maintainers according to our [Code Review](/docs/core/contributing/code-reviews) process. Be prepared to respond to feedback and make further changes if necessary. We'll be fast to respond to you, don't you worry!
+Your PR will be reviewed by maintainers according to our [Code Review](/core/contributing/code-reviews) process. Be prepared to respond to feedback and make further changes if necessary. We'll be fast to respond to you, don't you worry!
 
 Thank you so much.

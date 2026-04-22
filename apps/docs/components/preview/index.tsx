@@ -20,7 +20,6 @@ import {
   ImageZoom,
   InlineTOC,
 } from '@/components/preview/lazy';
-import BannerImage from '@/public/banner.webp';
 
 export function heading(): ReactNode {
   return (
@@ -102,8 +101,8 @@ export function zoomImage(): ReactNode {
   return (
     <Wrapper>
       <ImageZoom
-        alt="banner"
-        src={BannerImage}
+        alt="lomi."
+        src="/lomi_d.webp"
         className="my-0! rounded-sm bg-fd-background"
         priority
       />
@@ -211,12 +210,12 @@ export function rootToggle(): ReactNode {
             {
               title: 'Hello World',
               description: 'The example item of root toggle',
-              url: '/docs/ui',
+              url: '/ui',
             },
             {
               title: 'Other page',
               description: 'The example item of root toggle',
-              url: '/docs/headless',
+              url: '/headless',
             },
           ]}
         />

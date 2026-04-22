@@ -50,7 +50,7 @@ Initiate a payout to a beneficiary (contractor, supplier, employee).
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `amount` | number | Yes | Amount to pay beneficiary |
-| `currency_code` | string | Yes | Currency (XOF, USD, EUR, GBP) |
+| `currency_code` | string | Yes | Currency (XOF, USD, EUR) |
 | `payout_method_id` | UUID | No | Beneficiary's payout method |
 | `provider_code` | string | No | Provider (WAVE, SPI) - default: WAVE |
 | `payment_method_code` | string | No | Method (MOBILE_MONEY, BANK_TRANSFER) - default: MOBILE_MONEY |
@@ -104,7 +104,7 @@ Retrieve all beneficiary payouts with optional filtering.
 | `statuses` | string | No | Comma-separated: `pending,completed,failed` |
 | `startDate` | string | No | Filter by start date (ISO 8601) |
 | `endDate` | string | No | Filter by end date (ISO 8601) |
-| `currencyCode` | string | No | Filter by currency (XOF, USD, EUR, GBP) |
+| `currencyCode` | string | No | Filter by currency (XOF, USD, EUR) |
 | `limit` | integer | No | Results per page (default: 50) |
 | `offset` | integer | No | Pagination offset (default: 0) |
 

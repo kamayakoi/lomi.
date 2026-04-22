@@ -13,7 +13,7 @@ https://api.lomi.africa
 
 ## Authentication
 
-API requests to manage webhooks require authentication using an API key in the `` `X-API-Key` `` header. See [Authentication](/docs/reference/setup/authentication).
+API requests to manage webhooks require authentication using an API key in the `` `X-API-Key` `` header. See [Authentication](/reference/setup/authentication).
 
 ```http filename="Terminal"
 X-API-Key: your_api_key
@@ -27,7 +27,7 @@ To ensure the security and integrity of webhook events, lomi. signs each request
 2.  **Webhook Secret:** When you create a webhook endpoint via the API, a `` `secret` `` (prefixed with `` `whsec_` ``) is returned. **Store this secret securely, as it will not be shown again.**
 3.  **Verification:** Your endpoint should verify the signature by computing an `` `HMAC-SHA256` `` hash of the raw request body using the webhook secret and comparing it to the signature provided in the header.
 
-Refer to the [Webhook Signature Verification](/docs/core/advanced-guides/handling-webhooks) guide for detailed implementation examples in various languages.
+Refer to the [Webhook Signature Verification](/core/advanced-guides/handling-webhooks) guide for detailed implementation examples in various languages.
 
 ## Webhook events
 
@@ -47,6 +47,10 @@ When creating or updating a webhook, you subscribe it to specific event types. l
 | `` `test.webhook` ``            | A test event generated via the API.         | `` `TestPayload` ``     |
 
 _(Note: The specific structure of the data payload for each event type will be documented under the respective API resource, e.g., Transactions, Subscriptions.)_
+
+Webhook subscriptions and JSON payloads use **SCREAMING_SNAKE_CASE** event names (for example `PAYMENT_SUCCEEDED`). Some docs or OpenAPI tooling may show **dotted** names (for example `payment.succeeded`) as a human-readable alias for the same logical event—use the enum values above when configuring endpoints and when comparing `event` in request bodies.
+
+For operations guidance (retries, idempotency, delivery logs), see [Webhook reliability](/core/advanced-guides/webhook-reliability).
 
 ## API endpoints
 

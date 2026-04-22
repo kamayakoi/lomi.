@@ -10,8 +10,12 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 lomi. provides two types of API keys for each environment:
 
-- **Secret Keys (`sk_...`)**: Full access, server-side only. **Never share these.**
-- **Publishable Keys (`pk_...`)**: Limited access, safe for client-side use.
+- **Secret Keys** (`lomi_sk_test_…` / `lomi_sk_live_…`): Full access, server-side only. **Never share these.**
+- **Publishable Keys** (`pk_…` where applicable): Limited access, safe for client-side use only when documented for your integration.
+
+<Callout type="info">
+  Older examples may show `sk_test_` / `sk_live_` prefixes. Current keys issued by the dashboard follow **`lomi_sk_test_`** and **`lomi_sk_live_`** as in [Authentication](/reference/setup/authentication).
+</Callout>
 
 ## Managing environment variables
 
@@ -19,7 +23,7 @@ Set these in your `.env` file or deployment configuration:
 
 ```bash
 # Required: Your secret key
-LOMI_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
 
 # Required: Your webhook secret
 LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx

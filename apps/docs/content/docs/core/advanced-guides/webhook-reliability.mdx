@@ -1,0 +1,40 @@
+---
+title: Webhook reliability
+description: Retries, idempotency, delivery logs, and safe handling of duplicate events.
+---
+
+Production integrations must assume **at-least-once** delivery: the same logical event may arrive more than once. This guide complements [Handling webhooks](/core/advanced-guides/handling-webhooks) with operational behavior.
+
+## Respond quickly, process async
+
+Return **2xx** promptly after you validate the signature and persist enough to acknowledge receipt. Heavy work should run in a background queue so lomi. does not time out waiting on your handler.
+
+## Idempotent processing
+
+Use a stable **event id** (or payload hash + type + resource id) to detect duplicates:
+
+- If you have already applied the event, **skip** or **no-op** safely.
+- Never assume “exactly once” without storing processed ids.
+
+This matches server-side patterns where transaction updates **merge metadata** and balance updates check **already processed** flags.
+
+## Retries and delivery logs
+
+lomi. records delivery attempts in **webhook delivery logs** (see [Webhook delivery logs](/reference/platform/webhook-delivery-logs)). Use them to:
+
+- confirm whether your endpoint returned non-2xx
+- inspect latency and payload size
+- debug signature or parsing issues
+
+## Signature verification
+
+Verify using the **raw request body** bytes. Re-serialized JSON can break HMAC or similar schemes. Details: [Handling webhooks](/core/advanced-guides/handling-webhooks) and [API integration](/reference/setup/integration).
+
+## Test vs live
+
+Webhook endpoints and secrets are **environment-specific**. Promote configurations carefully so test URLs and secrets never receive live traffic.
+
+## Related API reference
+
+- [Webhooks API](/reference/payments/webhooks)
+- [Payment state machine](/reference/reference/payment-state-machine)

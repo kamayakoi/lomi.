@@ -1,10 +1,12 @@
 /* @proprietary license */
 
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 
 export const revalidate = false;
 
 export async function GET() {
+  const docsOrigin = getDocsSiteOrigin();
   const lines: string[] = [];
 
   // H1 Heading (Required) - Name of the project
@@ -84,7 +86,7 @@ export async function GET() {
     const list = docsMap.get(category) ?? [];
     list.push({
       title: page.data.title ?? 'lomi.',
-      url: `https://lomi.africa${page.url}`,
+      url: `${docsOrigin}${page.url}`,
       description: page.data.description,
     });
     docsMap.set(category, list);
@@ -133,7 +135,7 @@ export async function GET() {
   lines.push('## Contact & Support');
   lines.push('');
   lines.push('- Website: https://lomi.africa');
-  lines.push('- Documentation: https://lomi.africa/docs');
+  lines.push(`- Documentation: ${docsOrigin}`);
   lines.push('- Email: hello@lomi.africa');
   lines.push('- GitHub: https://github.com/lomiafrica/lomi./');
   lines.push('- Discord: https://discord.gg/33syDfh9');
@@ -155,7 +157,7 @@ export async function GET() {
   lines.push('');
   lines.push('**Q: How do I integrate lomi. with my app?**');
   lines.push(
-    'A: Use our REST API or official SDKs for JavaScript/Next.js, Python, Go, and PHP. Documentation is available at https://lomi.africa/docs',
+    `A: Use our REST API or official SDKs for JavaScript/Next.js, Python, Go, and PHP. Documentation is available at ${docsOrigin}`,
   );
   lines.push('');
   lines.push('**Q: How secure is lomi.?**');

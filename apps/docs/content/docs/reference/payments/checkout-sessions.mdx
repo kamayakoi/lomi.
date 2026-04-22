@@ -9,6 +9,10 @@ import { Callout } from 'fumadocs-ui/components/callout';
 The Checkout Sessions API allows you to create secure, temporary sessions for customer payments. Redirect your customer to the lomi. hosted checkout page to complete payment.
 
 <Callout type="info">
+  For cross-cutting rules (coupons, line items, currency, links to payment state), see **[Checkout behavior](/reference/payments/checkout-behavior)**.
+</Callout>
+
+<Callout type="info">
   Checkout sessions expire after **60 minutes** by default.
 </Callout>
 
@@ -21,7 +25,7 @@ Creates a new checkout session and returns a URL to redirect your customer to.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `amount` | `number` | No* | Amount to charge. Optional if `product_id` is provided |
-| `currency_code` | `string` | **Yes** | Currency code (`XOF`, `USD`, `EUR`, `GBP`) |
+| `currency_code` | `string` | **Yes** | Currency code (`XOF`, `USD`, `EUR`) |
 | `title` | `string` | No | Title shown on checkout page |
 | `description` | `string` | No | Description of the purchase |
 | `customer_id` | `string` | No | Existing customer ID |
@@ -156,7 +160,7 @@ Retrieve all checkout sessions with optional filtering.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `status` | `string` | Filter by status: `open`, `complete`, `expired` |
+| `status` | `string` | Filter by status: `open`, `completed`, `expired` (matches `checkout_session_status` in the database) |
 | `limit` | `number` | Results per page (default: `20`) |
 | `offset` | `number` | Pagination offset (default: `0`) |
 
@@ -225,7 +229,7 @@ curl -X GET "https://api.lomi.africa/checkout-sessions/cs_abc123..." \
 |-------|------|-------------|
 | `id` | `string` | Unique session identifier |
 | `checkout_url` | `string` | URL to redirect customer to |
-| `status` | `string` | `open`, `complete`, `expired` |
+| `status` | `string` | `open`, `completed`, `expired` |
 | `amount` | `number` | Amount to charge |
 | `currency_code` | `string` | Currency code |
 | `title` | `string` | Session title |
@@ -242,12 +246,20 @@ curl -X GET "https://api.lomi.africa/checkout-sessions/cs_abc123..." \
 
 ## Webhooks
 
-Subscribe to these events to track checkout status:
+There are **two different “webhook” layers** in the API codebase:
 
-| Event | Description |
-|-------|-------------|
-| `checkout.session.completed` | Payment successful, transaction created |
-| `checkout.session.expired` | Session expired without payment |
+1. **Inbound provider webhooks** (lomi. receives these): Wave and Stripe-style handlers use **Stripe-like event type strings** in the JSON body, for example `checkout.session.completed`, `checkout.session.payment_failed`, and `checkout.session.expired`. Those routes live under **OpenAPI → Webhooks - Providers** (e.g. `` `POST /webhooks/wave` ``, `` `POST /webhooks/stripe` ``). They are **not** the event names you pass to `` `authorized_events` `` on your own endpoint.
+
+2. **Outbound merchant webhooks** (lomi. calls **your** URL): Subscriptions are configured with the Postgres enum **`webhook_event`**, the same set documented in [Webhooks](/reference/payments/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``), as built in `` `WebhookSenderService.prepareWebhookPayload` `` in `` `apps/api` ``.
+
+For checkout outcomes on **your** server, subscribe at minimum to:
+
+| `authorized_events` value | When it fires |
+| ------------------------- | ------------- |
+| `` `PAYMENT_SUCCEEDED` `` | Payment completed; payload `` `data` `` follows the transaction shape (see [Webhooks](/reference/payments/webhooks)). |
+| `` `PAYMENT_FAILED` `` | Payment attempt failed (including some provider failure paths). |
+
+There is **no** separate `` `checkout.session.*` `` value in the `` `webhook_event` `` enum (`apps/api/src/utils/types/api.ts` mirrors the database type). Session expiry without a successful charge is reflected on the **session** and **transaction** records (e.g. status `` `expired` ``); use `` `GET /checkout-sessions/{id}` `` or list with `` `status=expired` `` / `` `completed` `` rather than expecting a merchant webhook named like `checkout.session.expired`.
 
 ---
 

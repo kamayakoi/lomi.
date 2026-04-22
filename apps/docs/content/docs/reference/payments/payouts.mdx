@@ -8,6 +8,10 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 The Payouts API allows you to withdraw funds from your merchant account balance to your bank account or mobile money.
 
+<Callout type="info">
+  For status progression, fees, and completion semantics, read **[Payout lifecycle](/reference/payments/payout-lifecycle)**.
+</Callout>
+
 <Callout type="warning">
   Payouts are processed asynchronously. Use webhooks to track status (`payout.completed` or `payout.failed`).
 </Callout>

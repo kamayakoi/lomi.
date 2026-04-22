@@ -1,17 +1,37 @@
-import { type Registry } from '@fumadocs/cli/build';
-import { fileURLToPath } from 'node:url';
+/* @proprietary license */
+
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const baseDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../');
-
-function selectFrom(r: Registry, component: string, filename: string) {
-  const comp = r.components.find((comp) => comp.name === component)!;
-
-  return {
-    component: comp,
-    file: comp.files.find((file) => path.basename(file.path) === filename)!,
-  };
+export interface RegistryFile {
+  type: string;
+  path: string;
 }
+
+export interface RegistryComponent {
+  name: string;
+  title?: string;
+  description?: string;
+  files: RegistryFile[];
+}
+
+export interface Registry {
+  dir: string;
+  name: string;
+  packageJson: string;
+  tsconfigPath: string;
+  onUnknownFile(absolutePath: string):
+    | undefined
+    | {
+        type: string;
+        path: string;
+      };
+  onResolve(ref: unknown): unknown;
+  components: RegistryComponent[];
+  dependencies: Record<string, string | null>;
+}
+
+const baseDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export const registry: Registry = {
   dir: baseDir,
@@ -21,16 +41,10 @@ export const registry: Registry = {
   onUnknownFile(absolutePath) {
     const filePath = path.relative(baseDir, absolutePath);
 
-    // source object is external
     if (filePath === 'lib/source.ts') return undefined;
-
-    // ignore all node_modules files (including type definitions)
     if (absolutePath.includes('node_modules')) return undefined;
-
-    // ignore TypeScript declaration files anywhere
     if (absolutePath.endsWith('.d.ts')) return undefined;
 
-    // allow specific lib files that are used by components
     if (filePath === 'lib/cn.ts') {
       return {
         type: 'lib',
@@ -38,14 +52,11 @@ export const registry: Registry = {
       };
     }
 
-    // ignore other internal lib files
     if (filePath.startsWith('lib/')) return undefined;
 
-    // for any other unknown files, return undefined to ignore them
     return undefined;
   },
   onResolve(ref) {
-    // No external UI registry to resolve from
     return ref;
   },
   components: [

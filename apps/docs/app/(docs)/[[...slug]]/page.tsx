@@ -1,13 +1,13 @@
 /* @proprietary license */
 
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { type ComponentProps, type FC, type ReactNode, type JSX } from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
-import { createMetadata } from '@/lib/utils/metadata';
+import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/preview/mermaid';
@@ -22,13 +22,23 @@ import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import { createGenerator } from 'fumadocs-typescript';
 import { getPageTreePeers } from 'fumadocs-core/page-tree';
 import { Card, Cards } from 'fumadocs-ui/components/card';
-// import { APIPage } from 'fumadocs-openapi/ui';
 import { LLMCopyButton, ViewOptions } from '@/components/preview/page-actions';
 import * as path from 'node:path';
 import { Banner } from 'fumadocs-ui/components/banner';
 import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
 import { DocsPage } from 'fumadocs-ui/page';
+
+const DEFAULT_DOC_SLUG = [
+  'core',
+  'introduction',
+  'what-is-lomi',
+] as const;
+
+function effectiveSlug(slug: string[] | undefined): string[] {
+  if (slug && slug.length > 0) return slug;
+  return [...DEFAULT_DOC_SLUG];
+}
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
@@ -49,13 +59,8 @@ export default async function Page({
   params: Promise<{ slug?: string[] }>;
 }) {
   const resolvedParams = await params;
-
-  // Redirect to default page if slug is empty
-  if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
-    redirect('/docs/core/introduction/what-is-lomi');
-  }
-
-  const page = source.getPage(resolvedParams.slug);
+  const slug = effectiveSlug(resolvedParams.slug);
+  const page = source.getPage(slug);
 
   if (!page) notFound();
 
@@ -128,7 +133,6 @@ export default async function Page({
             ),
             Wrapper,
             blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
-            // APIPage: (props: any): JSX.Element => <APIPage {...props} />,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             DocsCategory: ({ url }: any): JSX.Element => {
               return <DocsCategory url={url ?? page.url} />;
@@ -164,26 +168,32 @@ export async function generateMetadata({
   params: Promise<{ slug?: string[] }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
-  const page = source.getPage(resolvedParams.slug);
+  const slug = effectiveSlug(resolvedParams.slug);
+  const page = source.getPage(slug);
   if (!page) notFound();
 
   const description =
     page.data.description ?? 'The library for building documentation sites';
 
+  const origin = getDocsSiteOrigin();
+  const ogPath = [...page.slugs, 'image.png'].join('/');
   const image = {
-    url: ['/og', ...(resolvedParams.slug || []), 'image.png'].join('/'),
+    url: `${origin}/og/${ogPath}`,
     width: 1200,
     height: 630,
   };
+
+  const canonicalPath = page.url.startsWith('/') ? page.url : `/${page.url}`;
+  const canonical = `${origin}${canonicalPath}`;
 
   return createMetadata({
     title: page.data.title,
     description,
     alternates: {
-      canonical: `https://lomi.africa/docs/${page.slugs.join('/')}`,
+      canonical,
     },
     openGraph: {
-      url: `/docs/${page.slugs.join('/')}`,
+      url: canonicalPath,
       images: [image],
     },
     twitter: {
@@ -193,5 +203,8 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  return source.generateParams();
+  const params = source.generateParams();
+  const list = (Array.isArray(params) ? params : []) as { slug?: string[] }[];
+  const withoutEmpty = list.filter((p) => (p.slug?.length ?? 0) > 0);
+  return [{ slug: [] }, ...withoutEmpty];
 }

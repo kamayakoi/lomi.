@@ -6,10 +6,10 @@ description: Manage recurring customer subscriptions.
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The Subscriptions API provides read access to customer subscriptions. Subscriptions are automatically created when customers purchase recurring products through Checkout Sessions or Payment Links.
+The Subscriptions API lists and retrieves **subscription instances** (a customer on a recurring plan). These are typically created when customers buy recurring products through Checkout Sessions or Payment Links.
 
 <Callout type="info">
-  Subscriptions are **system-managed**. You can only cancel subscriptions—price, billing dates, and other fields cannot be modified.
+  SDKs may expose both **`/subscriptions`** helpers and dedicated **`/customer-subscriptions`** methods. For route-specific examples and status transitions, see **[Customer subscriptions](/reference/platform/customer-subscriptions)**. Immutable fields and cancel-only rules follow the generated OpenAPI descriptions for each operation.
 </Callout>
 
 ## List subscriptions

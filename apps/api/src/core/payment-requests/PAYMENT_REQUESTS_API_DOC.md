@@ -48,7 +48,7 @@ Create a new payment request.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `amount` | number | Yes | Amount to request |
-| `currency_code` | string | Yes | Currency (XOF, USD, EUR, GBP) |
+| `currency_code` | string | Yes | Currency (XOF, USD, EUR) |
 | `description` | string | No | Description of the payment request |
 | `customer_id` | UUID | No | Customer ID (if linked to a customer) |
 | `expiry_date` | string | Yes | Expiration date/time (ISO 8601) |

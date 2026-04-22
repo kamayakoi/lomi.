@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 // import { cn } from '@/lib/cn';
 // import { buttonVariants } from '@/components/ui/button';
 import 'katex/dist/katex.min.css';
+import { TryItOpenApiPanel } from '@/components/docs/try-it-openapi-panel';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const base = baseOptions();
@@ -79,6 +80,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         },
       }}
     >
+      <TryItOpenApiPanel />
       {children}
     </DocsLayout>
   );

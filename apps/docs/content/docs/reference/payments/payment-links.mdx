@@ -8,6 +8,8 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 The Payment Links API allows you to create reusable, shareable links for accepting payments. Links can be tied to a product or have a custom amount.
 
+End-to-end checkout rules (currency, coupons, sessions): **[Checkout behavior](/reference/payments/checkout-behavior)**.
+
 ## Link Types
 
 | Type | Description |
@@ -23,7 +25,7 @@ The Payment Links API allows you to create reusable, shareable links for accepti
 |-------|------|----------|-------------|
 | `link_type` | `string` | **Yes** | `product` or `instant` |
 | `title` | `string` | **Yes** | Link title |
-| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, etc.) |
+| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, `EUR`) |
 | `description` | `string` | No | Link description |
 | `amount` | `number` | Instant only | Amount for instant links |
 | `product_id` | `string` | Product only | Product ID for product links |

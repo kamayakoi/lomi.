@@ -1,13 +1,56 @@
 /* @proprietary license */
 
-import { RegistryCompiler, writeFumadocsRegistry } from '@fumadocs/cli/build';
-import { registry } from '@/components/preview/registry.mjs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
+import { registry } from '@/components/preview/registry';
 
-export async function buildRegistry() {
-  const compiler = new RegistryCompiler(registry);
-  const mainRegistry = await compiler.compile();
+function resolveSourceFile(baseDir: string, rel: string): string {
+  return path.normalize(path.join(baseDir, rel));
+}
 
-  await writeFumadocsRegistry(mainRegistry, {
-    dir: 'public/registry',
-  });
+export async function buildRegistry(): Promise<void> {
+  const outDir = path.join(process.cwd(), 'public/registry');
+  await mkdir(outDir, { recursive: true });
+
+  const indexes: { name: string; title?: string; description?: string }[] =
+    [];
+
+  for (const comp of registry.components) {
+    indexes.push({
+      name: comp.name,
+      ...(comp.title ? { title: comp.title } : {}),
+      ...(comp.description ? { description: comp.description } : {}),
+    });
+
+    const files = [];
+    for (const f of comp.files) {
+      const abs = resolveSourceFile(registry.dir, f.path);
+      const content = await readFile(abs);
+      files.push({
+        content: content.toString('utf8'),
+        type: f.type,
+        path: f.path,
+      });
+    }
+
+    const payload = {
+      name: comp.name,
+      ...(comp.title ? { title: comp.title } : {}),
+      ...(comp.description ? { description: comp.description } : {}),
+      files,
+      subComponents: [] as unknown[],
+      dependencies: registry.dependencies,
+      devDependencies: {},
+    };
+
+    const jsonRel = `${comp.name}.json`;
+    const jsonPath = path.join(outDir, jsonRel);
+    await mkdir(path.dirname(jsonPath), { recursive: true });
+    await writeFile(jsonPath, `${JSON.stringify(payload, null, 2)}\n`);
+  }
+
+  await writeFile(
+    path.join(outDir, '_registry.json'),
+    `${JSON.stringify({ indexes }, null, 2)}\n`,
+  );
 }

@@ -3,7 +3,9 @@ title: 'Handling webhooks'
 description: 'Webhooks provide real-time updates about events in your lomi. account. This guide explains how to securely receive and process these notifications.'
 ---
 
-For a general introduction and setup guide, see [Setting up webhooks](/docs/core/fundamentals/setup-webhooks).
+For a general introduction and setup guide, see [Setting up webhooks](/core/fundamentals/webhooks).
+
+Operational behavior (retries, duplicate events, delivery logs): [Webhook reliability](/core/advanced-guides/webhook-reliability).
 
 ## Setup summary
 
@@ -255,7 +257,7 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 ## Testing webhooks
 
-Refer to the [Testing guide](/docs/core/advanced-guides/testing) for details on using the lomi. Dashboard or CLI to send test events to your local endpoint.
+Refer to the [Testing guide](/core/advanced-guides/testing) for details on using the lomi. Dashboard or CLI to send test events to your local endpoint.
 
 ## Monitoring
 
@@ -263,6 +265,6 @@ Use the lomi. Dashboard (**Developers -> Webhooks**) to monitor delivery attempt
 
 ## Next steps
 
-- [Security best practices](/docs/core/advanced-guides/security-best-practices)
-- [Error handling](/docs/core/advanced-guides/error-handling)
-- [API Reference](/docs/reference)
+- [Security best practices](/core/advanced-guides/security-best-practices)
+- [Error handling](/core/advanced-guides/error-handling)
+- [API Reference](/reference/setup/overview)

@@ -1,7 +1,9 @@
 ---
-title: 'Authentification'
-description: "All lomi. requests are authentified using API keys. Any request that doesn't include a valid API key will return an authentication error."
+title: 'Authentication'
+description: "All lomi. requests are authenticated using API keys. Any request that doesn't include a valid API key will return an authentication error."
 ---
+
+For a guided path from your first `curl` to the OpenAPI pages, SDKs, and webhook caveats, see **[API integration](/reference/setup/integration)**.
 
 There are two types of API keys corresponding to lomi.'s two environments: Test and Live.
 
@@ -12,10 +14,12 @@ All API requests must be made over HTTPS. Requests made over plain HTTP will fai
 You must include an API key in the `` `X-API-Key` `` header for every request.
 
 ```http filename="API request header"
-GET /v1/providers HTTP/1.1
+GET /accounts HTTP/1.1
 Host: api.lomi.africa
 X-API-Key: your_api_key
 ```
+
+HTTP header names are case-insensitive; clients may send `` `X-API-Key` `` or `` `X-API-KEY` ``.
 
 Replace `your_api_key` with your specific secret API key.
 

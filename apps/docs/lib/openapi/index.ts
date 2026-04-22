@@ -1,9 +1,9 @@
 /* @proprietary license */
 
 import { createOpenAPI } from 'fumadocs-openapi/server';
-import path from 'node:path';
 
+/** Relative to `apps/docs` cwd so generated MDX `document=` keys stay portable. */
 export const openapi = createOpenAPI({
-  input: [path.resolve('./scalar.yaml')],
+  input: ['./openapi.json'],
   proxyUrl: '/api/proxy',
 });

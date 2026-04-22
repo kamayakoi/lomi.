@@ -16,7 +16,7 @@ A checkout session is a temporary, hosted payment page that:
 - ✅ **Create Checkout Session** - Generate hosted payment pages
 - ✅ **List Checkout Sessions** - View all sessions with filtering
 - ✅ **Get Checkout Session** - Fetch specific session details
-- ✅ **Status Filtering** - Filter by open, complete, or expired
+- ✅ **Status Filtering** - Filter by open, completed, or expired
 - ✅ **Pagination** - Handle large lists efficiently
 - ❌ **Update Session** - Not available (sessions are immutable)
 - ❌ **Delete Session** - Not available (sessions expire automatically)
@@ -111,7 +111,7 @@ GET /checkout-sessions
 Retrieves all checkout sessions for your organization with pagination and filtering.
 
 **Query Parameters:**
-- `status` (optional): Filter by session status (`open`, `complete`, `expired`)
+- `status` (optional): Filter by session status (`open`, `completed`, `expired`)
 - `limit` (optional): Number of results to return (default: 20)
 - `offset` (optional): Offset for pagination (default: 0)
 
@@ -123,7 +123,7 @@ Retrieves all checkout sessions for your organization with pagination and filter
     "organization_id": "789e0123-e89b-12d3-a456-426614174000",
     "amount": 10000.0,
     "currency_code": "XOF",
-    "status": "complete",
+    "status": "completed",
     "title": "Premium Subscription",
     "description": "Monthly subscription to premium features",
     "customer_id": "123e4567-e89b-12d3-a456-426614174000",
@@ -204,7 +204,7 @@ curl -H "x-api-key: your-api-key" https://api.lomi.africa/checkout-sessions
 ### open
 The session is active and awaiting payment. The checkout page is accessible to the customer.
 
-### complete
+### completed
 The customer completed the payment successfully. The transaction has been processed.
 
 ### expired
@@ -467,7 +467,7 @@ def get_checkout_session(session_id):
 
 ### Monitoring
 
-1. **Track Conversion**: Monitor open → complete conversion rate
+1. **Track Conversion**: Monitor open → completed conversion rate
 2. **Identify Dropoffs**: High expiration rate may indicate UX issues
 3. **Analyze Cancellations**: Understand why customers cancel
 4. **Set Up Alerts**: Get notified of failed session creations
@@ -550,12 +550,11 @@ const session = await api.checkoutSessions.create({
 
 ## Webhooks
 
-After a checkout session is completed, you'll receive webhook events:
+**Merchant webhooks** (URLs you register on `GET/POST /webhooks`) use the `webhook_event` enum (for example `PAYMENT_SUCCEEDED`, `PAYMENT_FAILED`). After a successful checkout, lomi. typically emits **`PAYMENT_SUCCEEDED`** with transaction payload data—see `WebhookSenderService` in the API repo.
 
-- `checkout.session.completed`: Payment successful
-- `checkout.session.expired`: Session expired without payment
+**Provider ingress** (e.g. `POST /webhooks/wave`) uses Stripe-style type strings such as `checkout.session.completed` internally; those are **not** valid values for `authorized_events` on your endpoint.
 
-Use webhooks to fulfill orders, activate subscriptions, or send confirmation emails.
+Use **`PAYMENT_SUCCEEDED`** / **`PAYMENT_FAILED`** to react to payment outcomes; poll **`GET /checkout-sessions/{id}`** or filter by `status` for session lifecycle (`open`, `completed`, `expired`).
 
 ---
 

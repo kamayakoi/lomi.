@@ -47,7 +47,7 @@ Initiate a withdrawal from your account balance.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `amount` | number | Yes | Amount to withdraw |
-| `currency_code` | string | Yes | Currency (XOF, USD, EUR, GBP) |
+| `currency_code` | string | Yes | Currency (XOF, USD, EUR) |
 | `payout_method_id` | UUID | Yes | Payout method ID (bank or mobile money) |
 | `provider_code` | string | No | Provider (WAVE, SPI, STRIPE) |
 | `metadata` | object | No | Additional metadata |

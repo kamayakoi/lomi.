@@ -1,0 +1,17 @@
+{
+  "indexes": [
+    {
+      "name": "graph-view",
+      "description": "A graph to display relationships of all pages"
+    },
+    {
+      "name": "mdx/page-actions",
+      "title": "AI Page Actions",
+      "description": "Common page actions for AI"
+    },
+    {
+      "name": "og/mono",
+      "description": "Open graph image generation (mono-style)"
+    }
+  ]
+}

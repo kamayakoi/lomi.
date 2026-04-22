@@ -4,13 +4,17 @@
     "payment-links",
     "payment-requests",
     "checkout-sessions",
+    "checkout-behavior",
     "charges",
     "transactions",
     "refunds",
     "payouts",
+    "payout-lifecycle",
     "beneficiary-payouts",
     "subscriptions",
+    "bnpl",
     "discount-coupons",
+    "coupon-logic-examples",
     "lomi-payment-elements",
     "webhooks"
   ]

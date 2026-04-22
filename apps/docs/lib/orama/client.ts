@@ -1,45 +1,51 @@
 /* @proprietary license */
 
-import { OramaClient } from '@oramacloud/client';
+import { OramaCloud } from '@orama/core';
 
-const apiKey = process.env.NEXT_PUBLIC_ORAMA_API_KEY;
-const endpoint = process.env.NEXT_PUBLIC_ORAMA_ENDPOINT;
+const publicApiKey = process.env.NEXT_PUBLIC_ORAMA_API_KEY;
+const publicProjectId = process.env.NEXT_PUBLIC_ORAMA_PROJECT_ID;
 
-// Validate environment variables
-const isConfigured = !!(apiKey && endpoint);
+/** Public search client (browser): project + public API key from Orama dashboard. */
+const isSearchConfigured = !!(publicApiKey && publicProjectId);
 
-if (!isConfigured) {
+if (!isSearchConfigured) {
   if (typeof window === 'undefined') {
-    // Server-side: use console.error (won't be removed in dev)
     console.error(
-      'Orama environment variables (NEXT_PUBLIC_ORAMA_API_KEY and NEXT_PUBLIC_ORAMA_ENDPOINT) are not set.',
+      'Orama search env vars are not set: NEXT_PUBLIC_ORAMA_PROJECT_ID and NEXT_PUBLIC_ORAMA_API_KEY.',
     );
   }
-  // Client-side: errors will be handled in the component
 }
 
-/** Last path segment of `NEXT_PUBLIC_ORAMA_ENDPOINT` — used by legacy `@oramacloud/client` CloudManager indexing only. */
-export const DataSourceId = endpoint ? (endpoint.split('/').pop() ?? '') : '';
+const endpoint = process.env.NEXT_PUBLIC_ORAMA_ENDPOINT;
+
+/**
+ * Datasource / index id for CloudManager (legacy) indexing and optional search scoping.
+ * Prefer `ORAMA_DATASOURCE_ID`; fall back to last segment of legacy `NEXT_PUBLIC_ORAMA_ENDPOINT`.
+ */
+export const DataSourceId =
+  process.env.ORAMA_DATASOURCE_ID ??
+  (endpoint ? (endpoint.split('/').pop() ?? '') : '');
 
 const hasOramaCoreIndex =
   !!process.env.ORAMA_PROJECT_ID && !!process.env.ORAMA_DATASOURCE_ID;
-const hasLegacyCloudManagerIndex = !!endpoint && !!DataSourceId;
+/** Legacy REST indexing: private key + known index id (endpoint optional if id is in env). */
+const hasLegacyCloudManagerIndex = !!DataSourceId;
 
 export const isAdmin =
   !!process.env.ORAMA_PRIVATE_API_KEY &&
   (hasOramaCoreIndex || hasLegacyCloudManagerIndex);
 
-// Only create client if environment variables are configured
-// Otherwise, create a mock client that will throw helpful errors
-export const orama = isConfigured
-  ? new OramaClient({
-      endpoint: endpoint!,
-      api_key: apiKey!,
+type SearchableOrama = Pick<OramaCloud, 'search'>;
+
+export const orama: SearchableOrama = isSearchConfigured
+  ? new OramaCloud({
+      projectId: publicProjectId!,
+      apiKey: publicApiKey!,
     })
-  : ({
+  : {
       search: async () => {
         throw new Error(
-          'Orama search is not configured. Please set NEXT_PUBLIC_ORAMA_API_KEY and NEXT_PUBLIC_ORAMA_ENDPOINT environment variables.',
+          'Orama search is not configured. Set NEXT_PUBLIC_ORAMA_PROJECT_ID and NEXT_PUBLIC_ORAMA_API_KEY.',
         );
       },
-    } as unknown as OramaClient);
+    };

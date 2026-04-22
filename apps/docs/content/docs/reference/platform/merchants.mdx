@@ -5,7 +5,9 @@ description: 'The Merchants API allows you to retrieve information about merchan
 
 ## Authentication
 
-Requests require authentication using your API key in the `` `X-API-Key` `` header. See the [Authentication](/docs/reference/setup/authentication) guide.
+Requests require authentication using your API key in the `` `X-API-Key` `` header. See the [Authentication](/reference/setup/authentication) guide.
+
+For organization-level settings, pricing, and metrics, prefer the [Organizations](/reference/platform/organizations) API when your integration key is org-scoped.
 
 ## Endpoints
 
@@ -45,7 +47,7 @@ Retrieves detailed information about a specific merchant account.
 }
 ```
 
-_(See [Data Models](/docs/reference/reference/data-models#merchant-object) for property descriptions)_
+_(See [Data Models](/reference/reference/data-models#merchant-object) for property descriptions)_
 
 **Possible error responses:**
 
@@ -170,4 +172,4 @@ Retrieves the current account balance for a merchant in a specific currency.
 
 - All monetary values (`` `mrr` ``, `` `arr` ``, `` `merchant_lifetime_value` ``, `` `balance` ``) are returned in the smallest currency unit (e.g., cents for USD, XOF represents the base unit directly).
 - Dates and times are returned in ISO 8601 format (`` `YYYY-MM-DDTHH:mm:ssZ` ``).
-- See the [Errors](/docs/reference/reference/errors) guide for general error handling information.
+- See the [Errors](/reference/reference/errors) guide for general error handling information.

@@ -1,0 +1,56 @@
+---
+title: 'API integration'
+description: 'End-to-end path from your first authenticated HTTP call to language samples, Try it, SDKs, and webhooks.'
+---
+
+This page is the **single entry point** for shipping a production-quality integration against lomi.’s REST API.
+
+## 1. Base URLs and your first request
+
+Use the **Test** environment while building; switch keys and host only when you go live.
+
+| Environment | Base URL | API keys |
+| --- | --- | --- |
+| Test | `https://sandbox.api.lomi.africa` | `lomi_sk_test_…` |
+| Live | `https://api.lomi.africa` | `lomi_sk_live_…` |
+
+Send your **secret** key on every request as `X-API-Key` (header names are case-insensitive). A minimal read that works in both environments is `GET /accounts`:
+
+```bash
+curl -sS \
+  -H "X-API-Key: $LOMI_API_KEY" \
+  "https://sandbox.api.lomi.africa/accounts"
+```
+
+Replace `$LOMI_API_KEY` with a **secret** key from the dashboard **Developers** / **API** section (`lomi_sk_test_…` / `lomi_sk_live_…`). Never send secret keys from a browser or mobile client. For environment details and key hygiene, see [Authentication](/reference/setup/authentication).
+
+## 2. Full HTTP reference (OpenAPI)
+
+The **canonical** list of paths, methods, parameters, security, and **request bodies** is the generated OpenAPI site:
+
+- **[OpenAPI reference index](/openapi/generated/index)** — browse operations; each page includes **language tabs** (cURL, JavaScript, Go, Python, Java, and C#) and a **Try it** playground.
+
+The playground sends requests through the docs **proxy** (`/api/proxy` in this app), so you can exercise the API from the browser without CORS issues. Treat it as a convenience for exploration, not a substitute for calling the API from your own servers in production.
+
+## 3. SDKs vs raw HTTP
+
+| Approach | When to use it | Docs |
+| --- | --- | --- |
+| **Raw HTTP** | Maximum control, any stack, smallest dependency | This hub + [OpenAPI reference](/openapi/generated/index) |
+| **Official / community SDKs** | Faster integration when a maintained client fits your runtime | [SDKs overview](/reference/sdks) and language pages (e.g. [PHP](/reference/sdks/php)) |
+
+SDKs should follow the same **base URL**, **headers**, and **JSON** conventions as raw HTTP.
+
+## 4. Webhooks (incoming HTTP to your server)
+
+Your endpoint receives **raw JSON** in the request body. For signature verification you must use the **exact bytes** the gateway sent—**do not** rely on a prettified or re-serialized JSON string, which can change spacing or key order and break HMAC or similar schemes.
+
+Ingress routes for payment providers (e.g. Wave, Stripe-style) are documented in the OpenAPI tree under the relevant **webhook** paths. Configure URLs in the dashboard and validate signatures using the provider’s documented algorithm and the **raw body** buffer.
+
+For managing **your** outbound webhook subscriptions (list, get, update) over the merchant API, see [Webhooks](/reference/payments/webhooks) and the matching operations in the [OpenAPI reference](/openapi/generated/index).
+
+## Next steps
+
+- **[Authentication](/reference/setup/authentication)** — keys, hosts, rate limits, security.
+- **[Overview](/reference/setup/overview)** — how the narrative reference maps to resources.
+- **[Errors](/reference/reference/errors)** — error object shape and HTTP status conventions.

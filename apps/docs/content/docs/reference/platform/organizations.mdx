@@ -7,6 +7,24 @@ import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 
 The Organizations API provides access to your organization's details and business metrics.
 
+Most integrations should treat the **organization** as the primary scope for API keys, balances, and settings. The [Merchants](/reference/platform/merchants) API remains useful for merchant profile reads and legacy paths that still expose a merchant id.
+
+## Pricing configuration
+
+Each organization has a pricing mode that determines how transaction fees are resolved:
+
+- `volume_tiered`: dynamic pricing based on processed volume tiers
+- `fixed`: stable organization fee schedule
+- `custom`: negotiated fee schedule (also resolved from organization-level fee configuration)
+
+In practice:
+
+- `volume_tiered` organizations use their current tier fee structure for supported categories.
+- `fixed` and `custom` organizations use organization fee configuration directly.
+- Additional fees (for example refunds, disputes, international card surcharges, subscription add-ons) can still apply depending on your setup.
+
+For the operational fee values currently applied to your account, rely on dashboard pricing screens and your latest commercial agreement.
+
 ## Get organization details
 
 Retrieve details of your authenticated organization.
@@ -150,16 +168,39 @@ curl -X GET "https://api.lomi.africa/organizations/metrics" \
 
 ---
 
-## Organization Object
+## Organization object
+
+These fields align with the **organization** resource returned by `GET /organizations` (see [OpenAPI](/openapi/generated/index)). Pricing **modes** (`volume_tiered`, `fixed`, `custom`) are explained above and in [Pricing](/core/merchant-of-record/pricing); they are not required to appear as a dedicated column on every organization payload.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | `string` | Unique organization identifier |
+| `organization_id` | `string` | Unique organization identifier |
 | `name` | `string` | Organization name |
 | `email` | `string` | Contact email |
-| `country` | `string` | Country |
-| `currency_code` | `string` | Default currency |
+| `phone_number` | `string` | Primary phone |
+| `verification_status` | `string` | `unverified`, `starter`, or `verified` |
+| `website_url` | `string` \| `null` | Website |
+| `logo_url` | `string` \| `null` | Logo URL |
+| `status` | `string` | `active`, `inactive`, or `suspended` |
+| `default_currency` | `string` | Default currency (`XOF`, `USD`, `EUR`) |
+| `slug` | `string` \| `null` | URL-friendly slug |
+| `storefront_enabled` | `boolean` | Storefront enabled |
+| `total_revenue` | `number` \| `null` | Total revenue (when present) |
+| `total_transactions` | `number` \| `null` | Transaction count |
+| `total_merchants` | `number` \| `null` | Merchant count |
+| `total_customers` | `number` \| `null` | Customer count |
+| `mrr` | `number` | Monthly recurring revenue |
+| `arr` | `number` | Annual recurring revenue |
+| `merchant_lifetime_value` | `number` | Average customer lifetime value |
+| `employee_number` | `string` \| `null` | Employee range label |
+| `industry` | `string` \| `null` | Industry |
+| `pin_code` | `string` \| `null` | Org PIN for sensitive ops (if set) |
+| `is_starter_business` | `boolean` | Starter business flag |
+| `metadata` | `object` | Additional metadata |
 | `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+| `is_deleted` | `boolean` | Soft-deleted |
+| `deleted_at` | `string` \| `null` | Deletion time |
 
 ---
 

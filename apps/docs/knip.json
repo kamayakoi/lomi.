@@ -32,8 +32,7 @@
         "**/*.stories.{ts,tsx,js,jsx}",
         "**/stories/**",
         "**/__tests__/**",
-        "**/__mocks__/**",
-        "studio/**"
+        "**/__mocks__/**"
       ],
       "ignoreExportsUsedInFile": true,
       "treatRulesAsErrors": false

@@ -3,7 +3,13 @@ title: 'Setting up webhooks'
 description: 'Webhooks allow your application to receive real-time notifications about events happening within your lomi. account, such as successful payments, new subscriptions, or failed transactions.'
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 Instead of constantly polling the API for changes, you can configure lomi. to send HTTP POST requests to an endpoint you control whenever specific events occur.
+
+<Callout type="info">
+  For retries, duplicate delivery, and delivery-log debugging, see [Webhook reliability](/core/advanced-guides/webhook-reliability).
+</Callout>
 
 ## Why use webhooks?
 
@@ -45,7 +51,7 @@ Once your endpoint is ready, configure it in your lomi. Merchant Dashboard (or v
 3.  Enter your **Endpoint URL** (the publicly accessible HTTPS URL you prepared).
 4.  Select the **Events** you want to subscribe to for this endpoint. You can choose multiple events.
 5.  Click "Create Webhook".
-6.  **Crucially, copy the generated `Signing Secret`** (it starts with `whsec_`). This secret is unique to this webhook endpoint and is essential for verifying incoming requests. Store it securely on your server; you will need it to verify signatures. Refer to the [API Keys guide](/docs/core/fundamentals/api-keys) for managing secrets.
+6.  **Crucially, copy the generated `Signing Secret`** (it starts with `whsec_`). This secret is unique to this webhook endpoint and is essential for verifying incoming requests. Store it securely on your server; you will need it to verify signatures. Refer to the [API Keys guide](/core/fundamentals/access-tokens) for managing secrets.
 
 ## 3. Receiving webhooks
 
@@ -231,7 +237,7 @@ You can test your endpoint integration using the "Test Webhook" feature in the l
 - **Process Asynchronously:** Defer complex logic to background jobs.
 - **Handle Duplicates (Idempotency):** Design your system to gracefully handle receiving the same event multiple times. Check the event `id`.
 - **Use HTTPS:** Ensure your endpoint uses HTTPS for secure communication.
-- **Secure Your Secret:** Keep your webhook signing secret confidential. Do not commit it to version control. Use environment variables or a secrets manager (see [API Keys guide](/docs/core/fundamentals/api-keys)).
+- **Secure Your Secret:** Keep your webhook signing secret confidential. Do not commit it to version control. Use environment variables or a secrets manager (see [API Keys guide](/core/fundamentals/access-tokens)).
 
 ## 9. Troubleshooting
 
