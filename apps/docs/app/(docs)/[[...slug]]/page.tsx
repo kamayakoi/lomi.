@@ -93,24 +93,29 @@ export default async function Page({
           components={getMDXComponents({
             ...Twoslash,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            a: ({ href, ...props }: any): JSX.Element => {
-              const found = source.getPageByHref(href ?? '', {
+            a: ({ href, children, ...props }: any): JSX.Element => {
+              const resolvedHref = typeof href === 'string' ? href : '';
+              const found = source.getPageByHref(resolvedHref, {
                 dir: path.dirname(page.path),
               });
 
-              if (!found) return <Link href={href} {...props} />;
+              if (!found) {
+                return (
+                  <Link href={resolvedHref} {...props}>
+                    {children}
+                  </Link>
+                );
+              }
 
+              const targetHref = found.hash
+                ? `${found.page.url}#${found.hash}`
+                : found.page.url;
               return (
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <Link
-                      href={
-                        found.hash
-                          ? `${found.page.url}#${found.hash}`
-                          : found.page.url
-                      }
-                      {...props}
-                    />
+                    <Link href={targetHref} {...props}>
+                      {children}
+                    </Link>
                   </HoverCardTrigger>
                   <HoverCardContent className="text-sm">
                     <p className="font-medium">{found.page.data.title}</p>

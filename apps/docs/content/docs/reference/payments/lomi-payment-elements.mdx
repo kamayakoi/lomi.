@@ -153,7 +153,7 @@ const { clientSecret } = await response.json();
     <body>
       <div id="lomi-checkout"></div>
       
-      <script type="module">
+      &lt;script type="module"&gt;
         import { loadLomiCheckout } from '@lomi/embed';
         
         loadLomiCheckout({
@@ -161,7 +161,7 @@ const { clientSecret } = await response.json();
           sessionId: 'cs_your_checkout_session_id',
           publicKey: 'lomi_pk_your_publishable_key',
         });
-      </script>
+      &lt;/script&gt;
     </body>
     </html>
     ```
