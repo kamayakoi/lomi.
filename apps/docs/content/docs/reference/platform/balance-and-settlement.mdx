@@ -16,7 +16,7 @@ Balances are updated when a transaction reaches **`completed`**. This page descr
 Each transaction stores an **`available_at`** timestamp computed from organization payment settings:
 
 - `NOW() + get_payment_availability_delay(organization, provider, payment_method)`
-- Example: some card configurations default to a **delayed** availability window; mobile money may be **immediate**.
+- Example: some card configurations default to a **delayed** availability window; Mobile Money may be **immediate**.
 
 The dashboard may show **available** vs **pending/settling** based on this and related rules.
 

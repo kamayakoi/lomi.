@@ -15,7 +15,7 @@ export async function GET() {
 
   // Blockquote Summary (Required) - Concise project summary
   lines.push(
-    "> lomi. is francophone West Africa's leading payment processing platform. We provide APIs and tools for businesses to accept mobile money (Wave, MTN, SPI), credit cards (Visa, Mastercard, Apple Pay, Google Pay), and bank transfers across 8 UEMOA countries: Senegal, Côte d'Ivoire, Mali, Burkina Faso, Benin, Togo, Niger, and Guinea-Bissau.",
+    "> lomi. is francophone West Africa's leading payment processing platform. We provide APIs and tools for businesses to accept Mobile Money (Wave, MTN, SPI), credit cards (Visa, Mastercard, Apple Pay, Google Pay), and bank transfers across 8 UEMOA countries: Senegal, Côte d'Ivoire, Mali, Burkina Faso, Benin, Togo, Niger, and Guinea-Bissau.",
   );
   lines.push('');
 
@@ -27,7 +27,7 @@ export async function GET() {
   );
   lines.push('');
   lines.push(
-    '- **Payment Processing**: Accept payments via mobile money, credit/debit cards, and bank transfers',
+    '- **Payment Processing**: Accept payments via Mobile Money, credit/debit cards, and bank transfers',
   );
   lines.push(
     '- **Instant Payouts**: Withdraw earnings to mobile wallets or bank accounts globally',
