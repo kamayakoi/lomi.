@@ -5,7 +5,7 @@
  */
 
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -29,6 +29,9 @@ import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
+import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
+import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
+import { AgentModule } from './agent/agent.module';
 
 @Module({
   imports: [
@@ -38,8 +41,8 @@ import { ChargesModule } from './core/charges/charges.module';
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 900000,
-        limit: 5000,
+        ttl: THROTTLE_TTL_MS,
+        limit: THROTTLE_LIMIT,
       },
     ]),
     EventEmitterModule.forRoot(),
@@ -60,10 +63,15 @@ import { ChargesModule } from './core/charges/charges.module';
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
+    AgentModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalJsonExceptionFilter,
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

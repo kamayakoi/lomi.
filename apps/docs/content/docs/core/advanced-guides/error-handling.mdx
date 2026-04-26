@@ -14,10 +14,11 @@ All API errors follow a consistent JSON structure:
 ```json filename="Example error response structure"
 {
   "error": {
+    "code": "bad_request",
     "message": "A human-readable description of the error.",
     "details": "Optional: Additional context or structured data about the error."
-    // Specific error types might include additional fields like "code" or validation details
-  }
+  },
+  "request_id": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
 

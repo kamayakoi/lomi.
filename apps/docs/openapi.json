@@ -2901,6 +2901,267 @@
           "Charges"
         ]
       }
+    },
+    "/agent/capabilities": {
+      "get": {
+        "operationId": "AgentCapabilitiesController_getCapabilities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Agent capability negotiation (unauthenticated discoverability surface)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/events": {
+      "get": {
+        "operationId": "AgentStreamController_stream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Server-Sent Events stream (scoped to organization, keepalive pings)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/subscriptions": {
+      "post": {
+        "operationId": "AgentSubscriptionsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Register for agent-appropriate notifications (MVP: in-process registry + SSE test ping)",
+        "tags": [
+          "Agent"
+        ]
+      },
+      "get": {
+        "operationId": "AgentSubscriptionsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "List agent subscriptions",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/subscriptions/{id}": {
+      "delete": {
+        "operationId": "AgentSubscriptionsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Subscription id",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Delete a subscription",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows": {
+      "post": {
+        "operationId": "AgentWorkflowsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkflowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Run created"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Start a multi-step workflow run (MVP, idempotency on idempotency_key)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows/{runId}": {
+      "get": {
+        "operationId": "AgentWorkflowsController_get",
+        "parameters": [
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Get workflow run state",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/workflows/{runId}/steps/{stepId}": {
+      "patch": {
+        "operationId": "AgentWorkflowsController_patchStep",
+        "parameters": [
+          {
+            "name": "stepId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          },
+          {
+            "name": "runId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWorkflowStepDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Advance a workflow step (orchestration primitive)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/handoff": {
+      "post": {
+        "operationId": "AgentHandoffController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHandoffDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Handoff registered"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Cross-service / cross-agent handoff (context + task envelope)",
+        "tags": [
+          "Agent"
+        ]
+      }
+    },
+    "/agent/handoff/{id}": {
+      "get": {
+        "operationId": "AgentHandoffController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Retrieve handoff record",
+        "tags": [
+          "Agent"
+        ]
+      }
     }
   },
   "info": {
@@ -2923,11 +3184,6 @@
   "components": {
     "securitySchemes": {
       "X-API-KEY": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-API-KEY"
-      },
-      "api-key": {
         "type": "apiKey",
         "in": "header",
         "name": "X-API-KEY"
@@ -5149,6 +5405,18 @@
           "verification_token",
           "webhook_id"
         ]
+      },
+      "CreateWorkflowDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateWorkflowStepDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateHandoffDto": {
+        "type": "object",
+        "properties": {}
       }
     }
   }

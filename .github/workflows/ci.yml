@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   detect-changes:
@@ -26,7 +26,8 @@ jobs:
   verify-openapi:
     name: Verify OpenAPI spec is in sync
     needs: detect-changes
-    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api == 'true' || needs.detect-changes.outputs.docs == 'true')
+    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api ==
+      'true' || needs.detect-changes.outputs.docs == 'true')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -35,8 +36,8 @@ jobs:
           version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: "22"
+          cache: "pnpm"
           cache-dependency-path: apps/api/pnpm-lock.yaml
       - name: Install API dependencies
         working-directory: apps/api
@@ -46,6 +47,18 @@ jobs:
         run: pnpm run openapi:export
       - name: Assert apps/docs/openapi.json matches export
         run: git diff --exit-code apps/docs/openapi.json
+
+  verify-agent-contracts:
+    name: Verify agent card + OpenAPI surface
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate `.well-known/agent.json` and OpenAPI paths
+        run: node scripts/verify-agent-contracts.mjs
 
   api-tests:
     name: API unit tests, coverage gate & e2e
@@ -59,8 +72,8 @@ jobs:
           version: 9
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: "22"
+          cache: "pnpm"
           cache-dependency-path: apps/api/pnpm-lock.yaml
       - name: Install API dependencies
         working-directory: apps/api
@@ -86,7 +99,8 @@ jobs:
 
   deploy-api:
     needs: detect-changes
-    if: needs.detect-changes.outputs.api == 'true' && github.ref == 'refs/heads/main'
+    if: needs.detect-changes.outputs.api == 'true' && github.ref ==
+      'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -101,7 +115,8 @@ jobs:
 
   deploy-docs:
     needs: detect-changes
-    if: needs.detect-changes.outputs.docs == 'true' && github.ref == 'refs/heads/main'
+    if: needs.detect-changes.outputs.docs == 'true' && github.ref ==
+      'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

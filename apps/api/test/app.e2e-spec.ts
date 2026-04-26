@@ -117,17 +117,48 @@ describe('App (e2e)', () => {
       .expect('Hello World!');
   });
 
+  it('GET /agent/capabilities is public (L5 negotiation surface)', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/agent/capabilities')
+      .expect(200);
+    expect(res.body).toMatchObject({
+      name: 'lomi.',
+      features: expect.objectContaining({
+        server_sent_events: '/agent/events',
+      }),
+    });
+  });
+
+  it('GET /agent/subscriptions returns 401 without API key (JSON envelope)', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/agent/subscriptions')
+      .expect(401);
+    expect(res.body).toMatchObject({
+      error: expect.objectContaining({ code: 'unauthorized' }),
+      request_id: expect.any(String),
+    });
+  });
+
+  it('GET /agent/subscriptions returns empty list with valid API key', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/agent/subscriptions')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .expect(200);
+    expect(res.body).toEqual({ data: [] });
+  });
+
   it('GET /transactions rejects without API key (401 + JSON shape)', async () => {
     const res = await request(app.getHttpServer())
       .get('/transactions')
       .expect(401);
 
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        statusCode: 401,
+    expect(res.body).toMatchObject({
+      error: expect.objectContaining({
+        code: 'unauthorized',
         message: 'API Key is missing',
       }),
-    );
+      request_id: expect.any(String),
+    });
   });
 
   it('GET /transactions rejects invalid API key', async () => {
@@ -136,12 +167,13 @@ describe('App (e2e)', () => {
       .set('X-API-KEY', 'nope')
       .expect(401);
 
-    expect(res.body).toEqual(
-      expect.objectContaining({
-        statusCode: 401,
+    expect(res.body).toMatchObject({
+      error: expect.objectContaining({
+        code: 'unauthorized',
         message: 'Invalid API Key',
       }),
-    );
+      request_id: expect.any(String),
+    });
   });
 
   it('GET /transactions returns data with valid API key (Tier-1 read smoke)', async () => {

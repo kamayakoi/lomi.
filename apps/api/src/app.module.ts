@@ -1,11 +1,14 @@
 import { Module, Logger } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullModule } from '@nestjs/bullmq';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
+import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
+import { AgentModule } from './agent/agent.module';
 import { SupabaseModule } from './utils/supabase/supabase.module';
 import { TransactionsModule } from './core/transactions/transactions.module';
 import { AccountsModule } from './core/accounts/accounts.module';
@@ -35,8 +38,8 @@ const logger = new Logger('RedisConfig');
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 900000, // 15 minutes
-        limit: 5000,
+        ttl: THROTTLE_TTL_MS, // 15 minutes
+        limit: THROTTLE_LIMIT,
       },
     ]),
     EventEmitterModule.forRoot(),
@@ -127,11 +130,16 @@ const logger = new Logger('RedisConfig');
     WebhookDeliveryLogsModule,
     WebhooksModule,
     ChargesModule,
+    AgentModule,
   ],
 
   controllers: [AppController],
   providers: [
     AppService,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalJsonExceptionFilter,
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

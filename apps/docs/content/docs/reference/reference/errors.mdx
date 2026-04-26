@@ -18,17 +18,21 @@ All error responses follow a consistent JSON format:
 ```json filename="Example of an error response"
 {
   "error": {
+    "code": "unauthorized",
     "message": "A human-readable description of the error.",
     "details": "Optional: Additional details or structured information about the error."
-  }
+  },
+  "request_id": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
 
-| Property        | Type                             | Description                                                                                                                     |
-| --------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `` `error` ``   | `` `object` ``                   | Container for the error information.                                                                                            |
-| `` `message` `` | `` `string` ``                   | A brief, human-readable summary of the error.                                                                                   |
-| `` `details` `` | `` `string` `` or `` `object` `` | Optional. Provides more specific context or structured data about the error (e.g., validation failures, conflicting resources). |
+| Property          | Type                             | Description                                                                                                                     |
+| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `` `error` ``     | `` `object` ``                   | Container for the error information.                                                                                          |
+| `` `error.code` ``| `` `string` ``                   | Machine-readable code (e.g. `unauthorized`, `rate_limit_exceeded`, `not_found`).                                              |
+| `` `message` ``   | `` `string` ``                   | A brief, human-readable summary of the error.                                                                                    |
+| `` `details` ``   | `` `string` `` or `` `object` `` | Optional. Provides more specific context or structured data about the error (e.g., validation failures, conflicting resources). |
+| `` `request_id` ``| `` `string` `` (UUID)            | Correlates the response with server logs; also sent as the `` `X-Request-Id` `` response header.                                |
 
 ## HTTP status codes
 

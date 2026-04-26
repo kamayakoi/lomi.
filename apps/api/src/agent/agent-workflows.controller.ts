@@ -1,0 +1,100 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ApiKeyGuard } from '../core/common/guards/api-key.guard';
+import {
+  CurrentUser,
+  type AuthContext,
+} from '../core/common/decorators/current-user.decorator';
+import {
+  CreateWorkflowDto,
+  UpdateWorkflowStepDto,
+} from './dto/create-workflow.dto';
+import { AgentWorkflowsStore } from './agent-workflows.store';
+import { L5EventBusService } from './l5-event-bus.service';
+
+@Controller('agent')
+@ApiTags('Agent')
+@ApiSecurity('api-key')
+@UseGuards(ApiKeyGuard)
+export class AgentWorkflowsController {
+  constructor(
+    private readonly workflows: AgentWorkflowsStore,
+    private readonly bus: L5EventBusService,
+  ) {}
+
+  @Post('workflows')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  @ApiOperation({ summary: 'Start a multi-step workflow run (MVP, idempotency on idempotency_key)' })
+  @ApiResponse({ status: 201, description: 'Run created' })
+  @ApiBody({ type: CreateWorkflowDto })
+  create(
+    @CurrentUser() user: AuthContext,
+    @Body() body: CreateWorkflowDto,
+  ) {
+    const run = this.workflows.create(user.organizationId, {
+      name: body.name,
+      steps: body.steps,
+      idempotency_key: body.idempotency_key,
+    });
+    this.bus.emit(user.organizationId, {
+      type: 'agent.workflow_created',
+      run_id: run.run_id,
+    });
+    return { data: run };
+  }
+
+  @Get('workflows/:runId')
+  @ApiParam({ name: 'runId' })
+  @ApiOperation({ summary: 'Get workflow run state' })
+  get(
+    @CurrentUser() user: AuthContext,
+    @Param('runId') runId: string,
+  ) {
+    return { data: this.workflows.get(user.organizationId, runId) };
+  }
+
+  @Patch('workflows/:runId/steps/:stepId')
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  @ApiParam({ name: 'runId' })
+  @ApiParam({ name: 'stepId' })
+  @ApiBody({ type: UpdateWorkflowStepDto })
+  @ApiOperation({ summary: 'Advance a workflow step (orchestration primitive)' })
+  @ApiResponse({ status: 200, description: 'Updated' })
+  patchStep(
+    @CurrentUser() user: AuthContext,
+    @Param('runId') runId: string,
+    @Param('stepId') stepId: string,
+    @Body() body: UpdateWorkflowStepDto,
+  ) {
+    const run = this.workflows.updateStep(
+      user.organizationId,
+      runId,
+      stepId,
+      body.status,
+    );
+    this.bus.emit(user.organizationId, {
+      type: 'agent.workflow_step',
+      run_id: run.run_id,
+      step_id: stepId,
+      status: body.status,
+    });
+    return { data: run };
+  }
+}
