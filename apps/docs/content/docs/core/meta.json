@@ -2,7 +2,7 @@
   "title": "First steps",
   "description": "Developers use lomi. to reliably accept payments in West Africa.",
   "root": true,
-  "icon": "Code",
+  "icon": "Compass",
   "pages": [
     "---Basics---",
     "introduction",

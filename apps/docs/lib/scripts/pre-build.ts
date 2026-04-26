@@ -84,7 +84,7 @@ export async function generateDocs() {
       items: [
         {
           path: 'index',
-          title: 'API operations',
+          title: 'REST API endpoints',
           description:
             'All endpoints from the OpenAPI document exported from the Nest API.',
         },
@@ -100,7 +100,7 @@ export async function generateDocs() {
         path: 'meta.json',
         content: `${JSON.stringify(
           {
-            title: 'Operations',
+            title: 'Endpoints',
             pages: ['index', ...pages],
           },
           null,
