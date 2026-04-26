@@ -1,7 +1,7 @@
 /* @proprietary license */
 
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { type ComponentProps, type FC, type ReactNode, type JSX } from 'react';
 import * as Twoslash from 'fumadocs-twoslash/ui';
 import { Callout } from 'fumadocs-ui/components/callout';
@@ -12,11 +12,6 @@ import { source } from '@/lib/utils/source';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/preview/mermaid';
 import { getMDXComponents } from '@/mdx-components';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card';
 import Link from 'fumadocs-core/link';
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
 import { createGenerator } from 'fumadocs-typescript';
@@ -55,6 +50,10 @@ export default async function Page({
   params: Promise<{ slug?: string[] }>;
 }) {
   const resolvedParams = await params;
+  if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
+    redirect(`/${DEFAULT_DOC_SLUG.join('/')}`);
+  }
+
   const slug = effectiveSlug(resolvedParams.slug);
   const page = source.getPage(slug);
 
@@ -111,19 +110,9 @@ export default async function Page({
                 ? `${found.page.url}#${found.hash}`
                 : found.page.url;
               return (
-                <HoverCard>
-                  <HoverCardTrigger asChild>
-                    <Link href={targetHref} {...props}>
-                      {children}
-                    </Link>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="text-sm">
-                    <p className="font-medium">{found.page.data.title}</p>
-                    <p className="text-fd-muted-foreground">
-                      {found.page.data.description}
-                    </p>
-                  </HoverCardContent>
-                </HoverCard>
+                <Link href={targetHref} {...props}>
+                  {children}
+                </Link>
               );
             },
             Banner,

@@ -5,6 +5,8 @@ import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { ReactNode } from 'react';
+import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
+import type { Folder } from 'fumadocs-core/page-tree';
 // import { Sparkles } from 'lucide-react';
 // import { AISearchTrigger } from '@/components/ai';
 // import { cn } from '@/lib/cn';
@@ -12,13 +14,60 @@ import type { ReactNode } from 'react';
 import 'katex/dist/katex.min.css';
 import { TryItOpenApiPanel } from '@/components/docs/try-it-openapi-panel';
 
+function getFirstPageUrl(node: Folder): string | undefined {
+  if (node.index?.url) return node.index.url;
+
+  for (const child of node.children) {
+    if (child.type === 'page') return child.url;
+    if (child.type === 'folder') {
+      const nested = getFirstPageUrl(child);
+      if (nested) return nested;
+    }
+  }
+
+  return undefined;
+}
+
 export default function Layout({ children }: { children: ReactNode }) {
   const base = baseOptions();
+  const tabs: LayoutTab[] = source.pageTree.children.flatMap((node) => {
+    if (node.type !== 'folder') return [];
+
+    const url = getFirstPageUrl(node);
+    if (!url) return [];
+
+    const meta = source.getNodeMeta(node);
+    const color = meta
+      ? `var(--${meta.path.split('/')[0]}-color, var(--color-fd-foreground))`
+      : 'var(--color-fd-foreground)';
+
+    return [
+      {
+        title: node.name,
+        description: node.description,
+        url,
+        $folder: node,
+        icon: node.icon ? (
+          <div
+            className="[&_svg]:size-full rounded-sm size-full text-(--tab-color) max-md:bg-(--tab-color)/10 max-md:border max-md:p-1.5"
+            style={
+              {
+                '--tab-color': color,
+              } as object
+            }
+          >
+            {node.icon}
+          </div>
+        ) : undefined,
+      },
+    ];
+  });
 
   return (
     <DocsLayout
       {...base}
       tree={source.pageTree}
+      tabs={tabs}
       // just icon items
       links={linkItems?.filter((item) => item.type === 'icon') ?? []}
       searchToggle={
@@ -53,32 +102,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         //   </AISearchTrigger>
         // ),
       }}
-      sidebar={{
-        tabs: {
-          transform(option, node) {
-            const meta = source.getNodeMeta(node);
-            if (!meta || !node.icon) return option;
-
-            const color = `var(--${meta.path.split('/')[0]}-color, var(--color-fd-foreground))`;
-
-            return {
-              ...option,
-              icon: (
-                <div
-                  className="[&_svg]:size-full rounded-sm size-full text-(--tab-color) max-md:bg-(--tab-color)/10 max-md:border max-md:p-1.5"
-                  style={
-                    {
-                      '--tab-color': color,
-                    } as object
-                  }
-                >
-                  {node.icon}
-                </div>
-              ),
-            };
-          },
-        },
-      }}
+      sidebar={{}}
     >
       <TryItOpenApiPanel />
       {children}
