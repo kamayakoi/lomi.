@@ -8,12 +8,19 @@ import { useEffect, type ReactNode } from 'react';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { TranslationProvider } from '@/lib/utils/translation-context';
 import { Toaster } from 'sonner';
+import type { Language } from '@/lib/i18n/config';
 
 const SearchDialog = dynamic(() => import('@/components/ui/search'), {
   ssr: false,
 });
 
-export function Provider({ children }: { children: ReactNode }) {
+export function Provider({
+  children,
+  initialLanguage = 'en',
+}: {
+  children: ReactNode;
+  initialLanguage?: Language;
+}) {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const uwuParam = urlParams.get('uwu');
@@ -42,7 +49,7 @@ export function Provider({ children }: { children: ReactNode }) {
         disableTransitionOnChange: false,
       }}
     >
-      <TranslationProvider>
+      <TranslationProvider initialLanguage={initialLanguage}>
         <TooltipProvider>
           {children}
           <Toaster />

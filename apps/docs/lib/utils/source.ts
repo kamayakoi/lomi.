@@ -7,9 +7,11 @@ import { icons } from 'lucide-react';
 import { transformerOpenAPI } from 'fumadocs-openapi/server';
 import { createElement } from 'react';
 import { docs } from '@/.source/server';
+import { fumadocsI18n } from '@/lib/i18n/fumadocs';
 
 export const source = loader({
   baseUrl: '/',
+  i18n: fumadocsI18n,
   icon(icon) {
     if (icon && icon in icons)
       return createElement(icons[icon as keyof typeof icons]);

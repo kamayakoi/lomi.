@@ -81,7 +81,7 @@ export async function GET() {
     { title: string; url: string; description?: string }[]
   >();
 
-  for (const page of source.getPages()) {
+  for (const page of source.getPages('en')) {
     const category = page.slugs[0] || 'general';
     const list = docsMap.get(category) ?? [];
     list.push({

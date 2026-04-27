@@ -11,7 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ slug: string[] }> },
 ) {
   const { slug } = await params;
-  const page = source.getPage(slug.slice(0, -1));
+  // OG images use default locale so crawlers without `lomi.language` see consistent branding.
+  const page = source.getPage(slug.slice(0, -1), 'en');
   if (!page) notFound();
 
   return generateOGImage({
@@ -23,10 +24,7 @@ export async function GET(
 export function generateStaticParams(): {
   slug: string[];
 }[] {
-  const params = source.generateParams();
-  const paramsArray = Array.isArray(params) ? params : [];
-  return paramsArray.map((page) => ({
-    ...page,
-    slug: [...page.slug, 'image.png'],
+  return source.getPages('en').map((page) => ({
+    slug: [...page.slugs, 'image.png'],
   }));
 }

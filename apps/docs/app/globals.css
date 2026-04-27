@@ -48,7 +48,7 @@
 }
 
 :root {
-  --radius: 0.675rem;
+  --radius: 0.3rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
@@ -404,6 +404,23 @@ button:active:focus {
 /* Sidebar Hover Styles */
 .sidebar-hover {
   @apply hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+}
+
+/* Docs sidebar spacing tweaks:
+   - tighten search <-> section selector gap
+   - tighten selector <-> section content gap */
+#nd-sidebar > div.flex.flex-col.gap-3.p-4.pb-2 {
+  gap: 0.4rem;
+  padding-bottom: 0;
+}
+
+/* Sidebar-specific radius overrides (fumadocs uses fixed rounded-* classes) */
+/* Normalize rounded-* classes so radius feels consistent everywhere */
+.rounded-sm,
+.rounded-md,
+.rounded-lg,
+.rounded-xl {
+  border-radius: var(--radius) !important;
 }
 
 /* Custom Blog Post Styling */

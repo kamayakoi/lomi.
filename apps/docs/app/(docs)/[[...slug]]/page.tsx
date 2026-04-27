@@ -9,6 +9,8 @@ import { TypeTable } from 'fumadocs-ui/components/type-table';
 import * as Preview from '@/components/preview';
 import { createMetadata, getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
+import { getDocsLocale } from '@/lib/utils/docs-locale';
+import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
 import { Mermaid } from '@/components/preview/mermaid';
 import { getMDXComponents } from '@/mdx-components';
@@ -55,7 +57,8 @@ export default async function Page({
   }
 
   const slug = effectiveSlug(resolvedParams.slug);
-  const page = source.getPage(slug);
+  const locale = await getDocsLocale();
+  const page = source.getPage(slug, locale);
 
   if (!page) notFound();
 
@@ -96,6 +99,7 @@ export default async function Page({
               const resolvedHref = typeof href === 'string' ? href : '';
               const found = source.getPageByHref(resolvedHref, {
                 dir: path.dirname(page.path),
+                language: locale,
               });
 
               if (!found) {
@@ -125,20 +129,20 @@ export default async function Page({
             blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             DocsCategory: ({ url }: any): JSX.Element => {
-              return <DocsCategory url={url ?? page.url} />;
+              return <DocsCategory url={url ?? page.url} locale={locale} />;
             },
             Installation,
             Customisation,
           })}
         />
-        {pageData.index ? <DocsCategory url={page.url} /> : null}
+        {pageData.index ? <DocsCategory url={page.url} locale={locale} /> : null}
       </div>
     </DocsPage>
   );
 }
 
-function DocsCategory({ url }: { url: string }) {
-  const peers = getPageTreePeers(source.pageTree, url);
+function DocsCategory({ url, locale }: { url: string; locale: Language }) {
+  const peers = getPageTreePeers(source.getPageTree(locale), url);
   const peersArray = Array.isArray(peers) ? peers : [];
 
   return (
@@ -159,7 +163,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = effectiveSlug(resolvedParams.slug);
-  const page = source.getPage(slug);
+  const locale = await getDocsLocale();
+  const page = source.getPage(slug, locale);
   if (!page) notFound();
 
   const description =
@@ -193,8 +198,9 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  const params = source.generateParams();
-  const list = (Array.isArray(params) ? params : []) as { slug?: string[] }[];
+  const list = source
+    .getPages('en')
+    .map((p) => ({ slug: p.slugs } as { slug: string[] }));
   const withoutEmpty = list.filter((p) => (p.slug?.length ?? 0) > 0);
   return [{ slug: [] }, ...withoutEmpty];
 }

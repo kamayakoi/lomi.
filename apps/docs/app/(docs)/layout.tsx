@@ -3,6 +3,7 @@
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions, linkItems, logo } from '@/lib/utils/layout.shared';
 import { source } from '@/lib/utils/source';
+import { getDocsLocale } from '@/lib/utils/docs-locale';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
@@ -28,15 +29,17 @@ function getFirstPageUrl(node: Folder): string | undefined {
   return undefined;
 }
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default async function Layout({ children }: { children: ReactNode }) {
+  const locale = await getDocsLocale();
+  const pageTree = source.getPageTree(locale);
   const base = baseOptions();
-  const tabs: LayoutTab[] = source.pageTree.children.flatMap((node) => {
+  const tabs: LayoutTab[] = pageTree.children.flatMap((node) => {
     if (node.type !== 'folder') return [];
 
     const url = getFirstPageUrl(node);
     if (!url) return [];
 
-    const meta = source.getNodeMeta(node);
+    const meta = source.getNodeMeta(node, locale);
     const color = meta
       ? `var(--${meta.path.split('/')[0]}-color, var(--color-fd-foreground))`
       : 'var(--color-fd-foreground)';
@@ -66,7 +69,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
       {...base}
-      tree={source.pageTree}
+      tree={pageTree}
       tabs={tabs}
       // just icon items
       links={linkItems?.filter((item) => item.type === 'icon') ?? []}

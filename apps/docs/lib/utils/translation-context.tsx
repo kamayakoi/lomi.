@@ -24,12 +24,15 @@ const TranslationContext = createContext<TranslationContextType>({
 // Main provider component
 export function TranslationProvider({
   children,
+  /** Server-read cookie value so the first client paint matches the server. */
+  initialLanguage = 'en',
 }: {
   children: React.ReactNode;
+  initialLanguage?: Language;
 }) {
-  // Always start with default language to prevent hydration mismatch
-  // We'll update to the correct language after mount
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('en');
+  // Match server-rendered locale when possible to avoid a flash
+  const [currentLanguage, setCurrentLanguage] =
+    useState<Language>(initialLanguage);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export function TranslationProvider({
 
     // After mount, read the actual language preference
     // Try cookie first (set by setLanguage), then localStorage
-    let preferredLang: Language = 'en';
+    let preferredLang: Language = initialLanguage;
 
     // Check cookie
     const cookieMatch = document.cookie

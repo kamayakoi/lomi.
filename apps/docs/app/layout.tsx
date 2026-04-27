@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
+import { getDocsLocale } from '@/lib/utils/docs-locale';
 
 const docsOrigin = getDocsSiteOrigin();
 
@@ -159,11 +160,22 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const initialLanguage = await getDocsLocale();
+  const htmlLang = initialLanguage === 'fr' ? 'fr' : 'en';
+
   return (
-    <html lang="en" className={`${font.variable}`} suppressHydrationWarning>
+    <html
+      lang={htmlLang}
+      className={`${font.variable}`}
+      suppressHydrationWarning
+    >
       <Body>
-        <Provider>{children}</Provider>
+        <Provider initialLanguage={initialLanguage}>{children}</Provider>
         <Analytics />
         <SpeedInsights />
       </Body>
