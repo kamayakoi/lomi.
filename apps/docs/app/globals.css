@@ -854,6 +854,13 @@ article .mt-auto {
   margin-top: 0.5rem;
 }
 
+/* Docs sidebar: bottom bar (border + theme slot) is only as wide as its contents and stays end-aligned, not full sidebar width. */
+#nd-sidebar div:has(> [data-sidebar-locale-theme]) {
+  width: fit-content;
+  max-width: 100%;
+  align-self: flex-start;
+}
+
 /*
 @import 'tailwindcss' source(none);
 @import 'fumadocs-ui/css/neutral.css';

@@ -29,12 +29,12 @@ export function DocsSidebarLocaleAndTheme({
   return (
     <div
       className={cn(
-        'flex w-full min-w-0 flex-1 max-w-full items-center justify-end',
+        'inline-flex w-max max-w-full min-w-0 items-center',
         className,
       )}
       data-sidebar-locale-theme
     >
-      <div className="flex min-w-0 items-center gap-2">
+      <div className="flex min-w-0 max-w-full items-center gap-2">
         <label
           className={cn(
             'relative flex h-7 min-w-0 max-w-34 cursor-pointer items-center gap-1.5',
