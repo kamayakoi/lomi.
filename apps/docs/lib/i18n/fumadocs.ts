@@ -7,7 +7,7 @@ import { defineI18n } from 'fumadocs-core/i18n';
  * segment; locale is selected via the `lomi.language` cookie in server components.
  */
 export const fumadocsI18n = defineI18n({
-  defaultLanguage: 'fr',
+  defaultLanguage: 'en',
   languages: ['en', 'fr'],
   hideLocale: 'always',
   parser: 'dot',
