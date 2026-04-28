@@ -90,7 +90,7 @@ export class ProductsController {
   @ApiOperation({
     summary: 'Get product by ID',
     description:
-      'Returns detailed information about a specific product, including all prices and fees. Only accessible if the product belongs to your organization.',
+      'Returns a product, including its prices and fees. Responds with 404 if the product does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',
@@ -118,7 +118,7 @@ export class ProductsController {
   @ApiOperation({
     summary: 'Create a new product',
     description:
-      'Creates a new product with one or more prices. The product and all prices are created atomically - if any part fails, the entire operation is rolled back. At least one price is required. The first price (or the one marked as is_default) will be the default price.',
+      'Creates a product with one or more prices in a single request. At least one price is required. The first price, or the one with `is_default` set, is used when no price is specified at checkout.',
   })
   @ApiResponse({
     status: 201,
@@ -180,7 +180,7 @@ export class ProductsController {
   @ApiOperation({
     summary: 'Set a price as the default',
     description:
-      "Sets a specific price as the default for a product. The default price is used when a customer doesn't specify a price ID in checkout. Only one price can be the default at a time - setting a new default automatically unsets the previous one.",
+      "Sets which price is used by default for this product (for example when checkout does not pass a price ID). One default at a time; choosing a new default replaces the previous one.",
   })
   @ApiParam({
     name: 'id',

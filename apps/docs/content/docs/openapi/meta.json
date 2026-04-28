@@ -1,7 +1,0 @@
-{
-  "title": "REST API",
-  "description": "Machine-generated reference from the OpenAPI document kept in sync with the Nest API.",
-  "root": true,
-  "icon": "BookOpen",
-  "pages": ["generated"]
-}

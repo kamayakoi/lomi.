@@ -8,8 +8,13 @@ import { buildRegistry } from '@/lib/scripts/build-registry';
 import * as OpenAPI from 'fumadocs-openapi';
 import { rimraf } from 'rimraf';
 import { openapi } from '@/lib/openapi';
+import { normalizeOpenApiSecurity } from '@/lib/openapi/security-normalize';
+import type { Document } from 'fumadocs-openapi';
 
-const OPENAPI_OUTPUT = './content/docs/openapi/generated';
+const OPENAPI_OUTPUT = './content/docs/api';
+const LEGACY_OPENAPI_OUTPUT = './content/docs/openapi';
+const API_SECTION_TITLE = 'REST API';
+const API_SECTION_DESCRIPTION = 'Payment and commerce endpoints.';
 
 function resolveApiRoot(): string | null {
   const candidates = [
@@ -47,61 +52,138 @@ function exportOpenApiFromNest(): void {
   }
 }
 
-async function normalizeOpenApiSecuritySchemes(): Promise<void> {
+async function normalizeOpenApiSecurityFile(): Promise<void> {
   const openApiPath = path.resolve(process.cwd(), 'openapi.json');
   if (!existsSync(openApiPath)) return;
 
   const raw = await readFile(openApiPath, 'utf-8');
-  const spec = JSON.parse(raw) as {
-    components?: { securitySchemes?: Record<string, unknown> };
-  };
-  const schemes = spec.components?.securitySchemes;
-  if (!schemes) return;
+  const spec = JSON.parse(raw) as Document;
+  const normalized = normalizeOpenApiSecurity(spec);
+  await writeFile(openApiPath, `${JSON.stringify(normalized, null, 2)}\n`, 'utf-8');
+}
 
-  const headerKey = 'X-API-KEY';
-  const requirementKey = 'api-key';
-  if (schemes[headerKey] && !schemes[requirementKey]) {
-    schemes[requirementKey] = schemes[headerKey];
-    await writeFile(openApiPath, `${JSON.stringify(spec, null, 2)}\n`, 'utf-8');
-  }
+function toSectionTitle(value: string): string {
+  return value
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 export async function generateDocs() {
   exportOpenApiFromNest();
-  await normalizeOpenApiSecuritySchemes();
+  await normalizeOpenApiSecurityFile();
+  await rimraf(LEGACY_OPENAPI_OUTPUT);
   await rimraf(OPENAPI_OUTPUT);
 
   await OpenAPI.generateFiles({
     input: openapi,
     output: OPENAPI_OUTPUT,
     per: 'operation',
-    includeDescription: true,
-    index: {
-      url: {
-        baseUrl: '/',
-        contentDir: path.resolve('./content/docs'),
-      },
-      items: [
-        {
-          path: 'index',
-          title: 'REST API endpoints',
-          description:
-            'All endpoints from the OpenAPI document exported from the Nest API.',
-        },
-      ],
+    groupBy: (entry) => {
+      const parts = entry.item.path.split('/').filter(Boolean);
+      return parts[0] ?? 'general';
     },
+    includeDescription: true,
     beforeWrite(files) {
-      const pages = files
+      const isAgentEntry = (entry: string): boolean => {
+        const parts = entry.split('/').filter(Boolean);
+        if (parts.length === 0) return false;
+
+        const leaf = parts.at(-1) ?? '';
+        return parts[0] === 'agent' || leaf.startsWith('Agent');
+      };
+
+      const nonAgentFiles = files.filter((file) => {
+        if (!file.path.endsWith('.mdx')) return true;
+        const entry = file.path.replace(/\.mdx$/, '');
+        return !isAgentEntry(entry);
+      });
+      files.splice(0, files.length, ...nonAgentFiles);
+
+      const withoutIndex = files.filter((file) => file.path !== 'index.mdx');
+      files.splice(0, files.length, ...withoutIndex);
+
+      const operationPaths = files
         .filter((f) => f.path.endsWith('.mdx'))
         .map((f) => f.path.replace(/\.mdx$/, ''))
-        .filter((name) => name !== 'index')
-        .sort();
+        .filter((name) => !isAgentEntry(name));
+      const fileByPath = new Map(files.map((file) => [file.path, file.content]));
+
+      const sections = new Map<string, string[]>();
+      const rootPages: string[] = [];
+
+      for (const entry of operationPaths) {
+        const [folder, ...rest] = entry.split('/');
+        const hasFolder = Boolean(folder && rest.length > 0);
+
+        if (!hasFolder) {
+          rootPages.push(entry);
+          continue;
+        }
+
+        const pages = sections.get(folder) ?? [];
+        pages.push(rest.join('/'));
+        sections.set(folder, pages);
+      }
+
+      const sortedSections = [...sections.entries()]
+        .map(([section, pages]) => [section, pages.sort()] as const)
+        .sort(([a], [b]) => a.localeCompare(b));
+
+      for (const [section, pages] of sortedSections) {
+        files.push({
+          path: `${section}/meta.json`,
+          content: `${JSON.stringify(
+            {
+              title: toSectionTitle(section),
+              pages,
+            },
+            null,
+            2,
+          )}\n`,
+        });
+        rootPages.push(section);
+      }
+
+      // Keep backward-compatible flat operation routes (legacy bookmarks/links):
+      // /api/PaymentLinksController_create
+      // -> aliases /api/payment-links/PaymentLinksController_create
+      const aliasNames = new Set<string>();
+      for (const entry of operationPaths) {
+        const [folder, ...rest] = entry.split('/');
+        if (!folder || rest.length === 0) continue;
+
+        const aliasName = rest.join('/');
+        if (!aliasName || aliasName === 'index' || aliasNames.has(aliasName)) {
+          continue;
+        }
+
+        const sourcePath = `${entry}.mdx`;
+        const aliasPath = `${aliasName}.mdx`;
+        const sourceContent = fileByPath.get(sourcePath);
+
+        if (!sourceContent || fileByPath.has(aliasPath)) continue;
+
+        files.push({
+          path: aliasPath,
+          content: sourceContent,
+        });
+        aliasNames.add(aliasName);
+      }
+
+      const uniqueRootPages = [...new Set(rootPages)];
+      const sortedRootPages = uniqueRootPages.sort();
+
       files.push({
         path: 'meta.json',
         content: `${JSON.stringify(
           {
-            title: 'Endpoints',
-            pages: ['index', ...pages],
+            title: API_SECTION_TITLE,
+            description: API_SECTION_DESCRIPTION,
+            root: true,
+            icon: 'BookOpen',
+            pages: sortedRootPages,
           },
           null,
           2,

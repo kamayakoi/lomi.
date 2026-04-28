@@ -77,7 +77,7 @@ export class SubscriptionsController {
   @ApiOperation({
     summary: 'Get subscriptions for a customer',
     description:
-      'Returns all subscriptions for a specific customer. Only accessible if the customer belongs to your organization.',
+      'Returns subscriptions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'customerId',
@@ -109,7 +109,7 @@ export class SubscriptionsController {
   @ApiOperation({
     summary: 'Get subscription by ID',
     description:
-      'Returns detailed information about a specific subscription. Only accessible if the subscription belongs to your organization.',
+      'Returns a single subscription. Responds with 404 if the subscription does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',

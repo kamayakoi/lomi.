@@ -7,7 +7,9 @@ import { getDocsLocale } from '@/lib/utils/docs-locale';
 // import { LargeSearchToggle } from 'fumadocs-ui/components/layout/search-toggle';
 import type { ReactNode } from 'react';
 import type { LayoutTab } from 'fumadocs-ui/layouts/shared';
-import type { Folder } from 'fumadocs-core/page-tree';
+import type { Folder, Node, Root } from 'fumadocs-core/page-tree';
+import { t as translate } from '@/lib/i18n/translations';
+import type { Language } from '@/lib/i18n/config';
 // import { Sparkles } from 'lucide-react';
 // import { AISearchTrigger } from '@/components/ai';
 // import { cn } from '@/lib/cn';
@@ -29,9 +31,72 @@ function getFirstPageUrl(node: Folder): string | undefined {
   return undefined;
 }
 
+const SECTION_LABEL_KEYS: Record<string, string> = {
+  'First steps': 'section.firstSteps',
+  'API Reference': 'section.apiReference',
+  'REST API': 'section.restApi',
+  Basics: 'section.basics',
+  Implementation: 'section.implementation',
+  Community: 'section.community',
+  Management: 'section.management',
+};
+
+const SECTION_DESCRIPTION_KEYS: Record<string, string> = {
+  'Developers use lomi. to reliably accept payments in West Africa.':
+    'sectionDescription.firstSteps',
+  'Complete reference to building with lomi. API.':
+    'sectionDescription.apiReference',
+  'Payment and commerce endpoints.': 'sectionDescription.restApi',
+};
+
+function localizeTreeLabel(value: ReactNode, locale: Language): ReactNode {
+  if (typeof value !== 'string') return value;
+
+  const key = SECTION_LABEL_KEYS[value];
+  if (!key) return value;
+
+  return translate(key, locale);
+}
+
+function localizeTreeDescription(value: ReactNode, locale: Language): ReactNode {
+  if (typeof value !== 'string') return value;
+
+  const key = SECTION_DESCRIPTION_KEYS[value];
+  if (!key) return value;
+
+  return translate(key, locale);
+}
+
+function localizeNode(node: Node, locale: Language): Node {
+  if (node.type === 'folder') {
+    return {
+      ...node,
+      name: localizeTreeLabel(node.name, locale),
+      children: node.children.map((child) => localizeNode(child, locale)),
+    };
+  }
+
+  if (node.type === 'separator') {
+    return {
+      ...node,
+      name: localizeTreeLabel(node.name, locale),
+    };
+  }
+
+  return node;
+}
+
+function localizeTree(root: Root, locale: Language): Root {
+  return {
+    ...root,
+    name: localizeTreeLabel(root.name, locale),
+    children: root.children.map((node) => localizeNode(node, locale)),
+  };
+}
+
 export default async function Layout({ children }: { children: ReactNode }) {
   const locale = await getDocsLocale();
-  const pageTree = source.getPageTree(locale);
+  const pageTree = localizeTree(source.getPageTree(locale), locale);
   const base = baseOptions();
   const tabs: LayoutTab[] = pageTree.children.flatMap((node) => {
     if (node.type !== 'folder') return [];
@@ -47,7 +112,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
     return [
       {
         title: node.name,
-        description: node.description,
+        description: localizeTreeDescription(node.description, locale),
         url,
         $folder: node,
         icon: node.icon ? (
@@ -69,6 +134,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <DocsLayout
       {...base}
+      i18n={false}
       tree={pageTree}
       tabs={tabs}
       // just icon items

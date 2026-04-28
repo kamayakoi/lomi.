@@ -6,9 +6,14 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import dynamic from 'next/dynamic';
 import { useEffect, type ReactNode } from 'react';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { TranslationProvider } from '@/lib/utils/translation-context';
+import {
+  TranslationProvider,
+  useTranslation,
+} from '@/lib/utils/translation-context';
 import { Toaster } from 'sonner';
 import type { Language } from '@/lib/i18n/config';
+import { languages } from '@/lib/i18n/config';
+import { t as translate } from '@/lib/i18n/translations';
 
 const SearchDialog = dynamic(() => import('@/components/ui/search'), {
   ssr: false,
@@ -39,6 +44,17 @@ export function Provider({
   }, []);
 
   return (
+    <TranslationProvider initialLanguage={initialLanguage}>
+      <RootProviderWithLanguage>{children}</RootProviderWithLanguage>
+    </TranslationProvider>
+  );
+}
+
+function RootProviderWithLanguage({ children }: { children: ReactNode }) {
+  const { currentLanguage } = useTranslation();
+  const t = (key: string) => translate(key, currentLanguage);
+
+  return (
     <RootProvider
       search={{
         SearchDialog,
@@ -48,13 +64,30 @@ export function Provider({
         defaultTheme: 'light',
         disableTransitionOnChange: false,
       }}
+      i18n={{
+        locale: currentLanguage,
+        locales: languages.map((lang) => ({
+          locale: lang.code,
+          name: lang.name,
+        })),
+        translations: {
+          search: t('search.search'),
+          searchNoResult: t('ui.searchNoResult'),
+          toc: t('ui.toc'),
+          tocNoHeadings: t('ui.tocNoHeadings'),
+          lastUpdate: t('ui.lastUpdate'),
+          chooseLanguage: t('ui.chooseLanguage'),
+          nextPage: t('ui.nextPage'),
+          previousPage: t('ui.previousPage'),
+          chooseTheme: t('ui.chooseTheme'),
+          editOnGithub: t('ui.editOnGithub'),
+        },
+      }}
     >
-      <TranslationProvider initialLanguage={initialLanguage}>
-        <TooltipProvider>
-          {children}
-          <Toaster />
-        </TooltipProvider>
-      </TranslationProvider>
+      <TooltipProvider>
+        {children}
+        <Toaster />
+      </TooltipProvider>
     </RootProvider>
   );
 }

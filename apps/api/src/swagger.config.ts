@@ -13,6 +13,9 @@ export function buildSwaggerDocumentBase() {
       'Payment processing API for francophone West African businesses.',
     )
     .setVersion('1.1.0')
-    .addApiKey({ type: 'apiKey', name: 'X-API-KEY', in: 'header' }, 'X-API-KEY')
+    .addApiKey(
+      { type: 'apiKey', name: 'X-API-KEY', in: 'header' },
+      'api-key',
+    )
     .build();
 }

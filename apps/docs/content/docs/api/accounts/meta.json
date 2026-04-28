@@ -1,0 +1,10 @@
+{
+  "title": "Accounts",
+  "pages": [
+    "AccountsController_checkAvailableBalance",
+    "AccountsController_findAll",
+    "AccountsController_findOne",
+    "AccountsController_getBalance",
+    "AccountsController_getBalanceBreakdown"
+  ]
+}

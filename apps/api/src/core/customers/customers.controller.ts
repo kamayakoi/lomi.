@@ -128,7 +128,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Get customer by ID',
     description:
-      'Returns detailed information about a specific customer. Only accessible if the customer belongs to your organization.',
+      'Returns a single customer. Responds with 404 if the customer does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',
@@ -209,7 +209,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Update a customer',
     description:
-      'Updates an existing customer. Only customers belonging to your organization can be updated. All fields are optional.',
+      'Updates a customer. Send only the fields to change. Responds with 404 if the customer does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',
@@ -262,7 +262,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Delete a customer',
     description:
-      'Soft deletes a customer. The customer will be marked as deleted but not removed from the database. Only customers belonging to your organization can be deleted.',
+      'Removes a customer from active use. They will no longer appear in list or get responses. Responds with 404 if the customer does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',
@@ -294,7 +294,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Get customer transactions',
     description:
-      'Returns all transactions for a specific customer. Only accessible if the customer belongs to your organization.',
+      'Returns transactions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',

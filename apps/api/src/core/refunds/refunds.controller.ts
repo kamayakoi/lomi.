@@ -11,7 +11,7 @@ import { CreateWaveRefundDto } from './dto/create-refund.dto';
 import { RefundResponseDto } from './dto/refund-response.dto';
 
 @ApiTags('Refunds')
-@ApiSecurity('X-API-KEY')
+@ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('refund')
 export class RefundsController {

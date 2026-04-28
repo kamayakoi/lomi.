@@ -40,11 +40,11 @@ export class OrganizationsController {
   @ApiOperation({
     summary: 'Get organization metrics',
     description:
-      'Get comprehensive metrics including MRR, ARR, LTV, revenue, and customer counts. All metrics are pre-calculated and stored in the database.',
+      'Returns MRR, ARR, LTV, revenue, and customer counts for your organization.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Organization metrics (pre-calculated values)',
+    description: 'Organization metrics',
     type: OrganizationMetricsResponseDto,
   })
   getMetrics(@CurrentUser() user: AuthContext) {

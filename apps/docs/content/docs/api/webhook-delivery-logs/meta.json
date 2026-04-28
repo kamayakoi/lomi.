@@ -1,0 +1,7 @@
+{
+  "title": "Webhook Delivery Logs",
+  "pages": [
+    "WebhookDeliveryLogsController_findAll",
+    "WebhookDeliveryLogsController_findOne"
+  ]
+}

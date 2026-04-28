@@ -224,12 +224,12 @@
     },
     "/organizations/metrics": {
       "get": {
-        "description": "Get comprehensive metrics including MRR, ARR, LTV, revenue, and customer counts. All metrics are pre-calculated and stored in the database.",
+        "description": "Returns MRR, ARR, LTV, revenue, and customer counts for your organization.",
         "operationId": "OrganizationsController_getMetrics",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Organization metrics (pre-calculated values)",
+            "description": "Organization metrics",
             "content": {
               "application/json": {
                 "schema": {
@@ -418,7 +418,7 @@
     },
     "/transactions/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific transaction. Only accessible if the transaction belongs to your organization.",
+        "description": "Returns a single transaction. Responds with 404 if the transaction does not exist or is not available for this API key.",
         "operationId": "TransactionsController_findOne",
         "parameters": [
           {
@@ -668,7 +668,7 @@
     },
     "/customers/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific customer. Only accessible if the customer belongs to your organization.",
+        "description": "Returns a single customer. Responds with 404 if the customer does not exist or is not available for this API key.",
         "operationId": "CustomersController_findOne",
         "parameters": [
           {
@@ -710,7 +710,7 @@
         ]
       },
       "patch": {
-        "description": "Updates an existing customer. Only customers belonging to your organization can be updated. All fields are optional.",
+        "description": "Updates a customer. Send only the fields to change. Responds with 404 if the customer does not exist or is not available for this API key.",
         "operationId": "CustomersController_update",
         "parameters": [
           {
@@ -799,7 +799,7 @@
         ]
       },
       "delete": {
-        "description": "Soft deletes a customer. The customer will be marked as deleted but not removed from the database. Only customers belonging to your organization can be deleted.",
+        "description": "Removes a customer from active use. They will no longer appear in list or get responses. Responds with 404 if the customer does not exist or is not available for this API key.",
         "operationId": "CustomersController_remove",
         "parameters": [
           {
@@ -848,7 +848,7 @@
     },
     "/customers/{id}/transactions": {
       "get": {
-        "description": "Returns all transactions for a specific customer. Only accessible if the customer belongs to your organization.",
+        "description": "Returns transactions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.",
         "operationId": "CustomersController_getTransactions",
         "parameters": [
           {
@@ -1145,7 +1145,7 @@
         },
         "security": [
           {
-            "X-API-KEY": []
+            "api-key": []
           }
         ],
         "summary": "Initiate a Wave refund",
@@ -1218,7 +1218,7 @@
         ]
       },
       "post": {
-        "description": "Creates a new product with one or more prices. The product and all prices are created atomically - if any part fails, the entire operation is rolled back. At least one price is required. The first price (or the one marked as is_default) will be the default price.",
+        "description": "Creates a product with one or more prices in a single request. At least one price is required. The first price, or the one with `is_default` set, is used when no price is specified at checkout.",
         "operationId": "ProductsController_create",
         "parameters": [],
         "responses": {
@@ -1252,7 +1252,7 @@
     },
     "/products/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific product, including all prices and fees. Only accessible if the product belongs to your organization.",
+        "description": "Returns a product, including its prices and fees. Responds with 404 if the product does not exist or is not available for this API key.",
         "operationId": "ProductsController_findOne",
         "parameters": [
           {
@@ -1343,7 +1343,7 @@
     },
     "/products/{id}/prices/{priceId}/set-default": {
       "post": {
-        "description": "Sets a specific price as the default for a product. The default price is used when a customer doesn't specify a price ID in checkout. Only one price can be the default at a time - setting a new default automatically unsets the previous one.",
+        "description": "Sets which price is used by default for this product (for example when checkout does not pass a price ID). One default at a time; choosing a new default replaces the previous one.",
         "operationId": "ProductsController_setDefaultPrice",
         "parameters": [
           {
@@ -1451,7 +1451,7 @@
     },
     "/subscriptions/customer/{customerId}": {
       "get": {
-        "description": "Returns all subscriptions for a specific customer. Only accessible if the customer belongs to your organization.",
+        "description": "Returns subscriptions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.",
         "operationId": "SubscriptionsController_findByCustomer",
         "parameters": [
           {
@@ -1498,7 +1498,7 @@
     },
     "/subscriptions/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific subscription. Only accessible if the subscription belongs to your organization.",
+        "description": "Returns a single subscription. Responds with 404 if the subscription does not exist or is not available for this API key.",
         "operationId": "SubscriptionsController_findOne",
         "parameters": [
           {
@@ -1736,7 +1736,7 @@
     },
     "/discount-coupons/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific discount coupon. Only accessible if the coupon belongs to your organization.",
+        "description": "Returns a single discount coupon. Responds with 404 if the coupon does not exist or is not available for this API key.",
         "operationId": "DiscountCouponsController_findOne",
         "parameters": [
           {
@@ -2356,7 +2356,7 @@
         },
         "security": [
           {
-            "X-API-KEY": []
+            "api-key": []
           }
         ],
         "summary": "Initiate a Wave payout",
@@ -2631,7 +2631,7 @@
     },
     "/webhook-delivery-logs/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific webhook delivery log. Only accessible if the log belongs to your organization.",
+        "description": "Returns a single webhook delivery log. Responds with 404 if the log does not exist or is not available for this API key.",
         "operationId": "WebhookDeliveryLogsController_findOne",
         "parameters": [
           {
@@ -2893,7 +2893,7 @@
         },
         "security": [
           {
-            "X-API-KEY": []
+            "api-key": []
           }
         ],
         "summary": "Initiate a Wave direct charge",
@@ -3183,11 +3183,6 @@
   ],
   "components": {
     "securitySchemes": {
-      "X-API-KEY": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-API-KEY"
-      },
       "api-key": {
         "type": "apiKey",
         "in": "header",

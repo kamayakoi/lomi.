@@ -1,0 +1,8 @@
+{
+  "title": "Checkout Sessions",
+  "pages": [
+    "CheckoutSessionsController_create",
+    "CheckoutSessionsController_findAll",
+    "CheckoutSessionsController_findOne"
+  ]
+}

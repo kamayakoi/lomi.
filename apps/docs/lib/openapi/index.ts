@@ -10,6 +10,7 @@ import type {
   PathItemObject,
   ReferenceObject,
 } from 'fumadocs-openapi';
+import { normalizeOpenApiSecurity } from '@/lib/openapi/security-normalize';
 
 const OPENAPI_DOCUMENT_ID = './openapi.json';
 const HTTP_METHODS = [
@@ -86,17 +87,6 @@ function ensurePathParameters(document: Document): Document {
   return document;
 }
 
-function normalizeSecuritySchemes(document: Document): Document {
-  const schemes = document.components?.securitySchemes;
-  if (!schemes) return document;
-
-  if (schemes['X-API-KEY'] && !schemes['api-key']) {
-    schemes['api-key'] = schemes['X-API-KEY'];
-  }
-
-  return document;
-}
-
 async function loadOpenApiDocument(): Promise<Document> {
   const absolutePath = path.resolve(process.cwd(), 'openapi.json');
   const raw = await readFile(absolutePath, 'utf-8');
@@ -108,7 +98,7 @@ export const openapi = createOpenAPI({
   input: async () => {
     const document = await loadOpenApiDocument();
     return {
-      [OPENAPI_DOCUMENT_ID]: normalizeSecuritySchemes(
+      [OPENAPI_DOCUMENT_ID]: normalizeOpenApiSecurity(
         ensurePathParameters(document),
       ),
     };

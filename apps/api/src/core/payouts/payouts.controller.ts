@@ -15,7 +15,7 @@ import { CreateWavePayoutDto } from './dto/create-payout.dto';
 import { PayoutResponseDto } from './dto/payout-response.dto';
 
 @ApiTags('Payouts')
-@ApiSecurity('X-API-KEY')
+@ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('payout')
 export class PayoutsController {

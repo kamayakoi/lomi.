@@ -376,6 +376,6 @@ Organization-level **fee** pricing (how much lomi. charges you on payments) is d
 
 - **Modes:** `volume_tiered`, `fixed`, and `custom` (see [Pricing](/core/merchant-of-record/pricing) and [Organizations — Pricing configuration](/reference/platform/organizations#pricing-configuration)).
 - **Resolution:** `volume_tiered` uses current processed-volume tiers; `fixed` and `custom` use configured fee schedules.
-- **API contract:** the `GET /organizations` response shape is defined in OpenAPI (`` `OrganizationResponseDto` ``); treat the [OpenAPI reference](/openapi/generated/index) as canonical for which fields are returned on each endpoint.
+- **API contract:** the `GET /organizations` response shape is defined in the API schema (`` `OrganizationResponseDto` ``); treat the [API reference](/api/index) as canonical for which fields are returned on each endpoint.
 
 Additional scenario-based fees (refunds, disputes, method surcharges) can still apply depending on active configuration.

@@ -157,7 +157,7 @@ export class TransactionsController {
   @ApiOperation({
     summary: 'Get transaction by ID',
     description:
-      'Returns detailed information about a specific transaction. Only accessible if the transaction belongs to your organization.',
+      'Returns a single transaction. Responds with 404 if the transaction does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',

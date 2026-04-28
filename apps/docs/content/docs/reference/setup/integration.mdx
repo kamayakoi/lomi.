@@ -24,11 +24,11 @@ curl -sS \
 
 Replace `$LOMI_API_KEY` with a **secret** key from the dashboard **Developers** / **API** section (`lomi_sk_test_…` / `lomi_sk_live_…`). Never send secret keys from a browser or mobile client. For environment details and key hygiene, see [Authentication](/reference/setup/authentication).
 
-## 2. Full HTTP reference (OpenAPI)
+## 2. Full HTTP reference (API)
 
-The **canonical** list of paths, methods, parameters, security, and **request bodies** is the generated OpenAPI site:
+The **canonical** list of paths, methods, parameters, security, and **request bodies** is the generated API site:
 
-- **[OpenAPI reference index](/openapi/generated/index)** — browse operations; each page includes **language tabs** (cURL, JavaScript, Go, Python, Java, and C#) and a **Try it** playground.
+- **[API reference index](/api/index)** — browse operations; each page includes **language tabs** (cURL, JavaScript, Go, Python, Java, and C#) and a **Try it** playground.
 
 The playground sends requests through the docs **proxy** (`/api/proxy` in this app), so you can exercise the API from the browser without CORS issues. Treat it as a convenience for exploration, not a substitute for calling the API from your own servers in production.
 
@@ -36,7 +36,7 @@ The playground sends requests through the docs **proxy** (`/api/proxy` in this a
 
 | Approach | When to use it | Docs |
 | --- | --- | --- |
-| **Raw HTTP** | Maximum control, any stack, smallest dependency | This hub + [OpenAPI reference](/openapi/generated/index) |
+| **Raw HTTP** | Maximum control, any stack, smallest dependency | This hub + [API reference](/api/index) |
 | **Official / community SDKs** | Faster integration when a maintained client fits your runtime | [SDKs overview](/reference/sdks) and language pages (e.g. [PHP](/reference/sdks/php)) |
 
 SDKs should follow the same **base URL**, **headers**, and **JSON** conventions as raw HTTP.
@@ -45,9 +45,9 @@ SDKs should follow the same **base URL**, **headers**, and **JSON** conventions 
 
 Your endpoint receives **raw JSON** in the request body. For signature verification you must use the **exact bytes** the gateway sent—**do not** rely on a prettified or re-serialized JSON string, which can change spacing or key order and break HMAC or similar schemes.
 
-Ingress routes for payment providers (e.g. Wave, Stripe-style) are documented in the OpenAPI tree under the relevant **webhook** paths. Configure URLs in the dashboard and validate signatures using the provider’s documented algorithm and the **raw body** buffer.
+Ingress routes for payment providers (e.g. Wave, Stripe-style) are documented in the API tree under the relevant **webhook** paths. Configure URLs in the dashboard and validate signatures using the provider’s documented algorithm and the **raw body** buffer.
 
-For managing **your** outbound webhook subscriptions (list, get, update) over the merchant API, see [Webhooks](/reference/payments/webhooks) and the matching operations in the [OpenAPI reference](/openapi/generated/index).
+For managing **your** outbound webhook subscriptions (list, get, update) over the merchant API, see [Webhooks](/reference/payments/webhooks) and the matching operations in the [API reference](/api/index).
 
 ## Next steps
 

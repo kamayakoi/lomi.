@@ -12,7 +12,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Charges')
-@ApiSecurity('X-API-KEY')
+@ApiSecurity('api-key')
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
 export class ChargesController {

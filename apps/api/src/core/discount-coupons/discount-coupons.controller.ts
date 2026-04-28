@@ -83,7 +83,7 @@ export class DiscountCouponsController {
   @ApiOperation({
     summary: 'Get discount coupon by ID',
     description:
-      'Returns detailed information about a specific discount coupon. Only accessible if the coupon belongs to your organization.',
+      'Returns a single discount coupon. Responds with 404 if the coupon does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',

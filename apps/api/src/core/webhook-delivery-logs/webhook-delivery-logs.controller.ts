@@ -107,7 +107,7 @@ export class WebhookDeliveryLogsController {
   @ApiOperation({
     summary: 'Get webhook delivery log by ID',
     description:
-      'Returns detailed information about a specific webhook delivery log. Only accessible if the log belongs to your organization.',
+      'Returns a single webhook delivery log. Responds with 404 if the log does not exist or is not available for this API key.',
   })
   @ApiParam({
     name: 'id',

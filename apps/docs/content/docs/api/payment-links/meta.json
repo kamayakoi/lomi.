@@ -1,0 +1,8 @@
+{
+  "title": "Payment Links",
+  "pages": [
+    "PaymentLinksController_create",
+    "PaymentLinksController_findAll",
+    "PaymentLinksController_findOne"
+  ]
+}

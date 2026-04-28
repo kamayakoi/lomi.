@@ -91,16 +91,6 @@ export const metadata: Metadata = {
       'x-default': docsOrigin,
     },
   },
-  icons: [
-    {
-      rel: 'icon',
-      url: '/favicon.ico',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/apple-touch-icon.png',
-    },
-  ],
   openGraph: {
     type: 'website',
     url: `${docsOrigin}/`,
