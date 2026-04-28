@@ -14,7 +14,7 @@ import { PayoutsService } from './payouts.service';
 import { CreateWavePayoutDto } from './dto/create-payout.dto';
 import { PayoutResponseDto } from './dto/payout-response.dto';
 
-@ApiTags('Payouts')
+@ApiTags('Virements sortants')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('payout')
@@ -23,17 +23,23 @@ export class PayoutsController {
 
   @Post('wave')
   @ApiOperation({
-    summary: 'Initiate a Wave payout',
+    summary: 'Lancer un virement Wave',
     description:
-      'Creates a payout via the Wave edge function. Response shape is provider JSON.',
+      "Crée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Payout initiated (JSON body from Wave edge function)',
+    description: "Virement initié (corps JSON de la fonction edge Wave)",
     type: PayoutResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid input or provider error' })
-  @ApiResponse({ status: 401, description: 'Invalid or missing API key' })
+  @ApiResponse({
+    status: 400,
+    description: 'Entrée invalide ou erreur fournisseur',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Clé API invalide ou manquante',
+  })
   async createWavePayout(
     @Body() createPayoutDto: CreateWavePayoutDto,
     @CurrentUser() user: AuthContext,

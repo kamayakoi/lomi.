@@ -23,10 +23,10 @@ export class WebhooksController {
   constructor(private readonly service: WebhooksService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List all webhooks' })
+  @ApiOperation({ summary: 'Lister les webhooks' })
   @ApiResponse({
     status: 200,
-    description: 'List of webhooks',
+    description: 'Liste des webhooks',
     type: WebhookResponseDto,
     isArray: true,
   })
@@ -35,10 +35,10 @@ export class WebhooksController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a webhook by ID' })
+  @ApiOperation({ summary: 'Obtenir un webhook par ID' })
   @ApiResponse({
     status: 200,
-    description: 'The webhook',
+    description: 'Le webhook',
     type: WebhookResponseDto,
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
@@ -46,10 +46,10 @@ export class WebhooksController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a webhook' })
+  @ApiOperation({ summary: 'Mettre à jour un webhook' })
   @ApiResponse({
     status: 200,
-    description: 'The webhook has been successfully updated.',
+    description: 'Webhook mis à jour avec succès',
     type: WebhookResponseDto,
   })
   @ApiBody({
@@ -67,7 +67,7 @@ export class WebhooksController {
     },
     examples: {
       rotateUrl: {
-        summary: 'Update delivery URL',
+        summary: "Mettre à jour l'URL de livraison",
         value: {
           url: 'https://example.com/webhooks/lomi',
           is_active: true,

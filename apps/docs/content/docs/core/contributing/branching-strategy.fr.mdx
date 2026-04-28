@@ -1,0 +1,188 @@
+---
+title: 'Stratégie de branches'
+description: 'Workflow Git inspiré de GitFlow, simplifié pour l’intégration et la livraison continues.'
+---
+
+## Branches principales
+
+Objectif : une branche de production stable (`main`) et un développement actif sur `develop`.
+
+Branches longues du dépôt :
+
+### Branche `main`
+
+- Code **prêt pour la production** uniquement, testé et validé.
+- **Protégée** : pas de push direct ; flux via PR depuis `release` ou `hotfix`.
+- **Étiquettes** : chaque fusion correspond à une release et reçoit une version sémantique (ex. `v1.2.3`).
+- **Déploiements** : fusion vers `main` → déploiement production automatisé.
+
+### Branche `develop`
+
+- Branche d’**intégration** principale pour le travail en cours.
+- Dernière version de dev intégrant fonctionnalités et correctifs en attente de release.
+- **Protégée** : contrôles CI requis avant fusion.
+- **Déploiements** : staging ou préproduction après fusion.
+- **Base des features** : créer les branches de fonctionnalités depuis `develop`.
+
+## Développement de fonctionnalités
+
+Branches de courte durée pour des tâches ciblées.
+
+### Branches `feature/*`
+
+Nouvelles fonctionnalités.
+
+```bash filename="Terminal - Feature Branch Workflow"
+# 1. Ensure your local develop is up-to-date
+git checkout develop
+git pull upstream develop
+
+# 2. Create your feature branch from develop
+git checkout -b feature/payment-method-wave
+
+# 3. Work on your feature, commit changes regularly
+# ... make changes ...
+git add .
+git commit -m "feat(payments): implement initial Wave structure"
+
+# 4. Keep your branch updated with develop (optional but recommended)
+git fetch upstream
+git rebase upstream/develop
+
+# 5. Push your feature branch to your fork
+git push origin feature/payment-method-wave
+```
+
+### Branches `fix/*`
+
+Correction de bugs non bloquants en cours de développement.
+
+```bash filename="Terminal - Bug Fix Branch Workflow"
+# 1. Create bug fix branch from develop
+git checkout develop
+git pull upstream develop
+git checkout -b fix/transaction-timeout-handling
+
+# 2. Fix the bug and commit
+# ... make changes ...
+git add .
+git commit -m "fix(transactions): increase timeout and add retry logic"
+
+# 3. Push the branch
+git push origin fix/transaction-timeout-handling
+```
+
+## Releases
+
+Branches pour préparer et publier les versions.
+
+### Branches `release/*`
+
+Finalisation avant mise en production : tests finaux, doc, corrections mineures liées à la release.
+
+```bash filename="Terminal - Release Branch Workflow"
+# 1. Create release branch from develop
+git checkout develop
+git pull upstream develop
+git checkout -b release/v1.2.0
+
+# 2. Perform release tasks (e.g., bump version, update changelog)
+npm version minor -m "chore(release): prepare release %s"
+# ... final tests, documentation updates ...
+
+# 3. Push the release branch (allows CI to run tests)
+git push origin release/v1.2.0
+
+# 4. Once ready, merge into main and develop, then tag main
+# (See Merge Strategy below)
+```
+
+### Branches `hotfix/*`
+
+Bugs critiques en production sur `main` — correction rapide.
+
+```bash filename="Terminal - Hotfix Branch Workflow"
+# 1. Create hotfix branch directly from main
+git checkout main
+git pull upstream main
+git checkout -b hotfix/critical-auth-issue-1.2.1
+
+# 2. Fix the critical bug
+# ... make changes ...
+git add .
+git commit -m "fix(auth): resolve critical login vulnerability"
+
+# 3. Bump the patch version
+npm version patch -m "chore(release): hotfix %s"
+
+# 4. Push the hotfix branch
+git push origin hotfix/critical-auth-issue-1.2.1
+
+# 5. Once fixed and tested, merge into main and develop, then tag main
+# (See Merge Strategy below)
+```
+
+## Règles de protection
+
+Paramètres GitHub typiques :
+
+1.  **`main`**
+    - Au moins une revue de PR obligatoire.
+    - Contrôles CI/lint verts avant fusion.
+    - Branche à jour avec la base avant fusion.
+    - **Pas de push direct.**
+    - Historique linéaire préféré (squash ou rebase des PR).
+
+2.  **`develop`**
+    - Contrôles CI avant fusion.
+    - Fusion sans revue réservée aux mainteneurs (selon équipe).
+    - Squash/rebase des PR pour un historique lisible.
+
+## Stratégie de fusion
+
+1.  **`feature` / `fix` → `develop`**
+    - PR vers `develop`, CI et revue OK.
+    - **Squash and Merge** ou **Rebase and Merge** pour garder un historique propre sur `develop`.
+    - Supprimer la branche après fusion.
+
+2.  **`release/*` → `main` et `develop`**
+    - PR `release/*` → `main` ; validations finales OK.
+    - **Merge commit (`--no-ff`)** pour conserver la préparation release.
+    - Après fusion sur `main`, **étiqueter** (`git tag v1.2.0 <hash>` puis `git push upstream --tags`).
+    - Rebaser ou fusionner `release/*` dans `develop` pour remonter les correctifs pré-release.
+    - Supprimer la branche `release` une fois intégrée.
+
+3.  **`hotfix/*` → `main` et `develop`**
+    - Procédure analogue : PR vers `main`, merge commit, tag sur `main`, puis même correctif ramené dans `develop`.
+    - Supprimer la branche `hotfix` ensuite.
+
+## Récapitulatif
+
+1.  **Nommage**
+    - `feature/<description>`
+    - `fix/<description>`
+    - `release/v<version>`
+    - `hotfix/<description-or-version>`
+    - Kebab-case.
+
+2.  **Commits**
+    - [Conventional Commits](https://www.conventionalcommits.org/).
+
+    ```bash filename="Exemple de format de message de commit"
+    # Format: <type>(<scope>): <subject>
+    # Example: feat(payments): add Wave payment provider integration
+    ```
+
+    - Référencer les tickets (`Closes #123` dans le corps).
+
+3.  **Pull requests**
+    - Titres et descriptions explicites.
+    - Liens vers les issues.
+    - Une PR par changement logique.
+    - Revues par les membres ou code owners appropriés.
+
+## Étapes suivantes
+
+- [Revue de code](/core/contributing/code-reviews)
+- [Versionnement](/core/contributing/versioning)
+- [Bonnes pratiques](/core/contributing/best-practices)

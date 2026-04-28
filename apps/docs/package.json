@@ -17,6 +17,7 @@
     "clean": "rimraf .next",
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev --turbo",
     "lint": "fumadocs-mdx && bun ./lib/scripts/lint.ts && eslint .",
+    "api:bootstrap": "pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts",
     "knip": "knip",
     "start": "next start",
     "mdx": "pnpm exec fumadocs-mdx",

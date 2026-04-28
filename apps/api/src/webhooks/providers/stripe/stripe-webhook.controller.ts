@@ -12,7 +12,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { StripeWebhookService } from './stripe-webhook.service';
 import type { Request } from 'express';
 
-@ApiTags('Webhooks - Providers')
+@ApiTags('Webhooks - Fournisseurs')
 @Controller('webhooks/stripe')
 export class StripeWebhookController {
   private readonly logger = new Logger(StripeWebhookController.name);
@@ -22,13 +22,13 @@ export class StripeWebhookController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Receive Stripe webhook events',
+    summary: 'Réception des événements webhook Stripe',
     description:
-      'Endpoint for Stripe to send payment notifications. Verifies signature and processes events.',
+      'Point de terminaison pour les notifications Stripe. Vérifie la signature et traite les événements.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Webhook received and processed successfully',
+    description: 'Webhook reçu et traité avec succès',
     schema: {
       type: 'object',
       properties: {
@@ -39,11 +39,11 @@ export class StripeWebhookController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid webhook signature',
+    description: 'Signature webhook invalide',
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error processing webhook',
+    description: 'Erreur interne lors du traitement du webhook',
   })
   async handleWebhook(
     @Headers() headers: Record<string, string>,

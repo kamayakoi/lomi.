@@ -1,0 +1,229 @@
+---
+title: Abonnements
+description: Gérez les abonnements clients récurrents.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+L’API Subscriptions permet de lister et récupérer des **instances d’abonnement** (un client sur un plan récurrent). Elles sont en général créées lorsque des clients souscrivent à un produit récurrent via une session ou un lien de paiement.
+
+<Callout type="info">
+  Les SDK peuvent exposer à la fois des helpers **`/subscriptions`** et des méthodes **`/customer-subscriptions`**. Exemples par route et transitions de statut : **[Abonnements clients](/reference/platform/customer-subscriptions)**. Les champs immuables et les règles d’annulation suivent les descriptions OpenAPI de chaque opération.
+</Callout>
+
+## Lister les abonnements
+
+Récupère tous les abonnements de votre organisation.
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `page` | `number` | Page (défaut : `1`) |
+| `pageSize` | `number` | Taille de page (défaut : `50`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const subscriptions = await lomi.subscriptions.list({
+  page: 1,
+  pageSize: 20,
+});
+
+subscriptions.forEach(sub => {
+  console.log(`${sub.id}: ${sub.status} - ${sub.amount} ${sub.currency_code}`);
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+subscriptions = client.subscriptions.list(page=1, pageSize=20)
+
+for sub in subscriptions:
+    print(f"{sub['id']}: {sub['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Abonnements d’un client
+
+Récupère les abonnements d’un client donné.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const customerSubs = await lomi.subscriptions.getByCustomer('cus_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+customer_subs = client.subscriptions.get_by_customer('cus_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir un abonnement
+
+Récupère le détail d’un abonnement.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const subscription = await lomi.subscriptions.get('sub_abc123...');
+console.log(`Status: ${subscription.status}`);
+console.log(`Next billing: ${subscription.current_period_end}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+subscription = client.subscriptions.get('sub_abc123...')
+print(f"Status: {subscription['status']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Annuler un abonnement
+
+Annule un abonnement actif. C’est la **seule** modification permise.
+
+### Corps de la requête
+
+| Champ | Type | Obligatoire | Description |
+|-------|------|-------------|-------------|
+| `cancel_at_period_end` | `boolean` | Non | Si `true`, annulation fin de période. Si `false`, annulation immédiate (défaut). |
+| `reason` | `string` | Non | Motif d’annulation |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
+
+const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
+  cancel_at_period_end: true,
+  reason: 'Customer requested cancellation',
+});
+
+console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+cancelled = client.subscriptions.cancel('sub_abc123...')
+
+scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
+    "cancel_at_period_end": True,
+    "reason": "Customer requested cancellation"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cancel_at_period_end": true,
+    "reason": "Customer requested cancellation"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Objet Subscription
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Identifiant unique |
+| `customer_id` | `string` | Client |
+| `product_id` | `string` | Produit |
+| `price_id` | `string` | Tarif |
+| `status` | `string` | `active`, `past_due`, `cancelled`, `trialing` |
+| `amount` | `number` | Montant récurrent |
+| `currency_code` | `string` | Devise |
+| `billing_interval` | `string` | `day`, `week`, `month`, `year` |
+| `current_period_start` | `string` | Début de période |
+| `current_period_end` | `string` | Fin de période (prochaine échéance) |
+| `cancel_at_period_end` | `boolean` | Annulation planifiée en fin de période |
+| `cancel_at` | `string` | Date d’annulation planifiée |
+| `cancelled_at` | `string` | Annulation effective |
+| `trial_start` | `string` | Début d’essai |
+| `trial_end` | `string` | Fin d’essai |
+| `created_at` | `string` | Création |
+
+---
+
+## Webhooks
+
+| Événement | Description |
+|-------|-------------|
+| `subscription.created` | Nouvel abonnement |
+| `subscription.updated` | Renouvellement ou mise à jour |
+| `subscription.cancelled` | Annulation |
+| `subscription.payment_failed` | Échec d’un paiement récurrent |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `401` | Clé API invalide ou manquante |
+| `404` | Abonnement ou client introuvable |

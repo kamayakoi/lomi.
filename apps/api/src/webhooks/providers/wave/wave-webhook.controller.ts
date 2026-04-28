@@ -13,7 +13,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { WaveWebhookService } from './wave-webhook.service';
 import type { Request } from 'express';
 
-@ApiTags('Webhooks - Providers')
+@ApiTags('Webhooks - Fournisseurs')
 @Controller('webhooks/wave')
 export class WaveWebhookController {
   private readonly logger = new Logger(WaveWebhookController.name);
@@ -23,13 +23,13 @@ export class WaveWebhookController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Receive Wave webhook events',
+    summary: 'Réception des événements webhook Wave',
     description:
-      'Endpoint for Wave to send payment notifications. Verifies signature and processes events.',
+      'Point de terminaison pour les notifications Wave. Vérifie la signature et traite les événements.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Webhook received and processed successfully',
+    description: 'Webhook reçu et traité avec succès',
     schema: {
       type: 'object',
       properties: {
@@ -40,11 +40,11 @@ export class WaveWebhookController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid webhook signature',
+    description: 'Signature webhook invalide',
   })
   @ApiResponse({
     status: 500,
-    description: 'Internal server error processing webhook',
+    description: 'Erreur interne lors du traitement du webhook',
   })
   async handleWebhook(
     @Headers() headers: Record<string, string>,

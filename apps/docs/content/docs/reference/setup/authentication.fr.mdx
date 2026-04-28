@@ -1,0 +1,67 @@
+---
+title: 'Authentification'
+description: "Les requêtes lomi. s’authentifient avec des clés API. Une requête sans clé valide renvoie une erreur d’authentification."
+---
+
+Pour un parcours guidé depuis votre premier `curl` jusqu’aux pages OpenAPI, SDK et pièges webhooks : **[Intégration API](/reference/setup/integration)**.
+
+Deux types de clés correspondent aux environnements **Test** et **Live**.
+
+## Clés API
+
+Les requêtes doivent être en HTTPS. Le HTTP nu échoue. Sans authentification, échec également.
+
+Une clé API doit figurer dans l’en-tête `` `X-API-Key` `` pour chaque requête.
+
+```http filename="API request header"
+GET /accounts HTTP/1.1
+Host: api.lomi.africa
+X-API-Key: your_api_key
+```
+
+Les noms d’en-têtes sont insensibles à la casse : `` `X-API-Key` `` ou `` `X-API-KEY` ``.
+
+Remplacez `your_api_key` par votre clé secrète.
+
+## Test et production
+
+### Environnement de test
+
+Développement et tests sans traiter des fonds réels ni affecter les données live. Fonctionnement proche du live.
+
+- **Clés :** préfixe `` `lomi_sk_test_` ``.
+- **Base URL :** `` `https://sandbox.api.lomi.africa` ``.
+- **Limites :** 120 requêtes/minute et 20 000/jour.
+- **Données :** données simulées ; champ du type `` `"environment": "test"` ``.
+
+### Environnement de production
+
+Opérations réelles et transactions véritables.
+
+- **Clés :** préfixe `` `lomi_sk_live_` ``.
+- **Base URL :** `` `https://api.lomi.africa` ``.
+- **Limites :** 60 requêtes/minute et 10 000/jour.
+- **Données :** données réelles ; champ du type `` `"environment": "live"` ``.
+
+Utilisez la paire base URL + clé adaptée à l’environnement.
+
+## Obtenir les clés
+
+Après inscription et vérification :
+
+1.  Connectez-vous au [tableau de bord](https://lomi.africa/portal).
+2.  Section **Developers** ou **Paramètres API**.
+3.  Générez des clés **Test** et **Live**.
+
+## Gestion et sécurité des clés
+
+Traitez les clés comme des secrets confidentiels (génération, révocation, usage surveillés dans le tableau de bord marchand).
+
+Bonnes pratiques :
+
+- **Confidentialité** : pas de partage imprudent ; secrets ou coffre sécurisé.
+- **Jamais côté client** : pas dans le front navigateur ou mobile.
+- **Pas dans le dépôt** : ne pas committer les secrets.
+- **Test en développement** : les clés live réservées à la production.
+- **Rotation** : périodique ou en cas de suspicion de compromission.
+- **Accès interne** : limiter qui voit les clés.

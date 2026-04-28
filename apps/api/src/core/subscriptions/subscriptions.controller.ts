@@ -27,7 +27,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Subscriptions')
+@ApiTags('Abonnements')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('subscriptions')
@@ -36,33 +36,33 @@ export class SubscriptionsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all subscriptions',
+    summary: 'Lister les abonnements',
     description:
-      "Returns all subscriptions for the authenticated merchant's organization. Subscriptions are automatically created when customers make recurring payments.",
+      "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
   })
   @ApiQuery({
     name: 'page',
     required: false,
-    description: 'Page number for pagination',
+    description: 'Numéro de page',
     type: Number,
     example: 1,
   })
   @ApiQuery({
     name: 'pageSize',
     required: false,
-    description: 'Number of items per page',
+    description: "Nombre d'éléments par page",
     type: Number,
     example: 50,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of subscriptions',
+    description: 'Liste des abonnements',
     type: SubscriptionResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -75,28 +75,28 @@ export class SubscriptionsController {
 
   @Get('customer/:customerId')
   @ApiOperation({
-    summary: 'Get subscriptions for a customer',
+    summary: 'Abonnements d’un client',
     description:
-      'Returns subscriptions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.',
+      "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'customerId',
-    description: 'Customer UUID',
+    description: 'UUID du client',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of customer subscriptions',
+    description: 'Liste des abonnements du client',
     type: SubscriptionResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 404,
-    description: 'Customer not found or access denied',
+    description: 'Client introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findByCustomer(
     @Param('customerId') customerId: string,
@@ -107,27 +107,27 @@ export class SubscriptionsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get subscription by ID',
+    summary: 'Obtenir un abonnement par ID',
     description:
-      'Returns a single subscription. Responds with 404 if the subscription does not exist or is not available for this API key.',
+      "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Subscription UUID',
+    description: 'UUID de l’abonnement',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Subscription details',
+    description: 'Détails de l’abonnement',
     type: SubscriptionResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Subscription not found or access denied',
+    description: 'Abonnement introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.subscriptionsService.findOne(id, user);
@@ -135,27 +135,27 @@ export class SubscriptionsController {
 
   @Post(':id/cancel')
   @ApiOperation({
-    summary: 'Cancel a subscription',
+    summary: 'Résilier un abonnement',
     description:
-      'Cancels an active subscription. This is the ONLY modification allowed on subscriptions. Price, billing dates, and other fields are system-managed and cannot be changed.',
+      "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Subscription UUID',
+    description: 'UUID de l’abonnement',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Subscription cancelled successfully',
+    description: 'Abonnement résilié avec succès',
     type: SubscriptionResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Subscription not found or access denied',
+    description: 'Abonnement introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     schema: {
@@ -166,9 +166,9 @@ export class SubscriptionsController {
     },
     examples: {
       withReason: {
-        summary: 'Cancel with reason',
+        summary: 'Résiliation avec motif',
         value: {
-          cancellation_reason: 'Customer requested cancellation',
+          cancellation_reason: 'Demande du client',
         },
       },
     },

@@ -19,6 +19,10 @@ We welcome contributions to improve lomi. and its documentation. If you find any
 
 For detailed contribution guidelines, see the main [CONTRIBUTING.md](https://github.com/lomiafrica/lomi./blob/master/CONTRIBUTING.md) in the monorepo.
 
+### REST API reference (this app)
+
+The REST section under `content/docs/api/` is **hand-authored MDX** with parity checks against `openapi.json`. See [REST API reference authoring](/core/contributing/api-reference-authoring). After API changes, run `pnpm run api:bootstrap` from `apps/docs` (and edit for clarity).
+
 ## Support
 
 Contact [hello@lomi.africa](mailto:hello@lomi.africa) or visit our [support center](https://docs.lomi.africa/support).

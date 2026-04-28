@@ -11,7 +11,7 @@ import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { AuthContext } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Charges')
+@ApiTags('Encaissements')
 @ApiSecurity('api-key')
 @Controller('charge')
 @UseGuards(ApiKeyGuard)
@@ -19,17 +19,20 @@ export class ChargesController {
   constructor(private readonly chargesService: ChargesService) {}
 
   @Post('wave')
-  @ApiOperation({ summary: 'Initiate a Wave direct charge' })
+  @ApiOperation({ summary: 'Lancer un encaissement direct Wave' })
   @ApiResponse({
     status: 201,
     description:
-      'Charge initiated successfully (JSON body from Wave edge function)',
+      "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
     schema: {
       type: 'object',
       additionalProperties: true,
     },
   })
-  @ApiResponse({ status: 400, description: 'Invalid input or Wave API error' })
+  @ApiResponse({
+    status: 400,
+    description: 'Entrée invalide ou erreur API Wave',
+  })
   async createWaveCharge(
     @Body() createChargeDto: CreateWaveChargeDto,
     @CurrentUser() user: AuthContext,

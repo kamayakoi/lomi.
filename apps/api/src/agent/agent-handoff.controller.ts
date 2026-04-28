@@ -39,8 +39,11 @@ export class AgentHandoffController {
   @Post('handoff')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @ApiBody({ type: CreateHandoffDto })
-  @ApiOperation({ summary: 'Cross-service / cross-agent handoff (context + task envelope)' })
-  @ApiResponse({ status: 201, description: 'Handoff registered' })
+  @ApiOperation({
+    summary:
+      'Transfert inter-services / inter-agents (contexte + enveloppe de tâche)',
+  })
+  @ApiResponse({ status: 201, description: 'Transfert enregistré' })
   create(
     @CurrentUser() user: AuthContext,
     @Body() body: CreateHandoffDto,
@@ -60,7 +63,7 @@ export class AgentHandoffController {
 
   @Get('handoff/:id')
   @ApiParam({ name: 'id' })
-  @ApiOperation({ summary: 'Retrieve handoff record' })
+  @ApiOperation({ summary: 'Récupérer un enregistrement de transfert' })
   get(
     @CurrentUser() user: AuthContext,
     @Param('id') id: string,

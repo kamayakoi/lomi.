@@ -10,7 +10,7 @@ import { RefundsService } from './refunds.service';
 import { CreateWaveRefundDto } from './dto/create-refund.dto';
 import { RefundResponseDto } from './dto/refund-response.dto';
 
-@ApiTags('Refunds')
+@ApiTags('Remboursements')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('refund')
@@ -19,17 +19,20 @@ export class RefundsController {
 
   @Post('wave')
   @ApiOperation({
-    summary: 'Initiate a Wave refund',
+    summary: 'Lancer un remboursement Wave',
     description:
-      'Creates a refund via the Wave edge function. Response shape is provider JSON.',
+      "Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Refund result (JSON body from Wave edge function)',
+    description: "Résultat du remboursement (corps JSON de la fonction edge)",
     type: RefundResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid input' })
-  @ApiResponse({ status: 500, description: 'Refund processing failed' })
+  @ApiResponse({ status: 400, description: 'Entrée invalide' })
+  @ApiResponse({
+    status: 500,
+    description: 'Échec du traitement du remboursement',
+  })
   async createWaveRefund(@Body() createRefundDto: CreateWaveRefundDto) {
     return this.refundsService.createWaveRefund(createRefundDto);
   }

@@ -1,0 +1,40 @@
+---
+title: Fiabilité des webhooks
+description: Nouvelles tentatives, idempotence, journaux de livraison et traitement sûr des doublons.
+---
+
+Les intégrations de production doivent supposer une livraison **au moins une fois** : le même événement logique peut arriver plusieurs fois. Ce guide complète [Recevoir les webhooks](/core/advanced-guides/handling-webhooks) sur le plan opérationnel.
+
+## Répondre vite, traiter en asynchrone
+
+Renvoyez un **2xx** rapidement après vérification de la signature et persistance minimale accusant réception. Le travail lourd passe par une file d’attente pour que lomi. n’expire pas en attendant votre handler.
+
+## Traitement idempotent
+
+Servez-vous d’un **identifiant d’événement** stable (ou empreinte + type + id ressource) pour détecter les doublons :
+
+- Si l’événement est déjà appliqué, **ignorez** ou faites un **no-op**.
+- Sans stockage des identifiants traités, n’assumez pas une livraison « exactement une fois ».
+
+Cela reflète les schémas côté serveur où les métadonnées sont **fusionnées** et les soldes vérifient des drapeaux **déjà traités**.
+
+## Nouvelles tentatives et journaux
+
+lomi. journalise les tentatives dans les **journaux de livraison webhook** (voir [Webhook delivery logs](/reference/platform/webhook-delivery-logs)) pour :
+
+- confirmer un code non 2xx
+- analyser latence et taille du corps
+- déboguer signature ou parsing
+
+## Vérification de signature
+
+Utilisez les **octets bruts** du corps. Un JSON resérialisé peut casser le HMAC. Détails : [Recevoir les webhooks](/core/advanced-guides/handling-webhooks) et [Intégration API](/reference/setup/integration).
+
+## Test et live
+
+Secrets et URLs webhook sont **propres à l’environnement**. Faites monter vos configurations progressivement pour qu’aucun secret ou URL de test ne reçoive du trafic live.
+
+## Référence API associée
+
+- [API Webhooks](/reference/payments/webhooks)
+- [Machine d’état des paiements](/reference/reference/payment-state-machine)

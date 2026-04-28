@@ -1,0 +1,179 @@
+---
+title: 'Variables d’environnement'
+description: 'Gérez en toute sécurité vos clés API et variables d’environnement.'
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Clés API
+
+lomi. propose deux types de clés API pour chaque environnement :
+
+- **Clés secrètes** (`lomi_sk_test_…` / `lomi_sk_live_…`) : accès complet, uniquement côté serveur. **Ne les partagez jamais.**
+- **Clés publiables** (`pk_…` le cas échéant) : accès limité ; utilisables côté client uniquement lorsque votre intégration le prévoit explicitement.
+
+<Callout type="info">
+  Les anciens exemples peuvent afficher les préfixes `sk_test_` / `sk_live_`. Les clés actuellement délivrées par le tableau de bord suivent **`lomi_sk_test_`** et **`lomi_sk_live_`**, comme dans [Authentification](/reference/setup/authentication).
+</Callout>
+
+## Gestion des variables d’environnement
+
+Définissez-les dans votre fichier `.env` ou votre configuration de déploiement :
+
+```bash
+# Required: Your secret key
+LOMI_SECRET_KEY=lomi_sk_test_xxxxxxxxxxxxxxxxxxxxxx
+
+# Required: Your webhook secret
+LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx
+
+# Optional: Base URL (defaults to https://api.lomi.africa)
+# LOMI_API_URL=https://api.lomi.africa
+```
+
+## Exemples d’initialisation
+
+Initialiser le SDK avec vos variables d’environnement :
+
+<Tabs items={["TypeScript", "Python", "Go", "PHP"]}>
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+apiKey: process.env.LOMI_SECRET_KEY!,
+environment: 'live', // or 'test'
+// Optional: Custom timeout
+timeout: 30000,
+});
+
+````
+</Tab>
+<Tab value="Python">
+```python
+import os
+from lomi import LomiClient
+
+api_client = LomiClient(
+    api_key=os.environ["LOMI_SECRET_KEY"],
+    environment="test" # or "live"
+)
+````
+
+</Tab>
+<Tab value="Go">
+```go
+import (
+    "os"
+    lomi "github.com/lomiafrica/lomi-go-sdk"
+)
+
+configuration := lomi.NewConfiguration()
+
+// Override host for sandbox
+configuration.Servers = lomi.ServerConfigurations{
+{
+URL: "https://sandbox.api.lomi.africa",
+Description: "Sandbox Environment",
+},
+}
+
+client := lomi.NewAPIClient(configuration)
+
+````
+</Tab>
+<Tab value="PHP">
+```php
+use Lomi\Configuration;
+
+$config = Configuration::getDefaultConfiguration()
+    ->setApiKey('X-API-KEY', getenv('LOMI_SECRET_KEY'))
+    ->setHost('https://sandbox.api.lomi.africa');
+````
+
+</Tab>
+</Tabs>
+
+## Vérification des webhooks
+
+Vérifiez les webhooks entrants à l’aide de `LOMI_WEBHOOK_SECRET` :
+
+<Tabs items={["TypeScript", "Python", "Go", "PHP"]}>
+<Tab value="TypeScript">
+```typescript
+// Express example
+import crypto from 'crypto';
+
+app.post('/webhook', (req, res) => {
+const signature = req.headers['x-lomi-signature'];
+const secret = process.env.LOMI_WEBHOOK_SECRET!;
+
+const expected = crypto
+.createHmac('sha256', secret)
+.update(req.rawBody)
+.digest('hex');
+
+if (signature !== expected) {
+return res.status(400).send('Invalid signature');
+}
+
+// Process event...
+});
+
+````
+</Tab>
+<Tab value="Python">
+```python
+# Flask example
+import hmac
+import hashlib
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    signature = request.headers.get('x-lomi-signature')
+    secret = os.environ['LOMI_WEBHOOK_SECRET'].encode()
+
+    expected = hmac.new(secret, request.data, hashlib.sha256).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        return jsonify({'error': 'Invalid signature'}), 400
+
+    # Process event...
+````
+
+</Tab>
+<Tab value="Go">
+```go
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
+    signature := r.Header.Get("x-lomi-signature")
+    secret := os.Getenv("LOMI_WEBHOOK_SECRET")
+    
+    body, _ := io.ReadAll(r.Body)
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(body)
+    expected := hex.EncodeToString(mac.Sum(nil))
+    
+    if !hmac.Equal([]byte(signature), []byte(expected)) {
+        http.Error(w, "Invalid signature", http.StatusBadRequest)
+        return
+    }
+}
+```
+</Tab>
+<Tab value="PHP">
+```php
+$signature = $_SERVER['HTTP_X_LOMI_SIGNATURE'];
+$secret = getenv('LOMI_WEBHOOK_SECRET');
+$payload = file_get_contents('php://input');
+
+$expected = hash_hmac('sha256', $payload, $secret);
+
+if (!hash_equals($expected, $signature)) {
+die('Invalid signature');
+}
+
+```
+</Tab>
+</Tabs>
+

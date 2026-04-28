@@ -1,0 +1,270 @@
+---
+title: 'Traiter les webhooks'
+description: 'Les webhooks fournissent des mises à jour en temps réel sur les événements de votre compte lomi.. Ce guide explique comment recevoir et traiter ces notifications en toute sécurité.'
+---
+
+Pour une introduction générale et la configuration, voir [Configurer les webhooks](/core/fundamentals/webhooks).
+
+Comportement opérationnel (nouvelles tentatives, doublons, journaux de livraison) : [Fiabilité des webhooks](/core/advanced-guides/webhook-reliability).
+
+## Résumé de la configuration
+
+### Configurer votre point de terminaison
+
+Préparez un point de terminaison HTTPS dédié pour recevoir des requêtes POST avec un corps JSON.
+
+```typescript filename="Configuration Express de base pour les webhooks"
+import express from 'express';
+import crypto from 'crypto';
+
+const app = express();
+
+// Définir la fonction de traitement du webhook
+async function handleWebhook(req: express.Request, res: express.Response) {
+  const LOMI_WEBHOOK_SECRET = process.env.LOMI_WEBHOOK_SECRET;
+  if (!LOMI_WEBHOOK_SECRET) {
+    console.error('Webhook secret is not configured.');
+    return res.status(500).send('Webhook configuration error');
+  }
+
+  // Vérifier la signature (implémentation ci-dessous)
+  const signature = req.headers['x-lomi-signature'] as string;
+  if (
+    !signature ||
+    !verifySignature(req.body, signature, LOMI_WEBHOOK_SECRET)
+  ) {
+    return res.status(400).send('Invalid signature');
+  }
+
+  // Répondre rapidement pour accuser réception
+  res.status(200).json({ received: true });
+
+  // Traiter l’événement de manière asynchrone
+  const event = JSON.parse(req.body.toString());
+  try {
+    await processWebhookEvent(event);
+  } catch (error) {
+    console.error('Error processing webhook event:', error);
+    // Journaliser l’erreur sans faire échouer la réponse à lomi.
+  }
+}
+
+// Utiliser express.raw() pour accéder au corps brut (vérification de signature)
+app.post(
+  '/your-webhook-endpoint',
+  express.raw({ type: 'application/json' }),
+  handleWebhook,
+);
+
+// Fonction de vérification de signature (voir ci-dessous)
+function verifySignature(
+  payload: Buffer,
+  signature: string,
+  secret: string,
+): boolean {
+  // ... implementation ...
+  return true; // Placeholder
+}
+
+// Logique de traitement de l’événement
+async function processWebhookEvent(event: any): Promise<void> {
+  console.log(`Processing event: ${event.id}, Type: ${event.event}`);
+  // Ajouter votre logique métier selon event.event
+}
+
+// Démarrer le serveur...
+```
+
+### Vérifier les signatures
+
+Vérifiez toujours l’en-tête `X-Lomi-Signature` pour garantir que la requête provient bien de lomi. et n’a pas été altérée.
+
+```typescript filename="Fonction de vérification de signature webhook"
+import crypto from 'crypto';
+
+function verifySignature(
+  payload: Buffer, // Corps brut (Buffer)
+  signatureHeader: string,
+  secret: string,
+): boolean {
+  if (!payload || !signatureHeader || !secret) {
+    return false;
+  }
+
+  try {
+    const hmac = crypto
+      .createHmac('sha256', secret)
+      .update(payload)
+      .digest('hex');
+
+    // Comparaison à temps constant
+    return crypto.timingSafeEqual(
+      Buffer.from(signatureHeader),
+      Buffer.from(hmac),
+    );
+  } catch (error) {
+    console.error('Error during signature verification:', error);
+    return false;
+  }
+}
+```
+
+## Traiter les événements
+
+Une fois la signature vérifiée, vous pouvez traiter le corps de l’événement en toute sécurité.
+
+```typescript filename="Traitement des événements webhook"
+interface LomiWebhookEvent {
+  id: string;
+  event: string; // ex. 'PAYMENT_SUCCEEDED'
+  timestamp: string;
+  data: any; // Structure selon le type d’événement
+  lomi_environment: 'live' | 'test';
+}
+
+async function processWebhookEvent(event: LomiWebhookEvent): Promise<void> {
+  // Facultatif : vérifier si l’identifiant a déjà été traité (idempotence)
+  if (await hasEventBeenProcessed(event.id)) {
+    console.log(`Event ${event.id} already processed. Skipping.`);
+    return;
+  }
+
+  console.log(`Processing event: ${event.id}, Type: ${event.event}`);
+
+  switch (event.event) {
+    case 'PAYMENT_SUCCEEDED':
+      const transaction = event.data; // Objet transaction
+      console.log(
+        `Payment succeeded for transaction: ${transaction.transaction_id}`,
+      );
+      // Ex. : livrer la commande, accorder l’accès, mettre à jour la base
+      // await fulfillOrder(transaction.metadata?.order_id, transaction);
+      break;
+
+    case 'PAYMENT_FAILED':
+      const failedTxn = event.data;
+      console.log(
+        `Payment failed for transaction: ${failedTxn.transaction_id}`,
+      );
+      // Ex. : notifier le client, passer la commande en échec
+      // await handleFailedPayment(failedTxn.metadata?.order_id, failedTxn);
+      break;
+
+    case 'SUBSCRIPTION_CREATED':
+      const subscription = event.data;
+      console.log(`Subscription created: ${subscription.subscription_id}`);
+      // Ex. : provisionner le service pour l’abonnement
+      break;
+
+    // Ajouter d’autres cas pour les événements auxquels vous êtes abonné…
+
+    default:
+      console.warn(`Unhandled event type: ${event.event}`);
+  }
+
+  // Facultatif : marquer l’événement comme traité
+  await markEventAsProcessed(event.id);
+}
+
+// Fonctions fictives pour l’idempotence (à implémenter avec votre BDD/cache)
+async function hasEventBeenProcessed(eventId: string): Promise<boolean> {
+  // Vérifier dans votre stockage si eventId existe
+  return false; // Remplacer par la vérification réelle
+}
+async function markEventAsProcessed(eventId: string): Promise<void> {
+  // Enregistrer eventId dans votre stockage
+}
+```
+
+## Bonnes pratiques
+
+### Répondre rapidement
+
+Accusez réception du webhook avec un statut `2xx` (par ex. `200`) immédiatement. Reportez tout traitement complexe ou appel externe à une file d’attente en arrière-plan.
+
+```typescript filename="Réponse rapide et traitement asynchrone"
+async function handleWebhook(req: express.Request, res: express.Response) {
+  // ... (vérifier la signature) ...
+  if (!isValidSignature) {
+    return res.status(400).send('Invalid signature');
+  }
+
+  // Accuser réception tout de suite
+  res.status(200).json({ received: true });
+
+  // Ajouter l’événement à une file en arrière-plan
+  const event = JSON.parse(req.body.toString());
+  backgroundQueue.add('process-webhook', event);
+}
+```
+
+### Gérer les doublons (idempotence)
+
+Les problèmes réseau ou les nouvelles tentatives peuvent provoquer des livraisons en double. Rendez votre traitement idempotent.
+
+- **Vérifier l’identifiant d’événement :** conservez le `id` (`evt_...`) des événements déjà traités. Avant traitement, si l’identifiant est déjà connu, ignorez-le.
+- **Contraintes en base :** utilisez des contraintes d’unicité lorsque c’est pertinent (par ex. sur une mise à jour de commande liée à l’ID de transaction) pour éviter les doublons au niveau données.
+
+```typescript filename="Exemple de vérification d’idempotence"
+async function processWebhookEvent(event: LomiWebhookEvent): Promise<void> {
+  const isProcessed = await database.checkIfEventProcessed(event.id);
+  if (isProcessed) {
+    console.log(`Event ${event.id} is a duplicate, skipping.`);
+    return;
+  }
+
+  // ... traiter l’événement ...
+
+  await database.markEventAsProcessed(event.id);
+}
+```
+
+### Gestion des erreurs
+
+Mettez en place une gestion d’erreurs robuste dans `processWebhookEvent`.
+
+- **Journaliser :** tracez les erreurs détaillées pendant le traitement.
+- **Nouvelle tentative interne :** pour les erreurs transitoires (par ex. indisponibilité temporaire de la base), envisagez des réessais dans le worker de la file.
+- **Surveillance :** surveillez les échecs sur le point de terminaison webhook et dans la file de traitement.
+- **Ne pas faire échouer la réponse `200 OK` :** même si le traitement interne échoue ensuite, lomi. doit déjà avoir reçu `200 OK`. Ce qui compte pour lomi., c’est l’accusé de livraison réussi.
+
+### Journalisation
+
+Enregistrez les informations utiles au débogage :
+
+- Réception des webhooks (identifiant et type d’événement).
+- Résultat de la vérification de signature.
+- Début et fin du traitement.
+- Erreurs avec le contexte nécessité (évitez de journaliser la charge brute ou des données sensibles sans mesure adaptée).
+
+```typescript filename="Exemple de journalisation dans le gestionnaire"
+async function handleWebhook(req: express.Request, res: express.Response) {
+  const eventId = JSON.parse(req.body.toString())?.id || 'unknown';
+  console.log(`Received webhook request for event ID (potential): ${eventId}`);
+
+  // ... (vérifier la signature) ...
+  if (!isValidSignature) {
+    console.warn(`Invalid signature for event ID: ${eventId}`);
+    return res.status(400).send('Invalid signature');
+  }
+  console.log(`Signature verified for event ID: ${eventId}`);
+
+  res.status(200).json({ received: true });
+
+  // ... (traitement asynchrone) ...
+}
+```
+
+## Tester les webhooks
+
+Voir le [guide des tests](/core/advanced-guides/testing) pour utiliser le Dashboard lomi. ou le CLI et envoyer des événements de test vers votre point de terminaison local.
+
+## Surveillance
+
+Utilisez le Dashboard lomi. (**Developers → Webhooks**) pour suivre les tentatives de livraison, consulter les événements récents, vérifier les codes de réponse de votre point de terminaison et relancer manuellement les livraisons en échec.
+
+## Étapes suivantes
+
+- [Bonnes pratiques de sécurité](/core/advanced-guides/security-best-practices)
+- [Gestion des erreurs](/core/advanced-guides/error-handling)
+- [Référence API](/reference/setup/overview)

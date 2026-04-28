@@ -26,6 +26,10 @@ export const docs = defineDocs({
        * API routes only
        */
       method: z.string().optional(),
+      /** REST reference: matches Nest `operationId` in OpenAPI */
+      operationId: z.string().optional(),
+      /** REST reference: OpenAPI path key, e.g. `/accounts/{id}` */
+      path: z.string().optional(),
     }),
   },
   meta: {

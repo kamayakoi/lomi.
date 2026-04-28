@@ -14,7 +14,7 @@ const docsOrigin = getDocsSiteOrigin();
 
 const title = 'lomi.';
 const description =
-  'lomi. is a suite of APIs powering online payment processing and e-commerce solutions in West Africa. Accept payments, send payouts, and automate financial workflows with ease.';
+  "Suite d'API pour le traitement des paiements en ligne et le commerce en Afrique de l'Ouest francophone. Encaissez, versez et automatisez vos flux financiers.";
 
 export const metadata: Metadata = {
   title: {

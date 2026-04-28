@@ -1,0 +1,349 @@
+---
+title: Produits
+description: Gérez les produits, les tarifs et la configuration des abonnements.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+L’API Products permet de gérer votre catalogue. Un produit représente un article ou un service ; chaque produit peut avoir jusqu’à **3 tarifs actifs**.
+
+## Créer un produit
+
+Crée un produit avec un ou plusieurs tarifs. Au moins un tarif est obligatoire.
+
+### Corps de la requête
+
+| Champ | Type | Obligatoire | Description |
+|-------|------|-------------|-------------|
+| `name` | `string` | **Oui** | Nom du produit |
+| `description` | `string` | Non | Description du produit |
+| `product_type` | `string` | **Oui** | `one_time`, `recurring` ou `usage_based` |
+| `images` | `array` | Non | URLs d’images |
+| `is_active` | `boolean` | Non | Actif (défaut : `true`) |
+| `display_on_storefront` | `boolean` | Non | Visible sur la vitrine (défaut : `true`) |
+| `prices` | `array` | **Oui** | Tableau d’objets tarif (voir ci-dessous) |
+| `metadata` | `object` | Non | Métadonnées clé-valeur |
+| `fee_type_ids` | `array` | Non | IDs de types de frais à appliquer |
+
+**Champs produit récurrent :**
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `failed_payment_action` | `string` | Action si paiement échoué : `pause`, `cancel`, `retry` |
+| `charge_day` | `number` | Jour du mois de prélèvement (1–31) |
+| `first_payment_type` | `string` | `initial`, `non_initial`, `prorated` |
+| `trial_enabled` | `boolean` | Activer une période d’essai |
+| `trial_period_days` | `number` | Durée de l’essai en jours |
+
+**Champs produit à l’usage :**
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `usage_aggregation` | `string` | `sum`, `max`, `last_during_period`, `last_ever` |
+| `usage_unit` | `string` | Unité de mesure (ex. `api_calls`) |
+
+### Objet tarif
+
+| Champ | Type | Obligatoire | Description |
+|-------|------|-------------|-------------|
+| `amount` | `number` | **Oui** | Montant (plus petite unité monétaire) |
+| `currency_code` | `string` | **Oui** | `XOF`, `USD`, `EUR` |
+| `billing_interval` | `string` | Non | `day`, `week`, `month`, `year` (requis pour récurrent) |
+| `pricing_model` | `string` | Non | `standard` (défaut), `pay_what_you_want` ou `tiered` |
+| `minimum_amount` | `number` | PWYW | Requis si `pricing_model` est `pay_what_you_want` |
+| `maximum_amount` | `number` | Non | Plafond optionnel pour `pay_what_you_want` |
+| `is_default` | `boolean` | Non | Tarif par défaut |
+| `metadata` | `object` | Non | Métadonnées sur le tarif |
+
+<Callout type="info">
+  `pay_what_you_want` exige `minimum_amount` (éventuellement `maximum_amount`). Pour `standard` et `tiered`, omittez-les sauf besoin d’intégration.
+</Callout>
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+// One-time product
+const product = await lomi.products.create({
+  name: 'E-book Bundle',
+  description: 'Collection de guides complète',
+  product_type: 'one_time',
+  prices: [
+    {
+      amount: 25000,
+      currency_code: 'XOF',
+      is_default: true,
+    },
+  ],
+  display_on_storefront: true,
+});
+
+// Subscription product with trial
+const subscription = await lomi.products.create({
+  name: 'Premium Plan',
+  description: 'Accès premium mensuel',
+  product_type: 'recurring',
+  prices: [
+    {
+      amount: 10000,
+      currency_code: 'XOF',
+      billing_interval: 'month',
+      is_default: true,
+    },
+  ],
+  trial_enabled: true,
+  trial_period_days: 14,
+  failed_payment_action: 'retry',
+});
+
+console.log(`Product created: ${product.product_id}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+# One-time product
+product = client.products.create({
+    "name": "E-book Bundle",
+    "description": "Collection de guides complète",
+    "product_type": "one_time",
+    "prices": [
+        {
+            "amount": 25000,
+            "currency_code": "XOF",
+            "is_default": True
+        }
+    ],
+    "display_on_storefront": True
+})
+
+print(f"Product created: {product['product_id']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/products" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "E-book Bundle",
+    "description": "Collection de guides complète",
+    "product_type": "one_time",
+    "prices": [
+      {
+        "amount": 25000,
+        "currency_code": "XOF",
+        "is_default": true
+      }
+    ],
+    "display_on_storefront": true
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Lister les produits
+
+Récupère les produits avec filtrage optionnel.
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `isActive` | `boolean` | Filtrer par statut actif |
+| `limit` | `number` | Résultats par page (défaut : `15`) |
+| `offset` | `number` | Décalage (défaut : `0`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const products = await lomi.products.list({
+  isActive: true,
+  limit: 20,
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+products = client.products.list(isActive=True, limit=20)
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir un produit
+
+Récupère le détail du produit et tous ses tarifs.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const product = await lomi.products.get('prod_abc123...');
+console.log(`Default price: ${product.prices.find(p => p.is_default)?.amount}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+product = client.products.get('prod_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Ajouter un tarif à un produit
+
+Ajoute une nouvelle option de tarif à un produit existant.
+
+<Callout type="warning">
+  Un produit peut compter au maximum **3 tarifs actifs**. Les tarifs existants ne se modifient pas — créez-en un nouveau.
+</Callout>
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const price = await lomi.products.addPrice('prod_abc123...', {
+  amount: 50000,
+  currency_code: 'XOF',
+  billing_interval: 'year',
+});
+
+console.log(`New price added: ${price.price_id}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+price = client.products.add_price('prod_abc123...', {
+    "amount": 50000,
+    "currency_code": "XOF",
+    "billing_interval": "year"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "currency_code": "XOF",
+    "billing_interval": "year"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Définir le tarif par défaut
+
+Définit un tarif comme tarif par défaut pour un produit.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const product = await lomi.products.setDefaultPrice('prod_abc123...', 'price_def456...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+product = client.products.set_default_price('prod_abc123...', 'price_def456...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices/price_def456.../set-default" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Objet Product
+
+Les champs correspondent à la ressource produit de l’API (voir OpenAPI **Products**). Champs courants :
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `product_id` | `string` | Identifiant produit |
+| `organization_id` | `string` | Organisation propriétaire |
+| `name` | `string` | Nom |
+| `description` | `string` \| `null` | Description |
+| `product_type` | `string` | `one_time`, `recurring`, `usage_based` |
+| `images` | `array` \| `null` | URLs d’images |
+| `is_active` | `boolean` | Statut actif |
+| `display_on_storefront` | `boolean` | Visibilité vitrine |
+| `prices` | `array` | Objets tarif (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, horodatages) |
+| `fees` | `array` | Lignes de frais associées (si présentes) |
+| `environment` | `string` | `test` ou `live` |
+| `failed_payment_action` | `string` \| `null` | Récurrent : `pause`, `cancel`, `retry` |
+| `charge_day` | `number` \| `null` | Jour de prélèvement (1–31) |
+| `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
+| `trial_enabled` | `boolean` | Essai activé |
+| `trial_period_days` | `number` \| `null` | Durée d’essai |
+| `usage_aggregation` | `string` \| `null` | Produits à l’usage |
+| `usage_unit` | `string` \| `null` | Produits à l’usage |
+| `metadata` | `object` \| `null` | Métadonnées |
+| `created_at` | `string` | Création |
+| `updated_at` | `string` | Dernière mise à jour |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `400` | Entrée invalide ou plafond de tarifs dépassé |
+| `401` | Clé API invalide ou manquante |
+| `404` | Produit ou tarif introuvable |

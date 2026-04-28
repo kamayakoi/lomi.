@@ -1,0 +1,25 @@
+---
+title: 'Journal des modifications'
+description: 'Modifications notables de l’API lomi. et des services associés.'
+---
+
+## Version 1
+
+- **Version initiale :** première version de notre API REST (sans préfixe de version global dans les chemins URL).
+- **Ressources principales :** endpoints pour notamment :
+  - [Authentification](/reference/setup/authentication)
+  - [Fournisseurs](/reference/reference/data-models#provider-object)
+  - [Webhooks](/reference/payments/webhooks)
+  - [Données marchand](/reference/platform/merchants)
+  - [Clients](/reference/platform/customers)
+  - [Plans](/reference/payments/subscriptions)
+  - [Produits](/reference/payments/products)
+  - [Sessions de paiement](/reference/payments/checkout-sessions)
+  - [Abonnements clients](/reference/platform/customer-subscriptions)
+  - [Liens de paiement](/reference/payments/payment-links)
+  - [Transactions](/reference/payments/transactions)
+  - [Remboursements](/reference/payments/refunds) (bêta)
+- **Environnements :** séparation Test et Live.
+- **Gestion d’erreurs :** structure d’erreur normalisée.
+- **CLI lomi.** : première version de l’interface `lomi.cli`.
+- **SDK Node.js** : première version du paquet `@lomi./sdk`.

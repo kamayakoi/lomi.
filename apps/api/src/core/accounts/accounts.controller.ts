@@ -17,7 +17,7 @@ import {
 } from '../common/decorators/current-user.decorator';
 import { type CurrencyCode } from '../../utils/types/api';
 
-@ApiTags('Accounts')
+@ApiTags('Comptes')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('accounts')
@@ -25,10 +25,10 @@ export class AccountsController {
   constructor(private readonly service: AccountsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List all accounts' })
+  @ApiOperation({ summary: 'Lister les comptes' })
   @ApiResponse({
     status: 200,
-    description: 'List of accounts',
+    description: 'Liste des comptes',
     type: AccountResponseDto,
     isArray: true,
   })
@@ -38,19 +38,19 @@ export class AccountsController {
 
   @Get('balance')
   @ApiOperation({
-    summary: 'Get account balance',
+    summary: 'Solde du compte',
     description:
-      'Fetch current account balance for all currencies or a specific currency',
+      'Récupère le solde courant pour toutes les devises ou pour une devise précise',
   })
   @ApiQuery({
     name: 'currency',
     required: false,
-    description: 'Filter by specific currency code (XOF, USD, EUR)',
+    description: 'Filtrer par code devise (XOF, USD, EUR)',
     enum: ['XOF', 'USD', 'EUR'],
   })
   @ApiResponse({
     status: 200,
-    description: 'Account balance information',
+    description: 'Informations de solde',
     type: AccountBalanceResponseDto,
     isArray: true,
   })
@@ -63,19 +63,19 @@ export class AccountsController {
 
   @Get('balance/breakdown')
   @ApiOperation({
-    summary: 'Get detailed balance breakdown',
+    summary: 'Détail du solde',
     description:
-      'Fetch detailed balance breakdown including available, pending, and total balances. Optionally convert to a target currency.',
+      'Récupère le détail des soldes (disponible, en attente, total). Conversion optionnelle vers une devise cible.',
   })
   @ApiQuery({
     name: 'target_currency',
     required: false,
-    description: 'Target currency for conversion (XOF, USD, EUR)',
+    description: 'Devise cible pour la conversion (XOF, USD, EUR)',
     enum: ['XOF', 'USD', 'EUR'],
   })
   @ApiResponse({
     status: 200,
-    description: 'Detailed balance breakdown with conversion',
+    description: 'Détail des soldes avec conversion',
     type: BalanceBreakdownResponseDto,
     isArray: true,
   })
@@ -88,23 +88,23 @@ export class AccountsController {
 
   @Get('balance/check/:currency')
   @ApiOperation({
-    summary: 'Check available balance',
+    summary: 'Vérifier le solde disponible',
     description:
-      'Check if merchant has sufficient available balance in specified currency',
+      'Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée',
   })
   @ApiResponse({
     status: 200,
-    description: 'Available balance check result',
+    description: 'Résultat de la vérification de solde',
     schema: {
       type: 'object',
       properties: {
         has_sufficient_balance: {
           type: 'boolean',
-          description: 'Whether merchant has funds available',
+          description: 'Indique si des fonds sont disponibles',
         },
         available_balance: {
           type: 'number',
-          description: 'Current available balance',
+          description: 'Solde disponible actuel',
         },
       },
     },
@@ -117,15 +117,15 @@ export class AccountsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get an account by ID' })
+  @ApiOperation({ summary: 'Obtenir un compte par ID' })
   @ApiResponse({
     status: 200,
-    description: 'The account',
+    description: 'Le compte',
     type: AccountResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Account not found',
+    description: 'Compte introuvable',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

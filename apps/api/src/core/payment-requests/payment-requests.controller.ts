@@ -29,7 +29,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Payment Requests')
+@ApiTags('Demandes de paiement')
 @ApiSecurity('api-key')
 @ApiExtraModels(PaymentRequestResponseDto)
 @UseGuards(ApiKeyGuard)
@@ -39,22 +39,22 @@ export class PaymentRequestsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new payment request',
+    summary: 'Créer une demande de paiement',
     description:
-      'Creates a payment request for a customer. Payment requests have an expiration date and can be tracked until completion or expiry.',
+      'Crée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.',
   })
   @ApiResponse({
     status: 201,
-    description: 'Payment request created successfully',
+    description: 'Demande de paiement créée avec succès',
     type: PaymentRequestResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or validation error',
+    description: 'Entrée invalide ou erreur de validation',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     schema: {
@@ -75,11 +75,11 @@ export class PaymentRequestsController {
     },
     examples: {
       default: {
-        summary: 'Payment request with expiry',
+        summary: 'Demande avec expiration',
         value: {
           amount: 25000,
           currency_code: 'XOF',
-          description: 'Consulting fee — March',
+          description: 'Honoraires conseil — mars',
           expiry_date: '2026-12-31T23:59:59.000Z',
           payment_reference: 'INV-2026-042',
         },
@@ -95,39 +95,39 @@ export class PaymentRequestsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all payment requests',
+    summary: 'Lister les demandes de paiement',
     description:
-      'Returns all payment requests for your organization with pagination and optional filtering by status and customer.',
+      "Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).",
   })
   @ApiQuery({
     name: 'status',
     required: false,
-    description: 'Filter by payment status',
+    description: 'Filtrer par statut',
     enum: ['pending', 'completed', 'failed', 'expired'],
   })
   @ApiQuery({
     name: 'customerId',
     required: false,
-    description: 'Filter by customer ID',
+    description: 'Filtrer par ID client',
     type: String,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results to return',
+    description: 'Nombre maximal de résultats',
     type: Number,
     example: 20,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Offset for pagination',
+    description: 'Décalage pour la pagination',
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of payment requests with pagination',
+    description: 'Liste paginée de demandes',
     schema: {
       type: 'object',
       properties: {
@@ -143,7 +143,7 @@ export class PaymentRequestsController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -157,27 +157,27 @@ export class PaymentRequestsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get a payment request by ID',
+    summary: 'Obtenir une demande de paiement par ID',
     description:
-      'Returns detailed information about a specific payment request, including its current status and payment details.',
+      'Renvoie le détail d’une demande (statut actuel, informations de paiement).',
   })
   @ApiParam({
     name: 'id',
-    description: 'Payment request UUID',
+    description: 'UUID de la demande',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Payment request details',
+    description: 'Détails de la demande',
     type: PaymentRequestResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Payment request not found or access denied',
+    description: 'Demande introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

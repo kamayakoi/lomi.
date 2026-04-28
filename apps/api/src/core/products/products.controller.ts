@@ -28,7 +28,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Products')
+@ApiTags('Produits')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('products')
@@ -37,39 +37,39 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all products',
+    summary: 'Lister les produits',
     description:
-      "Returns all products for the authenticated merchant's organization. Products include embedded prices and fees. Use this to display your product catalog or integrate with external systems.",
+      "Renvoie tous les produits de l'organisation du marchand authentifié, avec prix et frais intégrés. Utile pour afficher le catalogue ou intégrer des systèmes externes.",
   })
   @ApiQuery({
     name: 'isActive',
     required: false,
-    description: 'Filter by active status',
+    description: 'Filtrer par statut actif',
     type: Boolean,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results to return',
+    description: 'Nombre maximal de résultats',
     type: Number,
     example: 15,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Offset for pagination',
+    description: 'Décalage pour la pagination',
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of products with embedded prices',
+    description: 'Liste des produits avec prix embarqués',
     type: ProductResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -88,27 +88,27 @@ export class ProductsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get product by ID',
+    summary: 'Obtenir un produit par ID',
     description:
-      'Returns a product, including its prices and fees. Responds with 404 if the product does not exist or is not available for this API key.',
+      "Renvoie un produit avec ses prix et frais. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Product UUID',
+    description: 'UUID du produit',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Product details with embedded prices',
+    description: 'Détails du produit avec prix embarqués',
     type: ProductResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product not found or access denied',
+    description: 'Produit introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.productsService.findOne(id, user);
@@ -116,22 +116,22 @@ export class ProductsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new product',
+    summary: 'Créer un produit',
     description:
-      'Creates a product with one or more prices in a single request. At least one price is required. The first price, or the one with `is_default` set, is used when no price is specified at checkout.',
+      "Crée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Product created successfully',
+    description: 'Produit créé avec succès',
     type: ProductResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or validation error',
+    description: 'Entrée invalide ou erreur de validation',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   create(
     @Body() createProductDto: CreateProductDto,
@@ -142,31 +142,31 @@ export class ProductsController {
 
   @Post(':id/prices')
   @ApiOperation({
-    summary: 'Add a new price to a product',
+    summary: 'Ajouter un prix à un produit',
     description:
-      'Adds an additional price option to an existing product. Useful for offering multiple pricing tiers, currencies, or billing intervals. Note: A product can have a maximum of 3 active prices. You cannot modify existing prices - create a new one instead.',
+      "Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Product UUID',
+    description: 'UUID du produit',
     type: String,
   })
   @ApiResponse({
     status: 201,
-    description: 'Price added successfully',
+    description: 'Prix ajouté avec succès',
     type: PriceResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product not found or access denied',
+    description: 'Produit introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or maximum prices exceeded',
+    description: 'Entrée invalide ou nombre maximal de prix dépassé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   addPrice(
     @Param('id') id: string,
@@ -178,32 +178,32 @@ export class ProductsController {
 
   @Post(':id/prices/:priceId/set-default')
   @ApiOperation({
-    summary: 'Set a price as the default',
+    summary: 'Définir le prix par défaut',
     description:
-      "Sets which price is used by default for this product (for example when checkout does not pass a price ID). One default at a time; choosing a new default replaces the previous one.",
+      "Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Product UUID',
+    description: 'UUID du produit',
     type: String,
   })
   @ApiParam({
     name: 'priceId',
-    description: 'Price UUID',
+    description: 'UUID du prix',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Default price updated successfully',
+    description: 'Prix par défaut mis à jour',
     type: ProductResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Product or price not found',
+    description: 'Produit ou prix introuvable',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   setDefaultPrice(
     @Param('id') id: string,

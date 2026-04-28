@@ -8,9 +8,9 @@ import { DocumentBuilder } from '@nestjs/swagger';
  */
 export function buildSwaggerDocumentBase() {
   return new DocumentBuilder()
-    .setTitle('lomi. API')
+    .setTitle('API lomi.')
     .setDescription(
-      'Payment processing API for francophone West African businesses.',
+      "API de traitement des paiements pour les entreprises d'Afrique de l'Ouest francophone.",
     )
     .setVersion('1.1.0')
     .addApiKey(

@@ -27,7 +27,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Checkout Sessions')
+@ApiTags('Sessions de paiement')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('checkout-sessions')
@@ -36,26 +36,26 @@ export class CheckoutSessionsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new checkout session',
+    summary: 'Créer une session de paiement',
     description:
-      'Creates a hosted payment page for customers to complete their purchase. The checkout session expires after 60 minutes by default. Returns a session ID and URL to redirect your customer to.',
+      "Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Checkout session created successfully',
+    description: 'Session de paiement créée avec succès',
     type: CheckoutSessionResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or validation error',
+    description: 'Entrée invalide ou erreur de validation',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     description:
-      'Checkout session payload. Either set `amount` (+ optional product fields) or `line_items` for multi-product carts.',
+      'Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.',
     schema: {
       type: 'object',
       required: ['currency_code'],
@@ -103,7 +103,7 @@ export class CheckoutSessionsController {
     },
     examples: {
       amount: {
-        summary: 'Fixed amount checkout',
+        summary: 'Paiement à montant fixe',
         value: {
           currency_code: 'XOF',
           amount: 10000,
@@ -112,7 +112,7 @@ export class CheckoutSessionsController {
         },
       },
       lineItems: {
-        summary: 'Multi-product (line items)',
+        summary: 'Multi-produits (lignes)',
         value: {
           currency_code: 'XOF',
           line_items: [
@@ -132,39 +132,40 @@ export class CheckoutSessionsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all checkout sessions',
+    summary: 'Lister les sessions de paiement',
     description:
-      'Returns all checkout sessions for your organization with pagination and optional status filtering.',
+      "Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.",
   })
   @ApiQuery({
     name: 'status',
     required: false,
-    description: 'Filter by session status (matches checkout_session_status)',
+    description:
+      'Filtrer par statut de session (valeur checkout_session_status)',
     enum: ['open', 'completed', 'expired'],
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results to return',
+    description: 'Nombre maximal de résultats',
     type: Number,
     example: 20,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Offset for pagination',
+    description: 'Décalage pour la pagination',
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of checkout sessions',
+    description: 'Liste des sessions de paiement',
     type: CheckoutSessionResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -182,27 +183,27 @@ export class CheckoutSessionsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get a checkout session by ID',
+    summary: 'Obtenir une session de paiement par ID',
     description:
-      'Returns detailed information about a specific checkout session, including its current status and associated customer/product details.',
+      'Renvoie le détail d’une session (statut, client et produits associés).',
   })
   @ApiParam({
     name: 'id',
-    description: 'Checkout session UUID',
+    description: 'UUID de la session',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Checkout session details',
+    description: 'Détails de la session',
     type: CheckoutSessionResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Checkout session not found or access denied',
+    description: 'Session introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

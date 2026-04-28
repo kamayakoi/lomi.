@@ -28,7 +28,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Beneficiary Payouts')
+@ApiTags('Paiements vers bénéficiaires')
 @ApiSecurity('api-key')
 @ApiExtraModels(BeneficiaryPayoutResponseDto)
 @UseGuards(ApiKeyGuard)
@@ -38,23 +38,22 @@ export class BeneficiaryPayoutsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Initiate a beneficiary payout',
+    summary: 'Lancer un paiement vers un bénéficiaire',
     description:
-      'Initiates a payout to a beneficiary (contractor, supplier, employee, etc.). Returns immediately with pending status. The actual payout is processed asynchronously by the payment provider (Wave, SPI). Status updates are sent via webhooks. Use this for paying external parties from your account balance.',
+      "Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.",
   })
   @ApiResponse({
     status: 201,
-    description:
-      'Beneficiary payout initiated successfully with pending status',
+    description: 'Paiement initié avec succès (statut en attente)',
     type: BeneficiaryPayoutResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or insufficient balance',
+    description: 'Entrée invalide ou solde insuffisant',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   create(
     @Body() createDto: CreateBeneficiaryPayoutDto,
@@ -65,53 +64,53 @@ export class BeneficiaryPayoutsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all beneficiary payouts',
+    summary: 'Lister les paiements vers bénéficiaires',
     description:
-      'Returns all beneficiary payouts for your organization with pagination and optional filtering by status, date range, and currency.',
+      "Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).",
   })
   @ApiQuery({
     name: 'statuses',
     required: false,
-    description: 'Filter by payout statuses (comma-separated)',
+    description: 'Statuts (séparés par des virgules)',
     type: String,
     example: 'pending,completed,failed',
   })
   @ApiQuery({
     name: 'startDate',
     required: false,
-    description: 'Filter by start date (ISO 8601)',
+    description: 'Date de début (ISO 8601)',
     type: String,
   })
   @ApiQuery({
     name: 'endDate',
     required: false,
-    description: 'Filter by end date (ISO 8601)',
+    description: 'Date de fin (ISO 8601)',
     type: String,
   })
   @ApiQuery({
     name: 'currencyCode',
     required: false,
-    description: 'Filter by currency code',
+    description: 'Code devise',
     type: String,
     example: 'XOF',
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results to return',
+    description: 'Nombre maximal de résultats',
     type: Number,
     example: 50,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Offset for pagination',
+    description: 'Décalage pour la pagination',
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of beneficiary payouts with pagination',
+    description: 'Liste paginée des paiements',
     schema: {
       type: 'object',
       properties: {
@@ -126,7 +125,7 @@ export class BeneficiaryPayoutsController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -151,27 +150,27 @@ export class BeneficiaryPayoutsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get a beneficiary payout by ID',
+    summary: 'Obtenir un paiement bénéficiaire par ID',
     description:
-      'Returns detailed information about a specific beneficiary payout, including its current status and provider details.',
+      'Renvoie le détail d’un paiement (statut actuel et informations fournisseur).',
   })
   @ApiParam({
     name: 'id',
-    description: 'Beneficiary payout UUID',
+    description: 'UUID du paiement',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Beneficiary payout details',
+    description: 'Détails du paiement',
     type: BeneficiaryPayoutResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Beneficiary payout not found or access denied',
+    description: 'Paiement introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

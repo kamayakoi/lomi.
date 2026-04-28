@@ -32,89 +32,93 @@ export class TransactionsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all transactions',
+    summary: 'Lister les transactions',
     description:
-      "Returns all transactions for the authenticated merchant's organization with advanced filtering options. Transactions are created by the system when payments are processed.",
+      "Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.",
   })
   @ApiQuery({
     name: 'provider',
     required: false,
-    description: 'Filter by payment provider code',
+    description: 'Filtrer par code de fournisseur de paiement',
     type: String,
     example: 'WAVE',
   })
   @ApiQuery({
     name: 'status',
     required: false,
-    description: 'Filter by transaction status (comma-separated for multiple)',
+    description:
+      'Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs)',
     type: String,
     example: 'completed,pending',
   })
   @ApiQuery({
     name: 'type',
     required: false,
-    description: 'Filter by transaction type (comma-separated for multiple)',
+    description:
+      'Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs)',
     type: String,
     example: 'payment,refund',
   })
   @ApiQuery({
     name: 'currency',
     required: false,
-    description: 'Filter by currency code (comma-separated for multiple)',
+    description:
+      'Filtrer par code devise (séparés par des virgules pour plusieurs valeurs)',
     type: String,
     example: 'XOF,USD',
   })
   @ApiQuery({
     name: 'paymentMethod',
     required: false,
-    description: 'Filter by payment method code (comma-separated for multiple)',
+    description:
+      'Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs)',
     type: String,
     example: 'MOBILE_MONEY,CARDS',
   })
   @ApiQuery({
     name: 'page',
     required: false,
-    description: 'Page number for pagination',
+    description: 'Numéro de page',
     type: Number,
     example: 1,
   })
   @ApiQuery({
     name: 'pageSize',
     required: false,
-    description: 'Number of items per page',
+    description: "Nombre d'éléments par page",
     type: Number,
     example: 50,
   })
   @ApiQuery({
     name: 'startDate',
     required: false,
-    description: 'Filter transactions from this date (ISO 8601 format)',
+    description: 'À partir de cette date (format ISO 8601)',
     type: String,
     example: '2024-01-01T00:00:00Z',
   })
   @ApiQuery({
     name: 'endDate',
     required: false,
-    description: 'Filter transactions up to this date (ISO 8601 format)',
+    description: "Jusqu'à cette date (format ISO 8601)",
     type: String,
     example: '2024-12-31T23:59:59Z',
   })
   @ApiQuery({
     name: 'isPos',
     required: false,
-    description: 'Filter by POS transactions only',
+    description: 'Uniquement les transactions points de vente (TPV)',
     type: Boolean,
     example: false,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of transactions',
+    description: 'Liste des transactions',
     type: TransactionResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -155,27 +159,27 @@ export class TransactionsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get transaction by ID',
+    summary: 'Obtenir une transaction par ID',
     description:
-      'Returns a single transaction. Responds with 404 if the transaction does not exist or is not available for this API key.',
+      "Renvoie une transaction. Réponse 404 si elle n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Transaction UUID',
+    description: 'UUID de la transaction',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Transaction details',
+    description: 'Détails de la transaction',
     type: TransactionResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Transaction not found or access denied',
+    description: 'Transaction introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.transactionsService.findOne(id, user);

@@ -1,0 +1,396 @@
+---
+title: SDK Next.js
+description: SDK Next.js officiel avec hooks React pour l’API de paiement lomi.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+SDK Next.js officiel pour l’API de paiement lomi. Pensé pour Next.js 13+ avec App Router : hooks React et intégration serveur / client fluide.
+
+<Callout type="info">
+  Le SDK Next.js enrichit le SDK TypeScript avec des fonctionnalités React : hooks et utilitaires pour les composants serveur.
+</Callout>
+
+## Installation
+
+```bash
+npm install @lomi./sdk-next
+# ou
+pnpm add @lomi./sdk-next
+```
+
+## Démarrage rapide
+
+### Configuration côté serveur
+
+```typescript
+// lib/lomi.ts
+import { LomiSDK } from '@lomi./sdk-next';
+
+export const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: process.env.NODE_ENV === 'development' ? 'test' : 'live',
+});
+```
+
+### Utilisation côté client
+
+```typescript
+'use client';
+
+import { useLomiRequest } from '@lomi./sdk-next';
+```
+
+---
+
+## Composants serveur
+
+### Charger les clients
+
+```typescript
+// app/customers/page.tsx
+import { lomi } from '@/lib/lomi';
+
+export default async function CustomersPage() {
+  const customers = await lomi.customers.list();
+
+  return (
+    <div>
+      <h1>Clients ({customers.length})</h1>
+      <ul>
+        {customers.map((customer) => (
+          <li key={customer.id}>{customer.name} - {customer.email}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Charger les transactions avec filtres
+
+```typescript
+// app/transactions/page.tsx
+import { lomi } from '@/lib/lomi';
+
+export default async function TransactionsPage() {
+  const transactions = await lomi.transactions.list({
+    status: 'completed',
+    pageSize: 50,
+  });
+
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Fournisseur</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map((tx) => (
+          <tr key={tx.id}>
+            <td>{tx.id}</td>
+            <td>{tx.gross_amount} {tx.currency_code}</td>
+            <td>{tx.status}</td>
+            <td>{tx.provider_code}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+```
+
+### Indicateurs de l’organisation
+
+```typescript
+// app/dashboard/page.tsx
+import { lomi } from '@/lib/lomi';
+
+export default async function DashboardPage() {
+  const metrics = await lomi.organizations.getMetrics();
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <div>
+        <h3>MRR</h3>
+        <p>{metrics.mrr.toLocaleString()} {metrics.currency_code}</p>
+      </div>
+      <div>
+        <h3>ARR</h3>
+        <p>{metrics.arr.toLocaleString()} {metrics.currency_code}</p>
+      </div>
+      <div>
+        <h3>Clients</h3>
+        <p>{metrics.total_customers}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## Composants client (hooks)
+
+### Hook useLomiRequest
+
+```typescript
+'use client';
+
+import { useLomiRequest } from '@lomi./sdk-next';
+import { lomi } from '@/lib/lomi';
+
+export function CustomerList() {
+  const { data, loading, error, execute } = useLomiRequest(
+    () => lomi.customers.list()
+  );
+
+  if (loading) return <div>Chargement…</div>;
+  if (error) return <div>Erreur : {error.message}</div>;
+
+  return (
+    <div>
+      <button onClick={() => execute()}>Actualiser</button>
+      <ul>
+        {data?.map((customer) => (
+          <li key={customer.id}>{customer.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+### Formulaire de création de client
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { useLomiRequest } from '@lomi./sdk-next';
+import { lomi } from '@/lib/lomi';
+
+export function CreateCustomerForm() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone_number: '',
+  });
+
+  const { loading, error, execute } = useLomiRequest(
+    () => lomi.customers.create(formData),
+    { manual: true }
+  );
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = await execute();
+    if (result) {
+      alert(`Client créé : ${result.id}`);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Nom"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+      />
+      <input
+        type="email"
+        placeholder="E-mail"
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+      />
+      <input
+        type="tel"
+        placeholder="Téléphone"
+        value={formData.phone_number}
+        onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Création…' : 'Créer le client'}
+      </button>
+      {error && <p>Erreur : {error.message}</p>}
+    </form>
+  );
+}
+```
+
+---
+
+## Routes API
+
+### Créer une session de paiement
+
+```typescript
+// app/api/checkout/route.ts
+import { NextResponse } from 'next/server';
+import { lomi } from '@/lib/lomi';
+
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  const session = await lomi.checkoutSessions.create({
+    amount: body.amount,
+    currency_code: 'XOF',
+    title: body.title || 'Paiement',
+    success_url: `${process.env.NEXT_PUBLIC_URL}/success`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL}/cancel`,
+    customer_email: body.email,
+    metadata: {
+      user_id: body.userId,
+      order_id: body.orderId,
+    },
+  });
+
+  return NextResponse.json({ url: session.checkout_url });
+}
+```
+
+### Handler webhook
+
+```typescript
+// app/api/webhooks/lomi/route.ts
+import { NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(request: Request) {
+  const signature = request.headers.get('x-lomi-signature') || '';
+  const body = await request.text();
+
+  // Vérifier la signature
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.LOMI_WEBHOOK_SECRET!)
+    .update(body)
+    .digest('hex');
+
+  if (signature !== expectedSignature) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
+
+  const event = JSON.parse(body);
+
+  switch (event.type) {
+    case 'PAYMENT_SUCCEEDED':
+      console.log('Paiement réussi :', event.data.gross_amount);
+      // Mettre à jour le statut de la commande en base
+      break;
+
+
+
+    case 'SUBSCRIPTION_RENEWED':
+      console.log('Abonnement renouvelé :', event.data.id);
+      // Prolonger l’accès
+      break;
+
+    case 'REFUND_COMPLETED':
+      console.log('Remboursement traité :', event.data.id);
+      // Traiter le remboursement
+      break;
+
+    default:
+      console.log('Événement non géré :', event.type);
+  }
+
+  return NextResponse.json({ received: true });
+}
+```
+
+---
+
+## Composant CheckoutButton
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+
+interface CheckoutButtonProps {
+  amount: number;
+  productName: string;
+  email?: string;
+}
+
+export function CheckoutButton({ amount, productName, email }: CheckoutButtonProps) {
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          amount, 
+          title: productName,
+          email 
+        }),
+      });
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Erreur au tunnel :', error);
+      alert('Impossible de démarrer le paiement');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleCheckout}
+      disabled={loading}
+      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+    >
+      {loading ? 'Chargement…' : `Payer ${amount.toLocaleString()} XOF`}
+    </button>
+  );
+}
+```
+
+---
+
+## Variables d’environnement
+
+```bash
+# .env.local
+LOMI_API_KEY=lomi_sk_live_xxxxxxxxxxxxxxxxxxxxxx
+LOMI_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_URL=https://yoursite.com
+```
+
+---
+
+## Types TypeScript
+
+```typescript
+import type {
+  Customer,
+  CustomerCreate,
+  CheckoutSession,
+  CheckoutSessionCreate,
+  Transaction,
+  Product,
+  Subscription,
+  PaymentLink,
+} from '@lomi./sdk-next';
+```
+
+---
+
+## Ressources
+
+- [SDK TypeScript](/reference/sdks/typescript) — documentation du SDK de base
+- [Référence API](/reference/setup/overview) — documentation complète de l’API
+- [GitHub](https://github.com/lomiafrica/lomi.)
+- [Communauté Discord](https://discord.gg/yb4FnBmh)

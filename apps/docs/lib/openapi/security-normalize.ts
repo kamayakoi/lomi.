@@ -65,7 +65,9 @@ export function normalizeOpenApiSecurity(document: Document): Document {
   for (const pathItem of Object.values(document.paths)) {
     if (!pathItem) continue;
 
-    const item = pathItem as PathItemObject;
+    const item = pathItem as PathItemObject & {
+      security?: SecurityRequirementObject[];
+    };
     if (item.security) {
       item.security = mapSecurityRequirements(
         item.security as SecurityRequirementObject[],

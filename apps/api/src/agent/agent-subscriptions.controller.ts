@@ -38,8 +38,11 @@ export class AgentSubscriptionsController {
 
   @Post('subscriptions')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  @ApiOperation({ summary: 'Register for agent-appropriate notifications (MVP: in-process registry + SSE test ping)' })
-  @ApiResponse({ status: 201, description: 'Created' })
+  @ApiOperation({
+    summary:
+      "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
+  })
+  @ApiResponse({ status: 201, description: 'Créé' })
   create(
     @CurrentUser() user: AuthContext,
     @Body() body: CreateSubscriptionDto,
@@ -57,16 +60,16 @@ export class AgentSubscriptionsController {
   }
 
   @Get('subscriptions')
-  @ApiOperation({ summary: 'List agent subscriptions' })
+  @ApiOperation({ summary: "Lister les abonnements de l'agent" })
   list(@CurrentUser() user: AuthContext) {
     return { data: this.store.list(user.organizationId) };
   }
 
   @Delete('subscriptions/:id')
   @ApiParam({ name: 'id', description: 'Subscription id' })
-  @ApiOperation({ summary: 'Delete a subscription' })
-  @ApiResponse({ status: 200, description: 'Deleted' })
-  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiOperation({ summary: 'Supprimer un abonnement' })
+  @ApiResponse({ status: 200, description: 'Supprimé' })
+  @ApiResponse({ status: 404, description: 'Introuvable' })
   remove(
     @CurrentUser() user: AuthContext,
     @Param('id') id: string,

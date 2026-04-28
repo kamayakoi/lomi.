@@ -1,0 +1,68 @@
+---
+title: 'S’authentifier'
+description: 'Authentifiez votre CLI pour accepter les paiements plus rapidement.'
+---
+
+La commande `lomi. login` authentifie la **CLI lomi.** et lui permet d’interagir en toute sécurité avec **l’API lomi.** en votre nom au moyen d’un **jeton CLI** dédié. Cette authentification est un prérequis pour la plupart des commandes qui requièrent un accès à l’API (comme `status`, `payments`, `webhook` et `dev`).
+
+## Utilisation
+
+```bash filename="Terminal"
+lomi. login
+```
+
+## Fonctionnement
+
+Cette commande utilise un flux sécurisé de **Device Authorization Grant** (flux OAuth 2.0 standard pour les environnements aux entrées limitées, comme les CLI) :
+
+1.  **Démarrage** : la CLI contacte le service d’authentification **lomi.** pour lancer la connexion.
+2.  **Demande de code appareil** : le service génère un `user_code` unique (à saisir dans le navigateur) et un `device_code` (utilisé en interne par la CLI pour suivre l’état).
+3.  **Interaction utilisateur** :
+    - La CLI affiche le `user_code` à copier.
+    - Elle vous invite à appuyer sur Entrée, puis tente d’ouvrir votre navigateur par défaut sur `verification_uri` **lomi.**
+    - Dans le navigateur, vous vous connectez à votre compte **lomi.** (si besoin) et saisissez le `user_code` pour autoriser la CLI.
+4.  **Sondage** : pendant votre authentification dans le navigateur, la CLI interroge régulièrement le service avec le `device_code` pour savoir si l’autorisation est accordée.
+5.  **Obtention du jeton** : une fois l’autorisation approuvée dans le navigateur, le service fournit un **jeton CLI** court et sécurisé à la CLI en attente.
+6.  **Stockage sécurisé** : la CLI enregistre ce **jeton CLI** dans le fichier de configuration global (souvent `~/.lomi/config.json`). Ce jeton sert aux appels API ultérieurs effectués _par la CLI elle-même_.
+
+<Callout type="info" emoji="💡" title="Intérêt pour la sécurité">
+  Ce flux évite de devoir manipuler ou stocker manuellement votre
+  `LOMI_API_KEY` principale pour les opérations CLI courantes, ce qui renforce la
+  sécurité de vos identifiants principaux.
+</Callout>
+
+## Exemple de sortie
+
+Après une connexion réussie, un message de confirmation s’affiche :
+
+```text filename="Exemple de sortie terminal"
+Login initiated.
+
+Action Required to complete authentication:
+
+1. Copy this code: XXXX-XXXX
+
+2. Press enter to open your browser
+
+3. Paste the code when prompted on the webpage.
+
+IMPORTANT: After signing in, you might be redirected elsewhere...
+Please manually navigate back to the verification URL: https://lomi.africa/verify
+
+Press Enter to open the browser and continue...
+Waiting for you to authorize in the browser...
+Waiting for authorization in browser... ✓
+Saving CLI Token... ✓
+Login successful! CLI Token saved globally.
+
+You can now run lomi. CLI commands that require authentication.
+Use `lomi. init` in your project directory to set up SDK-specific API keys.
+```
+
+## Dépannage
+
+- **Le navigateur ne s’ouvre pas** : copiez manuellement l’`verification_uri` affichée dans le terminal et collez-la dans la barre d’adresse.
+- **Code expiré** : le `user_code` est temporel. S’il expire avant la fin de l’autorisation, relancez `lomi. login` pour un nouveau code.
+- **Accès refusé** : si vous refusez la demande dans le navigateur, la connexion CLI échoue. Relancez `lomi. login` si ce refus était involontaire.
+- **Erreurs réseau** : assurez-vous d’une connexion stable ; la CLI doit joindre le service d’authentification **lomi.**
+- **Pare-feu** : derrière un pare-feu strict, autorisez le HTTPS vers `lomi.africa`. Vérifiez les règles ou contactez l’administrateur réseau.

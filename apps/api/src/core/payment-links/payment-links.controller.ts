@@ -29,7 +29,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Payment Links')
+@ApiTags('Liens de paiement')
 @ApiSecurity('api-key')
 @ApiExtraModels(PaymentLinkResponseDto)
 @UseGuards(ApiKeyGuard)
@@ -39,22 +39,22 @@ export class PaymentLinksController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new payment link',
+    summary: 'Créer un lien de paiement',
     description:
-      'Creates a shareable payment link. Can be for a specific product (product link) or a custom amount (instant link). Product links reference a product and optional price. Instant links have a fixed amount.',
+      "Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Payment link created successfully',
+    description: 'Lien de paiement créé avec succès',
     type: PaymentLinkResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input or validation error',
+    description: 'Entrée invalide ou erreur de validation',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     schema: {
@@ -82,7 +82,7 @@ export class PaymentLinksController {
     },
     examples: {
       instant: {
-        summary: 'Instant (fixed amount) link',
+        summary: 'Lien instantané (montant fixe)',
         value: {
           link_type: 'instant',
           title: 'Invoice INV-001',
@@ -91,7 +91,7 @@ export class PaymentLinksController {
         },
       },
       product: {
-        summary: 'Product link',
+        summary: 'Lien produit',
         value: {
           link_type: 'product',
           title: 'Premium plan',
@@ -110,39 +110,39 @@ export class PaymentLinksController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all payment links',
+    summary: 'Lister les liens de paiement',
     description:
-      'Returns all payment links for your organization with pagination and optional filtering by type and active status.',
+      "Renvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).",
   })
   @ApiQuery({
     name: 'linkType',
     required: false,
-    description: 'Filter by link type',
+    description: 'Filtrer par type de lien',
     enum: ['product', 'instant'],
   })
   @ApiQuery({
     name: 'isActive',
     required: false,
-    description: 'Filter by active status',
+    description: 'Filtrer par statut actif',
     type: Boolean,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results to return',
+    description: 'Nombre maximal de résultats',
     type: Number,
     example: 20,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Offset for pagination',
+    description: 'Décalage pour la pagination',
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of payment links with pagination',
+    description: 'Liste paginée de liens de paiement',
     schema: {
       type: 'object',
       properties: {
@@ -158,7 +158,7 @@ export class PaymentLinksController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -178,27 +178,27 @@ export class PaymentLinksController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get a payment link by ID',
+    summary: 'Obtenir un lien de paiement par ID',
     description:
-      'Returns detailed information about a specific payment link, including its URL, configuration, and status.',
+      'Renvoie le détail d’un lien (URL, configuration et statut).',
   })
   @ApiParam({
     name: 'id',
-    description: 'Payment link UUID',
+    description: 'UUID du lien de paiement',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Payment link details',
+    description: 'Détails du lien',
     type: PaymentLinkResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Payment link not found or access denied',
+    description: 'Lien introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

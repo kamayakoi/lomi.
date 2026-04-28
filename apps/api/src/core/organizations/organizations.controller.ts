@@ -14,7 +14,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Organizations')
+@ApiTags('Organisations')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('organizations')
@@ -23,12 +23,13 @@ export class OrganizationsController {
 
   @Get()
   @ApiOperation({
-    summary: 'Get organization details',
-    description: "Returns the authenticated merchant's organization details",
+    summary: "Détails de l'organisation",
+    description:
+      "Renvoie les informations de l'organisation du marchand authentifié",
   })
   @ApiResponse({
     status: 200,
-    description: 'Organization details',
+    description: "Détails de l'organisation",
     type: OrganizationResponseDto,
     isArray: true,
   })
@@ -38,13 +39,13 @@ export class OrganizationsController {
 
   @Get('metrics')
   @ApiOperation({
-    summary: 'Get organization metrics',
+    summary: "Indicateurs de l'organisation",
     description:
-      'Returns MRR, ARR, LTV, revenue, and customer counts for your organization.',
+      "Renvoie le MRR, l'ARR, la LTV, le chiffre d'affaires et le nombre de clients pour votre organisation.",
   })
   @ApiResponse({
     status: 200,
-    description: 'Organization metrics',
+    description: "Indicateurs de l'organisation",
     type: OrganizationMetricsResponseDto,
   })
   getMetrics(@CurrentUser() user: AuthContext) {
@@ -53,18 +54,18 @@ export class OrganizationsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get organization by ID',
+    summary: 'Organisation par ID',
     description:
-      'Returns organization details by ID (must match authenticated organization)',
+      "Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)",
   })
   @ApiResponse({
     status: 200,
-    description: 'The organization',
+    description: "L'organisation",
     type: OrganizationResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Organization not found or access denied',
+    description: 'Organisation introuvable ou accès refusé',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.service.findOne(id, user);

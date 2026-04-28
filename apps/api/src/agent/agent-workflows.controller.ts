@@ -41,8 +41,11 @@ export class AgentWorkflowsController {
 
   @Post('workflows')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-  @ApiOperation({ summary: 'Start a multi-step workflow run (MVP, idempotency on idempotency_key)' })
-  @ApiResponse({ status: 201, description: 'Run created' })
+  @ApiOperation({
+    summary:
+      "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
+  })
+  @ApiResponse({ status: 201, description: 'Exécution créée' })
   @ApiBody({ type: CreateWorkflowDto })
   create(
     @CurrentUser() user: AuthContext,
@@ -62,7 +65,7 @@ export class AgentWorkflowsController {
 
   @Get('workflows/:runId')
   @ApiParam({ name: 'runId' })
-  @ApiOperation({ summary: 'Get workflow run state' })
+  @ApiOperation({ summary: "Obtenir l'état d'une exécution de workflow" })
   get(
     @CurrentUser() user: AuthContext,
     @Param('runId') runId: string,
@@ -75,8 +78,10 @@ export class AgentWorkflowsController {
   @ApiParam({ name: 'runId' })
   @ApiParam({ name: 'stepId' })
   @ApiBody({ type: UpdateWorkflowStepDto })
-  @ApiOperation({ summary: 'Advance a workflow step (orchestration primitive)' })
-  @ApiResponse({ status: 200, description: 'Updated' })
+  @ApiOperation({
+    summary: "Faire avancer une étape du workflow (primitive d'orchestration)",
+  })
+  @ApiResponse({ status: 200, description: 'Mis à jour' })
   patchStep(
     @CurrentUser() user: AuthContext,
     @Param('runId') runId: string,

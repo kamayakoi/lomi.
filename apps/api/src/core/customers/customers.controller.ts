@@ -33,7 +33,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Customers')
+@ApiTags('Clients')
 @ApiSecurity('api-key')
 @ApiExtraModels(CustomerResponseDto, TransactionResponseDto)
 @UseGuards(ApiKeyGuard)
@@ -43,46 +43,46 @@ export class CustomersController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all customers',
+    summary: 'Lister les clients',
     description:
-      "Returns all customers for the authenticated merchant's organization. Supports filtering by search term, customer type, and activity status.",
+      "Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.",
   })
   @ApiQuery({
     name: 'search',
     required: false,
-    description: 'Search by name or email',
+    description: 'Recherche par nom ou e-mail',
     type: String,
   })
   @ApiQuery({
     name: 'type',
     required: false,
-    description: 'Filter by customer type',
+    description: 'Filtrer par type de client',
     enum: ['business', 'individual', 'all'],
   })
   @ApiQuery({
     name: 'status',
     required: false,
     description:
-      'Filter by activity status (active = has transactions, inactive = no transactions)',
+      "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)",
     enum: ['active', 'inactive', 'all'],
   })
   @ApiQuery({
     name: 'page',
     required: false,
-    description: 'Page number for pagination',
+    description: 'Numéro de page',
     type: Number,
     example: 1,
   })
   @ApiQuery({
     name: 'pageSize',
     required: false,
-    description: 'Number of items per page',
+    description: "Nombre d'éléments par page",
     type: Number,
     example: 50,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of customers with pagination',
+    description: 'Liste paginée de clients',
     schema: {
       properties: {
         customers: {
@@ -103,7 +103,7 @@ export class CustomersController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -126,27 +126,27 @@ export class CustomersController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get customer by ID',
+    summary: 'Obtenir un client par ID',
     description:
-      'Returns a single customer. Responds with 404 if the customer does not exist or is not available for this API key.',
+      "Renvoie un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Customer UUID',
+    description: 'UUID du client',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Customer details',
+    description: 'Détails du client',
     type: CustomerResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Customer not found or access denied',
+    description: 'Client introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.customersService.findOne(id, user);
@@ -154,22 +154,22 @@ export class CustomersController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new customer',
+    summary: 'Créer un client',
     description:
-      'Creates a new customer in your organization. The customer will be automatically linked to your organization.',
+      "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Customer created successfully',
+    description: 'Client créé avec succès',
     type: CustomerResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input data',
+    description: "Données d'entrée invalides",
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     schema: {
@@ -190,7 +190,7 @@ export class CustomersController {
     },
     examples: {
       minimal: {
-        summary: 'Minimal customer',
+        summary: 'Client minimal',
         value: {
           name: 'Jane Doe',
           email: 'jane@example.com',
@@ -207,31 +207,31 @@ export class CustomersController {
 
   @Patch(':id')
   @ApiOperation({
-    summary: 'Update a customer',
+    summary: 'Mettre à jour un client',
     description:
-      'Updates a customer. Send only the fields to change. Responds with 404 if the customer does not exist or is not available for this API key.',
+      "Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Customer UUID',
+    description: 'UUID du client',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Customer updated successfully',
+    description: 'Client mis à jour avec succès',
     type: CustomerResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Customer not found or access denied',
+    description: 'Client introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input data',
+    description: "Données d'entrée invalides",
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   @ApiBody({
     schema: {
@@ -260,31 +260,34 @@ export class CustomersController {
 
   @Delete(':id')
   @ApiOperation({
-    summary: 'Delete a customer',
+    summary: 'Supprimer un client',
     description:
-      'Removes a customer from active use. They will no longer appear in list or get responses. Responds with 404 if the customer does not exist or is not available for this API key.',
+      "Retire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Customer UUID',
+    description: 'UUID du client',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Customer deleted successfully',
+    description: 'Client supprimé avec succès',
     schema: {
       properties: {
-        message: { type: 'string', example: 'Customer deleted successfully' },
+        message: {
+          type: 'string',
+          example: 'Client supprimé avec succès',
+        },
       },
     },
   })
   @ApiResponse({
     status: 404,
-    description: 'Customer not found or access denied',
+    description: 'Client introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   remove(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.customersService.remove(id, user);
@@ -292,18 +295,18 @@ export class CustomersController {
 
   @Get(':id/transactions')
   @ApiOperation({
-    summary: 'Get customer transactions',
+    summary: 'Transactions du client',
     description:
-      'Returns transactions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.',
+      "Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Customer UUID',
+    description: 'UUID du client',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of customer transactions',
+    description: 'Liste des transactions du client',
     schema: {
       type: 'array',
       items: { $ref: getSchemaPath(TransactionResponseDto) },
@@ -311,11 +314,11 @@ export class CustomersController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Customer not found or access denied',
+    description: 'Client introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   getTransactions(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.customersService.getTransactions(id, user);

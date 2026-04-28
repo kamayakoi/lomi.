@@ -15,5 +15,5 @@ export async function getDocsLocale(): Promise<Language> {
   if (raw && VALID_LOCALES.has(raw as Language)) {
     return raw as Language;
   }
-  return 'en';
+  return 'fr';
 }

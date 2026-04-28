@@ -15,7 +15,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Discount Coupons')
+@ApiTags('Coupons de réduction')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('discount-coupons')
@@ -26,19 +26,19 @@ export class DiscountCouponsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List all discount coupons',
+    summary: 'Lister les coupons',
     description:
-      "Returns all discount coupons for the authenticated merchant's organization.",
+      "Renvoie tous les coupons de réduction de l'organisation du marchand authentifié.",
   })
   @ApiResponse({
     status: 200,
-    description: 'List of discount coupons',
+    description: 'Liste des coupons',
     type: DiscountCouponResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(@CurrentUser() user: AuthContext) {
     return this.discountCouponsService.findAll(user);
@@ -46,18 +46,18 @@ export class DiscountCouponsController {
 
   @Get(':id/performance')
   @ApiOperation({
-    summary: 'Get coupon performance metrics',
+    summary: 'Indicateurs de performance du coupon',
     description:
-      'Returns performance metrics for a specific discount coupon, including usage statistics and revenue impact.',
+      "Renvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Coupon UUID',
+    description: 'UUID du coupon',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Coupon performance metrics',
+    description: 'Indicateurs de performance',
     schema: {
       properties: {
         total_uses: { type: 'number', example: 45 },
@@ -69,11 +69,11 @@ export class DiscountCouponsController {
   })
   @ApiResponse({
     status: 404,
-    description: 'Discount coupon not found or access denied',
+    description: 'Coupon introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   getPerformance(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.discountCouponsService.getPerformance(id, user);
@@ -81,27 +81,27 @@ export class DiscountCouponsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get discount coupon by ID',
+    summary: 'Obtenir un coupon par ID',
     description:
-      'Returns a single discount coupon. Responds with 404 if the coupon does not exist or is not available for this API key.',
+      "Renvoie un coupon. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Coupon UUID',
+    description: 'UUID du coupon',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Discount coupon details',
+    description: 'Détails du coupon',
     type: DiscountCouponResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Discount coupon not found or access denied',
+    description: 'Coupon introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.discountCouponsService.findOne(id, user);
@@ -109,22 +109,22 @@ export class DiscountCouponsController {
 
   @Post()
   @ApiOperation({
-    summary: 'Create a new discount coupon',
+    summary: 'Créer un coupon',
     description:
-      'Creates a new discount coupon in your organization. The coupon code will be automatically uppercased.',
+      "Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.",
   })
   @ApiResponse({
     status: 201,
-    description: 'Discount coupon created successfully',
+    description: 'Coupon créé avec succès',
     type: DiscountCouponResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid input data or coupon code already exists',
+    description: 'Données invalides ou code déjà utilisé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   create(
     @Body() createDto: CreateDiscountCouponDto,

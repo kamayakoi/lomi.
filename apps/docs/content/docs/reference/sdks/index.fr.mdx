@@ -1,0 +1,93 @@
+---
+title: 'Vue d’ensemble des SDK'
+description: 'SDK officiels lomi. pour intégrer les paiements dans votre langage préféré.'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# SDK lomi.
+
+SDK officiels pour l’API de paiement lomi.. Choisissez celui qui correspond à votre stack et acceptez des paiements rapidement.
+
+## Installation rapide
+
+| Langage       | Paquet           | Installation                               |
+| ------------- | ---------------- | ------------------------------------------ |
+| **TypeScript** | `@lomi./sdk`      | `npm install @lomi./sdk`                   |
+| **Python**     | `lomi-sdk`        | `pip install lomi-sdk`                     |
+| **Go**         | `lomi-go-sdk`     | `go get github.com/lomiafrica/lomi-go-sdk` |
+| **PHP**        | `lomi/lomi-sdk`   | Via Composer (voir ci-dessous)                   |
+
+<Callout type="info">
+  Tous les SDK sont générés automatiquement depuis notre spécification OpenAPI pour un comportement cohérent entre langages.
+</Callout>
+
+---
+
+## Services exposés
+
+Les SDK donnent accès aux services API suivants :
+
+| Service               | Description                         |
+| --------------------- | ----------------------------------- |
+| `customers`           | Création et gestion des clients         |
+| `checkoutSessions`    | Pages de paiement hébergées        |
+| `transactions`        | Historique des transactions            |
+| `paymentLinks`        | Liens de paiement partageables    |
+| `paymentRequests`     | Demandes de paiement aux clients     |
+| `products`            | Catalogue produits         |
+| `prices`              | Tarification produits           |
+| `subscriptions`        | Facturation récurrente        |
+| `refunds`             | Remboursements                     |
+| `discountCoupons`     | Coupons           |
+| `payouts`             | Virements vers banque / Mobile Money |
+| `beneficiaryPayouts`  | Virements à des tiers            |
+| `webhooks`            | Points de terminaison webhook         |
+| `webhookDeliveryLogs` | Débogage des livraisons webhook            |
+
+---
+
+## Choisir votre SDK
+
+<Cards>
+  <Card
+    title="TypeScript"
+    description="Node.js, Deno et applications navigateur"
+    href="/reference/sdks/typescript"
+  />
+  <Card
+    title="Python"
+    description="Django, Flask, FastAPI et scripts"
+    href="/reference/sdks/python"
+  />
+  <Card
+    title="Go"
+    description="Services web Go et microservices"
+    href="/reference/sdks/go"
+  />
+  <Card
+    title="PHP"
+    description="Laravel, Symfony et WordPress"
+    href="/reference/sdks/php"
+  />
+</Cards>
+
+---
+
+## Prérequis
+
+| SDK        | Version minimale             |
+| ---------- | --------------------------- |
+| TypeScript | Node.js 18+                 |
+| Python     | Python 3.9+                 |
+| Go         | Go 1.18+                    |
+| PHP        | PHP 8.0+                    |
+
+---
+
+## Besoin d’aide ?
+
+- **E-mail** : [hello@lomi.africa](mailto:hello@lomi.africa)
+- **Discord** : [Communauté](https://discord.gg/yb4FnBmh)
+- **GitHub** : [lomiafrica/lomi.](https://github.com/lomiafrica/lomi.)

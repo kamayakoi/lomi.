@@ -1,0 +1,149 @@
+---
+title: Journaux de livraison des webhooks
+description: Surveillez et déboguez les tentatives de livraison des webhooks.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+L’API Webhook Delivery Logs donne un accès en lecture seule à l’historique des livraisons. Les entrées sont créées automatiquement lors des envois vers vos points de terminaison.
+
+Voir **[Fiabilité des webhooks](/core/advanced-guides/webhook-reliability)** pour les nouvelles tentatives, échecs et idempotence.
+
+## Lister les journaux de livraison
+
+Récupère les journaux pour un webhook donné.
+
+### Paramètres de requête
+
+| Paramètre | Type | Obligatoire | Description |
+|-----------|------|-------------|-------------|
+| `webhookId` | `string` | **Oui** | Identifiant du webhook |
+| `successOnly` | `boolean` | Non | Uniquement les livraisons réussies |
+| `failedOnly` | `boolean` | Non | Uniquement les échecs |
+| `limit` | `number` | Non | Résultats par page (défaut : `25`) |
+| `offset` | `number` | Non | Décalage (défaut : `0`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const logs = await lomi.webhookDeliveryLogs.list({
+  webhookId: 'wh_abc123...',
+});
+
+const failedLogs = await lomi.webhookDeliveryLogs.list({
+  webhookId: 'wh_abc123...',
+  failedOnly: true,
+  limit: 50,
+});
+
+console.log(`Found ${failedLogs.length} failed deliveries`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+logs = client.webhook_delivery_logs.list(webhookId="wh_abc123...")
+
+failed_logs = client.webhook_delivery_logs.list(
+    webhookId="wh_abc123...",
+    failedOnly=True
+)
+
+print(f"Found {len(failed_logs)} failed deliveries")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/webhook-delivery-logs?webhookId=wh_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+
+curl -X GET "https://api.lomi.africa/webhook-delivery-logs?webhookId=wh_abc123...&failedOnly=true" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir un journal de livraison
+
+Détail d’une tentative : requête / réponse, délais.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const log = await lomi.webhookDeliveryLogs.get('log_abc123...');
+
+console.log(`Event: ${log.event_type}`);
+console.log(`Status: ${log.response_status_code}`);
+console.log(`Duration: ${log.duration_ms}ms`);
+console.log(`Success: ${log.success}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+log = client.webhook_delivery_logs.get('log_abc123...')
+
+print(f"Event: {log['event_type']}")
+print(f"Status: {log['response_status_code']}")
+print(f"Duration: {log['duration_ms']}ms")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/webhook-delivery-logs/log_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Objet Webhook Delivery Log
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Identifiant du journal |
+| `webhook_id` | `string` | Webhook associé |
+| `event_type` | `string` | Événement déclencheur |
+| `request_url` | `string` | URL du point de terminaison |
+| `request_headers` | `object` | En-têtes envoyés |
+| `request_body` | `object` | Corps envoyé |
+| `response_status_code` | `number` | Statut HTTP reçu |
+| `response_body` | `string` | Corps de la réponse |
+| `duration_ms` | `number` | Durée en ms |
+| `success` | `boolean` | Livraison réussie ou non |
+| `error_message` | `string` | Message d’erreur si échec |
+| `attempt_number` | `number` | Numéro de tentative |
+| `created_at` | `string` | Horodatage de la tentative |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `401` | Clé API invalide ou manquante |
+| `404` | Journal introuvable ou accès refusé |

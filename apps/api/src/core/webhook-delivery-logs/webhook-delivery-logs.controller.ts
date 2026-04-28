@@ -24,7 +24,7 @@ import {
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
 
-@ApiTags('Webhook Delivery Logs')
+@ApiTags('Journaux de livraison webhooks')
 @ApiSecurity('api-key')
 @UseGuards(ApiKeyGuard)
 @Controller('webhook-delivery-logs')
@@ -35,53 +35,53 @@ export class WebhookDeliveryLogsController {
 
   @Get()
   @ApiOperation({
-    summary: 'List webhook delivery logs',
+    summary: 'Lister les journaux de livraison',
     description:
-      'Returns delivery logs for a specific webhook. Logs are automatically created when webhooks are delivered. Use webhookId query parameter to filter by webhook.',
+      "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",
   })
   @ApiQuery({
     name: 'webhookId',
     required: true,
-    description: 'Filter by webhook ID',
+    description: 'Filtrer par identifiant de webhook',
     type: String,
   })
   @ApiQuery({
     name: 'successOnly',
     required: false,
-    description: 'Show only successful deliveries',
+    description: 'Uniquement les livraisons réussies',
     type: Boolean,
     example: false,
   })
   @ApiQuery({
     name: 'failedOnly',
     required: false,
-    description: 'Show only failed deliveries',
+    description: 'Uniquement les livraisons en échec',
     type: Boolean,
     example: false,
   })
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of logs to return',
+    description: 'Nombre maximal de journaux',
     type: Number,
     example: 25,
   })
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: 'Number of logs to skip (for pagination)',
+    description: "Nombre de journaux à ignorer (pagination)",
     type: Number,
     example: 0,
   })
   @ApiResponse({
     status: 200,
-    description: 'List of webhook delivery logs',
+    description: 'Liste des journaux de livraison',
     type: WebhookDeliveryLogResponseDto,
     isArray: true,
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findAll(
     @CurrentUser() user: AuthContext,
@@ -105,27 +105,27 @@ export class WebhookDeliveryLogsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Get webhook delivery log by ID',
+    summary: 'Obtenir un journal de livraison par ID',
     description:
-      'Returns a single webhook delivery log. Responds with 404 if the log does not exist or is not available for this API key.',
+      "Renvoie un journal. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
   })
   @ApiParam({
     name: 'id',
-    description: 'Log UUID',
+    description: 'UUID du journal',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Webhook delivery log details',
+    description: 'Détails du journal de livraison',
     type: WebhookDeliveryLogResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: 'Webhook delivery log not found or access denied',
+    description: 'Journal introuvable ou accès refusé',
   })
   @ApiResponse({
     status: 401,
-    description: 'Invalid or missing API key',
+    description: 'Clé API invalide ou manquante',
   })
   findOne(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.webhookDeliveryLogsService.findOne(id, user);

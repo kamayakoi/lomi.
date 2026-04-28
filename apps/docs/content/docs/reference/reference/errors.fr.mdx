@@ -1,0 +1,93 @@
+---
+title: 'Gestion des erreurs'
+description: 'Comprendre et traiter les erreurs renvoyées par l’API.'
+---
+
+Nous utilisons les codes HTTP usuels pour signaler le succès ou l’échec d’une requête :
+
+- Plage `` `2xx` `` : succès.
+- Plage `` `4xx` `` : erreur côté client (paramètre manquant, données invalides, etc.).
+- Plage `` `5xx` `` : erreur côté nos serveurs (rare) ; en cas de doute, voir notre [page de statut](https://status.lomi.africa).
+
+En cas d’échec (`` `4xx` `` ou `` `5xx` ``), le corps de la réponse contient un objet JSON décrivant l’erreur.
+
+## Structure de la réponse d’erreur
+
+Format JSON cohérent :
+
+```json filename="Exemple de réponse d’erreur"
+{
+  "error": {
+    "code": "unauthorized",
+    "message": "A human-readable description of the error.",
+    "details": "Optional: Additional details or structured information about the error."
+  },
+  "request_id": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+| Champ          | Type                             | Description                                                                                                                     |
+| ----------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `` `error` ``     | `` `object` ``                   | Conteneur d’informations d’erreur.                                                                                          |
+| `` `error.code` ``| `` `string` ``                   | Code machine (ex. `unauthorized`, `rate_limit_exceeded`, `not_found`).                                              |
+| `` `message` ``   | `` `string` ``                   | Résumé bref lisible par un humain.                                                                                    |
+| `` `details` ``   | `` `string` `` ou `` `object` `` | Optionnel. Contexte ou données structurées (échecs de validation, ressources en conflit, etc.). |
+| `` `request_id` ``| `` `string` `` (UUID)            | Permet la corrélation avec les journaux serveur ; également renvoyé dans l’en-tête `` `X-Request-Id` ``.                                |
+
+## Codes HTTP courants
+
+| Code        | Statut                | Signification                                                                                         |
+| ----------- | --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `` `200` `` | OK                    | Requête réussie.                                                                     |
+| `` `201` `` | Created               | Ressource créée (ex. webhook).               |
+| `` `204` `` | No Content            | Succès sans corps utile (ex. suppression). |
+| `` `400` `` | Bad Request           | Requête incorrecte ou paramètres invalides / manquants. |
+| `` `401` `` | Unauthorized          | Pas de clé API valide.                                                                      |
+| `` `403` `` | Forbidden             | La clé n’a pas les droits pour cette opération.                                    |
+| `` `404` `` | Not Found             | La ressource demandée est introuvable.                                                           |
+| `` `409` `` | Conflict              | Conflit avec l’état actuel (ex. doublon d’URL webhook).     |
+| `` `429` `` | Too Many Requests     | Plafonds de débit dépassés.                                                                 |
+| `` `500` `` | Internal Server Error | Erreur côté lomi. (exceptionnelle).                                            |
+| `` `503` `` | Service Unavailable   | Indisponibilité temporaire ; réessayez plus tard.                              |
+
+## Exemples de messages courants
+
+Les champs `` `message` `` et `` `details` `` varient ; exemples selon les statuts :
+
+**`` `400` `` Bad Request:**
+
+- `"message": "Invalid request"`, `"details": "Missing required field: \`url\`"`
+- `"message": "Invalid request"`, `"details": "Invalid \`Webhook ID\` format."`
+- `"message": "Invalid request body"`
+
+**`` `401` `` Unauthorized:**
+
+- `"message": "Invalid API key"`, `"details": "The provided API key is invalid or does not exist"`
+- `"message": "Missing API key"`, `"details": "API key is required for authentication"`
+- `"message": "Authentication required"`
+
+**`` `404` `` Not Found:**
+
+- `"message": "Webhook not found"`, `"details": "Webhook with ID \`wh\_...\` does not exist or does not belong to this organization."`
+- `"message": "Resource not found"`
+
+**`` `409` `` Conflict:**
+
+- `"message": "Conflict"`, `"details": "A webhook with this URL already exists for your organization."`
+
+**`` `429` `` Too Many Requests:**
+
+- `"message": "Rate limit exceeded"`
+
+**`` `500` `` Internal Server Error:**
+
+- `"message": "Internal server error"`
+- `"message": "Database error"`, `"details": "Failed to execute database query."`
+
+## Traiter les erreurs
+
+1.  **Lire le code HTTP** pour le diagnostic global.
+2.  **Analyser le corps JSON** pour les erreurs `` `4xx` `` ou `` `5xx` ``.
+3.  **Utiliser** `` `message` `` et `` `details` `` pour le détail fonctionnel.
+4.  **Adapter la logique** : correction utilisateur pour `` `400` ``, vérif credentials pour `` `401` ``, backoff pour `` `429` `` ou `` `5xx` ``.
+5.  **Journaliser** le corps complet et l’identifiant de requête (en-tête) pour le débogage.

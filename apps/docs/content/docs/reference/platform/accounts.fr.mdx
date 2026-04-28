@@ -1,0 +1,260 @@
+---
+title: Comptes
+description: Gérez les comptes marchands et consultez les soldes.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+L’API Accounts donne accès aux informations du compte marchand et au détail des soldes.
+
+Pour la mise à jour des soldes après paiement et la signification du statut « disponible », voir **[Solde et règlement](/reference/platform/balance-and-settlement)**.
+
+## Lister les comptes
+
+Récupère tous les comptes liés à votre organisation.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const accounts = await lomi.accounts.list();
+accounts.forEach(account => {
+  console.log(`${account.name}: ${account.id}`);
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+accounts = client.accounts.list()
+for account in accounts:
+    print(f"{account['name']}: {account['id']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/accounts" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir un compte par ID
+
+Récupère le détail d’un compte.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const account = await lomi.accounts.get('acc_abc123...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+account = client.accounts.get('acc_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/accounts/acc_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir le solde du compte
+
+Solde courant pour toutes les devises ou pour une devise précise.
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `currency` | `string` | Filtrer par devise : `XOF`, `USD`, `EUR` |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+// All currencies
+const balances = await lomi.accounts.getBalance();
+
+// Specific currency
+const xofBalance = await lomi.accounts.getBalance({ currency: 'XOF' });
+
+console.log(`Available: ${xofBalance.available}`);
+console.log(`Pending: ${xofBalance.pending}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+# All currencies
+balances = client.accounts.get_balance()
+
+# Specific currency
+xof_balance = client.accounts.get_balance(currency="XOF")
+print(f"Available: {xof_balance['available']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+# All currencies
+curl -X GET "https://api.lomi.africa/accounts/balance" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+
+# Specific currency
+curl -X GET "https://api.lomi.africa/accounts/balance?currency=XOF" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Détail du solde (répartition)
+
+Répartition détaillée avec conversion de devise optionnelle.
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `target_currency` | `string` | Convertir tous les montants dans cette devise |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+// Get breakdown
+const breakdown = await lomi.accounts.getBalanceBreakdown();
+
+// With currency conversion
+const convertedBreakdown = await lomi.accounts.getBalanceBreakdown({
+  target_currency: 'USD',
+});
+
+console.log(`Total in USD: ${convertedBreakdown.total}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+breakdown = client.accounts.get_balance_breakdown(target_currency="USD")
+print(f"Total in USD: {breakdown['total']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/accounts/balance/breakdown?target_currency=USD" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Vérifier le solde disponible
+
+Vérifie si le solde est suffisant pour une devise donnée.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const check = await lomi.accounts.checkBalance('XOF');
+
+if (check.has_sufficient_balance) {
+  console.log(`Available: ${check.available_balance} XOF`);
+} else {
+  console.log('Insufficient balance');
+}
+```
+</Tab>
+
+<Tab value="Python">
+```python
+check = client.accounts.check_balance("XOF")
+print(f"Has balance: {check['has_sufficient_balance']}")
+print(f"Available: {check['available_balance']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/accounts/balance/check/XOF" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+### Réponse
+
+```json
+{
+  "has_sufficient_balance": true,
+  "available_balance": 500000
+}
+```
+
+---
+
+## Objet Account
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Identifiant unique du compte |
+| `organization_id` | `string` | Organisation associée |
+| `name` | `string` | Nom du compte |
+| `currency_code` | `string` | Devise principale |
+| `created_at` | `string` | Horodatage de création |
+
+---
+
+## Objet Balance
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `available` | `number` | Disponible pour retrait |
+| `pending` | `number` | En attente de règlement |
+| `total` | `number` | Solde total |
+| `currency_code` | `string` | Code devise |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `401` | Clé API invalide ou manquante |
+| `404` | Compte introuvable |

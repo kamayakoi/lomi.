@@ -1,0 +1,38 @@
+---
+title: Comportement du tunnel de paiement
+description: Sessions, liens de paiement, montants, codes promo et règles d’expiration pour le tunnel hébergé.
+---
+
+Le tunnel combine **sessions de paiement**, **liens de paiement**, **produits / tarifs**, **codes promo** et parcours **prestataires**. Cette page décrit les règles transverses ; les détails d’endpoint restent sur chaque ressource.
+
+## Sessions de paiement
+
+- Les sessions sont en général **limitées dans le temps** (la fenêtre d’expiration par défaut est documentée sous [Sessions de paiement](/reference/payments/checkout-sessions)).
+- Le statut évolue (par ex. ouvert → terminé / expiré) lorsque le client paie ou que le temps est écoulé.
+- Le **`price_id`** sur la session choisit le tarif du produit appliqué ; le montant peut être dérivé ou validé par rapport aux tarifs du produit.
+
+## Liens de paiement
+
+- Les liens **produit** déterminent le montant à partir des tarifs catalogue (avec un prix éventuellement figé).
+- Les liens **instantanés** utilisent un montant fixe que vous fournissez.
+- Les flux multi-lignes peuvent définir **`has_line_items`** dans les métadonnées de session ; les totaux agrègent les lignes, les frais d’expédition / taxes optionnels et les frais liés au produit lorsqu’ils sont configurés.
+
+## Codes promo
+
+- La validation applique les **dates**, **plafonds d’usage**, **type de client** (nouveau ou récurrent), **périmètre** (organisation entière ou produits précis) et plafonds de **quantité**.
+- Plusieurs codes (lorsque c’est pris en charge) s’appliquent **séquentiellement** sur un montant courant — voir [Codes de réduction](/reference/payments/discount-coupons) et [Exemples de logique des codes](/reference/payments/coupon-logic-examples).
+
+## Multi-devises
+
+Lorsque la devise de la session diffère de celle d’un tarif produit, la logique serveur peut **convertir** pour valider que le montant payé correspond au tarif configuré dans l’autre devise.
+
+## Identité client
+
+Le tunnel peut **créer automatiquement ou fusionner** des fiches clients lorsque les champs de contact sont fournis, pour que les webhooks et transactions en aval s’associent lorsque possible à un `customer_id` stable.
+
+## Pages connexes
+
+- [Sessions de paiement](/reference/payments/checkout-sessions)
+- [Liens de paiement](/reference/payments/payment-links)
+- [Produits](/reference/payments/products)
+- [Machine à états du paiement](/reference/reference/payment-state-machine)

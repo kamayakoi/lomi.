@@ -12,6 +12,10 @@ import remarkMdx from 'remark-mdx';
 import { visit } from 'unist-util-visit';
 import { remark } from 'remark';
 import { remarkHeading } from 'fumadocs-core/mdx-plugins';
+import { isAgentRoute } from '@/lib/scripts/manual-api/constants';
+import {
+  collectPublicOperations,
+} from '@/lib/scripts/manual-api/render-operation-mdx';
 
 const HTTP_METHODS = [
   'get',
@@ -23,6 +27,8 @@ const HTTP_METHODS = [
   'patch',
   'trace',
 ] as const;
+
+type JsonObject = Record<string, unknown>;
 
 /** Guardrails for public REST docs tone (source: openapi.json from Nest @ApiOperation). */
 const OPENAPI_DESCRIPTION_BANNED: { test: RegExp; hint: string }[] = [
@@ -48,7 +54,69 @@ const OPENAPI_DESCRIPTION_BANNED: { test: RegExp; hint: string }[] = [
   },
 ];
 
-type JsonObject = Record<string, unknown>;
+/** Detect obvious leftover English in French-target OpenAPI strings. */
+const OPENAPI_ENGLISH_RESIDUAL: { test: RegExp; hint: string }[] = [
+  {
+    test: /\bInvalid or missing API key\b/i,
+    hint: 'Traduire : « Clé API invalide ou manquante ».',
+  },
+  {
+    test: /\bnot found or access denied\b/i,
+    hint: 'Traduire : « introuvable ou accès refusé ».',
+  },
+  {
+    test: /\bReturns all\b/i,
+    hint: "Traduire les descriptions d'opération (ex. « Renvoie tous les … »).",
+  },
+  {
+    test: /\bList all\b/i,
+    hint: "Traduire les résumés (ex. « Lister les … »).",
+  },
+  {
+    test: /\bCreated successfully\b/i,
+    hint: 'Traduire : « créé avec succès ».',
+  },
+];
+
+function collectOpenApiEnglishResidual(
+  spec: JsonObject,
+  errors: string[],
+): void {
+  const infos = spec.info;
+  if (infos && typeof infos === 'object' && 'description' in infos) {
+    const d = (infos as { description?: unknown }).description;
+    if (typeof d === 'string') {
+      for (const { test, hint } of OPENAPI_ENGLISH_RESIDUAL) {
+        if (test.test(d)) {
+          errors.push(`openapi.json info.description: probable English (${hint})`);
+        }
+      }
+    }
+  }
+
+  if (!spec.paths || typeof spec.paths !== 'object') return;
+
+  for (const [p, item] of Object.entries(spec.paths as Record<string, unknown>)) {
+    if (!item || typeof item !== 'object') continue;
+    const pathItem = item as JsonObject;
+    for (const method of HTTP_METHODS) {
+      const op = pathItem[method];
+      if (!op || typeof op !== 'object') continue;
+      const operation = op as JsonObject;
+      for (const field of ['summary', 'description'] as const) {
+        const text = operation[field];
+        if (typeof text !== 'string') continue;
+        for (const { test, hint } of OPENAPI_ENGLISH_RESIDUAL) {
+          if (test.test(text)) {
+            errors.push(
+              `openapi.json ${method.toUpperCase()} ${p} ${field}: probable English (${hint})`,
+            );
+          }
+        }
+      }
+    }
+  }
+}
 
 function collectOpenApiTextErrors(
   spec: JsonObject,
@@ -126,6 +194,89 @@ function collectOpenApiSecurityErrors(
   }
 }
 
+const REST_API_HEADINGS = [
+  '## Overview',
+  '## Authentication',
+  '## Endpoint',
+  '## Request',
+  '## Responses',
+  '## Errors',
+  '## Example',
+  '## OpenAPI',
+] as const;
+
+async function checkRestApiManualPages(): Promise<void> {
+  const openApiPath = path.resolve(process.cwd(), 'openapi.json');
+  const raw = await fs.readFile(openApiPath, 'utf-8');
+  const spec = JSON.parse(raw) as JsonObject;
+
+  const operations = collectPublicOperations(
+    spec as Parameters<typeof collectPublicOperations>[0],
+  ).filter((o) => !isAgentRoute(o.path));
+
+  const expected = new Set(
+    operations.map((o) => `${o.method.toUpperCase()} ${o.path}`),
+  );
+
+  const docFiles = await glob('content/docs/api/*/*.mdx');
+  const documented = new Set<string>();
+  const errors: string[] = [];
+
+  for (const file of docFiles) {
+    const parsed = await readFromPath(file);
+    const method = parsed.data['method'];
+    const routePath = parsed.data['path'];
+    const operationId = parsed.data['operationId'];
+
+    if (typeof method !== 'string' || typeof routePath !== 'string') {
+      errors.push(
+        `${file}: REST API pages must set frontmatter 'method' and 'path' (from OpenAPI).`,
+      );
+      continue;
+    }
+
+    if (typeof operationId !== 'string' || operationId.length === 0) {
+      errors.push(`${file}: REST API pages must set frontmatter 'operationId'.`);
+    }
+
+    const key = `${method.toUpperCase()} ${routePath}`;
+    documented.add(key);
+
+    for (const h of REST_API_HEADINGS) {
+      if (!parsed.content.includes(h)) {
+        errors.push(`${file}: missing required heading ${h}`);
+      }
+    }
+  }
+
+  for (const op of expected) {
+    if (!documented.has(op)) {
+      errors.push(
+        `Missing manual REST doc for OpenAPI operation: ${op}. Regenerate with: pnpm run api:bootstrap`,
+      );
+    }
+  }
+
+  for (const op of documented) {
+    if (!expected.has(op)) {
+      errors.push(
+        `Manual REST doc references unknown or non-public operation: ${op}. Update or remove the page; agent routes are excluded from this section.`,
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    for (const e of errors) console.error(e);
+    throw new Error(
+      `REST API manual docs checks failed (${errors.length} issue(s)).`,
+    );
+  }
+
+  console.log(
+    `REST API manual docs checks passed (${documented.size} operations).`,
+  );
+}
+
 async function checkOpenApiDocs(): Promise<void> {
   const openApiPath = path.resolve(process.cwd(), 'openapi.json');
   const raw = await fs.readFile(openApiPath, 'utf-8');
@@ -133,6 +284,7 @@ async function checkOpenApiDocs(): Promise<void> {
   const errors: string[] = [];
   collectOpenApiSecurityErrors(spec, errors);
   collectOpenApiTextErrors(spec, errors);
+  collectOpenApiEnglishResidual(spec, errors);
   if (errors.length > 0) {
     for (const e of errors) console.error(e);
     throw new Error(
@@ -243,6 +395,7 @@ async function checkLinks() {
 
 async function main() {
   await checkOpenApiDocs();
+  await checkRestApiManualPages();
   await checkLinks();
 }
 

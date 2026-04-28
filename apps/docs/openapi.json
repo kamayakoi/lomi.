@@ -7,7 +7,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "List of accounts",
+            "description": "Liste des comptes",
             "content": {
               "application/json": {
                 "schema": {
@@ -25,22 +25,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all accounts",
+        "summary": "Lister les comptes",
         "tags": [
-          "Accounts"
+          "Comptes"
         ]
       }
     },
     "/accounts/balance": {
       "get": {
-        "description": "Fetch current account balance for all currencies or a specific currency",
+        "description": "Récupère le solde courant pour toutes les devises ou pour une devise précise",
         "operationId": "AccountsController_getBalance",
         "parameters": [
           {
             "name": "currency",
             "required": false,
             "in": "query",
-            "description": "Filter by specific currency code (XOF, USD, EUR)",
+            "description": "Filtrer par code devise (XOF, USD, EUR)",
             "schema": {
               "enum": [
                 "XOF",
@@ -53,7 +53,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Account balance information",
+            "description": "Informations de solde",
             "content": {
               "application/json": {
                 "schema": {
@@ -71,22 +71,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get account balance",
+        "summary": "Solde du compte",
         "tags": [
-          "Accounts"
+          "Comptes"
         ]
       }
     },
     "/accounts/balance/breakdown": {
       "get": {
-        "description": "Fetch detailed balance breakdown including available, pending, and total balances. Optionally convert to a target currency.",
+        "description": "Récupère le détail des soldes (disponible, en attente, total). Conversion optionnelle vers une devise cible.",
         "operationId": "AccountsController_getBalanceBreakdown",
         "parameters": [
           {
             "name": "target_currency",
             "required": false,
             "in": "query",
-            "description": "Target currency for conversion (XOF, USD, EUR)",
+            "description": "Devise cible pour la conversion (XOF, USD, EUR)",
             "schema": {
               "enum": [
                 "XOF",
@@ -99,7 +99,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Detailed balance breakdown with conversion",
+            "description": "Détail des soldes avec conversion",
             "content": {
               "application/json": {
                 "schema": {
@@ -117,20 +117,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get detailed balance breakdown",
+        "summary": "Détail du solde",
         "tags": [
-          "Accounts"
+          "Comptes"
         ]
       }
     },
     "/accounts/balance/check/{currency}": {
       "get": {
-        "description": "Check if merchant has sufficient available balance in specified currency",
+        "description": "Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée",
         "operationId": "AccountsController_checkAvailableBalance",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Available balance check result",
+            "description": "Résultat de la vérification de solde",
             "content": {
               "application/json": {
                 "schema": {
@@ -138,11 +138,11 @@
                   "properties": {
                     "has_sufficient_balance": {
                       "type": "boolean",
-                      "description": "Whether merchant has funds available"
+                      "description": "Indique si des fonds sont disponibles"
                     },
                     "available_balance": {
                       "type": "number",
-                      "description": "Current available balance"
+                      "description": "Solde disponible actuel"
                     }
                   }
                 }
@@ -155,9 +155,9 @@
             "api-key": []
           }
         ],
-        "summary": "Check available balance",
+        "summary": "Vérifier le solde disponible",
         "tags": [
-          "Accounts"
+          "Comptes"
         ]
       }
     },
@@ -167,7 +167,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The account",
+            "description": "Le compte",
             "content": {
               "application/json": {
                 "schema": {
@@ -177,7 +177,7 @@
             }
           },
           "404": {
-            "description": "Account not found"
+            "description": "Compte introuvable"
           }
         },
         "security": [
@@ -185,20 +185,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get an account by ID",
+        "summary": "Obtenir un compte par ID",
         "tags": [
-          "Accounts"
+          "Comptes"
         ]
       }
     },
     "/organizations": {
       "get": {
-        "description": "Returns the authenticated merchant's organization details",
+        "description": "Renvoie les informations de l'organisation du marchand authentifié",
         "operationId": "OrganizationsController_findAll",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Organization details",
+            "description": "Détails de l'organisation",
             "content": {
               "application/json": {
                 "schema": {
@@ -216,20 +216,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get organization details",
+        "summary": "Détails de l'organisation",
         "tags": [
-          "Organizations"
+          "Organisations"
         ]
       }
     },
     "/organizations/metrics": {
       "get": {
-        "description": "Returns MRR, ARR, LTV, revenue, and customer counts for your organization.",
+        "description": "Renvoie le MRR, l'ARR, la LTV, le chiffre d'affaires et le nombre de clients pour votre organisation.",
         "operationId": "OrganizationsController_getMetrics",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Organization metrics",
+            "description": "Indicateurs de l'organisation",
             "content": {
               "application/json": {
                 "schema": {
@@ -244,20 +244,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get organization metrics",
+        "summary": "Indicateurs de l'organisation",
         "tags": [
-          "Organizations"
+          "Organisations"
         ]
       }
     },
     "/organizations/{id}": {
       "get": {
-        "description": "Returns organization details by ID (must match authenticated organization)",
+        "description": "Renvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)",
         "operationId": "OrganizationsController_findOne",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The organization",
+            "description": "L'organisation",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,7 +267,7 @@
             }
           },
           "404": {
-            "description": "Organization not found or access denied"
+            "description": "Organisation introuvable ou accès refusé"
           }
         },
         "security": [
@@ -275,22 +275,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get organization by ID",
+        "summary": "Organisation par ID",
         "tags": [
-          "Organizations"
+          "Organisations"
         ]
       }
     },
     "/transactions": {
       "get": {
-        "description": "Returns all transactions for the authenticated merchant's organization with advanced filtering options. Transactions are created by the system when payments are processed.",
+        "description": "Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.",
         "operationId": "TransactionsController_findAll",
         "parameters": [
           {
             "name": "isPos",
             "required": false,
             "in": "query",
-            "description": "Filter by POS transactions only",
+            "description": "Uniquement les transactions points de vente (TPV)",
             "schema": {
               "example": false,
               "type": "boolean"
@@ -300,7 +300,7 @@
             "name": "endDate",
             "required": false,
             "in": "query",
-            "description": "Filter transactions up to this date (ISO 8601 format)",
+            "description": "Jusqu'à cette date (format ISO 8601)",
             "schema": {
               "example": "2024-12-31T23:59:59Z",
               "type": "string"
@@ -310,7 +310,7 @@
             "name": "startDate",
             "required": false,
             "in": "query",
-            "description": "Filter transactions from this date (ISO 8601 format)",
+            "description": "À partir de cette date (format ISO 8601)",
             "schema": {
               "example": "2024-01-01T00:00:00Z",
               "type": "string"
@@ -320,7 +320,7 @@
             "name": "pageSize",
             "required": false,
             "in": "query",
-            "description": "Number of items per page",
+            "description": "Nombre d'éléments par page",
             "schema": {
               "example": 50,
               "type": "number"
@@ -330,7 +330,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number for pagination",
+            "description": "Numéro de page",
             "schema": {
               "example": 1,
               "type": "number"
@@ -340,7 +340,7 @@
             "name": "paymentMethod",
             "required": false,
             "in": "query",
-            "description": "Filter by payment method code (comma-separated for multiple)",
+            "description": "Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs)",
             "schema": {
               "example": "MOBILE_MONEY,CARDS",
               "type": "string"
@@ -350,7 +350,7 @@
             "name": "currency",
             "required": false,
             "in": "query",
-            "description": "Filter by currency code (comma-separated for multiple)",
+            "description": "Filtrer par code devise (séparés par des virgules pour plusieurs valeurs)",
             "schema": {
               "example": "XOF,USD",
               "type": "string"
@@ -360,7 +360,7 @@
             "name": "type",
             "required": false,
             "in": "query",
-            "description": "Filter by transaction type (comma-separated for multiple)",
+            "description": "Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs)",
             "schema": {
               "example": "payment,refund",
               "type": "string"
@@ -370,7 +370,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "Filter by transaction status (comma-separated for multiple)",
+            "description": "Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs)",
             "schema": {
               "example": "completed,pending",
               "type": "string"
@@ -380,7 +380,7 @@
             "name": "provider",
             "required": false,
             "in": "query",
-            "description": "Filter by payment provider code",
+            "description": "Filtrer par code de fournisseur de paiement",
             "schema": {
               "example": "WAVE",
               "type": "string"
@@ -389,7 +389,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of transactions",
+            "description": "Liste des transactions",
             "content": {
               "application/json": {
                 "schema": {
@@ -402,7 +402,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -410,7 +410,7 @@
             "api-key": []
           }
         ],
-        "summary": "List all transactions",
+        "summary": "Lister les transactions",
         "tags": [
           "Transactions"
         ]
@@ -418,14 +418,14 @@
     },
     "/transactions/{id}": {
       "get": {
-        "description": "Returns a single transaction. Responds with 404 if the transaction does not exist or is not available for this API key.",
+        "description": "Renvoie une transaction. Réponse 404 si elle n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "TransactionsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Transaction UUID",
+            "description": "UUID de la transaction",
             "schema": {
               "type": "string"
             }
@@ -433,7 +433,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Transaction details",
+            "description": "Détails de la transaction",
             "content": {
               "application/json": {
                 "schema": {
@@ -443,10 +443,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Transaction not found or access denied"
+            "description": "Transaction introuvable ou accès refusé"
           }
         },
         "security": [
@@ -454,7 +454,7 @@
             "api-key": []
           }
         ],
-        "summary": "Get transaction by ID",
+        "summary": "Obtenir une transaction par ID",
         "tags": [
           "Transactions"
         ]
@@ -462,14 +462,14 @@
     },
     "/customers": {
       "get": {
-        "description": "Returns all customers for the authenticated merchant's organization. Supports filtering by search term, customer type, and activity status.",
+        "description": "Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.",
         "operationId": "CustomersController_findAll",
         "parameters": [
           {
             "name": "pageSize",
             "required": false,
             "in": "query",
-            "description": "Number of items per page",
+            "description": "Nombre d'éléments par page",
             "schema": {
               "example": 50,
               "type": "number"
@@ -479,7 +479,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number for pagination",
+            "description": "Numéro de page",
             "schema": {
               "example": 1,
               "type": "number"
@@ -489,7 +489,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "Filter by activity status (active = has transactions, inactive = no transactions)",
+            "description": "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)",
             "schema": {
               "enum": [
                 "active",
@@ -503,7 +503,7 @@
             "name": "type",
             "required": false,
             "in": "query",
-            "description": "Filter by customer type",
+            "description": "Filtrer par type de client",
             "schema": {
               "enum": [
                 "business",
@@ -517,7 +517,7 @@
             "name": "search",
             "required": false,
             "in": "query",
-            "description": "Search by name or email",
+            "description": "Recherche par nom ou e-mail",
             "schema": {
               "type": "string"
             }
@@ -525,7 +525,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of customers with pagination",
+            "description": "Liste paginée de clients",
             "content": {
               "application/json": {
                 "schema": {
@@ -563,7 +563,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -571,13 +571,13 @@
             "api-key": []
           }
         ],
-        "summary": "List all customers",
+        "summary": "Lister les clients",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       },
       "post": {
-        "description": "Creates a new customer in your organization. The customer will be automatically linked to your organization.",
+        "description": "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
         "operationId": "CustomersController_create",
         "parameters": [],
         "requestBody": {
@@ -627,7 +627,7 @@
               },
               "examples": {
                 "minimal": {
-                  "summary": "Minimal customer",
+                  "summary": "Client minimal",
                   "value": {
                     "name": "Jane Doe",
                     "email": "jane@example.com"
@@ -639,7 +639,7 @@
         },
         "responses": {
           "201": {
-            "description": "Customer created successfully",
+            "description": "Client créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -649,10 +649,10 @@
             }
           },
           "400": {
-            "description": "Invalid input data"
+            "description": "Données d'entrée invalides"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -660,22 +660,22 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new customer",
+        "summary": "Créer un client",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       }
     },
     "/customers/{id}": {
       "get": {
-        "description": "Returns a single customer. Responds with 404 if the customer does not exist or is not available for this API key.",
+        "description": "Renvoie un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Customer UUID",
+            "description": "UUID du client",
             "schema": {
               "type": "string"
             }
@@ -683,7 +683,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Customer details",
+            "description": "Détails du client",
             "content": {
               "application/json": {
                 "schema": {
@@ -693,10 +693,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Customer not found or access denied"
+            "description": "Client introuvable ou accès refusé"
           }
         },
         "security": [
@@ -704,20 +704,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get customer by ID",
+        "summary": "Obtenir un client par ID",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       },
       "patch": {
-        "description": "Updates a customer. Send only the fields to change. Responds with 404 if the customer does not exist or is not available for this API key.",
+        "description": "Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_update",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Customer UUID",
+            "description": "UUID du client",
             "schema": {
               "type": "string"
             }
@@ -769,7 +769,7 @@
         },
         "responses": {
           "200": {
-            "description": "Customer updated successfully",
+            "description": "Client mis à jour avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -779,13 +779,13 @@
             }
           },
           "400": {
-            "description": "Invalid input data"
+            "description": "Données d'entrée invalides"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Customer not found or access denied"
+            "description": "Client introuvable ou accès refusé"
           }
         },
         "security": [
@@ -793,20 +793,20 @@
             "api-key": []
           }
         ],
-        "summary": "Update a customer",
+        "summary": "Mettre à jour un client",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       },
       "delete": {
-        "description": "Removes a customer from active use. They will no longer appear in list or get responses. Responds with 404 if the customer does not exist or is not available for this API key.",
+        "description": "Retire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_remove",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Customer UUID",
+            "description": "UUID du client",
             "schema": {
               "type": "string"
             }
@@ -814,14 +814,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Customer deleted successfully",
+            "description": "Client supprimé avec succès",
             "content": {
               "application/json": {
                 "schema": {
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Customer deleted successfully"
+                      "example": "Client supprimé avec succès"
                     }
                   }
                 }
@@ -829,10 +829,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Customer not found or access denied"
+            "description": "Client introuvable ou accès refusé"
           }
         },
         "security": [
@@ -840,22 +840,22 @@
             "api-key": []
           }
         ],
-        "summary": "Delete a customer",
+        "summary": "Supprimer un client",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       }
     },
     "/customers/{id}/transactions": {
       "get": {
-        "description": "Returns transactions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.",
+        "description": "Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "CustomersController_getTransactions",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Customer UUID",
+            "description": "UUID du client",
             "schema": {
               "type": "string"
             }
@@ -863,7 +863,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of customer transactions",
+            "description": "Liste des transactions du client",
             "content": {
               "application/json": {
                 "schema": {
@@ -876,10 +876,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Customer not found or access denied"
+            "description": "Client introuvable ou accès refusé"
           }
         },
         "security": [
@@ -887,15 +887,15 @@
             "api-key": []
           }
         ],
-        "summary": "Get customer transactions",
+        "summary": "Transactions du client",
         "tags": [
-          "Customers"
+          "Clients"
         ]
       }
     },
     "/payment-requests": {
       "post": {
-        "description": "Creates a payment request for a customer. Payment requests have an expiration date and can be tracked until completion or expiry.",
+        "description": "Crée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.",
         "operationId": "PaymentRequestsController_create",
         "parameters": [],
         "requestBody": {
@@ -943,11 +943,11 @@
               },
               "examples": {
                 "default": {
-                  "summary": "Payment request with expiry",
+                  "summary": "Demande avec expiration",
                   "value": {
                     "amount": 25000,
                     "currency_code": "XOF",
-                    "description": "Consulting fee — March",
+                    "description": "Honoraires conseil — mars",
                     "expiry_date": "2026-12-31T23:59:59.000Z",
                     "payment_reference": "INV-2026-042"
                   }
@@ -958,7 +958,7 @@
         },
         "responses": {
           "201": {
-            "description": "Payment request created successfully",
+            "description": "Demande de paiement créée avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -968,10 +968,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or validation error"
+            "description": "Entrée invalide ou erreur de validation"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -979,20 +979,20 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new payment request",
+        "summary": "Créer une demande de paiement",
         "tags": [
-          "Payment Requests"
+          "Demandes de paiement"
         ]
       },
       "get": {
-        "description": "Returns all payment requests for your organization with pagination and optional filtering by status and customer.",
+        "description": "Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).",
         "operationId": "PaymentRequestsController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Offset for pagination",
+            "description": "Décalage pour la pagination",
             "schema": {
               "example": 0,
               "type": "number"
@@ -1002,7 +1002,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of results to return",
+            "description": "Nombre maximal de résultats",
             "schema": {
               "example": 20,
               "type": "number"
@@ -1012,7 +1012,7 @@
             "name": "customerId",
             "required": false,
             "in": "query",
-            "description": "Filter by customer ID",
+            "description": "Filtrer par ID client",
             "schema": {
               "type": "string"
             }
@@ -1021,7 +1021,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "Filter by payment status",
+            "description": "Filtrer par statut",
             "schema": {
               "enum": [
                 "pending",
@@ -1035,7 +1035,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of payment requests with pagination",
+            "description": "Liste paginée de demandes",
             "content": {
               "application/json": {
                 "schema": {
@@ -1062,7 +1062,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1070,22 +1070,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all payment requests",
+        "summary": "Lister les demandes de paiement",
         "tags": [
-          "Payment Requests"
+          "Demandes de paiement"
         ]
       }
     },
     "/payment-requests/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific payment request, including its current status and payment details.",
+        "description": "Renvoie le détail d’une demande (statut actuel, informations de paiement).",
         "operationId": "PaymentRequestsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Payment request UUID",
+            "description": "UUID de la demande",
             "schema": {
               "type": "string"
             }
@@ -1093,7 +1093,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Payment request details",
+            "description": "Détails de la demande",
             "content": {
               "application/json": {
                 "schema": {
@@ -1103,10 +1103,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Payment request not found or access denied"
+            "description": "Demande introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1114,20 +1114,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get a payment request by ID",
+        "summary": "Obtenir une demande de paiement par ID",
         "tags": [
-          "Payment Requests"
+          "Demandes de paiement"
         ]
       }
     },
     "/refund/wave": {
       "post": {
-        "description": "Creates a refund via the Wave edge function. Response shape is provider JSON.",
+        "description": "Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
         "operationId": "RefundsController_createWaveRefund",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Refund result (JSON body from Wave edge function)",
+            "description": "Résultat du remboursement (corps JSON de la fonction edge)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1137,10 +1137,10 @@
             }
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Entrée invalide"
           },
           "500": {
-            "description": "Refund processing failed"
+            "description": "Échec du traitement du remboursement"
           }
         },
         "security": [
@@ -1148,22 +1148,22 @@
             "api-key": []
           }
         ],
-        "summary": "Initiate a Wave refund",
+        "summary": "Lancer un remboursement Wave",
         "tags": [
-          "Refunds"
+          "Remboursements"
         ]
       }
     },
     "/products": {
       "get": {
-        "description": "Returns all products for the authenticated merchant's organization. Products include embedded prices and fees. Use this to display your product catalog or integrate with external systems.",
+        "description": "Renvoie tous les produits de l'organisation du marchand authentifié, avec prix et frais intégrés. Utile pour afficher le catalogue ou intégrer des systèmes externes.",
         "operationId": "ProductsController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Offset for pagination",
+            "description": "Décalage pour la pagination",
             "schema": {
               "example": 0,
               "type": "number"
@@ -1173,7 +1173,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of results to return",
+            "description": "Nombre maximal de résultats",
             "schema": {
               "example": 15,
               "type": "number"
@@ -1183,7 +1183,7 @@
             "name": "isActive",
             "required": false,
             "in": "query",
-            "description": "Filter by active status",
+            "description": "Filtrer par statut actif",
             "schema": {
               "type": "boolean"
             }
@@ -1191,7 +1191,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of products with embedded prices",
+            "description": "Liste des produits avec prix embarqués",
             "content": {
               "application/json": {
                 "schema": {
@@ -1204,7 +1204,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1212,18 +1212,18 @@
             "api-key": []
           }
         ],
-        "summary": "List all products",
+        "summary": "Lister les produits",
         "tags": [
-          "Products"
+          "Produits"
         ]
       },
       "post": {
-        "description": "Creates a product with one or more prices in a single request. At least one price is required. The first price, or the one with `is_default` set, is used when no price is specified at checkout.",
+        "description": "Crée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.",
         "operationId": "ProductsController_create",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Product created successfully",
+            "description": "Produit créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -1233,10 +1233,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or validation error"
+            "description": "Entrée invalide ou erreur de validation"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1244,22 +1244,22 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new product",
+        "summary": "Créer un produit",
         "tags": [
-          "Products"
+          "Produits"
         ]
       }
     },
     "/products/{id}": {
       "get": {
-        "description": "Returns a product, including its prices and fees. Responds with 404 if the product does not exist or is not available for this API key.",
+        "description": "Renvoie un produit avec ses prix et frais. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "ProductsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Product UUID",
+            "description": "UUID du produit",
             "schema": {
               "type": "string"
             }
@@ -1267,7 +1267,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Product details with embedded prices",
+            "description": "Détails du produit avec prix embarqués",
             "content": {
               "application/json": {
                 "schema": {
@@ -1277,10 +1277,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Product not found or access denied"
+            "description": "Produit introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1288,22 +1288,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get product by ID",
+        "summary": "Obtenir un produit par ID",
         "tags": [
-          "Products"
+          "Produits"
         ]
       }
     },
     "/products/{id}/prices": {
       "post": {
-        "description": "Adds an additional price option to an existing product. Useful for offering multiple pricing tiers, currencies, or billing intervals. Note: A product can have a maximum of 3 active prices. You cannot modify existing prices - create a new one instead.",
+        "description": "Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.",
         "operationId": "ProductsController_addPrice",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Product UUID",
+            "description": "UUID du produit",
             "schema": {
               "type": "string"
             }
@@ -1311,7 +1311,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Price added successfully",
+            "description": "Prix ajouté avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -1321,13 +1321,13 @@
             }
           },
           "400": {
-            "description": "Invalid input or maximum prices exceeded"
+            "description": "Entrée invalide ou nombre maximal de prix dépassé"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Product not found or access denied"
+            "description": "Produit introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1335,22 +1335,22 @@
             "api-key": []
           }
         ],
-        "summary": "Add a new price to a product",
+        "summary": "Ajouter un prix à un produit",
         "tags": [
-          "Products"
+          "Produits"
         ]
       }
     },
     "/products/{id}/prices/{priceId}/set-default": {
       "post": {
-        "description": "Sets which price is used by default for this product (for example when checkout does not pass a price ID). One default at a time; choosing a new default replaces the previous one.",
+        "description": "Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.",
         "operationId": "ProductsController_setDefaultPrice",
         "parameters": [
           {
             "name": "priceId",
             "required": true,
             "in": "path",
-            "description": "Price UUID",
+            "description": "UUID du prix",
             "schema": {
               "type": "string"
             }
@@ -1359,7 +1359,7 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Product UUID",
+            "description": "UUID du produit",
             "schema": {
               "type": "string"
             }
@@ -1367,7 +1367,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Default price updated successfully",
+            "description": "Prix par défaut mis à jour",
             "content": {
               "application/json": {
                 "schema": {
@@ -1377,10 +1377,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Product or price not found"
+            "description": "Produit ou prix introuvable"
           }
         },
         "security": [
@@ -1388,22 +1388,22 @@
             "api-key": []
           }
         ],
-        "summary": "Set a price as the default",
+        "summary": "Définir le prix par défaut",
         "tags": [
-          "Products"
+          "Produits"
         ]
       }
     },
     "/subscriptions": {
       "get": {
-        "description": "Returns all subscriptions for the authenticated merchant's organization. Subscriptions are automatically created when customers make recurring payments.",
+        "description": "Renvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.",
         "operationId": "SubscriptionsController_findAll",
         "parameters": [
           {
             "name": "pageSize",
             "required": false,
             "in": "query",
-            "description": "Number of items per page",
+            "description": "Nombre d'éléments par page",
             "schema": {
               "example": 50,
               "type": "number"
@@ -1413,7 +1413,7 @@
             "name": "page",
             "required": false,
             "in": "query",
-            "description": "Page number for pagination",
+            "description": "Numéro de page",
             "schema": {
               "example": 1,
               "type": "number"
@@ -1422,7 +1422,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of subscriptions",
+            "description": "Liste des abonnements",
             "content": {
               "application/json": {
                 "schema": {
@@ -1435,7 +1435,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1443,22 +1443,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all subscriptions",
+        "summary": "Lister les abonnements",
         "tags": [
-          "Subscriptions"
+          "Abonnements"
         ]
       }
     },
     "/subscriptions/customer/{customerId}": {
       "get": {
-        "description": "Returns subscriptions for a customer. Responds with 404 if the customer does not exist or is not available for this API key.",
+        "description": "Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "SubscriptionsController_findByCustomer",
         "parameters": [
           {
             "name": "customerId",
             "required": true,
             "in": "path",
-            "description": "Customer UUID",
+            "description": "UUID du client",
             "schema": {
               "type": "string"
             }
@@ -1466,7 +1466,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of customer subscriptions",
+            "description": "Liste des abonnements du client",
             "content": {
               "application/json": {
                 "schema": {
@@ -1479,10 +1479,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Customer not found or access denied"
+            "description": "Client introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1490,22 +1490,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get subscriptions for a customer",
+        "summary": "Abonnements d’un client",
         "tags": [
-          "Subscriptions"
+          "Abonnements"
         ]
       }
     },
     "/subscriptions/{id}": {
       "get": {
-        "description": "Returns a single subscription. Responds with 404 if the subscription does not exist or is not available for this API key.",
+        "description": "Renvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "SubscriptionsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Subscription UUID",
+            "description": "UUID de l’abonnement",
             "schema": {
               "type": "string"
             }
@@ -1513,7 +1513,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Subscription details",
+            "description": "Détails de l’abonnement",
             "content": {
               "application/json": {
                 "schema": {
@@ -1523,10 +1523,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Subscription not found or access denied"
+            "description": "Abonnement introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1534,22 +1534,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get subscription by ID",
+        "summary": "Obtenir un abonnement par ID",
         "tags": [
-          "Subscriptions"
+          "Abonnements"
         ]
       }
     },
     "/subscriptions/{id}/cancel": {
       "post": {
-        "description": "Cancels an active subscription. This is the ONLY modification allowed on subscriptions. Price, billing dates, and other fields are system-managed and cannot be changed.",
+        "description": "Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.",
         "operationId": "SubscriptionsController_cancel",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Subscription UUID",
+            "description": "UUID de l’abonnement",
             "schema": {
               "type": "string"
             }
@@ -1569,9 +1569,9 @@
               },
               "examples": {
                 "withReason": {
-                  "summary": "Cancel with reason",
+                  "summary": "Résiliation avec motif",
                   "value": {
-                    "cancellation_reason": "Customer requested cancellation"
+                    "cancellation_reason": "Demande du client"
                   }
                 }
               }
@@ -1580,7 +1580,7 @@
         },
         "responses": {
           "200": {
-            "description": "Subscription cancelled successfully",
+            "description": "Abonnement résilié avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -1590,10 +1590,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Subscription not found or access denied"
+            "description": "Abonnement introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1601,20 +1601,20 @@
             "api-key": []
           }
         ],
-        "summary": "Cancel a subscription",
+        "summary": "Résilier un abonnement",
         "tags": [
-          "Subscriptions"
+          "Abonnements"
         ]
       }
     },
     "/discount-coupons": {
       "get": {
-        "description": "Returns all discount coupons for the authenticated merchant's organization.",
+        "description": "Renvoie tous les coupons de réduction de l'organisation du marchand authentifié.",
         "operationId": "DiscountCouponsController_findAll",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "List of discount coupons",
+            "description": "Liste des coupons",
             "content": {
               "application/json": {
                 "schema": {
@@ -1627,7 +1627,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1635,18 +1635,18 @@
             "api-key": []
           }
         ],
-        "summary": "List all discount coupons",
+        "summary": "Lister les coupons",
         "tags": [
-          "Discount Coupons"
+          "Coupons de réduction"
         ]
       },
       "post": {
-        "description": "Creates a new discount coupon in your organization. The coupon code will be automatically uppercased.",
+        "description": "Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.",
         "operationId": "DiscountCouponsController_create",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Discount coupon created successfully",
+            "description": "Coupon créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -1656,10 +1656,10 @@
             }
           },
           "400": {
-            "description": "Invalid input data or coupon code already exists"
+            "description": "Données invalides ou code déjà utilisé"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1667,22 +1667,22 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new discount coupon",
+        "summary": "Créer un coupon",
         "tags": [
-          "Discount Coupons"
+          "Coupons de réduction"
         ]
       }
     },
     "/discount-coupons/{id}/performance": {
       "get": {
-        "description": "Returns performance metrics for a specific discount coupon, including usage statistics and revenue impact.",
+        "description": "Renvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.",
         "operationId": "DiscountCouponsController_getPerformance",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Coupon UUID",
+            "description": "UUID du coupon",
             "schema": {
               "type": "string"
             }
@@ -1690,7 +1690,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Coupon performance metrics",
+            "description": "Indicateurs de performance",
             "content": {
               "application/json": {
                 "schema": {
@@ -1717,10 +1717,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Discount coupon not found or access denied"
+            "description": "Coupon introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1728,22 +1728,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get coupon performance metrics",
+        "summary": "Indicateurs de performance du coupon",
         "tags": [
-          "Discount Coupons"
+          "Coupons de réduction"
         ]
       }
     },
     "/discount-coupons/{id}": {
       "get": {
-        "description": "Returns a single discount coupon. Responds with 404 if the coupon does not exist or is not available for this API key.",
+        "description": "Renvoie un coupon. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "DiscountCouponsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Coupon UUID",
+            "description": "UUID du coupon",
             "schema": {
               "type": "string"
             }
@@ -1751,7 +1751,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Discount coupon details",
+            "description": "Détails du coupon",
             "content": {
               "application/json": {
                 "schema": {
@@ -1761,10 +1761,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Discount coupon not found or access denied"
+            "description": "Coupon introuvable ou accès refusé"
           }
         },
         "security": [
@@ -1772,20 +1772,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get discount coupon by ID",
+        "summary": "Obtenir un coupon par ID",
         "tags": [
-          "Discount Coupons"
+          "Coupons de réduction"
         ]
       }
     },
     "/checkout-sessions": {
       "post": {
-        "description": "Creates a hosted payment page for customers to complete their purchase. The checkout session expires after 60 minutes by default. Returns a session ID and URL to redirect your customer to.",
+        "description": "Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.",
         "operationId": "CheckoutSessionsController_create",
         "parameters": [],
         "requestBody": {
           "required": true,
-          "description": "Checkout session payload. Either set `amount` (+ optional product fields) or `line_items` for multi-product carts.",
+          "description": "Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.",
           "content": {
             "application/json": {
               "schema": {
@@ -1905,7 +1905,7 @@
               },
               "examples": {
                 "amount": {
-                  "summary": "Fixed amount checkout",
+                  "summary": "Paiement à montant fixe",
                   "value": {
                     "currency_code": "XOF",
                     "amount": 10000,
@@ -1914,7 +1914,7 @@
                   }
                 },
                 "lineItems": {
-                  "summary": "Multi-product (line items)",
+                  "summary": "Multi-produits (lignes)",
                   "value": {
                     "currency_code": "XOF",
                     "line_items": [
@@ -1932,7 +1932,7 @@
         },
         "responses": {
           "201": {
-            "description": "Checkout session created successfully",
+            "description": "Session de paiement créée avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -1942,10 +1942,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or validation error"
+            "description": "Entrée invalide ou erreur de validation"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -1953,20 +1953,20 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new checkout session",
+        "summary": "Créer une session de paiement",
         "tags": [
-          "Checkout Sessions"
+          "Sessions de paiement"
         ]
       },
       "get": {
-        "description": "Returns all checkout sessions for your organization with pagination and optional status filtering.",
+        "description": "Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.",
         "operationId": "CheckoutSessionsController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Offset for pagination",
+            "description": "Décalage pour la pagination",
             "schema": {
               "example": 0,
               "type": "number"
@@ -1976,7 +1976,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of results to return",
+            "description": "Nombre maximal de résultats",
             "schema": {
               "example": 20,
               "type": "number"
@@ -1986,7 +1986,7 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "Filter by session status (matches checkout_session_status)",
+            "description": "Filtrer par statut de session (valeur checkout_session_status)",
             "schema": {
               "enum": [
                 "open",
@@ -1999,7 +1999,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of checkout sessions",
+            "description": "Liste des sessions de paiement",
             "content": {
               "application/json": {
                 "schema": {
@@ -2012,7 +2012,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2020,22 +2020,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all checkout sessions",
+        "summary": "Lister les sessions de paiement",
         "tags": [
-          "Checkout Sessions"
+          "Sessions de paiement"
         ]
       }
     },
     "/checkout-sessions/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific checkout session, including its current status and associated customer/product details.",
+        "description": "Renvoie le détail d’une session (statut, client et produits associés).",
         "operationId": "CheckoutSessionsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Checkout session UUID",
+            "description": "UUID de la session",
             "schema": {
               "type": "string"
             }
@@ -2043,7 +2043,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Checkout session details",
+            "description": "Détails de la session",
             "content": {
               "application/json": {
                 "schema": {
@@ -2053,10 +2053,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Checkout session not found or access denied"
+            "description": "Session introuvable ou accès refusé"
           }
         },
         "security": [
@@ -2064,15 +2064,15 @@
             "api-key": []
           }
         ],
-        "summary": "Get a checkout session by ID",
+        "summary": "Obtenir une session de paiement par ID",
         "tags": [
-          "Checkout Sessions"
+          "Sessions de paiement"
         ]
       }
     },
     "/payment-links": {
       "post": {
-        "description": "Creates a shareable payment link. Can be for a specific product (product link) or a custom amount (instant link). Product links reference a product and optional price. Instant links have a fixed amount.",
+        "description": "Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.",
         "operationId": "PaymentLinksController_create",
         "parameters": [],
         "requestBody": {
@@ -2148,7 +2148,7 @@
               },
               "examples": {
                 "instant": {
-                  "summary": "Instant (fixed amount) link",
+                  "summary": "Lien instantané (montant fixe)",
                   "value": {
                     "link_type": "instant",
                     "title": "Invoice INV-001",
@@ -2157,7 +2157,7 @@
                   }
                 },
                 "product": {
-                  "summary": "Product link",
+                  "summary": "Lien produit",
                   "value": {
                     "link_type": "product",
                     "title": "Premium plan",
@@ -2171,7 +2171,7 @@
         },
         "responses": {
           "201": {
-            "description": "Payment link created successfully",
+            "description": "Lien de paiement créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -2181,10 +2181,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or validation error"
+            "description": "Entrée invalide ou erreur de validation"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2192,20 +2192,20 @@
             "api-key": []
           }
         ],
-        "summary": "Create a new payment link",
+        "summary": "Créer un lien de paiement",
         "tags": [
-          "Payment Links"
+          "Liens de paiement"
         ]
       },
       "get": {
-        "description": "Returns all payment links for your organization with pagination and optional filtering by type and active status.",
+        "description": "Renvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).",
         "operationId": "PaymentLinksController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Offset for pagination",
+            "description": "Décalage pour la pagination",
             "schema": {
               "example": 0,
               "type": "number"
@@ -2215,7 +2215,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of results to return",
+            "description": "Nombre maximal de résultats",
             "schema": {
               "example": 20,
               "type": "number"
@@ -2225,7 +2225,7 @@
             "name": "isActive",
             "required": false,
             "in": "query",
-            "description": "Filter by active status",
+            "description": "Filtrer par statut actif",
             "schema": {
               "type": "boolean"
             }
@@ -2234,7 +2234,7 @@
             "name": "linkType",
             "required": false,
             "in": "query",
-            "description": "Filter by link type",
+            "description": "Filtrer par type de lien",
             "schema": {
               "enum": [
                 "product",
@@ -2246,7 +2246,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of payment links with pagination",
+            "description": "Liste paginée de liens de paiement",
             "content": {
               "application/json": {
                 "schema": {
@@ -2273,7 +2273,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2281,22 +2281,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all payment links",
+        "summary": "Lister les liens de paiement",
         "tags": [
-          "Payment Links"
+          "Liens de paiement"
         ]
       }
     },
     "/payment-links/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific payment link, including its URL, configuration, and status.",
+        "description": "Renvoie le détail d’un lien (URL, configuration et statut).",
         "operationId": "PaymentLinksController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Payment link UUID",
+            "description": "UUID du lien de paiement",
             "schema": {
               "type": "string"
             }
@@ -2304,7 +2304,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Payment link details",
+            "description": "Détails du lien",
             "content": {
               "application/json": {
                 "schema": {
@@ -2314,10 +2314,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Payment link not found or access denied"
+            "description": "Lien introuvable ou accès refusé"
           }
         },
         "security": [
@@ -2325,20 +2325,20 @@
             "api-key": []
           }
         ],
-        "summary": "Get a payment link by ID",
+        "summary": "Obtenir un lien de paiement par ID",
         "tags": [
-          "Payment Links"
+          "Liens de paiement"
         ]
       }
     },
     "/payout/wave": {
       "post": {
-        "description": "Creates a payout via the Wave edge function. Response shape is provider JSON.",
+        "description": "Crée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
         "operationId": "PayoutsController_createWavePayout",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Payout initiated (JSON body from Wave edge function)",
+            "description": "Virement initié (corps JSON de la fonction edge Wave)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2348,10 +2348,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or provider error"
+            "description": "Entrée invalide ou erreur fournisseur"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2359,20 +2359,20 @@
             "api-key": []
           }
         ],
-        "summary": "Initiate a Wave payout",
+        "summary": "Lancer un virement Wave",
         "tags": [
-          "Payouts"
+          "Virements sortants"
         ]
       }
     },
     "/beneficiary-payouts": {
       "post": {
-        "description": "Initiates a payout to a beneficiary (contractor, supplier, employee, etc.). Returns immediately with pending status. The actual payout is processed asynchronously by the payment provider (Wave, SPI). Status updates are sent via webhooks. Use this for paying external parties from your account balance.",
+        "description": "Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.",
         "operationId": "BeneficiaryPayoutsController_create",
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Beneficiary payout initiated successfully with pending status",
+            "description": "Paiement initié avec succès (statut en attente)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2382,10 +2382,10 @@
             }
           },
           "400": {
-            "description": "Invalid input or insufficient balance"
+            "description": "Entrée invalide ou solde insuffisant"
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2393,20 +2393,20 @@
             "api-key": []
           }
         ],
-        "summary": "Initiate a beneficiary payout",
+        "summary": "Lancer un paiement vers un bénéficiaire",
         "tags": [
-          "Beneficiary Payouts"
+          "Paiements vers bénéficiaires"
         ]
       },
       "get": {
-        "description": "Returns all beneficiary payouts for your organization with pagination and optional filtering by status, date range, and currency.",
+        "description": "Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).",
         "operationId": "BeneficiaryPayoutsController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Offset for pagination",
+            "description": "Décalage pour la pagination",
             "schema": {
               "example": 0,
               "type": "number"
@@ -2416,7 +2416,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of results to return",
+            "description": "Nombre maximal de résultats",
             "schema": {
               "example": 50,
               "type": "number"
@@ -2426,7 +2426,7 @@
             "name": "currencyCode",
             "required": false,
             "in": "query",
-            "description": "Filter by currency code",
+            "description": "Code devise",
             "schema": {
               "example": "XOF",
               "type": "string"
@@ -2436,7 +2436,7 @@
             "name": "endDate",
             "required": false,
             "in": "query",
-            "description": "Filter by end date (ISO 8601)",
+            "description": "Date de fin (ISO 8601)",
             "schema": {
               "type": "string"
             }
@@ -2445,7 +2445,7 @@
             "name": "startDate",
             "required": false,
             "in": "query",
-            "description": "Filter by start date (ISO 8601)",
+            "description": "Date de début (ISO 8601)",
             "schema": {
               "type": "string"
             }
@@ -2454,7 +2454,7 @@
             "name": "statuses",
             "required": false,
             "in": "query",
-            "description": "Filter by payout statuses (comma-separated)",
+            "description": "Statuts (séparés par des virgules)",
             "schema": {
               "example": "pending,completed,failed",
               "type": "string"
@@ -2463,7 +2463,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of beneficiary payouts with pagination",
+            "description": "Liste paginée des paiements",
             "content": {
               "application/json": {
                 "schema": {
@@ -2487,7 +2487,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2495,22 +2495,22 @@
             "api-key": []
           }
         ],
-        "summary": "List all beneficiary payouts",
+        "summary": "Lister les paiements vers bénéficiaires",
         "tags": [
-          "Beneficiary Payouts"
+          "Paiements vers bénéficiaires"
         ]
       }
     },
     "/beneficiary-payouts/{id}": {
       "get": {
-        "description": "Returns detailed information about a specific beneficiary payout, including its current status and provider details.",
+        "description": "Renvoie le détail d’un paiement (statut actuel et informations fournisseur).",
         "operationId": "BeneficiaryPayoutsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Beneficiary payout UUID",
+            "description": "UUID du paiement",
             "schema": {
               "type": "string"
             }
@@ -2518,7 +2518,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Beneficiary payout details",
+            "description": "Détails du paiement",
             "content": {
               "application/json": {
                 "schema": {
@@ -2528,10 +2528,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Beneficiary payout not found or access denied"
+            "description": "Paiement introuvable ou accès refusé"
           }
         },
         "security": [
@@ -2539,22 +2539,22 @@
             "api-key": []
           }
         ],
-        "summary": "Get a beneficiary payout by ID",
+        "summary": "Obtenir un paiement bénéficiaire par ID",
         "tags": [
-          "Beneficiary Payouts"
+          "Paiements vers bénéficiaires"
         ]
       }
     },
     "/webhook-delivery-logs": {
       "get": {
-        "description": "Returns delivery logs for a specific webhook. Logs are automatically created when webhooks are delivered. Use webhookId query parameter to filter by webhook.",
+        "description": "Renvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.",
         "operationId": "WebhookDeliveryLogsController_findAll",
         "parameters": [
           {
             "name": "offset",
             "required": false,
             "in": "query",
-            "description": "Number of logs to skip (for pagination)",
+            "description": "Nombre de journaux à ignorer (pagination)",
             "schema": {
               "example": 0,
               "type": "number"
@@ -2564,7 +2564,7 @@
             "name": "limit",
             "required": false,
             "in": "query",
-            "description": "Number of logs to return",
+            "description": "Nombre maximal de journaux",
             "schema": {
               "example": 25,
               "type": "number"
@@ -2574,7 +2574,7 @@
             "name": "failedOnly",
             "required": false,
             "in": "query",
-            "description": "Show only failed deliveries",
+            "description": "Uniquement les livraisons en échec",
             "schema": {
               "example": false,
               "type": "boolean"
@@ -2584,7 +2584,7 @@
             "name": "successOnly",
             "required": false,
             "in": "query",
-            "description": "Show only successful deliveries",
+            "description": "Uniquement les livraisons réussies",
             "schema": {
               "example": false,
               "type": "boolean"
@@ -2594,7 +2594,7 @@
             "name": "webhookId",
             "required": true,
             "in": "query",
-            "description": "Filter by webhook ID",
+            "description": "Filtrer par identifiant de webhook",
             "schema": {
               "type": "string"
             }
@@ -2602,7 +2602,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of webhook delivery logs",
+            "description": "Liste des journaux de livraison",
             "content": {
               "application/json": {
                 "schema": {
@@ -2615,7 +2615,7 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           }
         },
         "security": [
@@ -2623,22 +2623,22 @@
             "api-key": []
           }
         ],
-        "summary": "List webhook delivery logs",
+        "summary": "Lister les journaux de livraison",
         "tags": [
-          "Webhook Delivery Logs"
+          "Journaux de livraison webhooks"
         ]
       }
     },
     "/webhook-delivery-logs/{id}": {
       "get": {
-        "description": "Returns a single webhook delivery log. Responds with 404 if the log does not exist or is not available for this API key.",
+        "description": "Renvoie un journal. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.",
         "operationId": "WebhookDeliveryLogsController_findOne",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
-            "description": "Log UUID",
+            "description": "UUID du journal",
             "schema": {
               "type": "string"
             }
@@ -2646,7 +2646,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Webhook delivery log details",
+            "description": "Détails du journal de livraison",
             "content": {
               "application/json": {
                 "schema": {
@@ -2656,10 +2656,10 @@
             }
           },
           "401": {
-            "description": "Invalid or missing API key"
+            "description": "Clé API invalide ou manquante"
           },
           "404": {
-            "description": "Webhook delivery log not found or access denied"
+            "description": "Journal introuvable ou accès refusé"
           }
         },
         "security": [
@@ -2667,9 +2667,9 @@
             "api-key": []
           }
         ],
-        "summary": "Get webhook delivery log by ID",
+        "summary": "Obtenir un journal de livraison par ID",
         "tags": [
-          "Webhook Delivery Logs"
+          "Journaux de livraison webhooks"
         ]
       }
     },
@@ -2679,7 +2679,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "List of webhooks",
+            "description": "Liste des webhooks",
             "content": {
               "application/json": {
                 "schema": {
@@ -2697,7 +2697,7 @@
             "api-key": []
           }
         ],
-        "summary": "List all webhooks",
+        "summary": "Lister les webhooks",
         "tags": [
           "Webhooks"
         ]
@@ -2709,7 +2709,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The webhook",
+            "description": "Le webhook",
             "content": {
               "application/json": {
                 "schema": {
@@ -2724,7 +2724,7 @@
             "api-key": []
           }
         ],
-        "summary": "Get a webhook by ID",
+        "summary": "Obtenir un webhook par ID",
         "tags": [
           "Webhooks"
         ]
@@ -2766,7 +2766,7 @@
               },
               "examples": {
                 "rotateUrl": {
-                  "summary": "Update delivery URL",
+                  "summary": "Mettre à jour l'URL de livraison",
                   "value": {
                     "url": "https://example.com/webhooks/lomi",
                     "is_active": true
@@ -2778,7 +2778,7 @@
         },
         "responses": {
           "200": {
-            "description": "The webhook has been successfully updated.",
+            "description": "Webhook mis à jour avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -2793,7 +2793,7 @@
             "api-key": []
           }
         ],
-        "summary": "Update a webhook",
+        "summary": "Mettre à jour un webhook",
         "tags": [
           "Webhooks"
         ]
@@ -2801,12 +2801,12 @@
     },
     "/webhooks/wave": {
       "post": {
-        "description": "Endpoint for Wave to send payment notifications. Verifies signature and processes events.",
+        "description": "Point de terminaison pour les notifications Wave. Vérifie la signature et traite les événements.",
         "operationId": "WaveWebhookController_handleWebhook",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Webhook received and processed successfully",
+            "description": "Webhook reçu et traité avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -2823,26 +2823,26 @@
             }
           },
           "401": {
-            "description": "Invalid webhook signature"
+            "description": "Signature webhook invalide"
           },
           "500": {
-            "description": "Internal server error processing webhook"
+            "description": "Erreur interne lors du traitement du webhook"
           }
         },
-        "summary": "Receive Wave webhook events",
+        "summary": "Réception des événements webhook Wave",
         "tags": [
-          "Webhooks - Providers"
+          "Webhooks - Fournisseurs"
         ]
       }
     },
     "/webhooks/stripe": {
       "post": {
-        "description": "Endpoint for Stripe to send payment notifications. Verifies signature and processes events.",
+        "description": "Point de terminaison pour les notifications Stripe. Vérifie la signature et traite les événements.",
         "operationId": "StripeWebhookController_handleWebhook",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Webhook received and processed successfully",
+            "description": "Webhook reçu et traité avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -2859,15 +2859,15 @@
             }
           },
           "400": {
-            "description": "Invalid webhook signature"
+            "description": "Signature webhook invalide"
           },
           "500": {
-            "description": "Internal server error processing webhook"
+            "description": "Erreur interne lors du traitement du webhook"
           }
         },
-        "summary": "Receive Stripe webhook events",
+        "summary": "Réception des événements webhook Stripe",
         "tags": [
-          "Webhooks - Providers"
+          "Webhooks - Fournisseurs"
         ]
       }
     },
@@ -2877,7 +2877,7 @@
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Charge initiated successfully (JSON body from Wave edge function)",
+            "description": "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2888,7 +2888,7 @@
             }
           },
           "400": {
-            "description": "Invalid input or Wave API error"
+            "description": "Entrée invalide ou erreur API Wave"
           }
         },
         "security": [
@@ -2896,9 +2896,9 @@
             "api-key": []
           }
         ],
-        "summary": "Initiate a Wave direct charge",
+        "summary": "Lancer un encaissement direct Wave",
         "tags": [
-          "Charges"
+          "Encaissements"
         ]
       }
     },
@@ -2911,7 +2911,7 @@
             "description": ""
           }
         },
-        "summary": "Agent capability negotiation (unauthenticated discoverability surface)",
+        "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
         "tags": [
           "Agent"
         ]
@@ -2931,7 +2931,7 @@
             "api-key": []
           }
         ],
-        "summary": "Server-Sent Events stream (scoped to organization, keepalive pings)",
+        "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
         "tags": [
           "Agent"
         ]
@@ -2943,7 +2943,7 @@
         "parameters": [],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Créé"
           }
         },
         "security": [
@@ -2951,7 +2951,7 @@
             "api-key": []
           }
         ],
-        "summary": "Register for agent-appropriate notifications (MVP: in-process registry + SSE test ping)",
+        "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
         "tags": [
           "Agent"
         ]
@@ -2969,7 +2969,7 @@
             "api-key": []
           }
         ],
-        "summary": "List agent subscriptions",
+        "summary": "Lister les abonnements de l'agent",
         "tags": [
           "Agent"
         ]
@@ -2989,10 +2989,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Deleted"
+            "description": "Supprimé"
           },
           "404": {
-            "description": "Not found"
+            "description": "Introuvable"
           }
         },
         "security": [
@@ -3000,7 +3000,7 @@
             "api-key": []
           }
         ],
-        "summary": "Delete a subscription",
+        "summary": "Supprimer un abonnement",
         "tags": [
           "Agent"
         ]
@@ -3022,7 +3022,7 @@
         },
         "responses": {
           "201": {
-            "description": "Run created"
+            "description": "Exécution créée"
           }
         },
         "security": [
@@ -3030,7 +3030,7 @@
             "api-key": []
           }
         ],
-        "summary": "Start a multi-step workflow run (MVP, idempotency on idempotency_key)",
+        "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
         "tags": [
           "Agent"
         ]
@@ -3057,7 +3057,7 @@
             "api-key": []
           }
         ],
-        "summary": "Get workflow run state",
+        "summary": "Obtenir l'état d'une exécution de workflow",
         "tags": [
           "Agent"
         ]
@@ -3092,7 +3092,7 @@
         },
         "responses": {
           "200": {
-            "description": "Updated"
+            "description": "Mis à jour"
           }
         },
         "security": [
@@ -3100,7 +3100,7 @@
             "api-key": []
           }
         ],
-        "summary": "Advance a workflow step (orchestration primitive)",
+        "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
         "tags": [
           "Agent"
         ]
@@ -3122,7 +3122,7 @@
         },
         "responses": {
           "201": {
-            "description": "Handoff registered"
+            "description": "Transfert enregistré"
           }
         },
         "security": [
@@ -3130,7 +3130,7 @@
             "api-key": []
           }
         ],
-        "summary": "Cross-service / cross-agent handoff (context + task envelope)",
+        "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
         "tags": [
           "Agent"
         ]
@@ -3157,7 +3157,7 @@
             "api-key": []
           }
         ],
-        "summary": "Retrieve handoff record",
+        "summary": "Récupérer un enregistrement de transfert",
         "tags": [
           "Agent"
         ]
@@ -3165,8 +3165,8 @@
     }
   },
   "info": {
-    "title": "lomi. API",
-    "description": "Payment processing API for francophone West African businesses.",
+    "title": "API lomi.",
+    "description": "API de traitement des paiements pour les entreprises d'Afrique de l'Ouest francophone.",
     "version": "1.1.0",
     "contact": {}
   },

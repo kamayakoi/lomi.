@@ -18,7 +18,10 @@ export class AgentStreamController {
 
   @Sse('events')
   @SkipThrottle()
-  @ApiOperation({ summary: 'Server-Sent Events stream (scoped to organization, keepalive pings)' })
+  @ApiOperation({
+    summary:
+      "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
+  })
   stream(@CurrentUser() user: AuthContext): Observable<MessageEvent> {
     return this.bus.events$(user.organizationId);
   }

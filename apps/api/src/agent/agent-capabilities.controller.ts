@@ -8,7 +8,10 @@ import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from '../config/http.constants';
 export class AgentCapabilitiesController {
   @Get('capabilities')
   @SkipThrottle()
-  @ApiOperation({ summary: 'Agent capability negotiation (unauthenticated discoverability surface)' })
+  @ApiOperation({
+    summary:
+      "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
+  })
   getCapabilities() {
     return {
       name: 'lomi.',

@@ -7,13 +7,6 @@ import type { MDXComponents } from 'mdx/types';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import * as icons from 'lucide-react';
-import { createAPIPage } from 'fumadocs-openapi/ui';
-import { openapi } from '@/lib/openapi';
-
-const APIPage = createAPIPage(openapi, {
-  showResponseSchema: false,
-});
-
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...(icons as unknown as MDXComponents),
@@ -24,7 +17,6 @@ export function getMDXComponents(components?: MDXComponents) {
     Accordions,
     Step,
     Steps,
-    APIPage,
     ...components,
   } satisfies MDXComponents;
 }

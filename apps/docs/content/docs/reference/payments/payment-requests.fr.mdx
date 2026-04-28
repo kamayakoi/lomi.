@@ -1,0 +1,200 @@
+---
+title: Demandes de paiement
+description: Envoyez des demandes de paiement aux clients avec une date d’expiration.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+
+L’API Payment Requests permet de créer des demandes de paiement limitées dans le temps. Utile pour la facturation et le B2B.
+
+## Créer une demande de paiement
+
+### Corps de la requête
+
+| Champ | Type | Obligatoire | Description |
+|-------|------|-------------|-------------|
+| `amount` | `number` | **Oui** | Montant demandé |
+| `currency_code` | `string` | **Oui** | Devise (`XOF`, `USD`, etc.) |
+| `expiry_date` | `string` | **Oui** | Date d’expiration (ISO 8601) |
+| `description` | `string` | Non | Description du paiement |
+| `customer_id` | `string` | Non | Identifiant client existant |
+| `payment_reference` | `string` | Non | Référence facture / commande |
+| `metadata` | `object` | Non | Paires clé-valeur |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+import { LomiSDK } from '@lomi./sdk';
+
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
+
+const request = await lomi.paymentRequests.create({
+  amount: 50000,
+  currency_code: 'XOF',
+  expiry_date: '2024-02-15T23:59:59Z',
+  description: 'Facture n° INV-2024-001',
+  customer_id: 'cus_abc123...',
+  payment_reference: 'INV-2024-001',
+  metadata: {
+    invoice_id: 'INV-2024-001',
+  },
+});
+
+console.log(`Payment request created: ${request.id}`);
+console.log(`Payment URL: ${request.payment_url}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+from lomi import LomiClient
+import os
+
+client = LomiClient(
+    api_key=os.environ["LOMI_API_KEY"],
+    environment="test"
+)
+
+request = client.payment_requests.create({
+    "amount": 50000,
+    "currency_code": "XOF",
+    "expiry_date": "2024-02-15T23:59:59Z",
+    "description": "Facture n° INV-2024-001",
+    "customer_id": "cus_abc123...",
+    "payment_reference": "INV-2024-001"
+})
+
+print(f"Payment request: {request['id']}")
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/payment-requests" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "currency_code": "XOF",
+    "expiry_date": "2024-02-15T23:59:59Z",
+    "description": "Facture n° INV-2024-001",
+    "customer_id": "cus_abc123...",
+    "payment_reference": "INV-2024-001"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Lister les demandes de paiement
+
+Récupère les demandes avec filtrage optionnel.
+
+### Paramètres de requête
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `status` | `string` | Statut : `pending`, `completed`, `failed`, `expired` |
+| `customerId` | `string` | Filtrer par client |
+| `limit` | `number` | Résultats par page (défaut : `20`) |
+| `offset` | `number` | Décalage (défaut : `0`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const requests = await lomi.paymentRequests.list({
+  status: 'pending',
+  limit: 20,
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+requests = client.payment_requests.list(status="pending", limit=20)
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/payment-requests?status=pending&limit=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Obtenir une demande de paiement
+
+Récupère le détail d’une demande.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const request = await lomi.paymentRequests.get('pr_abc123...');
+console.log(`Status: ${request.status}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+request = client.payment_requests.get('pr_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/payment-requests/pr_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Objet Payment Request
+
+| Champ | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Identifiant unique |
+| `amount` | `number` | Montant demandé |
+| `currency_code` | `string` | Devise |
+| `status` | `string` | `pending`, `completed`, `failed`, `expired` |
+| `description` | `string` | Description |
+| `customer_id` | `string` | Client associé |
+| `payment_reference` | `string` | Référence |
+| `payment_url` | `string` | URL pour payer |
+| `expiry_date` | `string` | Expiration |
+| `transaction_id` | `string` | Transaction créée une fois payé |
+| `metadata` | `object` | Métadonnées |
+| `created_at` | `string` | Création |
+
+---
+
+## Webhooks
+
+| Événement | Description |
+|-------|-------------|
+| `payment_request.completed` | Paiement reçu |
+| `payment_request.expired` | Demande expirée sans paiement |
+
+---
+
+## Réponses d’erreur
+
+| Statut | Description |
+|--------|-------------|
+| `400` | Entrée invalide |
+| `401` | Clé API invalide ou manquante |
+| `404` | Demande introuvable |
