@@ -9,17 +9,10 @@ operationId: CheckoutSessionsController_create
 
 ## Overview
 
-Create a hosted **checkout session**: lomi. returns a session id and checkout URL where the payer completes payment.
+Créer une session de paiement
 
-**Lifetime:** sessions expire **60 minutes after creation** unless your product logic dictates otherwise elsewhere.
+Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.
 
-Choose one of three shapes:
-
-| Mode | Typical fields |
-| --- | --- |
-| **Fixed amount** | `currency_code`, `amount`, URLs |
-| **Product / subscription** | `currency_code`, `product_id` and/or `price_id`, optionally `quantity` |
-| **Multi-product cart** | `currency_code`, `line_items` (each line needs `price_id`; root `product_id`, `price_id`, `quantity` are ignored — see `CreateCheckoutSessionDto` in `apps/api/src/core/checkout-sessions/dto/create-checkout-session.dto.ts`) |
 
 ## Authentication
 
@@ -40,60 +33,65 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
 _No query parameters._
 
+
 ### Request body
 
-`currency_code` is **always required**.
+Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
 
-| Field | Required | Role |
-| --- | --- | --- |
-| `currency_code` | Yes | One of `XOF`, `USD`, `EUR` |
-| `amount` | For simple amount checkouts | Smallest currency unit / amount semantics as documented for your merchant account |
-| `line_items[]` | For cart checkout | Each item requires `price_id`; when set, root `amount`/`product_id`/`price_id`/`quantity` are ignored (`CheckoutSessionsController`). |
-| `customer_*` | Optional | Prefer `customer_id` for known customers |
-| `success_url`, `cancel_url` | Recommended | Hosted redirect URLs after payment |
-| `payment_link_id` | Optional | Tie session creation to an existing payment link |
-| `metadata` | Optional | Your own opaque key/value object |
+Schema: `object`
 
-Example — fixed amount:
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | No | `number` | — |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
+| `title` | No | `string` | — |
+| `description` | No | `string` | — |
+| `customer_id` | No | `string` | — |
+| `customer_email` | No | `string` | — |
+| `customer_name` | No | `string` | — |
+| `customer_phone` | No | `string` | — |
+| `customer_city` | No | `string` | — |
+| `customer_country` | No | `string` | — |
+| `customer_address` | No | `string` | — |
+| `customer_postal_code` | No | `string` | — |
+| `product_id` | No | `string` | — |
+| `price_id` | No | `string` | — |
+| `subscription_id` | No | `string` | — |
+| `allow_quantity` | No | `boolean` | — |
+| `quantity` | No | `number` | — |
+| `success_url` | No | `string` | — |
+| `cancel_url` | No | `string` | — |
+| `allow_coupon_code` | No | `boolean` | — |
+| `require_billing_address` | No | `boolean` | — |
+| `payment_link_id` | No | `string` | — |
+| `metadata` | No | `object` | — |
+| `line_items` | No | `array<object>` | — |
+
+Example body:
 
 ```json
 {
-  "currency_code": "XOF",
-  "amount": 10000,
-  "success_url": "https://example.com/success",
-  "cancel_url": "https://example.com/cancel"
+  "currency_code": "XOF"
 }
 ```
 
-Example — line items:
-
-```json
-{
-  "currency_code": "XOF",
-  "line_items": [
-    { "price_id": "123e4567-e89b-12d3-a456-426614174000", "quantity": 2 }
-  ],
-  "success_url": "https://example.com/success"
-}
-```
 
 ## Responses
 
-**201** Created — body matches `CheckoutSessionResponseDto` (checkout URL, identifiers, expiration context).
-
 | Status | Description |
 | --- | --- |
-| `201` | Session créée avec succès |
+| `201` | Session de paiement créée avec succès |
 | `400` | Entrée invalide ou erreur de validation |
 | `401` | Clé API invalide ou manquante |
 
 ## Errors
 
-Validation errors return **400** with field-level hints when validation fails (`class-validator`). **401** bad or missing `X-API-KEY`. Prefer **retrying creates** behind an idempotent key pattern on your backend if implementing retries.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
@@ -101,14 +99,5 @@ Validation errors return **400** with field-level hints when validation fails (`
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "currency_code":"XOF",
-    "amount":10000,
-    "success_url":"https://example.com/success",
-    "cancel_url":"https://example.com/cancel"
-  }'
+  -d '{"currency_code":"XOF"}'
 ```
-
-## OpenAPI
-
-Authoritative schema: `apps/docs/openapi.json`. Regenerate from `apps/api` with `pnpm run openapi:export` after controller/DTO changes.

@@ -1,0 +1,24 @@
+{
+  "title": "API REST",
+  "description": "Points de terminaison paiements et commerce. Les pages de référence sont rédigées manuellement ; l’export OpenAPI JSON reste le contrat de schéma.",
+  "root": true,
+  "icon": "BookOpen",
+  "pages": [
+    "accounts",
+    "beneficiary-payouts",
+    "charge",
+    "checkout-sessions",
+    "customers",
+    "discount-coupons",
+    "organizations",
+    "payment-links",
+    "payment-requests",
+    "payout",
+    "products",
+    "refund",
+    "subscriptions",
+    "transactions",
+    "webhook-delivery-logs",
+    "webhooks"
+  ]
+}

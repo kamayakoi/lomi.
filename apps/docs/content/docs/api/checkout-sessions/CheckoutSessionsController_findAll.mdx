@@ -9,7 +9,10 @@ operationId: CheckoutSessionsController_findAll
 
 ## Overview
 
-List **checkout sessions for the current merchant organization**. Supports pagination and optional filter by lifecycle status (`open`, `completed`, `expired`).
+Lister les sessions de paiement
+
+Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.
+
 
 ## Authentication
 
@@ -30,17 +33,18 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
-| Name | Defaults | Notes |
-| --- | --- | --- |
-| `status` | (any) | `open` \| `completed` \| `expired` — filter by checkout session status |
-| `limit` | `20` | Max rows per page (`ParseIntPipe`; see `apps/api/src/core/checkout-sessions/checkout-sessions.controller.ts`) |
-| `offset` | `0` | Pagination offset |
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | No | — | Décalage pour la pagination |
+| `limit` | query | No | — | Nombre maximal de résultats |
+| `status` | query | No | — | Filtrer par statut de session (valeur checkout_session_status) |
+
+
 
 ## Responses
-
-Returns an **array** of `CheckoutSessionResponseDto`.
 
 | Status | Description |
 | --- | --- |
@@ -49,18 +53,11 @@ Returns an **array** of `CheckoutSessionResponseDto`.
 
 ## Errors
 
-**401:** invalid or absent API key **401** Unauthorized.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -G "https://sandbox.api.lomi.africa/checkout-sessions" \
-  --data-urlencode "status=open" \
-  --data-urlencode "limit=20" \
-  --data-urlencode "offset=0" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/checkout-sessions?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative schema: `apps/docs/openapi.json`.

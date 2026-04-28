@@ -9,11 +9,14 @@ operationId: BeneficiaryPayoutsController_findOne
 
 ## Overview
 
-Returns one beneficiary payout by UUID, including current **status** and provider-facing fields. **404** if the id is unknown or not accessible with your key.
+Obtenir un paiement bénéficiaire par ID
+
+Renvoie le détail d’un paiement (statut actuel et informations fournisseur).
+
 
 ## Authentication
 
-Merchant `X-API-KEY` — [Integration overview](/reference/setup/overview).
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -28,13 +31,16 @@ Base URLs:
 
 ### Path parameters
 
-| Name | Description |
-| --- | --- |
-| `id` | UUID du paiement |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | UUID du paiement |
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
+
+
 
 ## Responses
 
@@ -46,16 +52,11 @@ _None._
 
 ## Errors
 
-**404** cross-tenant or unknown id.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET \
-  "https://sandbox.api.lomi.africa/beneficiary-payouts/YOUR_PAYOUT_UUID" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/beneficiary-payouts/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

@@ -9,13 +9,14 @@ operationId: ProductsController_addPrice
 
 ## Overview
 
-Attach a new **price option** to existing product `id`. Existing prices are immutable—create a fresh row for plan changes.
+Ajouter un prix à un produit
 
-Hard cap: controller documents **max 3 active prices** per product; exceeding returns **400**.
+Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.
+
 
 ## Authentication
 
-Merchant `X-API-KEY`.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -30,37 +31,38 @@ Base URLs:
 
 ### Path parameters
 
-| Name |
-| --- |
-| `id` product UUID |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | UUID du produit |
+
+### Query parameters
+
+_No query parameters._
+
 
 ### Request body
 
-`AddPriceDto` (amount, currency cadence, nickname, etc.—see DTO file).
+_No application/json body for this operation._
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `201` | Price created |
-| `400` | Validation / max prices |
-| `401` | Unauthorized |
-| `404` | Product introuvable |
+| `201` | Prix ajouté avec succès |
+| `400` | Entrée invalide ou nombre maximal de prix dépassé |
+| `401` | Clé API invalide ou manquante |
+| `404` | Produit introuvable ou accès refusé |
 
 ## Errors
 
-**400** DTO validation or **max 3 active prices** exceeded. **401** unauthorized. **404** product not found for this org.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X POST \
-  "https://sandbox.api.lomi.africa/products/YOUR_PRODUCT_UUID/prices" \
+curl -sS -X POST "https://sandbox.api.lomi.africa/products/value/prices" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d @add-price.json
+  -d '{}'
 ```
-
-## OpenAPI
-
-Contract: `apps/docs/openapi.json`.

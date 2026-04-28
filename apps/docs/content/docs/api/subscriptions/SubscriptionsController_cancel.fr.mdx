@@ -1,0 +1,81 @@
+---
+title: "Résilier un abonnement"
+description: "Résilier un abonnement"
+full: true
+method: post
+path: /subscriptions/{id}/cancel
+operationId: SubscriptionsController_cancel
+---
+
+## Aperçu
+
+Résilier un abonnement
+
+Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /subscriptions/{id}/cancel`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | UUID de l’abonnement |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile JSON.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `cancellation_reason` | Non | `string` | — |
+
+Exemple de corps :
+
+```json
+{
+  "cancellation_reason": "string"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Abonnement résilié avec succès |
+| `401` | Clé API invalide ou manquante |
+| `404` | Abonnement introuvable ou accès refusé |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/cancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"cancellation_reason":"string"}'
+```

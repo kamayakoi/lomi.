@@ -1,0 +1,95 @@
+---
+title: "Créer un lien de paiement"
+description: "Créer un lien de paiement"
+full: true
+method: post
+path: /payment-links
+operationId: PaymentLinksController_create
+---
+
+## Aperçu
+
+Créer un lien de paiement
+
+Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /payment-links`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile JSON.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `link_type` | Oui | `enum ("product", "instant")` | — |
+| `title` | Oui | `string` | — |
+| `currency_code` | Oui | `enum ("XOF", "USD", "EUR")` | — |
+| `description` | Non | `string` | — |
+| `amount` | Non | `number` | — |
+| `product_id` | Non | `string` | — |
+| `price_id` | Non | `string` | — |
+| `allow_coupon_code` | Non | `boolean` | — |
+| `allow_quantity` | Non | `boolean` | — |
+| `require_billing_address` | Non | `boolean` | — |
+| `expires_at` | Non | `string` | — |
+| `success_url` | Non | `string` | — |
+| `cancel_url` | Non | `string` | — |
+| `metadata` | Non | `object` | — |
+
+Exemple de corps :
+
+```json
+{
+  "link_type": "product",
+  "title": "string",
+  "currency_code": "XOF"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `201` | Lien de paiement créé avec succès |
+| `400` | Entrée invalide ou erreur de validation |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/payment-links" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"link_type":"product","title":"string","currency_code":"XOF"}'
+```

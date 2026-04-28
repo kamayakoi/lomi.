@@ -9,11 +9,14 @@ operationId: CustomersController_getTransactions
 
 ## Overview
 
-Loads **transactions associated with customer `id`** (payment history auditing). Nested route **must** declare `:id/transactions`.
+Transactions du client
+
+Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+
 
 ## Authentication
 
-Merchant `X-API-KEY`.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -28,35 +31,32 @@ Base URLs:
 
 ### Path parameters
 
-| Name |
-| --- |
-| `id` (customer UUID) |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | UUID du client |
 
 ### Query parameters
 
-_None in controller._
+_No query parameters._
+
+
+
 
 ## Responses
 
-**200** — `TransactionResponseDto[]`
-
 | Status | Description |
 | --- | --- |
-| `200` | Liste transactions |
-| `401` | Unauthorized |
+| `200` | Liste des transactions du client |
+| `401` | Clé API invalide ou manquante |
 | `404` | Client introuvable ou accès refusé |
 
 ## Errors
 
-Customer must exist beforehand.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/customers/YOUR_UUID/transactions" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/customers/value/transactions" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

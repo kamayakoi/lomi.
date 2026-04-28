@@ -9,13 +9,14 @@ operationId: ProductsController_findAll
 
 ## Overview
 
-Paginated catalogue listing with embedded price rows (`ProductResponseDto` array returned by service).
+Lister les produits
 
-`isActive` filter uses string parsing in controller: pass literal `"true"` or `"false"` to enable boolean filter; omit for all.
+Renvoie tous les produits de l'organisation du marchand authentifié, avec prix et frais intégrés. Utile pour afficher le catalogue ou intégrer des systèmes externes.
+
 
 ## Authentication
 
-Merchant `X-API-KEY`.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -28,35 +29,35 @@ Base URLs:
 
 ## Request
 
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
 ### Query parameters
 
-| Param | Default | Notes |
-| --- | --- | --- |
-| `isActive` | n/a | `"true"`/`"false"` string |
-| `limit` | `15` | Max rows |
-| `offset` | `0` | Skip rows |
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | No | — | Décalage pour la pagination |
+| `limit` | query | No | — | Nombre maximal de résultats |
+| `isActive` | query | No | — | Filtrer par statut actif |
+
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Product list |
-| `401` | Unauthorized |
+| `200` | Liste des produits avec prix embarqués |
+| `401` | Clé API invalide ou manquante |
 
 ## Errors
 
-**401** invalid or missing API key.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -G "https://sandbox.api.lomi.africa/products" \
-  --data-urlencode "isActive=true" \
-  --data-urlencode "limit=30" \
-  --data-urlencode "offset=0" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/products?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Contract: `apps/docs/openapi.json`.

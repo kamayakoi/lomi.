@@ -1,0 +1,9 @@
+{
+  "title": "Abonnements",
+  "pages": [
+    "SubscriptionsController_cancel",
+    "SubscriptionsController_findAll",
+    "SubscriptionsController_findByCustomer",
+    "SubscriptionsController_findOne"
+  ]
+}

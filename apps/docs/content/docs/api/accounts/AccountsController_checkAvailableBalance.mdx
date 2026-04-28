@@ -9,12 +9,10 @@ operationId: AccountsController_checkAvailableBalance
 
 ## Overview
 
-Pre-flight helper for disbursement / automation: returns whether enough **available** balance exists right now for the given **`currency`** path segment (not query-based).
+Vérifier le solde disponible
 
-JSON fields (per Swagger schema):
+Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée
 
-- `has_sufficient_balance` (`boolean`)
-- `available_balance` (`number`)
 
 ## Authentication
 
@@ -33,32 +31,29 @@ Base URLs:
 
 ### Path parameters
 
-| Name | Required | Description |
-| --- | --- | --- |
-| `currency` | Yes | `XOF`, `USD`, or `EUR` |
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
+
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
 | `200` | Résultat de la vérification de solde |
-| `401` | Clé API invalide ou manquante |
 
 ## Errors
 
-**401** unauthorized.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/check/XOF" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/check/currency_value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

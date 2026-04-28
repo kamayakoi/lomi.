@@ -1,0 +1,10 @@
+{
+  "title": "Produits",
+  "pages": [
+    "ProductsController_addPrice",
+    "ProductsController_create",
+    "ProductsController_findAll",
+    "ProductsController_findOne",
+    "ProductsController_setDefaultPrice"
+  ]
+}

@@ -1,6 +1,6 @@
 ---
-title: "Abonnements d'un client"
-description: "Abonnements d'un client"
+title: "Abonnements d’un client"
+description: "Abonnements d’un client"
 full: true
 method: get
 path: /subscriptions/customer/{customerId}
@@ -9,11 +9,14 @@ operationId: SubscriptionsController_findByCustomer
 
 ## Overview
 
-Scoped listing of **subscriptions for `customerId`** UUID (must belong to your org). Returns **404** customer missing / inaccessible.
+Abonnements d’un client
+
+Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+
 
 ## Authentication
 
-Merchant `X-API-KEY`.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -28,36 +31,32 @@ Base URLs:
 
 ### Path parameters
 
-| Name |
-| --- |
-| `customerId` |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `customerId` | Yes | — | UUID du client |
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
+
+
 
 ## Responses
-
-**200** — `SubscriptionResponseDto[]`.
 
 | Status | Description |
 | --- | --- |
 | `200` | Liste des abonnements du client |
-| `401` | Unauthorized |
+| `401` | Clé API invalide ou manquante |
 | `404` | Client introuvable ou accès refusé |
 
 ## Errors
 
-**404** cross-tenant lookup.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET \
-  "https://sandbox.api.lomi.africa/subscriptions/customer/YOUR_CUSTOMER_UUID" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/subscriptions/customer/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Contract: `apps/docs/openapi.json`.

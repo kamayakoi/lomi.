@@ -1,0 +1,8 @@
+{
+  "title": "Demandes de paiement",
+  "pages": [
+    "PaymentRequestsController_create",
+    "PaymentRequestsController_findAll",
+    "PaymentRequestsController_findOne"
+  ]
+}

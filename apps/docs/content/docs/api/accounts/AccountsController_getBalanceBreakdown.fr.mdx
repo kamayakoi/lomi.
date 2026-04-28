@@ -1,0 +1,60 @@
+---
+title: "Détail du solde"
+description: "Détail du solde"
+full: true
+method: get
+path: /accounts/balance/breakdown
+operationId: AccountsController_getBalanceBreakdown
+---
+
+## Aperçu
+
+Détail du solde
+
+Récupère le détail des soldes (disponible, en attente, total). Conversion optionnelle vers une devise cible.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /accounts/balance/breakdown`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `target_currency` | query | Non | — | Devise cible pour la conversion (XOF, USD, EUR) |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Détail des soldes avec conversion |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/breakdown?target_currency=XOF" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

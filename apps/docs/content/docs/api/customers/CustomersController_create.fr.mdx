@@ -1,0 +1,89 @@
+---
+title: "Créer un client"
+description: "Créer un client"
+full: true
+method: post
+path: /customers
+operationId: CustomersController_create
+---
+
+## Aperçu
+
+Créer un client
+
+Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /customers`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile JSON.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `name` | Oui | `string` | — |
+| `email` | Non | `string` | — |
+| `phone_number` | Non | `string` | — |
+| `whatsapp_number` | Non | `string` | — |
+| `country` | Non | `string` | — |
+| `city` | Non | `string` | — |
+| `address` | Non | `string` | — |
+| `postal_code` | Non | `string` | — |
+| `is_business` | Non | `boolean` | — |
+| `metadata` | Non | `object` | — |
+
+Exemple de corps :
+
+```json
+{
+  "name": "Jane Doe"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `201` | Client créé avec succès |
+| `400` | Données d'entrée invalides |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/customers" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane Doe"}'
+```

@@ -1,0 +1,70 @@
+---
+title: "Lister les transactions"
+description: "Lister les transactions"
+full: true
+method: get
+path: /transactions
+operationId: TransactionsController_findAll
+---
+
+## Aperçu
+
+Lister les transactions
+
+Renvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /transactions`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `isPos` | query | Non | — | Uniquement les transactions points de vente (TPV) |
+| `endDate` | query | Non | — | Jusqu'à cette date (format ISO 8601) |
+| `startDate` | query | Non | — | À partir de cette date (format ISO 8601) |
+| `pageSize` | query | Non | — | Nombre d'éléments par page |
+| `page` | query | Non | — | Numéro de page |
+| `paymentMethod` | query | Non | — | Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs) |
+| `currency` | query | Non | — | Filtrer par code devise (séparés par des virgules pour plusieurs valeurs) |
+| `type` | query | Non | — | Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs) |
+| `status` | query | Non | — | Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs) |
+| `provider` | query | Non | — | Filtrer par code de fournisseur de paiement |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Liste des transactions |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/transactions?isPos=true&endDate=value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

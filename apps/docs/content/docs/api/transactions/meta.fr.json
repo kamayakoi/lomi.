@@ -1,0 +1,7 @@
+{
+  "title": "Transactions",
+  "pages": [
+    "TransactionsController_findAll",
+    "TransactionsController_findOne"
+  ]
+}

@@ -1,0 +1,88 @@
+---
+title: "Créer une demande de paiement"
+description: "Créer une demande de paiement"
+full: true
+method: post
+path: /payment-requests
+operationId: PaymentRequestsController_create
+---
+
+## Aperçu
+
+Créer une demande de paiement
+
+Crée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /payment-requests`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile JSON.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Oui | `number` | — |
+| `currency_code` | Oui | `enum ("XOF", "USD", "EUR")` | — |
+| `description` | Non | `string` | — |
+| `customer_id` | Non | `string` | — |
+| `expiry_date` | Oui | `string` | — |
+| `payment_reference` | Non | `string` | — |
+| `metadata` | Non | `object` | — |
+
+Exemple de corps :
+
+```json
+{
+  "amount": 0,
+  "currency_code": "XOF",
+  "expiry_date": "string"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `201` | Demande de paiement créée avec succès |
+| `400` | Entrée invalide ou erreur de validation |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/payment-requests" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":0,"currency_code":"XOF","expiry_date":"string"}'
+```

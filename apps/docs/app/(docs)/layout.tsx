@@ -96,7 +96,11 @@ function localizeTree(root: Root, locale: Language): Root {
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const locale = await getDocsLocale();
-  const pageTree = localizeTree(source.getPageTree(locale), locale);
+  const requestedTree = source.getPageTree(locale);
+  const fallbackLocale: Language = locale === 'fr' ? 'en' : 'fr';
+  const treeLocale =
+    requestedTree.children.length > 0 ? locale : fallbackLocale;
+  const pageTree = localizeTree(source.getPageTree(treeLocale), treeLocale);
   const base = baseOptions();
   const tabs: LayoutTab[] = pageTree.children.flatMap((node) => {
     if (node.type !== 'folder') return [];

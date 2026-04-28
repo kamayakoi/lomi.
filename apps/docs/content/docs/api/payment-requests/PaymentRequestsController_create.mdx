@@ -9,9 +9,10 @@ operationId: PaymentRequestsController_create
 
 ## Overview
 
-Create a **payment request** for one of your customers to pay a known amount by a **deadline**.
+Créer une demande de paiement
 
-The request is trackable through its lifecycle (`pending` → `completed` / `failed` / `expired` via other flows and webhooks depending on your integration).
+Crée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.
+
 
 ## Authentication
 
@@ -32,40 +33,40 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
 _No query parameters._
 
+
 ### Request body
 
-Required fields per OpenAPI and `CreatePaymentRequestDto` in `apps/api/src/core/payment-requests/dto/create-payment-request.dto.ts`:
+JSON request payload.
 
-| Field | Required | Notes |
-| --- | --- | --- |
-| `amount` | Yes | Amount to request (see your product’s smallest unit rules) |
-| `currency_code` | Yes | One of `XOF`, `USD`, `EUR` |
-| `expiry_date` | Yes | ISO-8601 datetime after which the request expires |
-| `description` | Optional | Free text (invoice label, etc.) |
-| `customer_id` | Optional | Existing customer UUID |
-| `payment_reference` | Optional | Your invoice / order ref for reconciliation |
-| `metadata` | Optional | Opaque object for your ops stack |
+Schema: `object`
 
-Example:
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Yes | `number` | — |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
+| `description` | No | `string` | — |
+| `customer_id` | No | `string` | — |
+| `expiry_date` | Yes | `string` | — |
+| `payment_reference` | No | `string` | — |
+| `metadata` | No | `object` | — |
+
+Example body:
 
 ```json
 {
-  "amount": 25000,
+  "amount": 0,
   "currency_code": "XOF",
-  "description": "Consulting — March",
-  "expiry_date": "2026-12-31T23:59:59.000Z",
-  "payment_reference": "INV-2026-042",
-  "metadata": { "department": "finance" }
+  "expiry_date": "string"
 }
 ```
 
-## Responses
 
-**201** — body is `PaymentRequestResponseDto` (ids, status, timestamps as returned by the service).
+## Responses
 
 | Status | Description |
 | --- | --- |
@@ -75,9 +76,7 @@ Example:
 
 ## Errors
 
-**400** when `expiry_date` is not a valid datetime, `currency_code` outside allowed values, or numeric validation fails.
-
-**401** when the API key is missing or not valid for the environment.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
@@ -85,14 +84,5 @@ Example:
 curl -sS -X POST "https://sandbox.api.lomi.africa/payment-requests" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "amount":25000,
-    "currency_code":"XOF",
-    "expiry_date":"2026-12-31T23:59:59.000Z",
-    "payment_reference":"INV-2026-042"
-  }'
+  -d '{"amount":0,"currency_code":"XOF","expiry_date":"string"}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json` (export from `apps/api`).

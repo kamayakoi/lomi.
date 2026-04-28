@@ -1,0 +1,63 @@
+---
+title: "Lister les sessions de paiement"
+description: "Lister les sessions de paiement"
+full: true
+method: get
+path: /checkout-sessions
+operationId: CheckoutSessionsController_findAll
+---
+
+## Aperçu
+
+Lister les sessions de paiement
+
+Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /checkout-sessions`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | Non | — | Décalage pour la pagination |
+| `limit` | query | Non | — | Nombre maximal de résultats |
+| `status` | query | Non | — | Filtrer par statut de session (valeur checkout_session_status) |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Liste des sessions de paiement |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/checkout-sessions?offset=1&limit=1" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

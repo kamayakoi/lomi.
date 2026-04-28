@@ -9,13 +9,14 @@ operationId: RefundsController_createWaveRefund
 
 ## Overview
 
-Creates a **Wave refund** against an existing **transaction** (`transactionId` UUID). Response shape follows the **edge Wave refund** payload (`RefundResponseDto`).
+Lancer un remboursement Wave
 
-**Amount** must be ≥ **1** (per `CreateWaveRefundDto` validation).
+Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.
+
 
 ## Authentication
 
-`X-API-KEY` (**ApiKeyGuard** on controller). Include the same merchant key as for other REST calls.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -28,34 +29,32 @@ Base URLs:
 
 ## Request
 
-### Request body
-
-| Field | Required | Notes |
-| --- | --- | --- |
-| `transactionId` | Yes | UUID of the transaction to refund |
-| `amount` | Yes | Amount to refund (≥ 1) |
-| `reason` | No | Optional reason string |
-
 ### Path parameters
 
-_None._
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
+
+### Request body
+
+_No application/json body for this operation._
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `201` | Résultat du remboursement (JSON edge) |
+| `201` | Résultat du remboursement (corps JSON de la fonction edge) |
 | `400` | Entrée invalide |
-| `401` | Clé API invalide ou manquante |
-| `500` | Échec du traitement du remboursement côté service / fournisseur |
+| `500` | Échec du traitement du remboursement |
 
 ## Errors
 
-**400** invalid UUID, amount, or business validation. **500** retry may or may not be safe — record the outcome and reconcile with transactions; see [Webhook reliability](/core/advanced-guides/webhook-reliability) for delivery semantics.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
@@ -63,13 +62,5 @@ _None._
 curl -sS -X POST "https://sandbox.api.lomi.africa/refund/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "transactionId": "123e4567-e89b-12d3-a456-426614174000",
-    "amount": 1000,
-    "reason": "Customer request"
-  }'
+  -d '{}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

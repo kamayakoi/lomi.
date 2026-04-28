@@ -9,18 +9,14 @@ operationId: BeneficiaryPayoutsController_findAll
 
 ## Overview
 
-Paginated list of **beneficiary payouts** for your organization.
+Lister les paiements vers bénéficiaires
 
-- **`statuses`** — comma-separated (e.g. `pending,completed,failed`).
-- **`startDate` / `endDate`** — ISO 8601 range.
-- **`currencyCode`** — filter (e.g. `XOF`).
-- **`limit`** — default **50**; **`offset`** — default **0**.
+Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).
 
-Response shape: `{ data: BeneficiaryPayoutResponseDto[], limit, offset }`.
 
 ## Authentication
 
-Merchant `X-API-KEY` — [Integration overview](/reference/setup/overview).
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -35,18 +31,21 @@ Base URLs:
 
 ### Path parameters
 
-_None._
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-| Name | Default | Description |
-| --- | --- | --- |
-| `statuses` | — | Statuts, virgules |
-| `startDate` | — | ISO 8601 |
-| `endDate` | — | ISO 8601 |
-| `currencyCode` | — | ex. `XOF` |
-| `limit` | `50` | Max résultats |
-| `offset` | `0` | Pagination |
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | No | — | Décalage pour la pagination |
+| `limit` | query | No | — | Nombre maximal de résultats |
+| `currencyCode` | query | No | — | Code devise |
+| `endDate` | query | No | — | Date de fin (ISO 8601) |
+| `startDate` | query | No | — | Date de début (ISO 8601) |
+| `statuses` | query | No | — | Statuts (séparés par des virgules) |
+
+
 
 ## Responses
 
@@ -57,19 +56,11 @@ _None._
 
 ## Errors
 
-**401** missing/invalid key.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -G "https://sandbox.api.lomi.africa/beneficiary-payouts" \
-  --data-urlencode "statuses=pending,completed" \
-  --data-urlencode "currencyCode=XOF" \
-  --data-urlencode "limit=25" \
-  --data-urlencode "offset=0" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/beneficiary-payouts?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

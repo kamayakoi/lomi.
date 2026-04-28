@@ -9,13 +9,14 @@ operationId: WaveWebhookController_handleWebhook
 
 ## Overview
 
-**Inbound Wave→lomi webhook receiver.** This is called by Wave’s servers with a JSON body; lomi verifies signatures using **`Wave-Signature`** (v1 scheme) or falls back to legacy `Authorization` headers. **Not** a merchant `X-API-KEY` route.
+Réception des événements webhook Wave
 
-See verification flow in `apps/api/src/webhooks/providers/wave/wave-webhook.service.ts` (looks for headers containing `wave-signature`, etc.).
+Point de terminaison pour les notifications Wave. Vérifie la signature et traite les événements.
+
 
 ## Authentication
 
-Wave signs requests — present **`Wave-Signature`** (preferred) or `Wave-Authorization`/`Authorization` per legacy behavior. Merchant API keys **must not** be substituted here.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -30,39 +31,36 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters._
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
 
 ### Request body
 
-Wave event JSON. The controller prefers `rawBody` (Buffer) parsed to JSON; fallback uses parsed `body` if raw is absent.
+_No application/json body for this operation._
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Webhook processed — `{ received: true, … }` |
-| `401` | Signature verification failed (`UnauthorizedException`) |
-| `500` | Processing error |
+| `200` | Webhook reçu et traité avec succès |
+| `401` | Signature webhook invalide |
+| `500` | Erreur interne lors du traitement du webhook |
 
 ## Errors
 
-**401** when signature cannot be validated (deployment should configure Wave webhook secret correctly).
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
-Operational teams exercise via Wave dashboards or tooling that preserves signing headers—not raw merchant curl.
-
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/wave" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "Wave-Signature: t=1234567890,v1=hexsignature" \
-  --data-binary @wave-event.json
+  -d '{}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

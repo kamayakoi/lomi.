@@ -1,0 +1,8 @@
+{
+  "title": "Organisations",
+  "pages": [
+    "OrganizationsController_findAll",
+    "OrganizationsController_findOne",
+    "OrganizationsController_getMetrics"
+  ]
+}

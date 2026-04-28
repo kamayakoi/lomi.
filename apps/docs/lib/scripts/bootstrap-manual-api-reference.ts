@@ -60,7 +60,7 @@ async function main(): Promise<void> {
         | { parameters?: unknown[] }
         | undefined;
 
-      const mdx = renderOperationPageMdx({
+      const mdxEn = renderOperationPageMdx({
         method,
         path: routePath,
         operationId,
@@ -75,10 +75,30 @@ async function main(): Promise<void> {
             ? TSchemas
             : never,
         },
+        lang: 'en',
+      });
+      const mdxFr = renderOperationPageMdx({
+        method,
+        path: routePath,
+        operationId,
+        operation,
+        pathItem: rawPathItem as Parameters<
+          typeof renderOperationPageMdx
+        >[0]['pathItem'],
+        components: {
+          schemas: schemaComponents as Parameters<
+            typeof renderOperationPageMdx
+          >[0]['components'] extends { schemas?: infer TSchemas }
+            ? TSchemas
+            : never,
+        },
+        lang: 'fr',
       });
 
       const filePath = join(dir, `${operationId}.mdx`);
-      writeFileSync(filePath, `${mdx.trim()}\n`, 'utf-8');
+      writeFileSync(filePath, `${mdxEn.trim()}\n`, 'utf-8');
+      const filePathFr = join(dir, `${operationId}.fr.mdx`);
+      writeFileSync(filePathFr, `${mdxFr.trim()}\n`, 'utf-8');
     }
 
     const pageNames = entries

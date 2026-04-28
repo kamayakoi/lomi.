@@ -51,6 +51,114 @@ type PathItemObject = {
 } & Record<string, OperationObject | (ParameterObject | ReferenceObject)[] | undefined>;
 
 const HTTP_OPS = ['get', 'post', 'put', 'patch', 'delete'] as const;
+type DocsLanguage = 'en' | 'fr';
+
+type Labels = {
+  name: string;
+  overview: string;
+  authentication: string;
+  endpoint: string;
+  request: string;
+  pathParameters: string;
+  queryParameters: string;
+  headers: string;
+  requestBody: string;
+  responses: string;
+  errors: string;
+  example: string;
+  noPathParameters: string;
+  noQueryParameters: string;
+  noJsonBody: string;
+  jsonPayload: string;
+  field: string;
+  required: string;
+  type: string;
+  description: string;
+  status: string;
+  in: string;
+  schema: string;
+  yes: string;
+  no: string;
+  exampleBody: string;
+  baseUrls: string;
+  responseFallback: string;
+  authenticationText: string;
+  errorsText: string;
+};
+
+function labelsForLanguage(lang: DocsLanguage): Labels {
+  if (lang === 'fr') {
+    return {
+      name: 'Nom',
+      overview: 'Aperçu',
+      authentication: 'Authentification',
+      endpoint: 'Point de terminaison',
+      request: 'Requête',
+      pathParameters: 'Paramètres de chemin',
+      queryParameters: 'Paramètres de requête',
+      headers: 'En-têtes',
+      requestBody: 'Corps de la requête',
+      responses: 'Réponses',
+      errors: 'Erreurs',
+      example: 'Exemple',
+      noPathParameters: '_Aucun paramètre de chemin au-delà du motif d’URL._\n',
+      noQueryParameters: '_Aucun paramètre de requête._\n',
+      noJsonBody: '_Aucun corps application/json pour cette opération._',
+      jsonPayload: 'Charge utile JSON.',
+      field: 'Champ',
+      required: 'Obligatoire',
+      type: 'Type',
+      description: 'Description',
+      status: 'Statut',
+      in: 'Emplacement',
+      schema: 'Schéma',
+      yes: 'Oui',
+      no: 'Non',
+      exampleBody: 'Exemple de corps :',
+      baseUrls: 'URLs de base :',
+      responseFallback: '_Voir les réponses OpenAPI pour cette opération._\n',
+      authenticationText:
+        'Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `${servers[0]}` et une clé **live** avec `${servers[1]}`.',
+      errorsText:
+        'Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.',
+    };
+  }
+
+  return {
+    name: 'Name',
+    overview: 'Overview',
+    authentication: 'Authentication',
+    endpoint: 'Endpoint',
+    request: 'Request',
+    pathParameters: 'Path parameters',
+    queryParameters: 'Query parameters',
+    headers: 'Headers',
+    requestBody: 'Request body',
+    responses: 'Responses',
+    errors: 'Errors',
+    example: 'Example',
+    noPathParameters: '_No path parameters beyond the URL pattern._\n',
+    noQueryParameters: '_No query parameters._\n',
+    noJsonBody: '_No application/json body for this operation._',
+    jsonPayload: 'JSON request payload.',
+    field: 'Field',
+    required: 'Required',
+    type: 'Type',
+    description: 'Description',
+    status: 'Status',
+    in: 'In',
+    schema: 'Schema',
+    yes: 'Yes',
+    no: 'No',
+    exampleBody: 'Example body:',
+    baseUrls: 'Base URLs:',
+    responseFallback: '_See OpenAPI responses for this operation._\n',
+    authenticationText:
+      'Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `${servers[0]}` and a **live** key against `${servers[1]}`.',
+    errorsText:
+      'Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.',
+  };
+}
 
 /** Avoid MDX `{}` JSX interpretation in free text. */
 function escapeMdxText(s: string | undefined): string {
@@ -142,9 +250,12 @@ function toSampleValue(
   return 'value';
 }
 
-function paramRow(p: ParameterObject | ReferenceObject): string {
+function paramRow(
+  p: ParameterObject | ReferenceObject,
+  labels: Labels,
+): string {
   if ('$ref' in p || !('in' in p)) return '';
-  const required = 'required' in p && p.required ? 'Yes' : 'No';
+  const required = 'required' in p && p.required ? labels.yes : labels.no;
   const schema =
     'schema' in p && p.schema && typeof p.schema === 'object' && '$ref' in p.schema
       ? ((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? ''
@@ -187,15 +298,16 @@ function responseRows(
 function buildRequestBodySection(
   operation: OperationObject,
   components: ComponentsObject | undefined,
+  labels: Labels,
 ): { section: string; sampleBody: unknown | null } {
   const rb = operation.requestBody;
   if (!rb || isRef(rb)) {
     return {
       sampleBody: null,
       section: [
-        '### Request body',
+        `### ${labels.requestBody}`,
         '',
-        '_No application/json body for this operation._',
+        labels.noJsonBody,
         '',
       ].join('\n'),
     };
@@ -216,10 +328,19 @@ function buildRequestBodySection(
     ? `\`${schemaTypeLabel(rawSchema, components)}\``
     : '`object`';
 
-  const lines = ['### Request body', '', desc || 'JSON request payload.', '', `Schema: ${schemaLabel}`, ''];
+  const lines = [
+    `### ${labels.requestBody}`,
+    '',
+    desc || labels.jsonPayload,
+    '',
+    `${labels.schema}: ${schemaLabel}`,
+    '',
+  ];
 
   if (resolvedSchema?.properties) {
-    lines.push('| Field | Required | Type | Description |');
+    lines.push(
+      `| ${labels.field} | ${labels.required} | ${labels.type} | ${labels.description} |`,
+    );
     lines.push('| --- | --- | --- | --- |');
     const required = new Set(resolvedSchema.required ?? []);
     for (const [field, fieldSchema] of Object.entries(resolvedSchema.properties)) {
@@ -228,7 +349,7 @@ function buildRequestBodySection(
         ? escapeMdxText(fieldSchema.description)
         : '';
       lines.push(
-        `| \`${field}\` | ${required.has(field) ? 'Yes' : 'No'} | \`${fieldType}\` | ${fieldDesc || '—'} |`,
+        `| \`${field}\` | ${required.has(field) ? labels.yes : labels.no} | \`${fieldType}\` | ${fieldDesc || '—'} |`,
       );
     }
     lines.push('');
@@ -236,7 +357,7 @@ function buildRequestBodySection(
 
   const sampleBody = toSampleValue(rawSchema ?? resolvedSchema, components);
   if (sampleBody && typeof sampleBody === 'object') {
-    lines.push('Example body:');
+    lines.push(labels.exampleBody);
     lines.push('');
     lines.push('```json');
     lines.push(JSON.stringify(sampleBody, null, 2));
@@ -258,8 +379,11 @@ export function renderOperationPageMdx(input: {
   operation: OperationObject;
   pathItem?: PathParamsInput;
   components?: ComponentsObject;
+  lang?: DocsLanguage;
 }): string {
   const { method, path, operationId, operation, pathItem, components } = input;
+  const lang = input.lang ?? 'en';
+  const labels = labelsForLanguage(lang);
   const mLower = method.toLowerCase();
   const titleSource = operation.summary ?? operationId;
   const description = operation.description
@@ -286,11 +410,14 @@ export function renderOperationPageMdx(input: {
 
   const pathTable =
     pathParams.length === 0
-      ? '_No path parameters beyond the URL pattern._\n'
-      : ['| Name | Required | Schema | Description |', '| --- | --- | --- | --- |']
+      ? labels.noPathParameters
+      : [
+          `| ${labels.name} | ${labels.required} | ${labels.schema} | ${labels.description} |`,
+          '| --- | --- | --- | --- |',
+        ]
           .concat(
             pathParams.map((p) => {
-              const req = p.required ? 'Yes' : 'No';
+              const req = p.required ? labels.yes : labels.no;
               const schema =
                 'schema' in p && p.schema && typeof p.schema === 'object' && '$ref' in p.schema
                   ? ((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? ''
@@ -306,33 +433,36 @@ export function renderOperationPageMdx(input: {
 
   const queryTable =
     queryParams.length === 0
-      ? '_No query parameters._\n'
-      : ['| Name | In | Required | Schema | Description |', '| --- | --- | --- | --- | --- |']
-          .concat(queryParams.map((p) => paramRow(p)).filter(Boolean))
+      ? labels.noQueryParameters
+      : [
+          `| ${labels.name} | ${labels.in} | ${labels.required} | ${labels.schema} | ${labels.description} |`,
+          '| --- | --- | --- | --- | --- |',
+        ]
+          .concat(queryParams.map((p) => paramRow(p, labels)).filter(Boolean))
           .join('\n');
 
   const headerTable =
     headerParams.length === 0
       ? ''
       : [
-          '### Headers',
+          `### ${labels.headers}`,
           '',
-          '| Name | In | Required | Schema | Description |',
+          `| ${labels.name} | ${labels.in} | ${labels.required} | ${labels.schema} | ${labels.description} |`,
           '| --- | --- | --- | --- | --- |',
-          ...headerParams.map((p) => paramRow(p)).filter(Boolean),
+          ...headerParams.map((p) => paramRow(p, labels)).filter(Boolean),
           '',
         ].join('\n');
 
   const shouldHaveBody = mLower === 'post' || mLower === 'put' || mLower === 'patch';
   const requestBody = shouldHaveBody
-    ? buildRequestBodySection(operation, components)
+    ? buildRequestBodySection(operation, components, labels)
     : { section: '', sampleBody: null };
   const bodySection = requestBody.section;
 
   const responseTable =
     responseRows(operation.responses).length === 0
-      ? '_See OpenAPI responses for this operation._\n'
-      : ['| Status | Description |', '| --- | --- |', ...responseRows(operation.responses)].join(
+      ? labels.responseFallback
+      : [`| ${labels.status} | ${labels.description} |`, '| --- | --- |', ...responseRows(operation.responses)].join(
           '\n',
         );
 
@@ -387,49 +517,47 @@ path: ${path}
 operationId: ${operationId}
 ---
 
-## Overview
+## ${labels.overview}
 
 ${escapeMdxText(operation.summary ?? titleSource)}${description}
 
-## Authentication
+## ${labels.authentication}
 
-Merchant routes require an API key in the \`X-API-KEY\` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against \`${servers[0]}\` and a **live** key against \`${servers[1]}\`.
+${labels.authenticationText
+  .replaceAll('${servers[0]}', servers[0])
+  .replaceAll('${servers[1]}', servers[1])}
 
-## Endpoint
+## ${labels.endpoint}
 
 ${endpointLine}
 
-Base URLs:
+${labels.baseUrls}
 
 ${servers.map((u) => `- \`${u}\``).join('\n')}
 
-## Request
+## ${labels.request}
 
-### Path parameters
+### ${labels.pathParameters}
 
 ${pathTable}
 
-### Query parameters
+### ${labels.queryParameters}
 
 ${queryTable}
 ${headerTable ? '\n' + headerTable : ''}
 ${bodySection}
 
-## Responses
+## ${labels.responses}
 
 ${responseTable}
 
-## Errors
+## ${labels.errors}
 
-Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+${labels.errorsText}
 
-## Example
+## ${labels.example}
 
 ${curlExample}
-
-## OpenAPI
-
-Manual reference pages are authored in \`apps/docs/content/docs/api/\`. After API changes, run **OpenAPI export** (\`apps/api\`) and regenerate pages with \`pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts\` from \`apps/docs\`. The machine-readable contract stays in \`apps/docs/openapi.json\`. Operation id: \`${operationId}\`.
 `;
 }
 

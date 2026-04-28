@@ -9,7 +9,10 @@ operationId: PaymentRequestsController_findAll
 
 ## Overview
 
-Paginated list of **payment requests** for your organization. Filter by status and/or customer id.
+Lister les demandes de paiement
+
+Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).
+
 
 ## Authentication
 
@@ -30,24 +33,19 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
-| Name | Defaults | Notes |
-| --- | --- | --- |
-| `status` | (any) | One of `pending`, `completed`, `failed`, `expired` |
-| `customerId` | (optional) | Narrow to a single customer UUID |
-| `limit` | `20` | Page size |
-| `offset` | `0` | Zero-based offset |
+| Name | In | Required | Schema | Description |
+| --- | --- | --- | --- | --- |
+| `offset` | query | No | — | Décalage pour la pagination |
+| `limit` | query | No | — | Nombre maximal de résultats |
+| `customerId` | query | No | — | Filtrer par ID client |
+| `status` | query | No | — | Filtrer par statut |
+
+
 
 ## Responses
-
-**200** returns a **wrapper object** (not a bare array):
-
-| Field | Meaning |
-| --- | --- |
-| `data` | `PaymentRequestResponseDto[]` |
-| `total` | Total matching rows |
-| `limit` / `offset` | Echo of paging params |
 
 | Status | Description |
 | --- | --- |
@@ -56,18 +54,11 @@ _No path parameters beyond the URL pattern._
 
 ## Errors
 
-**401** Unauthorized for bad key.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -G "https://sandbox.api.lomi.africa/payment-requests" \
-  --data-urlencode "status=pending" \
-  --data-urlencode "limit=20" \
-  --data-urlencode "offset=0" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/payment-requests?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

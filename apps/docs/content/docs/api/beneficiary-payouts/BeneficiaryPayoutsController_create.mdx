@@ -9,13 +9,14 @@ operationId: BeneficiaryPayoutsController_create
 
 ## Overview
 
-Initiates a **third-party payout** from your account balance (supplier, staff, vendor, etc.). The API returns immediately with a **pending** state; settlement is **asynchronous** on the provider (Wave, SPI). Status updates arrive through **your merchant webhooks** — see [Handling webhooks](/core/advanced-guides/handling-webhooks).
+Lancer un paiement vers un bénéficiaire
 
-**400** covers validation errors and **insufficient balance** (per controller description).
+Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.
+
 
 ## Authentication
 
-Merchant `X-API-KEY` — [Integration overview](/reference/setup/overview).
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -30,36 +31,30 @@ Base URLs:
 
 ### Path parameters
 
-_None._
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
 
 ### Request body
 
-`CreateBeneficiaryPayoutDto` (`apps/api/src/core/beneficiary-payouts/dto/create-beneficiary-payout.dto.ts`):
+_No application/json body for this operation._
 
-| Field | Required | Notes |
-| --- | --- | --- |
-| `amount` | Yes | Montant |
-| `currency_code` | Yes | `XOF` \| `USD` \| `EUR` |
-| `payout_method_id` | No | Compte / moyen enregistré (UUID) |
-| `provider_code` | No | défaut `WAVE` — `SPI` possible |
-| `payment_method_code` | No | défaut `MOBILE_MONEY` — `BANK_TRANSFER` possible |
-| `metadata` | No | Objet clé-valeur (référence facture, etc.) |
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `201` | Paiement initié (statut en attente) |
+| `201` | Paiement initié avec succès (statut en attente) |
 | `400` | Entrée invalide ou solde insuffisant |
 | `401` | Clé API invalide ou manquante |
 
 ## Errors
 
-**400** DTO validation, business rules, or insufficient funds. **401** bad key.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
@@ -67,15 +62,5 @@ _None._
 curl -sS -X POST "https://sandbox.api.lomi.africa/beneficiary-payouts" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "amount": 5000,
-    "currency_code": "XOF",
-    "provider_code": "WAVE",
-    "payment_method_code": "MOBILE_MONEY",
-    "metadata": { "reference": "INV-2025-0042" }
-  }'
+  -d '{}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

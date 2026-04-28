@@ -33,6 +33,21 @@ function effectiveSlug(slug: string[] | undefined): string[] {
   return [...DEFAULT_DOC_SLUG];
 }
 
+function getFallbackLanguage(locale: Language): Language {
+  return locale === 'fr' ? 'en' : 'fr';
+}
+
+function resolvePageForLocale(slug: string[], locale: Language) {
+  const primary = source.getPage(slug, locale);
+  if (primary) return { page: primary, resolvedLocale: locale };
+
+  const fallbackLocale = getFallbackLanguage(locale);
+  const fallback = source.getPage(slug, fallbackLocale);
+  if (fallback) return { page: fallback, resolvedLocale: fallbackLocale };
+
+  return { page: null, resolvedLocale: locale };
+}
+
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
     const Comp = Preview[preview as keyof typeof Preview];
@@ -58,7 +73,7 @@ export default async function Page({
 
   const slug = effectiveSlug(resolvedParams.slug);
   const locale = await getDocsLocale();
-  const page = source.getPage(slug, locale);
+  const { page, resolvedLocale } = resolvePageForLocale(slug, locale);
 
   if (!page) notFound();
 
@@ -99,7 +114,7 @@ export default async function Page({
               const resolvedHref = typeof href === 'string' ? href : '';
               const found = source.getPageByHref(resolvedHref, {
                 dir: path.dirname(page.path),
-                language: locale,
+                language: resolvedLocale,
               });
 
               if (!found) {
@@ -135,7 +150,9 @@ export default async function Page({
             Customisation,
           })}
         />
-        {pageData.index ? <DocsCategory url={page.url} locale={locale} /> : null}
+        {pageData.index ? (
+          <DocsCategory url={page.url} locale={resolvedLocale} />
+        ) : null}
       </div>
     </DocsPage>
   );
@@ -164,7 +181,7 @@ export async function generateMetadata({
   const resolvedParams = await params;
   const slug = effectiveSlug(resolvedParams.slug);
   const locale = await getDocsLocale();
-  const page = source.getPage(slug, locale);
+  const { page } = resolvePageForLocale(slug, locale);
   if (!page) notFound();
 
   const description =

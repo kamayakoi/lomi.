@@ -1,0 +1,62 @@
+---
+title: "Obtenir un paiement bénéficiaire par ID"
+description: "Obtenir un paiement bénéficiaire par ID"
+full: true
+method: get
+path: /beneficiary-payouts/{id}
+operationId: BeneficiaryPayoutsController_findOne
+---
+
+## Aperçu
+
+Obtenir un paiement bénéficiaire par ID
+
+Renvoie le détail d’un paiement (statut actuel et informations fournisseur).
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /beneficiary-payouts/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `id` | Oui | — | UUID du paiement |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Détails du paiement |
+| `401` | Clé API invalide ou manquante |
+| `404` | Paiement introuvable ou accès refusé |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/beneficiary-payouts/value" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

@@ -9,13 +9,14 @@ operationId: DiscountCouponsController_getPerformance
 
 ## Overview
 
-Aggregate **usage & revenue metrics** for a single coupon UUID.
+Indicateurs de performance du coupon
 
-Response shape documented in Swagger: `total_uses`, `total_discount_amount`, `total_revenue`, `average_order_value`.
+Renvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.
+
 
 ## Authentication
 
-Merchant `X-API-KEY`.
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -30,36 +31,32 @@ Base URLs:
 
 ### Path parameters
 
-| Name |
-| --- |
-| `id` Coupon UUID |
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | UUID du coupon |
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
+
+
 
 ## Responses
 
-**200** — metrics object (see controller `@ApiResponse` schema).
-
 | Status | Description |
 | --- | --- |
-| `200` | Indicateurs |
-| `401` | Unauthorized |
+| `200` | Indicateurs de performance |
+| `401` | Clé API invalide ou manquante |
 | `404` | Coupon introuvable ou accès refusé |
 
 ## Errors
 
-**404** hidden resource.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X GET \
-  "https://sandbox.api.lomi.africa/discount-coupons/YOUR_COUPON_UUID/performance" \
+curl -sS -X GET "https://sandbox.api.lomi.africa/discount-coupons/value/performance" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
-
-## OpenAPI
-
-Contract: `apps/docs/openapi.json`.

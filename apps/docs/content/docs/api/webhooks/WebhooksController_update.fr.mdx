@@ -1,0 +1,83 @@
+---
+title: "Mettre à jour un webhook"
+description: "Mettre à jour un webhook"
+full: true
+method: patch
+path: /webhooks/{id}
+operationId: WebhooksController_update
+---
+
+## Aperçu
+
+Mettre à jour un webhook
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`PATCH /webhooks/{id}`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile JSON.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `url` | Non | `string` | — |
+| `is_active` | Non | `boolean` | — |
+| `authorized_events` | Non | `string` | — |
+| `spi_event_types` | Non | `string` | — |
+| `supports_spi` | Non | `boolean` | — |
+| `verification_token` | Non | `string` | — |
+| `metadata` | Non | `object` | — |
+
+Exemple de corps :
+
+```json
+{
+  "url": "string",
+  "is_active": true,
+  "authorized_events": "string"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Webhook mis à jour avec succès |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X PATCH "https://sandbox.api.lomi.africa/webhooks/id_value" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"string","is_active":true,"authorized_events":"string"}'
+```

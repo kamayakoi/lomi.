@@ -1,0 +1,103 @@
+---
+title: "Créer une session de paiement"
+description: "Créer une session de paiement"
+full: true
+method: post
+path: /checkout-sessions
+operationId: CheckoutSessionsController_create
+---
+
+## Aperçu
+
+Créer une session de paiement
+
+Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /checkout-sessions`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
+
+Schéma: `object`
+
+| Champ | Obligatoire | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Non | `number` | — |
+| `currency_code` | Oui | `enum ("XOF", "USD", "EUR")` | — |
+| `title` | Non | `string` | — |
+| `description` | Non | `string` | — |
+| `customer_id` | Non | `string` | — |
+| `customer_email` | Non | `string` | — |
+| `customer_name` | Non | `string` | — |
+| `customer_phone` | Non | `string` | — |
+| `customer_city` | Non | `string` | — |
+| `customer_country` | Non | `string` | — |
+| `customer_address` | Non | `string` | — |
+| `customer_postal_code` | Non | `string` | — |
+| `product_id` | Non | `string` | — |
+| `price_id` | Non | `string` | — |
+| `subscription_id` | Non | `string` | — |
+| `allow_quantity` | Non | `boolean` | — |
+| `quantity` | Non | `number` | — |
+| `success_url` | Non | `string` | — |
+| `cancel_url` | Non | `string` | — |
+| `allow_coupon_code` | Non | `boolean` | — |
+| `require_billing_address` | Non | `boolean` | — |
+| `payment_link_id` | Non | `string` | — |
+| `metadata` | Non | `object` | — |
+| `line_items` | Non | `array<object>` | — |
+
+Exemple de corps :
+
+```json
+{
+  "currency_code": "XOF"
+}
+```
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `201` | Session de paiement créée avec succès |
+| `400` | Entrée invalide ou erreur de validation |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"currency_code":"XOF"}'
+```

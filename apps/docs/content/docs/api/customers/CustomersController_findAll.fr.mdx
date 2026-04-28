@@ -1,0 +1,65 @@
+---
+title: "Lister les clients"
+description: "Lister les clients"
+full: true
+method: get
+path: /customers
+operationId: CustomersController_findAll
+---
+
+## Aperçu
+
+Lister les clients
+
+Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`GET /customers`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+_Aucun paramètre de chemin au-delà du motif d’URL._
+
+
+### Paramètres de requête
+
+| Nom | Emplacement | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- | --- |
+| `pageSize` | query | Non | — | Nombre d'éléments par page |
+| `page` | query | Non | — | Numéro de page |
+| `status` | query | Non | — | Filtrer par activité (active = au moins une transaction, inactive = aucune transaction) |
+| `type` | query | Non | — | Filtrer par type de client |
+| `search` | query | Non | — | Recherche par nom ou e-mail |
+
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Liste paginée de clients |
+| `401` | Clé API invalide ou manquante |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X GET "https://sandbox.api.lomi.africa/customers?pageSize=1&page=1" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```

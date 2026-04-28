@@ -9,14 +9,10 @@ operationId: PaymentLinksController_create
 
 ## Overview
 
-Create a **shareable payment link**:
+Créer un lien de paiement
 
-| `link_type` | What to send | Notes |
-| --- | --- | --- |
-| **`instant`** | `title`, `currency_code`, **`amount`** required for a fixed-price link | No `product_id` |
-| **`product`** | `title`, `currency_code`, **`product_id`** (optionally `price_id` if the product has multiple prices) | Omit `amount` for product-driven pricing |
+Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.
 
-Optional UX flags: `allow_coupon_code`, `allow_quantity`, `require_billing_address`, `expires_at`, redirect URLs, `metadata`.
 
 ## Authentication
 
@@ -37,40 +33,47 @@ Base URLs:
 
 _No path parameters beyond the URL pattern._
 
+
 ### Query parameters
 
 _No query parameters._
 
+
 ### Request body
 
-Minimum required: `link_type`, `title`, `currency_code`.
+JSON request payload.
 
-**Instant link example**
+Schema: `object`
 
-```json
-{
-  "link_type": "instant",
-  "title": "Invoice INV-001",
-  "currency_code": "XOF",
-  "amount": 15000,
-  "success_url": "https://example.com/thanks"
-}
-```
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `link_type` | Yes | `enum ("product", "instant")` | — |
+| `title` | Yes | `string` | — |
+| `currency_code` | Yes | `enum ("XOF", "USD", "EUR")` | — |
+| `description` | No | `string` | — |
+| `amount` | No | `number` | — |
+| `product_id` | No | `string` | — |
+| `price_id` | No | `string` | — |
+| `allow_coupon_code` | No | `boolean` | — |
+| `allow_quantity` | No | `boolean` | — |
+| `require_billing_address` | No | `boolean` | — |
+| `expires_at` | No | `string` | — |
+| `success_url` | No | `string` | — |
+| `cancel_url` | No | `string` | — |
+| `metadata` | No | `object` | — |
 
-**Product link example**
+Example body:
 
 ```json
 {
   "link_type": "product",
-  "title": "Premium plan",
-  "currency_code": "XOF",
-  "product_id": "123e4567-e89b-12d3-a456-426614174000"
+  "title": "string",
+  "currency_code": "XOF"
 }
 ```
 
-## Responses
 
-**201** Created — `PaymentLinkResponseDto` includes the public URL and identifiers.
+## Responses
 
 | Status | Description |
 | --- | --- |
@@ -80,7 +83,7 @@ Minimum required: `link_type`, `title`, `currency_code`.
 
 ## Errors
 
-**400** when mutually exclusive fields are combined (e.g. product link with amount-only rules) or enums are wrong—align with validation in `apps/api/src/core/payment-links`.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
@@ -88,14 +91,5 @@ Minimum required: `link_type`, `title`, `currency_code`.
 curl -sS -X POST "https://sandbox.api.lomi.africa/payment-links" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "link_type":"instant",
-    "title":"Invoice INV-001",
-    "currency_code":"XOF",
-    "amount":15000
-  }'
+  -d '{"link_type":"product","title":"string","currency_code":"XOF"}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

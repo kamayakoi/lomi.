@@ -9,22 +9,14 @@ operationId: StripeWebhookController_handleWebhook
 
 ## Overview
 
-**Inbound Stripe→lomi webhook receiver.** Stripe POSTs signed event payloads here; this route is **not** called with merchant `X-API-KEY` — Stripe authenticates via **`Stripe-Signature`**.
+Réception des événements webhook Stripe
 
-Implementation uses **raw bytes** (`rawBody`) for cryptographic verification — see `apps/api/src/webhooks/providers/stripe/stripe-webhook.controller.ts` and Express middleware wiring in `apps/api/src/main.ts`.
+Point de terminaison pour les notifications Stripe. Vérifie la signature et traite les événements.
 
-Configure this URL as the Stripe webhook endpoint in the Stripe Dashboard (test vs live URLs).
 
 ## Authentication
 
-These requests are authenticated by Stripe using **`Stripe-Signature`** (your Stripe signing secret stays in lomi infra / dashboard—not in merchant API docs). **Do not** send `Authorization: Bearer` or merchant `X-API-KEY` from Stripe servers.
-
-### Headers
-
-| Header | Required | Notes |
-| --- | --- | --- |
-| `Stripe-Signature` | Yes | HMAC verification input |
-| `Content-Type` | Typically `application/json` | Preserve body bytes |
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
 
 ## Endpoint
 
@@ -39,48 +31,36 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters._
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
-_None._
+_No query parameters._
+
 
 ### Request body
 
-The **exact JSON Stripe posts** (`event.json` structure). Middleware must expose the unchanged raw payload to Nest for signature verification; if `rawBody` is missing processing fails with HTTP error.
+_No application/json body for this operation._
 
-This is distinct from merchant JSON-RPC style APIs above.
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
-| `200` | Webhook reçu et traité avec succès — JSON includes `{ "received": true, ...processor fields }` |
-| `400` | Signature webhook invalide or missing raw payload |
+| `200` | Webhook reçu et traité avec succès |
+| `400` | Signature webhook invalide |
 | `500` | Erreur interne lors du traitement du webhook |
 
 ## Errors
 
-**400** malformed signature or middleware misconfiguration (**no merchant 401 here**). Stripe may retry deliveries on transient errors—implement idempotent processing on your Stripe integration side accordingly.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
-Merchant developers usually **never call this** manually. For diagnostics, simulate with Stripe CLI and forward preserving signature:
-
-```bash
-stripe trigger payment_intent.succeeded
-# or forward an event Stripe CLI emits to your URL with proper Stripe-Signature
-```
-
-Manual curl placeholder (normally invalid without real signature):
-
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/webhooks/stripe" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -H "Stripe-Signature: $STRIPE_SIGNATURE" \
-  --data-binary @stripe-event.json
+  -d '{}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

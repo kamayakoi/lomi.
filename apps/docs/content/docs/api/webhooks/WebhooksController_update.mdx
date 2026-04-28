@@ -9,9 +9,7 @@ operationId: WebhooksController_update
 
 ## Overview
 
-Partially updates a webhook endpoint configuration: delivery URL, active flag, event subscription filters, verification token, and metadata. Omit fields you do not want to change.
-
-Implementation: `apps/api/src/webhooks/webhooks.controller.ts` — body matches `UpdateWebhookDto` in `apps/api/src/webhooks/dto/update-webhook.dto.ts`.
+Mettre à jour un webhook
 
 ## Authentication
 
@@ -30,58 +28,56 @@ Base URLs:
 
 ### Path parameters
 
-| Name | Required | Description |
-| --- | --- | --- |
-| `id` | Yes | Webhook UUID |
+_No path parameters beyond the URL pattern._
+
 
 ### Query parameters
 
 _No query parameters._
 
+
 ### Request body
 
-Partial JSON. Common fields:
+JSON request payload.
 
-| Field | Purpose |
-| --- | --- |
-| `url` | HTTPS delivery endpoint |
-| `is_active` | Enable/disable delivery attempts |
-| `authorized_events` | Encoded list / filter (per your org’s stored format) |
-| `spi_event_types` | SPI-related subscriptions when supported |
-| `supports_spi` | SPI toggle |
-| `verification_token` | Secret your handler can echo for verification |
-| `metadata` | Opaque object |
+Schema: `object`
 
-Example rotation:
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `url` | No | `string` | — |
+| `is_active` | No | `boolean` | — |
+| `authorized_events` | No | `string` | — |
+| `spi_event_types` | No | `string` | — |
+| `supports_spi` | No | `boolean` | — |
+| `verification_token` | No | `string` | — |
+| `metadata` | No | `object` | — |
+
+Example body:
 
 ```json
 {
-  "url": "https://example.com/webhooks/lomi",
-  "is_active": true
+  "url": "string",
+  "is_active": true,
+  "authorized_events": "string"
 }
 ```
+
 
 ## Responses
 
 | Status | Description |
 | --- | --- |
 | `200` | Webhook mis à jour avec succès |
-| `401` | Clé API invalide ou manquante |
-| `404` | Resource not found for org |
 
 ## Errors
 
-**401** bad key. **404** bad id or cross-tenant access.
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
 
 ## Example
 
 ```bash
-curl -sS -X PATCH "https://sandbox.api.lomi.africa/webhooks/YOUR_WEBHOOK_UUID" \
+curl -sS -X PATCH "https://sandbox.api.lomi.africa/webhooks/id_value" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"url":"https://example.com/webhooks/lomi","is_active":true}'
+  -d '{"url":"string","is_active":true,"authorized_events":"string"}'
 ```
-
-## OpenAPI
-
-Authoritative contract: `apps/docs/openapi.json`.

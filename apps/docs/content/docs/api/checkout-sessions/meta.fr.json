@@ -1,0 +1,8 @@
+{
+  "title": "Sessions de paiement",
+  "pages": [
+    "CheckoutSessionsController_create",
+    "CheckoutSessionsController_findAll",
+    "CheckoutSessionsController_findOne"
+  ]
+}

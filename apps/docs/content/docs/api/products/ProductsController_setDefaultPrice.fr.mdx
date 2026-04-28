@@ -1,0 +1,68 @@
+---
+title: "Définir le prix par défaut"
+description: "Définir le prix par défaut"
+full: true
+method: post
+path: /products/{id}/prices/{priceId}/set-default
+operationId: ProductsController_setDefaultPrice
+---
+
+## Aperçu
+
+Définir le prix par défaut
+
+Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.
+
+
+## Authentification
+
+Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.
+
+## Point de terminaison
+
+`POST /products/{id}/prices/{priceId}/set-default`
+
+URLs de base :
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Requête
+
+### Paramètres de chemin
+
+| Nom | Obligatoire | Schéma | Description |
+| --- | --- | --- | --- |
+| `priceId` | Oui | — | UUID du prix |
+| `id` | Oui | — | UUID du produit |
+
+### Paramètres de requête
+
+_Aucun paramètre de requête._
+
+
+### Corps de la requête
+
+_Aucun corps application/json pour cette opération._
+
+
+## Réponses
+
+| Statut | Description |
+| --- | --- |
+| `200` | Prix par défaut mis à jour |
+| `401` | Clé API invalide ou manquante |
+| `404` | Produit ou prix introuvable |
+
+## Erreurs
+
+Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.
+
+## Exemple
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/products/value/prices/value/set-default" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
