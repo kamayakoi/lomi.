@@ -52,12 +52,16 @@ describe('CheckoutSessionsController', () => {
       amount: 1000,
       currency_code: 'XOF',
     } as CreateCheckoutSessionDto;
-    service.create.mockResolvedValue({ checkout_session_id: 'cs_1' } as any);
+    service.create.mockResolvedValue({
+      checkout_session_id: 'cs_1',
+      checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
+    } as any);
 
     const result = await controller.create(dto, user);
 
     expect(service.create).toHaveBeenCalledWith(dto, user);
     expect(result.checkout_session_id).toBe('cs_1');
+    expect(result.checkout_url).toContain('/checkout/cs_1');
   });
 
   it('findAll forwards status + pagination to service', async () => {
@@ -67,9 +71,13 @@ describe('CheckoutSessionsController', () => {
   });
 
   it('findOne delegates to service', async () => {
-    service.findOne.mockResolvedValue({ checkout_session_id: 'cs_1' } as any);
+    service.findOne.mockResolvedValue({
+      checkout_session_id: 'cs_1',
+      checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
+    } as any);
     const result = await controller.findOne('cs_1', user);
     expect(service.findOne).toHaveBeenCalledWith('cs_1', user);
     expect(result.checkout_session_id).toBe('cs_1');
+    expect(result.checkout_url).toContain('/checkout/cs_1');
   });
 });

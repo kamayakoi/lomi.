@@ -29,6 +29,7 @@ import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-
 import { WebhooksOpenApiModule } from './webhooks/webhooks-open-api.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
+import { PaymentIntentsModule } from './core/payment-intents/payment-intents.module';
 import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter';
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 import { AgentModule } from './agent/agent.module';
@@ -63,6 +64,7 @@ import { AgentModule } from './agent/agent.module';
     WebhookDeliveryLogsModule,
     WebhooksOpenApiModule,
     ChargesModule,
+    PaymentIntentsModule,
     AgentModule,
   ],
   controllers: [AppController],

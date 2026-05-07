@@ -11,6 +11,13 @@ import type { Database } from '../types.js';
 type CheckoutSessionsRow = Database['public']['Tables']['checkout_sessions']['Row'];
 type CheckoutSessionsInsert = Database['public']['Tables']['checkout_sessions']['Insert'];
 type CheckoutSessionsUpdate = Database['public']['Tables']['checkout_sessions']['Update'];
+export type CheckoutSessionCreateResponse = CheckoutSessionsRow & {
+    /**
+     * Hosted checkout URL returned by API create endpoint.
+     * Useful for redirect and embedded checkout handoff.
+     */
+    checkout_url?: string;
+};
 
 export class CheckoutSessionsService {
 
@@ -44,8 +51,8 @@ export class CheckoutSessionsService {
     /**
      * Create a new checkout_session
      */
-    public static async create(data: CheckoutSessionsInsert): Promise<CheckoutSessionsRow> {
-        return await request<CheckoutSessionsRow>({
+    public static async create(data: CheckoutSessionsInsert): Promise<CheckoutSessionCreateResponse> {
+        return await request<CheckoutSessionCreateResponse>({
             method: 'POST',
             url: '/checkout-sessions',
             body: data,

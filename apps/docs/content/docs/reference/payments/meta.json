@@ -3,6 +3,7 @@
     "products",
     "payment-links",
     "payment-requests",
+    "payment-intents",
     "checkout-sessions",
     "checkout-behavior",
     "charges",

@@ -27,6 +27,7 @@ import { WebhookDeliveryLogsModule } from './core/webhook-delivery-logs/webhook-
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { ApiLoggingInterceptor } from './core/interceptors/api-logging.interceptor';
 import { ChargesModule } from './core/charges/charges.module';
+import { PaymentIntentsModule } from './core/payment-intents/payment-intents.module';
 
 const logger = new Logger('RedisConfig');
 
@@ -130,6 +131,7 @@ const logger = new Logger('RedisConfig');
     WebhookDeliveryLogsModule,
     WebhooksModule,
     ChargesModule,
+    PaymentIntentsModule,
     AgentModule,
   ],
 

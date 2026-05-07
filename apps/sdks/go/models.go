@@ -711,6 +711,7 @@ type CheckoutSessions struct {
 	Amount float64 `json:"amount"`
 	CancelUrl *string `json:"cancel_url"`
 	CheckoutSessionId string `json:"checkout_session_id"`
+	CheckoutUrl *string `json:"checkout_url"`
 	CreatedAt string `json:"created_at"`
 	CreatedBy *string `json:"created_by"`
 	CurrencyCode string `json:"currency_code"`

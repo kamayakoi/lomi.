@@ -8,6 +8,8 @@
 interface LomiEmbedOptions {
   publicKey: string;      // lomi_pk_... (your lomi. publishable key)
   sessionId: string;      // Checkout Session ID from create_checkout_session
+  checkoutUrl?: string;   // Full checkout URL returned by API (preferred when available)
+  checkoutBaseUrl?: string; // Optional base URL override (e.g. https://checkout.lomi.africa)
   elementId?: string;     // Optional: DOM ID to mount iframe into (for inline mode)
   mode?: 'modal' | 'inline'; // Default: 'modal'
   // Custom dimensions (optional - defaults provided)
@@ -25,6 +27,18 @@ interface LomiEmbedResult {
 const DEFAULT_MAX_WIDTH = '500px';
 const DEFAULT_MODAL_HEIGHT = '85vh';
 const DEFAULT_MODAL_HEIGHT_DESKTOP = '90vh';
+const DEFAULT_CHECKOUT_BASE_URL = 'https://checkout.lomi.africa';
+
+const withEmbeddedParam = (url: string): string => {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set('embedded', 'true');
+    return parsed.toString();
+  } catch {
+    const joiner = url.includes('?') ? '&' : '?';
+    return `${url}${joiner}embedded=true`;
+  }
+};
 
 const getModalStyles = (options: LomiEmbedOptions) => ({
   overlay: `
@@ -82,12 +96,12 @@ const getModalStyles = (options: LomiEmbedOptions) => ({
 export const loadLomiCheckout = (options: LomiEmbedOptions): LomiEmbedResult | undefined => {
   const mode = options.mode || 'modal';
   
-  // Base URL for lomi. Checkout
-  const baseUrl = typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? window.location.origin
-    : 'https://lomi.africa';
-    
-  const checkoutUrl = `${baseUrl}/checkout/${options.sessionId}?embedded=true`;
+  // Prefer server-provided checkout URL to avoid local routing collisions.
+  const checkoutUrl = options.checkoutUrl
+    ? withEmbeddedParam(options.checkoutUrl)
+    : withEmbeddedParam(
+        `${options.checkoutBaseUrl || DEFAULT_CHECKOUT_BASE_URL}/checkout/${options.sessionId}`,
+      );
 
   // Create iframe
   const iframe = document.createElement('iframe');

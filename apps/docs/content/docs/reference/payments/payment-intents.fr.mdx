@@ -1,0 +1,139 @@
+---
+title: Payment Intents
+description: Créez des client secrets pour formulaires carte embarqués.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+L'API Payment Intents est utilisée pour les intégrations **formulaire carte uniquement**, où votre application affiche les champs carte (ex. `@lomi./sdk`) puis confirme le paiement côté client.
+
+<Callout type="info">
+  Utilisez cette API pour un formulaire carte embarqué.  
+  Si vous préférez une page hébergée (redirection ou iframe), utilisez [Checkout Sessions](/reference/payments/checkout-sessions).
+</Callout>
+
+## Créer un payment intent
+
+`POST /payment-intents`
+
+### Authentification
+
+Deux options :
+
+- `X-API-KEY: <votre-clé>`
+- `Authorization: Bearer <votre-clé>`
+
+### Corps de requête
+
+| Champ | Type | Obligatoire | Description |
+|-------|------|-------------|-------------|
+| `amount` | `number` | **Oui** | Montant à encaisser dans la devise source |
+| `currency_code` | `string` | Non | `XOF`, `USD`, `EUR` (par défaut `XOF`) |
+| `currency` | `string` | Non | Alias rétrocompatible de `currency_code` |
+| `customer_id` | `string` (UUID v4) | **Un des chemins requis**¹ | ID client interne |
+| `customer_email` | `string` | **Un des chemins requis**¹ | E-mail valide (chemin invité) |
+| `customer_name` | `string` | **Un des chemins requis**¹ | Nom affiché (chemin invité) |
+| `customer_phone` | `string` | Non | Téléphone client |
+| `description` | `string` | Non | Description du paiement |
+| `payment_reference` | `string` | Non | Référence marchande (facture, commande, etc.) |
+| `product_id` | `string` (UUID v4) | Non | UUID produit optionnel dans les métadonnées |
+| `subscription_id` | `string` (UUID v4) | Non | UUID abonnement optionnel dans les métadonnées |
+| `quantity` | `number` | Non | Quantité pour la réconciliation |
+| `metadata` | `object` | Non | Métadonnées personnalisées |
+
+¹ Envoyez **`customer_id`** **ou** **`customer_email` + `customer_name`** pour que l’API crée/trouve un client interne avant l’encaissement — sinon **400**.
+
+### Réponse
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "pi_3QxYk6...",
+    "client_secret": "pi_3QxYk6..._secret_...",
+    "amount": 152,
+    "currency": "eur",
+    "original_amount": 10000,
+    "original_currency": "XOF",
+    "status": "requires_payment_method"
+  }
+}
+```
+
+---
+
+## Exemple complet
+
+### 1) Serveur : créer le payment intent
+
+<Tabs items={['Node', 'cURL']}>
+  <Tab value="Node">
+    ```typescript
+    const response = await fetch('https://api.lomi.africa/payment-intents', {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': process.env.LOMI_API_KEY!,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: 10000,
+        currency_code: 'XOF',
+        customer_email: 'customer@example.com',
+        customer_name: 'Ada Lovelace',
+        description: 'Commande #ORD-12345',
+        payment_reference: 'ORD-12345',
+      }),
+    });
+
+    const body = await response.json();
+    const clientSecret = body.data.client_secret;
+    ```
+  </Tab>
+
+  <Tab value="cURL">
+    ```bash
+    curl -X POST "https://api.lomi.africa/payment-intents" \
+      -H "X-API-KEY: $LOMI_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "amount": 10000,
+        "currency_code": "XOF",
+        "customer_email": "customer@example.com",
+        "customer_name": "Ada Lovelace",
+        "description": "Commande #ORD-12345"
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+### 2) Client : monter le formulaire carte et confirmer
+
+```typescript
+import { loadLomi } from '@lomi./sdk';
+
+const lomi = await loadLomi('lomi_pk_your_publishable_key');
+const elements = lomi.elements({ clientSecret });
+const paymentElement = elements.create('payment');
+paymentElement.mount('#payment-element');
+
+const { error } = await lomi.confirmPayment({
+  elements,
+  confirmParams: {
+    return_url: 'https://example.com/payments/success',
+  },
+});
+
+if (error) {
+  console.error(error.message);
+}
+```
+
+---
+
+## Webhooks et réconciliation
+
+- Abonnez-vous aux événements marchands `PAYMENT_SUCCEEDED` et `PAYMENT_FAILED`.
+- Pour une bonne réconciliation, transmettez **`customer_id`** ou **`customer_email` + `customer_name`**, et des références (`payment_reference`, `metadata.order_id`).
+- Une transaction interne « en attente » est créée pour chaque intent réussi ; en cas d’échec d’enregistrement l’API renvoie **400** (corriger ou réessayer).
+- Voir [Webhooks](/reference/payments/webhooks) pour la vérification de signature et les retries.

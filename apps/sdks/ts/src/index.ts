@@ -23,16 +23,24 @@ export {
 export { handleApiError } from './error-handler.js';
 
 // Export Payment Elements for client-side card forms
-export { loadLomi, lomi, mountCardForm } from './elements.js';
+export {
+  loadLomi,
+  lomi,
+  createLomiElements,
+  createLomiPaymentElement,
+} from './elements.js';
 export type { 
   Lomi, 
   LomiElements, 
   LomiElementsOptions,
   LomiPaymentResult,
   LomiSetupResult,
-  LomiCardFormOptions,
-  LomiCardFormUpdateOptions,
-  LomiCardFormResult,
+  LomiPaymentElement,
+  LomiPaymentElementCreateOptions,
+  LomiPaymentElementTheme,
+  LomiBillingAddressCollection,
+  CreateLomiElementsOptions,
+  CreateLomiPaymentElementOptions,
 } from './elements.js';
 
 // Re-export all generated types and services

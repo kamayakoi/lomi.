@@ -2902,6 +2902,80 @@
         ]
       }
     },
+    "/payment-intents": {
+      "post": {
+        "description": "Crée un Payment Intent Stripe pour une intégration carte embarquée (Payment Elements / Card Element) et renvoie le client_secret.",
+        "operationId": "PaymentIntentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentIntentDto"
+              },
+              "examples": {
+                "minimal": {
+                  "summary": "Sans customer_id (e-mail + nom)",
+                  "value": {
+                    "amount": 10000,
+                    "currency_code": "XOF",
+                    "customer_email": "client@example.com",
+                    "customer_name": "Ada Lovelace"
+                  }
+                },
+                "withCustomer": {
+                  "summary": "Avec client + metadata",
+                  "value": {
+                    "amount": 25000,
+                    "currency_code": "XOF",
+                    "customer_id": "550e8400-e29b-41d4-a716-446655440000",
+                    "customer_email": "john@example.com",
+                    "customer_name": "John Doe",
+                    "description": "Invoice #INV-2026-001",
+                    "payment_reference": "INV-2026-001",
+                    "metadata": {
+                      "order_id": "ORD-2026-001",
+                      "source": "mobile_app"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment Intent créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntentResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Entrée invalide ou erreur de préparation du montant"
+          },
+          "401": {
+            "description": "Clé API invalide ou manquante"
+          },
+          "503": {
+            "description": "Stripe non configuré sur cette instance API"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Créer un Payment Intent carte (client_secret)",
+        "tags": [
+          "Intents de paiement"
+        ]
+      }
+    },
     "/agent/capabilities": {
       "get": {
         "operationId": "AgentCapabilitiesController_getCapabilities",
@@ -5404,6 +5478,151 @@
           "url",
           "verification_token",
           "webhook_id"
+        ]
+      },
+      "CreatePaymentIntentDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 10000,
+            "description": "Amount to charge in the original currency"
+          },
+          "currency_code": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Currency code",
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "example": "XOF",
+            "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ]
+          },
+          "customer_id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440000",
+            "description": "Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer."
+          },
+          "customer_email": {
+            "type": "string",
+            "example": "john@example.com",
+            "description": "Customer email — required together with customer_name when customer_id is omitted."
+          },
+          "customer_name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Customer display name — required together with customer_email when customer_id is omitted."
+          },
+          "customer_phone": {
+            "type": "string",
+            "example": "+221771234567",
+            "description": "Customer phone number"
+          },
+          "description": {
+            "type": "string",
+            "example": "Invoice #INV-2026-001",
+            "description": "Description shown in payment providers and logs"
+          },
+          "payment_reference": {
+            "type": "string",
+            "example": "INV-2026-001",
+            "description": "Reference included in metadata for reconciliation"
+          },
+          "product_id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440002",
+            "description": "Optional product UUID for metadata and reconciliation"
+          },
+          "subscription_id": {
+            "type": "string",
+            "example": "550e8400-e29b-41d4-a716-446655440003",
+            "description": "Optional subscription UUID for metadata and reconciliation"
+          },
+          "quantity": {
+            "type": "number",
+            "example": 1,
+            "description": "Optional quantity for internal reconciliation",
+            "default": 1
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "order_id": "ORD-12345"
+            },
+            "description": "Custom metadata merged into provider metadata"
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      },
+      "PaymentIntentDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "pi_3QxYk6..."
+          },
+          "client_secret": {
+            "type": "string",
+            "example": "pi_3QxYk6..._secret_..."
+          },
+          "amount": {
+            "type": "number",
+            "example": 152
+          },
+          "currency": {
+            "type": "string",
+            "example": "eur"
+          },
+          "original_amount": {
+            "type": "number",
+            "example": 10000
+          },
+          "original_currency": {
+            "type": "string",
+            "example": "XOF"
+          },
+          "status": {
+            "type": "string",
+            "example": "requires_payment_method"
+          }
+        },
+        "required": [
+          "id",
+          "client_secret",
+          "amount",
+          "currency",
+          "original_amount",
+          "original_currency",
+          "status"
+        ]
+      },
+      "PaymentIntentResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/PaymentIntentDataDto"
+          }
+        },
+        "required": [
+          "success",
+          "data"
         ]
       },
       "CreateWorkflowDto": {

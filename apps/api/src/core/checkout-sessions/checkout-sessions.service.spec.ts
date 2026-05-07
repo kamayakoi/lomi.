@@ -57,6 +57,7 @@ describe('CheckoutSessionsService', () => {
     const expectedResponse = {
       ...createDto,
       checkout_session_id: 'session_123',
+      checkout_url: 'https://checkout.lomi.africa/checkout/session_123',
     };
 
     mockSupabaseService.rpc.mockResolvedValue({
