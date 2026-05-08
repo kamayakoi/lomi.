@@ -157,7 +157,7 @@ export async function GET() {
   lines.push('');
   lines.push('**Q: How do I integrate lomi. with my app?**');
   lines.push(
-    `A: Use our REST API or official SDKs for JavaScript/Next.js, Python, Go, and PHP. Documentation is available at ${docsOrigin}`,
+    `A: Use our REST API or official SDKs for TypeScript, Python, Go, and PHP. Documentation is available at ${docsOrigin}`,
   );
   lines.push('');
   lines.push('**Q: How secure is lomi.?**');

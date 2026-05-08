@@ -1,54 +1,44 @@
 /**
  * PaymentRequestsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Payment requests - create payment intents and track status
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type PaymentRequestsRow = Database['public']['Tables']['payment_requests']['Row'];
-type PaymentRequestsInsert = Database['public']['Tables']['payment_requests']['Insert'];
-type PaymentRequestsUpdate = Database['public']['Tables']['payment_requests']['Update'];
 
 export class PaymentRequestsService {
+    /**
+     * OpenAPI operationId: `PaymentRequestsController_create`.
+     * Créer une demande de paiement
+     */
+    public static async create(body?: unknown): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/payment-requests',
+            body,
+        });
+    }
 
     /**
-     * List payment_requests
-     * Payment requests - create payment intents and track status
+     * OpenAPI operationId: `PaymentRequestsController_findOne`.
+     * Obtenir une demande de paiement par ID
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<PaymentRequestsRow[]> {
-        return await request<PaymentRequestsRow[]>({
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/payment-requests/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `PaymentRequestsController_findAll`.
+     * Lister les demandes de paiement
+     */
+    public static async list(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
             method: 'GET',
             url: '/payment-requests',
             query: options,
-        });
-    }
-
-    /**
-     * Get a single payment_request
-     */
-    public static async get(id: string): Promise<PaymentRequestsRow> {
-        return await request<PaymentRequestsRow>({
-            method: 'GET',
-            url: '/payment-requests/{id}',
-            path: { id },
-        });
-    }
-
-    /**
-     * Create a new payment_request
-     */
-    public static async create(data: PaymentRequestsInsert): Promise<PaymentRequestsRow> {
-        return await request<PaymentRequestsRow>({
-            method: 'POST',
-            url: '/payment-requests',
-            body: data,
         });
     }
 }

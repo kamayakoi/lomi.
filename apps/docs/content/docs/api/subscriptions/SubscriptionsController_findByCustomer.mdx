@@ -1,6 +1,6 @@
 ---
-title: "List customer subscriptions"
-description: "List customer subscriptions"
+title: "List subscriptions for customer"
+description: "List subscriptions for customer"
 full: true
 method: get
 path: /subscriptions/customer/{customerId}
@@ -9,9 +9,9 @@ operationId: SubscriptionsController_findByCustomer
 
 ## Overview
 
-List customer subscriptions
+List subscriptions for customer
 
-Returns subscriptions for a given customer. Responds with 404 if the customer does not exist or is not accessible for this API key.
+Returns subscriptions for a customer ID. Responds with 404 when the customer is unknown.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `customerId` | Yes | — | Customer UUID |
+| `customerId` | Yes | — | UUID du client |
 
 ### Query parameters
 
@@ -46,9 +46,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Customer subscriptions list |
-| `401` | API key missing or invalid |
-| `404` | Customer not found or access denied |
+| `200` | Liste des abonnements du client |
+| `401` | Clé API invalide ou manquante |
+| `404` | Client introuvable ou accès refusé |
 
 ## Errors
 

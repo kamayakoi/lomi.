@@ -4,7 +4,7 @@
  * 
  * This script:
  * 1. Copies API types from apps/api to apps/sdks
- * 2. Generates SDKs for all languages (TypeScript, JavaScript, Python, Go, PHP, Next.js)
+ * 2. Generates SDKs for all supported languages (TypeScript, Python, Go, PHP)
  * 
  * Run: npm run generate:all
  */
@@ -64,7 +64,9 @@ const SDKS = [
 async function generateAll() {
     console.log('🚀 lomi. Multi-Language SDK Generation\n');
     console.log('='.repeat(60));
-    console.log('📋 Using type-based generation from api.ts\n');
+    console.log(
+        '📋 Public merchant SDKs use apps/docs/openapi.json + strict allowlist\n',
+    );
 
     // Step 1: Pre-generation - Copy API types
     log.step('Running pre-generation setup...');
@@ -111,14 +113,27 @@ async function generateAll() {
     console.log(`\n✅ ${successCount} SDKs generated successfully`);
     if (failureCount > 0) {
         console.log(`❌ ${failureCount} SDKs failed to generate`);
+        return false;
     }
 
+    log.step('Verifying cross-language SDK surface parity…');
+    const parityOk = exec('node scripts/verify-sdk-surface-parity.js', {
+        cwd: path.join(__dirname, '..'),
+    });
+    if (!parityOk) {
+        log.error('SDK manifest parity verification failed.');
+        return false;
+    }
+    log.success('All language manifests match TypeScript canonical output.');
+
     console.log('\n💡 Next steps:');
-    console.log('   1. Review generated SDKs in apps/sdks/');
-    console.log('   2. Test each SDK');
+    console.log(
+        '   1. Review/commit generated SDK sources + manifests (sdk-public-methods.json, etc.)',
+    );
+    console.log('   2. Run builds/tests locally (npm run build in ts/, go test, etc.)');
     console.log('   3. Publish to package managers\n');
 
-    return failureCount === 0;
+    return true;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

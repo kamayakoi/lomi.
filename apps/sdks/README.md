@@ -1,8 +1,6 @@
 # lomi. SDKs
 
-Official SDKs for the [lomi.](https://lomi.africa) payments API.
-
-We provide SDKs for multiple languages and frameworks to help you integrate with the lomi. API quickly and easily.
+Official SDKs mirror the **same public merchant routes** as documented: they are generated from [`apps/docs/openapi.json`](../docs/openapi.json) and the strict allowlist [`apps/docs/lib/scripts/manual-api/_expected-public-operations.json`](../docs/lib/scripts/manual-api/_expected-public-operations.json).
 
 | Language/Framework | Package | Installation | Directory |
 |-------------------|---------|--------------|-----------|
@@ -61,11 +59,14 @@ from lomi import LomiClient
 
 client = LomiClient(api_key='your-api-key')
 
-# List customers
-customers = client.customers.list()
+# List customers (optional filters)
+customers = client.customers.list(params={"page": "1"})
 
-# Get transaction
-transaction = client.transactions.get('txn_id')
+# Checkout sessions (snake_case client attributes)
+sessions = client.checkout_sessions.list()
+
+# Wave charge
+result = client.charges.create_wave_charge(body={"amount": 5000})
 ```
 
 ### Go
@@ -75,11 +76,16 @@ import lomi "github.com/lomiafrica/lomi-go-sdk"
 
 client := lomi.NewClient("your-api-key")
 
-// List customers
-customers, err := client.Customers.List(nil)
+customers, err := client.Customers.List(map[string]string{"page": "1"})
+if err != nil {
+	panic(err)
+}
+txn, err := client.Transactions.Get("txn_id")
+_, _ = txn, err
 
-// Get transaction
-transaction, err := client.Transactions.Get("txn_id")
+_, err = client.Charges.CreateWaveCharge(map[string]interface{}{
+	"amount": 1000,
+})
 ```
 
 ### PHP
@@ -89,11 +95,8 @@ use Lomi\LomiClient;
 
 $client = new LomiClient('your-api-key');
 
-// List customers
-$customers = $client->customers->list();
-
-// Get transaction  
-$transaction = $client->transactions->get('txn_id');
+$session = $client->checkoutSessions->create(['amount' => 5000]);
+$intent = $client->paymentIntents->create(['amount' => 1000]);
 ```
 
 ## Available services
@@ -101,6 +104,8 @@ $transaction = $client->transactions->get('txn_id');
 All SDKs provide access to these services:
 
 - `accounts` - Balance and account operations
+- `charges` - Direct charges (e.g. Wave)
+- `paymentIntents` - Payment intents API
 - `organizations` - Organization metrics (MRR, ARR, etc.)
 - `customers` - Customer management
 - `paymentRequests` - Payment requests

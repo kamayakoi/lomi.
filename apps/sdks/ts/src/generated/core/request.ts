@@ -32,30 +32,26 @@ export class ApiError extends Error {
 
 function getUrl(options: ApiRequestOptions): string {
     let url = `${OpenAPI.BASE}${options.url}`;
-    
     if (options.path) {
         for (const [key, value] of Object.entries(options.path)) {
             url = url.replace(`{${key}}`, String(value));
         }
     }
-    
     return url;
 }
 
 function getHeaders(options: ApiRequestOptions): Record<string, string> {
-    const headers: Record<string, string> = {
+    return {
         'Content-Type': 'application/json',
         ...OpenAPI.HEADERS,
         ...options.headers,
     };
-    
-    return headers;
 }
 
 export async function request<T>(options: ApiRequestOptions): Promise<T> {
     const url = getUrl(options);
     const headers = getHeaders(options);
-    
+
     const config: AxiosRequestConfig = {
         method: options.method,
         url,
@@ -63,7 +59,7 @@ export async function request<T>(options: ApiRequestOptions): Promise<T> {
         params: options.query,
         data: options.body,
     };
-    
+
     try {
         const response = await axios(config);
         return response.data;

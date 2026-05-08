@@ -1,259 +1,258 @@
 #!/usr/bin/env node
 /**
- * Python SDK Generator
- * 
- * Generates Python SDK from TypeScript types using Pydantic models
- * - Modular structure: services/ and models/
- * - Comprehensive Tests generation
- * - No docs
+ * Python SDK generator — public merchant surface from OpenAPI + allowlist.
+ * Matches TypeScript naming via sdk-public-methods parity manifest.
  */
 
 import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { parseApiConfig, parseSchema, toPascalCase, toSnakeCase } from './utils.js';
+import {
+  readSpecAndAllowlist,
+  getNormalizedOperations,
+  sdkPropertyName,
+  camelSdkPropToSnake,
+  tsMethodToPythonName,
+} from './public-sdk-operations.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const outputDir = join(__dirname, '../python/lomi');
-const testsDir = join(__dirname, '../python/tests');
-const modelsDir = join(outputDir, 'models');
+const sdksRoot = join(__dirname, '..');
+const outputDir = join(sdksRoot, 'python/lomi');
+const testsDir = join(sdksRoot, 'python/tests');
 const servicesDir = join(outputDir, 'services');
 
-console.log('🔨 Generating Python SDK...');
+console.log('🔨 Generating Python SDK from OpenAPI + allowlist…');
 
-// First ensure pre-generate has run
-console.log('📋 Running pre-generation...');
 execSync('node scripts/pre-generate.js', {
-    cwd: join(__dirname, '..'),
-    stdio: 'inherit'
+  cwd: sdksRoot,
+  stdio: 'inherit',
 });
 
-// Clean output dirs
-if (existsSync(outputDir)) rmSync(outputDir, { recursive: true });
+if (existsSync(servicesDir)) rmSync(servicesDir, { recursive: true });
 if (existsSync(testsDir)) rmSync(testsDir, { recursive: true });
 
 mkdirSync(outputDir, { recursive: true });
-mkdirSync(modelsDir, { recursive: true });
 mkdirSync(servicesDir, { recursive: true });
 mkdirSync(testsDir, { recursive: true });
 
-// Parse config and schema
-const resources = parseApiConfig();
-const schema = parseSchema();
+const { spec, allowed } = readSpecAndAllowlist();
+const { byService } = getNormalizedOperations(spec, allowed);
 
-console.log(`✅ Found ${resources.length} API resources`);
-
-// Helper to map TS types to Python types
-function mapType(field) {
-    let pyType = 'Any';
-
-    if (field.isEnum) {
-        pyType = toPascalCase(field.enumName || 'str');
-    } else if (field.type === 'string') {
-        pyType = 'str';
-    } else if (field.type === 'number') {
-        pyType = 'float';
-    } else if (field.type === 'boolean') {
-        pyType = 'bool';
-    } else if (field.type === 'json') {
-        pyType = 'Dict[str, Any]';
-    } else if (field.type === 'array') {
-        pyType = 'List[str]';
-    }
-
-    if (field.isOptional) {
-        return `Optional[${pyType}]`;
-    }
-    return pyType;
+function escapeDocSummary(nop) {
+  const t = nop.summary || nop.sdkMethodName;
+  return String(t).replace(/\r?\n/g, ' ').replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
 }
 
-// 1. Generate Models 
-const allModelNames = [];
+/**
+ * Build single method Python source from normalized op.
+ * @param {any} nop
+ */
+function buildPythonMethod(nop) {
+  const pyName = tsMethodToPythonName(nop.sdkMethodName);
+  const tmpl = nop.pathTemplate;
+  const pNames = nop.pathParamNames;
+  const hasQuery = nop.httpMethodLower === 'get' && nop.queryParams.length > 0;
+  const hasBody = nop.wantsBody;
 
-for (const r of resources) {
-    const tableSchema = schema.tables[r.tableName];
-    if (!tableSchema) continue;
+  const sigParts = [...pNames.map((n) => `${n}: str`)];
+  if (hasQuery) sigParts.push('params: Optional[Dict[str, Any]] = None');
+  if (hasBody) sigParts.push('body: Optional[Dict[str, Any]] = None');
 
-    const className = toPascalCase(r.tableName);
-    const snakeName = toSnakeCase(r.tableName);
-    allModelNames.push(className);
+  const sigClause = sigParts.length ? `, ${sigParts.join(', ')}` : '';
 
-    let content = `from __future__ import annotations
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+  const pathBody = [`path = ${JSON.stringify(tmpl)}`];
+  for (const n of pNames) {
+    pathBody.push(`path = path.replace("{${n}}", str(${n}))`);
+  }
 
+  let req = `self._request("${nop.httpMethodLower.toUpperCase()}", path`;
+  if (hasQuery) req += ', params=params';
+  if (hasBody) req += ', data=body';
+  req += ')';
+
+  const indentedPath = pathBody.map((l) => `        ${l}`).join('\n');
+
+  return `    def ${pyName}(self${sigClause}) -> Any:
+        """${escapeDocSummary(nop)}"""
+${indentedPath}
+        return ${req}
 `;
-    // -- Row Model
-    content += `class ${className}(BaseModel):\n`;
-    content += `    """${r.description || className} model"""\n`;
-    for (const field of tableSchema.row) {
-        content += `    ${field.name}: ${mapType(field)} = Field(default=None)\n`;
-    }
-    content += '\n';
-
-    // -- Insert Model
-    if (tableSchema.insert.length > 0) {
-        content += `class ${className}Create(BaseModel):\n`;
-        for (const field of tableSchema.insert) {
-            const type = mapType(field);
-            const defaultVal = field.isOptional ? ' = None' : '';
-            content += `    ${field.name}: ${type}${defaultVal}\n`;
-        }
-        content += '\n';
-    }
-
-    // -- Update Model
-    if (tableSchema.update.length > 0) {
-        content += `class ${className}Update(BaseModel):\n`;
-        for (const field of tableSchema.update) {
-            const type = mapType({ ...field, isOptional: true });
-            content += `    ${field.name}: ${type} = None\n`;
-        }
-        content += '\n';
-    }
-
-    writeFileSync(join(modelsDir, `${snakeName}.py`), content);
 }
 
-// Generate models/__init__.py 
-let modelsInit = `"""
-lomi. Models
-"""
-from typing import *
-
-`;
-for (const r of resources) {
-    const snakeName = toSnakeCase(r.tableName);
-    const className = toPascalCase(r.tableName);
-    modelsInit += `from .${snakeName} import ${className}, ${className}Create, ${className}Update\n`;
+function escapePyStr(s) {
+  return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
-writeFileSync(join(modelsDir, '__init__.py'), modelsInit);
 
+/** @type {Map<string,string>} serviceClass -> module stem (snake) */
+const serviceModuleStem = new Map();
 
-// 2. Generate Services 
-for (const r of resources) {
-    const snakeName = toSnakeCase(r.tableName);
-    const className = toPascalCase(r.tableName);
-    const serviceName = `${className}Service`;
+for (const svc of byService.keys()) {
+  serviceModuleStem.set(svc, camelSdkPropToSnake(sdkPropertyName(svc)));
+}
 
-    let content = `from typing import List, Optional
-from ..models import ${className}, ${className}Create, ${className}Update
+for (const [serviceClassName, ops] of byService) {
+  const stem = serviceModuleStem.get(serviceClassName);
+  const sorted = [...ops].sort((a, b) =>
+    tsMethodToPythonName(a.sdkMethodName).localeCompare(
+      tsMethodToPythonName(b.sdkMethodName),
+    ),
+  );
+  const blocks = sorted.map((o) => buildPythonMethod(o)).join('\n');
+
+  const content = `from __future__ import annotations
+
+from typing import Any, Dict, Optional
+
 from ..client_base import ClientBase
 
-class ${serviceName}(ClientBase):
-    """${r.tableName} API service"""
-    
-    ${r.operations.list ? `
-    def list(self, **params) -> List[${className}]:
-        """List ${r.tableName}"""
-        return self._request("GET", "/${r.tableName.replace(/_/g, '-')}", model=${className}, params=params)
-    ` : ''}
-    ${r.operations.get ? `
-    def get(self, id: str) -> ${className}:
-        """Get a single ${r.tableName.slice(0, -1)}"""
-        return self._request("GET", f"/${r.tableName.replace(/_/g, '-')}/{id}", model=${className})
-    ` : ''}
-    ${r.operations.create ? `
-    def create(self, data: ${className}Create) -> ${className}:
-        """Create a new ${r.tableName.slice(0, -1)}"""
-        return self._request("POST", "/${r.tableName.replace(/_/g, '-')}", model=${className}, data=data)
-    ` : ''}
-    ${r.operations.update ? `
-    def update(self, id: str, data: ${className}Update) -> ${className}:
-        """Update a ${r.tableName.slice(0, -1)}"""
-        return self._request("PATCH", f"/${r.tableName.replace(/_/g, '-')}/{id}", model=${className}, data=data)
-    ` : ''}
-    ${r.operations.delete ? `
-    def delete(self, id: str) -> None:
-        """Delete a ${r.tableName.slice(0, -1)}"""
-        return self._request("DELETE", f"/${r.tableName.replace(/_/g, '-')}/{id}")
-    ` : ''}
+
+class ${serviceClassName}(ClientBase):
+    """Public merchant API — generated from OpenAPI allowlist."""
+
+${blocks}
 `;
-    writeFileSync(join(servicesDir, `${snakeName}.py`), content);
+
+  writeFileSync(join(servicesDir, `${stem}.py`), content);
 }
-// Generate services/__init__.py
-let servicesInit = ``;
-for (const r of resources) {
-    servicesInit += `from .${toSnakeCase(r.tableName)} import ${toPascalCase(r.tableName)}Service\n`;
+
+let servicesInit = '';
+for (const [serviceClassName, stem] of [...serviceModuleStem.entries()].sort(
+  (a, b) => a[1].localeCompare(b[1]),
+)) {
+  servicesInit += `from .${stem} import ${serviceClassName}\n`;
 }
 writeFileSync(join(servicesDir, '__init__.py'), servicesInit);
 
-// 3. Generate Client Base 
+const modelsDir = join(outputDir, 'models');
+if (existsSync(modelsDir)) rmSync(modelsDir, { recursive: true });
+mkdirSync(modelsDir, { recursive: true });
+
+writeFileSync(
+  join(modelsDir, '__init__.py'),
+  `"""Types are dictated by the public API OpenAPI schema; use Dict[str, Any] or narrow in your app."""
+from typing import Any, Dict
+
+__all__ = ["JSONDict"]
+JSONDict = Dict[str, Any]
+`,
+);
+
 const clientBaseContent = `
-from typing import Optional, Dict, Any, List, Type, TypeVar, TYPE_CHECKING
+from typing import Optional, Dict, Any, TYPE_CHECKING
+import warnings
 import requests
+
 from .exceptions import LomiError, LomiAuthError, LomiNotFoundError
-from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from .client import LomiClient
 
-T = TypeVar("T", bound=BaseModel)
 
 class ClientBase:
-    def __init__(self, client: 'LomiClient'):
+    """HTTP helpers shared by generated services."""
+
+    def __init__(self, client: "LomiClient"):
         self._client = client
 
-    def _request(self, method: str, path: str, model: Type[T] = None, params: Optional[Dict[str, Any]] = None, data: Optional[Dict[str, Any]] = None) -> Any:
-        return self._client._request(method, path, model, params, data)
-`;
-writeFileSync(join(outputDir, 'client_base.py'), clientBaseContent);
-
-
-// 4. Generate Main Client
-const clientContent = `"""
-lomi. Python SDK Client
-AUTO-GENERATED - Do not edit manually
-"""
-
-import requests
-from typing import Optional, Dict, Any, List, Type, TypeVar
-from .exceptions import LomiError, LomiAuthError, LomiNotFoundError
-from .models import *
-from .services import *
-from pydantic import BaseModel
-
-T = TypeVar("T", bound=BaseModel)
-
-class LomiClient:
-    """Main lomi. SDK client"""
-    
-    def __init__(
-        self,
-        api_key: str,
-        base_url: str = "https://api.lomi.africa",
-        environment: str = "live"
-    ):
-        self.api_key = api_key
-        self.base_url = base_url if environment != "test" else "https://sandbox.api.lomi.africa"
-        self.session = requests.Session()
-        self.session.headers.update({
-            "X-API-KEY": api_key,
-            "Content-Type": "application/json",
-        })
-        
-        # Initialize service instances
-${resources.map(r => `        self.${toSnakeCase(r.tableName)} = ${toPascalCase(r.tableName)}Service(self)`).join('\n')}
-    
     def _request(
         self,
         method: str,
         path: str,
-        model: Type[T] = None,
         params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict[str, Any]] = None,
     ) -> Any:
-        """Make an HTTP request to the API"""
-        url = f"{self.base_url}{path}"
-        
-        # Convert Pydantic models to dict if passed as data
-        json_data = data
-        if hasattr(data, 'dict'):
-             json_data = data.dict(exclude_unset=True)
+        """Make an HTTP request to the merchant API."""
+        return self._client._request(method, path, params=params, data=data)
+`;
 
+writeFileSync(join(outputDir, 'client_base.py'), clientBaseContent);
+
+const exceptionsContent = `"""lomi-sdk exceptions."""
+
+from typing import Optional, Any
+
+
+class LomiError(Exception):
+    """Base SDK error."""
+
+    def __init__(self, message: str, status_code: Optional[int] = None, body: Any = None):
+        super().__init__(message)
+        self.status_code = status_code
+        self.body = body
+
+
+class LomiAuthError(LomiError):
+    """Invalid API credentials."""
+
+
+class LomiNotFoundError(LomiError):
+    """Resource missing."""
+`;
+
+writeFileSync(join(outputDir, 'exceptions.py'), exceptionsContent);
+
+const sortedServicesForClient = [...byService.keys()].sort((a, b) =>
+  a.localeCompare(b),
+);
+
+let clientInits = '';
+for (const serviceClassName of sortedServicesForClient) {
+  const stem = camelSdkPropToSnake(sdkPropertyName(serviceClassName));
+  const snakeAttr = stem;
+  clientInits += `        self.${snakeAttr} = ${serviceClassName}(self)\n`;
+}
+
+const clientPy = `"""lomi. Python SDK — generated from OpenAPI + public allowlist."""
+
+import requests
+from typing import Optional, Dict, Any
+
+from .exceptions import LomiError, LomiAuthError, LomiNotFoundError
+from .services import *
+
+def _flatten_data(data):
+    if data is None:
+        return None
+    if hasattr(data, "model_dump"):
+        return data.model_dump(exclude_unset=True)
+    if hasattr(data, "dict"):
+        return data.dict(exclude_unset=True)
+    return data
+
+
+class LomiClient:
+    """Merchant API client (public routes only)."""
+
+    def __init__(
+        self,
+        api_key: str,
+        base_url: str = "https://api.lomi.africa",
+        environment: str = "live",
+    ):
+        self.api_key = api_key
+        test_host = environment in ("test", "sandbox") or (
+            isinstance(environment, str) and environment.lower() == "test"
+        )
+        self.base_url = (
+            base_url if not test_host else "https://sandbox.api.lomi.africa"
+        )
+        self.session = requests.Session()
+        self.session.headers.update(
+            {"X-API-KEY": api_key, "Content-Type": "application/json"}
+        )
+${clientInits}
+    def _request(
+        self,
+        method: str,
+        path: str,
+        params: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        url = f"{self.base_url}{path}"
+        json_data = _flatten_data(data)
         try:
             response = self.session.request(
                 method=method,
@@ -261,106 +260,113 @@ ${resources.map(r => `        self.${toSnakeCase(r.tableName)} = ${toPascalCase(
                 params=params,
                 json=json_data,
             )
-            
+
             if response.status_code == 401:
-                raise LomiAuthError("Invalid API key", response.status_code, response.json())
-            elif response.status_code == 404:
-                raise LomiNotFoundError("Resource not found", response.status_code, response.json())
-            elif response.status_code >= 400:
-                raise LomiError(f"API error: {response.text}", response.status_code, response.json() if response.text else None)
-            
-            resp_data = response.json() if response.text else None
-            
-            # If model class provided, parse response
-            if model and resp_data:
-                if isinstance(resp_data, list):
-                    return [model(**item) for item in resp_data]
-                return model(**resp_data)
-                
-            return resp_data
-            
+                raise LomiAuthError(
+                    "Invalid API key",
+                    response.status_code,
+                    response.json() if response.content else None,
+                )
+            if response.status_code == 404:
+                raise LomiNotFoundError(
+                    "Resource not found",
+                    response.status_code,
+                    response.json() if response.content else None,
+                )
+            if response.status_code >= 400:
+                raise LomiError(
+                    f"API error: {response.text}",
+                    response.status_code,
+                    response.json() if response.text else None,
+                )
+
+            return response.json() if response.content else None
         except requests.RequestException as e:
-            raise LomiError(f"Request failed: {str(e)}")
+            raise LomiError(f"Request failed: {type(e).__name__}: {e}") from e
+
 `;
-writeFileSync(join(outputDir, 'client.py'), clientContent);
 
-// Generate Exceptions
-const exceptionsContent = `"""
-lomi. SDK Exceptions
-AUTO-GENERATED - Do not edit manually
-"""
+writeFileSync(join(outputDir, 'client.py'), clientPy);
 
-class LomiError(Exception):
-    """Base exception for lomi. SDK"""
-    def __init__(self, message: str, status_code: int = None, body: dict = None):
-        super().__init__(message)
-        self.status_code = status_code
-        self.body = body
-
-class LomiAuthError(LomiError):
-    """Authentication error"""
-    pass
-
-class LomiNotFoundError(LomiError):
-    """Resource not found error"""
-    pass
-`;
-writeFileSync(join(outputDir, 'exceptions.py'), exceptionsContent);
-
-// Generate __init__.py
-const initContent = `"""
-lomi. Python SDK
-AUTO-GENERATED - Do not edit manually
-"""
+const initContent = `"""lomi Python SDK — public merchant API surface."""
 
 from .client import LomiClient
 from .exceptions import LomiError, LomiAuthError, LomiNotFoundError
-from .models import *
 
-__version__ = "1.0.0"
+__all__ = ["LomiClient", "LomiError", "LomiAuthError", "LomiNotFoundError"]
 `;
+
 writeFileSync(join(outputDir, '__init__.py'), initContent);
-writeFileSync(join(outputDir, 'py.typed'), '');
 
-// Generate Tests
-// 1. Basic Client Test
-const testClientContent = `import unittest
-from lomi import LomiClient
-
-class TestLomiClient(unittest.TestCase):
-    def test_init(self):
-        client = LomiClient(api_key="test_key")
-        self.assertEqual(client.api_key, "test_key")
-        self.assertEqual(client.base_url, "https://api.lomi.africa")
-
-    def test_sandbox(self):
-        client = LomiClient(api_key="test_key", environment="test")
-        self.assertEqual(client.base_url, "https://sandbox.api.lomi.africa")
-
-if __name__ == '__main__':
-    unittest.main()
-`;
-writeFileSync(join(testsDir, 'test_client.py'), testClientContent);
-
-// 2. Individual Service Tests
-for (const r of resources) {
-    const snakeName = toSnakeCase(r.tableName);
-    const className = toPascalCase(r.tableName);
-
-    const content = `import unittest
-from lomi import LomiClient
-
-class Test${className}Service(unittest.TestCase):
-    def setUp(self):
-        self.client = LomiClient(api_key="test_key")
-
-    def test_service_initialized(self):
-        self.assertIsNotNone(self.client.${snakeName})
-        
-    # TODO: Add mock tests for ${className} methods
-`;
-    writeFileSync(join(testsDir, `test_${snakeName}.py`), content);
+const manifestSdk = {};
+for (const svc of sortedServicesForClient) {
+  const key = sdkPropertyName(svc);
+  manifestSdk[key] = [...byService.get(svc)]
+    .map((o) => o.sdkMethodName)
+    .sort();
 }
 
+writeFileSync(
+  join(outputDir, 'sdk_python_methods.json'),
+  `${JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      language: 'python',
+      naming: 'ts_method_names_manifest_pep8_sdk_methods_are_snake_case_in_code',
+      sdk: manifestSdk,
+      python_methods: Object.fromEntries(
+        Object.entries(manifestSdk).map(([k, methods]) => [
+          camelSdkPropToSnake(k),
+          methods.map((m) => tsMethodToPythonName(m)),
+        ]),
+      ),
+    },
+    null,
+    2,
+  )}\n`,
+);
 
-console.log('✅ Python SDK generated successfully!');
+writeFileSync(
+  join(testsDir, 'test_generated_surface.py'),
+  `"""Smoke test: generated services attach to client."""
+import unittest
+
+
+class TestSurface(unittest.TestCase):
+    def test_client_services(self):
+        from lomi import LomiClient
+
+        c = LomiClient(api_key="test")
+
+        attrs = sorted(
+            a
+            for a in dir(c)
+            if not a.startswith("_") and callable(getattr(c, a, None)) is False
+        )
+        # spot-check newly added surfaces
+        self.assertTrue(hasattr(c, "charges"))
+        self.assertTrue(hasattr(c, "payment_intents"))
+
+        expected = sorted(
+            name
+            for name in attrs
+            if name
+            not in ("api_key", "base_url", "session")
+        )
+
+        services = sorted(
+            a
+            for a in attrs
+            if not a.startswith('_')
+            and getattr(c, a).__class__.__name__.endswith("Service")
+        )
+        assert len(expected) >= 10
+        print("services:", services)
+
+
+if __name__ == "__main__":
+    unittest.main()
+`,
+);
+
+console.log(`✅ Python SDK generated — ${allowed.length} operations, ${byService.size} services.`);

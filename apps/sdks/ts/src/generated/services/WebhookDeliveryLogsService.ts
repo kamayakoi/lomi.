@@ -1,43 +1,32 @@
 /**
  * WebhookDeliveryLogsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Webhook event log - history of webhook deliveries
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type WebhookDeliveryLogsRow = Database['public']['Tables']['webhook_delivery_logs']['Row'];
-type WebhookDeliveryLogsInsert = Database['public']['Tables']['webhook_delivery_logs']['Insert'];
-type WebhookDeliveryLogsUpdate = Database['public']['Tables']['webhook_delivery_logs']['Update'];
 
 export class WebhookDeliveryLogsService {
-
     /**
-     * List webhook_delivery_logs
-     * Webhook event log - history of webhook deliveries
+     * OpenAPI operationId: `WebhookDeliveryLogsController_findOne`.
+     * Obtenir un journal de livraison par ID
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<WebhookDeliveryLogsRow[]> {
-        return await request<WebhookDeliveryLogsRow[]>({
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/webhook-delivery-logs',
-            query: options,
+            url: '/webhook-delivery-logs/{id}',
+            path: { id: id },
         });
     }
 
     /**
-     * Get a single webhook_delivery_log
+     * OpenAPI operationId: `WebhookDeliveryLogsController_findAll`.
+     * Lister les journaux de livraison
      */
-    public static async get(id: string): Promise<WebhookDeliveryLogsRow> {
-        return await request<WebhookDeliveryLogsRow>({
+    public static async list(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/webhook-delivery-logs/{id}',
-            path: { id },
+            url: '/webhook-delivery-logs',
+            query: options,
         });
     }
 }

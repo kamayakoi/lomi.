@@ -174,9 +174,9 @@ export class CreateCheckoutSessionDto {
   allow_coupon_code?: boolean;
 
   @ApiProperty({
-    example: true,
+    example: false,
     description: 'Require billing address',
-    default: true,
+    default: false,
     required: false,
   })
   require_billing_address?: boolean;

@@ -11,10 +11,12 @@ import { OpenAPI } from './generated/index.js';
 import {
   AccountsService,
   BeneficiaryPayoutsService,
+  ChargesService,
   CheckoutSessionsService,
   CustomersService,
   DiscountCouponsService,
   OrganizationsService,
+  PaymentIntentsService,
   PaymentLinksService,
   PaymentRequestsService,
   PayoutsService,
@@ -29,10 +31,12 @@ import {
 export class LomiSDK {
   public readonly accounts: typeof AccountsService;
   public readonly beneficiaryPayouts: typeof BeneficiaryPayoutsService;
+  public readonly charges: typeof ChargesService;
   public readonly checkoutSessions: typeof CheckoutSessionsService;
   public readonly customers: typeof CustomersService;
   public readonly discountCoupons: typeof DiscountCouponsService;
   public readonly organizations: typeof OrganizationsService;
+  public readonly paymentIntents: typeof PaymentIntentsService;
   public readonly paymentLinks: typeof PaymentLinksService;
   public readonly paymentRequests: typeof PaymentRequestsService;
   public readonly payouts: typeof PayoutsService;
@@ -61,10 +65,12 @@ export class LomiSDK {
     // Assign all generated services
     this.accounts = AccountsService;
     this.beneficiaryPayouts = BeneficiaryPayoutsService;
+    this.charges = ChargesService;
     this.checkoutSessions = CheckoutSessionsService;
     this.customers = CustomersService;
     this.discountCoupons = DiscountCouponsService;
     this.organizations = OrganizationsService;
+    this.paymentIntents = PaymentIntentsService;
     this.paymentLinks = PaymentLinksService;
     this.paymentRequests = PaymentRequestsService;
     this.payouts = PayoutsService;

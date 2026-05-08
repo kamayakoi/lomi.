@@ -1,51 +1,46 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// TransactionsService handles transactions API operations
 type TransactionsService struct {
 	client *Client
 }
 
-
-// List returns a list of transactions
-func (s *TransactionsService) List(params map[string]string) ([]Transactions, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/transactions", query, nil)
-	if err != nil {
-		return nil, err
+func (s *TransactionsService) Get(id string) (interface{}, error) {
+		path := "/transactions/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []Transactions
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *TransactionsService) List(params map[string]string) (interface{}, error) {
+		path := "/transactions"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
-
-
-
-// Get returns a single transactions
-func (s *TransactionsService) Get(id string) (*Transactions, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/transactions/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result Transactions
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
-
-
 

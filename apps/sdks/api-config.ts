@@ -299,6 +299,7 @@ export const EXPOSED_FUNCTIONS = [
   'check_merchant_available_balance',
   'verify_api_key',
   'create_checkout_session',
+  'create_checkout_session_with_line_items',
   'list_checkout_sessions',
   'get_webhook',
   'get_webhook_by_id',
@@ -333,6 +334,7 @@ export const EXPOSED_FUNCTIONS = [
   'get_product_prices_api',
   'get_product_fees_api',
   'get_coupon_details_for_management',
+  'fetch_wave_provider_settings',
   // Wave webhook functions
   'get_wave_transaction_by_checkout_id',
   'get_checkout_session_by_wave_id',

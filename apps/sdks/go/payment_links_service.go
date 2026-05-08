@@ -1,65 +1,63 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// PaymentLinksService handles payment_links API operations
 type PaymentLinksService struct {
 	client *Client
 }
 
-
-// List returns a list of payment_links
-func (s *PaymentLinksService) List(params map[string]string) ([]PaymentLinks, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/payment-links", query, nil)
-	if err != nil {
-		return nil, err
+func (s *PaymentLinksService) Create(body interface{}) (interface{}, error) {
+		path := "/payment-links"
+		bodyResp, err := s.client.doRequest("POST", path, nil, body)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []PaymentLinks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *PaymentLinksService) Get(id string) (interface{}, error) {
+		path := "/payment-links/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single payment_links
-func (s *PaymentLinksService) Get(id string) (*PaymentLinks, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/payment-links/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *PaymentLinksService) List(params map[string]string) (interface{}, error) {
+		path := "/payment-links"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result PaymentLinks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Create creates a new payment_links
-func (s *PaymentLinksService) Create(req PaymentLinksCreate) (*PaymentLinks, error) {
-	body, err := s.client.doRequest("POST", "/payment-links", nil, req)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result PaymentLinks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
 

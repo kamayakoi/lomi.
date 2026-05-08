@@ -77,7 +77,7 @@ lomi. fournit deux types de clés pour chaque environnement :
 
 Choisissez votre langage et installez le SDK lomi. :
 
-<Tabs items={["TypeScript", "Python", "Go", "PHP", "Next.js"]}>
+<Tabs items={["TypeScript", "Python", "Go", "PHP"]}>
 <Tab value="TypeScript">
 ```bash
 # Using npm
@@ -124,17 +124,6 @@ Puis exécutez :
 composer install
 ```
 </Tab>
-<Tab value="Next.js">
-```bash
-# Using npm
-npm install @lomi./sdk-next
-
-# Using pnpm
-
-pnpm add @lomi./sdk-next
-
-````
-</Tab>
 </Tabs>
 </Step>
 
@@ -155,7 +144,7 @@ export LOMI_PUBLISHABLE_KEY=lomi_pk_live_xxxxxxxxxxxxxxxxxxxxxx
 
 Initialisez le SDK et vérifiez votre connexion :
 
-<Tabs items={["TypeScript", "Python", "Go", "PHP", "Next.js"]}>
+<Tabs items={["TypeScript", "Python", "Go", "PHP"]}>
 <Tab value="TypeScript">
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
@@ -255,32 +244,6 @@ try {
 }
 ````
 
-</Tab>
-<Tab value="Next.js">
-```typescript
-// lib/lomi/server.ts (Server-side)
-import { LomiSDK } from '@lomi./sdk';
-
-export const lomi = new LomiSDK({
-  apiKey: process.env.LOMI_SECRET_KEY!,
-  environment: 'live',
-});
-
-// app/customers/page.tsx (Server Component)
-import { lomi } from '@/lib/lomi/server';
-
-export default async function CustomersPage() {
-  const customers = await lomi.customers.list();
-  
-  return (
-    <ul>
-      {customers.data?.map((customer) => (
-        <li key={customer.id}>{customer.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
 </Tab>
 </Tabs>
 

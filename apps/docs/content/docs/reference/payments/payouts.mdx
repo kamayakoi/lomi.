@@ -1,34 +1,22 @@
 ---
 title: Payouts
-description: Withdraw funds from your account balance.
+description: Initiate outbound mobile-money payouts on supported rails (provider-specific payloads).
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-The Payouts API allows you to withdraw funds from your merchant account balance to your bank account or Mobile Money.
-
-<Callout type="info">
-  For status progression, fees, and completion semantics, read **[Payout lifecycle](/reference/payments/payout-lifecycle)**.
-</Callout>
+Merchant-initiated payouts on supported rails are exposed as **`POST`** routes with provider-specific payloads. There is currently **no** generic `GET /payouts` list API in the public merchant contract—track completion with **webhooks**.
 
 <Callout type="warning">
-  Payouts are processed asynchronously. Use webhooks to track status (`payout.completed` or `payout.failed`).
+  Payout initiation is asynchronous. Listen for webhook events (`payout.completed`, `payout.failed`, …) rather than polling a list endpoint that does not exist on the public REST surface yet.
 </Callout>
 
-## Initiate a payout
+Lifecycle, limits, fees: **[Payout lifecycle](/reference/payments/payout-lifecycle)**.
 
-Withdraw funds from your account balance.
+## Initiate a Wave payout
 
-### Request Body
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `amount` | `number` | **Yes** | Amount to withdraw |
-| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, etc.) |
-| `payout_method_id` | `string` | **Yes** | Your payout method (bank/Mobile Money) |
-| `description` | `string` | No | Payout description |
-| `metadata` | `object` | No | Custom key-value pairs |
+Maps to `POST /payout/wave`. Request payload matches the Nest DTO (`amount`, `currency`, nested `beneficiary`).
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -41,164 +29,61 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-const payout = await lomi.payouts.create({
-  amount: 100000,
-  currency_code: 'XOF',
-  payout_method_id: 'pm_abc123...',
-  description: 'Monthly withdrawal',
+await lomi.payouts.createWavePayout({
+  amount: 25000,
+  currency: 'XOF',
+  beneficiary: {
+    name: 'Aicha Diallo',
+    phoneNumber: '+221771234567',
+  },
+  reason: 'Weekly settlement',
 });
-
-console.log(`Payout initiated: ${payout.id}, Status: ${payout.status}`);
 ```
 </Tab>
 
 <Tab value="Python">
 ```python
-from lomi import LomiClient
-import os
-
-client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
-    environment="test"
+# Mirrors the Wave payout edge contract (field names mirror server expectation)
+response = requests.post(
+    "https://api.lomi.africa/payout/wave",
+    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
+    json={
+        "amount": 25000,
+        "currency": "XOF",
+        "beneficiary": {"name": "Aicha Diallo", "phoneNumber": "+221771234567"},
+        "reason": "Weekly settlement",
+    },
 )
-
-payout = client.payouts.create({
-    "amount": 100000,
-    "currency_code": "XOF",
-    "payout_method_id": "pm_abc123...",
-    "description": "Monthly withdrawal"
-})
-
-print(f"Payout initiated: {payout['id']}")
+print(response.status_code, response.json())
 ```
 </Tab>
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/payouts" \
+curl -X POST "https://api.lomi.africa/payout/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "amount": 100000,
-    "currency_code": "XOF",
-    "payout_method_id": "pm_abc123...",
-    "description": "Monthly withdrawal"
+    "amount": 25000,
+    "currency": "XOF",
+    "beneficiary": { "name": "Aicha Diallo", "phoneNumber": "+221771234567" },
+    "reason": "Weekly settlement"
   }'
 ```
 </Tab>
 
 </Tabs>
 
----
+## Field reference (Wave payout)
 
-## List payouts
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `amount` | `number` | **Yes** | Amount to send (minimums enforced server-side). |
+| `currency` | `string` | **Yes** | ISO currency (`XOF`, …). |
+| `beneficiary` | `object` | **Yes** | Recipient `name` + `phoneNumber` (mobile-money ID). |
+| `reason` | `string` | No | Ledger / audit memo. |
 
-Retrieve all payouts with optional filtering.
+## Next steps
 
-### Query Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `statuses` | `string` | Comma-separated statuses: `pending`, `completed`, `failed` |
-| `startDate` | `string` | Filter from this date (ISO 8601) |
-| `endDate` | `string` | Filter up to this date (ISO 8601) |
-| `limit` | `number` | Results per page (default: `50`) |
-| `offset` | `number` | Pagination offset (default: `0`) |
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const payouts = await lomi.payouts.list({
-  statuses: 'completed',
-  startDate: '2024-01-01T00:00:00Z',
-  limit: 20,
-});
-```
-</Tab>
-
-<Tab value="Python">
-```python
-payouts = client.payouts.list(
-    statuses="completed",
-    startDate="2024-01-01T00:00:00Z",
-    limit=20
-)
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/payouts?statuses=completed&limit=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Get a payout
-
-Retrieve details of a specific payout.
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const payout = await lomi.payouts.get('po_abc123...');
-console.log(`Status: ${payout.status}`);
-```
-</Tab>
-
-<Tab value="Python">
-```python
-payout = client.payouts.get('po_abc123...')
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/payouts/po_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Payout Object
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Unique payout identifier |
-| `amount` | `number` | Payout amount |
-| `currency_code` | `string` | Currency code |
-| `status` | `string` | `pending`, `completed`, `failed` |
-| `payout_method_id` | `string` | Payout destination |
-| `description` | `string` | Description |
-| `failure_reason` | `string` | Reason for failure (if failed) |
-| `provider_code` | `string` | Payment provider |
-| `metadata` | `object` | Custom metadata |
-| `created_at` | `string` | Creation timestamp |
-
----
-
-## Webhooks
-
-| Event | Description |
-|-------|-------------|
-| `payout.pending` | Payout initiated |
-| `payout.completed` | Payout successfully processed |
-| `payout.failed` | Payout failed |
-
----
-
-## Error Responses
-
-| Status | Description |
-|--------|-------------|
-| `400` | Invalid input or insufficient balance |
-| `401` | Invalid or missing API key |
-| `404` | Payout not found |
+- Monitor **[webhooks](/reference/payments/webhooks)** and **[delivery logs](/reference/platform/webhook-delivery-logs)** for payout status transitions.
+- For paying third-parties outside your treasury flows, compare **[Beneficiary payouts](/reference/payments/beneficiary-payouts)**.

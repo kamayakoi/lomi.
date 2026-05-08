@@ -23,11 +23,10 @@ Envoie un paiement vers un bénéficiaire externe.
 | Champ | Type | Obligatoire | Description |
 |-------|------|-------------|-------------|
 | `amount` | `number` | **Oui** | Montant envoyé |
-| `currency_code` | `string` | **Oui** | Devise (`XOF`, `USD`, etc.) |
-| `beneficiary_phone` | `string` | **Oui** | Numéro du destinataire |
-| `beneficiary_name` | `string` | Non | Nom du destinataire |
-| `provider_code` | `string` | Non | Prestataire (ex. `WAVE`) |
-| `description` | `string` | Non | Description du paiement |
+| `currency_code` | `string` | **Oui** | Devise (`XOF`, `USD`, `EUR`) |
+| `payout_method_id` | `string` | Non | Identifiant bénéficiaire / compte ou mobile-money |
+| `provider_code` | `string` | Non | `WAVE`, `SPI`, … |
+| `payment_method_code` | `string` | Non | `MOBILE_MONEY`, `BANK_TRANSFER` |
 | `metadata` | `object` | Non | Métadonnées |
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
@@ -44,10 +43,9 @@ const lomi = new LomiSDK({
 const payout = await lomi.beneficiaryPayouts.create({
   amount: 50000,
   currency_code: 'XOF',
-  beneficiary_phone: '+221771234567',
-  beneficiary_name: 'Amadou Ba',
+  payout_method_id: '123e4567-e89b-12d3-a456-426614174000',
   provider_code: 'WAVE',
-  description: 'Paiement prestataire – janvier',
+  payment_method_code: 'MOBILE_MONEY',
   metadata: {
     invoice_id: 'INV-2024-001',
   },
@@ -70,10 +68,9 @@ client = LomiClient(
 payout = client.beneficiary_payouts.create({
     "amount": 50000,
     "currency_code": "XOF",
-    "beneficiary_phone": "+221771234567",
-    "beneficiary_name": "Amadou Ba",
+    "payout_method_id": "123e4567-e89b-12d3-a456-426614174000",
     "provider_code": "WAVE",
-    "description": "Paiement prestataire – janvier",
+    "payment_method_code": "MOBILE_MONEY",
     "metadata": {"invoice_id": "INV-2024-001"}
 })
 
@@ -89,10 +86,9 @@ curl -X POST "https://api.lomi.africa/beneficiary-payouts" \
   -d '{
     "amount": 50000,
     "currency_code": "XOF",
-    "beneficiary_phone": "+221771234567",
-    "beneficiary_name": "Amadou Ba",
+    "payout_method_id": "123e4567-e89b-12d3-a456-426614174000",
     "provider_code": "WAVE",
-    "description": "Paiement prestataire – janvier",
+    "payment_method_code": "MOBILE_MONEY",
     "metadata": {"invoice_id": "INV-2024-001"}
   }'
 ```

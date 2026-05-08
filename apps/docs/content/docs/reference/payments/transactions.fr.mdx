@@ -20,7 +20,7 @@ Récupère toutes les transactions avec filtrage avancé.
 
 | Paramètre | Type | Description |
 |-----------|------|-------------|
-| `provider` | `string` | Filtrer par prestataire (ex. `WAVE`, `STRIPE`) |
+| `provider` | `string` | Filtrer par prestataire (ex. `WAVE`, code canal carte) |
 | `status` | `string` | Filtrer par statut. Valeurs séparées par des virgules (ex. `completed,pending`) |
 | `type` | `string` | Filtrer par type. Valeurs séparées par des virgules (ex. `payment,refund`) |
 | `currency` | `string` | Filtrer par devise. Valeurs séparées par des virgules (ex. `XOF,USD`) |
@@ -161,7 +161,7 @@ curl -X GET "https://api.lomi.africa/transactions/tx_abc123..." \
 | `currency_code` | `string` | Devise (ex. `XOF`, `USD`) |
 | `status` | `string` | `pending`, `completed`, `failed`, `refunded` |
 | `type` | `string` | `payment`, `refund`, `payout` |
-| `provider_code` | `string` | Prestataire (ex. `WAVE`, `STRIPE`) |
+| `provider_code` | `string` | Prestataire (`WAVE`, etc.) |
 | `payment_method_code` | `string` | Moyen de paiement (ex. `MOBILE_MONEY`, `CARDS`) |
 | `description` | `string` | Description |
 | `metadata` | `object` | Métadonnées transmises au paiement |

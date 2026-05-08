@@ -1,55 +1,44 @@
 /**
  * WebhooksService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Webhook configuration - receive real-time event notifications
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type WebhooksRow = Database['public']['Tables']['webhooks']['Row'];
-type WebhooksInsert = Database['public']['Tables']['webhooks']['Insert'];
-type WebhooksUpdate = Database['public']['Tables']['webhooks']['Update'];
 
 export class WebhooksService {
+    /**
+     * OpenAPI operationId: `WebhooksController_findOne`.
+     * Obtenir un webhook par ID
+     */
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/webhooks/{id}',
+            path: { id: id },
+        });
+    }
 
     /**
-     * List webhooks
-     * Webhook configuration - receive real-time event notifications
+     * OpenAPI operationId: `WebhooksController_findAll`.
+     * Lister les webhooks
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<WebhooksRow[]> {
-        return await request<WebhooksRow[]>({
+    public static async list(): Promise<any> {
+        return await request<any>({
             method: 'GET',
             url: '/webhooks',
-            query: options,
         });
     }
 
     /**
-     * Get a single webhook
+     * OpenAPI operationId: `WebhooksController_update`.
+     * Mettre à jour un webhook
      */
-    public static async get(id: string): Promise<WebhooksRow> {
-        return await request<WebhooksRow>({
-            method: 'GET',
-            url: '/webhooks/{id}',
-            path: { id },
-        });
-    }
-
-    /**
-     * Update an existing webhook
-     */
-    public static async update(id: string, data: WebhooksUpdate): Promise<WebhooksRow> {
-        return await request<WebhooksRow>({
+    public static async update(id: string, body?: unknown): Promise<any> {
+        return await request<any>({
             method: 'PATCH',
             url: '/webhooks/{id}',
-            path: { id },
-            body: data,
+            path: { id: id },
+            body,
         });
     }
 }

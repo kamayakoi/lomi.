@@ -1,16 +1,14 @@
-// Package lomi provides types for the lomi. API
-// AUTO-GENERATED - Do not edit manually
 package lomi
 
-import (
-	"net/url"
-)
+import "net/url"
 
-// paramsToQuery converts a map of parameters to url.Values
 func paramsToQuery(params map[string]string) url.Values {
-	query := url.Values{}
-	for k, v := range params {
-		query.Add(k, v)
+	if params == nil || len(params) == 0 {
+		return nil
 	}
-	return query
+	q := url.Values{}
+	for k, v := range params {
+		q.Set(k, v)
+	}
+	return q
 }

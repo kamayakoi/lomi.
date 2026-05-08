@@ -1,43 +1,32 @@
 /**
  * TransactionsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Transaction history - view completed and pending transactions
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type TransactionsRow = Database['public']['Tables']['transactions']['Row'];
-type TransactionsInsert = Database['public']['Tables']['transactions']['Insert'];
-type TransactionsUpdate = Database['public']['Tables']['transactions']['Update'];
 
 export class TransactionsService {
-
     /**
-     * List transactions
-     * Transaction history - view completed and pending transactions
+     * OpenAPI operationId: `TransactionsController_findOne`.
+     * Obtenir une transaction par ID
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<TransactionsRow[]> {
-        return await request<TransactionsRow[]>({
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/transactions',
-            query: options,
+            url: '/transactions/{id}',
+            path: { id: id },
         });
     }
 
     /**
-     * Get a single transaction
+     * OpenAPI operationId: `TransactionsController_findAll`.
+     * Lister les transactions
      */
-    public static async get(id: string): Promise<TransactionsRow> {
-        return await request<TransactionsRow>({
+    public static async list(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/transactions/{id}',
-            path: { id },
+            url: '/transactions',
+            query: options,
         });
     }
 }

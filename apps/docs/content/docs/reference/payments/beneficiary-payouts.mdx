@@ -23,12 +23,11 @@ Send a payment to an external beneficiary.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `amount` | `number` | **Yes** | Amount to send |
-| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, etc.) |
-| `beneficiary_phone` | `string` | **Yes** | Recipient phone number |
-| `beneficiary_name` | `string` | No | Recipient name |
-| `provider_code` | `string` | No | Payment provider (e.g., `WAVE`) |
-| `description` | `string` | No | Payment description |
-| `metadata` | `object` | No | Custom key-value pairs |
+| `currency_code` | `string` | **Yes** | Currency (`XOF`, `USD`, `EUR`) |
+| `payout_method_id` | `string` | No | Saved beneficiary / bank or mobile-money routing id |
+| `provider_code` | `string` | No | `WAVE`, `SPI`, … |
+| `payment_method_code` | `string` | No | `MOBILE_MONEY`, `BANK_TRANSFER` |
+| `metadata` | `object` | No | Custom reconciliation payload |
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -44,13 +43,10 @@ const lomi = new LomiSDK({
 const payout = await lomi.beneficiaryPayouts.create({
   amount: 50000,
   currency_code: 'XOF',
-  beneficiary_phone: '+221771234567',
-  beneficiary_name: 'Amadou Ba',
+  payout_method_id: '123e4567-e89b-12d3-a456-426614174000',
   provider_code: 'WAVE',
-  description: 'Contractor payment - January',
-  metadata: {
-    invoice_id: 'INV-2024-001',
-  },
+  payment_method_code: 'MOBILE_MONEY',
+  metadata: { invoice_id: 'INV-2024-001' },
 });
 
 console.log(`Payout sent: ${payout.id}, Status: ${payout.status}`);
@@ -70,10 +66,9 @@ client = LomiClient(
 payout = client.beneficiary_payouts.create({
     "amount": 50000,
     "currency_code": "XOF",
-    "beneficiary_phone": "+221771234567",
-    "beneficiary_name": "Amadou Ba",
+    "payout_method_id": "123e4567-e89b-12d3-a456-426614174000",
     "provider_code": "WAVE",
-    "description": "Contractor payment - January",
+    "payment_method_code": "MOBILE_MONEY",
     "metadata": {"invoice_id": "INV-2024-001"}
 })
 
@@ -89,10 +84,9 @@ curl -X POST "https://api.lomi.africa/beneficiary-payouts" \
   -d '{
     "amount": 50000,
     "currency_code": "XOF",
-    "beneficiary_phone": "+221771234567",
-    "beneficiary_name": "Amadou Ba",
+    "payout_method_id": "123e4567-e89b-12d3-a456-426614174000",
     "provider_code": "WAVE",
-    "description": "Contractor payment - January",
+    "payment_method_code": "MOBILE_MONEY",
     "metadata": {"invoice_id": "INV-2024-001"}
   }'
 ```

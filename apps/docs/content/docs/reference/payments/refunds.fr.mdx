@@ -1,29 +1,18 @@
 ---
 title: Remboursements
-description: Effectuez des remboursements totaux ou partiels sur les transactions.
+description: Lancez un remboursement via `POST /refund/wave`.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-L’API Refunds permet de rembourser des transactions terminées. Les remboursements sont traités de façon asynchrone par le prestataire d’origine.
+Côté REST marchand public, expose **`POST /refund/wave`** avec `{ transactionId, amount, reason? }`. Pas de liste générique `GET /refunds` dans le contrat public actuel — utilisez les webhooks et les transactions.
 
 <Callout type="warning">
-  Les remboursements sont **initiés** immédiatement mais traités de manière asynchrone. Suivez le statut final via webhook (`refund.completed` ou `refund.failed`).
+  Vérifiez `transactionId`. Le traitement est asynchrone ; le suivi passe par les événements envoyés sur votre URL webhooks.
 </Callout>
 
-## Initier un remboursement
-
-Effectue un remboursement total ou partiel d’une transaction terminée.
-
-### Corps de la requête
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `transaction_id` | `string` | **Oui** | ID de la transaction à rembourser |
-| `amount` | `number` | Non | Montant (remboursement total si omis) |
-| `reason` | `string` | Non | Motif du remboursement |
-| `metadata` | `object` | Non | Paires clé-valeur |
+## Créer un remboursement
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -36,173 +25,50 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-const fullRefund = await lomi.refunds.create({
-  transaction_id: 'tx_abc123...',
-  reason: 'Customer requested refund',
-});
-
-const partialRefund = await lomi.refunds.create({
-  transaction_id: 'tx_abc123...',
+await lomi.refunds.createWaveRefund({
+  transactionId: '123e4567-e89b-12d3-a456-426614174000',
   amount: 5000,
-  reason: 'Partial product return',
-  metadata: {
-    ticket_id: 'TICKET-456',
-  },
+  reason: 'doublon',
 });
-
-console.log(`Refund initiated: ${partialRefund.id}, Status: ${partialRefund.status}`);
 ```
 </Tab>
 
 <Tab value="Python">
 ```python
-from lomi import LomiClient
-import os
+import requests, os
 
-client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
-    environment="test"
+r = requests.post(
+    "https://api.lomi.africa/refund/wave",
+    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
+    json={
+        "transactionId": "123e4567-e89b-12d3-a456-426614174000",
+        "amount": 5000,
+        "reason": "doublon",
+    },
 )
-
-refund = client.refunds.create({
-    "transaction_id": "tx_abc123...",
-    "amount": 5000,
-    "reason": "Customer requested refund",
-    "metadata": {"ticket_id": "TICKET-456"}
-})
-
-print(f"Refund initiated: {refund['id']}, Status: {refund['status']}")
+print(r.status_code, r.json())
 ```
 </Tab>
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/refunds" \
+curl -X POST "https://api.lomi.africa/refund/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "transaction_id": "tx_abc123...",
+    "transactionId": "123e4567-e89b-12d3-a456-426614174000",
     "amount": 5000,
-    "reason": "Customer requested refund",
-    "metadata": {"ticket_id": "TICKET-456"}
+    "reason": "doublon"
   }'
 ```
 </Tab>
 
 </Tabs>
 
----
+## Champs
 
-## Lister les remboursements
-
-Récupère les remboursements avec filtrage optionnel.
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `status` | `string` | Statut : `pending`, `completed`, `failed`, `cancelled` |
-| `startDate` | `string` | À partir de cette date (ISO 8601) |
-| `endDate` | `string` | Jusqu’à cette date (ISO 8601) |
-| `limit` | `number` | Résultats par page (défaut : `50`) |
-| `offset` | `number` | Décalage (défaut : `0`) |
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const refunds = await lomi.refunds.list({
-  status: 'completed',
-  startDate: '2024-01-01T00:00:00Z',
-  limit: 20,
-});
-```
-</Tab>
-
-<Tab value="Python">
-```python
-refunds = client.refunds.list(
-    status="completed",
-    startDate="2024-01-01T00:00:00Z",
-    limit=20
-)
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/refunds?status=completed&startDate=2024-01-01T00:00:00Z&limit=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Obtenir un remboursement
-
-Récupère le détail d’un remboursement.
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const refund = await lomi.refunds.get('ref_abc123...');
-console.log(`Status: ${refund.status}`);
-```
-</Tab>
-
-<Tab value="Python">
-```python
-refund = client.refunds.get('ref_abc123...')
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/refunds/ref_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Objet Refund
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Identifiant du remboursement |
-| `transaction_id` | `string` | Transaction d’origine |
-| `amount` | `number` | Montant remboursé |
-| `currency_code` | `string` | Devise |
-| `status` | `string` | `pending`, `completed`, `failed`, `cancelled` |
-| `reason` | `string` | Motif |
-| `failure_reason` | `string` | Motif d’échec (si échec) |
-| `provider_code` | `string` | Prestataire |
-| `metadata` | `object` | Métadonnées |
-| `created_at` | `string` | Horodatage de création |
-
----
-
-## Webhooks
-
-Abonnez-vous à ces événements pour le suivi :
-
-| Événement | Description |
-|-------|-------------|
-| `refund.pending` | Remboursement initié, attente prestataire |
-| `refund.completed` | Remboursement traité avec succès |
-| `refund.failed` | Échec (voir `failure_reason`) |
-
----
-
-## Réponses d’erreur
-
-| Statut | Description |
-|--------|-------------|
-| `400` | Entrée invalide ou montant supérieur à la transaction |
-| `401` | Clé API invalide ou manquante |
-| `404` | Transaction ou remboursement introuvable |
+| Champ | Type | Obligatoire |
+| --- | --- | --- |
+| `transactionId` | UUID | Oui |
+| `amount` | `number` | Oui |
+| `reason` | `string` | Non |

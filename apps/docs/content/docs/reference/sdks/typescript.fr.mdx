@@ -147,35 +147,58 @@ const price = await lomi.products.addPrice('prod_abc123...', {
 
 ```typescript
 const cancelled = await lomi.subscriptions.cancel('sub_abc123...', {
-  cancel_at_period_end: true,
-  reason: 'Demande du client',
+  cancellation_reason: 'Demande du client',
 });
 ```
 
 ---
 
-## Virements
+## Virements et appels spécifiques aux rails
 
-### Initier un retrait
+### Virement Wave (`POST /payout/wave`)
 
 ```typescript
-const payout = await lomi.payouts.create({
-  amount: 100000,
-  currency_code: 'XOF',
-  payout_method_id: 'pm_abc123...',
-  description: 'Retrait mensuel',
+await lomi.payouts.createWavePayout({
+  amount: 25000,
+  currency: 'XOF',
+  beneficiary: { name: 'Aicha Diallo', phoneNumber: '+221771234567' },
 });
 ```
 
-### Payer un bénéficiaire
+### Bénéficiaire (`POST /beneficiary-payouts`)
 
 ```typescript
 const beneficiaryPayout = await lomi.beneficiaryPayouts.create({
   amount: 50000,
   currency_code: 'XOF',
-  beneficiary_phone: '+221771234567',
-  beneficiary_name: 'Nom du prestataire',
+  payout_method_id: '123e4567-e89b-12d3-a456-426614174000',
   provider_code: 'WAVE',
+  payment_method_code: 'MOBILE_MONEY',
+});
+```
+
+### Encaissement mobile money (`POST /charge/wave`)
+
+```typescript
+await lomi.charges.createWaveCharge({
+  amount: 5000,
+  currency: 'XOF',
+  customer: {
+    name: 'Moussa Ndiaye',
+    phoneNumber: '+221771234567',
+    email: 'moussa@example.com',
+  },
+});
+```
+
+### PaymentIntent carte (`POST /payment-intents`)
+
+```typescript
+await lomi.paymentIntents.create({
+  amount: 2500,
+  currency_code: 'XOF',
+  customer_email: 'buyer@example.com',
+  customer_name: 'Acheteur Test',
 });
 ```
 
@@ -243,40 +266,35 @@ interface LomiConfig {
 |---------|----------|
 | `accounts` | `list`, `get`, `getBalance`, `getBalanceBreakdown`, `checkBalance` |
 | `beneficiaryPayouts` | `list`, `get`, `create` |
+| `charges` | `createWaveCharge` |
 | `checkoutSessions` | `list`, `get`, `create` |
 | `customers` | `list`, `get`, `create`, `update`, `delete`, `getTransactions` |
 | `discountCoupons` | `list`, `get`, `create`, `getPerformance` |
 | `organizations` | `list`, `get`, `getMetrics` |
+| `paymentIntents` | `create` |
 | `paymentLinks` | `list`, `get`, `create` |
 | `paymentRequests` | `list`, `get`, `create` |
-| `payouts` | `list`, `get`, `create` |
+| `payouts` | `createWavePayout` |
 | `products` | `list`, `get`, `create`, `addPrice`, `setDefaultPrice` |
-| `refunds` | `list`, `get`, `create` |
-| `subscriptions` | `list`, `get`, `getByCustomer`, `cancel` |
+| `refunds` | `createWaveRefund` |
+| `subscriptions` | `list`, `get`, `findByCustomer`, `cancel` |
 | `transactions` | `list`, `get` |
 | `webhookDeliveryLogs` | `list`, `get` |
-| `webhooks` | `list`, `get`, `create`, `update`, `delete` |
+| `webhooks` | `list`, `get`, `update` |
 
 ---
 
 ## Types TypeScript
 
-Tous les types de requêtes et de réponses sont exportés :
+Les types de lignes Supabase (`Database`) sont exportés pour les intégrations avancées :
 
 ```typescript
-import type {
-  LomiConfig,
-  Customer,
-  CustomerCreate,
-  CheckoutSession,
-  CheckoutSessionCreate,
-  Transaction,
-  Product,
-  ProductCreate,
-  Subscription,
-  PaymentLink,
-} from '@lomi./sdk';
+import type { Database } from '@lomi./sdk';
+
+type Customer = Database['public']['Tables']['customers']['Row'];
 ```
+
+Pour les corps de requêtes complexes, partez des exemples REST ; les méthodes utilisent encore `unknown` le temps d’affiner le typage.
 
 ---
 

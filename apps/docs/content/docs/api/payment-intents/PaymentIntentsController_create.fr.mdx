@@ -11,7 +11,7 @@ operationId: PaymentIntentsController_create
 
 Créer un Payment Intent carte (client_secret)
 
-Crée un Payment Intent carte pour une intégration carte embarquée (Payment Elements / Card Element) et renvoie le client_secret.
+Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.
 
 
 ## Authentification
@@ -60,6 +60,9 @@ Schéma: `CreatePaymentIntentDto`
 | `subscription_id` | Non | `string` | Optional subscription UUID for metadata and reconciliation |
 | `quantity` | Non | `number` | Optional quantity for internal reconciliation |
 | `metadata` | Non | `object` | Custom metadata merged into provider metadata |
+| `appearance_theme` | Non | `enum ("light", "dark", "flat", ...)` | Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility. |
+| `appearance_border_radius` | Non | `number` | Optional Payment Element border radius (px) returned for client-side rendering. |
+| `appearance_billing_address` | Non | `enum ("auto", "never")` | Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI. |
 
 Exemple de corps :
 

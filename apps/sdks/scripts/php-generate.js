@@ -1,220 +1,180 @@
 #!/usr/bin/env node
 /**
- * PHP SDK Generator
- * 
- * Generates PHP SDK from TypeScript types using strongly-typed Classes
- * - Modular Services in src/Services/
- * - Comprehensive Test generation
- * - No docs
+ * PHP SDK generator — public merchant surface from OpenAPI + allowlist.
  */
 
-import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
+import { writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { parseApiConfig, parseSchema, toPascalCase, toCamelCase } from './utils.js';
+import {
+  readSpecAndAllowlist,
+  getNormalizedOperations,
+  sdkPropertyName,
+} from './public-sdk-operations.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const sdksRoot = join(__dirname, '..');
+const srcDir = join(sdksRoot, 'php/src');
+const servicesDir = join(srcDir, 'Services');
+const testsDir = join(sdksRoot, 'php/tests');
 
-const outputDir = join(__dirname, '../php/src');
-const modelsDir = join(outputDir, 'Models');
-const servicesDir = join(outputDir, 'Services');
-const testsDir = join(__dirname, '../php/tests');
+console.log('🔨 Generating PHP SDK from OpenAPI + allowlist…');
 
-console.log('🔨 Generating PHP SDK...');
-
-// First ensure pre-generate has run
-console.log('📋 Running pre-generation...');
 execSync('node scripts/pre-generate.js', {
-    cwd: join(__dirname, '..'),
-    stdio: 'inherit'
+  cwd: sdksRoot,
+  stdio: 'inherit',
 });
 
-// Clean and create output directory
-if (!existsSync(outputDir)) {
-    mkdirSync(outputDir, { recursive: true });
-}
-if (existsSync(modelsDir)) rmSync(modelsDir, { recursive: true });
-if (existsSync(servicesDir)) rmSync(servicesDir, { recursive: true });
-if (existsSync(testsDir)) rmSync(testsDir, { recursive: true });
-
-mkdirSync(modelsDir, { recursive: true });
+rmSync(servicesDir, { recursive: true, force: true });
+rmSync(testsDir, { recursive: true, force: true });
 mkdirSync(servicesDir, { recursive: true });
 mkdirSync(testsDir, { recursive: true });
 
-// Parse config and schema
-const resources = parseApiConfig();
-const schema = parseSchema();
+const modelsDir = join(srcDir, 'Models');
+rmSync(modelsDir, { recursive: true, force: true });
+mkdirSync(modelsDir, { recursive: true });
 
-console.log(`✅ Found ${resources.length} API resources`);
+writeFileSync(
+  join(modelsDir, 'Placeholder.php'),
+  `<?php
+namespace Lomi\Models;
 
-function mapType(field) {
-    let phpType = 'mixed';
+/** Reserved — define DTOs locally or from OpenAPI schemas. */
+final class Placeholder {}
+`,
+);
 
-    if (field.isEnum) {
-        phpType = 'string';
-    } else if (field.type === 'string') {
-        phpType = 'string';
-    } else if (field.type === 'number') {
-        phpType = 'float';
-    } else if (field.type === 'boolean') {
-        phpType = 'bool';
-    } else if (field.type === 'json') {
-        phpType = 'array';
-    } else if (field.type === 'array') {
-        phpType = 'array';
-    }
+const { spec, allowed } = readSpecAndAllowlist();
+const { byService } = getNormalizedOperations(spec, allowed);
 
-    if (field.isOptional) {
-        return `?${phpType}`;
-    }
-    return phpType;
+function svcPhpClass(serviceClassName) {
+  return serviceClassName;
 }
 
-// Generate Models
-for (const r of resources) {
-    const tableSchema = schema.tables[r.tableName];
-    if (!tableSchema) continue;
+function svcPhpFile(serviceClassName) {
+  return `${serviceClassName}.php`;
+}
 
-    const className = toPascalCase(r.tableName);
+/** @param {string} s */
+function phpEscape(s) {
+  return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
 
-    // -- Row Model
-    let classContent = `<?php
 /**
- * ${className} Model
- * AUTO-GENERATED - Do not edit manually
+ * @param {any} nop
  */
+function phpMethod(nop) {
+  const name = nop.sdkMethodName;
+  const tmpl = nop.pathTemplate;
+  const ids = nop.pathParamNames;
+  const hasQ = nop.httpMethodLower === 'get' && nop.queryParams.length > 0;
+  const hasB = nop.wantsBody;
 
-namespace Lomi\\Models;
+  const paramsPhp = [];
+  for (const id of ids) paramsPhp.push(`string $${id}`);
+  if (hasQ) paramsPhp.push('?array $params = null');
+  if (hasB) paramsPhp.push('?array $body = null');
+  const sig = paramsPhp.length ? paramsPhp.join(', ') : '';
 
-class ${className}
-{
+  let pathCode = `        $path = '${phpEscape(tmpl)}';\n`;
+  for (const id of ids) {
+    pathCode += `        $path = str_replace('{${id}}', $${id}, $path);\n`;
+  }
+
+  let req = `return $this->client->request('${nop.httpMethodLower.toUpperCase()}', $path`;
+  const opts = [];
+  if (hasQ) opts.push("'query' => \$params ?? []");
+  if (hasB) opts.push("'json' => \$body");
+  if (opts.length) req += `, [${opts.join(', ')}]`;
+  req += ');';
+
+  const doc = nop.summary
+    ? phpEscape(nop.summary.replace(/\r?\n/g, ' '))
+    : name;
+
+  return `
+    /**
+     * ${doc}
+     */
+    public function ${name}(${sig}): array
+    {
+${pathCode}
+        ${req}
+    }
 `;
-    // Properties
-    for (const field of tableSchema.row) {
-        classContent += `    public ${mapType(field)} $${toCamelCase(field.name)};\n`;
-    }
-
-    // Constructor
-    classContent += `\n    public function __construct(array $data = [])\n    {\n`;
-    for (const field of tableSchema.row) {
-        const propName = toCamelCase(field.name);
-        classContent += `        $this->${propName} = $data['${field.name}'] ?? null;\n`;
-    }
-    classContent += `    }\n`;
-
-    classContent += `}\n`;
-    writeFileSync(join(modelsDir, `${className}.php`), classContent);
 }
 
-// Generate Services
-for (const r of resources) {
-    const className = toPascalCase(r.tableName);
-    const serviceName = `${className}Service`;
+const sortedSvc = [...byService.keys()].sort((a, b) => a.localeCompare(b));
 
-    let content = `<?php
+for (const serviceClassName of sortedSvc) {
+  const ops = [...byService.get(serviceClassName)].sort((a, b) =>
+    a.sdkMethodName.localeCompare(b.sdkMethodName),
+  );
+  const meth = ops.map((o) => phpMethod(o)).join('\n');
+  const cls = svcPhpClass(serviceClassName);
+
+  const file = `<?php
 
 namespace Lomi\\Services;
 
 use Lomi\\LomiClient;
-use Lomi\\Models\\${className};
 
-class ${serviceName}
+/**
+ * Public merchant API (${cls})
+ */
+class ${cls}
 {
     private LomiClient $client;
-    
+
     public function __construct(LomiClient $client)
     {
         $this->client = $client;
     }
-    
-    ${r.operations.list ? `
-    /**
-     * List ${r.tableName}
-     * @return \\Lomi\\Models\\${className}[]
-     */
-    public function list(array $params = []): array
-    {
-        $response = $this->client->request('GET', '/${r.tableName.replace(/_/g, '-')}', [
-            'query' => $params
-        ]);
-        
-        return array_map(function ($item) {
-            return new \\Lomi\\Models\\${className}($item);
-        }, $response);
-    }` : ''}
-    
-    ${r.operations.get ? `
-    /**
-     * Get a single ${r.tableName}
-     */
-    public function get(string $id): \\Lomi\\Models\\${className}
-    {
-        $response = $this->client->request('GET', "/${r.tableName.replace(/_/g, '-')}/{$id}");
-        return new \\Lomi\\Models\\${className}($response);
-    }` : ''}
-
-    ${r.operations.create ? `
-    /**
-     * Create a new ${r.tableName}
-     */
-    public function create(array $data): \\Lomi\\Models\\${className}
-    {
-        $response = $this->client->request('POST', "/${r.tableName.replace(/_/g, '-')}", [
-            'json' => $data
-        ]);
-        return new \\Lomi\\Models\\${className}($response);
-    }` : ''}
-    
-    ${r.operations.update ? `
-    /**
-     * Update a ${r.tableName}
-     */
-    public function update(string $id, array $data): \\Lomi\\Models\\${className}
-    {
-        $response = $this->client->request('PATCH', "/${r.tableName.replace(/_/g, '-')}/{$id}", [
-            'json' => $data
-        ]);
-        return new \\Lomi\\Models\\${className}($response);
-    }` : ''}
-
+${meth}
 }
 `;
-    writeFileSync(join(servicesDir, `${serviceName}.php`), content);
+
+  writeFileSync(join(servicesDir, svcPhpFile(serviceClassName)), file);
 }
 
+let useLines = '';
+let propLines = '';
+let ctorLines = '';
 
-// Generate LomiClient.php
-const clientContent = `<?php
+for (const svcClass of sortedSvc) {
+  const cpp = svcPhpClass(svcClass);
+  useLines += `use Lomi\\Services\\${cpp};\n`;
+  const camelProp = sdkPropertyName(svcClass);
+  propLines += `    public ${cpp} $${camelProp};\n`;
+  ctorLines += `        $this->${camelProp} = new ${cpp}($this);\n`;
+}
+
+const lomiClientPhp = `<?php
 /**
- * lomi. PHP SDK Client
- * AUTO-GENERATED - Do not edit manually
+ * lomi. PHP SDK — public merchant allowlist
  */
-
 namespace Lomi;
 
 use GuzzleHttp\\Client;
 use GuzzleHttp\\Exception\\RequestException;
-${resources.map(r => `use Lomi\\Services\\${toPascalCase(r.tableName)}Service;`).join('\n')}
-
+${useLines}
 class LomiClient
 {
     private string $apiKey;
     private string $baseUrl;
     private Client $httpClient;
 
-${resources.map(r => `    public ${toPascalCase(r.tableName)}Service $${toCamelCase(r.tableName)};`).join('\n')}
-
+${propLines}
     public function __construct(string $apiKey, array $options = [])
     {
         $this->apiKey = $apiKey;
         $this->baseUrl = $options['base_url'] ?? 'https://api.lomi.africa';
-        
+
         if (($options['environment'] ?? 'live') === 'test') {
             $this->baseUrl = 'https://sandbox.api.lomi.africa';
         }
-        
+
         $this->httpClient = new Client([
             'base_uri' => $this->baseUrl,
             'headers' => [
@@ -223,8 +183,7 @@ ${resources.map(r => `    public ${toPascalCase(r.tableName)}Service $${toCamelC
             ],
         ]);
 
-        // Initialize services
-${resources.map(r => `        $this->${toCamelCase(r.tableName)} = new ${toPascalCase(r.tableName)}Service($this);`).join('\n')}
+${ctorLines}
     }
 
     public function request(string $method, string $path, array $options = []): array
@@ -250,7 +209,7 @@ ${resources.map(r => `        $this->${toCamelCase(r.tableName)} = new ${toPasca
 class LomiException extends \\Exception
 {
     public ?array $body;
-    
+
     public function __construct(string $message, int $code = 0, ?array $body = null)
     {
         parent::__construct($message, $code);
@@ -258,47 +217,51 @@ class LomiException extends \\Exception
     }
 }
 `;
-writeFileSync(join(outputDir, 'LomiClient.php'), clientContent);
 
-// Generate Basic Tests
-const testContent = `<?php
+writeFileSync(join(srcDir, 'LomiClient.php'), lomiClientPhp);
+
+const manifestSdk = {};
+for (const svc of sortedSvc) {
+  manifestSdk[sdkPropertyName(svc)] = [...byService.get(svc)]
+    .map((o) => o.sdkMethodName)
+    .sort();
+}
+
+writeFileSync(
+  join(srcDir, 'sdk_php_methods.json'),
+  `${JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      language: 'php',
+      sdk: manifestSdk,
+    },
+    null,
+    2,
+  )}\n`,
+);
+
+writeFileSync(
+  join(testsDir, 'SurfaceTest.php'),
+  `<?php
 
 namespace Lomi\\Tests;
 
 use Lomi\\LomiClient;
 use PHPUnit\\Framework\\TestCase;
 
-class LomiClientTest extends TestCase
+class SurfaceTest extends TestCase
 {
-    public function testInitialization()
+    public function testClientConstructs(): void
     {
-        $client = new LomiClient('test_key');
-        $this->assertInstanceOf(LomiClient::class, $client);
+        $c = new LomiClient('test');
+        $this->assertInstanceOf(LomiClient::class, $c);
+        $this->assertTrue(property_exists($c, 'paymentIntents'));
+        $this->assertTrue(property_exists($c, 'charges'));
     }
 }
-`;
-writeFileSync(join(testsDir, 'LomiClientTest.php'), testContent);
+`,
+);
 
-// Generate Per-Service Tests
-for (const r of resources) {
-    const className = toPascalCase(r.tableName);
-    const content = `<?php
-
-namespace Lomi\\Tests;
-
-use Lomi\\LomiClient;
-use PHPUnit\\Framework\\TestCase;
-
-class ${className}Test extends TestCase
-{
-    public function testServiceInitialization()
-    {
-        $client = new LomiClient('test_key');
-        $this->assertNotNull($client->${toCamelCase(r.tableName)});
-    }
-}
-`;
-    writeFileSync(join(testsDir, `${className}Test.php`), content);
-}
-
-console.log('✅ PHP SDK generated successfully!');
+console.log(
+  `✅ PHP SDK generated — ${allowed.length} operations, ${byService.size} services.`,
+);

@@ -1,43 +1,42 @@
 /**
  * OrganizationsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Organization metrics - view MRR, ARR, total revenue, merchant lifetime value, and other organization metrics
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type OrganizationsRow = Database['public']['Tables']['organizations']['Row'];
-type OrganizationsInsert = Database['public']['Tables']['organizations']['Insert'];
-type OrganizationsUpdate = Database['public']['Tables']['organizations']['Update'];
 
 export class OrganizationsService {
-
     /**
-     * List organizations
-     * Organization metrics - view MRR, ARR, total revenue, merchant lifetime value, and other organization metrics
+     * OpenAPI operationId: `OrganizationsController_findOne`.
+     * Organisation par ID
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<OrganizationsRow[]> {
-        return await request<OrganizationsRow[]>({
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/organizations',
-            query: options,
+            url: '/organizations/{id}',
+            path: { id: id },
         });
     }
 
     /**
-     * Get a single organization
+     * OpenAPI operationId: `OrganizationsController_getMetrics`.
+     * Indicateurs de l'organisation
      */
-    public static async get(id: string): Promise<OrganizationsRow> {
-        return await request<OrganizationsRow>({
+    public static async getMetrics(): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/organizations/{id}',
-            path: { id },
+            url: '/organizations/metrics',
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `OrganizationsController_findAll`.
+     * Détails de l'organisation
+     */
+    public static async list(): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/organizations',
         });
     }
 }

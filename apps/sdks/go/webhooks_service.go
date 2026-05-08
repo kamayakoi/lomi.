@@ -1,65 +1,64 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// WebhooksService handles webhooks API operations
 type WebhooksService struct {
 	client *Client
 }
 
-
-// List returns a list of webhooks
-func (s *WebhooksService) List(params map[string]string) ([]Webhooks, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/webhooks", query, nil)
-	if err != nil {
-		return nil, err
+func (s *WebhooksService) Get(id string) (interface{}, error) {
+		path := "/webhooks/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []Webhooks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *WebhooksService) List() (interface{}, error) {
+		path := "/webhooks"
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single webhooks
-func (s *WebhooksService) Get(id string) (*Webhooks, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/webhooks/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *WebhooksService) Update(id string, body interface{}) (interface{}, error) {
+		path := "/webhooks/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("PATCH", path, nil, body)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result Webhooks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
-
-// Update updates a webhooks
-func (s *WebhooksService) Update(id string, req WebhooksUpdate) (*Webhooks, error) {
-	body, err := s.client.doRequest("PATCH", fmt.Sprintf("/webhooks/%s", id), nil, req)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result Webhooks
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
 

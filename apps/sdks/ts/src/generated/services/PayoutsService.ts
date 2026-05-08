@@ -1,54 +1,19 @@
 /**
  * PayoutsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Payout management - transfer funds to beneficiaries
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type PayoutsRow = Database['public']['Tables']['payouts']['Row'];
-type PayoutsInsert = Database['public']['Tables']['payouts']['Insert'];
-type PayoutsUpdate = Database['public']['Tables']['payouts']['Update'];
 
 export class PayoutsService {
-
     /**
-     * List payouts
-     * Payout management - transfer funds to beneficiaries
+     * OpenAPI operationId: `PayoutsController_createWavePayout`.
+     * Lancer un virement Wave
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<PayoutsRow[]> {
-        return await request<PayoutsRow[]>({
-            method: 'GET',
-            url: '/payouts',
-            query: options,
-        });
-    }
-
-    /**
-     * Get a single payout
-     */
-    public static async get(id: string): Promise<PayoutsRow> {
-        return await request<PayoutsRow>({
-            method: 'GET',
-            url: '/payouts/{id}',
-            path: { id },
-        });
-    }
-
-    /**
-     * Create a new payout
-     */
-    public static async create(data: PayoutsInsert): Promise<PayoutsRow> {
-        return await request<PayoutsRow>({
+    public static async createWavePayout(): Promise<any> {
+        return await request<any>({
             method: 'POST',
-            url: '/payouts',
-            body: data,
+            url: '/payout/wave',
         });
     }
 }

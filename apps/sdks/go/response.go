@@ -1,14 +1,10 @@
-// Package lomi provides types for the lomi. API
-// AUTO-GENERATED - Do not edit manually
 package lomi
 
 import "fmt"
 
-// Error represents an API error
 type Error struct {
 	StatusCode int
 	Message    string
-	Body       map[string]interface{}
 }
 
 func (e *Error) Error() string {

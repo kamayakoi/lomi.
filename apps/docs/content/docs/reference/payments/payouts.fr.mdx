@@ -1,34 +1,22 @@
 ---
 title: Virements
-description: Retirez des fonds disponibles sur le solde de votre compte.
+description: Lancez des virements sortants mobile money avec un corps spécifique au prestataire.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-L’API Payouts permet de retirer des fonds du solde marchand vers votre compte bancaire ou Mobile Money.
-
-<Callout type="info">
-  Progression des statuts, frais et sémantique de clôture : **[Cycle de vie des virements](/reference/payments/payout-lifecycle)**.
-</Callout>
+Les virements initiés marchands sur les rails pris en charge sont exposés en **`POST`** avec un corps propre au prestataire. Il **n’y a pas** de liste REST publique générique (`GET /payouts`) dans le contrat marchand suivre l’état via les **webhooks**.
 
 <Callout type="warning">
-  Les virements sont traités de façon asynchrone. Utilisez les webhooks pour suivre le statut (`payout.completed` ou `payout.failed`).
+  Le traitement est asynchrone. Écoutez les webhooks (`payout.completed`, `payout.failed`, …) au lieu de poller une liste REST qui n’est pas exposée dans le périmètre public actuel.
 </Callout>
 
-## Initier un virement
+Cycle de vie, limites et frais : **[cycle de vie des virements](/reference/payments/payout-lifecycle.fr)**.
 
-Retire des fonds du solde de votre compte.
+## Lancer un virement Wave
 
-### Corps de la requête
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `amount` | `number` | **Oui** | Montant à retirer |
-| `currency_code` | `string` | **Oui** | Devise (`XOF`, `USD`, etc.) |
-| `payout_method_id` | `string` | **Oui** | Votre moyen de virement (banque / Mobile Money) |
-| `description` | `string` | Non | Libellé du virement |
-| `metadata` | `object` | Non | Paires clé-valeur |
+Expose `POST /payout/wave` (`montant`, `devise`, bénéficiaire imbriqué).
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
@@ -41,164 +29,57 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-const payout = await lomi.payouts.create({
-  amount: 100000,
-  currency_code: 'XOF',
-  payout_method_id: 'pm_abc123...',
-  description: 'Retrait mensuel',
+await lomi.payouts.createWavePayout({
+  amount: 25000,
+  currency: 'XOF',
+  beneficiary: {
+    name: 'Aicha Diallo',
+    phoneNumber: '+221771234567',
+  },
+  reason: 'Règlement hebdomadaire',
 });
-
-console.log(`Payout initiated: ${payout.id}, Status: ${payout.status}`);
 ```
 </Tab>
 
 <Tab value="Python">
 ```python
-from lomi import LomiClient
-import os
+import requests, os
 
-client = LomiClient(
-    api_key=os.environ["LOMI_API_KEY"],
-    environment="test"
+r = requests.post(
+    "https://api.lomi.africa/payout/wave",
+    headers={"X-API-KEY": os.environ["LOMI_API_KEY"], "Content-Type": "application/json"},
+    json={
+        "amount": 25000,
+        "currency": "XOF",
+        "beneficiary": {"name": "Aicha Diallo", "phoneNumber": "+221771234567"},
+        "reason": "Règlement hebdomadaire",
+    },
 )
-
-payout = client.payouts.create({
-    "amount": 100000,
-    "currency_code": "XOF",
-    "payout_method_id": "pm_abc123...",
-    "description": "Retrait mensuel"
-})
-
-print(f"Payout initiated: {payout['id']}")
+print(r.status_code, r.json())
 ```
 </Tab>
 
 <Tab value="cURL">
 ```bash
-curl -X POST "https://api.lomi.africa/payouts" \
+curl -X POST "https://api.lomi.africa/payout/wave" \
   -H "X-API-KEY: $LOMI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "amount": 100000,
-    "currency_code": "XOF",
-    "payout_method_id": "pm_abc123...",
-    "description": "Retrait mensuel"
+    "amount": 25000,
+    "currency": "XOF",
+    "beneficiary": { "name": "Aicha Diallo", "phoneNumber": "+221771234567" },
+    "reason": "Règlement hebdomadaire"
   }'
 ```
 </Tab>
 
 </Tabs>
 
----
+## Champs (virement Wave)
 
-## Lister les virements
-
-Récupère les virements avec filtrage optionnel.
-
-### Paramètres de requête
-
-| Paramètre | Type | Description |
-|-----------|------|-------------|
-| `statuses` | `string` | Statuts séparés par des virgules : `pending`, `completed`, `failed` |
-| `startDate` | `string` | À partir de cette date (ISO 8601) |
-| `endDate` | `string` | Jusqu’à cette date (ISO 8601) |
-| `limit` | `number` | Résultats par page (défaut : `50`) |
-| `offset` | `number` | Décalage (défaut : `0`) |
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const payouts = await lomi.payouts.list({
-  statuses: 'completed',
-  startDate: '2024-01-01T00:00:00Z',
-  limit: 20,
-});
-```
-</Tab>
-
-<Tab value="Python">
-```python
-payouts = client.payouts.list(
-    statuses="completed",
-    startDate="2024-01-01T00:00:00Z",
-    limit=20
-)
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/payouts?statuses=completed&limit=20" \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Obtenir un virement
-
-Récupère le détail d’un virement.
-
-<Tabs items={["TypeScript", "Python", "cURL"]}>
-
-<Tab value="TypeScript">
-```typescript
-const payout = await lomi.payouts.get('po_abc123...');
-console.log(`Status: ${payout.status}`);
-```
-</Tab>
-
-<Tab value="Python">
-```python
-payout = client.payouts.get('po_abc123...')
-```
-</Tab>
-
-<Tab value="cURL">
-```bash
-curl -X GET "https://api.lomi.africa/payouts/po_abc123..." \
-  -H "X-API-KEY: $LOMI_API_KEY"
-```
-</Tab>
-
-</Tabs>
-
----
-
-## Objet Payout
-
-| Champ | Type | Description |
-|-------|------|-------------|
-| `id` | `string` | Identifiant du virement |
-| `amount` | `number` | Montant |
-| `currency_code` | `string` | Devise |
-| `status` | `string` | `pending`, `completed`, `failed` |
-| `payout_method_id` | `string` | Moyen de destination |
-| `description` | `string` | Description |
-| `failure_reason` | `string` | Motif d’échec (si échec) |
-| `provider_code` | `string` | Prestataire |
-| `metadata` | `object` | Métadonnées |
-| `created_at` | `string` | Horodatage de création |
-
----
-
-## Webhooks
-
-| Événement | Description |
-|-------|-------------|
-| `payout.pending` | Virement initié |
-| `payout.completed` | Virement traité avec succès |
-| `payout.failed` | Virement en échec |
-
----
-
-## Réponses d’erreur
-
-| Statut | Description |
-|--------|-------------|
-| `400` | Entrée invalide ou solde insuffisant |
-| `401` | Clé API invalide ou manquante |
-| `404` | Virement introuvable |
+| Champ | Type | Obligatoire | Description |
+| --- | --- | --- | --- |
+| `amount` | `number` | Oui | Montant |
+| `currency` | `string` | Oui | Devise |
+| `beneficiary` | `object` | Oui | `name` et `phoneNumber` |
+| `reason` | `string` | Non | Motif / audit |

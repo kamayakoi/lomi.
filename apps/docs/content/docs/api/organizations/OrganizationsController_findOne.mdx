@@ -11,7 +11,7 @@ operationId: OrganizationsController_findOne
 
 Retrieve organization
 
-Returns organization details by ID (must match the authenticated organization scope).
+Returns one organization by ID. Responds with 404 when unknown or outside your scope.
 
 
 ## Authentication
@@ -31,9 +31,7 @@ Base URLs:
 
 ### Path parameters
 
-| Name | Required | Schema | Description |
-| --- | --- | --- | --- |
-| `id` | Yes | — | Organization UUID |
+_No path parameters beyond the URL pattern._
 
 
 ### Query parameters
@@ -47,8 +45,8 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Organization details |
-| `404` | Organization not found or access denied |
+| `200` | L'organisation |
+| `404` | Organisation introuvable ou accès refusé |
 
 ## Errors
 

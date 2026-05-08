@@ -11,7 +11,7 @@ operationId: PaymentIntentsController_create
 
 Create card PaymentIntent
 
-Creates a card PaymentIntent for Elements / Card integrations and exposes client_secret securely.
+Creates a card PaymentIntent for Elements-style integrations and returns `client_secret` for the client.
 
 
 ## Authentication
@@ -60,6 +60,9 @@ Schema: `CreatePaymentIntentDto`
 | `subscription_id` | No | `string` | Optional subscription UUID for metadata and reconciliation |
 | `quantity` | No | `number` | Optional quantity for internal reconciliation |
 | `metadata` | No | `object` | Custom metadata merged into provider metadata |
+| `appearance_theme` | No | `enum ("light", "dark", "flat", ...)` | Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility. |
+| `appearance_border_radius` | No | `number` | Optional Payment Element border radius (px) returned for client-side rendering. |
+| `appearance_billing_address` | No | `enum ("auto", "never")` | Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI. |
 
 Example body:
 
@@ -77,7 +80,7 @@ Example body:
 | `201` | Payment Intent créé avec succès |
 | `400` | Entrée invalide ou erreur de préparation du montant |
 | `401` | Clé API invalide ou manquante |
-| `503` | Card payment processor is not configured on this API instance |
+| `503` | Le processeur de paiement carte n’est pas configuré sur cette instance API |
 
 ## Errors
 

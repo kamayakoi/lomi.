@@ -12,6 +12,7 @@ jobs:
     outputs:
       api: ${{ steps.changes.outputs.api }}
       docs: ${{ steps.changes.outputs.docs }}
+      sdks: ${{ steps.changes.outputs.sdks }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
@@ -22,6 +23,9 @@ jobs:
               - 'apps/api/**'
             docs:
               - 'apps/docs/**'
+              - 'apps/sdks/ts/**'
+            sdks:
+              - 'apps/sdks/**'
 
   verify-openapi:
     name: Verify OpenAPI spec is in sync
@@ -58,7 +62,67 @@ jobs:
         with:
           node-version: "22"
       - name: Validate `.well-known/agent.json` and OpenAPI paths
-        run: node scripts/verify-agent-contracts.mjs
+        run: node apps/docs/lib/scripts/verify-agent-contracts.mjs
+
+  verify-docs:
+    name: Docs lint + SDK snippet contract
+    needs: detect-changes
+    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.docs ==
+      'true' || needs.detect-changes.outputs.api == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: apps/docs/pnpm-lock.yaml
+      - name: Install Docs dependencies
+        working-directory: apps/docs
+        run: pnpm install --frozen-lockfile
+      - name: Lint Docs
+        working-directory: apps/docs
+        run: pnpm run lint
+
+  verify-sdk-parity:
+    name: Multi-language SDK surface parity + smoke tests
+    needs: detect-changes
+    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.sdks ==
+      'true' || needs.detect-changes.outputs.docs ==
+      'true' || needs.detect-changes.outputs.api ==
+      'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Generate SDKs + manifest parity check
+        working-directory: apps/sdks
+        run: |
+          node scripts/typescript-generate.js
+          node scripts/python-generate.js
+          node scripts/go-generate.js
+          node scripts/php-generate.js
+          node scripts/verify-sdk-surface-parity.js
+      - name: Go SDK tests
+        working-directory: apps/sdks/go
+        run: go test ./...
+      - name: Python SDK tests
+        working-directory: apps/sdks/python
+        run: |
+          pip install -r requirements.txt
+          python -m unittest discover -s tests -p 'test*.py'
 
   api-tests:
     name: API unit tests, coverage gate & e2e

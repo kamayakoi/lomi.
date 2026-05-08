@@ -1,51 +1,63 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// OrganizationsService handles organizations API operations
 type OrganizationsService struct {
 	client *Client
 }
 
-
-// List returns a list of organizations
-func (s *OrganizationsService) List(params map[string]string) ([]Organizations, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/organizations", query, nil)
-	if err != nil {
-		return nil, err
+func (s *OrganizationsService) Get(id string) (interface{}, error) {
+		path := "/organizations/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []Organizations
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *OrganizationsService) GetMetrics() (interface{}, error) {
+		path := "/organizations/metrics"
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single organizations
-func (s *OrganizationsService) Get(id string) (*Organizations, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/organizations/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *OrganizationsService) List() (interface{}, error) {
+		path := "/organizations"
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result Organizations
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
-
-
 

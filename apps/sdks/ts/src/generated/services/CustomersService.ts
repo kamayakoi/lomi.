@@ -1,29 +1,65 @@
 /**
  * CustomersService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Customer management - create and manage customer profiles
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type CustomersRow = Database['public']['Tables']['customers']['Row'];
-type CustomersInsert = Database['public']['Tables']['customers']['Insert'];
-type CustomersUpdate = Database['public']['Tables']['customers']['Update'];
 
 export class CustomersService {
+    /**
+     * OpenAPI operationId: `CustomersController_create`.
+     * Créer un client
+     */
+    public static async create(body?: unknown): Promise<any> {
+        return await request<any>({
+            method: 'POST',
+            url: '/customers',
+            body,
+        });
+    }
 
     /**
-     * List customers
-     * Customer management - create and manage customer profiles
+     * OpenAPI operationId: `CustomersController_remove`.
+     * Supprimer un client
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<CustomersRow[]> {
-        return await request<CustomersRow[]>({
+    public static async delete(id: string): Promise<any> {
+        return await request<any>({
+            method: 'DELETE',
+            url: '/customers/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `CustomersController_findOne`.
+     * Obtenir un client par ID
+     */
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/customers/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `CustomersController_getTransactions`.
+     * Transactions du client
+     */
+    public static async getTransactions(id: string): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/customers/{id}/transactions',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `CustomersController_findAll`.
+     * Lister les clients
+     */
+    public static async list(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
             method: 'GET',
             url: '/customers',
             query: options,
@@ -31,47 +67,15 @@ export class CustomersService {
     }
 
     /**
-     * Get a single customer
+     * OpenAPI operationId: `CustomersController_update`.
+     * Mettre à jour un client
      */
-    public static async get(id: string): Promise<CustomersRow> {
-        return await request<CustomersRow>({
-            method: 'GET',
-            url: '/customers/{id}',
-            path: { id },
-        });
-    }
-
-    /**
-     * Create a new customer
-     */
-    public static async create(data: CustomersInsert): Promise<CustomersRow> {
-        return await request<CustomersRow>({
-            method: 'POST',
-            url: '/customers',
-            body: data,
-        });
-    }
-
-    /**
-     * Update an existing customer
-     */
-    public static async update(id: string, data: CustomersUpdate): Promise<CustomersRow> {
-        return await request<CustomersRow>({
+    public static async update(id: string, body?: unknown): Promise<any> {
+        return await request<any>({
             method: 'PATCH',
             url: '/customers/{id}',
-            path: { id },
-            body: data,
-        });
-    }
-
-    /**
-     * Delete a customer
-     */
-    public static async delete(id: string): Promise<void> {
-        return await request<void>({
-            method: 'DELETE',
-            url: '/customers/{id}',
-            path: { id },
+            path: { id: id },
+            body,
         });
     }
 }

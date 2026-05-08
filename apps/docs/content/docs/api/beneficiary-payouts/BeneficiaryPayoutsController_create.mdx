@@ -1,6 +1,6 @@
 ---
-title: "Lancer un paiement vers un bénéficiaire"
-description: "Lancer un paiement vers un bénéficiaire"
+title: "Create beneficiary payout"
+description: "Create beneficiary payout"
 full: true
 method: post
 path: /beneficiary-payouts
@@ -9,9 +9,9 @@ operationId: BeneficiaryPayoutsController_create
 
 ## Overview
 
-Lancer un paiement vers un bénéficiaire
+Create beneficiary payout
 
-Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.
+Initiates a payout to a third-party beneficiary from your account balance. Processing is asynchronous; updates arrive via outbound webhooks.
 
 
 ## Authentication

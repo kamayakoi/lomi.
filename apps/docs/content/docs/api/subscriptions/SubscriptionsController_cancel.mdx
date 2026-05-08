@@ -11,7 +11,7 @@ operationId: SubscriptionsController_cancel
 
 Cancel subscription
 
-Cancels an active subscription. This is the only allowed subscription mutation; billing plan and cycle attributes remain system-managed.
+Cancels an active subscription. Optional cancellation reason is stored for audit.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | Subscription UUID |
+| `id` | Yes | — | UUID de l’abonnement |
 
 ### Query parameters
 
@@ -63,9 +63,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `200` | Subscription canceled successfully |
-| `401` | API key missing or invalid |
-| `404` | Subscription not found or access denied |
+| `200` | Abonnement résilié avec succès |
+| `401` | Clé API invalide ou manquante |
+| `404` | Abonnement introuvable ou accès refusé |
 
 ## Errors
 

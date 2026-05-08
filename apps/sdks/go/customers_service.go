@@ -1,85 +1,117 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// CustomersService handles customers API operations
 type CustomersService struct {
 	client *Client
 }
 
-
-// List returns a list of customers
-func (s *CustomersService) List(params map[string]string) ([]Customers, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/customers", query, nil)
-	if err != nil {
-		return nil, err
+func (s *CustomersService) Create(body interface{}) (interface{}, error) {
+		path := "/customers"
+		bodyResp, err := s.client.doRequest("POST", path, nil, body)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []Customers
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *CustomersService) Delete(id string) (interface{}, error) {
+		path := "/customers/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("DELETE", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single customers
-func (s *CustomersService) Get(id string) (*Customers, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/customers/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *CustomersService) Get(id string) (interface{}, error) {
+		path := "/customers/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result Customers
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *CustomersService) GetTransactions(id string) (interface{}, error) {
+		path := "/customers/{id}/transactions"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return &result, nil
-}
 
 
-
-// Create creates a new customers
-func (s *CustomersService) Create(req CustomersCreate) (*Customers, error) {
-	body, err := s.client.doRequest("POST", "/customers", nil, req)
-	if err != nil {
-		return nil, err
+func (s *CustomersService) List(params map[string]string) (interface{}, error) {
+		path := "/customers"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result Customers
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *CustomersService) Update(id string, body interface{}) (interface{}, error) {
+		path := "/customers/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("PATCH", path, nil, body)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return &result, nil
-}
-
-
-
-// Update updates a customers
-func (s *CustomersService) Update(id string, req CustomersUpdate) (*Customers, error) {
-	body, err := s.client.doRequest("PATCH", fmt.Sprintf("/customers/%s", id), nil, req)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result Customers
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Delete deletes a customers
-func (s *CustomersService) Delete(id string) error {
-	_, err := s.client.doRequest("DELETE", fmt.Sprintf("/customers/%s", id), nil, nil)
-	return err
-}
 

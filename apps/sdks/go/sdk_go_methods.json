@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-05-08T14:16:39.384Z",
+  "language": "go",
+  "sdk": {
+    "accounts": [
+      "checkBalance",
+      "get",
+      "getBalance",
+      "getBalanceBreakdown",
+      "list"
+    ],
+    "beneficiaryPayouts": [
+      "create",
+      "get",
+      "list"
+    ],
+    "charges": [
+      "createWaveCharge"
+    ],
+    "checkoutSessions": [
+      "create",
+      "get",
+      "list"
+    ],
+    "customers": [
+      "create",
+      "delete",
+      "get",
+      "getTransactions",
+      "list",
+      "update"
+    ],
+    "discountCoupons": [
+      "create",
+      "get",
+      "getPerformance",
+      "list"
+    ],
+    "organizations": [
+      "get",
+      "getMetrics",
+      "list"
+    ],
+    "paymentIntents": [
+      "create"
+    ],
+    "paymentLinks": [
+      "create",
+      "get",
+      "list"
+    ],
+    "paymentRequests": [
+      "create",
+      "get",
+      "list"
+    ],
+    "payouts": [
+      "createWavePayout"
+    ],
+    "products": [
+      "addPrice",
+      "create",
+      "get",
+      "list",
+      "setDefaultPrice"
+    ],
+    "refunds": [
+      "createWaveRefund"
+    ],
+    "subscriptions": [
+      "cancel",
+      "findByCustomer",
+      "get",
+      "list"
+    ],
+    "transactions": [
+      "get",
+      "list"
+    ],
+    "webhookDeliveryLogs": [
+      "get",
+      "list"
+    ],
+    "webhooks": [
+      "get",
+      "list",
+      "update"
+    ]
+  }
+}

@@ -1,26 +1,20 @@
 package lomi
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewClient(t *testing.T) {
-	apiKey := "test_key"
-	client := NewClient(apiKey)
-
-	if client.APIKey != apiKey {
-		t.Errorf("Expected API key %s, got %s", apiKey, client.APIKey)
+	c := NewClient("k")
+	if c.APIKey != "k" {
+		t.Fatal("api key")
 	}
-
-	if client.BaseURL != DefaultBaseURL {
-		t.Errorf("Expected base URL %s, got %s", DefaultBaseURL, client.BaseURL)
+	if c.BaseURL != DefaultBaseURL {
+		t.Fatal("base url")
 	}
 }
 
 func TestWithSandbox(t *testing.T) {
-	client := NewClient("test_key", WithSandbox())
-
-	if client.BaseURL != SandboxBaseURL {
-		t.Errorf("Expected sandbox URL %s, got %s", SandboxBaseURL, client.BaseURL)
+	c := NewClient("k", WithSandbox())
+	if c.BaseURL != SandboxBaseURL {
+		t.Fatal("sandbox")
 	}
 }

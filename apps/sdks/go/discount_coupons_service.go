@@ -1,65 +1,81 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// DiscountCouponsService handles discount_coupons API operations
 type DiscountCouponsService struct {
 	client *Client
 }
 
-
-// List returns a list of discount_coupons
-func (s *DiscountCouponsService) List(params map[string]string) ([]DiscountCoupons, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/discount-coupons", query, nil)
-	if err != nil {
-		return nil, err
+func (s *DiscountCouponsService) Create() (interface{}, error) {
+		path := "/discount-coupons"
+		bodyResp, err := s.client.doRequest("POST", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []DiscountCoupons
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *DiscountCouponsService) Get(id string) (interface{}, error) {
+		path := "/discount-coupons/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single discount_coupons
-func (s *DiscountCouponsService) Get(id string) (*DiscountCoupons, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/discount-coupons/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *DiscountCouponsService) GetPerformance(id string) (interface{}, error) {
+		path := "/discount-coupons/{id}/performance"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result DiscountCoupons
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *DiscountCouponsService) List() (interface{}, error) {
+		path := "/discount-coupons"
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return &result, nil
-}
-
-
-
-// Create creates a new discount_coupons
-func (s *DiscountCouponsService) Create(req DiscountCouponsCreate) (*DiscountCoupons, error) {
-	body, err := s.client.doRequest("POST", "/discount-coupons", nil, req)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result DiscountCoupons
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
 

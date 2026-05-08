@@ -1,0 +1,279 @@
+#!/usr/bin/env node
+/**
+ * Shared public merchant SDK contract: OpenAPI + strict allowlist.
+ * Used by TypeScript, Python, Go, and PHP generators.
+ */
+
+import { readFileSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export const SCRIPTS_DIR = __dirname;
+
+export const DEFAULT_OPENAPI_PATH = join(
+  __dirname,
+  '../../docs/openapi.json',
+);
+export const DEFAULT_ALLOWLIST_PATH = join(
+  __dirname,
+  '../../docs/lib/scripts/manual-api/_expected-public-operations.json',
+);
+
+/** @type {Record<string, string>} */
+export const METHOD_NAME_BY_OP = {
+  'DELETE /customers/{id}': 'delete',
+  'GET /accounts': 'list',
+  'GET /accounts/balance': 'getBalance',
+  'GET /accounts/balance/breakdown': 'getBalanceBreakdown',
+  'GET /accounts/balance/check/{currency}': 'checkBalance',
+  'GET /accounts/{id}': 'get',
+  'GET /beneficiary-payouts': 'list',
+  'GET /beneficiary-payouts/{id}': 'get',
+  'GET /checkout-sessions': 'list',
+  'GET /checkout-sessions/{id}': 'get',
+  'GET /customers': 'list',
+  'GET /customers/{id}': 'get',
+  'GET /customers/{id}/transactions': 'getTransactions',
+  'GET /discount-coupons': 'list',
+  'GET /discount-coupons/{id}': 'get',
+  'GET /discount-coupons/{id}/performance': 'getPerformance',
+  'GET /organizations': 'list',
+  'GET /organizations/metrics': 'getMetrics',
+  'GET /organizations/{id}': 'get',
+  'GET /payment-links': 'list',
+  'GET /payment-links/{id}': 'get',
+  'GET /payment-requests': 'list',
+  'GET /payment-requests/{id}': 'get',
+  'GET /products': 'list',
+  'GET /products/{id}': 'get',
+  'GET /subscriptions': 'list',
+  'GET /subscriptions/customer/{customerId}': 'findByCustomer',
+  'GET /subscriptions/{id}': 'get',
+  'GET /transactions': 'list',
+  'GET /transactions/{id}': 'get',
+  'GET /webhook-delivery-logs': 'list',
+  'GET /webhook-delivery-logs/{id}': 'get',
+  'GET /webhooks': 'list',
+  'GET /webhooks/{id}': 'get',
+  'PATCH /customers/{id}': 'update',
+  'PATCH /webhooks/{id}': 'update',
+  'POST /beneficiary-payouts': 'create',
+  'POST /charge/wave': 'createWaveCharge',
+  'POST /checkout-sessions': 'create',
+  'POST /customers': 'create',
+  'POST /discount-coupons': 'create',
+  'POST /payment-intents': 'create',
+  'POST /payment-links': 'create',
+  'POST /payment-requests': 'create',
+  'POST /payout/wave': 'createWavePayout',
+  'POST /products': 'create',
+  'POST /products/{id}/prices': 'addPrice',
+  'POST /products/{id}/prices/{priceId}/set-default': 'setDefaultPrice',
+  'POST /refund/wave': 'createWaveRefund',
+  'POST /subscriptions/{id}/cancel': 'cancel',
+};
+
+export const HTTP_WITH_BODY = new Set(['post', 'patch', 'put']);
+
+function hyphenSegmentsToPascal(seg) {
+  return seg
+    .split('-')
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+    .join('');
+}
+
+/** @param {string} pathTpl */
+export function serviceClassForPath(pathTpl) {
+  const segs = pathTpl.split('/').filter(Boolean);
+  const a = segs[0];
+  const b = segs[1];
+  if (a === 'charge' && b === 'wave') return 'ChargesService';
+  if (a === 'payout' && b === 'wave') return 'PayoutsService';
+  if (a === 'refund' && b === 'wave') return 'RefundsService';
+  return `${hyphenSegmentsToPascal(a)}Service`;
+}
+
+/** @param {string} serviceClass e.g. CustomersService */
+export function sdkPropertyName(serviceClass) {
+  const base = serviceClass.replace(/Service$/, '');
+  return base.charAt(0).toLowerCase() + base.slice(1);
+}
+
+export function pathIds(pathTpl) {
+  const ids = [];
+  for (const part of pathTpl.split('/')) {
+    const m = /^\{([^}]+)}$/.exec(part);
+    if (m) ids.push(m[1]);
+  }
+  return ids;
+}
+
+/** @param {string | undefined} ref @param {any} spec */
+export function resolveRef(ref, spec) {
+  if (!ref || typeof ref !== 'string' || !ref.startsWith('#/')) return null;
+  let cur = spec;
+  for (const segment of ref.replace(/^#\//, '').split('/')) {
+    cur = cur?.[segment];
+  }
+  return cur ?? null;
+}
+
+/** @param {any} p @param {any} spec */
+export function normalizeParam(p, spec) {
+  if (!p) return null;
+  if (p.$ref) return resolveRef(p.$ref, spec);
+  return p;
+}
+
+/** @param {any} spec @param {any} pathItem @param {any} op */
+export function flattenParams(spec, pathItem, op) {
+  const merged = [...(pathItem.parameters || []), ...(op.parameters || [])];
+  return merged.map((p) => normalizeParam(p, spec)).filter(Boolean);
+}
+
+/** @param {string} httpLower get|post|... @param {any} op */
+export function wantsBody(httpLower, op) {
+  if (!HTTP_WITH_BODY.has(httpLower)) return false;
+  if (!op.requestBody) return false;
+  const c = op.requestBody.content || {};
+  return !!(c['application/json'] || c['multipart/form-data']);
+}
+
+/**
+ * @param {string} openapiPath
+ * @param {string} allowlistPath
+ */
+export function readSpecAndAllowlist(
+  openapiPath = DEFAULT_OPENAPI_PATH,
+  allowlistPath = DEFAULT_ALLOWLIST_PATH,
+) {
+  if (!existsSync(openapiPath)) {
+    throw new Error(`Missing OpenAPI json: ${openapiPath}`);
+  }
+  if (!existsSync(allowlistPath)) {
+    throw new Error(`Missing allowlist: ${allowlistPath}`);
+  }
+  const spec = JSON.parse(readFileSync(openapiPath, 'utf-8'));
+  const allowed = JSON.parse(readFileSync(allowlistPath, 'utf-8'));
+  return { spec, allowed };
+}
+
+/**
+ * Normalized ops sorted by operationKey for stable codegen.
+ * @param {any} spec
+ * @param {string[]} allowed
+ */
+export function getNormalizedOperations(spec, allowed) {
+  /** @type {Array<{ operationKey: string, httpMethodLower: string, pathTemplate: string, sdkMethodName: string, serviceClassName: string, sdkPropertyCamel: string, operationId: string, summary: string, pathParamNames: string[], queryParams: any[], wantsBody: boolean, openApiOp: any, pathItem: any }>} */
+  const out = [];
+
+  for (const entry of allowed) {
+    const [method, ...pathParts] = String(entry).split(/\s+/);
+    const template = pathParts.join(' ');
+    const key = `${method.toUpperCase()} ${template}`;
+    const sdkMethod = METHOD_NAME_BY_OP[key];
+    if (!sdkMethod) {
+      throw new Error(`METHOD_NAME_BY_OP missing for allowed operation: ${key}`);
+    }
+    const pathItemRoot = spec.paths?.[template];
+    if (!pathItemRoot || typeof pathItemRoot !== 'object') {
+      throw new Error(`OpenAPI paths missing "${template}" (from allowlist)`);
+    }
+    const lw = method.toLowerCase();
+    const op = pathItemRoot[lw];
+    if (!op || typeof op !== 'object') {
+      throw new Error(`OpenAPI missing ${lw.toUpperCase()} ${template}`);
+    }
+    const pathItem = pathItemRoot;
+    const qp = flattenParams(spec, pathItem, op).filter((q) => q.in === 'query');
+    const pathParamNames = pathIds(template);
+    const serviceClassName = serviceClassForPath(template);
+    const sdkProp = sdkPropertyName(serviceClassName);
+
+    out.push({
+      operationKey: key,
+      httpMethodLower: lw,
+      pathTemplate: template,
+      sdkMethodName: sdkMethod,
+      serviceClassName,
+      sdkPropertyCamel: sdkProp,
+      operationId: op.operationId ?? sdkMethod,
+      summary: op.summary ?? '',
+      pathParamNames,
+      queryParams: qp,
+      wantsBody: wantsBody(lw, op),
+      openApiOp: op,
+      pathItem,
+    });
+  }
+
+  out.sort((a, b) => a.operationKey.localeCompare(b.operationKey));
+
+  /** @type Map<string, typeof out> */
+  const byService = new Map();
+  for (const o of out) {
+    const arr = byService.get(o.serviceClassName) ?? [];
+    arr.push(o);
+    byService.set(o.serviceClassName, arr);
+  }
+
+  for (const [svc, arr] of byService) {
+    const seen = new Set();
+    for (const op of arr) {
+      if (seen.has(op.sdkMethodName))
+        throw new Error(`Duplicate method "${op.sdkMethodName}" on ${svc}`);
+      seen.add(op.sdkMethodName);
+    }
+  }
+
+  return { operations: out, byService };
+}
+
+/**
+ * e.g. beneficiaryPayouts -> beneficiary_payouts
+ * @param {string} camel
+ */
+export function camelSdkPropToSnake(camel) {
+  return camel
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')
+    .toLowerCase();
+}
+
+/**
+ * TS SDK method name -> Python snake_case (getBalance -> get_balance).
+ * @param {string} tsName
+ */
+export function tsMethodToPythonName(tsName) {
+  if (!/[A-Z]/.test(tsName)) return tsName;
+  return camelSdkPropToSnake(tsName);
+}
+
+/** Go struct field exported from camelCase sdk service property name. */
+export function sdkPropToGoField(camelSdkProp) {
+  return camelSdkProp.charAt(0).toUpperCase() + camelSdkProp.slice(1);
+}
+
+/** TS camelCase sdk method → Go exported name */
+export function tsMethodToGo(tsName) {
+  return tsName.charAt(0).toUpperCase() + tsName.slice(1);
+}
+
+/** Build sdk manifest identical shape to sdk-public-methods.json `sdk` object */
+export function buildSdkManifestGrouped(byServiceMap) {
+  /** @type {Record<string, string[]>} */
+  const manifest = {};
+  const sortedServices = [...byServiceMap.keys()].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  for (const svc of sortedServices) {
+    const prop = sdkPropertyName(svc);
+    const methods = [...byServiceMap.get(svc)].map((o) => o.sdkMethodName);
+    methods.sort();
+    manifest[prop] = methods;
+  }
+  return manifest;
+}

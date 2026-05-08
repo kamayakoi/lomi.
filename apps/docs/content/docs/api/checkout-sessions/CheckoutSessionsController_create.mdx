@@ -11,7 +11,7 @@ operationId: CheckoutSessionsController_create
 
 Create checkout session
 
-Creates hosted checkout—buyer completes payment on lomi. Defaults to a 60 minute expiry.
+Creates hosted checkout—the buyer completes payment on lomi. Defaults to a 60 minute expiry.
 
 
 ## Authentication
@@ -41,7 +41,7 @@ _No query parameters._
 
 ### Request body
 
-Checkout payload: provide either `amount` (with optional product fields) or `line_items` for multi-item carts.
+Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
 
 Schema: `object`
 
@@ -85,9 +85,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Checkout session created successfully |
-| `400` | Invalid input or validation error |
-| `401` | API key missing or invalid |
+| `201` | Session de paiement créée avec succès |
+| `400` | Entrée invalide ou erreur de validation |
+| `401` | Clé API invalide ou manquante |
 
 ## Errors
 

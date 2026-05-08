@@ -1,43 +1,67 @@
 /**
  * AccountsService
- * AUTO-GENERATED - Do not edit manually
- * 
- * Account balances - view organization account balances and SPI account information
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
  */
 
 import { request } from '../core/request.js';
-import type { Database } from '../types.js';
-
-type AccountsRow = Database['public']['Tables']['accounts']['Row'];
-type AccountsInsert = Database['public']['Tables']['accounts']['Insert'];
-type AccountsUpdate = Database['public']['Tables']['accounts']['Update'];
 
 export class AccountsService {
+    /**
+     * OpenAPI operationId: `AccountsController_checkAvailableBalance`.
+     * Vérifier le solde disponible
+     */
+    public static async checkBalance(currency: string): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/accounts/balance/check/{currency}',
+            path: { currency: currency },
+        });
+    }
 
     /**
-     * List accounts
-     * Account balances - view organization account balances and SPI account information
+     * OpenAPI operationId: `AccountsController_findOne`.
+     * Obtenir un compte par ID
      */
-    public static async list(options?: {
-        limit?: number;
-        offset?: number;
-        [key: string]: any;
-    }): Promise<AccountsRow[]> {
-        return await request<AccountsRow[]>({
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/accounts',
+            url: '/accounts/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `AccountsController_getBalance`.
+     * Solde du compte
+     */
+    public static async getBalance(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/accounts/balance',
             query: options,
         });
     }
 
     /**
-     * Get a single account
+     * OpenAPI operationId: `AccountsController_getBalanceBreakdown`.
+     * Détail du solde
      */
-    public static async get(id: string): Promise<AccountsRow> {
-        return await request<AccountsRow>({
+    public static async getBalanceBreakdown(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/accounts/{id}',
-            path: { id },
+            url: '/accounts/balance/breakdown',
+            query: options,
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `AccountsController_findAll`.
+     * Lister les comptes
+     */
+    public static async list(): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/accounts',
         });
     }
 }

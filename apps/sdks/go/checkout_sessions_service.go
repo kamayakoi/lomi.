@@ -1,65 +1,63 @@
-// AUTO-GENERATED - Do not edit manually
+// AUTO-GENERATED — public merchant allowlist
 package lomi
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 )
 
-// CheckoutSessionsService handles checkout_sessions API operations
 type CheckoutSessionsService struct {
 	client *Client
 }
 
-
-// List returns a list of checkout_sessions
-func (s *CheckoutSessionsService) List(params map[string]string) ([]CheckoutSessions, error) {
-	query := paramsToQuery(params)
-	body, err := s.client.doRequest("GET", "/checkout-sessions", query, nil)
-	if err != nil {
-		return nil, err
+func (s *CheckoutSessionsService) Create(body interface{}) (interface{}, error) {
+		path := "/checkout-sessions"
+		bodyResp, err := s.client.doRequest("POST", path, nil, body)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result []CheckoutSessions
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
+
+
+func (s *CheckoutSessionsService) Get(id string) (interface{}, error) {
+		path := "/checkout-sessions/{id}"
+		path = strings.ReplaceAll(path, "{id}", id)
+		bodyResp, err := s.client.doRequest("GET", path, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	return result, nil
-}
 
 
-
-// Get returns a single checkout_sessions
-func (s *CheckoutSessionsService) Get(id string) (*CheckoutSessions, error) {
-	body, err := s.client.doRequest("GET", fmt.Sprintf("/checkout-sessions/%s", id), nil, nil)
-	if err != nil {
-		return nil, err
+func (s *CheckoutSessionsService) List(params map[string]string) (interface{}, error) {
+		path := "/checkout-sessions"
+		bodyResp, err := s.client.doRequest("GET", path, paramsToQuery(params), nil)
+		if err != nil {
+			return nil, err
+		}
+		if len(bodyResp) == 0 {
+			return nil, nil
+		}
+		var out interface{}
+		if err := json.Unmarshal(bodyResp, &out); err != nil {
+			return nil, err
+		}
+		return out, nil
 	}
-	
-	var result CheckoutSessions
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-// Create creates a new checkout_sessions
-func (s *CheckoutSessionsService) Create(req CheckoutSessionsCreate) (*CheckoutSessions, error) {
-	body, err := s.client.doRequest("POST", "/checkout-sessions", nil, req)
-	if err != nil {
-		return nil, err
-	}
-	
-	var result CheckoutSessions
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, err
-	}
-	return &result, nil
-}
-
-
-
-
 
