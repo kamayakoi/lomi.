@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un client par ID"
-description: "Obtenir un client par ID"
+title: "Retrieve a customer"
+description: "Retrieve a customer"
 full: true
 method: get
 path: /customers/{id}
@@ -9,9 +9,9 @@ operationId: CustomersController_findOne
 
 ## Overview
 
-Obtenir un client par ID
+Retrieve a customer
 
-Renvoie un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+Returns one customer by ID. Returns 404 if unknown or inaccessible for this API key.
 
 
 ## Authentication
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/customers/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `CustomersController_findOne`
+- **Operation**: `GET /customers/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

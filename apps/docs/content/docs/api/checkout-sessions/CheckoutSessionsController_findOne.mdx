@@ -1,6 +1,6 @@
 ---
-title: "Obtenir une session de paiement par ID"
-description: "Obtenir une session de paiement par ID"
+title: "Retrieve checkout session"
+description: "Retrieve checkout session"
 full: true
 method: get
 path: /checkout-sessions/{id}
@@ -9,9 +9,9 @@ operationId: CheckoutSessionsController_findOne
 
 ## Overview
 
-Obtenir une session de paiement par ID
+Retrieve checkout session
 
-Renvoie le détail d’une session (statut, client et produits associés).
+Returns session details—status and associated customer/product contexts.
 
 
 ## Authentication
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/checkout-sessions/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `CheckoutSessionsController_findOne`
+- **Operation**: `GET /checkout-sessions/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

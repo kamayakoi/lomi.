@@ -45,7 +45,7 @@ SDKs should follow the same **base URL**, **headers**, and **JSON** conventions 
 
 Your endpoint receives **raw JSON** in the request body. For signature verification you must use the **exact bytes** the gateway sent—**do not** rely on a prettified or re-serialized JSON string, which can change spacing or key order and break HMAC or similar schemes.
 
-Ingress routes for payment providers (e.g. Wave, Stripe-style) are documented in the API tree under the relevant **webhook** paths. Configure URLs in the dashboard and validate signatures using the provider’s documented algorithm and the **raw body** buffer.
+Provider ingress webhooks are internal processing routes. Merchant integrations should focus on outbound webhook subscriptions documented under [Webhooks](/reference/payments/webhooks), and always validate signatures on the raw request body.
 
 For managing **your** outbound webhook subscriptions (list, get, update) over the merchant API, see [Webhooks](/reference/payments/webhooks) and the matching operations in the [API reference](/api/index).
 

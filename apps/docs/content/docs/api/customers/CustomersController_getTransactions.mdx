@@ -1,6 +1,6 @@
 ---
-title: "Transactions du client"
-description: "Transactions du client"
+title: "List customer transactions"
+description: "List customer transactions"
 full: true
 method: get
 path: /customers/{id}/transactions
@@ -9,9 +9,9 @@ operationId: CustomersController_getTransactions
 
 ## Overview
 
-Transactions du client
+List customer transactions
 
-Renvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+Returns transactions tied to one customer ID. Returns 404 if unknown or inaccessible.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | UUID du client |
+| `id` | Yes | — | Customer UUID |
 
 ### Query parameters
 
@@ -46,9 +46,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste des transactions du client |
-| `401` | Clé API invalide ou manquante |
-| `404` | Client introuvable ou accès refusé |
+| `200` | Customer transactions list |
+| `401` | API key missing or invalid |
+| `404` | Customer not found or access denied |
 
 ## Errors
 
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/customers/value/transactions" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `CustomersController_getTransactions`
+- **Operation**: `GET /customers/{id}/transactions`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

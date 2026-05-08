@@ -9,10 +9,16 @@ import {
   Req,
 } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiExcludeController,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { WaveWebhookService } from './wave-webhook.service';
 import type { Request } from 'express';
 
+@ApiExcludeController()
 @ApiTags('Webhooks - Fournisseurs')
 @Controller('webhooks/wave')
 export class WaveWebhookController {

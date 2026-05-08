@@ -40,6 +40,7 @@
   "POST /checkout-sessions",
   "POST /customers",
   "POST /discount-coupons",
+  "POST /payment-intents",
   "POST /payment-links",
   "POST /payment-requests",
   "POST /payout/wave",
@@ -47,7 +48,5 @@
   "POST /products/{id}/prices",
   "POST /products/{id}/prices/{priceId}/set-default",
   "POST /refund/wave",
-  "POST /subscriptions/{id}/cancel",
-  "POST /webhooks/stripe",
-  "POST /webhooks/wave"
+  "POST /subscriptions/{id}/cancel"
 ]

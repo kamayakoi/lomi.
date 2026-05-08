@@ -110,7 +110,7 @@ export class CreatePaymentIntentDto {
     example: 'stripe',
     enum: ['light', 'dark', 'flat', 'stripe', 'night'],
     description:
-      'Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases.',
+      'Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility.',
   })
   appearance_theme?: 'light' | 'dark' | 'flat' | 'stripe' | 'night';
 

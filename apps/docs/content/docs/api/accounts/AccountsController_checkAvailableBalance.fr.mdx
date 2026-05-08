@@ -57,3 +57,10 @@ Les erreurs suivent le format JSON standard (code de statut et message lisible p
 curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/check/currency_value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `AccountsController_checkAvailableBalance`
+- **Operation**: `GET /accounts/balance/check/{currency}`
+
+Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.

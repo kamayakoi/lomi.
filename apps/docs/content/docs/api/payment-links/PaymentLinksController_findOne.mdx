@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un lien de paiement par ID"
-description: "Obtenir un lien de paiement par ID"
+title: "Retrieve payment link"
+description: "Retrieve payment link"
 full: true
 method: get
 path: /payment-links/{id}
@@ -9,9 +9,9 @@ operationId: PaymentLinksController_findOne
 
 ## Overview
 
-Obtenir un lien de paiement par ID
+Retrieve payment link
 
-Renvoie le détail d’un lien (URL, configuration et statut).
+Returns shareable URLs, visibility settings and current status.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | UUID du lien de paiement |
+| `id` | Yes | — | Payment link UUID |
 
 ### Query parameters
 
@@ -46,9 +46,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détails du lien |
-| `401` | Clé API invalide ou manquante |
-| `404` | Lien introuvable ou accès refusé |
+| `200` | Payment link details |
+| `401` | API key missing or invalid |
+| `404` | Payment link not found or access denied |
 
 ## Errors
 
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/payment-links/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `PaymentLinksController_findOne`
+- **Operation**: `GET /payment-links/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

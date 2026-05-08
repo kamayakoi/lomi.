@@ -1,8 +1,6 @@
 {
   "title": "Webhooks",
   "pages": [
-    "StripeWebhookController_handleWebhook",
-    "WaveWebhookController_handleWebhook",
     "WebhooksController_findAll",
     "WebhooksController_findOne",
     "WebhooksController_update"

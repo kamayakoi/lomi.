@@ -246,11 +246,7 @@ curl -X GET "https://api.lomi.africa/checkout-sessions/cs_abc123..." \
 
 ## Webhooks
 
-There are **two different “webhook” layers** in the API codebase:
-
-1. **Inbound provider webhooks** (lomi. receives these): Wave and Stripe-style handlers use **Stripe-like event type strings** in the JSON body, for example `checkout.session.completed`, `checkout.session.payment_failed`, and `checkout.session.expired`. Those routes live under **OpenAPI → Webhooks - Providers** (e.g. `` `POST /webhooks/wave` ``, `` `POST /webhooks/stripe` ``). They are **not** the event names you pass to `` `authorized_events` `` on your own endpoint.
-
-2. **Outbound merchant webhooks** (lomi. calls **your** URL): Subscriptions are configured with the Postgres enum **`webhook_event`**, the same set documented in [Webhooks](/reference/payments/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``), as built in `` `WebhookSenderService.prepareWebhookPayload` `` in `` `apps/api` ``.
+Merchant webhook subscriptions (lomi. calls **your** URL) are configured with the Postgres enum **`webhook_event`**, the same set documented in [Webhooks](/reference/payments/webhooks). The HTTP body field `` `event` `` and the `` `X-Lomi-Event` `` header use those values (for example `` `PAYMENT_SUCCEEDED` ``), as built in `` `WebhookSenderService.prepareWebhookPayload` `` in `` `apps/api` ``.
 
 For checkout outcomes on **your** server, subscribe at minimum to:
 

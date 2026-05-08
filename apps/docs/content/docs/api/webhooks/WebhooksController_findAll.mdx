@@ -1,6 +1,6 @@
 ---
-title: "Lister les webhooks"
-description: "Lister les webhooks"
+title: "List webhooks"
+description: "List webhooks"
 full: true
 method: get
 path: /webhooks
@@ -9,7 +9,10 @@ operationId: WebhooksController_findAll
 
 ## Overview
 
-Lister les webhooks
+List webhooks
+
+Returns configured outbound webhook subscriptions for merchant events.
+
 
 ## Authentication
 
@@ -54,3 +57,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/webhooks" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `WebhooksController_findAll`
+- **Operation**: `GET /webhooks`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

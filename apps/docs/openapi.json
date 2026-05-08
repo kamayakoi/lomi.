@@ -2799,78 +2799,6 @@
         ]
       }
     },
-    "/webhooks/wave": {
-      "post": {
-        "description": "Point de terminaison pour les notifications Wave. Vérifie la signature et traite les événements.",
-        "operationId": "WaveWebhookController_handleWebhook",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Webhook reçu et traité avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "received": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  },
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Signature webhook invalide"
-          },
-          "500": {
-            "description": "Erreur interne lors du traitement du webhook"
-          }
-        },
-        "summary": "Réception des événements webhook Wave",
-        "tags": [
-          "Webhooks - Fournisseurs"
-        ]
-      }
-    },
-    "/webhooks/stripe": {
-      "post": {
-        "description": "Point de terminaison pour les notifications Stripe. Vérifie la signature et traite les événements.",
-        "operationId": "StripeWebhookController_handleWebhook",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Webhook reçu et traité avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "received": {
-                      "type": "boolean",
-                      "example": true
-                    }
-                  },
-                  "additionalProperties": true
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Signature webhook invalide"
-          },
-          "500": {
-            "description": "Erreur interne lors du traitement du webhook"
-          }
-        },
-        "summary": "Réception des événements webhook Stripe",
-        "tags": [
-          "Webhooks - Fournisseurs"
-        ]
-      }
-    },
     "/charge/wave": {
       "post": {
         "operationId": "ChargesController_createWaveCharge",
@@ -2904,7 +2832,7 @@
     },
     "/payment-intents": {
       "post": {
-        "description": "Crée un Payment Intent Stripe pour une intégration carte embarquée (Payment Elements / Card Element) et renvoie le client_secret.",
+        "description": "Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.",
         "operationId": "PaymentIntentsController_create",
         "parameters": [],
         "requestBody": {
@@ -2962,7 +2890,7 @@
             "description": "Clé API invalide ou manquante"
           },
           "503": {
-            "description": "Stripe non configuré sur cette instance API"
+            "description": "Le processeur de paiement carte n’est pas configuré sur cette instance API"
           }
         },
         "security": [
@@ -4816,6 +4744,10 @@
             "type": "string",
             "example": "string"
           },
+          "checkout_url": {
+            "type": "string",
+            "example": "https://checkout.lomi.africa/checkout/123e4567-e89b-12d3-a456-426614174000"
+          },
           "created_at": {
             "type": "string",
             "example": "string"
@@ -4943,6 +4875,7 @@
           "amount",
           "cancel_url",
           "checkout_session_id",
+          "checkout_url",
           "created_at",
           "created_by",
           "currency_code",
@@ -5561,11 +5494,54 @@
               "order_id": "ORD-12345"
             },
             "description": "Custom metadata merged into provider metadata"
+          },
+          "appearance_theme": {
+            "type": "string",
+            "example": "stripe",
+            "enum": [
+              "light",
+              "dark",
+              "flat",
+              "stripe",
+              "night"
+            ],
+            "description": "Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility."
+          },
+          "appearance_border_radius": {
+            "type": "number",
+            "example": 6,
+            "description": "Optional Payment Element border radius (px) returned for client-side rendering."
+          },
+          "appearance_billing_address": {
+            "type": "string",
+            "example": "never",
+            "enum": [
+              "auto",
+              "never"
+            ],
+            "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
           }
         },
         "required": [
           "amount"
         ]
+      },
+      "PaymentIntentAppearanceDto": {
+        "type": "object",
+        "properties": {
+          "theme": {
+            "type": "string",
+            "example": "light"
+          },
+          "border_radius": {
+            "type": "number",
+            "example": 6
+          },
+          "billing_address": {
+            "type": "string",
+            "example": "never"
+          }
+        }
       },
       "PaymentIntentDataDto": {
         "type": "object",
@@ -5597,6 +5573,9 @@
           "status": {
             "type": "string",
             "example": "requires_payment_method"
+          },
+          "appearance": {
+            "$ref": "#/components/schemas/PaymentIntentAppearanceDto"
           }
         },
         "required": [

@@ -1,6 +1,6 @@
 ---
-title: "Résilier un abonnement"
-description: "Résilier un abonnement"
+title: "Cancel subscription"
+description: "Cancel subscription"
 full: true
 method: post
 path: /subscriptions/{id}/cancel
@@ -9,9 +9,9 @@ operationId: SubscriptionsController_cancel
 
 ## Overview
 
-Résilier un abonnement
+Cancel subscription
 
-Résilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.
+Cancels an active subscription. This is the only allowed subscription mutation; billing plan and cycle attributes remain system-managed.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | UUID de l’abonnement |
+| `id` | Yes | — | Subscription UUID |
 
 ### Query parameters
 
@@ -63,9 +63,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `200` | Abonnement résilié avec succès |
-| `401` | Clé API invalide ou manquante |
-| `404` | Abonnement introuvable ou accès refusé |
+| `200` | Subscription canceled successfully |
+| `401` | API key missing or invalid |
+| `404` | Subscription not found or access denied |
 
 ## Errors
 
@@ -79,3 +79,10 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/subscriptions/value/cancel" \
   -H "Content-Type: application/json" \
   -d '{"cancellation_reason":"string"}'
 ```
+
+## OpenAPI
+
+- **operationId**: `SubscriptionsController_cancel`
+- **Operation**: `POST /subscriptions/{id}/cancel`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

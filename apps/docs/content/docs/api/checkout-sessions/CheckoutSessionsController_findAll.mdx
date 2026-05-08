@@ -1,6 +1,6 @@
 ---
-title: "Lister les sessions de paiement"
-description: "Lister les sessions de paiement"
+title: "List checkout sessions"
+description: "List checkout sessions"
 full: true
 method: get
 path: /checkout-sessions
@@ -9,9 +9,9 @@ operationId: CheckoutSessionsController_findAll
 
 ## Overview
 
-Lister les sessions de paiement
+List checkout sessions
 
-Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.
+Lists sessions with optional pagination filters and checkout status filtering.
 
 
 ## Authentication
@@ -61,3 +61,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/checkout-sessions?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `CheckoutSessionsController_findAll`
+- **Operation**: `GET /checkout-sessions`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

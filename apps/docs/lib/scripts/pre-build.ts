@@ -64,6 +64,11 @@ async function refreshOpenApiArtifacts(): Promise<void> {
   await rimraf(LEGACY_OPENAPI_OUTPUT);
 }
 
+/** When unset/false, docs build uses the committed `openapi.json` only (no export, no normalize). */
+function isOpenApiSyncOptedIn(): boolean {
+  return process.env.DOCS_SYNC_OPENAPI === '1';
+}
+
 async function main() {
   try {
     await buildRegistry();
@@ -74,7 +79,13 @@ async function main() {
     );
   }
 
-  await refreshOpenApiArtifacts();
+  if (isOpenApiSyncOptedIn()) {
+    await refreshOpenApiArtifacts();
+  } else {
+    console.log(
+      '[docs pre-build] Skipping OpenAPI export/sync (using committed openapi.json). Set DOCS_SYNC_OPENAPI=1 to run apps/api openapi:export + security normalize (see api-reference-authoring).',
+    );
+  }
 }
 
 await main().catch((e) => {

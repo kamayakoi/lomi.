@@ -146,6 +146,85 @@ function collectOpenApiTextErrors(
   }
 }
 
+/** Provider ingress routes must not appear in the committed public OpenAPI contract. */
+const FORBIDDEN_PUBLIC_OPENAPI_PATHS = new Set([
+  '/webhooks/stripe',
+  '/webhooks/wave',
+]);
+
+function collectForbiddenProviderIngressOpenApiPaths(
+  spec: JsonObject,
+  errors: string[],
+): void {
+  if (!spec.paths || typeof spec.paths !== 'object') return;
+  for (const pathKey of Object.keys(spec.paths as Record<string, unknown>)) {
+    if (FORBIDDEN_PUBLIC_OPENAPI_PATHS.has(pathKey)) {
+      errors.push(
+        `openapi.json defines forbidden provider-ingress path "${pathKey}"; remove it from the export graph and re-run apps/api openapi:export.`,
+      );
+    }
+  }
+}
+
+/** After stripping fenced code blocks — narrative and tables, not examples. */
+const DOCS_FORBIDDEN_INGRESS_SNIPPETS: readonly string[] = [
+  '/webhooks/stripe',
+  '/webhooks/wave',
+];
+
+const DOCS_FORBIDDEN_PROSE: { re: RegExp; hint: string }[] = [
+  {
+    re: /\bStripe\b/,
+    hint:
+      'Public docs must not name the underlying card processor; describe card payments generically.',
+  },
+  {
+    re: /stripe\.com/i,
+    hint: 'Remove vendor-specific links or hostnames from public docs.',
+  },
+];
+
+function stripMarkdownCodeFences(content: string): string {
+  return content.replace(/```[\s\S]*?```/g, '');
+}
+
+async function checkPublicDocsProviderIngressPolicy(): Promise<void> {
+  const files = await glob('content/docs/**/*.mdx');
+  const errors: string[] = [];
+
+  for (const file of files) {
+    const text = await fs.readFile(path.resolve(file), 'utf-8');
+    for (const snippet of DOCS_FORBIDDEN_INGRESS_SNIPPETS) {
+      if (text.includes(snippet)) {
+        errors.push(
+          `${file}: contains forbidden provider-ingress reference "${snippet}".`,
+        );
+      }
+    }
+    for (const token of ['StripeWebhook', 'WaveWebhook'] as const) {
+      if (text.includes(token)) {
+        errors.push(
+          `${file}: contains internal controller identifier "${token}" — remove from public docs.`,
+        );
+      }
+    }
+    const body = stripMarkdownCodeFences(text);
+    for (const { re, hint } of DOCS_FORBIDDEN_PROSE) {
+      if (re.test(body)) {
+        errors.push(`${file}: policy violation (${hint})`);
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    for (const e of errors) console.error(e);
+    throw new Error(
+      `Public docs provider-ingress / vendor policy checks failed (${errors.length} issue(s)).`,
+    );
+  }
+  console.log('Public docs provider policy checks passed.');
+}
+
 function collectOpenApiSecurityErrors(
   spec: JsonObject,
   errors: string[],
@@ -160,7 +239,7 @@ function collectOpenApiSecurityErrors(
     'X-API-KEY' in (schemes.securitySchemes as object)
   ) {
     errors.push(
-      "openapi.json: components.securitySchemes must use only the canonical name `api-key` (header `name` stays `X-API-KEY`), not a duplicate `X-API-KEY` scheme key. Run `pnpm run build:pre` in apps/docs or normalize security.",
+      "openapi.json: components.securitySchemes must use only the canonical name `api-key` (header `name` stays `X-API-KEY`), not a duplicate `X-API-KEY` scheme key. Normalize the committed spec (or run `DOCS_SYNC_OPENAPI=1 pnpm run build:pre:sync` in apps/docs if you intentionally sync from the API export).",
     );
   }
 
@@ -194,16 +273,21 @@ function collectOpenApiSecurityErrors(
   }
 }
 
-const REST_API_HEADINGS = [
-  '## Overview',
-  '## Authentication',
-  '## Endpoint',
-  '## Request',
-  '## Responses',
-  '## Errors',
-  '## Example',
-  '## OpenAPI',
+/** Manual REST pages may use EN headings or localized FR equivalents. */
+const REST_API_HEADING_ALTERNATIVES = [
+  ['## Overview', '## Aperçu'],
+  ['## Authentication', '## Authentification'],
+  ['## Endpoint', '## Point de terminaison'],
+  ['## Request', '## Requête'],
+  ['## Responses', '## Réponses'],
+  ['## Errors', '## Erreurs'],
+  ['## Example', '## Exemple'],
+  ['## OpenAPI'],
 ] as const;
+
+function hasAnyHeading(content: string, alternatives: readonly string[]): boolean {
+  return alternatives.some((h) => content.includes(h));
+}
 
 async function checkRestApiManualPages(): Promise<void> {
   const openApiPath = path.resolve(process.cwd(), 'openapi.json');
@@ -242,9 +326,11 @@ async function checkRestApiManualPages(): Promise<void> {
     const key = `${method.toUpperCase()} ${routePath}`;
     documented.add(key);
 
-    for (const h of REST_API_HEADINGS) {
-      if (!parsed.content.includes(h)) {
-        errors.push(`${file}: missing required heading ${h}`);
+    for (const alts of REST_API_HEADING_ALTERNATIVES) {
+      if (!hasAnyHeading(parsed.content, alts)) {
+        errors.push(
+          `${file}: missing required heading(s) — need one of: ${alts.join(' | ')}`,
+        );
       }
     }
   }
@@ -252,7 +338,7 @@ async function checkRestApiManualPages(): Promise<void> {
   for (const op of expected) {
     if (!documented.has(op)) {
       errors.push(
-        `Missing manual REST doc for OpenAPI operation: ${op}. Regenerate with: pnpm run api:bootstrap`,
+        `Missing manual REST doc for OpenAPI operation: ${op}. Regenerate with: CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference`,
       );
     }
   }
@@ -283,6 +369,7 @@ async function checkOpenApiDocs(): Promise<void> {
   const spec = JSON.parse(raw) as JsonObject;
   const errors: string[] = [];
   collectOpenApiSecurityErrors(spec, errors);
+  collectForbiddenProviderIngressOpenApiPaths(spec, errors);
   collectOpenApiTextErrors(spec, errors);
   collectOpenApiEnglishResidual(spec, errors);
   if (errors.length > 0) {
@@ -395,6 +482,7 @@ async function checkLinks() {
 
 async function main() {
   await checkOpenApiDocs();
+  await checkPublicDocsProviderIngressPolicy();
   await checkRestApiManualPages();
   await checkLinks();
 }

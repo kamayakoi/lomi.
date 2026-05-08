@@ -1,6 +1,6 @@
 ---
-title: "Créer une session de paiement"
-description: "Créer une session de paiement"
+title: "Create checkout session"
+description: "Create checkout session"
 full: true
 method: post
 path: /checkout-sessions
@@ -9,9 +9,9 @@ operationId: CheckoutSessionsController_create
 
 ## Overview
 
-Créer une session de paiement
+Create checkout session
 
-Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.
+Creates hosted checkout—buyer completes payment on lomi. Defaults to a 60 minute expiry.
 
 
 ## Authentication
@@ -41,7 +41,7 @@ _No query parameters._
 
 ### Request body
 
-Charge utile de session : indiquez `amount` (et champs produit optionnels) ou `line_items` pour un panier multi-produits.
+Checkout payload: provide either `amount` (with optional product fields) or `line_items` for multi-item carts.
 
 Schema: `object`
 
@@ -85,9 +85,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Session de paiement créée avec succès |
-| `400` | Entrée invalide ou erreur de validation |
-| `401` | Clé API invalide ou manquante |
+| `201` | Checkout session created successfully |
+| `400` | Invalid input or validation error |
+| `401` | API key missing or invalid |
 
 ## Errors
 
@@ -101,3 +101,10 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
   -H "Content-Type: application/json" \
   -d '{"currency_code":"XOF"}'
 ```
+
+## OpenAPI
+
+- **operationId**: `CheckoutSessionsController_create`
+- **Operation**: `POST /checkout-sessions`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

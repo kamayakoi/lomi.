@@ -42,6 +42,24 @@ function stripNoiseOpenApiPaths<T extends { paths?: Record<string, unknown> }>(
   return { ...document, paths };
 }
 
+/** Provider ingress — must never ship in the public merchant OpenAPI artifact. */
+const FORBIDDEN_PROVIDER_INGRESS_PATHS = ['/webhooks/stripe', '/webhooks/wave'] as const;
+
+function assertNoForbiddenProviderIngressPaths(document: {
+  paths?: Record<string, unknown>;
+}): void {
+  if (!document.paths) return;
+  for (const pathKey of Object.keys(document.paths)) {
+    if (
+      (FORBIDDEN_PROVIDER_INGRESS_PATHS as readonly string[]).includes(pathKey)
+    ) {
+      throw new Error(
+        `Public OpenAPI must not include provider ingress path "${pathKey}". Keep provider modules out of OpenApiExportModule / webhooks-open-api.module.`,
+      );
+    }
+  }
+}
+
 function attachExpressMiddleware(expressApp: express.Express) {
   expressApp.use(
     '/webhooks',
@@ -71,6 +89,8 @@ async function exportOpenApi(): Promise<void> {
   const document = stripNoiseOpenApiPaths(
     SwaggerModule.createDocument(app, builderResult),
   );
+
+  assertNoForbiddenProviderIngressPaths(document);
 
   document.servers = [
     { url: 'https://api.lomi.africa', description: 'Live' },

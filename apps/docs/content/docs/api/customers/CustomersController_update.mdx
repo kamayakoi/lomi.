@@ -1,6 +1,6 @@
 ---
-title: "Mettre à jour un client"
-description: "Mettre à jour un client"
+title: "Update a customer"
+description: "Update a customer"
 full: true
 method: patch
 path: /customers/{id}
@@ -9,9 +9,9 @@ operationId: CustomersController_update
 
 ## Overview
 
-Mettre à jour un client
+Update a customer
 
-Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+Partial update — send only fields to change. Returns 404 if unknown or inaccessible.
 
 
 ## Authentication
@@ -91,3 +91,10 @@ curl -sS -X PATCH "https://sandbox.api.lomi.africa/customers/value" \
   -H "Content-Type: application/json" \
   -d '{"name":"string","email":"string","phone_number":"string"}'
 ```
+
+## OpenAPI
+
+- **operationId**: `CustomersController_update`
+- **Operation**: `PATCH /customers/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

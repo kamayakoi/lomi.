@@ -3,7 +3,7 @@
 /**
  * One-shot / maintenance: (re)writes manual REST API MDX pages from apps/docs/openapi.json
  * and refreshes per-section meta.json under content/docs/api. Run from apps/docs:
- * `pnpm exec tsx lib/scripts/bootstrap-manual-api-reference.ts`
+ * `CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference`
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -30,6 +30,17 @@ function toSectionTitle(value: string): string {
 }
 
 async function main(): Promise<void> {
+  if (process.env.CONFIRM_BOOTSTRAP !== '1') {
+    console.error(
+      [
+        'Refusing to regenerate REST API MDX (destructive).',
+        'Set CONFIRM_BOOTSTRAP=1 to confirm you intend to overwrite content/docs/api/** and _expected-public-operations.json.',
+        'Example: CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference',
+      ].join('\n'),
+    );
+    process.exit(1);
+  }
+
   const specPath = join(process.cwd(), 'openapi.json');
   const raw = readFileSync(specPath, 'utf-8');
   const spec = JSON.parse(raw) as unknown as Parameters<

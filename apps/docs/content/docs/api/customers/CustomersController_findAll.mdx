@@ -1,6 +1,6 @@
 ---
-title: "Lister les clients"
-description: "Lister les clients"
+title: "List customers"
+description: "List customers"
 full: true
 method: get
 path: /customers
@@ -9,9 +9,9 @@ operationId: CustomersController_findAll
 
 ## Overview
 
-Lister les clients
+List customers
 
-Renvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.
+Paginated customer list with optional filters: search text, activity status, customer type.
 
 
 ## Authentication
@@ -63,3 +63,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/customers?pageSize=1&page=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `CustomersController_findAll`
+- **Operation**: `GET /customers`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

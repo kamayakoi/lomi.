@@ -368,6 +368,8 @@ function buildRequestBodySection(
   return { section: lines.join('\n'), sampleBody };
 }
 
+import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
+
 type PathParamsInput = {
   parameters?: (ParameterObject | ReferenceObject)[];
 };
@@ -385,9 +387,14 @@ export function renderOperationPageMdx(input: {
   const lang = input.lang ?? 'en';
   const labels = labelsForLanguage(lang);
   const mLower = method.toLowerCase();
-  const titleSource = operation.summary ?? operationId;
-  const description = operation.description
-    ? `\n\n${escapeMdxText(operation.description)}\n`
+  const enCopy = lang === 'en' ? EN_OPERATION_COPY[operationId] : undefined;
+  const titleSource = enCopy?.summary ?? operation.summary ?? operationId;
+  const overviewDetail =
+    lang === 'en' && enCopy
+      ? (enCopy.body ?? operation.description)
+      : operation.description;
+  const description = overviewDetail
+    ? `\n\n${escapeMdxText(overviewDetail)}\n`
     : '';
 
   const servers = ['https://sandbox.api.lomi.africa', 'https://api.lomi.africa'];
@@ -466,10 +473,12 @@ export function renderOperationPageMdx(input: {
           '\n',
         );
 
-  const yamlTitle = JSON.stringify(operation.summary ?? operationId);
+  const yamlTitle = JSON.stringify(titleSource);
   const yamlDescription = JSON.stringify(
-    operation.summary ??
-      `${method.toUpperCase()} ${path} — see REST API reference`,
+    enCopy
+      ? titleSource
+      : operation.summary ??
+          `${method.toUpperCase()} ${path} — see REST API reference`,
   );
 
   const pathSample = new Map(
@@ -519,7 +528,7 @@ operationId: ${operationId}
 
 ## ${labels.overview}
 
-${escapeMdxText(operation.summary ?? titleSource)}${description}
+${escapeMdxText(titleSource)}${description}
 
 ## ${labels.authentication}
 
@@ -558,6 +567,17 @@ ${labels.errorsText}
 ## ${labels.example}
 
 ${curlExample}
+
+## OpenAPI
+
+- **operationId**: \`${operationId}\`
+- **Operation**: \`${method.toUpperCase()} ${path}\`
+
+${
+  lang === 'fr'
+    ? 'Schémas complets et **Try it** : [référence API](/api/index). Contrat machine : `openapi.json` à la racine des docs.'
+    : 'Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.'
+}
 `;
 }
 

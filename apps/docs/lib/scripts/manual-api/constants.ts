@@ -12,6 +12,7 @@ export const REST_API_SECTION_ORDER = [
   'customers',
   'discount-coupons',
   'organizations',
+  'payment-intents',
   'payment-links',
   'payment-requests',
   'payout',

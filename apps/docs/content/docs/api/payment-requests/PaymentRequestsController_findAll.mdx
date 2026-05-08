@@ -1,6 +1,6 @@
 ---
-title: "Lister les demandes de paiement"
-description: "Lister les demandes de paiement"
+title: "List payment requests"
+description: "List payment requests"
 full: true
 method: get
 path: /payment-requests
@@ -9,9 +9,9 @@ operationId: PaymentRequestsController_findAll
 
 ## Overview
 
-Lister les demandes de paiement
+List payment requests
 
-Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).
+Paginated ledger of requests optionally filtered by status or payer references.
 
 
 ## Authentication
@@ -62,3 +62,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/payment-requests?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `PaymentRequestsController_findAll`
+- **Operation**: `GET /payment-requests`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

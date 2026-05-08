@@ -1,0 +1,6 @@
+{
+  "title": "Payment Intents",
+  "pages": [
+    "PaymentIntentsController_create"
+  ]
+}

@@ -1,6 +1,6 @@
 ---
-title: "Mettre à jour un webhook"
-description: "Mettre à jour un webhook"
+title: "Update webhook"
+description: "Update webhook"
 full: true
 method: patch
 path: /webhooks/{id}
@@ -9,7 +9,10 @@ operationId: WebhooksController_update
 
 ## Overview
 
-Mettre à jour un webhook
+Update webhook
+
+Patch delivery URL, rotating secrets, subscribed events metadata or lifecycle flags.
+
 
 ## Authentication
 
@@ -28,7 +31,9 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters beyond the URL pattern._
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | UUID of the webhook |
 
 
 ### Query parameters
@@ -81,3 +86,10 @@ curl -sS -X PATCH "https://sandbox.api.lomi.africa/webhooks/id_value" \
   -H "Content-Type: application/json" \
   -d '{"url":"string","is_active":true,"authorized_events":"string"}'
 ```
+
+## OpenAPI
+
+- **operationId**: `WebhooksController_update`
+- **Operation**: `PATCH /webhooks/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

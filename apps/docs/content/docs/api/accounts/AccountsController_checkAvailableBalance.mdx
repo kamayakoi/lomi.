@@ -1,6 +1,6 @@
 ---
-title: "Vérifier le solde disponible"
-description: "Vérifier le solde disponible"
+title: "Check available balance"
+description: "Check available balance"
 full: true
 method: get
 path: /accounts/balance/check/{currency}
@@ -9,9 +9,9 @@ operationId: AccountsController_checkAvailableBalance
 
 ## Overview
 
-Vérifier le solde disponible
+Check available balance
 
-Vérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée
+Checks whether sufficient funds exist in the requested currency.
 
 
 ## Authentication
@@ -31,7 +31,9 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters beyond the URL pattern._
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `currency` | Yes | — | Currency code (`XOF`, `USD`, `EUR`) |
 
 
 ### Query parameters
@@ -45,7 +47,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Résultat de la vérification de solde |
+| `200` | Available-balance check result |
 
 ## Errors
 
@@ -57,3 +59,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/accounts/balance/check/currency_value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `AccountsController_checkAvailableBalance`
+- **Operation**: `GET /accounts/balance/check/{currency}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

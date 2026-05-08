@@ -1,0 +1,100 @@
+---
+title: "Create card PaymentIntent"
+description: "Create card PaymentIntent"
+full: true
+method: post
+path: /payment-intents
+operationId: PaymentIntentsController_create
+---
+
+## Overview
+
+Create card PaymentIntent
+
+Creates a card PaymentIntent for Elements / Card integrations and exposes client_secret securely.
+
+
+## Authentication
+
+Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `https://sandbox.api.lomi.africa` and a **live** key against `https://api.lomi.africa`.
+
+## Endpoint
+
+`POST /payment-intents`
+
+Base URLs:
+
+- `https://sandbox.api.lomi.africa`
+- `https://api.lomi.africa`
+
+## Request
+
+### Path parameters
+
+_No path parameters beyond the URL pattern._
+
+
+### Query parameters
+
+_No query parameters._
+
+
+### Request body
+
+JSON request payload.
+
+Schema: `CreatePaymentIntentDto`
+
+| Field | Required | Type | Description |
+| --- | --- | --- | --- |
+| `amount` | Yes | `number` | Amount to charge in the original currency |
+| `currency_code` | No | `enum ("XOF", "USD", "EUR")` | Currency code |
+| `currency` | No | `enum ("XOF", "USD", "EUR")` | Backward-compatible alias for currency_code. Use currency_code in new integrations. |
+| `customer_id` | No | `string` | Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer. |
+| `customer_email` | No | `string` | Customer email — required together with customer_name when customer_id is omitted. |
+| `customer_name` | No | `string` | Customer display name — required together with customer_email when customer_id is omitted. |
+| `customer_phone` | No | `string` | Customer phone number |
+| `description` | No | `string` | Description shown in payment providers and logs |
+| `payment_reference` | No | `string` | Reference included in metadata for reconciliation |
+| `product_id` | No | `string` | Optional product UUID for metadata and reconciliation |
+| `subscription_id` | No | `string` | Optional subscription UUID for metadata and reconciliation |
+| `quantity` | No | `number` | Optional quantity for internal reconciliation |
+| `metadata` | No | `object` | Custom metadata merged into provider metadata |
+
+Example body:
+
+```json
+{
+  "amount": 10000
+}
+```
+
+
+## Responses
+
+| Status | Description |
+| --- | --- |
+| `201` | Payment Intent créé avec succès |
+| `400` | Entrée invalide ou erreur de préparation du montant |
+| `401` | Clé API invalide ou manquante |
+| `503` | Card payment processor is not configured on this API instance |
+
+## Errors
+
+Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.
+
+## Example
+
+```bash
+curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"amount":10000}'
+```
+
+## OpenAPI
+
+- **operationId**: `PaymentIntentsController_create`
+- **Operation**: `POST /payment-intents`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

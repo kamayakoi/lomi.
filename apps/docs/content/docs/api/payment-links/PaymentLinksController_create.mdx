@@ -1,6 +1,6 @@
 ---
-title: "Créer un lien de paiement"
-description: "Créer un lien de paiement"
+title: "Create payment link"
+description: "Create payment link"
 full: true
 method: post
 path: /payment-links
@@ -9,9 +9,9 @@ operationId: PaymentLinksController_create
 
 ## Overview
 
-Créer un lien de paiement
+Create payment link
 
-Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.
+Product links reference catalog items; instant links collect a fixed amount.
 
 
 ## Authentication
@@ -77,9 +77,9 @@ Example body:
 
 | Status | Description |
 | --- | --- |
-| `201` | Lien de paiement créé avec succès |
-| `400` | Entrée invalide ou erreur de validation |
-| `401` | Clé API invalide ou manquante |
+| `201` | Payment link created successfully |
+| `400` | Invalid input or validation error |
+| `401` | API key missing or invalid |
 
 ## Errors
 
@@ -93,3 +93,10 @@ curl -sS -X POST "https://sandbox.api.lomi.africa/payment-links" \
   -H "Content-Type: application/json" \
   -d '{"link_type":"product","title":"string","currency_code":"XOF"}'
 ```
+
+## OpenAPI
+
+- **operationId**: `PaymentLinksController_create`
+- **Operation**: `POST /payment-links`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

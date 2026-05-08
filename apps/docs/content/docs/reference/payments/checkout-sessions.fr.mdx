@@ -245,11 +245,7 @@ curl -X GET "https://api.lomi.africa/checkout-sessions/cs_abc123..." \
 
 ## Webhooks
 
-Il existe **deux niveaux distincts de « webhooks »** dans le code de l’API :
-
-1. **Webhooks entrants prestataires** (reçus par lomi.) : Wave et les gestionnaires façon Stripe utilisent des **chaînes de type événement façon Stripe** dans le corps JSON, par ex. `checkout.session.completed`, `checkout.session.payment_failed`, `checkout.session.expired`. Ces routes figurent sous **OpenAPI → Webhooks - Providers** (par ex. `` `POST /webhooks/wave` ``, `` `POST /webhooks/stripe` ``). Ce ne sont **pas** les noms d’événements que vous passez dans `` `authorized_events` `` sur votre propre point de terminaison.
-
-2. **Webhooks sortants marchands** (lomi. appelle **votre** URL) : les abonnements utilisent l’énumération Postgres **`webhook_event`**, le même jeu que dans [Webhooks](/reference/payments/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``), comme dans `` `WebhookSenderService.prepareWebhookPayload` `` dans `` `apps/api` ``.
+Les **webhooks sortants marchands** (lomi. appelle **votre** URL) utilisent l’énumération Postgres **`webhook_event`**, le même jeu que dans [Webhooks](/reference/payments/webhooks). Le champ HTTP `` `event` `` et l’en-tête `` `X-Lomi-Event` `` reprennent ces valeurs (par ex. `` `PAYMENT_SUCCEEDED` ``), comme dans `` `WebhookSenderService.prepareWebhookPayload` `` dans `` `apps/api` ``.
 
 Pour les résultats de tunnel **côté votre serveur**, souscrivez au minimum à :
 

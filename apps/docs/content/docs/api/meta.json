@@ -11,6 +11,7 @@
     "customers",
     "discount-coupons",
     "organizations",
+    "payment-intents",
     "payment-links",
     "payment-requests",
     "payout",

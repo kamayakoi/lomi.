@@ -1,6 +1,6 @@
 ---
-title: "Abonnements d’un client"
-description: "Abonnements d’un client"
+title: "List customer subscriptions"
+description: "List customer subscriptions"
 full: true
 method: get
 path: /subscriptions/customer/{customerId}
@@ -9,9 +9,9 @@ operationId: SubscriptionsController_findByCustomer
 
 ## Overview
 
-Abonnements d’un client
+List customer subscriptions
 
-Renvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.
+Returns subscriptions for a given customer. Responds with 404 if the customer does not exist or is not accessible for this API key.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `customerId` | Yes | — | UUID du client |
+| `customerId` | Yes | — | Customer UUID |
 
 ### Query parameters
 
@@ -46,9 +46,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Liste des abonnements du client |
-| `401` | Clé API invalide ou manquante |
-| `404` | Client introuvable ou accès refusé |
+| `200` | Customer subscriptions list |
+| `401` | API key missing or invalid |
+| `404` | Customer not found or access denied |
 
 ## Errors
 
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/subscriptions/customer/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `SubscriptionsController_findByCustomer`
+- **Operation**: `GET /subscriptions/customer/{customerId}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

@@ -1,6 +1,6 @@
 ---
-title: "Lister les liens de paiement"
-description: "Lister les liens de paiement"
+title: "List payment links"
+description: "List payment links"
 full: true
 method: get
 path: /payment-links
@@ -9,9 +9,9 @@ operationId: PaymentLinksController_findAll
 
 ## Overview
 
-Lister les liens de paiement
+List payment links
 
-Renvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).
+Paginated link list filtered by activation state and optional link-type filters.
 
 
 ## Authentication
@@ -62,3 +62,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/payment-links?offset=1&limit=1" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `PaymentLinksController_findAll`
+- **Operation**: `GET /payment-links`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

@@ -23,7 +23,7 @@ export class PaymentIntentsController {
   @ApiOperation({
     summary: 'Créer un Payment Intent carte (client_secret)',
     description:
-      'Crée un Payment Intent Stripe pour une intégration carte via Payment Element et renvoie le client_secret.',
+      'Crée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.',
   })
   @ApiResponse({
     status: 201,
@@ -40,7 +40,7 @@ export class PaymentIntentsController {
   })
   @ApiResponse({
     status: 503,
-    description: 'Stripe non configuré sur cette instance API',
+    description: 'Le processeur de paiement carte n’est pas configuré sur cette instance API',
   })
   @ApiBody({
     type: CreatePaymentIntentDto,

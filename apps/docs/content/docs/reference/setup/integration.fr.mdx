@@ -45,7 +45,7 @@ Les SDK respectent les mêmes URL de base, en-têtes et JSON que l’HTTP brut.
 
 Votre point de terminaison reçoit du **JSON brut**. Pour la signature, utilisez les **octets exacts** reçus : pas de JSON reformaté, qui peut casser les schémas HMAC.
 
-Les routes ingress des prestataires (Wave, type Stripe…) figurent sous les chemins **webhook** de l’arbre API. URL configurées dans le tableau de bord ; vérifiez les signatures comme documenté avec le tampon brut.
+Les webhooks ingress prestataires sont des routes internes de traitement. Côté intégration marchand, concentrez-vous sur les abonnements webhook sortants documentés dans [Webhooks](/reference/payments/webhooks) et validez toujours les signatures sur le corps brut.
 
 Pour vos **abonnements** webhook sortants (liste, détail, mise à jour) via l’API marchand : [Webhooks](/reference/payments/webhooks) et opérations homonymes dans la [référence API](/api/index).
 

@@ -8,10 +8,16 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiExcludeController,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { StripeWebhookService } from './stripe-webhook.service';
 import type { Request } from 'express';
 
+@ApiExcludeController()
 @ApiTags('Webhooks - Fournisseurs')
 @Controller('webhooks/stripe')
 export class StripeWebhookController {

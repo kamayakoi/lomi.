@@ -1,6 +1,6 @@
 ---
-title: "Obtenir un webhook par ID"
-description: "Obtenir un webhook par ID"
+title: "Retrieve webhook"
+description: "Retrieve webhook"
 full: true
 method: get
 path: /webhooks/{id}
@@ -9,7 +9,10 @@ operationId: WebhooksController_findOne
 
 ## Overview
 
-Obtenir un webhook par ID
+Retrieve webhook
+
+Fetches webhook configuration keyed by outbound subscription ID.
+
 
 ## Authentication
 
@@ -28,7 +31,9 @@ Base URLs:
 
 ### Path parameters
 
-_No path parameters beyond the URL pattern._
+| Name | Required | Schema | Description |
+| --- | --- | --- | --- |
+| `id` | Yes | — | Webhook UUID |
 
 
 ### Query parameters
@@ -42,7 +47,7 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Le webhook |
+| `200` | Webhook details |
 
 ## Errors
 
@@ -54,3 +59,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/webhooks/id_value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `WebhooksController_findOne`
+- **Operation**: `GET /webhooks/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.

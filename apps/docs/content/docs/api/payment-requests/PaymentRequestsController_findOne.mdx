@@ -1,6 +1,6 @@
 ---
-title: "Obtenir une demande de paiement par ID"
-description: "Obtenir une demande de paiement par ID"
+title: "Retrieve payment request"
+description: "Retrieve payment request"
 full: true
 method: get
 path: /payment-requests/{id}
@@ -9,9 +9,9 @@ operationId: PaymentRequestsController_findOne
 
 ## Overview
 
-Obtenir une demande de paiement par ID
+Retrieve payment request
 
-Renvoie le détail d’une demande (statut actuel, informations de paiement).
+Returns current readiness state alongside payment metadata payloads.
 
 
 ## Authentication
@@ -33,7 +33,7 @@ Base URLs:
 
 | Name | Required | Schema | Description |
 | --- | --- | --- | --- |
-| `id` | Yes | — | UUID de la demande |
+| `id` | Yes | — | Payment request UUID |
 
 ### Query parameters
 
@@ -46,9 +46,9 @@ _No query parameters._
 
 | Status | Description |
 | --- | --- |
-| `200` | Détails de la demande |
-| `401` | Clé API invalide ou manquante |
-| `404` | Demande introuvable ou accès refusé |
+| `200` | Payment request details |
+| `401` | API key missing or invalid |
+| `404` | Payment request not found or access denied |
 
 ## Errors
 
@@ -60,3 +60,10 @@ Errors follow the standard JSON error format (status code and machine-readable m
 curl -sS -X GET "https://sandbox.api.lomi.africa/payment-requests/value" \
   -H "X-API-KEY: $LOMI_API_KEY"
 ```
+
+## OpenAPI
+
+- **operationId**: `PaymentRequestsController_findOne`
+- **Operation**: `GET /payment-requests/{id}`
+
+Full schemas and **Try it**: [API reference](/api/index). Machine-readable contract: repo `apps/docs/openapi.json`.
