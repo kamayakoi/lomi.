@@ -19,3 +19,6 @@
 [submodule "apps/website"]
 	path = apps/website
 	url = https://github.com/lomiafrica/website.git
+[submodule "apps/plugins"]
+	path = apps/plugins
+	url = https://github.com/lomiafrica/plugins.git
