@@ -1,6 +1,6 @@
 {
   "name": "@lomi./sdk",
-  "version": "1.5.9",
+  "version": "1.5.10",
   "description": "Official TypeScript SDK for the lomi. API",
   "type": "module",
   "main": "dist/index.js",
