@@ -22,3 +22,6 @@
 [submodule "apps/plugins"]
 	path = apps/plugins
 	url = https://github.com/lomiafrica/plugins.git
+[submodule "apps/jumbo"]
+	path = apps/jumbo
+	url = https://github.com/lomiafrica/jumbo.git
