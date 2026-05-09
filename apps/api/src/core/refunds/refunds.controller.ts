@@ -21,11 +21,11 @@ export class RefundsController {
   @ApiOperation({
     summary: 'Lancer un remboursement Wave',
     description:
-      "Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
+      'Crée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.',
   })
   @ApiResponse({
     status: 201,
-    description: "Résultat du remboursement (corps JSON de la fonction edge)",
+    description: 'Résultat du remboursement (corps JSON de la fonction edge)',
     type: RefundResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Entrée invalide' })

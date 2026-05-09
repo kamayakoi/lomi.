@@ -283,7 +283,9 @@ export class PaymentIntentsService {
       baseMetadata.subscription_id = createDto.subscription_id;
     }
     if (createDto.appearance_theme) {
-      baseMetadata.appearance_theme = toStripeTheme(createDto.appearance_theme)!;
+      baseMetadata.appearance_theme = toStripeTheme(
+        createDto.appearance_theme,
+      )!;
       baseMetadata.appearance_theme_alias = toLomiTheme(
         createDto.appearance_theme,
       )!;
@@ -360,8 +362,7 @@ export class PaymentIntentsService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      const message =
-        error instanceof Error ? error.message : 'Unknown error';
+      const message = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error({
         message: 'create_stripe_transaction_exception',
         organization_id: user.organizationId,

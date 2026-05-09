@@ -111,7 +111,7 @@ export class DiscountCouponsController {
   @ApiOperation({
     summary: 'Créer un coupon',
     description:
-      "Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.",
+      'Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.',
   })
   @ApiResponse({
     status: 201,

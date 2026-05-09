@@ -144,7 +144,7 @@ export class ProductsController {
   @ApiOperation({
     summary: 'Ajouter un prix à un produit',
     description:
-      "Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.",
+      'Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.',
   })
   @ApiParam({
     name: 'id',

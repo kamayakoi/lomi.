@@ -14,7 +14,10 @@ jest.mock('stripe', () => {
 });
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { PaymentIntentsService } from './payment-intents.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
@@ -138,7 +141,9 @@ describe('PaymentIntentsService', () => {
       }),
     );
 
-    const txCall = rpcMock.mock.calls.find((c) => c[0] === 'create_stripe_transaction');
+    const txCall = rpcMock.mock.calls.find(
+      (c) => c[0] === 'create_stripe_transaction',
+    );
     expect(txCall).toBeDefined();
     expect(txCall![1]).toMatchObject({
       p_customer_id: '550e8400-e29b-41d4-a716-446655440000',
@@ -173,7 +178,9 @@ describe('PaymentIntentsService', () => {
       p_name: 'Ada Lovelace',
     });
 
-    const txCall = rpcMock.mock.calls.find((c) => c[0] === 'create_stripe_transaction');
+    const txCall = rpcMock.mock.calls.find(
+      (c) => c[0] === 'create_stripe_transaction',
+    );
     expect(txCall![1].p_customer_id).toBe('cust_via_rpc');
   });
 

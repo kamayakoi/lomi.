@@ -40,7 +40,7 @@ export class BeneficiaryPayoutsController {
   @ApiOperation({
     summary: 'Lancer un paiement vers un bénéficiaire',
     description:
-      "Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.",
+      'Initie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.',
   })
   @ApiResponse({
     status: 201,

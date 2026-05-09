@@ -43,14 +43,11 @@ export class AgentWorkflowsController {
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   @ApiOperation({
     summary:
-      "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
+      'Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)',
   })
   @ApiResponse({ status: 201, description: 'Exécution créée' })
   @ApiBody({ type: CreateWorkflowDto })
-  create(
-    @CurrentUser() user: AuthContext,
-    @Body() body: CreateWorkflowDto,
-  ) {
+  create(@CurrentUser() user: AuthContext, @Body() body: CreateWorkflowDto) {
     const run = this.workflows.create(user.organizationId, {
       name: body.name,
       steps: body.steps,
@@ -66,10 +63,7 @@ export class AgentWorkflowsController {
   @Get('workflows/:runId')
   @ApiParam({ name: 'runId' })
   @ApiOperation({ summary: "Obtenir l'état d'une exécution de workflow" })
-  get(
-    @CurrentUser() user: AuthContext,
-    @Param('runId') runId: string,
-  ) {
+  get(@CurrentUser() user: AuthContext, @Param('runId') runId: string) {
     return { data: this.workflows.get(user.organizationId, runId) };
   }
 

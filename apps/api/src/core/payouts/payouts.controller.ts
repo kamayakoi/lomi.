@@ -25,11 +25,11 @@ export class PayoutsController {
   @ApiOperation({
     summary: 'Lancer un virement Wave',
     description:
-      "Crée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.",
+      'Crée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.',
   })
   @ApiResponse({
     status: 201,
-    description: "Virement initié (corps JSON de la fonction edge Wave)",
+    description: 'Virement initié (corps JSON de la fonction edge Wave)',
     type: PayoutResponseDto,
   })
   @ApiResponse({

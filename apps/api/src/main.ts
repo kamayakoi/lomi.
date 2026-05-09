@@ -9,15 +9,13 @@ import { buildSwaggerDocumentBase } from './swagger.config';
 async function bootstrap() {
   const expressApp = express();
 
-  expressApp.use(
-    (req: express.Request & { id?: string }, res, next) => {
-      const id =
-        (req.headers['x-request-id'] as string | undefined) || randomUUID();
-      req.id = id;
-      res.setHeader('X-Request-Id', id);
-      next();
-    },
-  );
+  expressApp.use((req: express.Request & { id?: string }, res, next) => {
+    const id =
+      (req.headers['x-request-id'] as string | undefined) || randomUUID();
+    req.id = id;
+    res.setHeader('X-Request-Id', id);
+    next();
+  });
 
   // Middleware to capture raw body for webhook signature verification
   expressApp.use(

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Request body for `POST /payment-intents`.  
+ * Request body for `POST /payment-intents`.
  * Validation runs in `PaymentIntentsService` (Swagger schema generation is more reliable
  * with explicit primitive `type` hints than with `class-validator` on this shape).
  */

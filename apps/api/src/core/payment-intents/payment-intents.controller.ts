@@ -7,7 +7,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
-import { CurrentUser, type AuthContext } from '../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthContext,
+} from '../common/decorators/current-user.decorator';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { PaymentIntentResponseDto } from './dto/payment-intent-response.dto';
 import { PaymentIntentsService } from './payment-intents.service';
@@ -40,7 +43,8 @@ export class PaymentIntentsController {
   })
   @ApiResponse({
     status: 503,
-    description: 'Le processeur de paiement carte n’est pas configuré sur cette instance API',
+    description:
+      'Le processeur de paiement carte n’est pas configuré sur cette instance API',
   })
   @ApiBody({
     type: CreatePaymentIntentDto,

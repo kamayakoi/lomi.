@@ -34,5 +34,8 @@ export function pathToFolder(route: string): string {
 }
 
 export function isAgentRoute(route: string): boolean {
-  return route.startsWith(`${AGENT_OPENAPI_PREFIX}/`) || route === AGENT_OPENAPI_PREFIX;
+  return (
+    route.startsWith(`${AGENT_OPENAPI_PREFIX}/`) ||
+    route === AGENT_OPENAPI_PREFIX
+  );
 }

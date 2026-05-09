@@ -13,9 +13,7 @@ import { visit } from 'unist-util-visit';
 import { remark } from 'remark';
 import { remarkHeading } from 'fumadocs-core/mdx-plugins';
 import { isAgentRoute } from '@/lib/scripts/manual-api/constants';
-import {
-  collectPublicOperations,
-} from '@/lib/scripts/manual-api/render-operation-mdx';
+import { collectPublicOperations } from '@/lib/scripts/manual-api/render-operation-mdx';
 
 const HTTP_METHODS = [
   'get',
@@ -34,23 +32,23 @@ type JsonObject = Record<string, unknown>;
 const OPENAPI_DESCRIPTION_BANNED: { test: RegExp; hint: string }[] = [
   {
     test: /not removed from the database/i,
-    hint: "Avoid storage implementation detail (e.g. say the resource no longer appears in list/get).",
+    hint: 'Avoid storage implementation detail (e.g. say the resource no longer appears in list/get).',
   },
   {
     test: /pre-calculated and stored in the database/i,
-    hint: "Describe the metrics returned, not how they are stored.",
+    hint: 'Describe the metrics returned, not how they are stored.',
   },
   {
     test: /only accessible if the .+ belongs to your organization/i,
-    hint: "Prefer: “Responds with 404 if … not available for this API key.”",
+    hint: 'Prefer: “Responds with 404 if … not available for this API key.”',
   },
   {
     test: /soft deletes? a/i,
-    hint: "Describe customer-visible behavior, not “soft delete” / DB details.",
+    hint: 'Describe customer-visible behavior, not “soft delete” / DB details.',
   },
   {
     test: /marked as deleted but not removed/i,
-    hint: "Same as soft-delete: describe API behavior, not row state.",
+    hint: 'Same as soft-delete: describe API behavior, not row state.',
   },
 ];
 
@@ -70,7 +68,7 @@ const OPENAPI_ENGLISH_RESIDUAL: { test: RegExp; hint: string }[] = [
   },
   {
     test: /\bList all\b/i,
-    hint: "Traduire les résumés (ex. « Lister les … »).",
+    hint: 'Traduire les résumés (ex. « Lister les … »).',
   },
   {
     test: /\bCreated successfully\b/i,
@@ -88,7 +86,9 @@ function collectOpenApiEnglishResidual(
     if (typeof d === 'string') {
       for (const { test, hint } of OPENAPI_ENGLISH_RESIDUAL) {
         if (test.test(d)) {
-          errors.push(`openapi.json info.description: probable English (${hint})`);
+          errors.push(
+            `openapi.json info.description: probable English (${hint})`,
+          );
         }
       }
     }
@@ -96,7 +96,9 @@ function collectOpenApiEnglishResidual(
 
   if (!spec.paths || typeof spec.paths !== 'object') return;
 
-  for (const [p, item] of Object.entries(spec.paths as Record<string, unknown>)) {
+  for (const [p, item] of Object.entries(
+    spec.paths as Record<string, unknown>,
+  )) {
     if (!item || typeof item !== 'object') continue;
     const pathItem = item as JsonObject;
     for (const method of HTTP_METHODS) {
@@ -118,13 +120,12 @@ function collectOpenApiEnglishResidual(
   }
 }
 
-function collectOpenApiTextErrors(
-  spec: JsonObject,
-  errors: string[],
-): void {
+function collectOpenApiTextErrors(spec: JsonObject, errors: string[]): void {
   if (!spec.paths || typeof spec.paths !== 'object') return;
 
-  for (const [p, item] of Object.entries(spec.paths as Record<string, unknown>)) {
+  for (const [p, item] of Object.entries(
+    spec.paths as Record<string, unknown>,
+  )) {
     if (!item || typeof item !== 'object') continue;
     const pathItem = item as JsonObject;
     for (const method of HTTP_METHODS) {
@@ -175,8 +176,7 @@ const DOCS_FORBIDDEN_INGRESS_SNIPPETS: readonly string[] = [
 const DOCS_FORBIDDEN_PROSE: { re: RegExp; hint: string }[] = [
   {
     re: /\bStripe\b/,
-    hint:
-      'Public docs must not name the underlying card processor; describe card payments generically.',
+    hint: 'Public docs must not name the underlying card processor; describe card payments generically.',
   },
   {
     re: /stripe\.com/i,
@@ -239,7 +239,7 @@ function collectOpenApiSecurityErrors(
     'X-API-KEY' in (schemes.securitySchemes as object)
   ) {
     errors.push(
-      "openapi.json: components.securitySchemes must use only the canonical name `api-key` (header `name` stays `X-API-KEY`), not a duplicate `X-API-KEY` scheme key. Normalize the committed spec (or run `DOCS_SYNC_OPENAPI=1 pnpm run build:pre:sync` in apps/docs if you intentionally sync from the API export).",
+      'openapi.json: components.securitySchemes must use only the canonical name `api-key` (header `name` stays `X-API-KEY`), not a duplicate `X-API-KEY` scheme key. Normalize the committed spec (or run `DOCS_SYNC_OPENAPI=1 pnpm run build:pre:sync` in apps/docs if you intentionally sync from the API export).',
     );
   }
 
@@ -257,7 +257,9 @@ function collectOpenApiSecurityErrors(
   checkReqs('openapi.json security', spec.security);
   if (!spec.paths || typeof spec.paths !== 'object') return;
 
-  for (const [p, item] of Object.entries(spec.paths as Record<string, unknown>)) {
+  for (const [p, item] of Object.entries(
+    spec.paths as Record<string, unknown>,
+  )) {
     if (!item || typeof item !== 'object') continue;
     const pathItem = item as JsonObject;
     checkReqs(`openapi.json path ${p}`, pathItem.security);
@@ -285,7 +287,10 @@ const REST_API_HEADING_ALTERNATIVES = [
   ['## OpenAPI'],
 ] as const;
 
-function hasAnyHeading(content: string, alternatives: readonly string[]): boolean {
+function hasAnyHeading(
+  content: string,
+  alternatives: readonly string[],
+): boolean {
   return alternatives.some((h) => content.includes(h));
 }
 
@@ -320,7 +325,9 @@ async function checkRestApiManualPages(): Promise<void> {
     }
 
     if (typeof operationId !== 'string' || operationId.length === 0) {
-      errors.push(`${file}: REST API pages must set frontmatter 'operationId'.`);
+      errors.push(
+        `${file}: REST API pages must set frontmatter 'operationId'.`,
+      );
     }
 
     const key = `${method.toUpperCase()} ${routePath}`;

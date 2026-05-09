@@ -13,7 +13,7 @@ export class L5EventBusService {
   events$(organizationId: string): Observable<MessageEvent> {
     const data = this.stream.asObservable().pipe(
       filter((e) => e.organizationId === organizationId),
-      map((e) => ({ data: e.event } as MessageEvent)),
+      map((e) => ({ data: e.event }) as MessageEvent),
     );
     const pings = interval(30_000).pipe(
       map(

@@ -1,7 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import {
-  assertPaymentIntentReconciliationInput,
-} from './assert-payment-intent-reconciliation';
+import { assertPaymentIntentReconciliationInput } from './assert-payment-intent-reconciliation';
 
 describe('assertPaymentIntentReconciliationInput', () => {
   it('allows customer_id alone', () => {

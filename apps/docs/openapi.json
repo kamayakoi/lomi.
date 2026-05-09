@@ -26,9 +26,7 @@
           }
         ],
         "summary": "Lister les comptes",
-        "tags": [
-          "Comptes"
-        ]
+        "tags": ["Comptes"]
       }
     },
     "/accounts/balance": {
@@ -42,11 +40,7 @@
             "in": "query",
             "description": "Filtrer par code devise (XOF, USD, EUR)",
             "schema": {
-              "enum": [
-                "XOF",
-                "USD",
-                "EUR"
-              ],
+              "enum": ["XOF", "USD", "EUR"],
               "type": "string"
             }
           }
@@ -72,9 +66,7 @@
           }
         ],
         "summary": "Solde du compte",
-        "tags": [
-          "Comptes"
-        ]
+        "tags": ["Comptes"]
       }
     },
     "/accounts/balance/breakdown": {
@@ -88,11 +80,7 @@
             "in": "query",
             "description": "Devise cible pour la conversion (XOF, USD, EUR)",
             "schema": {
-              "enum": [
-                "XOF",
-                "USD",
-                "EUR"
-              ],
+              "enum": ["XOF", "USD", "EUR"],
               "type": "string"
             }
           }
@@ -118,9 +106,7 @@
           }
         ],
         "summary": "Détail du solde",
-        "tags": [
-          "Comptes"
-        ]
+        "tags": ["Comptes"]
       }
     },
     "/accounts/balance/check/{currency}": {
@@ -156,9 +142,7 @@
           }
         ],
         "summary": "Vérifier le solde disponible",
-        "tags": [
-          "Comptes"
-        ]
+        "tags": ["Comptes"]
       }
     },
     "/accounts/{id}": {
@@ -186,9 +170,7 @@
           }
         ],
         "summary": "Obtenir un compte par ID",
-        "tags": [
-          "Comptes"
-        ]
+        "tags": ["Comptes"]
       }
     },
     "/organizations": {
@@ -217,9 +199,7 @@
           }
         ],
         "summary": "Détails de l'organisation",
-        "tags": [
-          "Organisations"
-        ]
+        "tags": ["Organisations"]
       }
     },
     "/organizations/metrics": {
@@ -245,9 +225,7 @@
           }
         ],
         "summary": "Indicateurs de l'organisation",
-        "tags": [
-          "Organisations"
-        ]
+        "tags": ["Organisations"]
       }
     },
     "/organizations/{id}": {
@@ -276,9 +254,7 @@
           }
         ],
         "summary": "Organisation par ID",
-        "tags": [
-          "Organisations"
-        ]
+        "tags": ["Organisations"]
       }
     },
     "/transactions": {
@@ -411,9 +387,7 @@
           }
         ],
         "summary": "Lister les transactions",
-        "tags": [
-          "Transactions"
-        ]
+        "tags": ["Transactions"]
       }
     },
     "/transactions/{id}": {
@@ -455,9 +429,7 @@
           }
         ],
         "summary": "Obtenir une transaction par ID",
-        "tags": [
-          "Transactions"
-        ]
+        "tags": ["Transactions"]
       }
     },
     "/customers": {
@@ -491,11 +463,7 @@
             "in": "query",
             "description": "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)",
             "schema": {
-              "enum": [
-                "active",
-                "inactive",
-                "all"
-              ],
+              "enum": ["active", "inactive", "all"],
               "type": "string"
             }
           },
@@ -505,11 +473,7 @@
             "in": "query",
             "description": "Filtrer par type de client",
             "schema": {
-              "enum": [
-                "business",
-                "individual",
-                "all"
-              ],
+              "enum": ["business", "individual", "all"],
               "type": "string"
             }
           },
@@ -572,9 +536,7 @@
           }
         ],
         "summary": "Lister les clients",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       },
       "post": {
         "description": "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
@@ -586,9 +548,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -661,9 +621,7 @@
           }
         ],
         "summary": "Créer un client",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       }
     },
     "/customers/{id}": {
@@ -705,9 +663,7 @@
           }
         ],
         "summary": "Obtenir un client par ID",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       },
       "patch": {
         "description": "Met à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
@@ -794,9 +750,7 @@
           }
         ],
         "summary": "Mettre à jour un client",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       },
       "delete": {
         "description": "Retire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.",
@@ -841,9 +795,7 @@
           }
         ],
         "summary": "Supprimer un client",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       }
     },
     "/customers/{id}/transactions": {
@@ -888,9 +840,7 @@
           }
         ],
         "summary": "Transactions du client",
-        "tags": [
-          "Clients"
-        ]
+        "tags": ["Clients"]
       }
     },
     "/payment-requests": {
@@ -904,22 +854,14 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "amount",
-                  "currency_code",
-                  "expiry_date"
-                ],
+                "required": ["amount", "currency_code", "expiry_date"],
                 "properties": {
                   "amount": {
                     "type": "number"
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": [
-                      "XOF",
-                      "USD",
-                      "EUR"
-                    ]
+                    "enum": ["XOF", "USD", "EUR"]
                   },
                   "description": {
                     "type": "string"
@@ -980,9 +922,7 @@
           }
         ],
         "summary": "Créer une demande de paiement",
-        "tags": [
-          "Demandes de paiement"
-        ]
+        "tags": ["Demandes de paiement"]
       },
       "get": {
         "description": "Renvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).",
@@ -1023,12 +963,7 @@
             "in": "query",
             "description": "Filtrer par statut",
             "schema": {
-              "enum": [
-                "pending",
-                "completed",
-                "failed",
-                "expired"
-              ],
+              "enum": ["pending", "completed", "failed", "expired"],
               "type": "string"
             }
           }
@@ -1071,9 +1006,7 @@
           }
         ],
         "summary": "Lister les demandes de paiement",
-        "tags": [
-          "Demandes de paiement"
-        ]
+        "tags": ["Demandes de paiement"]
       }
     },
     "/payment-requests/{id}": {
@@ -1115,9 +1048,7 @@
           }
         ],
         "summary": "Obtenir une demande de paiement par ID",
-        "tags": [
-          "Demandes de paiement"
-        ]
+        "tags": ["Demandes de paiement"]
       }
     },
     "/refund/wave": {
@@ -1149,9 +1080,7 @@
           }
         ],
         "summary": "Lancer un remboursement Wave",
-        "tags": [
-          "Remboursements"
-        ]
+        "tags": ["Remboursements"]
       }
     },
     "/products": {
@@ -1213,9 +1142,7 @@
           }
         ],
         "summary": "Lister les produits",
-        "tags": [
-          "Produits"
-        ]
+        "tags": ["Produits"]
       },
       "post": {
         "description": "Crée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.",
@@ -1245,9 +1172,7 @@
           }
         ],
         "summary": "Créer un produit",
-        "tags": [
-          "Produits"
-        ]
+        "tags": ["Produits"]
       }
     },
     "/products/{id}": {
@@ -1289,9 +1214,7 @@
           }
         ],
         "summary": "Obtenir un produit par ID",
-        "tags": [
-          "Produits"
-        ]
+        "tags": ["Produits"]
       }
     },
     "/products/{id}/prices": {
@@ -1336,9 +1259,7 @@
           }
         ],
         "summary": "Ajouter un prix à un produit",
-        "tags": [
-          "Produits"
-        ]
+        "tags": ["Produits"]
       }
     },
     "/products/{id}/prices/{priceId}/set-default": {
@@ -1389,9 +1310,7 @@
           }
         ],
         "summary": "Définir le prix par défaut",
-        "tags": [
-          "Produits"
-        ]
+        "tags": ["Produits"]
       }
     },
     "/subscriptions": {
@@ -1444,9 +1363,7 @@
           }
         ],
         "summary": "Lister les abonnements",
-        "tags": [
-          "Abonnements"
-        ]
+        "tags": ["Abonnements"]
       }
     },
     "/subscriptions/customer/{customerId}": {
@@ -1491,9 +1408,7 @@
           }
         ],
         "summary": "Abonnements d’un client",
-        "tags": [
-          "Abonnements"
-        ]
+        "tags": ["Abonnements"]
       }
     },
     "/subscriptions/{id}": {
@@ -1535,9 +1450,7 @@
           }
         ],
         "summary": "Obtenir un abonnement par ID",
-        "tags": [
-          "Abonnements"
-        ]
+        "tags": ["Abonnements"]
       }
     },
     "/subscriptions/{id}/cancel": {
@@ -1602,9 +1515,7 @@
           }
         ],
         "summary": "Résilier un abonnement",
-        "tags": [
-          "Abonnements"
-        ]
+        "tags": ["Abonnements"]
       }
     },
     "/discount-coupons": {
@@ -1636,9 +1547,7 @@
           }
         ],
         "summary": "Lister les coupons",
-        "tags": [
-          "Coupons de réduction"
-        ]
+        "tags": ["Coupons de réduction"]
       },
       "post": {
         "description": "Crée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.",
@@ -1668,9 +1577,7 @@
           }
         ],
         "summary": "Créer un coupon",
-        "tags": [
-          "Coupons de réduction"
-        ]
+        "tags": ["Coupons de réduction"]
       }
     },
     "/discount-coupons/{id}/performance": {
@@ -1729,9 +1636,7 @@
           }
         ],
         "summary": "Indicateurs de performance du coupon",
-        "tags": [
-          "Coupons de réduction"
-        ]
+        "tags": ["Coupons de réduction"]
       }
     },
     "/discount-coupons/{id}": {
@@ -1773,9 +1678,7 @@
           }
         ],
         "summary": "Obtenir un coupon par ID",
-        "tags": [
-          "Coupons de réduction"
-        ]
+        "tags": ["Coupons de réduction"]
       }
     },
     "/checkout-sessions": {
@@ -1790,9 +1693,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "currency_code"
-                ],
+                "required": ["currency_code"],
                 "properties": {
                   "amount": {
                     "type": "number",
@@ -1800,11 +1701,7 @@
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": [
-                      "XOF",
-                      "USD",
-                      "EUR"
-                    ],
+                    "enum": ["XOF", "USD", "EUR"],
                     "example": "XOF"
                   },
                   "title": {
@@ -1883,9 +1780,7 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": [
-                        "price_id"
-                      ],
+                      "required": ["price_id"],
                       "properties": {
                         "price_id": {
                           "type": "string",
@@ -1954,9 +1849,7 @@
           }
         ],
         "summary": "Créer une session de paiement",
-        "tags": [
-          "Sessions de paiement"
-        ]
+        "tags": ["Sessions de paiement"]
       },
       "get": {
         "description": "Renvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.",
@@ -1988,11 +1881,7 @@
             "in": "query",
             "description": "Filtrer par statut de session (valeur checkout_session_status)",
             "schema": {
-              "enum": [
-                "open",
-                "completed",
-                "expired"
-              ],
+              "enum": ["open", "completed", "expired"],
               "type": "string"
             }
           }
@@ -2021,9 +1910,7 @@
           }
         ],
         "summary": "Lister les sessions de paiement",
-        "tags": [
-          "Sessions de paiement"
-        ]
+        "tags": ["Sessions de paiement"]
       }
     },
     "/checkout-sessions/{id}": {
@@ -2065,9 +1952,7 @@
           }
         ],
         "summary": "Obtenir une session de paiement par ID",
-        "tags": [
-          "Sessions de paiement"
-        ]
+        "tags": ["Sessions de paiement"]
       }
     },
     "/payment-links": {
@@ -2081,29 +1966,18 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "link_type",
-                  "title",
-                  "currency_code"
-                ],
+                "required": ["link_type", "title", "currency_code"],
                 "properties": {
                   "link_type": {
                     "type": "string",
-                    "enum": [
-                      "product",
-                      "instant"
-                    ]
+                    "enum": ["product", "instant"]
                   },
                   "title": {
                     "type": "string"
                   },
                   "currency_code": {
                     "type": "string",
-                    "enum": [
-                      "XOF",
-                      "USD",
-                      "EUR"
-                    ]
+                    "enum": ["XOF", "USD", "EUR"]
                   },
                   "description": {
                     "type": "string"
@@ -2193,9 +2067,7 @@
           }
         ],
         "summary": "Créer un lien de paiement",
-        "tags": [
-          "Liens de paiement"
-        ]
+        "tags": ["Liens de paiement"]
       },
       "get": {
         "description": "Renvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).",
@@ -2236,10 +2108,7 @@
             "in": "query",
             "description": "Filtrer par type de lien",
             "schema": {
-              "enum": [
-                "product",
-                "instant"
-              ],
+              "enum": ["product", "instant"],
               "type": "string"
             }
           }
@@ -2282,9 +2151,7 @@
           }
         ],
         "summary": "Lister les liens de paiement",
-        "tags": [
-          "Liens de paiement"
-        ]
+        "tags": ["Liens de paiement"]
       }
     },
     "/payment-links/{id}": {
@@ -2326,9 +2193,7 @@
           }
         ],
         "summary": "Obtenir un lien de paiement par ID",
-        "tags": [
-          "Liens de paiement"
-        ]
+        "tags": ["Liens de paiement"]
       }
     },
     "/payout/wave": {
@@ -2360,9 +2225,7 @@
           }
         ],
         "summary": "Lancer un virement Wave",
-        "tags": [
-          "Virements sortants"
-        ]
+        "tags": ["Virements sortants"]
       }
     },
     "/beneficiary-payouts": {
@@ -2394,9 +2257,7 @@
           }
         ],
         "summary": "Lancer un paiement vers un bénéficiaire",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
+        "tags": ["Paiements vers bénéficiaires"]
       },
       "get": {
         "description": "Renvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).",
@@ -2496,9 +2357,7 @@
           }
         ],
         "summary": "Lister les paiements vers bénéficiaires",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
+        "tags": ["Paiements vers bénéficiaires"]
       }
     },
     "/beneficiary-payouts/{id}": {
@@ -2540,9 +2399,7 @@
           }
         ],
         "summary": "Obtenir un paiement bénéficiaire par ID",
-        "tags": [
-          "Paiements vers bénéficiaires"
-        ]
+        "tags": ["Paiements vers bénéficiaires"]
       }
     },
     "/webhook-delivery-logs": {
@@ -2624,9 +2481,7 @@
           }
         ],
         "summary": "Lister les journaux de livraison",
-        "tags": [
-          "Journaux de livraison webhooks"
-        ]
+        "tags": ["Journaux de livraison webhooks"]
       }
     },
     "/webhook-delivery-logs/{id}": {
@@ -2668,9 +2523,7 @@
           }
         ],
         "summary": "Obtenir un journal de livraison par ID",
-        "tags": [
-          "Journaux de livraison webhooks"
-        ]
+        "tags": ["Journaux de livraison webhooks"]
       }
     },
     "/webhooks": {
@@ -2698,9 +2551,7 @@
           }
         ],
         "summary": "Lister les webhooks",
-        "tags": [
-          "Webhooks"
-        ]
+        "tags": ["Webhooks"]
       }
     },
     "/webhooks/{id}": {
@@ -2725,9 +2576,7 @@
           }
         ],
         "summary": "Obtenir un webhook par ID",
-        "tags": [
-          "Webhooks"
-        ]
+        "tags": ["Webhooks"]
       },
       "patch": {
         "operationId": "WebhooksController_update",
@@ -2794,9 +2643,7 @@
           }
         ],
         "summary": "Mettre à jour un webhook",
-        "tags": [
-          "Webhooks"
-        ]
+        "tags": ["Webhooks"]
       }
     },
     "/charge/wave": {
@@ -2825,9 +2672,7 @@
           }
         ],
         "summary": "Lancer un encaissement direct Wave",
-        "tags": [
-          "Encaissements"
-        ]
+        "tags": ["Encaissements"]
       }
     },
     "/payment-intents": {
@@ -2899,9 +2744,7 @@
           }
         ],
         "summary": "Créer un Payment Intent carte (client_secret)",
-        "tags": [
-          "Intents de paiement"
-        ]
+        "tags": ["Intents de paiement"]
       }
     },
     "/agent/capabilities": {
@@ -2914,9 +2757,7 @@
           }
         },
         "summary": "Négociation des capacités de l'agent (surface de découverte non authentifiée)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/events": {
@@ -2934,9 +2775,7 @@
           }
         ],
         "summary": "Flux Server-Sent Events (limité à l'organisation, signaux de maintien de connexion)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/subscriptions": {
@@ -2954,9 +2793,7 @@
           }
         ],
         "summary": "S'inscrire aux notifications adaptées à l'agent (MVP : registre en mémoire + ping de test SSE)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       },
       "get": {
         "operationId": "AgentSubscriptionsController_list",
@@ -2972,9 +2809,7 @@
           }
         ],
         "summary": "Lister les abonnements de l'agent",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/subscriptions/{id}": {
@@ -3003,9 +2838,7 @@
           }
         ],
         "summary": "Supprimer un abonnement",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows": {
@@ -3033,9 +2866,7 @@
           }
         ],
         "summary": "Démarrer un workflow multi-étapes (MVP, idempotence sur idempotency_key)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows/{runId}": {
@@ -3060,9 +2891,7 @@
           }
         ],
         "summary": "Obtenir l'état d'une exécution de workflow",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/workflows/{runId}/steps/{stepId}": {
@@ -3103,9 +2932,7 @@
           }
         ],
         "summary": "Faire avancer une étape du workflow (primitive d'orchestration)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/handoff": {
@@ -3133,9 +2960,7 @@
           }
         ],
         "summary": "Transfert inter-services / inter-agents (contexte + enveloppe de tâche)",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     },
     "/agent/handoff/{id}": {
@@ -3160,9 +2985,7 @@
           }
         ],
         "summary": "Récupérer un enregistrement de transfert",
-        "tags": [
-          "Agent"
-        ]
+        "tags": ["Agent"]
       }
     }
   },
@@ -3213,11 +3036,7 @@
           "currency_code": {
             "type": "string",
             "example": "XOF",
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ],
+            "enum": ["XOF", "USD", "EUR"],
             "description": "Currency code"
           },
           "is_spi_account": {
@@ -3249,11 +3068,7 @@
           "spi_account_status": {
             "type": "string",
             "example": "OUVERT",
-            "enum": [
-              "OUVERT",
-              "BLOQUE",
-              "CLOTURE"
-            ],
+            "enum": ["OUVERT", "BLOQUE", "CLOTURE"],
             "description": "SPI account status"
           },
           "spi_account_balance": {
@@ -3311,11 +3126,7 @@
             "description": "Last updated timestamp"
           }
         },
-        "required": [
-          "currency_code",
-          "balance",
-          "last_updated"
-        ]
+        "required": ["currency_code", "balance", "last_updated"]
       },
       "BalanceBreakdownResponseDto": {
         "type": "object",
@@ -3395,11 +3206,7 @@
           "verification_status": {
             "type": "string",
             "example": "verified",
-            "enum": [
-              "unverified",
-              "starter",
-              "verified"
-            ],
+            "enum": ["unverified", "starter", "verified"],
             "description": "KYC verification status"
           },
           "website_url": {
@@ -3415,21 +3222,13 @@
           "status": {
             "type": "string",
             "example": "active",
-            "enum": [
-              "active",
-              "inactive",
-              "suspended"
-            ],
+            "enum": ["active", "inactive", "suspended"],
             "description": "Organization status"
           },
           "default_currency": {
             "type": "string",
             "example": "XOF",
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ],
+            "enum": ["XOF", "USD", "EUR"],
             "description": "Default currency"
           },
           "slug": {
@@ -3636,11 +3435,7 @@
             "type": "string",
             "example": "payment",
             "description": "Transaction type",
-            "enum": [
-              "payment",
-              "refund",
-              "payout"
-            ]
+            "enum": ["payment", "refund", "payout"]
           },
           "status": {
             "type": "string",
@@ -3759,10 +3554,7 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
+            "enum": ["test", "live"]
           },
           "created_at": {
             "type": "string",
@@ -3884,10 +3676,7 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
+            "enum": ["test", "live"]
           },
           "created_at": {
             "type": "string",
@@ -4184,33 +3973,20 @@
             "type": "string",
             "example": "XOF",
             "description": "Currency code",
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ]
+            "enum": ["XOF", "USD", "EUR"]
           },
           "billing_interval": {
             "type": "string",
             "example": "month",
             "description": "Billing interval for recurring products",
-            "enum": [
-              "day",
-              "week",
-              "month",
-              "year"
-            ],
+            "enum": ["day", "week", "month", "year"],
             "nullable": true
           },
           "pricing_model": {
             "type": "string",
             "example": "standard",
             "description": "Pricing model",
-            "enum": [
-              "standard",
-              "pay_what_you_want",
-              "tiered"
-            ]
+            "enum": ["standard", "pay_what_you_want", "tiered"]
           },
           "minimum_amount": {
             "type": "number",
@@ -4296,16 +4072,10 @@
             "type": "string",
             "example": "recurring",
             "description": "Product type",
-            "enum": [
-              "one_time",
-              "recurring",
-              "usage_based"
-            ]
+            "enum": ["one_time", "recurring", "usage_based"]
           },
           "images": {
-            "example": [
-              "https://example.com/image.png"
-            ],
+            "example": ["https://example.com/image.png"],
             "description": "Product images URLs",
             "nullable": true,
             "type": "array",
@@ -4335,11 +4105,7 @@
             "type": "string",
             "example": "pause",
             "description": "Action to take on failed payment",
-            "enum": [
-              "pause",
-              "cancel",
-              "retry"
-            ],
+            "enum": ["pause", "cancel", "retry"],
             "nullable": true
           },
           "charge_day": {
@@ -4352,11 +4118,7 @@
             "type": "string",
             "example": "initial",
             "description": "When to charge first payment",
-            "enum": [
-              "initial",
-              "non_initial",
-              "prorated"
-            ],
+            "enum": ["initial", "non_initial", "prorated"],
             "nullable": true
           },
           "trial_enabled": {
@@ -4374,12 +4136,7 @@
             "type": "string",
             "example": "sum",
             "description": "Usage aggregation method",
-            "enum": [
-              "sum",
-              "max",
-              "last_during_period",
-              "last_ever"
-            ],
+            "enum": ["sum", "max", "last_during_period", "last_ever"],
             "nullable": true
           },
           "usage_unit": {
@@ -4392,10 +4149,7 @@
             "type": "string",
             "example": "live",
             "description": "Environment",
-            "enum": [
-              "test",
-              "live"
-            ]
+            "enum": ["test", "live"]
           },
           "prices": {
             "description": "Product prices",
@@ -4518,10 +4272,7 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
+            "enum": ["test", "live"]
           },
           "created_at": {
             "type": "string",
@@ -4572,10 +4323,7 @@
             "type": "string",
             "example": "percentage",
             "description": "Type of discount",
-            "enum": [
-              "percentage",
-              "fixed"
-            ]
+            "enum": ["percentage", "fixed"]
           },
           "discount_percentage": {
             "type": "number",
@@ -4593,11 +4341,7 @@
             "type": "string",
             "example": "all",
             "description": "Customer type this coupon applies to",
-            "enum": [
-              "all",
-              "new",
-              "existing"
-            ]
+            "enum": ["all", "new", "existing"]
           },
           "is_active": {
             "type": "boolean",
@@ -4625,11 +4369,7 @@
             "type": "string",
             "example": "total",
             "description": "Usage frequency limit type",
-            "enum": [
-              "total",
-              "per_customer",
-              "per_customer_per_product"
-            ]
+            "enum": ["total", "per_customer", "per_customer_per_product"]
           },
           "usage_limit_value": {
             "type": "number",
@@ -4666,10 +4406,7 @@
             ]
           },
           "applies_to_product_types": {
-            "example": [
-              "one_time",
-              "recurring"
-            ],
+            "example": ["one_time", "recurring"],
             "description": "Product types this coupon applies to",
             "nullable": true,
             "type": "array",
@@ -4681,10 +4418,7 @@
             "type": "string",
             "example": "live",
             "description": "Environment (test or live)",
-            "enum": [
-              "test",
-              "live"
-            ]
+            "enum": ["test", "live"]
           },
           "created_at": {
             "type": "string",
@@ -5425,21 +5159,13 @@
             "type": "string",
             "example": "XOF",
             "description": "Currency code",
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ]
+            "enum": ["XOF", "USD", "EUR"]
           },
           "currency": {
             "type": "string",
             "example": "XOF",
             "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
-            "enum": [
-              "XOF",
-              "USD",
-              "EUR"
-            ]
+            "enum": ["XOF", "USD", "EUR"]
           },
           "customer_id": {
             "type": "string",
@@ -5498,13 +5224,7 @@
           "appearance_theme": {
             "type": "string",
             "example": "stripe",
-            "enum": [
-              "light",
-              "dark",
-              "flat",
-              "stripe",
-              "night"
-            ],
+            "enum": ["light", "dark", "flat", "stripe", "night"],
             "description": "Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility."
           },
           "appearance_border_radius": {
@@ -5515,16 +5235,11 @@
           "appearance_billing_address": {
             "type": "string",
             "example": "never",
-            "enum": [
-              "auto",
-              "never"
-            ],
+            "enum": ["auto", "never"],
             "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
           }
         },
-        "required": [
-          "amount"
-        ]
+        "required": ["amount"]
       },
       "PaymentIntentAppearanceDto": {
         "type": "object",
@@ -5599,10 +5314,7 @@
             "$ref": "#/components/schemas/PaymentIntentDataDto"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "CreateWorkflowDto": {
         "type": "object",

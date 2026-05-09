@@ -38,7 +38,7 @@ export class CheckoutSessionsController {
   @ApiOperation({
     summary: 'Créer une session de paiement',
     description:
-      "Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.",
+      'Crée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.',
   })
   @ApiResponse({
     status: 201,

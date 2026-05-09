@@ -23,7 +23,7 @@ export class ChargesController {
   @ApiResponse({
     status: 201,
     description:
-      "Encaissement initié (corps JSON renvoyé par la fonction edge Wave)",
+      'Encaissement initié (corps JSON renvoyé par la fonction edge Wave)',
     schema: {
       type: 'object',
       additionalProperties: true,

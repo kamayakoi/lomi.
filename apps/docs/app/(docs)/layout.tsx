@@ -58,7 +58,10 @@ function localizeTreeLabel(value: ReactNode, locale: Language): ReactNode {
   return translate(key, locale);
 }
 
-function localizeTreeDescription(value: ReactNode, locale: Language): ReactNode {
+function localizeTreeDescription(
+  value: ReactNode,
+  locale: Language,
+): ReactNode {
   if (typeof value !== 'string') return value;
 
   const key = SECTION_DESCRIPTION_KEYS[value];

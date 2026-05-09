@@ -48,7 +48,10 @@ type SchemaObject = {
 
 type PathItemObject = {
   parameters?: (ParameterObject | ReferenceObject)[];
-} & Record<string, OperationObject | (ParameterObject | ReferenceObject)[] | undefined>;
+} & Record<
+  string,
+  OperationObject | (ParameterObject | ReferenceObject)[] | undefined
+>;
 
 const HTTP_OPS = ['get', 'post', 'put', 'patch', 'delete'] as const;
 type DocsLanguage = 'en' | 'fr';
@@ -205,7 +208,10 @@ function schemaTypeLabel(
   if (!schema) return 'object';
   if (isRef(schema)) return getSchemaNameFromRef(schema.$ref);
   if (schema.enum?.length) {
-    const values = schema.enum.slice(0, 3).map((v) => JSON.stringify(v)).join(', ');
+    const values = schema.enum
+      .slice(0, 3)
+      .map((v) => JSON.stringify(v))
+      .join(', ');
     return `enum (${values}${schema.enum.length > 3 ? ', ...' : ''})`;
   }
   if (schema.type === 'array') {
@@ -225,7 +231,11 @@ function toSampleValue(
   if (!schema) return 'value';
   if (depth > 3) return '...';
   if (isRef(schema)) {
-    return toSampleValue(resolveSchema(schema, components), components, depth + 1);
+    return toSampleValue(
+      resolveSchema(schema, components),
+      components,
+      depth + 1,
+    );
   }
   if (schema.example !== undefined) return schema.example;
   if (schema.enum && schema.enum.length > 0) return schema.enum[0];
@@ -241,7 +251,9 @@ function toSampleValue(
     const required = new Set(schema.required ?? []);
     const keys = Object.keys(properties);
     const chosen =
-      required.size > 0 ? [...required].filter((k) => k in properties) : keys.slice(0, 3);
+      required.size > 0
+        ? [...required].filter((k) => k in properties)
+        : keys.slice(0, 3);
     for (const key of chosen) {
       out[key] = toSampleValue(properties[key], components, depth + 1);
     }
@@ -257,12 +269,16 @@ function paramRow(
   if ('$ref' in p || !('in' in p)) return '';
   const required = 'required' in p && p.required ? labels.yes : labels.no;
   const schema =
-    'schema' in p && p.schema && typeof p.schema === 'object' && '$ref' in p.schema
-      ? ((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? ''
+    'schema' in p &&
+    p.schema &&
+    typeof p.schema === 'object' &&
+    '$ref' in p.schema
+      ? (((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? '')
       : '';
-  const desc = 'description' in p && typeof p.description === 'string'
-    ? escapeMdxText(p.description)
-    : '';
+  const desc =
+    'description' in p && typeof p.description === 'string'
+      ? escapeMdxText(p.description)
+      : '';
   const nameCell = '`' + (p.name ?? '') + '`';
   const schemaCell = schema ? `\`${schema}\`` : '—';
   return `| ${nameCell} | ${String(p.in)} | ${required} | ${schemaCell} | ${desc} |`;
@@ -287,7 +303,12 @@ function responseRows(
   const rows: string[] = [];
   for (const [code, res] of Object.entries(responses)) {
     let desc = '';
-    if (!isRef(res) && typeof res === 'object' && res !== null && 'description' in res) {
+    if (
+      !isRef(res) &&
+      typeof res === 'object' &&
+      res !== null &&
+      'description' in res
+    ) {
       desc = escapeMdxText((res as ResponseObject).description ?? '');
     }
     rows.push(`| \`${code}\` | ${desc || '—'} |`);
@@ -304,12 +325,9 @@ function buildRequestBodySection(
   if (!rb || isRef(rb)) {
     return {
       sampleBody: null,
-      section: [
-        `### ${labels.requestBody}`,
-        '',
-        labels.noJsonBody,
-        '',
-      ].join('\n'),
+      section: [`### ${labels.requestBody}`, '', labels.noJsonBody, ''].join(
+        '\n',
+      ),
     };
   }
 
@@ -343,7 +361,9 @@ function buildRequestBodySection(
     );
     lines.push('| --- | --- | --- | --- |');
     const required = new Set(resolvedSchema.required ?? []);
-    for (const [field, fieldSchema] of Object.entries(resolvedSchema.properties)) {
+    for (const [field, fieldSchema] of Object.entries(
+      resolvedSchema.properties,
+    )) {
       const fieldType = schemaTypeLabel(fieldSchema, components);
       const fieldDesc = isSchemaObject(fieldSchema)
         ? escapeMdxText(fieldSchema.description)
@@ -397,12 +417,16 @@ export function renderOperationPageMdx(input: {
     ? `\n\n${escapeMdxText(overviewDetail)}\n`
     : '';
 
-  const servers = ['https://sandbox.api.lomi.africa', 'https://api.lomi.africa'];
+  const servers = [
+    'https://sandbox.api.lomi.africa',
+    'https://api.lomi.africa',
+  ];
   const endpointLine = `\`${method.toUpperCase()} ${path}\``;
 
   const pathLevelParams =
-    pathItem?.parameters?.filter((p): p is ParameterObject => !isRef(p) && 'in' in p) ??
-    [];
+    pathItem?.parameters?.filter(
+      (p): p is ParameterObject => !isRef(p) && 'in' in p,
+    ) ?? [];
 
   const opParams = [...pathLevelParams];
   if (Array.isArray(operation.parameters)) {
@@ -426,8 +450,13 @@ export function renderOperationPageMdx(input: {
             pathParams.map((p) => {
               const req = p.required ? labels.yes : labels.no;
               const schema =
-                'schema' in p && p.schema && typeof p.schema === 'object' && '$ref' in p.schema
-                  ? ((p.schema as ReferenceObject).$ref ?? '').split('/').pop() ?? ''
+                'schema' in p &&
+                p.schema &&
+                typeof p.schema === 'object' &&
+                '$ref' in p.schema
+                  ? (((p.schema as ReferenceObject).$ref ?? '')
+                      .split('/')
+                      .pop() ?? '')
                   : '';
               const desc =
                 'description' in p && typeof p.description === 'string'
@@ -460,7 +489,8 @@ export function renderOperationPageMdx(input: {
           '',
         ].join('\n');
 
-  const shouldHaveBody = mLower === 'post' || mLower === 'put' || mLower === 'patch';
+  const shouldHaveBody =
+    mLower === 'post' || mLower === 'put' || mLower === 'patch';
   const requestBody = shouldHaveBody
     ? buildRequestBodySection(operation, components, labels)
     : { section: '', sampleBody: null };
@@ -469,16 +499,18 @@ export function renderOperationPageMdx(input: {
   const responseTable =
     responseRows(operation.responses).length === 0
       ? labels.responseFallback
-      : [`| ${labels.status} | ${labels.description} |`, '| --- | --- |', ...responseRows(operation.responses)].join(
-          '\n',
-        );
+      : [
+          `| ${labels.status} | ${labels.description} |`,
+          '| --- | --- |',
+          ...responseRows(operation.responses),
+        ].join('\n');
 
   const yamlTitle = JSON.stringify(titleSource);
   const yamlDescription = JSON.stringify(
     enCopy
       ? titleSource
-      : operation.summary ??
-          `${method.toUpperCase()} ${path} — see REST API reference`,
+      : (operation.summary ??
+          `${method.toUpperCase()} ${path} — see REST API reference`),
   );
 
   const pathSample = new Map(
@@ -490,7 +522,10 @@ export function renderOperationPageMdx(input: {
   );
   const queryExample = queryParams
     .slice(0, 2)
-    .map((p) => `${encodeURIComponent(p.name ?? 'param')}=${parameterSampleValue(p)}`)
+    .map(
+      (p) =>
+        `${encodeURIComponent(p.name ?? 'param')}=${parameterSampleValue(p)}`,
+    )
     .join('&');
   const fullPath = queryExample ? `${urlPath}?${queryExample}` : urlPath;
 
@@ -583,7 +618,12 @@ ${
 
 export function collectPublicOperations(spec: {
   paths?: Record<string, PathItemObject>;
-}): { method: string; path: string; operationId: string; operation: OperationObject }[] {
+}): {
+  method: string;
+  path: string;
+  operationId: string;
+  operation: OperationObject;
+}[] {
   const out: {
     method: string;
     path: string;
@@ -597,7 +637,12 @@ export function collectPublicOperations(spec: {
     for (const m of HTTP_OPS) {
       const op = item[m] as OperationObject | undefined;
       if (!op?.operationId) continue;
-      out.push({ method: m, path: p, operationId: op.operationId, operation: op });
+      out.push({
+        method: m,
+        path: p,
+        operationId: op.operationId,
+        operation: op,
+      });
     }
   }
   return out;

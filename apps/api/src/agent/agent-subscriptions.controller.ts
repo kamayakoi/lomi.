@@ -70,10 +70,7 @@ export class AgentSubscriptionsController {
   @ApiOperation({ summary: 'Supprimer un abonnement' })
   @ApiResponse({ status: 200, description: 'Supprimé' })
   @ApiResponse({ status: 404, description: 'Introuvable' })
-  remove(
-    @CurrentUser() user: AuthContext,
-    @Param('id') id: string,
-  ) {
+  remove(@CurrentUser() user: AuthContext, @Param('id') id: string) {
     const ok = this.store.delete(user.organizationId, id);
     if (!ok) {
       throw new NotFoundException('Subscription not found');

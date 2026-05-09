@@ -41,10 +41,7 @@ export class AgentSubscriptionsStore {
     );
   }
 
-  get(
-    organizationId: string,
-    id: string,
-  ): AgentSubscriptionRecord | undefined {
+  get(organizationId: string, id: string): AgentSubscriptionRecord | undefined {
     const r = this.store.get(id);
     if (!r || r.organization_id !== organizationId) return undefined;
     return r;

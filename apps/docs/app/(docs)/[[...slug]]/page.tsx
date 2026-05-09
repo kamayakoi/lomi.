@@ -217,7 +217,7 @@ export async function generateMetadata({
 export function generateStaticParams() {
   const list = source
     .getPages('en')
-    .map((p) => ({ slug: p.slugs } as { slug: string[] }));
+    .map((p) => ({ slug: p.slugs }) as { slug: string[] });
   const withoutEmpty = list.filter((p) => (p.slug?.length ?? 0) > 0);
   return [{ slug: [] }, ...withoutEmpty];
 }

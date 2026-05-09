@@ -43,7 +43,9 @@ const requiredPaths = [
 ];
 for (const p of requiredPaths) {
   if (!spec.paths[p]) {
-    throw new Error(`OpenAPI must include path ${p} (re-run apps/api: pnpm run openapi:export)`);
+    throw new Error(
+      `OpenAPI must include path ${p} (re-run apps/api: pnpm run openapi:export)`,
+    );
   }
 }
 

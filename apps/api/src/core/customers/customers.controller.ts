@@ -63,7 +63,7 @@ export class CustomersController {
     name: 'status',
     required: false,
     description:
-      "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)",
+      'Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)',
     enum: ['active', 'inactive', 'all'],
   })
   @ApiQuery({
@@ -156,7 +156,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Créer un client',
     description:
-      "Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.",
+      'Crée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.',
   })
   @ApiResponse({
     status: 201,

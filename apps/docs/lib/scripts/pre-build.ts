@@ -54,7 +54,11 @@ async function normalizeOpenApiSecurityFile(): Promise<void> {
   const raw = await readFile(openApiPath, 'utf-8');
   const spec = JSON.parse(raw) as Document;
   const normalized = normalizeOpenApiSecurity(spec);
-  await writeFile(openApiPath, `${JSON.stringify(normalized, null, 2)}\n`, 'utf-8');
+  await writeFile(
+    openApiPath,
+    `${JSON.stringify(normalized, null, 2)}\n`,
+    'utf-8',
+  );
 }
 
 async function refreshOpenApiArtifacts(): Promise<void> {

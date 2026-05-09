@@ -69,7 +69,7 @@ export class WebhookDeliveryLogsController {
   @ApiQuery({
     name: 'offset',
     required: false,
-    description: "Nombre de journaux à ignorer (pagination)",
+    description: 'Nombre de journaux à ignorer (pagination)',
     type: Number,
     example: 0,
   })

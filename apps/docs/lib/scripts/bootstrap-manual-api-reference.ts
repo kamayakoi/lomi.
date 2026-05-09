@@ -49,8 +49,9 @@ async function main(): Promise<void> {
 
   const all = collectPublicOperations(spec);
   const merchant = all.filter((o) => !isAgentRoute(o.path));
-  const schemaComponents = (spec as { components?: { schemas?: Record<string, unknown> } })
-    .components?.schemas;
+  const schemaComponents = (
+    spec as { components?: { schemas?: Record<string, unknown> } }
+  ).components?.schemas;
 
   const byFolder = new Map<string, typeof merchant>();
   for (const entry of merchant) {
@@ -156,9 +157,14 @@ async function main(): Promise<void> {
     `Manual API docs: wrote ${merchant.length} operations across ${byFolder.size} folders.`,
   );
 
-  const openapiOnly = merchant.map((o) => `${o.method.toUpperCase()} ${o.path}`).sort();
+  const openapiOnly = merchant
+    .map((o) => `${o.method.toUpperCase()} ${o.path}`)
+    .sort();
   writeFileSync(
-    join(process.cwd(), 'lib/scripts/manual-api/_expected-public-operations.json'),
+    join(
+      process.cwd(),
+      'lib/scripts/manual-api/_expected-public-operations.json',
+    ),
     `${JSON.stringify(openapiOnly, null, 2)}\n`,
     'utf-8',
   );

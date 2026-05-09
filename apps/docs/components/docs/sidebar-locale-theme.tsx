@@ -43,10 +43,7 @@ export function DocsSidebarLocaleAndTheme({
             'hover:bg-fd-accent/30',
           )}
         >
-          <Languages
-            className="size-3.5 shrink-0 opacity-90"
-            aria-hidden
-          />
+          <Languages className="size-3.5 shrink-0 opacity-90" aria-hidden />
           <span className="sr-only">Documentation language</span>
           <select
             aria-label="Documentation language"

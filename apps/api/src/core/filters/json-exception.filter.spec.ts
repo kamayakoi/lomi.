@@ -2,9 +2,12 @@ import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 import { GlobalJsonExceptionFilter } from './json-exception.filter';
 
-function mockHost(
-  res: { status: jest.Mock; json: jest.Mock; setHeader: jest.Mock; headersSent: boolean },
-) {
+function mockHost(res: {
+  status: jest.Mock;
+  json: jest.Mock;
+  setHeader: jest.Mock;
+  headersSent: boolean;
+}) {
   return {
     switchToHttp: () => ({
       getResponse: () => res,
@@ -24,7 +27,10 @@ describe('GlobalJsonExceptionFilter', () => {
       headersSent: false,
     };
     filter.catch(new ThrottlerException('Too many'), mockHost(res));
-    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', expect.any(String));
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'Retry-After',
+      expect.any(String),
+    );
     expect(res.status).toHaveBeenCalledWith(429);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({

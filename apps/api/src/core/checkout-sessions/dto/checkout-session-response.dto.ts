@@ -18,7 +18,8 @@ export class CheckoutSessionResponseDto {
   checkout_session_id: string;
 
   @ApiProperty({
-    example: 'https://checkout.lomi.africa/checkout/123e4567-e89b-12d3-a456-426614174000',
+    example:
+      'https://checkout.lomi.africa/checkout/123e4567-e89b-12d3-a456-426614174000',
     type: String,
   })
   checkout_url: string;

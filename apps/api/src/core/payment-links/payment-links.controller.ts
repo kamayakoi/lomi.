@@ -41,7 +41,7 @@ export class PaymentLinksController {
   @ApiOperation({
     summary: 'Créer un lien de paiement',
     description:
-      "Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.",
+      'Crée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.',
   })
   @ApiResponse({
     status: 201,
@@ -179,8 +179,7 @@ export class PaymentLinksController {
   @Get(':id')
   @ApiOperation({
     summary: 'Obtenir un lien de paiement par ID',
-    description:
-      'Renvoie le détail d’un lien (URL, configuration et statut).',
+    description: 'Renvoie le détail d’un lien (URL, configuration et statut).',
   })
   @ApiParam({
     name: 'id',
