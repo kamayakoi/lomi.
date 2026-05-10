@@ -19,6 +19,7 @@ import {
   listenHostOptions,
   mcpHttpBasePath,
 } from './env-config.js';
+import { extractSessionMerchantApiKey } from './session-merchant-key.js';
 
 function warnProductionWithoutBearer(): void {
   if (
@@ -52,22 +53,6 @@ function bearerAuthMiddleware(
   next();
 }
 
-function firstHeaderValue(
-  value: string | string[] | undefined,
-): string | null {
-  if (!value) return null;
-  if (Array.isArray(value)) return value[0]?.trim() || null;
-  return value.trim() || null;
-}
-
-/** Per-session merchant key from client-provided headers (preferred over server env). */
-function extractSessionMerchantApiKey(req: Request): string | null {
-  const userProvided =
-    firstHeaderValue(req.headers['x-lomi-api-key']) ??
-    firstHeaderValue(req.headers['x-api-key']);
-  return userProvided && userProvided.length > 0 ? userProvided : null;
-}
-
 /** One MCP server instance per Streamable HTTP session (SDK pattern). */
 function createSessionMcpServer(
   manifest: ToolsManifest,
@@ -79,7 +64,9 @@ function createSessionMcpServer(
       instructions: [
         'Hosted MCP server for the lomi. merchant REST API.',
         'Client auth for MCP transport can use LOMI_MCP_BEARER_TOKEN when configured.',
-        'Merchant REST auth uses per-session x-lomi-api-key / x-api-key header when provided; server-side LOMI_API_KEY is fallback only.',
+        'Merchant REST auth: prefer x-lomi-api-key / x-api-key (e.g. lomi_mcp_* from dashboard connect).',
+        'When LOMI_MCP_BEARER_TOKEN is unset, Authorization: Bearer <lomi_* merchant key> is accepted.',
+        'Server-side LOMI_API_KEY is a fallback for single-tenant deployments only.',
       ].join('\n'),
     },
   );

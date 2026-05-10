@@ -25,21 +25,38 @@ Default endpoint:
 - MCP: `https://<your-host>/mcp`
 - Health: `https://<your-host>/health`
 
-## Authentication model (current)
+## Authentication model
 
-The hosted MCP server supports two key modes:
+### Merchant credential (REST)
 
-1. **Preferred (multi-user):** user sends their own merchant key in request headers:
-   - `x-lomi-api-key: <merchant_api_key>` (or `x-api-key`)
-2. **Fallback (single-tenant):** server env `LOMI_API_KEY`
+Tool calls need a valid merchant API key (same keys as the REST API):
 
-MCP transport access can be protected with:
+1. **Recommended:** `x-lomi-api-key` or `x-api-key` on MCP HTTP requests (especially when `LOMI_MCP_BEARER_TOKEN` protects the route).
+2. **Optional:** `Authorization: Bearer <lomi_* key>` is accepted **only when** `LOMI_MCP_BEARER_TOKEN` is **not** configured (typical local/dev setups).
+
+### MCP transport gate
+
+When set, clients must send:
 
 - `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`
 
+`/health` stays unauthenticated for probes.
+
 <Callout type="info">
-  For multi-merchant production, prefer per-user `x-lomi-api-key` instead of a single server-level `LOMI_API_KEY`.
+  For multi-merchant production, avoid a single server-wide `LOMI_API_KEY`; pass per-user keys via headers instead.
 </Callout>
+
+## Dashboard connect flow (device authorization)
+
+Merchants can approve MCP access in the browser—similar to CLI login—without hunting for an existing API key copy/paste:
+
+1. **Start session:** `POST https://<supabase-project>.supabase.co/functions/v1/mcp-auth/device-auth`  
+   Response includes `device_code`, `user_code`, `verification_uri`, `interval`, `expires_in`.
+2. **Browser:** User opens `verification_uri` (`/connect/mcp-verify` on the dashboard), signs in if needed, enters `user_code`, and authorizes.
+3. **Poll token:** `POST …/mcp-auth/token` with JSON `{ "device_code": "<device_code>" }` until it returns `{ "api_key": "lomi_mcp_…", "token_type": "bearer" }` (while pending, the endpoint responds like OAuth device flow with `authorization_pending`).
+4. **Use with MCP:** Configure the HTTP MCP client to send `x-lomi-api-key: <api_key>` on initialize (and transport bearer if your host requires it).
+
+**Deploy requirements:** apply the `mcp_device_requests` migration and deploy the **`mcp-auth`** Supabase Edge Function (`apps/dashboard/supabase/functions/mcp-auth`).
 
 ## Railway deployment (quick path)
 
@@ -54,19 +71,10 @@ MCP transport access can be protected with:
 
 ## Client configuration expectations
 
-When connecting to hosted MCP, each user should provide:
+Hosted MCP users typically configure:
 
-- MCP bearer token (if enabled)
-- Their own Lomi merchant API key header
+- MCP URL (`https://<host>/mcp` or custom `LOMI_MCP_HTTP_PATH`)
+- Optional transport bearer (`LOMI_MCP_BEARER_TOKEN`)
+- Merchant credential header (`x-lomi-api-key`) from the dashboard connect flow or from **Developers → API keys**
 
-This keeps merchant ownership isolated without asking users to self-host.
-
-## Next UX improvement
-
-The best experience is dashboard OAuth-style connection:
-
-1. user signs in on dashboard
-2. user approves MCP access
-3. MCP receives merchant-scoped token
-
-Header-based keys work now; OAuth can be added later for a one-click connect flow.
+See `apps/mcp/README.md` for Cursor / HTTP examples.

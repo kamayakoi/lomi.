@@ -108,10 +108,12 @@ LOMI_MCP_BEARER_TOKEN=local-dev-secret pnpm run smoke:http
 docker build -t lomi-mcp ./apps/mcp
 docker run --rm -p 3333:3333 \
   -e LOMI_MCP_BEARER_TOKEN=change-me \
-  -e LOMI_API_KEY=merchant-secret \
   -e LOMI_API_BASE_URL=https://api.lomi.africa \
   -e LOMI_API_BASE_URL_ALLOWLIST=api.lomi.africa \
   lomi-mcp
+
+# Clients send merchant credentials via `x-lomi-api-key` / `x-api-key`, or (when
+# `LOMI_MCP_BEARER_TOKEN` is unset) `Authorization: Bearer <lomi_* key>`.
 ```
 
 ### Observability
@@ -140,21 +142,29 @@ docker run --rm -p 3333:3333 \
 
 For shared hosted MCP, each user should provide:
 
-- `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>` to access the MCP server
-- `x-lomi-api-key: <their_merchant_key>` (or `x-api-key`) to execute tools under their own merchant account
+- `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>` to access the MCP server (when configured)
+- Merchant credential for tool calls, in order of precedence:
+  - `x-lomi-api-key: <key>` or `x-api-key: <key>` (**recommended when transport bearer is enabled**)
+  - otherwise `Authorization: Bearer <lomi_* merchant key>` is accepted **only if** `LOMI_MCP_BEARER_TOKEN` is unset (dev/single-header clients)
 
-This avoids hardcoding one merchant key server-side.
+Use a **`lomi_mcp_*` key from the dashboard connect flow** or any valid merchant secret key.
 
-### Better auth UX (next step)
+### Dashboard device flow (recommended UX)
 
-Best UX is dashboard-backed OAuth/login and token exchange (instead of manually pasting API keys). That is feasible, but requires a separate auth flow:
+1. Your MCP client or helper script calls  
+   `POST https://<project>.supabase.co/functions/v1/mcp-auth/device-auth`  
+   (no body). Save `device_code`, `user_code`, and `verification_uri`.
+2. User opens `verification_uri` (e.g. `https://dashboard…/connect/mcp-verify`), signs in, enters `user_code`, and clicks **Authorize**.
+3. Client polls  
+   `POST …/mcp-auth/token` with `{ "device_code": "<device_code>" }`  
+   until it receives `{ "api_key": "lomi_mcp_…" }` (same polling semantics as CLI login).
+4. Configure hosted MCP with `x-lomi-api-key: <api_key>` on the MCP initialize request (and `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>` when your deployment uses it).
 
-1. user signs in on `apps/dashboard`
-2. user approves MCP access + scopes
-3. MCP receives an access token / merchant context
-4. tools execute with that merchant context
+Deploy **`mcp-auth`** edge function + DB migration `mcp_device_requests` before enabling this flow in production.
 
-Current implementation supports header-based per-user keys now, which is the quickest secure path before full OAuth UX.
+### Legacy / manual keys
+
+Users can still paste an existing merchant API key into `x-lomi-api-key` without using the device flow.
 
 ### Regenerating after API changes
 
