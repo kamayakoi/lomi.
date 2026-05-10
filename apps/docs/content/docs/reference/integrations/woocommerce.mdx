@@ -1,0 +1,61 @@
+---
+title: WooCommerce
+description:
+  Install and configure the lomi. WooCommerce gateway — hosted checkout
+  sessions, return handler, and signed webhooks.
+---
+
+# WooCommerce
+
+WordPress plugin that redirects shoppers to **Lomi hosted checkout** and confirms payment via the WooCommerce REST listener plus merchant webhooks.
+
+## Requirements
+
+- WordPress **6.2+**, PHP **7.4+**
+- WooCommerce **9.6+** (see plugin header in source)
+- Store currency **XOF**, **USD**, or **EUR** (gateway validates supported currencies)
+- HTTPS recommended for production
+
+Source: [plugin header / readme](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/woo-lomi.php)
+
+## Setup checklist
+
+1. Install **lomi. WooCommerce Payment Gateway** and activate WooCommerce.
+2. Go to **WooCommerce → Settings → Payments → lomi.** (or **Set up**).
+3. Enable the gateway; choose **Test mode** while integrating.
+4. Paste **Test/Live secret API keys** and matching **webhook signing secrets** from [dashboard.lomi.africa](https://dashboard.lomi.africa).
+5. Copy the **webhook URL** shown in red at the top of the settings page into **Dashboard → Developer / Webhooks** (same signing secret as configured in Woo).
+
+## Payment flow
+
+1. Customer selects **lomi.** and places the order.
+2. Plugin calls `POST /v1/checkout-sessions` with success/cancel URLs and metadata (`wc_order_id`, etc.).
+3. Customer completes payment on Lomi Checkout.
+4. **Return URL** hits the WooCommerce API listener (`WC_Gateway_Lomi`), which loads `GET /v1/checkout-sessions/{id}` and completes the order when status is `completed`.
+5. **Webhook** `PAYMENT_SUCCEEDED` can finalize the order if the return URL is delayed; signature verified with `X-Lomi-Signature` over the raw body.
+
+Implementation reference: [`class-wc-gateway-lomi.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/includes/class-wc-gateway-lomi.php)
+
+## Webhooks
+
+| Header | Role |
+| --- | --- |
+| `X-Lomi-Event` | Must be `PAYMENT_SUCCEEDED` for capture logic |
+| `X-Lomi-Signature` | HMAC-SHA256 hex of raw body, secret = dashboard webhook secret |
+
+Always verify on the **exact raw bytes** received — do not re-stringify JSON.
+
+## Go-live and QA
+
+Use the shared checklist before production:
+
+- [Integration QA checklist](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md)
+
+Technical contract (aligned with Magento / Presta):
+
+- [Platform plugins integration contract](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md)
+
+## More docs
+
+- [E‑commerce extensions hub](/reference/integrations)
+- Merchant-facing readme (WordPress.org format): [readme.txt](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/woo/readme.txt)

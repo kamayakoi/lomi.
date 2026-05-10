@@ -1,0 +1,48 @@
+---
+title: PrestaShop
+description:
+  PrestaShop 1.7+ module — hosted checkout sessions, module webhook controller,
+  signed webhooks.
+---
+
+# PrestaShop
+
+Module under **`lomi/`** in the monorepo: hosted checkout via `POST /v1/checkout-sessions` and verification via `GET /v1/checkout-sessions/{id}`.
+
+## Requirements
+
+- PrestaShop **1.7+**
+- Shop currency **EUR**, **USD**, or **XOF**
+
+## Install
+
+1. Zip the **`lomi`** folder from [`apps/plugins/prestashop/lomi`](https://github.com/lomiafrica/lomi./tree/master/apps/plugins/prestashop/lomi).
+2. **Back office → Modules → Upload a module**.
+3. Configure **test/live secret keys**, **webhook signing secret**, and **test mode** switch.
+4. Webhook URL is displayed on the module configuration page.
+
+Detailed steps: [PrestaShop module README](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/README.md)
+
+## Webhook URL
+
+Point your Lomi dashboard webhook to:
+
+`https://YOUR-SHOP/index.php?fc=module&module=lomi&controller=webhook`
+
+Your shop may expose a **friendly URL** for the same controller — either works if it reaches the module front controller.
+
+## Payment flow
+
+1. Customer chooses **Pay with lomi.** → POST to **validation** controller creates the checkout session and redirects to Lomi Checkout.
+2. **callback** controller verifies the session (cart id + customer secure key), then validates the PrestaShop order when status is `completed` and amount/currency match.
+
+Source: [`validation.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/validation.php), [`callback.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/callback.php), [`webhook.php`](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/prestashop/lomi/controllers/front/webhook.php)
+
+## Shared docs
+
+- [Platform plugins integration contract](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_CONTRACT.md)
+- [Integration QA checklist](https://github.com/lomiafrica/lomi./blob/master/apps/plugins/INTEGRATION_QA_CHECKLIST.md)
+
+## More docs
+
+- [E‑commerce extensions hub](/reference/integrations)

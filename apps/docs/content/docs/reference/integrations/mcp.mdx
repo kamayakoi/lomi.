@@ -1,0 +1,72 @@
+---
+title: MCP integration
+description: Connect AI clients to Lomi via the hosted MCP server.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# MCP integration
+
+Use Lomi MCP to let tools like Cursor and Claude call your merchant API through a standardized MCP interface.
+
+## What this server provides
+
+- OpenAPI-driven MCP tools generated from Lomi public API
+- Hosted HTTP streamable MCP endpoint
+- Local stdio mode for development
+- Optional MCP bearer gate (`LOMI_MCP_BEARER_TOKEN`)
+
+## Hosted endpoint for your users
+
+For real users, deploy one hosted MCP service (for example on Railway) and share the MCP URL.
+
+Default endpoint:
+
+- MCP: `https://<your-host>/mcp`
+- Health: `https://<your-host>/health`
+
+## Authentication model (current)
+
+The hosted MCP server supports two key modes:
+
+1. **Preferred (multi-user):** user sends their own merchant key in request headers:
+   - `x-lomi-api-key: <merchant_api_key>` (or `x-api-key`)
+2. **Fallback (single-tenant):** server env `LOMI_API_KEY`
+
+MCP transport access can be protected with:
+
+- `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`
+
+<Callout type="info">
+  For multi-merchant production, prefer per-user `x-lomi-api-key` instead of a single server-level `LOMI_API_KEY`.
+</Callout>
+
+## Railway deployment (quick path)
+
+1. Create a new Railway service from this repository.
+2. Set root directory to `apps/mcp`.
+3. Deploy with start command `pnpm run start:http` (already configured in `apps/mcp/railway.json`).
+4. Configure env vars:
+   - required: `LOMI_MCP_BEARER_TOKEN`
+   - recommended: `LOMI_API_BASE_URL`, `LOMI_API_BASE_URL_ALLOWLIST`
+   - optional fallback: `LOMI_API_KEY`
+5. Confirm `GET /health` is `200`.
+
+## Client configuration expectations
+
+When connecting to hosted MCP, each user should provide:
+
+- MCP bearer token (if enabled)
+- Their own Lomi merchant API key header
+
+This keeps merchant ownership isolated without asking users to self-host.
+
+## Next UX improvement
+
+The best experience is dashboard OAuth-style connection:
+
+1. user signs in on dashboard
+2. user approves MCP access
+3. MCP receives merchant-scoped token
+
+Header-based keys work now; OAuth can be added later for a one-click connect flow.

@@ -1,0 +1,2113 @@
+{
+  "manifestVersion": 1,
+  "apiVersion": "1.1.0",
+  "apiTitle": "API lomi.",
+  "toolCount": 50,
+  "tools": [
+    {
+      "name": "lomi_delete_customers_id",
+      "operationKey": "DELETE /customers/{id}",
+      "method": "delete",
+      "pathTemplate": "/customers/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Supprimer un client",
+      "description": "Supprimer un client\n\nRetire un client de l'usage actif : il n'apparaît plus dans les listes ni les réponses de détail. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: DELETE /customers/{id}",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_remove",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_accounts",
+      "operationKey": "GET /accounts",
+      "method": "get",
+      "pathTemplate": "/accounts",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lister les comptes",
+      "description": "Lister les comptes\n\nREST: GET /accounts",
+      "tags": [
+        "Comptes"
+      ],
+      "operationId": "AccountsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_accounts_balance",
+      "operationKey": "GET /accounts/balance",
+      "method": "get",
+      "pathTemplate": "/accounts/balance",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "currency"
+      ],
+      "title": "Solde du compte",
+      "description": "Solde du compte\n\nRécupère le solde courant pour toutes les devises ou pour une devise précise\n\nREST: GET /accounts/balance",
+      "tags": [
+        "Comptes"
+      ],
+      "operationId": "AccountsController_getBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string",
+            "description": "Filtrer par code devise (XOF, USD, EUR)"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_accounts_balance_breakdown",
+      "operationKey": "GET /accounts/balance/breakdown",
+      "method": "get",
+      "pathTemplate": "/accounts/balance/breakdown",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "target_currency"
+      ],
+      "title": "Détail du solde",
+      "description": "Détail du solde\n\nRécupère le détail des soldes (disponible, en attente, total). Conversion optionnelle vers une devise cible.\n\nREST: GET /accounts/balance/breakdown",
+      "tags": [
+        "Comptes"
+      ],
+      "operationId": "AccountsController_getBalanceBreakdown",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target_currency": {
+            "enum": [
+              "XOF",
+              "USD",
+              "EUR"
+            ],
+            "type": "string",
+            "description": "Devise cible pour la conversion (XOF, USD, EUR)"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_accounts_balance_check_currency",
+      "operationKey": "GET /accounts/balance/check/{currency}",
+      "method": "get",
+      "pathTemplate": "/accounts/balance/check/{currency}",
+      "pathParamNames": [
+        "currency"
+      ],
+      "queryParamNames": [],
+      "title": "Vérifier le solde disponible",
+      "description": "Vérifier le solde disponible\n\nVérifie si le marchand dispose d’un solde disponible suffisant dans la devise indiquée\n\nREST: GET /accounts/balance/check/{currency}",
+      "tags": [
+        "Comptes"
+      ],
+      "operationId": "AccountsController_checkAvailableBalance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Path parameter \"currency\" for `/accounts/balance/check/{currency}`."
+          }
+        },
+        "required": [
+          "currency"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_accounts_id",
+      "operationKey": "GET /accounts/{id}",
+      "method": "get",
+      "pathTemplate": "/accounts/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un compte par ID",
+      "description": "Obtenir un compte par ID\n\nREST: GET /accounts/{id}",
+      "tags": [
+        "Comptes"
+      ],
+      "operationId": "AccountsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/accounts/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_beneficiary_payouts",
+      "operationKey": "GET /beneficiary-payouts",
+      "method": "get",
+      "pathTemplate": "/beneficiary-payouts",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "currencyCode",
+        "endDate",
+        "startDate",
+        "statuses"
+      ],
+      "title": "Lister les paiements vers bénéficiaires",
+      "description": "Lister les paiements vers bénéficiaires\n\nRenvoie les paiements de l'organisation avec pagination et filtres optionnels (statuts, plage de dates, devise).\n\nREST: GET /beneficiary-payouts",
+      "tags": [
+        "Paiements vers bénéficiaires"
+      ],
+      "operationId": "BeneficiaryPayoutsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currencyCode": {
+            "example": "XOF",
+            "type": "string",
+            "description": "Code devise"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Date de fin (ISO 8601)"
+          },
+          "limit": {
+            "example": 50,
+            "type": "number",
+            "description": "Nombre maximal de résultats"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Décalage pour la pagination"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Date de début (ISO 8601)"
+          },
+          "statuses": {
+            "example": "pending,completed,failed",
+            "type": "string",
+            "description": "Statuts (séparés par des virgules)"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_beneficiary_payouts_id",
+      "operationKey": "GET /beneficiary-payouts/{id}",
+      "method": "get",
+      "pathTemplate": "/beneficiary-payouts/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un paiement bénéficiaire par ID",
+      "description": "Obtenir un paiement bénéficiaire par ID\n\nRenvoie le détail d’un paiement (statut actuel et informations fournisseur).\n\nREST: GET /beneficiary-payouts/{id}",
+      "tags": [
+        "Paiements vers bénéficiaires"
+      ],
+      "operationId": "BeneficiaryPayoutsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du paiement"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_checkout_sessions",
+      "operationKey": "GET /checkout-sessions",
+      "method": "get",
+      "pathTemplate": "/checkout-sessions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "status"
+      ],
+      "title": "Lister les sessions de paiement",
+      "description": "Lister les sessions de paiement\n\nRenvoie les sessions de l'organisation avec pagination et filtre de statut optionnel.\n\nREST: GET /checkout-sessions",
+      "tags": [
+        "Sessions de paiement"
+      ],
+      "operationId": "CheckoutSessionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Nombre maximal de résultats"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Décalage pour la pagination"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "completed",
+              "expired"
+            ],
+            "type": "string",
+            "description": "Filtrer par statut de session (valeur checkout_session_status)"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_checkout_sessions_id",
+      "operationKey": "GET /checkout-sessions/{id}",
+      "method": "get",
+      "pathTemplate": "/checkout-sessions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir une session de paiement par ID",
+      "description": "Obtenir une session de paiement par ID\n\nRenvoie le détail d’une session (statut, client et produits associés).\n\nREST: GET /checkout-sessions/{id}",
+      "tags": [
+        "Sessions de paiement"
+      ],
+      "operationId": "CheckoutSessionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de la session"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_customers",
+      "operationKey": "GET /customers",
+      "method": "get",
+      "pathTemplate": "/customers",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page",
+        "status",
+        "type",
+        "search"
+      ],
+      "title": "Lister les clients",
+      "description": "Lister les clients\n\nRenvoie tous les clients de l'organisation du marchand authentifié. Filtres possibles : recherche, type de client et statut d'activité.\n\nREST: GET /customers",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Numéro de page"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "Nombre d'éléments par page"
+          },
+          "search": {
+            "type": "string",
+            "description": "Recherche par nom ou e-mail"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "inactive",
+              "all"
+            ],
+            "type": "string",
+            "description": "Filtrer par activité (active = au moins une transaction, inactive = aucune transaction)"
+          },
+          "type": {
+            "enum": [
+              "business",
+              "individual",
+              "all"
+            ],
+            "type": "string",
+            "description": "Filtrer par type de client"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_customers_id",
+      "operationKey": "GET /customers/{id}",
+      "method": "get",
+      "pathTemplate": "/customers/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un client par ID",
+      "description": "Obtenir un client par ID\n\nRenvoie un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /customers/{id}",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_customers_id_transactions",
+      "operationKey": "GET /customers/{id}/transactions",
+      "method": "get",
+      "pathTemplate": "/customers/{id}/transactions",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Transactions du client",
+      "description": "Transactions du client\n\nRenvoie les transactions d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /customers/{id}/transactions",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_getTransactions",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_discount_coupons",
+      "operationKey": "GET /discount-coupons",
+      "method": "get",
+      "pathTemplate": "/discount-coupons",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lister les coupons",
+      "description": "Lister les coupons\n\nRenvoie tous les coupons de réduction de l'organisation du marchand authentifié.\n\nREST: GET /discount-coupons",
+      "tags": [
+        "Coupons de réduction"
+      ],
+      "operationId": "DiscountCouponsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_discount_coupons_id",
+      "operationKey": "GET /discount-coupons/{id}",
+      "method": "get",
+      "pathTemplate": "/discount-coupons/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un coupon par ID",
+      "description": "Obtenir un coupon par ID\n\nRenvoie un coupon. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /discount-coupons/{id}",
+      "tags": [
+        "Coupons de réduction"
+      ],
+      "operationId": "DiscountCouponsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du coupon"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_discount_coupons_id_performance",
+      "operationKey": "GET /discount-coupons/{id}/performance",
+      "method": "get",
+      "pathTemplate": "/discount-coupons/{id}/performance",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Indicateurs de performance du coupon",
+      "description": "Indicateurs de performance du coupon\n\nRenvoie les statistiques d'utilisation et l'impact sur le chiffre d'affaires pour un coupon donné.\n\nREST: GET /discount-coupons/{id}/performance",
+      "tags": [
+        "Coupons de réduction"
+      ],
+      "operationId": "DiscountCouponsController_getPerformance",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du coupon"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_organizations",
+      "operationKey": "GET /organizations",
+      "method": "get",
+      "pathTemplate": "/organizations",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Détails de l'organisation",
+      "description": "Détails de l'organisation\n\nRenvoie les informations de l'organisation du marchand authentifié\n\nREST: GET /organizations",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_organizations_id",
+      "operationKey": "GET /organizations/{id}",
+      "method": "get",
+      "pathTemplate": "/organizations/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Organisation par ID",
+      "description": "Organisation par ID\n\nRenvoie les détails d'une organisation par son identifiant (doit correspondre à l'organisation authentifiée)\n\nREST: GET /organizations/{id}",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/organizations/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_organizations_metrics",
+      "operationKey": "GET /organizations/metrics",
+      "method": "get",
+      "pathTemplate": "/organizations/metrics",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Indicateurs de l'organisation",
+      "description": "Indicateurs de l'organisation\n\nRenvoie le MRR, l'ARR, la LTV, le chiffre d'affaires et le nombre de clients pour votre organisation.\n\nREST: GET /organizations/metrics",
+      "tags": [
+        "Organisations"
+      ],
+      "operationId": "OrganizationsController_getMetrics",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_payment_links",
+      "operationKey": "GET /payment-links",
+      "method": "get",
+      "pathTemplate": "/payment-links",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "isActive",
+        "linkType"
+      ],
+      "title": "Lister les liens de paiement",
+      "description": "Lister les liens de paiement\n\nRenvoie tous les liens de l'organisation avec pagination et filtres optionnels (type, actif).\n\nREST: GET /payment-links",
+      "tags": [
+        "Liens de paiement"
+      ],
+      "operationId": "PaymentLinksController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Filtrer par statut actif"
+          },
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Nombre maximal de résultats"
+          },
+          "linkType": {
+            "enum": [
+              "product",
+              "instant"
+            ],
+            "type": "string",
+            "description": "Filtrer par type de lien"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Décalage pour la pagination"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_payment_links_id",
+      "operationKey": "GET /payment-links/{id}",
+      "method": "get",
+      "pathTemplate": "/payment-links/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un lien de paiement par ID",
+      "description": "Obtenir un lien de paiement par ID\n\nRenvoie le détail d’un lien (URL, configuration et statut).\n\nREST: GET /payment-links/{id}",
+      "tags": [
+        "Liens de paiement"
+      ],
+      "operationId": "PaymentLinksController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du lien de paiement"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_payment_requests",
+      "operationKey": "GET /payment-requests",
+      "method": "get",
+      "pathTemplate": "/payment-requests",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "customerId",
+        "status"
+      ],
+      "title": "Lister les demandes de paiement",
+      "description": "Lister les demandes de paiement\n\nRenvoie toutes les demandes de l'organisation avec pagination et filtres optionnels (statut, client).\n\nREST: GET /payment-requests",
+      "tags": [
+        "Demandes de paiement"
+      ],
+      "operationId": "PaymentRequestsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Filtrer par ID client"
+          },
+          "limit": {
+            "example": 20,
+            "type": "number",
+            "description": "Nombre maximal de résultats"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Décalage pour la pagination"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "completed",
+              "failed",
+              "expired"
+            ],
+            "type": "string",
+            "description": "Filtrer par statut"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_payment_requests_id",
+      "operationKey": "GET /payment-requests/{id}",
+      "method": "get",
+      "pathTemplate": "/payment-requests/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir une demande de paiement par ID",
+      "description": "Obtenir une demande de paiement par ID\n\nRenvoie le détail d’une demande (statut actuel, informations de paiement).\n\nREST: GET /payment-requests/{id}",
+      "tags": [
+        "Demandes de paiement"
+      ],
+      "operationId": "PaymentRequestsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de la demande"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_products",
+      "operationKey": "GET /products",
+      "method": "get",
+      "pathTemplate": "/products",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "isActive"
+      ],
+      "title": "Lister les produits",
+      "description": "Lister les produits\n\nRenvoie tous les produits de l'organisation du marchand authentifié, avec prix et frais intégrés. Utile pour afficher le catalogue ou intégrer des systèmes externes.\n\nREST: GET /products",
+      "tags": [
+        "Produits"
+      ],
+      "operationId": "ProductsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Filtrer par statut actif"
+          },
+          "limit": {
+            "example": 15,
+            "type": "number",
+            "description": "Nombre maximal de résultats"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Décalage pour la pagination"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_products_id",
+      "operationKey": "GET /products/{id}",
+      "method": "get",
+      "pathTemplate": "/products/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un produit par ID",
+      "description": "Obtenir un produit par ID\n\nRenvoie un produit avec ses prix et frais. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /products/{id}",
+      "tags": [
+        "Produits"
+      ],
+      "operationId": "ProductsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du produit"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_subscriptions",
+      "operationKey": "GET /subscriptions",
+      "method": "get",
+      "pathTemplate": "/subscriptions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "pageSize",
+        "page"
+      ],
+      "title": "Lister les abonnements",
+      "description": "Lister les abonnements\n\nRenvoie tous les abonnements de l'organisation du marchand authentifié. Les abonnements sont créés automatiquement lorsque les clients effectuent des paiements récurrents.\n\nREST: GET /subscriptions",
+      "tags": [
+        "Abonnements"
+      ],
+      "operationId": "SubscriptionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Numéro de page"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "Nombre d'éléments par page"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_subscriptions_customer_customerId",
+      "operationKey": "GET /subscriptions/customer/{customerId}",
+      "method": "get",
+      "pathTemplate": "/subscriptions/customer/{customerId}",
+      "pathParamNames": [
+        "customerId"
+      ],
+      "queryParamNames": [],
+      "title": "Abonnements d’un client",
+      "description": "Abonnements d’un client\n\nRenvoie les abonnements d'un client. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /subscriptions/customer/{customerId}",
+      "tags": [
+        "Abonnements"
+      ],
+      "operationId": "SubscriptionsController_findByCustomer",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "UUID du client"
+          }
+        },
+        "required": [
+          "customerId"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_subscriptions_id",
+      "operationKey": "GET /subscriptions/{id}",
+      "method": "get",
+      "pathTemplate": "/subscriptions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un abonnement par ID",
+      "description": "Obtenir un abonnement par ID\n\nRenvoie un abonnement. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /subscriptions/{id}",
+      "tags": [
+        "Abonnements"
+      ],
+      "operationId": "SubscriptionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de l’abonnement"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_transactions",
+      "operationKey": "GET /transactions",
+      "method": "get",
+      "pathTemplate": "/transactions",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "isPos",
+        "endDate",
+        "startDate",
+        "pageSize",
+        "page",
+        "paymentMethod",
+        "currency",
+        "type",
+        "status",
+        "provider"
+      ],
+      "title": "Lister les transactions",
+      "description": "Lister les transactions\n\nRenvoie les transactions de l'organisation du marchand authentifié avec filtres avancés. Les transactions sont créées par le système lors du traitement des paiements.\n\nREST: GET /transactions",
+      "tags": [
+        "Transactions"
+      ],
+      "operationId": "TransactionsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "example": "XOF,USD",
+            "type": "string",
+            "description": "Filtrer par code devise (séparés par des virgules pour plusieurs valeurs)"
+          },
+          "endDate": {
+            "example": "2024-12-31T23:59:59Z",
+            "type": "string",
+            "description": "Jusqu'à cette date (format ISO 8601)"
+          },
+          "isPos": {
+            "example": false,
+            "type": "boolean",
+            "description": "Uniquement les transactions points de vente (TPV)"
+          },
+          "page": {
+            "example": 1,
+            "type": "number",
+            "description": "Numéro de page"
+          },
+          "pageSize": {
+            "example": 50,
+            "type": "number",
+            "description": "Nombre d'éléments par page"
+          },
+          "paymentMethod": {
+            "example": "MOBILE_MONEY,CARDS",
+            "type": "string",
+            "description": "Filtrer par code de moyen de paiement (séparés par des virgules pour plusieurs valeurs)"
+          },
+          "provider": {
+            "example": "WAVE",
+            "type": "string",
+            "description": "Filtrer par code de fournisseur de paiement"
+          },
+          "startDate": {
+            "example": "2024-01-01T00:00:00Z",
+            "type": "string",
+            "description": "À partir de cette date (format ISO 8601)"
+          },
+          "status": {
+            "example": "completed,pending",
+            "type": "string",
+            "description": "Filtrer par statut de transaction (séparés par des virgules pour plusieurs valeurs)"
+          },
+          "type": {
+            "example": "payment,refund",
+            "type": "string",
+            "description": "Filtrer par type de transaction (séparés par des virgules pour plusieurs valeurs)"
+          }
+        }
+      }
+    },
+    {
+      "name": "lomi_get_transactions_id",
+      "operationKey": "GET /transactions/{id}",
+      "method": "get",
+      "pathTemplate": "/transactions/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir une transaction par ID",
+      "description": "Obtenir une transaction par ID\n\nRenvoie une transaction. Réponse 404 si elle n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /transactions/{id}",
+      "tags": [
+        "Transactions"
+      ],
+      "operationId": "TransactionsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID de la transaction"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_webhook_delivery_logs",
+      "operationKey": "GET /webhook-delivery-logs",
+      "method": "get",
+      "pathTemplate": "/webhook-delivery-logs",
+      "pathParamNames": [],
+      "queryParamNames": [
+        "offset",
+        "limit",
+        "failedOnly",
+        "successOnly",
+        "webhookId"
+      ],
+      "title": "Lister les journaux de livraison",
+      "description": "Lister les journaux de livraison\n\nRenvoie les journaux de livraison pour un webhook donné. Ils sont créés automatiquement lors des tentatives d'envoi. Filtrez avec le paramètre de requête webhookId.\n\nREST: GET /webhook-delivery-logs",
+      "tags": [
+        "Journaux de livraison webhooks"
+      ],
+      "operationId": "WebhookDeliveryLogsController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "failedOnly": {
+            "example": false,
+            "type": "boolean",
+            "description": "Uniquement les livraisons en échec"
+          },
+          "limit": {
+            "example": 25,
+            "type": "number",
+            "description": "Nombre maximal de journaux"
+          },
+          "offset": {
+            "example": 0,
+            "type": "number",
+            "description": "Nombre de journaux à ignorer (pagination)"
+          },
+          "successOnly": {
+            "example": false,
+            "type": "boolean",
+            "description": "Uniquement les livraisons réussies"
+          },
+          "webhookId": {
+            "type": "string",
+            "description": "Filtrer par identifiant de webhook"
+          }
+        },
+        "required": [
+          "webhookId"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_webhook_delivery_logs_id",
+      "operationKey": "GET /webhook-delivery-logs/{id}",
+      "method": "get",
+      "pathTemplate": "/webhook-delivery-logs/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un journal de livraison par ID",
+      "description": "Obtenir un journal de livraison par ID\n\nRenvoie un journal. Réponse 404 s'il n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: GET /webhook-delivery-logs/{id}",
+      "tags": [
+        "Journaux de livraison webhooks"
+      ],
+      "operationId": "WebhookDeliveryLogsController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du journal"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_get_webhooks",
+      "operationKey": "GET /webhooks",
+      "method": "get",
+      "pathTemplate": "/webhooks",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lister les webhooks",
+      "description": "Lister les webhooks\n\nREST: GET /webhooks",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_findAll",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "name": "lomi_get_webhooks_id",
+      "operationKey": "GET /webhooks/{id}",
+      "method": "get",
+      "pathTemplate": "/webhooks/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Obtenir un webhook par ID",
+      "description": "Obtenir un webhook par ID\n\nREST: GET /webhooks/{id}",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_findOne",
+      "write": false,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/webhooks/{id}`."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_patch_customers_id",
+      "operationKey": "PATCH /customers/{id}",
+      "method": "patch",
+      "pathTemplate": "/customers/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Mettre à jour un client",
+      "description": "Mettre à jour un client\n\nMet à jour un client. N'envoyez que les champs à modifier. Réponse 404 si le client n'existe pas ou n'est pas accessible avec cette clé API.\n\nREST: PATCH /customers/{id}",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_update",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "is_business": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone_number": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              },
+              "whatsapp_number": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID du client"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_patch_webhooks_id",
+      "operationKey": "PATCH /webhooks/{id}",
+      "method": "patch",
+      "pathTemplate": "/webhooks/{id}",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Mettre à jour un webhook",
+      "description": "Mettre à jour un webhook\n\nREST: PATCH /webhooks/{id}",
+      "tags": [
+        "Webhooks"
+      ],
+      "operationId": "WebhooksController_update",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "authorized_events": {
+                "type": "string"
+              },
+              "is_active": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "spi_event_types": {
+                "type": "string"
+              },
+              "supports_spi": {
+                "type": "boolean"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "verification_token": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "Path parameter \"id\" for `/webhooks/{id}`."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_beneficiary_payouts",
+      "operationKey": "POST /beneficiary-payouts",
+      "method": "post",
+      "pathTemplate": "/beneficiary-payouts",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un paiement vers un bénéficiaire",
+      "description": "Lancer un paiement vers un bénéficiaire\n\nInitie un paiement vers un bénéficiaire (prestataire, fournisseur, salarié, etc.). Réponse immédiate en statut en attente ; le traitement est asynchrone côté fournisseur (Wave, SPI). Les mises à jour arrivent via webhooks. Sert à payer des tiers depuis le solde du compte.\n\nREST: POST /beneficiary-payouts",
+      "tags": [
+        "Paiements vers bénéficiaires"
+      ],
+      "operationId": "BeneficiaryPayoutsController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_charge_wave",
+      "operationKey": "POST /charge/wave",
+      "method": "post",
+      "pathTemplate": "/charge/wave",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un encaissement direct Wave",
+      "description": "Lancer un encaissement direct Wave\n\nREST: POST /charge/wave",
+      "tags": [
+        "Encaissements"
+      ],
+      "operationId": "ChargesController_createWaveCharge",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_checkout_sessions",
+      "operationKey": "POST /checkout-sessions",
+      "method": "post",
+      "pathTemplate": "/checkout-sessions",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer une session de paiement",
+      "description": "Créer une session de paiement\n\nCrée une page de paiement hébergée pour que le client finalise son achat. La session expire après 60 minutes par défaut. Renvoie un identifiant de session et une URL de redirection.\n\nREST: POST /checkout-sessions",
+      "tags": [
+        "Sessions de paiement"
+      ],
+      "operationId": "CheckoutSessionsController_create",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "required": [
+              "currency_code"
+            ],
+            "properties": {
+              "allow_coupon_code": {
+                "type": "boolean"
+              },
+              "allow_quantity": {
+                "type": "boolean"
+              },
+              "amount": {
+                "type": "number",
+                "example": 10000
+              },
+              "cancel_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "currency_code": {
+                "type": "string",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ],
+                "example": "XOF"
+              },
+              "customer_address": {
+                "type": "string"
+              },
+              "customer_city": {
+                "type": "string"
+              },
+              "customer_country": {
+                "type": "string"
+              },
+              "customer_email": {
+                "type": "string",
+                "format": "email"
+              },
+              "customer_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "customer_name": {
+                "type": "string"
+              },
+              "customer_phone": {
+                "type": "string"
+              },
+              "customer_postal_code": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "line_items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "price_id"
+                  ],
+                  "properties": {
+                    "price_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "quantity": {
+                      "type": "number"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "payment_link_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "price_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "product_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "require_billing_address": {
+                "type": "boolean"
+              },
+              "subscription_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "success_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_customers",
+      "operationKey": "POST /customers",
+      "method": "post",
+      "pathTemplate": "/customers",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un client",
+      "description": "Créer un client\n\nCrée un client dans votre organisation. Il est automatiquement rattaché à votre organisation.\n\nREST: POST /customers",
+      "tags": [
+        "Clients"
+      ],
+      "operationId": "CustomersController_create",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "city": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "is_business": {
+                "type": "boolean"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "name": {
+                "type": "string",
+                "example": "Jane Doe"
+              },
+              "phone_number": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              },
+              "whatsapp_number": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_discount_coupons",
+      "operationKey": "POST /discount-coupons",
+      "method": "post",
+      "pathTemplate": "/discount-coupons",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un coupon",
+      "description": "Créer un coupon\n\nCrée un coupon dans votre organisation. Le code sera automatiquement mis en majuscules.\n\nREST: POST /discount-coupons",
+      "tags": [
+        "Coupons de réduction"
+      ],
+      "operationId": "DiscountCouponsController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_payment_intents",
+      "operationKey": "POST /payment-intents",
+      "method": "post",
+      "pathTemplate": "/payment-intents",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un Payment Intent carte (client_secret)",
+      "description": "Créer un Payment Intent carte (client_secret)\n\nCrée un Payment Intent carte pour une intégration via Payment Element et renvoie le client_secret.\n\nREST: POST /payment-intents",
+      "tags": [
+        "Intents de paiement"
+      ],
+      "operationId": "PaymentIntentsController_create",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "number",
+                "example": 10000,
+                "description": "Amount to charge in the original currency"
+              },
+              "appearance_billing_address": {
+                "type": "string",
+                "example": "never",
+                "enum": [
+                  "auto",
+                  "never"
+                ],
+                "description": "Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI."
+              },
+              "appearance_border_radius": {
+                "type": "number",
+                "example": 6,
+                "description": "Optional Payment Element border radius (px) returned for client-side rendering."
+              },
+              "appearance_theme": {
+                "type": "string",
+                "example": "stripe",
+                "enum": [
+                  "light",
+                  "dark",
+                  "flat",
+                  "stripe",
+                  "night"
+                ],
+                "description": "Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility."
+              },
+              "currency": {
+                "type": "string",
+                "example": "XOF",
+                "description": "Backward-compatible alias for currency_code. Use currency_code in new integrations.",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "currency_code": {
+                "type": "string",
+                "example": "XOF",
+                "description": "Currency code",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "customer_email": {
+                "type": "string",
+                "example": "john@example.com",
+                "description": "Customer email — required together with customer_name when customer_id is omitted."
+              },
+              "customer_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440000",
+                "description": "Internal customer UUID (v4). Alternative: send customer_email + customer_name to create/find a customer."
+              },
+              "customer_name": {
+                "type": "string",
+                "example": "John Doe",
+                "description": "Customer display name — required together with customer_email when customer_id is omitted."
+              },
+              "customer_phone": {
+                "type": "string",
+                "example": "+221771234567",
+                "description": "Customer phone number"
+              },
+              "description": {
+                "type": "string",
+                "example": "Invoice #INV-2026-001",
+                "description": "Description shown in payment providers and logs"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true,
+                "example": {
+                  "order_id": "ORD-12345"
+                },
+                "description": "Custom metadata merged into provider metadata"
+              },
+              "payment_reference": {
+                "type": "string",
+                "example": "INV-2026-001",
+                "description": "Reference included in metadata for reconciliation"
+              },
+              "product_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440002",
+                "description": "Optional product UUID for metadata and reconciliation"
+              },
+              "quantity": {
+                "type": "number",
+                "example": 1,
+                "description": "Optional quantity for internal reconciliation",
+                "default": 1
+              },
+              "subscription_id": {
+                "type": "string",
+                "example": "550e8400-e29b-41d4-a716-446655440003",
+                "description": "Optional subscription UUID for metadata and reconciliation"
+              }
+            },
+            "required": [
+              "amount"
+            ],
+            "description": "JSON request body for this operation."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_payment_links",
+      "operationKey": "POST /payment-links",
+      "method": "post",
+      "pathTemplate": "/payment-links",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un lien de paiement",
+      "description": "Créer un lien de paiement\n\nCrée un lien de paiement partageable : produit (lien produit) ou montant fixe (lien instantané). Les liens produit référencent un produit et un prix optionnel ; les liens instantanés ont un montant fixe.\n\nREST: POST /payment-links",
+      "tags": [
+        "Liens de paiement"
+      ],
+      "operationId": "PaymentLinksController_create",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "required": [
+              "currency_code",
+              "link_type",
+              "title"
+            ],
+            "properties": {
+              "allow_coupon_code": {
+                "type": "boolean"
+              },
+              "allow_quantity": {
+                "type": "boolean"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "cancel_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "currency_code": {
+                "type": "string",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "description": {
+                "type": "string"
+              },
+              "expires_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "link_type": {
+                "type": "string",
+                "enum": [
+                  "product",
+                  "instant"
+                ]
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "price_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "product_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "require_billing_address": {
+                "type": "boolean"
+              },
+              "success_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_payment_requests",
+      "operationKey": "POST /payment-requests",
+      "method": "post",
+      "pathTemplate": "/payment-requests",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer une demande de paiement",
+      "description": "Créer une demande de paiement\n\nCrée une demande de paiement pour un client. Elle a une date d’expiration et peut être suivie jusqu’à réussite ou expiration.\n\nREST: POST /payment-requests",
+      "tags": [
+        "Demandes de paiement"
+      ],
+      "operationId": "PaymentRequestsController_create",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "required": [
+              "amount",
+              "currency_code",
+              "expiry_date"
+            ],
+            "properties": {
+              "amount": {
+                "type": "number"
+              },
+              "currency_code": {
+                "type": "string",
+                "enum": [
+                  "XOF",
+                  "USD",
+                  "EUR"
+                ]
+              },
+              "customer_id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "description": {
+                "type": "string"
+              },
+              "expiry_date": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "metadata": {
+                "type": "object",
+                "additionalProperties": true
+              },
+              "payment_reference": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_payout_wave",
+      "operationKey": "POST /payout/wave",
+      "method": "post",
+      "pathTemplate": "/payout/wave",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un virement Wave",
+      "description": "Lancer un virement Wave\n\nCrée un virement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.\n\nREST: POST /payout/wave",
+      "tags": [
+        "Virements sortants"
+      ],
+      "operationId": "PayoutsController_createWavePayout",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_products",
+      "operationKey": "POST /products",
+      "method": "post",
+      "pathTemplate": "/products",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Créer un produit",
+      "description": "Créer un produit\n\nCrée un produit avec un ou plusieurs tarifs en une seule requête. Au moins un prix est requis. Le premier prix, ou celui avec `is_default`, est utilisé lorsque aucun prix n'est précisé au paiement.\n\nREST: POST /products",
+      "tags": [
+        "Produits"
+      ],
+      "operationId": "ProductsController_create",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_products_id_prices",
+      "operationKey": "POST /products/{id}/prices",
+      "method": "post",
+      "pathTemplate": "/products/{id}/prices",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Ajouter un prix à un produit",
+      "description": "Ajouter un prix à un produit\n\nAjoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.\n\nREST: POST /products/{id}/prices",
+      "tags": [
+        "Produits"
+      ],
+      "operationId": "ProductsController_addPrice",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du produit"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_products_id_prices_priceId_set_default",
+      "operationKey": "POST /products/{id}/prices/{priceId}/set-default",
+      "method": "post",
+      "pathTemplate": "/products/{id}/prices/{priceId}/set-default",
+      "pathParamNames": [
+        "id",
+        "priceId"
+      ],
+      "queryParamNames": [],
+      "title": "Définir le prix par défaut",
+      "description": "Définir le prix par défaut\n\nIndique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.\n\nREST: POST /products/{id}/prices/{priceId}/set-default",
+      "tags": [
+        "Produits"
+      ],
+      "operationId": "ProductsController_setDefaultPrice",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID du produit"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          },
+          "priceId": {
+            "type": "string",
+            "description": "UUID du prix"
+          }
+        },
+        "required": [
+          "id",
+          "priceId"
+        ]
+      }
+    },
+    {
+      "name": "lomi_post_refund_wave",
+      "operationKey": "POST /refund/wave",
+      "method": "post",
+      "pathTemplate": "/refund/wave",
+      "pathParamNames": [],
+      "queryParamNames": [],
+      "title": "Lancer un remboursement Wave",
+      "description": "Lancer un remboursement Wave\n\nCrée un remboursement via la fonction edge Wave. La forme de la réponse suit le JSON du fournisseur.\n\nREST: POST /refund/wave",
+      "tags": [
+        "Remboursements"
+      ],
+      "operationId": "RefundsController_createWaveRefund",
+      "write": true,
+      "wantsBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "lomi_post_subscriptions_id_cancel",
+      "operationKey": "POST /subscriptions/{id}/cancel",
+      "method": "post",
+      "pathTemplate": "/subscriptions/{id}/cancel",
+      "pathParamNames": [
+        "id"
+      ],
+      "queryParamNames": [],
+      "title": "Résilier un abonnement",
+      "description": "Résilier un abonnement\n\nRésilie un abonnement actif. C'est la seule modification autorisée sur un abonnement. Prix, dates de facturation et autres champs sont gérés par le système.\n\nREST: POST /subscriptions/{id}/cancel",
+      "tags": [
+        "Abonnements"
+      ],
+      "operationId": "SubscriptionsController_cancel",
+      "write": true,
+      "wantsBody": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "cancellation_reason": {
+                "type": "string"
+              }
+            },
+            "description": "JSON request body for this operation."
+          },
+          "id": {
+            "type": "string",
+            "description": "UUID de l’abonnement"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Optional Idempotency-Key header (recommended on writes for safe retries)."
+          }
+        },
+        "required": [
+          "body",
+          "id"
+        ]
+      }
+    }
+  ]
+}

@@ -13,6 +13,7 @@ jobs:
       api: ${{ steps.changes.outputs.api }}
       docs: ${{ steps.changes.outputs.docs }}
       sdks: ${{ steps.changes.outputs.sdks }}
+      mcp: ${{ steps.changes.outputs.mcp }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v3
@@ -26,6 +27,8 @@ jobs:
               - 'apps/sdks/ts/**'
             sdks:
               - 'apps/sdks/**'
+            mcp:
+              - 'apps/mcp/**'
 
   verify-openapi:
     name: Verify OpenAPI spec is in sync
@@ -51,6 +54,45 @@ jobs:
         run: pnpm run openapi:export
       - name: Assert apps/docs/openapi.json matches export
         run: git diff --exit-code apps/docs/openapi.json
+
+  verify-mcp-manifest:
+    name: Verify MCP tools manifest is in sync
+    needs: detect-changes
+    if: github.event_name == 'pull_request' && (needs.detect-changes.outputs.api ==
+      'true' || needs.detect-changes.outputs.docs ==
+      'true' || needs.detect-changes.outputs.sdks ==
+      'true' || needs.detect-changes.outputs.mcp ==
+      'true')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: apps/mcp/pnpm-lock.yaml
+      - name: Install MCP dependencies
+        working-directory: apps/mcp
+        run: pnpm install --frozen-lockfile
+      - name: Regenerate MCP manifest
+        working-directory: apps/mcp
+        run: pnpm run generate
+      - name: Assert MCP manifest matches generator output
+        run: git diff --exit-code apps/mcp/src/generated/tools-manifest.json
+      - name: Typecheck MCP package
+        working-directory: apps/mcp
+        run: pnpm exec tsc --noEmit
+      - name: MCP unit tests
+        working-directory: apps/mcp
+        run: pnpm test
+      - name: MCP hosted smoke (HTTP transport)
+        working-directory: apps/mcp
+        env:
+          LOMI_MCP_BEARER_TOKEN: ci-smoke-bearer
+        run: pnpm run smoke:http
 
   verify-agent-contracts:
     name: Verify agent card + OpenAPI surface
