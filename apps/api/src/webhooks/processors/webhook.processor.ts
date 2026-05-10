@@ -21,20 +21,15 @@ export class WebhookQueueProcessor extends WorkerHost {
       `Processing webhook job ${job.id} (attempt ${job.attemptsMade + 1}/${job.opts.attempts || 1})`,
     );
 
-    const {
-      webhook,
-      event,
-      data,
-      dispatchId,
-      outboxId,
-      merchantId,
-    } = job.data;
+    const { webhook, event, data, dispatchId, outboxId, merchantId } = job.data;
 
     if (dispatchId) {
-      const { data: shouldRun, error: srErr } =
-        await this.supabase.rpc('webhook_dispatch_should_process', {
+      const { data: shouldRun, error: srErr } = await this.supabase.rpc(
+        'webhook_dispatch_should_process',
+        {
           p_dispatch_id: dispatchId,
-        });
+        },
+      );
       if (srErr) {
         this.logger.warn(
           `webhook_dispatch_should_process error: ${srErr.message}`,
@@ -68,8 +63,7 @@ export class WebhookQueueProcessor extends WorkerHost {
     if (!result.shouldRetry && dispatchId) {
       await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
         p_dispatch_id: dispatchId,
-        p_reason:
-          result.deadLetterReason ?? 'non_retryable_delivery_failure',
+        p_reason: result.deadLetterReason ?? 'non_retryable_delivery_failure',
       });
       await this.supabase.rpc('log_webhook_delivery', {
         p_webhook_id: webhook.id,

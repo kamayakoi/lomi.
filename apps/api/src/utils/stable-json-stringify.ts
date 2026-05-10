@@ -12,6 +12,8 @@ export function stableStringify(value: unknown): string {
   }
   const obj = value as Record<string, unknown>;
   const keys = Object.keys(obj).sort();
-  const props = keys.map((k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`);
+  const props = keys.map(
+    (k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`,
+  );
   return `{${props.join(',')}}`;
 }

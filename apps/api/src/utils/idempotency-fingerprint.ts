@@ -7,12 +7,18 @@ export function snapshotRequestBody(payload: Record<string, unknown>): string {
 }
 
 /** SHA-256 fingerprint of canonical JSON snapshot. */
-export function fingerprintRequestBody(payload: Record<string, unknown>): string {
-  return createHash('sha256').update(snapshotRequestBody(payload)).digest('hex');
+export function fingerprintRequestBody(
+  payload: Record<string, unknown>,
+): string {
+  return createHash('sha256')
+    .update(snapshotRequestBody(payload))
+    .digest('hex');
 }
 
 /** Normalize optional Idempotency-Key header (Stripe-style max ~255 chars). */
-export function normalizeIdempotencyKey(header?: string | string[]): string | null {
+export function normalizeIdempotencyKey(
+  header?: string | string[],
+): string | null {
   const raw = Array.isArray(header) ? header[0] : header;
   const t = typeof raw === 'string' ? raw.trim() : '';
   if (!t.length) return null;

@@ -50,7 +50,10 @@ export class WebhookSenderService {
     if (!raw?.trim()) {
       return false;
     }
-    const ids = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    const ids = raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
     return ids.includes(organizationId);
   }
 

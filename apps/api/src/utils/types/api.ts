@@ -6,7 +6,7 @@
  * Generated from database.types.ts - only includes:
  * - Exposed enums (36 enums)
  * - Exposed tables (15 tables)
- * - Exposed functions (54 functions)
+ * - Exposed functions (66 functions)
  *
  * DO NOT EDIT MANUALLY - This file is auto-generated
  * Run: npm run generate:api-types
@@ -1778,8 +1778,6 @@ export type Database = {
           p_metadata?: Json | null;
           p_organization_id: string;
           p_payment_link_id?: string | null;
-          p_idempotency_body_hash?: string | null;
-          p_idempotency_key?: string | null;
           p_price_id?: string | null;
           p_product_id?: string | null;
           p_quantity?: number | null;
@@ -1811,8 +1809,6 @@ export type Database = {
           p_metadata?: Json | null;
           p_organization_id: string;
           p_payment_link_id?: string | null;
-          p_idempotency_body_hash?: string | null;
-          p_idempotency_key?: string | null;
           p_require_billing_address?: boolean | null;
           p_shipping_amount?: number | null;
           p_success_url?: string | null;
@@ -1972,10 +1968,10 @@ export type Database = {
       };
       set_rate_limit_policy: {
         Args: {
-          p_api_key?: string | null;
+          p_api_key: string;
           p_endpoint_pattern: string;
           p_environment: string;
-          p_organization_id?: string | null;
+          p_organization_id: string;
           p_priority?: number | null;
           p_requests_per_day: number;
           p_requests_per_minute: number;
@@ -1990,17 +1986,17 @@ export type Database = {
       list_rate_limit_policies: {
         Args: { p_organization_id: string };
         Returns: {
-          policy_id: string;
-          scope_type: string;
-          organization_id: string | null;
-          api_key: string | null;
+          api_key: string;
+          created_at: string;
           endpoint_pattern: string;
           environment: string;
-          requests_per_minute: number;
-          requests_per_day: number;
-          priority: number;
           is_active: boolean;
-          created_at: string;
+          organization_id: string;
+          policy_id: string;
+          priority: number;
+          requests_per_day: number;
+          requests_per_minute: number;
+          scope_type: string;
           updated_at: string;
         }[];
       };
@@ -2011,11 +2007,11 @@ export type Database = {
           p_organization_id: string;
         };
         Returns: {
-          requests_per_minute: number;
-          requests_per_day: number;
-          matched_policy_id: string | null;
-          used_configured_policy: boolean;
           environment: string;
+          matched_policy_id: string;
+          requests_per_day: number;
+          requests_per_minute: number;
+          used_configured_policy: boolean;
         }[];
       };
       webhook_outbox_upsert_event: {
@@ -2039,10 +2035,10 @@ export type Database = {
         Args: {
           p_attempt_number: number;
           p_dispatch_id: string;
-          p_error_message?: string | null;
-          p_request_duration_ms?: number | null;
-          p_response_body?: string | null;
-          p_response_status?: number | null;
+          p_error_message: string;
+          p_request_duration_ms: number;
+          p_response_body: string;
+          p_response_status: number;
         };
         Returns: string;
       };
@@ -2550,14 +2546,12 @@ export type Database = {
           p_amount: number;
           p_created_by: string;
           p_currency_code: APIEnums['currency_code'];
-          p_customer_id: string | null;
-          p_description?: string | null;
+          p_customer_id: string;
+          p_description: string;
           p_environment?: string | null;
           p_expiry_date: string;
           p_organization_id: string;
-          p_payment_reference?: string | null;
-          p_idempotency_body_hash?: string | null;
-          p_idempotency_key?: string | null;
+          p_payment_reference: string;
         };
         Returns: {
           amount: number;
@@ -2781,7 +2775,14 @@ export type Database = {
       discount_type: 'percentage' | 'fixed';
       failed_payment_action: 'cancel' | 'pause' | 'continue';
       first_payment_type: 'initial' | 'non_initial' | 'prorated';
-      integration_source: 'system' | 'shopify' | 'woocommerce' | 'prestashop';
+      integration_source:
+        | 'system'
+        | 'shopify'
+        | 'woocommerce'
+        | 'prestashop'
+        | 'magento'
+        | 'odoo'
+        | 'bubble';
       invoice_status: 'sent' | 'paid' | 'overdue' | 'cancelled' | 'draft';
       link_type: 'instant' | 'product';
       organization_status: 'active' | 'inactive' | 'suspended';
@@ -2793,7 +2794,6 @@ export type Database = {
         | 'BNPL'
         | 'FREE';
       payout_status: 'pending' | 'processing' | 'completed' | 'failed';
-      pricing_plan_type: 'fixed' | 'volume_tiered' | 'custom';
       pricing_model: 'standard' | 'pay_what_you_want' | 'tiered' | 'volume';
       product_type: 'one_time' | 'recurring' | 'usage_based';
       provider_code:

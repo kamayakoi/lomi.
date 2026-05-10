@@ -54,8 +54,7 @@ function createSupabaseE2eMock() {
       return {
         data: {
           checkout_session_id: 'cs_e2e',
-          checkout_url:
-            'https://checkout.lomi.africa/checkout/cs_e2e',
+          checkout_url: 'https://checkout.lomi.africa/checkout/cs_e2e',
           amount: args.p_amount ?? 5000,
           currency_code: 'XOF',
           expires_at: '2099-01-01T00:00:00.000Z',
@@ -69,8 +68,7 @@ function createSupabaseE2eMock() {
       return {
         data: {
           checkout_session_id: 'cs_cart_e2e',
-          checkout_url:
-            'https://checkout.lomi.africa/checkout/cs_cart_e2e',
+          checkout_url: 'https://checkout.lomi.africa/checkout/cs_cart_e2e',
           amount: 3000,
           currency_code: args.p_currency_code,
           expires_at: '2099-01-01T00:00:00.000Z',
@@ -307,8 +305,7 @@ describe('App (e2e)', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         checkout_session_id: 'cs_e2e',
-        checkout_url:
-          'https://checkout.lomi.africa/checkout/cs_e2e',
+        checkout_url: 'https://checkout.lomi.africa/checkout/cs_e2e',
         currency_code: 'XOF',
         amount: 5000,
         expires_at: expect.any(String),
@@ -372,8 +369,7 @@ describe('App (e2e)', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         checkout_session_id: 'cs_cart_e2e',
-        checkout_url:
-          'https://checkout.lomi.africa/checkout/cs_cart_e2e',
+        checkout_url: 'https://checkout.lomi.africa/checkout/cs_cart_e2e',
         line_item_count: 1,
       }),
     );

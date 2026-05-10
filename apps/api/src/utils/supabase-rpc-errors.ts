@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 
 /** Maps Postgres RPC sentinel messages to Nest HTTP exceptions. */
 export function throwMappedSupabaseRpcError(message: string): never {

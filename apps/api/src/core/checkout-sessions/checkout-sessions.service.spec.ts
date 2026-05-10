@@ -187,8 +187,7 @@ describe('CheckoutSessionsService', () => {
 
     const expectedResponse = {
       checkout_session_id: 'cart_session_1',
-      checkout_url:
-        'https://checkout.lomi.africa/checkout/cart_session_1',
+      checkout_url: 'https://checkout.lomi.africa/checkout/cart_session_1',
       amount: 2000,
       currency_code: 'XOF',
     };

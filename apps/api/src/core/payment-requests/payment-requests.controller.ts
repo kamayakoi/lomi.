@@ -106,9 +106,10 @@ export class PaymentRequestsController {
     idempotencyKey?: string | string[],
   ) {
     const normalizedKey = normalizeIdempotencyKey(idempotencyKey);
-    const dtoPayload = JSON.parse(
-      JSON.stringify(createDto),
-    ) as Record<string, unknown>;
+    const dtoPayload = JSON.parse(JSON.stringify(createDto)) as Record<
+      string,
+      unknown
+    >;
     const idempotency =
       normalizedKey !== null
         ? {
