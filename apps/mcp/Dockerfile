@@ -12,8 +12,7 @@ COPY tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
 
-RUN pnpm run generate \
-    && pnpm exec tsc \
+RUN pnpm exec tsc \
     && pnpm prune --prod
 
 ENV NODE_ENV=production
