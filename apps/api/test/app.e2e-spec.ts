@@ -54,8 +54,42 @@ function createSupabaseE2eMock() {
       return {
         data: {
           checkout_session_id: 'cs_e2e',
+          checkout_url:
+            'https://checkout.lomi.africa/checkout/cs_e2e',
+          amount: args.p_amount ?? 5000,
           currency_code: 'XOF',
+          expires_at: '2099-01-01T00:00:00.000Z',
+          environment: 'test',
         },
+        error: null,
+      };
+    }
+
+    if (fn === 'create_checkout_session_with_line_items') {
+      return {
+        data: {
+          checkout_session_id: 'cs_cart_e2e',
+          checkout_url:
+            'https://checkout.lomi.africa/checkout/cs_cart_e2e',
+          amount: 3000,
+          currency_code: args.p_currency_code,
+          expires_at: '2099-01-01T00:00:00.000Z',
+          environment: args.p_environment,
+          line_item_count: 1,
+        },
+        error: null,
+      };
+    }
+
+    if (fn === 'list_checkout_sessions') {
+      return {
+        data: [
+          {
+            checkout_session_id: 'cs_list_1',
+            merchant_id: args.p_merchant_id,
+            currency_code: 'XOF',
+          },
+        ],
         error: null,
       };
     }
@@ -63,27 +97,64 @@ function createSupabaseE2eMock() {
     return { data: null, error: null };
   });
 
+  function checkoutSessionsFrom() {
+    return {
+      select: () => ({
+        eq: (col1: string, val1: string) => ({
+          eq: (col2: string, val2: string) => ({
+            single: async () => {
+              if (
+                col1 === 'checkout_session_id' &&
+                val1 === 'cs_found' &&
+                col2 === 'organization_id' &&
+                val2 === 'org_e2e'
+              ) {
+                return {
+                  data: {
+                    checkout_session_id: 'cs_found',
+                    organization_id: 'org_e2e',
+                    currency_code: 'XOF',
+                  },
+                  error: null,
+                };
+              }
+              return {
+                data: null,
+                error: { message: 'not found' },
+              };
+            },
+          }),
+        }),
+      }),
+    };
+  }
+
   return {
     onModuleInit: () => {},
     rpc,
     getClient: () => ({
       rpc,
-      from: () => ({
-        select: () => ({
-          eq: () => ({
+      from: (table: string) => {
+        if (table === 'checkout_sessions') {
+          return checkoutSessionsFrom();
+        }
+        return {
+          select: () => ({
             eq: () => ({
+              eq: () => ({
+                single: async () => ({
+                  data: null,
+                  error: { message: 'not found' },
+                }),
+              }),
               single: async () => ({
                 data: null,
                 error: { message: 'not found' },
               }),
             }),
-            single: async () => ({
-              data: null,
-              error: { message: 'not found' },
-            }),
           }),
-        }),
-      }),
+        };
+      },
     }),
   };
 }
@@ -236,8 +307,133 @@ describe('App (e2e)', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         checkout_session_id: 'cs_e2e',
+        checkout_url:
+          'https://checkout.lomi.africa/checkout/cs_e2e',
+        currency_code: 'XOF',
+        amount: 5000,
+        expires_at: expect.any(String),
+        environment: 'test',
+      }),
+    );
+  });
+
+  it('POST /checkout-sessions forwards trimmed Idempotency-Key to RPC', async () => {
+    await request(app.getHttpServer())
+      .post('/checkout-sessions')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .set('Idempotency-Key', '  e2e-idem-7  ')
+      .send({
+        currency_code: 'XOF',
+        amount: 5000,
+      })
+      .expect(201);
+
+    expect(supabaseMock.rpc).toHaveBeenCalledWith(
+      'create_checkout_session',
+      expect.objectContaining({
+        p_idempotency_key: 'e2e-idem-7',
+        p_idempotency_body_hash: expect.any(String),
+      }),
+    );
+  });
+
+  it('POST /payment-requests forwards Idempotency-Key to RPC', async () => {
+    await request(app.getHttpServer())
+      .post('/payment-requests')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .set('Idempotency-Key', 'pr-idem-1')
+      .send({
+        amount: 1000,
+        currency_code: 'XOF',
+        expiry_date: '2026-12-31T23:59:59.000Z',
+      })
+      .expect(201);
+
+    expect(supabaseMock.rpc).toHaveBeenCalledWith(
+      'create_payment_request_api',
+      expect.objectContaining({
+        p_idempotency_key: 'pr-idem-1',
+        p_idempotency_body_hash: expect.any(String),
+      }),
+    );
+  });
+
+  it('POST /checkout-sessions with line_items uses cart RPC (Tier-1 write)', async () => {
+    const priceId = '33333333-3333-3333-3333-333333333333';
+    const res = await request(app.getHttpServer())
+      .post('/checkout-sessions')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .send({
+        currency_code: 'XOF',
+        line_items: [{ price_id: priceId, quantity: 1 }],
+      })
+      .expect(201);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        checkout_session_id: 'cs_cart_e2e',
+        checkout_url:
+          'https://checkout.lomi.africa/checkout/cs_cart_e2e',
+        line_item_count: 1,
+      }),
+    );
+    expect(supabaseMock.rpc).toHaveBeenCalledWith(
+      'create_checkout_session_with_line_items',
+      expect.objectContaining({
+        p_line_items: [{ price_id: priceId, quantity: 1 }],
+      }),
+    );
+  });
+
+  it('GET /checkout-sessions returns 401 without API key', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/checkout-sessions')
+      .expect(401);
+    expect(res.body).toMatchObject({
+      error: expect.objectContaining({
+        code: 'unauthorized',
+        message: 'API Key is missing',
+      }),
+      request_id: expect.any(String),
+    });
+  });
+
+  it('GET /checkout-sessions returns list with valid API key', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/checkout-sessions')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .expect(200);
+
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body[0]).toEqual(
+      expect.objectContaining({
+        checkout_session_id: 'cs_list_1',
         currency_code: 'XOF',
       }),
     );
+  });
+
+  it('GET /checkout-sessions/:id returns session when found', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/checkout-sessions/cs_found')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .expect(200);
+
+    expect(res.body).toMatchObject({
+      checkout_session_id: 'cs_found',
+      organization_id: 'org_e2e',
+    });
+  });
+
+  it('GET /checkout-sessions/:id returns 404 when not found', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/checkout-sessions/missing-id')
+      .set('X-API-KEY', 'valid_e2e_key')
+      .expect(404);
+
+    expect(res.body).toMatchObject({
+      error: expect.objectContaining({ code: 'not_found' }),
+      request_id: expect.any(String),
+    });
   });
 });

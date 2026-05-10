@@ -57,9 +57,12 @@ describe('CheckoutSessionsController', () => {
       checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
     } as any);
 
-    const result = await controller.create(dto, user);
+    const result = (await controller.create(dto, user)) as {
+      checkout_session_id: string;
+      checkout_url: string;
+    };
 
-    expect(service.create).toHaveBeenCalledWith(dto, user);
+    expect(service.create).toHaveBeenCalledWith(dto, user, undefined);
     expect(result.checkout_session_id).toBe('cs_1');
     expect(result.checkout_url).toContain('/checkout/cs_1');
   });
@@ -75,7 +78,10 @@ describe('CheckoutSessionsController', () => {
       checkout_session_id: 'cs_1',
       checkout_url: 'https://checkout.lomi.africa/checkout/cs_1',
     } as any);
-    const result = await controller.findOne('cs_1', user);
+    const result = (await controller.findOne('cs_1', user)) as {
+      checkout_session_id: string;
+      checkout_url: string;
+    };
     expect(service.findOne).toHaveBeenCalledWith('cs_1', user);
     expect(result.checkout_session_id).toBe('cs_1');
     expect(result.checkout_url).toContain('/checkout/cs_1');

@@ -9,7 +9,25 @@ import {
 import { ThrottlerException } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
-import { throttleRetryAfterSeconds } from '../../config/http.constants';
+import {
+  THROTTLE_LIMIT,
+  THROTTLE_TTL_MS,
+  WRITE_THROTTLE_LIMIT,
+  WRITE_THROTTLE_TTL_MS,
+  throttleRetryAfterSeconds,
+  writeThrottleRetryAfterSeconds,
+} from '../../config/http.constants';
+
+function inferWriteThrottleFromRequest(req: Request): boolean {
+  if (req.method !== 'POST') return false;
+  const path = req.path ?? req.url ?? '';
+  return (
+    path === '/checkout-sessions' ||
+    path === '/payment-requests' ||
+    path.endsWith('/checkout-sessions') ||
+    path.endsWith('/payment-requests')
+  );
+}
 
 type ErrorBody = {
   error: {
@@ -88,13 +106,27 @@ export class GlobalJsonExceptionFilter implements ExceptionFilter {
     const requestId = req.id ?? randomUUID();
 
     if (exception instanceof ThrottlerException) {
-      const retryAfter = throttleRetryAfterSeconds();
+      const writeScoped = inferWriteThrottleFromRequest(req);
+      const retryAfter = writeScoped
+        ? writeThrottleRetryAfterSeconds()
+        : throttleRetryAfterSeconds();
+      const limitCap = writeScoped ? WRITE_THROTTLE_LIMIT : THROTTLE_LIMIT;
       res.setHeader('Retry-After', String(retryAfter));
+      res.setHeader('X-RateLimit-Limit', String(limitCap));
+      res.setHeader('X-RateLimit-Policy', 'fixed-window');
+      res.setHeader(
+        'X-RateLimit-Window-Seconds',
+        String(
+          writeScoped
+            ? Math.max(1, Math.ceil(WRITE_THROTTLE_TTL_MS / 1000))
+            : Math.max(1, Math.ceil(THROTTLE_TTL_MS / 1000)),
+        ),
+      );
       this.send(res, requestId, HttpStatus.TOO_MANY_REQUESTS, {
         error: {
           code: 'rate_limit_exceeded',
           message: 'Too many requests',
-          details: { retry_after_seconds: retryAfter },
+          details: { retry_after_seconds: retryAfter, limit: limitCap },
         },
         request_id: requestId,
       });

@@ -2,36 +2,67 @@
  * Shared environment helpers for MCP runtime (stdio + HTTP).
  */
 
+function quoted(v: string | undefined): string {
+  return v === undefined ? '<unset>' : `"${v}"`;
+}
+
+function parseUrlOrThrow(rawUrl: string, varName: string): URL {
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      throw new Error('unsupported protocol');
+    }
+    return url;
+  } catch {
+    throw new Error(
+      `[env] ${varName} must be a valid http/https URL, got ${quoted(rawUrl)}. Example: "https://api.lomi.africa".`,
+    );
+  }
+}
+
+function parseCsvHosts(raw: string, varName: string): string[] {
+  const parts = raw.split(',').map((s) => s.trim());
+  const emptyEntries = parts.filter((s) => s.length === 0).length;
+  if (emptyEntries > 0) {
+    throw new Error(
+      `[env] ${varName} contains empty entries. Use comma-separated hostnames only (no blanks), e.g. "api.lomi.africa,sandbox.api.lomi.africa".`,
+    );
+  }
+  for (const host of parts) {
+    if (host.includes('://') || host.includes('/') || host.includes('?') || host.includes('#')) {
+      throw new Error(
+        `[env] ${varName} must contain hostnames only. Invalid entry: "${host}". Remove protocol/path and keep only hostnames.`,
+      );
+    }
+  }
+  return parts;
+}
+
 export function getLomiApiBaseUrl(): string {
-  const u =
-    process.env.LOMI_API_BASE_URL ??
-    process.env.LOMI_API_URL ??
-    'https://api.lomi.africa';
-  const trimmed = u.replace(/\/$/, '');
-  assertOutboundHostnameAllowed(trimmed);
-  return trimmed;
+  const primary = process.env.LOMI_API_BASE_URL?.trim();
+  const legacy = process.env.LOMI_API_URL?.trim();
+
+  if (primary && legacy && primary !== legacy) {
+    throw new Error(
+      `[env] LOMI_API_BASE_URL (${quoted(primary)}) conflicts with legacy LOMI_API_URL (${quoted(legacy)}). Keep only one value, preferably LOMI_API_BASE_URL.`,
+    );
+  }
+
+  const raw = primary ?? legacy ?? 'https://api.lomi.africa';
+  const parsed = parseUrlOrThrow(raw, primary ? 'LOMI_API_BASE_URL' : legacy ? 'LOMI_API_URL' : 'LOMI_API_BASE_URL');
+  const normalized = parsed.toString().replace(/\/$/, '');
+  assertOutboundHostnameAllowed(normalized);
+  return normalized;
 }
 
 function assertOutboundHostnameAllowed(baseUrl: string): void {
   const raw = process.env.LOMI_API_BASE_URL_ALLOWLIST?.trim();
   if (!raw) return;
-  const allowed = new Set(
-    raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean),
-  );
-  let hostname: string;
-  try {
-    hostname = new URL(baseUrl).hostname;
-  } catch {
-    throw new Error(
-      `Invalid LOMI_API_BASE_URL for outbound calls: "${baseUrl}"`,
-    );
-  }
+  const allowed = new Set(parseCsvHosts(raw, 'LOMI_API_BASE_URL_ALLOWLIST'));
+  const hostname = parseUrlOrThrow(baseUrl, 'LOMI_API_BASE_URL').hostname;
   if (!allowed.has(hostname)) {
     throw new Error(
-      `Outbound API hostname "${hostname}" not allowed by LOMI_API_BASE_URL_ALLOWLIST`,
+      `[env] Outbound API hostname "${hostname}" is not allowed by LOMI_API_BASE_URL_ALLOWLIST (${quoted(raw)}). Add "${hostname}" to the allowlist.`,
     );
   }
 }
@@ -44,10 +75,18 @@ export function getOptionalMerchantApiKey(): string | null {
   if (cachedPositiveMerchantKey !== undefined) {
     return cachedPositiveMerchantKey;
   }
-  const key =
-    process.env.LOMI_API_KEY ??
-    process.env.X_API_KEY ??
-    process.env.LOMI_SECRET_KEY;
+  const keyCandidates = [
+    process.env.LOMI_API_KEY?.trim(),
+    process.env.X_API_KEY?.trim(),
+    process.env.LOMI_SECRET_KEY?.trim(),
+  ].filter((v): v is string => Boolean(v && v.length > 0));
+  const distinct = Array.from(new Set(keyCandidates));
+  if (distinct.length > 1) {
+    throw new Error(
+      '[env] Multiple merchant key env vars are set with different values (LOMI_API_KEY / X_API_KEY / LOMI_SECRET_KEY). Keep exactly one to avoid ambiguous auth.',
+    );
+  }
+  const key = distinct[0] ?? null;
   if (!key || key.trim() === '') {
     return null;
   }
@@ -61,7 +100,7 @@ export function getTransportMode(): McpTransportMode {
   const t = (process.env.LOMI_MCP_TRANSPORT ?? 'stdio').toLowerCase();
   if (t === 'http' || t === 'stdio') return t as McpTransportMode;
   throw new Error(
-    `Invalid LOMI_MCP_TRANSPORT="${process.env.LOMI_MCP_TRANSPORT}". Use "stdio" or "http".`,
+    `[env] Invalid LOMI_MCP_TRANSPORT=${quoted(process.env.LOMI_MCP_TRANSPORT)}. Use "stdio" or "http".`,
   );
 }
 
@@ -76,10 +115,7 @@ export function listenHostOptions(): {
   if (!raw) {
     return { host };
   }
-  const allowedHosts = raw
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const allowedHosts = parseCsvHosts(raw, 'LOMI_MCP_ALLOWED_HOSTS');
   // Railway health checks can use this host header.
   if (
     (process.env.RAILWAY_PROJECT_ID || process.env.RAILWAY_ENVIRONMENT_ID) &&
@@ -91,25 +127,189 @@ export function listenHostOptions(): {
 }
 
 export function httpListenPort(): number {
-  const p = Number(process.env.PORT ?? process.env.LOMI_MCP_HTTP_PORT ?? '3333');
-  if (!Number.isFinite(p) || p < 0 || p > 65535) {
+  const raw = process.env.PORT ?? process.env.LOMI_MCP_HTTP_PORT ?? '3333';
+  const p = Number(raw);
+  if (!Number.isFinite(p) || p <= 0 || p > 65535 || !Number.isInteger(p)) {
     throw new Error(
-      `Invalid PORT / LOMI_MCP_HTTP_PORT: "${process.env.PORT ?? process.env.LOMI_MCP_HTTP_PORT}"`,
+      `[env] Invalid PORT/LOMI_MCP_HTTP_PORT=${quoted(raw)}. Use an integer between 1 and 65535.`,
     );
   }
   return p;
 }
 
 export function mcpHttpBasePath(): string {
-  const p =
+  const raw =
     process.env.LOMI_MCP_HTTP_PATH?.trim() ||
     process.env.MCP_HTTP_PATH?.trim() ||
     '/mcp';
-  return p.startsWith('/') ? p : `/${p}`;
+  const p = raw.startsWith('/') ? raw : `/${raw}`;
+  if (p.length === 0 || p.includes(' ') || p.includes('?') || p.includes('#')) {
+    throw new Error(
+      `[env] Invalid LOMI_MCP_HTTP_PATH/MCP_HTTP_PATH=${quoted(raw)}. Use a URL path like "/mcp" (no spaces/query/hash).`,
+    );
+  }
+  return p;
 }
 
-/** Optional Bearer gate for hosted MCP HTTP (recommended in production). */
+function parseEnvIntInRange(
+  raw: string | undefined,
+  envName: string,
+  defaultValue: number,
+  min: number,
+  max: number,
+): number {
+  if (raw === undefined || raw.trim() === '') {
+    return defaultValue;
+  }
+  const n = Number(raw.trim());
+  if (!Number.isInteger(n) || n < min || n > max) {
+    throw new Error(
+      `[env] ${envName} must be an integer between ${min} and ${max}, got ${quoted(raw)}.`,
+    );
+  }
+  return n;
+}
+
+/** Max concurrent MCP HTTP sessions (streamable transport). Default 2000. */
+export function mcpMaxSessions(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_MAX_SESSIONS,
+    'LOMI_MCP_MAX_SESSIONS',
+    2000,
+    1,
+    100_000,
+  );
+}
+
+/** Idle time after which a session is evicted. Default 30 minutes. */
+export function mcpSessionTtlMs(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_SESSION_TTL_MS,
+    'LOMI_MCP_SESSION_TTL_MS',
+    30 * 60 * 1000,
+    60_000,
+    24 * 60 * 60 * 1000,
+  );
+}
+
+/** Max JSON body size for Express (bytes). Default 1 MiB. */
+export function mcpMaxBodyBytes(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_MAX_BODY_BYTES,
+    'LOMI_MCP_MAX_BODY_BYTES',
+    1024 * 1024,
+    4096,
+    50 * 1024 * 1024,
+  );
+}
+
+/**
+ * Per-client IP max MCP requests per rolling 60s window on /mcp routes.
+ * 0 = disabled (default).
+ */
+export function mcpRateLimitRpm(): number {
+  return parseEnvIntInRange(
+    process.env.LOMI_MCP_RATE_LIMIT_RPM,
+    'LOMI_MCP_RATE_LIMIT_RPM',
+    0,
+    0,
+    100_000,
+  );
+}
+
+/**
+ * Hosted MCP transport bearer(s). Comma-separated for zero-downtime rotation.
+ * Empty / unset = no transport gate.
+ */
+export function getMcpHttpBearerTokens(): string[] {
+  const raw = process.env.LOMI_MCP_BEARER_TOKEN?.trim();
+  if (!raw) return [];
+  const segments = raw.split(',');
+  for (const seg of segments) {
+    if (seg.trim() === '') {
+      throw new Error(
+        `[env] LOMI_MCP_BEARER_TOKEN contains an empty entry. Use comma-separated tokens with no empty segments, or a single token.`,
+      );
+    }
+  }
+  const tokens = segments.map((s) => s.trim()).filter(Boolean);
+  const distinct = new Set(tokens);
+  if (distinct.size !== tokens.length) {
+    throw new Error(
+      `[env] LOMI_MCP_BEARER_TOKEN contains duplicate token(s). Remove duplicates.`,
+    );
+  }
+  return tokens;
+}
+
+export function isMcpTransportBearerToken(candidate: string): boolean {
+  return getMcpHttpBearerTokens().includes(candidate);
+}
+
+/** First transport token, if any (backward compatibility). */
 export function getMcpHttpBearerToken(): string | null {
-  const t = process.env.LOMI_MCP_BEARER_TOKEN?.trim();
-  return t && t.length > 0 ? t : null;
+  const tokens = getMcpHttpBearerTokens();
+  return tokens.length > 0 ? tokens[0]! : null;
+}
+
+export type ReadinessCheck = {
+  name: string;
+  ok: boolean;
+  detail?: string;
+};
+
+/**
+ * Validates env and outbound config for /ready (does not require manifest).
+ */
+export function getMcpReadinessChecks(): {
+  ok: boolean;
+  checks: ReadinessCheck[];
+} {
+  const checks: ReadinessCheck[] = [];
+
+  const run = (name: string, fn: () => void): void => {
+    try {
+      fn();
+      checks.push({ name, ok: true });
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : String(e);
+      checks.push({ name, ok: false, detail });
+    }
+  };
+
+  run('lomi_api_base_url', () => {
+    void getLomiApiBaseUrl();
+  });
+  run('mcp_bearer_tokens', () => {
+    void getMcpHttpBearerTokens();
+  });
+  run('listen_host', () => {
+    void listenHostOptions();
+  });
+  run('http_port', () => {
+    void httpListenPort();
+  });
+  run('mcp_http_path', () => {
+    void mcpHttpBasePath();
+  });
+  run('mcp_max_sessions', () => {
+    void mcpMaxSessions();
+  });
+  run('mcp_session_ttl_ms', () => {
+    void mcpSessionTtlMs();
+  });
+  run('mcp_max_body_bytes', () => {
+    void mcpMaxBodyBytes();
+  });
+  run('mcp_rate_limit_rpm', () => {
+    void mcpRateLimitRpm();
+  });
+  run('merchant_key_env', () => {
+    void getOptionalMerchantApiKey();
+  });
+
+  return {
+    ok: checks.every((c) => c.ok),
+    checks,
+  };
 }

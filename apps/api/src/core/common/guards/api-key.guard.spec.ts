@@ -32,6 +32,43 @@ describe('ApiKeyGuard', () => {
     expect(supabase.rpc).not.toHaveBeenCalled();
   });
 
+  it('accepts API key from X-API-KEY header', async () => {
+    supabase.rpc.mockResolvedValue({
+      data: [
+        {
+          is_valid: true,
+          merchant_id: 'm2',
+          organization_id: 'o2',
+          environment: 'live',
+        },
+      ],
+      error: null,
+    });
+
+    const req: any = {
+      headers: { 'x-api-key': 'sk_test_abc' },
+      url: '/checkout-sessions',
+      method: 'POST',
+      ip: '192.168.1.1',
+    };
+
+    await expect(guard.canActivate(createMockContext(req))).resolves.toBe(true);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      'verify_api_key',
+      expect.objectContaining({
+        p_api_key: 'sk_test_abc',
+        p_endpoint: '/checkout-sessions',
+        p_request_method: 'POST',
+        p_ip_address: '192.168.1.1',
+      }),
+    );
+    expect(req.user).toEqual({
+      merchantId: 'm2',
+      organizationId: 'o2',
+      environment: 'live',
+    });
+  });
+
   it('accepts API key from Authorization: Bearer', async () => {
     supabase.rpc.mockResolvedValue({
       data: [

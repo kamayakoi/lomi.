@@ -4,6 +4,7 @@ import { fromJSONSchema } from 'zod';
 import type { ManifestTool, ToolsManifest } from './manifest.js';
 import { callLomiRest, formatHttpResult } from './lomi-http.js';
 import { getLomiApiBaseUrl, getOptionalMerchantApiKey } from './env-config.js';
+import { mcpLog } from './mcp-request-context.js';
 
 export type ToolRegistrationContext = {
   baseUrl: string;
@@ -42,9 +43,17 @@ function registerOneTool(
         };
       }
       try {
+        const t0 = Date.now();
         const result = await callLomiRest(tool, input, {
           baseUrl: ctx.baseUrl,
           apiKey,
+        });
+        const latencyMs = Date.now() - t0;
+        mcpLog('tool_upstream_complete', {
+          tool: tool.name,
+          method: tool.method,
+          upstreamStatus: result.status,
+          latencyMs,
         });
         const text = formatHttpResult(result);
         const ok = result.status >= 200 && result.status < 300;

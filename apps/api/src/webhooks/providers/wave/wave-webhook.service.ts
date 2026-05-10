@@ -50,6 +50,36 @@ export class WaveWebhookService {
       throw new Error('Missing event type in webhook payload');
     }
 
+    const eventDedupeKey =
+      event.data?.id ??
+      event.data?.transaction_id ??
+      crypto.createHash('sha256').update(rawBody).digest('hex');
+
+    const { data: claimed, error: claimError } = await this.supabase.rpc(
+      'claim_inbound_provider_webhook_event',
+      {
+        p_provider: 'WAVE',
+        p_provider_event_id: `${event.type}:${String(eventDedupeKey)}`,
+        p_metadata: { type: event.type } as any,
+      },
+    );
+
+    if (claimError) {
+      this.logger.warn(
+        `Wave inbound idempotency claim error: ${claimError.message}`,
+      );
+    } else if (claimed === false) {
+      this.logger.log({
+        message: 'wave_webhook_duplicate',
+        event_type: event.type,
+        dedupe_key: eventDedupeKey,
+      });
+      return {
+        message: 'duplicate_event',
+        duplicate: true,
+      };
+    }
+
     this.logger.log(`Processing Wave webhook: ${event.type}`);
     this.logger.debug(`Event data: ${JSON.stringify(event, null, 2)}`);
 

@@ -1,14 +1,18 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
 import { WebhookSenderService } from '../webhook-sender.service';
 import { WebhookEvent } from '../../utils/types/api';
+import { SupabaseService } from '../../utils/supabase/supabase.service';
 
 @Processor('webhooks')
 export class WebhookQueueProcessor extends WorkerHost {
   private readonly logger = new Logger(WebhookQueueProcessor.name);
 
-  constructor(private readonly webhookSender: WebhookSenderService) {
+  constructor(
+    private readonly webhookSender: WebhookSenderService,
+    private readonly supabase: SupabaseService,
+  ) {
     super();
   }
 
@@ -17,25 +21,98 @@ export class WebhookQueueProcessor extends WorkerHost {
       `Processing webhook job ${job.id} (attempt ${job.attemptsMade + 1}/${job.opts.attempts || 1})`,
     );
 
-    try {
-      const { webhook, event, data } = job.data;
-      const success = await this.webhookSender.sendWebhook(
-        webhook,
-        event as WebhookEvent,
-        data,
-      );
+    const {
+      webhook,
+      event,
+      data,
+      dispatchId,
+      outboxId,
+      merchantId,
+    } = job.data;
 
-      if (!success) {
-        throw new Error(`Webhook delivery failed for ${webhook.id}`);
+    if (dispatchId) {
+      const { data: shouldRun, error: srErr } =
+        await this.supabase.rpc('webhook_dispatch_should_process', {
+          p_dispatch_id: dispatchId,
+        });
+      if (srErr) {
+        this.logger.warn(
+          `webhook_dispatch_should_process error: ${srErr.message}`,
+        );
+      } else if (shouldRun === false) {
+        this.logger.log(
+          `Skipping job ${job.id}: dispatch ${dispatchId} not pending`,
+        );
+        return { success: true, skipped: true };
       }
-
-      return { success: true, webhookId: webhook.id };
-    } catch (error: any) {
-      this.logger.error(
-        `Webhook job ${job.id} failed: ${error.message}`,
-        error.stack,
-      );
-      throw error; // Re-throw to trigger BullMQ retry
     }
+
+    const attemptNumber = job.attemptsMade + 1;
+
+    const result = await this.webhookSender.sendWebhookWithContext(
+      webhook,
+      event as WebhookEvent,
+      data,
+      {
+        dispatchId,
+        outboxId,
+        attemptNumber,
+        merchantId,
+      },
+    );
+
+    if (result.success) {
+      return { success: true, webhookId: webhook.id };
+    }
+
+    if (!result.shouldRetry && dispatchId) {
+      await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
+        p_dispatch_id: dispatchId,
+        p_reason:
+          result.deadLetterReason ?? 'non_retryable_delivery_failure',
+      });
+      await this.supabase.rpc('log_webhook_delivery', {
+        p_webhook_id: webhook.id,
+        p_merchant_id: merchantId ?? data?.merchant_id ?? data?.organization_id,
+        p_organization_id: data?.organization_id,
+        p_event_type: event,
+        p_payload: this.webhookSender.prepareWebhookPayload(
+          event as WebhookEvent,
+          data,
+          outboxId,
+        ),
+        p_response_status: result.lastResponseStatus ?? 0,
+        p_response_body:
+          typeof result.lastResponseBody === 'string'
+            ? result.lastResponseBody
+            : JSON.stringify(result.lastResponseBody ?? {}),
+        p_attempt_number: attemptNumber,
+        p_headers: null,
+        p_request_duration_ms: undefined,
+      });
+      return { success: false, terminal: true, webhookId: webhook.id };
+    }
+
+    throw new Error(
+      `Webhook delivery failed for ${webhook.id} (retryable); status=${result.lastResponseStatus}`,
+    );
+  }
+
+  @OnWorkerEvent('failed')
+  async onFailed(job: Job | undefined, error: Error) {
+    if (!job) return;
+    const max = job.opts.attempts ?? 1;
+    const dispatchId = job.data?.dispatchId as string | undefined;
+    if (!dispatchId) return;
+    if (job.attemptsMade < max) return;
+
+    this.logger.warn(
+      `Webhook job permanently failed after ${job.attemptsMade} attempts: ${error.message}`,
+    );
+
+    await this.supabase.rpc('mark_webhook_dispatch_dead_letter', {
+      p_dispatch_id: dispatchId,
+      p_reason: `exhausted_bull_attempts:${error.message?.slice(0, 500)}`,
+    });
   }
 }

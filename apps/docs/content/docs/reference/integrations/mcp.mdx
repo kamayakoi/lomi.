@@ -1,80 +1,58 @@
 ---
 title: MCP integration
-description: Connect AI clients to Lomi via the hosted MCP server.
+description: Connect your AI client to Lomi with the Model Context Protocol.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
 # MCP integration
 
-Use Lomi MCP to let tools like Cursor and Claude call your merchant API through a standardized MCP interface.
+This page is for **developers** wiring an MCP-compatible client (Cursor, Claude Desktop, custom agents, etc.) to **Lomi’s merchant API** via our MCP server.
 
-## What this server provides
+## What you need from your team
 
-- OpenAPI-driven MCP tools generated from Lomi public API
-- Hosted HTTP streamable MCP endpoint
-- Local stdio mode for development
-- Optional MCP bearer gate (`LOMI_MCP_BEARER_TOKEN`)
+- **MCP base URL** — e.g. `https://your-mcp-host.example` (your org hosts it or gives you a shared URL).
+- **Transport secret** (optional) — if they set `LOMI_MCP_BEARER_TOKEN`, you must send it as a Bearer token (see below).
+- **Merchant API key** — a `lomi_*` secret used for tool calls (from the dashboard device flow or **Developers → API keys**).
 
-## Hosted endpoint for your users
+## Endpoints
 
-For real users, deploy one hosted MCP service (for example on Railway) and share the MCP URL.
+| Purpose | URL |
+| --- | --- |
+| MCP (Streamable HTTP) | `https://<host>/mcp` |
+| Liveness | `https://<host>/health` |
+| Readiness (config + manifest) | `https://<host>/ready` |
 
-Default endpoint:
+The MCP path may differ if your host sets a custom `LOMI_MCP_HTTP_PATH`.
 
-- MCP: `https://<your-host>/mcp`
-- Health: `https://<your-host>/health`
+## How to authenticate
 
-## Authentication model
+**If a transport secret is configured on the server:**
 
-### Merchant credential (REST)
+- Send `Authorization: Bearer <transport-secret>` (your host may allow **comma-separated** rotation values server-side; you receive **one** secret to use).
+- Send your merchant key as **`x-lomi-api-key`** or **`x-api-key`** — do not rely on `Authorization` for the merchant key in that case.
 
-Tool calls need a valid merchant API key (same keys as the REST API):
+**If no transport secret is configured** (unusual in production):
 
-1. **Recommended:** `x-lomi-api-key` or `x-api-key` on MCP HTTP requests (especially when `LOMI_MCP_BEARER_TOKEN` protects the route).
-2. **Optional:** `Authorization: Bearer <lomi_* key>` is accepted **only when** `LOMI_MCP_BEARER_TOKEN` is **not** configured (typical local/dev setups).
-
-### MCP transport gate
-
-When set, clients must send:
-
-- `Authorization: Bearer <LOMI_MCP_BEARER_TOKEN>`
-
-`/health` stays unauthenticated for probes.
+- You may use `Authorization: Bearer <lomi_* merchant key>` for simple local setups, or still prefer `x-lomi-api-key`.
 
 <Callout type="info">
-  For multi-merchant production, avoid a single server-wide `LOMI_API_KEY`; pass per-user keys via headers instead.
+  One deployment can serve **many merchants**: each user attaches their own key via **`x-lomi-api-key`** (not a single shared `LOMI_API_KEY` on the server).
 </Callout>
 
-## Dashboard connect flow (device authorization)
+## Get a `lomi_mcp_*` key (browser flow)
 
-Merchants can approve MCP access in the browser—similar to CLI login—without hunting for an existing API key copy/paste:
+1. `POST https://<supabase-project>.supabase.co/functions/v1/mcp-auth/device-auth` — no body. Keep `device_code`, `user_code`, `verification_uri`.
+2. Open **`verification_uri`** (dashboard path `/connect/mcp-verify`), sign in, enter **`user_code`**, authorize.
+3. `POST https://<supabase-project>.supabase.co/functions/v1/mcp-auth/token` with JSON `{ "device_code": "<device_code>" }` — poll until you get `{ "api_key": "lomi_mcp_…" }` (pending responses use `authorization_pending`).
+4. Configure your MCP client: **`x-lomi-api-key: <api_key>`** plus **`Authorization: Bearer <transport-secret>`** if your MCP host requires it.
 
-1. **Start session:** `POST https://<supabase-project>.supabase.co/functions/v1/mcp-auth/device-auth`  
-   Response includes `device_code`, `user_code`, `verification_uri`, `interval`, `expires_in`.
-2. **Browser:** User opens `verification_uri` (`/connect/mcp-verify` on the dashboard), signs in if needed, enters `user_code`, and authorizes.
-3. **Poll token:** `POST …/mcp-auth/token` with JSON `{ "device_code": "<device_code>" }` until it returns `{ "api_key": "lomi_mcp_…", "token_type": "bearer" }` (while pending, the endpoint responds like OAuth device flow with `authorization_pending`).
-4. **Use with MCP:** Configure the HTTP MCP client to send `x-lomi-api-key: <api_key>` on initialize (and transport bearer if your host requires it).
+Alternatively, use any valid **secret** key from **Developers → API keys** as `x-lomi-api-key`.
 
-**Deploy requirements:** apply the `mcp_device_requests` migration and deploy the **`mcp-auth`** Supabase Edge Function (`apps/dashboard/supabase/functions/mcp-auth`).
+## Local development (Cursor, stdio)
 
-## Railway deployment (quick path)
+Build `apps/mcp` (`pnpm install` && `pnpm run build`), then point Cursor at `dist/index.js` with env vars **`LOMI_API_KEY`** (or **`X_API_KEY`**) and **`LOMI_API_BASE_URL`** (`https://api.lomi.africa` or `https://sandbox.api.lomi.africa`). See the package README in the repo for a JSON snippet.
 
-1. Create a new Railway service from this repository.
-2. Set root directory to `apps/mcp`.
-3. Deploy with start command `pnpm run start:http` (already configured in `apps/mcp/railway.json`).
-4. Configure env vars:
-   - required: `LOMI_MCP_BEARER_TOKEN`
-   - recommended: `LOMI_API_BASE_URL`, `LOMI_API_BASE_URL_ALLOWLIST`
-   - optional fallback: `LOMI_API_KEY`
-5. Confirm `GET /health` is `200`.
+## Sandbox
 
-## Client configuration expectations
-
-Hosted MCP users typically configure:
-
-- MCP URL (`https://<host>/mcp` or custom `LOMI_MCP_HTTP_PATH`)
-- Optional transport bearer (`LOMI_MCP_BEARER_TOKEN`)
-- Merchant credential header (`x-lomi-api-key`) from the dashboard connect flow or from **Developers → API keys**
-
-See `apps/mcp/README.md` for Cursor / HTTP examples.
+Tool calls use whatever API base URL the **MCP server** is configured with (`LOMI_API_BASE_URL`). For sandbox data, that base URL must be **`https://sandbox.api.lomi.africa`**.

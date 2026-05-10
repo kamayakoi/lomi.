@@ -49,7 +49,7 @@ describe('PaymentRequestsController', () => {
 
     const result = await controller.create(dto, user);
 
-    expect(service.create).toHaveBeenCalledWith(dto, user);
+    expect(service.create).toHaveBeenCalledWith(dto, user, undefined);
     expect(result).toEqual({ request_id: 'pr_1' });
   });
 
@@ -81,7 +81,9 @@ describe('PaymentRequestsController', () => {
 
   it('findOne delegates to service', async () => {
     service.findOne.mockResolvedValue({ request_id: 'pr_1' } as any);
-    const result = await controller.findOne('pr_1', user);
+    const result = (await controller.findOne('pr_1', user)) as {
+      request_id: string;
+    };
     expect(service.findOne).toHaveBeenCalledWith('pr_1', user);
     expect(result.request_id).toBe('pr_1');
   });

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getMcpHttpBearerToken } from './env-config.js';
+import { isMcpTransportBearerToken } from './env-config.js';
 
 export function firstHeaderValue(
   value: string | string[] | undefined,
@@ -21,10 +21,11 @@ export function looksLikeLomiApiCredential(token: string): boolean {
  *
  * Precedence:
  * 1. `x-lomi-api-key` / `x-api-key`
- * 2. `Authorization: Bearer <credential>` only when it is **not** the hosted MCP
- *    transport secret (`LOMI_MCP_BEARER_TOKEN`) and looks like a `lomi_*` API credential.
+ * 2. `Authorization: Bearer <credential>` only when it is **not** one of the hosted MCP
+ *    transport bearer secrets (`LOMI_MCP_BEARER_TOKEN`, comma-separated when rotating)
+ *    and looks like a `lomi_*` API credential.
  *
- * When `LOMI_MCP_BEARER_TOKEN` is set, clients should prefer headers for the merchant key
+ * When transport bearer token(s) are set, clients should prefer headers for the merchant key
  * because `Authorization` is reserved for the MCP transport gate.
  */
 export function extractSessionMerchantApiKey(req: Request): string | null {
@@ -33,12 +34,11 @@ export function extractSessionMerchantApiKey(req: Request): string | null {
     firstHeaderValue(req.headers['x-api-key']);
   if (headerKey && headerKey.length > 0) return headerKey;
 
-  const transportToken = getMcpHttpBearerToken();
   const auth = firstHeaderValue(req.headers.authorization);
   if (!auth?.startsWith('Bearer ')) return null;
   const bearer = auth.slice('Bearer '.length).trim();
   if (!bearer) return null;
-  if (transportToken && bearer === transportToken) return null;
+  if (isMcpTransportBearerToken(bearer)) return null;
   if (looksLikeLomiApiCredential(bearer)) return bearer;
   return null;
 }

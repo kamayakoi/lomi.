@@ -40,7 +40,7 @@ describe('TransactionsController', () => {
   });
 
   it('findAll splits comma-separated filters into arrays', async () => {
-    transactionsService.findAll.mockResolvedValue([]);
+    (transactionsService.findAll as jest.Mock).mockResolvedValue([]);
 
     await controller.findAll(
       user,
@@ -72,7 +72,7 @@ describe('TransactionsController', () => {
   });
 
   it('findAll passes undefined arrays when filters omitted', async () => {
-    transactionsService.findAll.mockResolvedValue([]);
+    (transactionsService.findAll as jest.Mock).mockResolvedValue([]);
     await controller.findAll(user);
     // Parse*Pipe/DefaultValuePipe only apply at the HTTP boundary; direct calls
     // forward undefined page/pageSize and the service applies its own defaults.

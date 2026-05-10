@@ -48,7 +48,7 @@ describe('PaymentLinksController', () => {
     } as CreatePaymentLinkDto;
     service.create.mockResolvedValue({ link_id: 'l1' } as any);
 
-    const result = await controller.create(dto, user);
+    const result = (await controller.create(dto, user)) as { link_id: string };
 
     expect(service.create).toHaveBeenCalledWith(dto, user);
     expect(result.link_id).toBe('l1');
@@ -80,7 +80,7 @@ describe('PaymentLinksController', () => {
 
   it('findOne delegates to service', async () => {
     service.findOne.mockResolvedValue({ link_id: 'l1' } as any);
-    const result = await controller.findOne('l1', user);
+    const result = (await controller.findOne('l1', user)) as { link_id: string };
     expect(service.findOne).toHaveBeenCalledWith('l1', user);
     expect(result.link_id).toBe('l1');
   });

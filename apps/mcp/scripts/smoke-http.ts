@@ -26,7 +26,20 @@ async function main(): Promise<void> {
   });
 
   const addr = server.address() as AddressInfo;
-  const baseUrl = `http://127.0.0.1:${addr.port}/mcp`;
+  const origin = `http://127.0.0.1:${addr.port}`;
+
+  const health = await fetch(`${origin}/health`);
+  if (!health.ok) {
+    throw new Error(`smoke-http: GET /health expected 200, got ${health.status}`);
+  }
+
+  const ready = await fetch(`${origin}/ready`);
+  if (!ready.ok) {
+    const text = await ready.text();
+    throw new Error(`smoke-http: GET /ready expected 200, got ${ready.status}: ${text}`);
+  }
+
+  const baseUrl = `${origin}/mcp`;
 
   const transport = new StreamableHTTPClientTransport(new URL(baseUrl), {
     requestInit: {

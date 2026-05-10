@@ -8,6 +8,7 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,6 +19,7 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { CheckoutSessionsService } from './checkout-sessions.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { CheckoutSessionResponseDto } from './dto/checkout-session-response.dto';
@@ -26,6 +28,14 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
+import {
+  WRITE_THROTTLE_LIMIT,
+  WRITE_THROTTLE_TTL_MS,
+} from '../../config/http.constants';
+import {
+  fingerprintRequestBody,
+  normalizeIdempotencyKey,
+} from '../../utils/idempotency-fingerprint';
 
 @ApiTags('Sessions de paiement')
 @ApiSecurity('api-key')
@@ -123,11 +133,28 @@ export class CheckoutSessionsController {
       },
     },
   })
+  @Throttle({
+    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
+  })
   create(
     @Body() createDto: CreateCheckoutSessionDto,
     @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key')
+    idempotencyKey?: string | string[],
   ) {
-    return this.service.create(createDto, user);
+    const normalizedKey = normalizeIdempotencyKey(idempotencyKey);
+    const dtoPayload = JSON.parse(
+      JSON.stringify(createDto),
+    ) as Record<string, unknown>;
+    const idempotency =
+      normalizedKey !== null
+        ? {
+            key: normalizedKey,
+            bodyHash: fingerprintRequestBody(dtoPayload),
+          }
+        : undefined;
+
+    return this.service.create(createDto, user, idempotency);
   }
 
   @Get()

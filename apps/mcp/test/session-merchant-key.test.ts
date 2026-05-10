@@ -2,16 +2,16 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { Request } from 'express';
 
 vi.mock('../src/env-config.js', () => ({
-  getMcpHttpBearerToken: vi.fn(),
+  isMcpTransportBearerToken: vi.fn(),
 }));
 
-import { getMcpHttpBearerToken } from '../src/env-config.js';
+import { isMcpTransportBearerToken } from '../src/env-config.js';
 import {
   extractSessionMerchantApiKey,
   looksLikeLomiApiCredential,
 } from '../src/session-merchant-key.js';
 
-const mockTransportBearer = vi.mocked(getMcpHttpBearerToken);
+const mockIsTransportBearer = vi.mocked(isMcpTransportBearerToken);
 
 function req(headers: Record<string, string | string[] | undefined>): Request {
   return { headers } as Request;
@@ -38,7 +38,7 @@ describe('looksLikeLomiApiCredential', () => {
 
 describe('extractSessionMerchantApiKey', () => {
   beforeEach(() => {
-    mockTransportBearer.mockReturnValue(null);
+    mockIsTransportBearer.mockReturnValue(false);
   });
 
   it('prefers explicit API key headers', () => {
@@ -63,7 +63,7 @@ describe('extractSessionMerchantApiKey', () => {
   });
 
   it('reads Bearer merchant credential when transport bearer unset', () => {
-    mockTransportBearer.mockReturnValue(null);
+    mockIsTransportBearer.mockReturnValue(false);
     expect(
       extractSessionMerchantApiKey(
         req({ authorization: 'Bearer lomi_mcp_abcdefghijklmnop' }),
@@ -71,11 +71,18 @@ describe('extractSessionMerchantApiKey', () => {
     ).toBe('lomi_mcp_abcdefghijklmnop');
   });
 
-  it('ignores Bearer when it matches MCP transport secret', () => {
-    mockTransportBearer.mockReturnValue('transport-secret');
+  it('ignores Bearer when it matches any MCP transport secret', () => {
+    mockIsTransportBearer.mockImplementation(
+      (t) => t === 'transport-secret' || t === 'transport-secret-2',
+    );
     expect(
       extractSessionMerchantApiKey(
         req({ authorization: 'Bearer transport-secret' }),
+      ),
+    ).toBe(null);
+    expect(
+      extractSessionMerchantApiKey(
+        req({ authorization: 'Bearer transport-secret-2' }),
       ),
     ).toBe(null);
   });

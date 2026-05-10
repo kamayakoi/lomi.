@@ -2,7 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
-import { CurrencyCode } from '../../utils/types/api';
+import type { CurrencyCode, Json } from '../../utils/types/api';
+import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
+
+export type CheckoutIdempotencyContext = {
+  key: string;
+  bodyHash: string;
+};
 
 @Injectable()
 export class CheckoutSessionsService {
@@ -13,53 +19,64 @@ export class CheckoutSessionsService {
    * Uses RPC: create_checkout_session for single product
    * Uses RPC: create_checkout_session_with_line_items for multi-product
    */
-  async create(createDto: CreateCheckoutSessionDto, user: AuthContext) {
-    // Check if this is a multi-product checkout (has line_items)
+  async create(
+    createDto: CreateCheckoutSessionDto,
+    user: AuthContext,
+    idempotency?: CheckoutIdempotencyContext,
+  ) {
     if (createDto.line_items && createDto.line_items.length > 0) {
-      // Multi-product checkout - use the line items RPC
+      const rpcArgs = {
+        p_organization_id: user.organizationId,
+        p_created_by: user.merchantId,
+        p_currency_code: createDto.currency_code as CurrencyCode,
+        p_line_items: createDto.line_items as unknown as Json,
+        p_environment: user.environment,
+        p_customer_id: createDto.customer_id || null,
+        p_metadata: createDto.metadata || null,
+        p_title: createDto.title || null,
+        p_description: createDto.description || null,
+        p_success_url: createDto.success_url || null,
+        p_cancel_url: createDto.cancel_url || null,
+        p_customer_email: createDto.customer_email || null,
+        p_customer_name: createDto.customer_name || null,
+        p_customer_phone: createDto.customer_phone || null,
+        p_customer_city: createDto.customer_city || null,
+        p_customer_country: createDto.customer_country || null,
+        p_customer_address: createDto.customer_address || null,
+        p_customer_postal_code: createDto.customer_postal_code || null,
+        p_allow_coupon_code: createDto.allow_coupon_code ?? false,
+        p_expiration_minutes: 60,
+        p_require_billing_address: createDto.require_billing_address ?? false,
+        p_payment_link_id: createDto.payment_link_id || null,
+        ...(idempotency
+          ? {
+              p_idempotency_key: idempotency.key,
+              p_idempotency_body_hash: idempotency.bodyHash,
+            }
+          : {}),
+      };
+
       const { data, error } = await this.supabase.rpc(
         'create_checkout_session_with_line_items',
-        {
-          p_organization_id: user.organizationId,
-          p_created_by: user.merchantId,
-          p_currency_code: createDto.currency_code as CurrencyCode,
-          p_line_items: createDto.line_items as any,
-          p_environment: user.environment,
-          p_customer_id: createDto.customer_id || null,
-          p_metadata: createDto.metadata || null,
-          p_title: createDto.title || null,
-          p_description: createDto.description || null,
-          p_success_url: createDto.success_url || null,
-          p_cancel_url: createDto.cancel_url || null,
-          p_customer_email: createDto.customer_email || null,
-          p_customer_name: createDto.customer_name || null,
-          p_customer_phone: createDto.customer_phone || null,
-          p_customer_city: createDto.customer_city || null,
-          p_customer_country: createDto.customer_country || null,
-          p_customer_address: createDto.customer_address || null,
-          p_customer_postal_code: createDto.customer_postal_code || null,
-          p_allow_coupon_code: createDto.allow_coupon_code ?? false,
-          p_expiration_minutes: 60,
-          p_require_billing_address: createDto.require_billing_address ?? false,
-          p_payment_link_id: createDto.payment_link_id || null,
-        },
+        rpcArgs,
       );
 
-      console.log('create_checkout_session_with_line_items RPC result:', {
-        data,
-        error,
-      });
+      if (process.env.LOMI_DEBUG_CHECKOUT_RPC === '1') {
+        console.log('create_checkout_session_with_line_items RPC result:', {
+          data,
+          error,
+        });
+      }
 
-      if (error) throw new Error(error.message);
+      if (error) throwMappedSupabaseRpcError(error.message);
       return data;
     }
 
-    // Single product checkout - use existing RPC
-    const { data, error } = await this.supabase.rpc('create_checkout_session', {
+    const rpcArgs = {
       p_organization_id: user.organizationId,
       p_environment: user.environment,
       p_created_by: user.merchantId,
-      p_amount: (createDto.amount ?? null) as any,
+      p_amount: (createDto.amount ?? null) as unknown as number,
       p_currency_code: createDto.currency_code as CurrencyCode,
       p_customer_id: createDto.customer_id || null,
       p_metadata: createDto.metadata || null,
@@ -82,18 +99,27 @@ export class CheckoutSessionsService {
       p_allow_coupon_code: createDto.allow_coupon_code ?? false,
       p_require_billing_address: createDto.require_billing_address ?? false,
       p_payment_link_id: createDto.payment_link_id || null,
-    });
+      ...(idempotency
+        ? {
+            p_idempotency_key: idempotency.key,
+            p_idempotency_body_hash: idempotency.bodyHash,
+          }
+        : {}),
+    };
 
-    console.log('create_checkout_session RPC result:', { data, error });
+    const { data, error } = await this.supabase.rpc(
+      'create_checkout_session',
+      rpcArgs,
+    );
 
-    if (error) throw new Error(error.message);
+    if (process.env.LOMI_DEBUG_CHECKOUT_RPC === '1') {
+      console.log('create_checkout_session RPC result:', { data, error });
+    }
+
+    if (error) throwMappedSupabaseRpcError(error.message);
     return data;
   }
 
-  /**
-   * List checkout sessions with pagination and filtering
-   * Uses RPC: list_checkout_sessions
-   */
   async findAll(
     user: AuthContext,
     status?: string,
@@ -102,7 +128,7 @@ export class CheckoutSessionsService {
   ) {
     const { data, error } = await this.supabase.rpc('list_checkout_sessions', {
       p_merchant_id: user.merchantId,
-      p_status: (status as any) || null,
+      p_status: (status as never) || null,
       p_limit: limit,
       p_offset: offset,
     });
@@ -111,9 +137,6 @@ export class CheckoutSessionsService {
     return data || [];
   }
 
-  /**
-   * Get single checkout session by ID
-   */
   async findOne(id: string, user: AuthContext) {
     const { data, error } = await this.supabase
       .getClient()

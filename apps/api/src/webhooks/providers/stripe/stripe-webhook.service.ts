@@ -37,6 +37,32 @@ export class StripeWebhookService {
 
     const event = this.verifyWebhook(signature, rawBody);
 
+    const { data: claimed, error: claimError } = await this.supabase.rpc(
+      'claim_inbound_provider_webhook_event',
+      {
+        p_provider: 'STRIPE',
+        p_provider_event_id: event.id,
+        p_metadata: { type: event.type } as any,
+      },
+    );
+
+    if (claimError) {
+      this.logger.warn(
+        `Stripe inbound idempotency claim error: ${claimError.message}`,
+      );
+    } else if (claimed === false) {
+      this.logger.log({
+        message: 'stripe_webhook_duplicate',
+        event_id: event.id,
+        event_type: event.type,
+      });
+      return {
+        message: 'duplicate_event',
+        duplicate: true,
+        event_id: event.id,
+      };
+    }
+
     // Wide Event: Log webhook receipt with structured context
     this.logger.log({
       message: 'stripe_webhook_received',

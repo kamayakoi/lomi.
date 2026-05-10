@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BadRequestException,
+  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -84,6 +85,45 @@ describe('PaymentRequestsService', () => {
           p_environment: user.environment,
         }),
       );
+    });
+
+    it('forwards idempotency arguments to create_payment_request_api', async () => {
+      const dto: CreatePaymentRequestDto = {
+        amount: 1000,
+        currency_code: 'XOF',
+        expiry_date: '2026-12-31T23:59:59.000Z',
+      };
+
+      mockClientRpc.mockResolvedValue({ data: { request_id: 'x' }, error: null });
+
+      await service.create(dto, user, { key: 'ik', bodyHash: 'fh' });
+
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'create_payment_request_api',
+        expect.objectContaining({
+          p_idempotency_key: 'ik',
+          p_idempotency_body_hash: 'fh',
+        }),
+      );
+    });
+
+    it('maps idempotency_key_conflict RPC error to ConflictException', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'idempotency_key_conflict' },
+      });
+
+      await expect(
+        service.create(
+          {
+            amount: 1,
+            currency_code: 'XOF',
+            expiry_date: '2026-01-01T00:00:00.000Z',
+          } as CreatePaymentRequestDto,
+          user,
+          { key: 'k', bodyHash: 'h' },
+        ),
+      ).rejects.toBeInstanceOf(ConflictException);
     });
 
     it('throws when RPC returns an error', async () => {

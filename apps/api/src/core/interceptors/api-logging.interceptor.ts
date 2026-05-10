@@ -64,16 +64,29 @@ export class ApiLoggingInterceptor implements NestInterceptor {
         // Cast to any because the types are not yet generated for the new RPC
         const rpcName = 'log_api_interaction' as any;
 
+        const endpointPath = urlWithoutQuery(request.url);
+        const heavyPayloadPaths = isCheckoutSessionsPath(endpointPath);
+        const requestPayload = heavyPayloadPaths
+          ? truncateLogPayload(request.body)
+          : request.body
+            ? request.body
+            : {};
+        const responsePayload = heavyPayloadPaths
+          ? truncateLogPayload(responseBody)
+          : responseBody
+            ? responseBody
+            : {};
+
         // Don't await this to avoid blocking the response
         this.supabase
           .rpc(rpcName, {
             p_organization_id: user.organizationId,
             p_api_key: apiKey,
-            p_endpoint: urlWithoutQuery(request.url),
+            p_endpoint: endpointPath,
             p_request_method: request.method,
-            p_request_payload: request.body ? request.body : {},
+            p_request_payload: requestPayload,
             p_response_status: statusCode,
-            p_response_payload: responseBody ? responseBody : {},
+            p_response_payload: responsePayload,
             p_response_time: durationMs,
           })
           .then(({ error }) => {
@@ -108,4 +121,37 @@ export class ApiLoggingInterceptor implements NestInterceptor {
 
 function urlWithoutQuery(url: string): string {
   return url.split('?')[0];
+}
+
+/** Checkout routes can carry large line_items / metadata; keep logs small. */
+function isCheckoutSessionsPath(path: string): boolean {
+  return (
+    path === '/checkout-sessions' || path.startsWith('/checkout-sessions/')
+  );
+}
+
+const CHECKOUT_LOG_PAYLOAD_MAX_CHARS = 2048;
+
+function truncateLogPayload(value: unknown): Record<string, unknown> {
+  if (value === null || value === undefined) {
+    return {};
+  }
+  let text: string;
+  try {
+    text = typeof value === 'string' ? value : JSON.stringify(value);
+  } catch {
+    return { _log_serialization_failed: true };
+  }
+  if (text.length <= CHECKOUT_LOG_PAYLOAD_MAX_CHARS) {
+    try {
+      return JSON.parse(text) as Record<string, unknown>;
+    } catch {
+      return { preview: text };
+    }
+  }
+  return {
+    _truncated: true,
+    original_length: text.length,
+    preview: text.slice(0, CHECKOUT_LOG_PAYLOAD_MAX_CHARS),
+  };
 }

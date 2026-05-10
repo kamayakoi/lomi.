@@ -7,6 +7,12 @@ import {
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { throwMappedSupabaseRpcError } from '../../utils/supabase-rpc-errors';
+
+export type PaymentRequestIdempotencyContext = {
+  key: string;
+  bodyHash: string;
+};
 
 @Injectable()
 export class PaymentRequestsService {
@@ -16,23 +22,34 @@ export class PaymentRequestsService {
    * Create a payment request
    * Uses RPC: create_payment_request_api
    */
-  async create(createDto: CreatePaymentRequestDto, user: AuthContext) {
-    const { data, error } = await this.supabase.getClient().rpc(
-      'create_payment_request_api' as any,
-      {
-        p_organization_id: user.organizationId,
-        p_customer_id: createDto.customer_id || null,
-        p_amount: createDto.amount,
-        p_currency_code: createDto.currency_code,
-        p_description: createDto.description || null,
-        p_expiry_date: createDto.expiry_date,
-        p_payment_reference: createDto.payment_reference || null,
-        p_created_by: user.merchantId,
-        p_environment: user.environment || 'live',
-      } as any,
-    );
+  async create(
+    createDto: CreatePaymentRequestDto,
+    user: AuthContext,
+    idempotency?: PaymentRequestIdempotencyContext,
+  ) {
+    const rpcArgs = {
+      p_organization_id: user.organizationId,
+      p_customer_id: createDto.customer_id || null,
+      p_amount: createDto.amount,
+      p_currency_code: createDto.currency_code,
+      p_description: createDto.description || null,
+      p_expiry_date: createDto.expiry_date,
+      p_payment_reference: createDto.payment_reference || null,
+      p_created_by: user.merchantId,
+      p_environment: user.environment || 'live',
+      ...(idempotency
+        ? {
+            p_idempotency_key: idempotency.key,
+            p_idempotency_body_hash: idempotency.bodyHash,
+          }
+        : {}),
+    };
 
-    if (error) throw new Error(error.message);
+    const { data, error } = await this.supabase
+      .getClient()
+      .rpc('create_payment_request_api', rpcArgs as never);
+
+    if (error) throwMappedSupabaseRpcError(error.message);
 
     if (!data) {
       throw new Error('Failed to create payment request');

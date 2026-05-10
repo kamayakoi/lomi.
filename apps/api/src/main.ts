@@ -49,7 +49,8 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders:
       'X-API-KEY,X-Request-Id,Idempotency-Key,X-Lomi-Signature,X-Lomi-Event,X-Webhook-ID,X-Merchant-Signature,Content-Type,Authorization',
-    exposedHeaders: 'X-Request-Id,Retry-After',
+    exposedHeaders:
+      'X-Request-Id,Retry-After,X-RateLimit-Limit,X-RateLimit-Policy,X-RateLimit-Window-Seconds',
   });
 
   const document = SwaggerModule.createDocument(

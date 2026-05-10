@@ -8,6 +8,7 @@ import {
   Query,
   ParseIntPipe,
   DefaultValuePipe,
+  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +21,7 @@ import {
   ApiExtraModels,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { PaymentRequestsService } from './payment-requests.service';
 import { CreatePaymentRequestDto } from './dto/create-payment-request.dto';
 import { PaymentRequestResponseDto } from './dto/payment-request-response.dto';
@@ -28,6 +30,14 @@ import {
   CurrentUser,
   type AuthContext,
 } from '../common/decorators/current-user.decorator';
+import {
+  WRITE_THROTTLE_LIMIT,
+  WRITE_THROTTLE_TTL_MS,
+} from '../../config/http.constants';
+import {
+  fingerprintRequestBody,
+  normalizeIdempotencyKey,
+} from '../../utils/idempotency-fingerprint';
 
 @ApiTags('Demandes de paiement')
 @ApiSecurity('api-key')
@@ -86,11 +96,28 @@ export class PaymentRequestsController {
       },
     },
   })
+  @Throttle({
+    default: { limit: WRITE_THROTTLE_LIMIT, ttl: WRITE_THROTTLE_TTL_MS },
+  })
   create(
     @Body() createDto: CreatePaymentRequestDto,
     @CurrentUser() user: AuthContext,
+    @Headers('idempotency-key')
+    idempotencyKey?: string | string[],
   ) {
-    return this.service.create(createDto, user);
+    const normalizedKey = normalizeIdempotencyKey(idempotencyKey);
+    const dtoPayload = JSON.parse(
+      JSON.stringify(createDto),
+    ) as Record<string, unknown>;
+    const idempotency =
+      normalizedKey !== null
+        ? {
+            key: normalizedKey,
+            bodyHash: fingerprintRequestBody(dtoPayload),
+          }
+        : undefined;
+
+    return this.service.create(createDto, user, idempotency);
   }
 
   @Get()

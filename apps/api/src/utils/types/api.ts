@@ -1778,6 +1778,8 @@ export type Database = {
           p_metadata?: Json | null;
           p_organization_id: string;
           p_payment_link_id?: string | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
           p_price_id?: string | null;
           p_product_id?: string | null;
           p_quantity?: number | null;
@@ -1809,6 +1811,8 @@ export type Database = {
           p_metadata?: Json | null;
           p_organization_id: string;
           p_payment_link_id?: string | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
           p_require_billing_address?: boolean | null;
           p_shipping_amount?: number | null;
           p_success_url?: string | null;
@@ -1965,6 +1969,102 @@ export type Database = {
           p_webhook_id: string;
         };
         Returns: string;
+      };
+      set_rate_limit_policy: {
+        Args: {
+          p_api_key?: string | null;
+          p_endpoint_pattern: string;
+          p_environment: string;
+          p_organization_id?: string | null;
+          p_priority?: number | null;
+          p_requests_per_day: number;
+          p_requests_per_minute: number;
+          p_scope_type: string;
+        };
+        Returns: string;
+      };
+      disable_rate_limit_policy: {
+        Args: { p_policy_id: string };
+        Returns: boolean;
+      };
+      list_rate_limit_policies: {
+        Args: { p_organization_id: string };
+        Returns: {
+          policy_id: string;
+          scope_type: string;
+          organization_id: string | null;
+          api_key: string | null;
+          endpoint_pattern: string;
+          environment: string;
+          requests_per_minute: number;
+          requests_per_day: number;
+          priority: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        }[];
+      };
+      get_effective_rate_limit: {
+        Args: {
+          p_api_key: string;
+          p_endpoint: string;
+          p_organization_id: string;
+        };
+        Returns: {
+          requests_per_minute: number;
+          requests_per_day: number;
+          matched_policy_id: string | null;
+          used_configured_policy: boolean;
+          environment: string;
+        }[];
+      };
+      webhook_outbox_upsert_event: {
+        Args: {
+          p_event_type: APIEnums['webhook_event'];
+          p_idempotency_key: string;
+          p_organization_id: string;
+          p_payload: Json;
+        };
+        Returns: string;
+      };
+      webhook_dispatch_ensure: {
+        Args: { p_outbox_id: string; p_webhook_id: string };
+        Returns: string;
+      };
+      webhook_dispatch_should_process: {
+        Args: { p_dispatch_id: string };
+        Returns: boolean;
+      };
+      record_webhook_delivery_attempt: {
+        Args: {
+          p_attempt_number: number;
+          p_dispatch_id: string;
+          p_error_message?: string | null;
+          p_request_duration_ms?: number | null;
+          p_response_body?: string | null;
+          p_response_status?: number | null;
+        };
+        Returns: string;
+      };
+      mark_webhook_dispatch_delivered: {
+        Args: { p_dispatch_id: string };
+        Returns: undefined;
+      };
+      mark_webhook_dispatch_dead_letter: {
+        Args: { p_dispatch_id: string; p_reason: string };
+        Returns: undefined;
+      };
+      reconcile_webhook_outbox_status: {
+        Args: { p_outbox_id: string };
+        Returns: undefined;
+      };
+      claim_inbound_provider_webhook_event: {
+        Args: {
+          p_metadata?: Json | null;
+          p_provider: APIEnums['provider_code'];
+          p_provider_event_id: string;
+        };
+        Returns: boolean;
       };
       create_beneficiary_payout: {
         Args: {
@@ -2450,12 +2550,14 @@ export type Database = {
           p_amount: number;
           p_created_by: string;
           p_currency_code: APIEnums['currency_code'];
-          p_customer_id: string;
-          p_description: string;
+          p_customer_id: string | null;
+          p_description?: string | null;
           p_environment?: string | null;
           p_expiry_date: string;
           p_organization_id: string;
-          p_payment_reference: string;
+          p_payment_reference?: string | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
         };
         Returns: {
           amount: number;
@@ -2691,6 +2793,7 @@ export type Database = {
         | 'BNPL'
         | 'FREE';
       payout_status: 'pending' | 'processing' | 'completed' | 'failed';
+      pricing_plan_type: 'fixed' | 'volume_tiered' | 'custom';
       pricing_model: 'standard' | 'pay_what_you_want' | 'tiered' | 'volume';
       product_type: 'one_time' | 'recurring' | 'usage_based';
       provider_code:
