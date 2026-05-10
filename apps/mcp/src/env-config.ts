@@ -69,9 +69,9 @@ export function listenHostOptions(): {
   host: string;
   allowedHosts?: string[];
 } {
-  const host =
-    process.env.LOMI_MCP_HTTP_HOST?.trim() ||
-    (getTransportMode() === 'http' ? '0.0.0.0' : '127.0.0.1');
+  // HTTP entrypoint should be reachable by platform health checks even when
+  // LOMI_MCP_TRANSPORT is unset (e.g. start:http deployments on Railway).
+  const host = process.env.LOMI_MCP_HTTP_HOST?.trim() || '0.0.0.0';
   const raw = process.env.LOMI_MCP_ALLOWED_HOSTS?.trim();
   if (!raw) {
     return { host };
