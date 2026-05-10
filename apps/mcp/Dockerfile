@@ -4,7 +4,7 @@ FROM node:22-bookworm-slim
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
-RUN corepack enable pnpm && pnpm install --frozen-lockfile
+RUN corepack enable pnpm && pnpm install --frozen-lockfile --allow-build=esbuild
 
 COPY tsconfig.json ./
 COPY src ./src
