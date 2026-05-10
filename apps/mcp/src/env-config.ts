@@ -80,6 +80,13 @@ export function listenHostOptions(): {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
+  // Railway health checks can use this host header.
+  if (
+    (process.env.RAILWAY_PROJECT_ID || process.env.RAILWAY_ENVIRONMENT_ID) &&
+    !allowedHosts.includes('healthcheck.railway.app')
+  ) {
+    allowedHosts.push('healthcheck.railway.app');
+  }
   return { host, allowedHosts };
 }
 
