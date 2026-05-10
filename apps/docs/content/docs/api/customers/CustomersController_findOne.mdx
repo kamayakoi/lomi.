@@ -11,7 +11,16 @@ operationId: CustomersController_findOne
 
 Retrieve a customer
 
-Returns one customer by ID. Returns 404 if unknown or inaccessible for this API key.
+Returns one customer by ID. Responds with **404** if the record is unknown or not visible to this API key.
+
+
+### When to use this
+
+Use on profile pages or before updating a customer or creating a subscription.
+
+### See also
+
+[Customer transactions](/api/customers/CustomersController_getTransactions)
 
 
 ## Authentication

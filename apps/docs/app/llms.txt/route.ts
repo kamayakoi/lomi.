@@ -1,175 +1,305 @@
 /* @proprietary license */
 
+import { REST_API_SECTION_ORDER } from '@/lib/scripts/manual-api/constants';
 import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 
 export const revalidate = false;
 
+function sectionTitleFromFolder(folder: string): string {
+  return folder
+    .replace(/[-_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/** First English MDX page under `api/{folder}/` (sorted by URL) for stable deep links. */
+function firstApiPageInFolder(
+  pages: ReturnType<typeof source.getPages>,
+  folder: string,
+) {
+  return pages
+    .filter((p) => p.slugs[0] === 'api' && p.slugs[1] === folder)
+    .sort((a, b) => a.url.localeCompare(b.url))[0];
+}
+
+function pageBySlugPath(
+  pages: ReturnType<typeof source.getPages>,
+  path: string,
+) {
+  return pages.find((p) => p.slugs.join('/') === path);
+}
+
 export async function GET() {
   const docsOrigin = getDocsSiteOrigin();
+  const pages = source.getPages('en');
+
   const lines: string[] = [];
 
-  // H1 Heading (Required) - Name of the project
   lines.push('# lomi.');
   lines.push('');
-
-  // Blockquote Summary (Required) - Concise project summary
   lines.push(
-    "> lomi. is francophone West Africa's leading payment processing platform. We provide APIs and tools for businesses to accept Mobile Money (Wave, MTN, SPI), credit cards (Visa, Mastercard, Apple Pay, Google Pay), and bank transfers across 8 UEMOA countries: Senegal, Côte d'Ivoire, Mali, Burkina Faso, Benin, Togo, Niger, and Guinea-Bissau.",
+    "> Francophone West Africa's payment platform: Mobile Money (Wave, MTN, SPI), cards (Visa, Mastercard, Apple Pay, Google Pay), bank transfers across eight UEMOA markets. Use this file as a **map**—then read the linked pages for schemas and examples.",
   );
   lines.push('');
 
-  // Detailed Information Section
-  lines.push('## About lomi.');
+  lines.push('## How to use this briefing');
   lines.push('');
   lines.push(
-    'lomi. is a unified payment infrastructure built for African businesses. Our platform offers:',
-  );
-  lines.push('');
-  lines.push(
-    '- **Payment Processing**: Accept payments via Mobile Money, credit/debit cards, and bank transfers',
+    '1. Read **Authentication** and **Integration quickstart** below.',
   );
   lines.push(
-    '- **Instant Payouts**: Withdraw earnings to mobile wallets or bank accounts globally',
+    '2. Pick one **Payment flow** that matches your product (hosted checkout, links, direct charge, subscriptions, or payouts).',
   );
   lines.push(
-    '- **Subscription Management**: Create and manage recurring payment plans',
-  );
-  lines.push(
-    '- **Fraud Prevention**: Built-in fraud detection and chargeback protection',
-  );
-  lines.push(
-    '- **Developer-First**: REST APIs and SDKs for JavaScript, Python, Go, and PHP',
-  );
-  lines.push(
-    '- **Merchant of Record**: We handle tax compliance and regulatory requirements',
+    `3. Use the [REST API hub](${docsOrigin}/api/index) for Try-it and samples; treat \`apps/docs/openapi.json\` in the monorepo as the machine-readable contract.`,
   );
   lines.push('');
 
-  // Pricing Information
-  lines.push('## Pricing');
+  lines.push('## Integration quickstart');
   lines.push('');
-  lines.push('- Mobile Money: 2% + 200 F CFA per transaction');
-  lines.push('- Credit Cards: 3.5% + $0.40 per transaction');
-  lines.push('- No setup fees, no monthly costs, no hidden charges');
+  lines.push(
+    '1. Create a merchant account and API keys in the [dashboard](https://dashboard.lomi.africa).',
+  );
+  lines.push(
+    '2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.',
+  );
+  const integrationPage = pageBySlugPath(
+    pages,
+    'reference/setup/integration',
+  );
+  const createAccountPage = pageBySlugPath(
+    pages,
+    'core/fundamentals/create-account',
+  );
+  if (integrationPage) {
+    lines.push(
+      `3. Follow the [integration overview](${docsOrigin}${integrationPage.url}) for headers, environments, and product choices.`,
+    );
+  }
+  if (createAccountPage) {
+    lines.push(
+      `4. If you have not already, see [${createAccountPage.data.title ?? 'Create account'}](${docsOrigin}${createAccountPage.url}).`,
+    );
+  }
   lines.push('');
 
-  // Supported Payment Methods
-  lines.push('## Supported Payment Methods');
+  lines.push('## Authentication and environments');
   lines.push('');
-  lines.push('### Mobile Money');
-  lines.push("- Wave (Senegal, Côte d'Ivoire)");
-  lines.push('- MTN Mobile Money (West and Central Africa)');
-  lines.push('- SPI Interoperable Payments (All UEMOA countries)');
+  lines.push(
+    'Send the merchant **API key** on every server-side call: header `X-API-KEY`. Sandbox and live keys are different; using the wrong key against an environment returns **401**.',
+  );
   lines.push('');
-  lines.push('### Cards');
-  lines.push('- Visa');
-  lines.push('- Mastercard');
-  lines.push('- American Express');
-  lines.push('- GIM UEMOA');
+  lines.push('- **Sandbox base URL**: `https://sandbox.api.lomi.africa`');
+  lines.push('- **Live base URL**: `https://api.lomi.africa`');
   lines.push('');
 
-  // Core Documentation
-  lines.push('## Core Documentation');
+  lines.push('## Idempotency, errors, and retries');
   lines.push('');
-  lines.push('Essential resources for getting started with lomi.:');
+  lines.push(
+    'Errors use the standard JSON shape with an HTTP status and a machine-readable message.',
+  );
+  lines.push(
+    '**401** usually means a missing/invalid key; **404** means the resource does not exist for this API key; **429** means rate limiting.',
+  );
+  lines.push(
+    'For **creates** that must not double-charge (payments, payouts), send an idempotency key when your client or gateway supports it.',
+  );
   lines.push('');
 
-  // Organize documentation by categories
-  const docsMap = new Map<
+  lines.push('## Payment flows (pick one)');
+  lines.push('');
+  lines.push(
+    'Choose the path that matches your UX—not every merchant needs every API.',
+  );
+  lines.push('');
+  const hostedCheckout = pages.find(
+    (p) => p.slugs[2] === 'CheckoutSessionsController_create',
+  );
+  if (hostedCheckout) {
+    lines.push(
+      `- **Hosted checkout** — buyer completes payment on the hosted experience: [Create checkout session](${docsOrigin}${hostedCheckout.url}).`,
+    );
+  }
+  const plCreate = pages.find(
+    (p) => p.slugs[2] === 'PaymentLinksController_create',
+  );
+  if (plCreate) {
+    lines.push(
+      `- **Shareable payment links** → [${plCreate.data.title ?? 'Create payment link'}](${docsOrigin}${plCreate.url}).`,
+    );
+  }
+  const charge = pages.find((p) => p.slugs[2] === 'ChargesController_createWaveCharge');
+  if (charge) {
+    lines.push(
+      `- **Direct mobile-money charge (server-initiated)** → [${charge.data.title ?? 'Charge'}](${docsOrigin}${charge.url}) when you are not using hosted checkout.`,
+    );
+  }
+  const pi = pages.find(
+    (p) => p.slugs[2] === 'PaymentIntentsController_create',
+  );
+  if (pi) {
+    lines.push(
+      `- **Card PaymentIntent / Elements-style** → [${pi.data.title ?? 'PaymentIntent'}](${docsOrigin}${pi.url}).`,
+    );
+  }
+  const pr = pages.find(
+    (p) => p.slugs[2] === 'PaymentRequestsController_create',
+  );
+  if (pr) {
+    lines.push(
+      `- **Payment request (invoice-style)** → [${pr.data.title ?? 'Create payment request'}](${docsOrigin}${pr.url}).`,
+    );
+  }
+  const subList = firstApiPageInFolder(pages, 'subscriptions');
+  if (subList) {
+    lines.push(
+      `- **Subscriptions** → explore [${subList.data.title ?? 'Subscriptions'}](${docsOrigin}${subList.url}) (list, cancel, per-customer).`,
+    );
+  }
+  const payout = firstApiPageInFolder(pages, 'payout');
+  const ben = firstApiPageInFolder(pages, 'beneficiary-payouts');
+  if (payout) {
+    lines.push(
+      `- **Payouts to your wallet** → [${payout.data.title ?? 'Payout'}](${docsOrigin}${payout.url}).`,
+    );
+  }
+  if (ben) {
+    lines.push(
+      `- **Third-party beneficiary payouts** → [${ben.data.title ?? 'Beneficiary payouts'}](${docsOrigin}${ben.url}).`,
+    );
+  }
+  const wh = firstApiPageInFolder(pages, 'webhooks');
+  if (wh) {
+    lines.push(
+      `- **Outbound webhooks (events to your server)** → [${wh.data.title ?? 'Webhooks'}](${docsOrigin}${wh.url}) and delivery logs under the same API section.`,
+    );
+  }
+  lines.push('');
+
+  lines.push('## REST API by domain');
+  lines.push('');
+  lines.push(
+    `Each item links into the generated endpoint pages for that resource group. Primary hub: [REST API](${docsOrigin}/api/index).`,
+  );
+  lines.push('');
+  for (const folder of REST_API_SECTION_ORDER) {
+    const p = firstApiPageInFolder(pages, folder);
+    if (!p) continue;
+    const label = sectionTitleFromFolder(folder);
+    lines.push(
+      `- **${label}**: [${p.data.title ?? label}](${docsOrigin}${p.url})`,
+    );
+  }
+  lines.push('');
+
+  lines.push('## Guides to read next');
+  lines.push('');
+  const whatIs = pageBySlugPath(pages, 'core/introduction/what-is-lomi');
+  if (whatIs) {
+    lines.push(
+      `- [${whatIs.data.title ?? 'What is lomi.?'}](${docsOrigin}${whatIs.url})`,
+    );
+  }
+  const psm = pages.find(
+    (p) =>
+      p.url.includes('payment-state-machine') ||
+      p.slugs.join('/').includes('payment-state-machine'),
+  );
+  if (psm) {
+    lines.push(
+      `- [${psm.data.title ?? 'Payment state machine'}](${docsOrigin}${psm.url}) — status transitions and balances`,
+    );
+  }
+  const mcp = pageBySlugPath(pages, 'reference/integrations/mcp');
+  if (mcp) {
+    lines.push(`- [${mcp.data.title ?? 'MCP'}](${docsOrigin}${mcp.url})`);
+  }
+  lines.push('');
+
+  lines.push('## Document map (browse by section)');
+  lines.push('');
+  lines.push(
+    'Prefer section sidebars on the docs site for exhaustive lists. High-level areas:',
+  );
+  lines.push('');
+  const catOrder = ['core', 'reference', 'api', 'openapi'];
+  const byCat = new Map<
     string,
     { title: string; url: string; description?: string }[]
   >();
-
-  for (const page of source.getPages('en')) {
+  for (const page of pages) {
     const category = page.slugs[0] || 'general';
-    const list = docsMap.get(category) ?? [];
+    const list = byCat.get(category) ?? [];
     list.push({
       title: page.data.title ?? 'lomi.',
       url: `${docsOrigin}${page.url}`,
       description: page.data.description,
     });
-    docsMap.set(category, list);
+    byCat.set(category, list);
   }
-
-  // Add core/fundamentals first if they exist
-  const corePages = docsMap.get('core');
-  if (corePages) {
-    for (const page of corePages) {
+  for (const cat of catOrder) {
+    const list = byCat.get(cat);
+    if (!list?.length) continue;
+    const sample = list.slice(0, 4);
+    lines.push(`### ${cat}`);
+    for (const entry of sample) {
       lines.push(
-        `- [${page.title}](${page.url})${page.description ? `: ${page.description}` : ''}`,
+        `- [${entry.title}](${entry.url})${entry.description ? ` — ${entry.description}` : ''}`,
+      );
+    }
+    if (list.length > sample.length) {
+      lines.push(
+        `_…and ${list.length - sample.length} more pages in this section (see docs sidebar)._`,
+      );
+    }
+    lines.push('');
+  }
+  for (const [category, list] of byCat) {
+    if (catOrder.includes(category)) continue;
+    const sample = list.slice(0, 3);
+    lines.push(`### ${category}`);
+    for (const entry of sample) {
+      lines.push(
+        `- [${entry.title}](${entry.url})${entry.description ? ` — ${entry.description}` : ''}`,
+      );
+    }
+    if (list.length > sample.length) {
+      lines.push(
+        `_…and ${list.length - sample.length} more pages (see docs sidebar)._`,
       );
     }
     lines.push('');
   }
 
-  // API Reference section
-  lines.push('## API Reference');
-  lines.push('');
-  const refPages = docsMap.get('reference');
-  if (refPages) {
-    for (const page of refPages) {
-      lines.push(
-        `- [${page.title}](${page.url})${page.description ? `: ${page.description}` : ''}`,
-      );
-    }
-  }
-  lines.push('');
-
-  // Additional Documentation
-  lines.push('## Additional Resources');
-  lines.push('');
-
-  for (const [category, pages] of docsMap) {
-    if (category === 'core' || category === 'reference') continue;
-    lines.push(`### ${category.charAt(0).toUpperCase() + category.slice(1)}`);
-    for (const page of pages) {
-      lines.push(
-        `- [${page.title}](${page.url})${page.description ? `: ${page.description}` : ''}`,
-      );
-    }
-    lines.push('');
-  }
-
-  // Contact Information
-  lines.push('## Contact & Support');
+  lines.push('## Contact and support');
   lines.push('');
   lines.push('- Website: https://lomi.africa');
   lines.push(`- Documentation: ${docsOrigin}`);
   lines.push('- Email: hello@lomi.africa');
   lines.push('- GitHub: https://github.com/lomiafrica/lomi./');
   lines.push('- Discord: https://discord.gg/33syDfh9');
-  lines.push('- Twitter/X: https://twitter.com/lomiafrica');
+  lines.push('- X: https://twitter.com/lomiafrica');
   lines.push('');
 
-  // FAQ for LLMs
-  lines.push('## Frequently Asked Questions');
+  lines.push('## Common questions');
   lines.push('');
-  lines.push('**Q: How do I get started with lomi.?**');
   lines.push(
-    'A: Create an account on the dashboard, connect your payment methods, and start accepting payments in minutes.',
+    `**Where do schemas live?** Use the [REST API](${docsOrigin}/api/index) explorer and the OpenAPI export at \`apps/docs/openapi.json\` (generated from \`apps/api\`).`,
   );
-  lines.push('');
-  lines.push('**Q: What countries does lomi. support?**');
-  lines.push(
-    "A: All 8 UEMOA countries: Senegal, Côte d'Ivoire, Mali, Burkina Faso, Benin, Togo, Niger, and Guinea-Bissau. Credit cards are accepted from customers worldwide.",
-  );
-  lines.push('');
-  lines.push('**Q: How do I integrate lomi. with my app?**');
-  lines.push(
-    `A: Use our REST API or official SDKs for TypeScript, Python, Go, and PHP. Documentation is available at ${docsOrigin}`,
-  );
-  lines.push('');
-  lines.push('**Q: How secure is lomi.?**');
-  lines.push(
-    'A: lomi. is PCI DSS compliant and uses industry-standard encryption, tokenization, and fraud detection to protect transactions.',
-  );
+  const txHub = firstApiPageInFolder(pages, 'transactions');
+  if (txHub) {
+    lines.push(
+      `**How do I reconcile payments?** Start from [${txHub.data.title ?? 'Transactions'}](${docsOrigin}${txHub.url}) and tie provider references to your internal order IDs using metadata on creates.`,
+    );
+  }
   lines.push('');
 
   return new Response(lines.join('\n'), {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
+      'Cache-Control': 'public, max-age=86400',
     },
   });
 }

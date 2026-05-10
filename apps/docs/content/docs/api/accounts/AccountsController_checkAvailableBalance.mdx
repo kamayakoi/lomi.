@@ -11,7 +11,16 @@ operationId: AccountsController_checkAvailableBalance
 
 Check available balance
 
-Checks whether sufficient funds exist in the requested currency.
+Checks whether sufficient funds exist in the requested currency before you move money out or reserve balance.
+
+
+### When to use this
+
+Call before initiating a payout, beneficiary payout, or any flow where you must guarantee spendable balance.
+
+### See also
+
+[Account balances](/api/accounts/AccountsController_getBalance) · [Payouts](/api/payout/PayoutsController_createWavePayout)
 
 
 ## Authentication

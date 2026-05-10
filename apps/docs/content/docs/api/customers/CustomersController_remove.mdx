@@ -11,7 +11,16 @@ operationId: CustomersController_remove
 
 Remove a customer
 
-Stops exposing the customer in list/detail responses. Returns 404 if unknown or inaccessible.
+Stops returning the customer in list and detail views for your organization.
+
+
+### When to use this
+
+Use for GDPR-style deletion requests or when you must disable a buyer record from merchant-facing APIs.
+
+### Good to know
+
+Behavior follows platform rules for retained financial records; confirm with your compliance team for legal holds.
 
 
 ## Authentication

@@ -11,7 +11,12 @@ operationId: AccountsController_getBalanceBreakdown
 
 Balance breakdown
 
-Returns balance components (available, pending, totals) with optional conversion to a target currency.
+Returns balance components (available, pending, totals) and may convert amounts into a target currency for reporting.
+
+
+### When to use this
+
+Use when finance or support teams need a split between pending and available, not just a single number.
 
 
 ## Authentication

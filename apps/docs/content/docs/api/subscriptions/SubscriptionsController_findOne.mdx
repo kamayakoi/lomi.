@@ -11,7 +11,12 @@ operationId: SubscriptionsController_findOne
 
 Retrieve subscription
 
-Returns one subscription by ID. Responds with 404 when unknown or inaccessible.
+Returns one subscription by ID including cycle and price references. Responds with **404** when unknown or inaccessible.
+
+
+### When to use this
+
+Use before upgrades, cancelations, or invoicing integration.
 
 
 ## Authentication

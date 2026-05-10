@@ -11,7 +11,16 @@ operationId: SubscriptionsController_cancel
 
 Cancel subscription
 
-Cancels an active subscription. Optional cancellation reason is stored for audit.
+Cancels an active subscription; optional reason is stored for analytics and chargeback context.
+
+
+### When to use this
+
+Use when the customer ends service or you enforce policy cancellations.
+
+### See also
+
+[Retrieve subscription](/api/subscriptions/SubscriptionsController_findOne)
 
 
 ## Authentication

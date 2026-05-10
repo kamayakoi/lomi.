@@ -11,7 +11,20 @@ operationId: WebhooksController_update
 
 Update webhook
 
-Patch delivery URL, rotating secrets, subscribed events metadata or lifecycle flags.
+Patches delivery URL, secrets, subscribed events, or lifecycle flags for an existing subscription.
+
+
+### When to use this
+
+Use when rotating signing secrets without re-creating the endpoint record.
+
+### Good to know
+
+Coordinate secret rotation with your receiver to avoid rejecting signed payloads.
+
+### See also
+
+[Webhook delivery logs](/api/webhook-delivery-logs/WebhookDeliveryLogsController_findAll)
 
 
 ## Authentication

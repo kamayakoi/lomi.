@@ -11,7 +11,12 @@ operationId: AccountsController_getBalance
 
 Account balances
 
-Returns current balances across currencies, optionally filtered by a single currency.
+Returns current balances across currencies; optionally filter to one currency for simpler UI.
+
+
+### When to use this
+
+Use for wallet surfaces, “available funds” displays, or pre-checking balances without fetching every account object.
 
 
 ## Authentication

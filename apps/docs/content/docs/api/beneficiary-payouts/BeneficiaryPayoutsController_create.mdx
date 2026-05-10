@@ -11,7 +11,20 @@ operationId: BeneficiaryPayoutsController_create
 
 Create beneficiary payout
 
-Initiates a payout to a third-party beneficiary from your account balance. Processing is asynchronous; updates arrive via outbound webhooks.
+Initiates a payout from your balance to a third-party beneficiary on supported rails.
+
+
+### When to use this
+
+Use when paying suppliers or partners to a saved beneficiary profile—not the same as a standard organization payout.
+
+### Good to know
+
+Processing is **asynchronous**. Treat the response as accepted for processing; definitive status arrives via [outbound webhooks](/api/webhooks/WebhooksController_findAll) and reconciliation APIs.
+
+### See also
+
+[List beneficiary payouts](/api/beneficiary-payouts/BeneficiaryPayoutsController_findAll) · [Check balance](/api/accounts/AccountsController_checkAvailableBalance)
 
 
 ## Authentication

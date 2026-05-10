@@ -11,7 +11,16 @@ operationId: SubscriptionsController_findByCustomer
 
 List subscriptions for customer
 
-Returns subscriptions for a customer ID. Responds with 404 when the customer is unknown.
+Returns subscriptions tied to one customer ID. Responds with **404** when the customer is unknown.
+
+
+### When to use this
+
+Use on customer portals showing active plans.
+
+### See also
+
+[Retrieve customer](/api/customers/CustomersController_findOne)
 
 
 ## Authentication

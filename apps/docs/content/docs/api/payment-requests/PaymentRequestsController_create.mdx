@@ -11,7 +11,16 @@ operationId: PaymentRequestsController_create
 
 Create payment request
 
-Creates a payer-facing payable request carrying expiry and reconciliation metadata.
+Creates a payer-facing request with amount, expiry, and metadata for reconciliation.
+
+
+### When to use this
+
+Use for “pay this invoice” or POS-style requests where the payer confirms on their device.
+
+### See also
+
+[Retrieve payment request](/api/payment-requests/PaymentRequestsController_findOne) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication

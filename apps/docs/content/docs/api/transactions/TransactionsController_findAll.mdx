@@ -11,7 +11,16 @@ operationId: TransactionsController_findAll
 
 List transactions
 
-Returns transactions for your organization with optional filters.
+Returns ledger transactions with filters for status, provider, method, currency, and time range.
+
+
+### When to use this
+
+Use as the primary reconciliation feed for payments, refunds, and payouts visible to your org.
+
+### See also
+
+See also [payment state machine](/reference/reference/payment-state-machine) for status semantics.
 
 
 ## Authentication

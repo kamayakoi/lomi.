@@ -6,6 +6,7 @@ import remarkMdx from 'remark-mdx';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
 import { remarkInclude } from 'fumadocs-mdx/config';
 import { type Page } from '@/lib/utils/source';
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { remarkNpm } from 'fumadocs-core/mdx-plugins';
 import fs from 'node:fs/promises';
 
@@ -17,14 +18,6 @@ const processor = remark()
   .use(remarkNpm);
 
 export async function getLLMText(page: Page) {
-  const category =
-    {
-      ui: 'lomi. Framework',
-      headless: 'lomi. Core (core library of framework)',
-      mdx: 'lomi. MDX (the built-in content source)',
-      cli: 'lomi. CLI (the CLI tool for automating lomi. apps)',
-    }[page.slugs[0]] ?? page.slugs[0];
-
   if (!page.absolutePath) {
     throw new Error(`Page ${page.url} has no absolutePath`);
   }
@@ -34,11 +27,12 @@ export async function getLLMText(page: Page) {
     value: await fs.readFile(page.absolutePath),
   });
 
-  return `# ${category}: ${page.data.title}
-URL: ${page.url}
-Source: https://raw.githubusercontent.com/lomiafrica/docs.lomi.africa/refs/heads/main/content/docs/${page.path}
+  const origin = getDocsSiteOrigin();
 
-${page.data.description}
-        
+  return `# ${page.data.title}
+Source: ${origin}${page.url}
+
+${page.data.description ?? ''}
+
 ${processed.value}`;
 }

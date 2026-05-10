@@ -11,7 +11,20 @@ operationId: PayoutsController_createWavePayout
 
 Initiate mobile-money payout
 
-Initiates a payout on supported rails. Response shape mirrors the provider payload.
+Initiates an organization payout to a configured mobile-money destination on supported rails.
+
+
+### When to use this
+
+Use to settle funds from your lomi. balance to your wallet when beneficiary APIs are not involved.
+
+### Good to know
+
+Rail availability and provider payloads vary; always reconcile using transaction and balance APIs.
+
+### See also
+
+[Check available balance](/api/accounts/AccountsController_checkAvailableBalance) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication

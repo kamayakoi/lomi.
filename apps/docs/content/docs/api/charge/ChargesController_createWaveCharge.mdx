@@ -11,7 +11,20 @@ operationId: ChargesController_createWaveCharge
 
 Create direct mobile-money charge
 
-Initiates a payer-facing charge for supported mobile-money rails. Follow provider instructions returned in the response.
+Starts a payer-facing mobile-money charge on a supported rail; the response includes the next step for the customer.
+
+
+### When to use this
+
+Use for server-initiated mobile-money collection when you are **not** using a hosted checkout session.
+
+### Good to know
+
+Follow the provider instructions in the response; UX is rail-specific (USSD, app redirect, etc.).
+
+### See also
+
+[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) · [Transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication

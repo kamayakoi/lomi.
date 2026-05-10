@@ -11,7 +11,16 @@ operationId: WebhookDeliveryLogsController_findAll
 
 List webhook delivery logs
 
-Returns delivery attempts for outbound webhooks filtered by webhook ID.
+Returns delivery attempts for an outbound webhook endpoint, including HTTP status and retry hints.
+
+
+### When to use this
+
+Use when debugging missed events or proving delivery to auditors.
+
+### See also
+
+[Retrieve webhook](/api/webhooks/WebhooksController_findOne)
 
 
 ## Authentication

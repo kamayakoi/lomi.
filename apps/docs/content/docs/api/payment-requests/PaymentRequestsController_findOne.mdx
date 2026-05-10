@@ -11,7 +11,12 @@ operationId: PaymentRequestsController_findOne
 
 Retrieve payment request
 
-Returns current readiness state alongside payment metadata payloads.
+Returns the latest state, amounts, and payer reference data for one request.
+
+
+### When to use this
+
+Use on status pages and after callbacks keyed by request ID.
 
 
 ## Authentication

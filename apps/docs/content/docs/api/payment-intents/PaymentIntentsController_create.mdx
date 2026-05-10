@@ -11,7 +11,20 @@ operationId: PaymentIntentsController_create
 
 Create card PaymentIntent
 
-Creates a card PaymentIntent for Elements-style integrations and returns `client_secret` for the client.
+Creates a card PaymentIntent for Elements-style integrations and returns `client_secret` for client-side confirmation.
+
+
+### When to use this
+
+Use for in-app card entry where you own the product UI and tokenization flow against lomi.'s card stack.
+
+### Good to know
+
+Never log or expose `client_secret` publicly; treat it like a short-lived capability for the client SDK.
+
+### See also
+
+[Create checkout session](/api/checkout-sessions/CheckoutSessionsController_create) if you prefer hosted card collection.
 
 
 ## Authentication

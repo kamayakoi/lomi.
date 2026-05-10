@@ -21,7 +21,7 @@ For detailed contribution guidelines, see the main [CONTRIBUTING.md](https://git
 
 ### REST API reference (this app)
 
-The REST section under `content/docs/api/` is **hand-authored MDX** with parity checks against `openapi.json`. See [REST API reference authoring](/core/contributing/api-reference-authoring). After API changes, export OpenAPI from `apps/api`, then if you need to regenerate scaffolding: `CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference` from `apps/docs` (and edit for clarity).
+The REST section under `content/docs/api/` is **hand-authored MDX** with parity checks against `openapi.json`. See [REST API reference authoring](/core/contributing/api-reference-authoring). After API changes, export OpenAPI from `apps/api`, then if needed regenerate scaffolding in safe mode: `CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference` from `apps/docs` (creates missing pages only). Use `BOOTSTRAP_OVERWRITE=1` only when you intentionally want to replace existing pages.
 
 ## Support
 

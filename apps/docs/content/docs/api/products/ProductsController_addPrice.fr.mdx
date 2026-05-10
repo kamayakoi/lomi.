@@ -14,6 +14,11 @@ Ajouter un prix à un produit
 Ajoute une nouvelle option tarifaire à un produit (palier, devise ou période). Un produit ne peut avoir au plus 3 prix actifs. Les prix existants ne se modifient pas : créez-en un nouveau.
 
 
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `POST /products/&#123;id&#125;/prices` (Ajouter un prix à un produit).
+
+
 ## Authentification
 
 Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.

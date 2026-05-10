@@ -1,12 +1,17 @@
 /* @proprietary license */
 
 /**
- * One-shot / maintenance: (re)writes manual REST API MDX pages from apps/docs/openapi.json
- * and refreshes per-section meta.json under content/docs/api. Run from apps/docs:
+ * One-shot / maintenance: scaffolds manual REST API MDX pages from apps/docs/openapi.json
+ * and refreshes per-section meta.json under content/docs/api.
+ *
+ * Safe mode (default): only creates missing operation pages.
+ * Overwrite mode: set BOOTSTRAP_OVERWRITE=1 to also replace existing pages.
+ *
+ * Run from apps/docs:
  * `CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference`
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import {
@@ -34,12 +39,15 @@ async function main(): Promise<void> {
     console.error(
       [
         'Refusing to regenerate REST API MDX (destructive).',
-        'Set CONFIRM_BOOTSTRAP=1 to confirm you intend to overwrite content/docs/api/** and _expected-public-operations.json.',
-        'Example: CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference',
+        'Set CONFIRM_BOOTSTRAP=1 to confirm you intend to scaffold content/docs/api/** and rewrite _expected-public-operations.json.',
+        'Default behavior is safe (missing files only). To overwrite existing operation pages too, also set BOOTSTRAP_OVERWRITE=1.',
+        'Example (safe): CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference',
+        'Example (overwrite): CONFIRM_BOOTSTRAP=1 BOOTSTRAP_OVERWRITE=1 pnpm run api:regenerate-rest-reference',
       ].join('\n'),
     );
     process.exit(1);
   }
+  const overwriteExisting = process.env.BOOTSTRAP_OVERWRITE === '1';
 
   const specPath = join(process.cwd(), 'openapi.json');
   const raw = readFileSync(specPath, 'utf-8');
@@ -61,6 +69,9 @@ async function main(): Promise<void> {
     byFolder.set(folder, list);
   }
 
+  let wroteEn = 0;
+  let wroteFr = 0;
+  let skippedExisting = 0;
   for (const [folder, entries] of byFolder) {
     const dir = join(DOCS_API_ROOT, folder);
     mkdirSync(dir, { recursive: true });
@@ -108,9 +119,19 @@ async function main(): Promise<void> {
       });
 
       const filePath = join(dir, `${operationId}.mdx`);
-      writeFileSync(filePath, `${mdxEn.trim()}\n`, 'utf-8');
+      if (!overwriteExisting && existsSync(filePath)) {
+        skippedExisting += 1;
+      } else {
+        writeFileSync(filePath, `${mdxEn.trim()}\n`, 'utf-8');
+        wroteEn += 1;
+      }
       const filePathFr = join(dir, `${operationId}.fr.mdx`);
-      writeFileSync(filePathFr, `${mdxFr.trim()}\n`, 'utf-8');
+      if (!overwriteExisting && existsSync(filePathFr)) {
+        skippedExisting += 1;
+      } else {
+        writeFileSync(filePathFr, `${mdxFr.trim()}\n`, 'utf-8');
+        wroteFr += 1;
+      }
     }
 
     const pageNames = entries
@@ -154,7 +175,7 @@ async function main(): Promise<void> {
   );
 
   console.log(
-    `Manual API docs: wrote ${merchant.length} operations across ${byFolder.size} folders.`,
+    `Manual API docs: ${overwriteExisting ? 'overwrite' : 'safe'} mode, wrote EN=${wroteEn}, FR=${wroteFr}, skipped-existing=${skippedExisting}, operations=${merchant.length}, folders=${byFolder.size}.`,
   );
 
   const openapiOnly = merchant

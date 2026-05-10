@@ -1,5 +1,10 @@
 /* @proprietary license */
 
+import {
+  EN_OPERATION_COPY,
+  type EnOperationOverride,
+} from '@/lib/scripts/manual-api/en-operation-overrides';
+
 type ReferenceObject = { $ref: string };
 
 type ComponentsObject = {
@@ -87,6 +92,9 @@ type Labels = {
   responseFallback: string;
   authenticationText: string;
   errorsText: string;
+  guidanceWhenToUse: string;
+  guidanceGoodToKnow: string;
+  guidanceSeeAlso: string;
 };
 
 function labelsForLanguage(lang: DocsLanguage): Labels {
@@ -124,6 +132,9 @@ function labelsForLanguage(lang: DocsLanguage): Labels {
         'Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `${servers[0]}` et une clé **live** avec `${servers[1]}`.',
       errorsText:
         'Les erreurs suivent le format JSON standard (code de statut et message lisible par machine). Validez les entrées avant appel ; **401** indique une clé manquante/invalide, **404** une ressource introuvable pour cette organisation, **429** une limitation de débit. Pour les retries sûrs sur les créations, envoyez une clé d’idempotence quand votre flux le permet.',
+      guidanceWhenToUse: 'Quand utiliser cet endpoint',
+      guidanceGoodToKnow: 'À savoir',
+      guidanceSeeAlso: 'Voir aussi',
     };
   }
 
@@ -160,6 +171,9 @@ function labelsForLanguage(lang: DocsLanguage): Labels {
       'Merchant routes require an API key in the `X-API-KEY` header (see [Integration overview](/reference/setup/overview)). Use a **test** key against `${servers[0]}` and a **live** key against `${servers[1]}`.',
     errorsText:
       'Errors follow the standard JSON error format (status code and machine-readable message). Validate inputs before calling; **401** indicates a missing/invalid key, **404** a missing resource for this organization, **429** rate limiting. For safe retries on create-style calls, send an idempotency key when your flow supports it.',
+    guidanceWhenToUse: 'When to use this',
+    guidanceGoodToKnow: 'Good to know',
+    guidanceSeeAlso: 'See also',
   };
 }
 
@@ -388,7 +402,37 @@ function buildRequestBodySection(
   return { section: lines.join('\n'), sampleBody };
 }
 
-import { EN_OPERATION_COPY } from '@/lib/scripts/manual-api/en-operation-overrides';
+function buildOverviewGuidanceBlocks(
+  enCopy: EnOperationOverride | undefined,
+  lang: DocsLanguage,
+  titleSource: string,
+  method: string,
+  path: string,
+): string {
+  const lb = labelsForLanguage(lang);
+  const fallbackWhenToUse =
+    lang === 'fr'
+      ? `Utilisez cet endpoint quand vous devez exécuter \`${method.toUpperCase()} ${path}\` (${escapeMdxText(titleSource)}).`
+      : `Use this endpoint when your flow needs \`${method.toUpperCase()} ${path}\` (${escapeMdxText(titleSource)}).`;
+  const parts: string[] = [];
+  const whenToUseText =
+    lang === 'en' ? (enCopy?.whenToUse ?? fallbackWhenToUse) : fallbackWhenToUse;
+  if (whenToUseText) {
+    parts.push(
+      `### ${lb.guidanceWhenToUse}\n\n${escapeMdxText(whenToUseText)}`,
+    );
+  }
+  if (lang === 'en' && enCopy?.caveats) {
+    parts.push(
+      `### ${lb.guidanceGoodToKnow}\n\n${escapeMdxText(enCopy.caveats)}`,
+    );
+  }
+  if (lang === 'en' && enCopy?.related) {
+    parts.push(`### ${lb.guidanceSeeAlso}\n\n${enCopy.related}`);
+  }
+  if (parts.length === 0) return '';
+  return `\n\n${parts.join('\n\n')}\n`;
+}
 
 type PathParamsInput = {
   parameters?: (ParameterObject | ReferenceObject)[];
@@ -416,6 +460,13 @@ export function renderOperationPageMdx(input: {
   const description = overviewDetail
     ? `\n\n${escapeMdxText(overviewDetail)}\n`
     : '';
+  const guidanceBlocks = buildOverviewGuidanceBlocks(
+    enCopy,
+    lang,
+    titleSource,
+    method,
+    path,
+  );
 
   const servers = [
     'https://sandbox.api.lomi.africa',
@@ -563,7 +614,7 @@ operationId: ${operationId}
 
 ## ${labels.overview}
 
-${escapeMdxText(titleSource)}${description}
+${escapeMdxText(titleSource)}${description}${guidanceBlocks}
 
 ## ${labels.authentication}
 

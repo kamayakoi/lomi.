@@ -14,6 +14,11 @@ Définir le prix par défaut
 Indique le prix utilisé par défaut pour ce produit (par exemple si le paiement ne fournit pas d'ID de prix). Un seul défaut à la fois ; un nouveau défaut remplace l'ancien.
 
 
+### Quand utiliser cet endpoint
+
+Utilisez cet endpoint quand vous devez exécuter `POST /products/&#123;id&#125;/prices/&#123;priceId&#125;/set-default` (Définir le prix par défaut).
+
+
 ## Authentification
 
 Les routes marchandes nécessitent une clé API dans l’en-tête `X-API-KEY` (voir [Aperçu de l’intégration](/reference/setup/overview)). Utilisez une clé **test** avec `https://sandbox.api.lomi.africa` et une clé **live** avec `https://api.lomi.africa`.

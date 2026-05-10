@@ -11,7 +11,20 @@ operationId: RefundsController_createWaveRefund
 
 Initiate refund
 
-Initiates a refund on supported rails. Response shape mirrors the provider payload.
+Initiates a refund on supported rails; final status follows provider rules.
+
+
+### When to use this
+
+Use for buyer reversals tied to an eligible capture on mobile money or compatible methods.
+
+### Good to know
+
+Refunds may be asynchronous; confirm completion via [transactions](/api/transactions/TransactionsController_findOne) or webhooks.
+
+### See also
+
+[Retrieve transaction](/api/transactions/TransactionsController_findOne)
 
 
 ## Authentication

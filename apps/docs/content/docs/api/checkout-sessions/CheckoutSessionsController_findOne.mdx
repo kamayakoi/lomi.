@@ -11,7 +11,16 @@ operationId: CheckoutSessionsController_findOne
 
 Retrieve checkout session
 
-Returns session details—status and associated customer/product contexts.
+Returns session details including status and associated customer and line items where applicable.
+
+
+### When to use this
+
+Poll or display after redirect from checkout, or when handling async notifications keyed by session ID.
+
+### See also
+
+[List transactions](/api/transactions/TransactionsController_findAll)
 
 
 ## Authentication

@@ -13,13 +13,18 @@ The public REST reference lives under `content/docs/api/` in the docs app. **Nar
    - From `apps/api`: `pnpm run openapi:export` (writes `apps/docs/openapi.json`). CI must stay green: the exported file must match the repo (`verify-openapi` in GitHub Actions).
    - Optional: from `apps/docs`, sync export + security normalization in one step: `pnpm run build:pre:sync` (sets `DOCS_SYNC_OPENAPI=1`).
 
-3. **Do not** run mass REST regeneration unless you intend to overwrite many files. If you must align MDX scaffolding with the spec:
+3. **Do not** run mass REST regeneration unless you actually need scaffolding updates. Safe mode only creates missing operation pages:
 
    ```bash
    CONFIRM_BOOTSTRAP=1 pnpm run api:regenerate-rest-reference
    ```
 
    Alias: `pnpm run api:bootstrap` (same script; still requires `CONFIRM_BOOTSTRAP=1`).
+   To overwrite existing operation pages too, opt in explicitly:
+
+   ```bash
+   CONFIRM_BOOTSTRAP=1 BOOTSTRAP_OVERWRITE=1 pnpm run api:regenerate-rest-reference
+   ```
 
    Then **edit** pages for clarity: examples, edge cases, links to guides, and wording.
 
@@ -64,6 +69,6 @@ Older bookmarks used flat paths like `/api/AccountsController_findAll`. The app 
 | Script                                                      | Role |
 | ----------------------------------------------------------- | ---- |
 | `lib/scripts/pre-build.ts`                                  | Registry build; **optional** OpenAPI export when `DOCS_SYNC_OPENAPI=1` (`build:pre:sync`). Does **not** overwrite REST MDX. |
-| `lib/scripts/bootstrap-manual-api-reference.ts`           | **Destructive**: regenerates operation MDX + `meta.json` from `openapi.json` (requires `CONFIRM_BOOTSTRAP=1`). |
+| `lib/scripts/bootstrap-manual-api-reference.ts`           | Regenerates operation scaffolding + `meta.json` from `openapi.json`; default is **missing-only** (`CONFIRM_BOOTSTRAP=1`), full overwrite requires `BOOTSTRAP_OVERWRITE=1`. |
 | `lib/scripts/manual-api/render-operation-mdx.ts`            | Template for one operation page |
 | `lib/scripts/manual-api/_expected-public-operations.json`   | Generated list of `METHOD /path` strings (bootstrap output) |
