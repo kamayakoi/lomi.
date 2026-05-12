@@ -1775,6 +1775,8 @@ export type Database = {
           p_description?: string | null;
           p_environment?: string | null;
           p_expiration_minutes?: number | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
           p_metadata?: Json | null;
           p_organization_id: string;
           p_payment_link_id?: string | null;
@@ -1805,6 +1807,8 @@ export type Database = {
           p_description?: string | null;
           p_environment?: string | null;
           p_expiration_minutes?: number | null;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
           p_line_items: Json;
           p_metadata?: Json | null;
           p_organization_id: string;
@@ -2550,6 +2554,8 @@ export type Database = {
           p_description: string;
           p_environment?: string | null;
           p_expiry_date: string;
+          p_idempotency_body_hash?: string | null;
+          p_idempotency_key?: string | null;
           p_organization_id: string;
           p_payment_reference: string;
         };

@@ -65,10 +65,7 @@ export async function GET() {
   lines.push(
     '2. Build against **sandbox** first (`https://sandbox.api.lomi.africa`), then switch to **live** (`https://api.lomi.africa`) with live keys.',
   );
-  const integrationPage = pageBySlugPath(
-    pages,
-    'reference/setup/integration',
-  );
+  const integrationPage = pageBySlugPath(pages, 'reference/setup/integration');
   const createAccountPage = pageBySlugPath(
     pages,
     'core/fundamentals/create-account',
@@ -130,7 +127,9 @@ export async function GET() {
       `- **Shareable payment links** → [${plCreate.data.title ?? 'Create payment link'}](${docsOrigin}${plCreate.url}).`,
     );
   }
-  const charge = pages.find((p) => p.slugs[2] === 'ChargesController_createWaveCharge');
+  const charge = pages.find(
+    (p) => p.slugs[2] === 'ChargesController_createWaveCharge',
+  );
   if (charge) {
     lines.push(
       `- **Direct mobile-money charge (server-initiated)** → [${charge.data.title ?? 'Charge'}](${docsOrigin}${charge.url}) when you are not using hosted checkout.`,

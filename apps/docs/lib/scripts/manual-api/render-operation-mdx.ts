@@ -416,7 +416,9 @@ function buildOverviewGuidanceBlocks(
       : `Use this endpoint when your flow needs \`${method.toUpperCase()} ${path}\` (${escapeMdxText(titleSource)}).`;
   const parts: string[] = [];
   const whenToUseText =
-    lang === 'en' ? (enCopy?.whenToUse ?? fallbackWhenToUse) : fallbackWhenToUse;
+    lang === 'en'
+      ? (enCopy?.whenToUse ?? fallbackWhenToUse)
+      : fallbackWhenToUse;
   if (whenToUseText) {
     parts.push(
       `### ${lb.guidanceWhenToUse}\n\n${escapeMdxText(whenToUseText)}`,

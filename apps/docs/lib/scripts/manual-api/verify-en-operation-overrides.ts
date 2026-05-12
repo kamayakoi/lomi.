@@ -30,7 +30,9 @@ if (missing.length > 0) {
   for (const m of missing.sort((a, b) =>
     a.operationId.localeCompare(b.operationId),
   )) {
-    console.error(`  - ${m.operationId}  (${m.method.toUpperCase()} ${m.path})`);
+    console.error(
+      `  - ${m.operationId}  (${m.method.toUpperCase()} ${m.path})`,
+    );
   }
   process.exit(1);
 }

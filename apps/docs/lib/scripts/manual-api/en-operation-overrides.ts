@@ -160,16 +160,14 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   DiscountCouponsController_create: {
     summary: 'Create discount coupon',
     body: 'Creates a coupon with scope and redemption rules for use at checkout or payment links.',
-    whenToUse:
-      'Use when launching promotions or segment-specific discounts.',
+    whenToUse: 'Use when launching promotions or segment-specific discounts.',
     related:
       '[List coupons](/api/discount-coupons/DiscountCouponsController_findAll) · [Checkout session](/api/checkout-sessions/CheckoutSessionsController_create)',
   },
   DiscountCouponsController_findAll: {
     summary: 'List discount coupons',
     body: 'Returns coupons configured for your organization.',
-    whenToUse:
-      'Use to populate an admin UI or audit active promotions.',
+    whenToUse: 'Use to populate an admin UI or audit active promotions.',
   },
   DiscountCouponsController_findOne: {
     summary: 'Retrieve discount coupon',
@@ -180,16 +178,14 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   DiscountCouponsController_getPerformance: {
     summary: 'Coupon performance metrics',
     body: 'Returns usage and performance metrics for a coupon (redemptions, revenue impact) for reporting.',
-    whenToUse:
-      'Use in marketing dashboards to measure campaign effectiveness.',
+    whenToUse: 'Use in marketing dashboards to measure campaign effectiveness.',
     related:
       '[Retrieve coupon](/api/discount-coupons/DiscountCouponsController_findOne)',
   },
   OrganizationsController_findAll: {
     summary: 'List organizations',
     body: 'Returns organizations visible to your API key (merchant users often have one; partners may see several).',
-    whenToUse:
-      'Use at login or when building org-switcher experiences.',
+    whenToUse: 'Use at login or when building org-switcher experiences.',
   },
   OrganizationsController_findOne: {
     summary: 'Retrieve organization',
@@ -202,14 +198,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns revenue and subscriber-oriented aggregates suitable for dashboard cards.',
     whenToUse:
       'Use for home screens and executive summaries rather than low-level transaction drill-down.',
-    related:
-      '[Transactions](/api/transactions/TransactionsController_findAll)',
+    related: '[Transactions](/api/transactions/TransactionsController_findAll)',
   },
   PaymentIntentsController_create: {
     summary: 'Create card PaymentIntent',
     body: 'Creates a card PaymentIntent for Elements-style integrations and returns `client_secret` for client-side confirmation.',
     whenToUse:
-      'Use for in-app card entry where you own the product UI and tokenization flow against lomi.\'s card stack.',
+      "Use for in-app card entry where you own the product UI and tokenization flow against lomi.'s card stack.",
     caveats:
       'Never log or expose `client_secret` publicly; treat it like a short-lived capability for the client SDK.',
     related:
@@ -232,8 +227,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   PaymentLinksController_findOne: {
     summary: 'Retrieve payment link',
     body: 'Returns URLs, visibility, and status for a single link.',
-    whenToUse:
-      'Use before resharing a link or embedding it in messaging.',
+    whenToUse: 'Use before resharing a link or embedding it in messaging.',
   },
   PaymentRequestsController_create: {
     summary: 'Create payment request',
@@ -246,14 +240,12 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   PaymentRequestsController_findAll: {
     summary: 'List payment requests',
     body: 'Returns a paginated ledger of requests with optional filters for status or references.',
-    whenToUse:
-      'Use for finance teams tracking outstanding requests.',
+    whenToUse: 'Use for finance teams tracking outstanding requests.',
   },
   PaymentRequestsController_findOne: {
     summary: 'Retrieve payment request',
     body: 'Returns the latest state, amounts, and payer reference data for one request.',
-    whenToUse:
-      'Use on status pages and after callbacks keyed by request ID.',
+    whenToUse: 'Use on status pages and after callbacks keyed by request ID.',
   },
   PayoutsController_createWavePayout: {
     summary: 'Initiate mobile-money payout',
@@ -270,8 +262,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Adds another price point to an existing product (currency, billing cadence, or amount variants).',
     whenToUse:
       'Use when expanding to new markets or adding a second billing option to the same product.',
-    related:
-      '[Retrieve product](/api/products/ProductsController_findOne)',
+    related: '[Retrieve product](/api/products/ProductsController_findOne)',
   },
   ProductsController_create: {
     summary: 'Create product',
@@ -298,8 +289,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Marks which price lomi. uses when a flow does not specify an explicit price ID.',
     whenToUse:
       'Use after adding multiple prices so checkout and links have a clear fallback.',
-    related:
-      '[Add product price](/api/products/ProductsController_addPrice)',
+    related: '[Add product price](/api/products/ProductsController_addPrice)',
   },
   RefundsController_createWaveRefund: {
     summary: 'Initiate refund',
@@ -328,16 +318,13 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   SubscriptionsController_findByCustomer: {
     summary: 'List subscriptions for customer',
     body: 'Returns subscriptions tied to one customer ID. Responds with **404** when the customer is unknown.',
-    whenToUse:
-      'Use on customer portals showing active plans.',
-    related:
-      '[Retrieve customer](/api/customers/CustomersController_findOne)',
+    whenToUse: 'Use on customer portals showing active plans.',
+    related: '[Retrieve customer](/api/customers/CustomersController_findOne)',
   },
   SubscriptionsController_findOne: {
     summary: 'Retrieve subscription',
     body: 'Returns one subscription by ID including cycle and price references. Responds with **404** when unknown or inaccessible.',
-    whenToUse:
-      'Use before upgrades, cancelations, or invoicing integration.',
+    whenToUse: 'Use before upgrades, cancelations, or invoicing integration.',
   },
   TransactionsController_findAll: {
     summary: 'List transactions',
@@ -358,8 +345,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
     body: 'Returns delivery attempts for an outbound webhook endpoint, including HTTP status and retry hints.',
     whenToUse:
       'Use when debugging missed events or proving delivery to auditors.',
-    related:
-      '[Retrieve webhook](/api/webhooks/WebhooksController_findOne)',
+    related: '[Retrieve webhook](/api/webhooks/WebhooksController_findOne)',
   },
   WebhookDeliveryLogsController_findOne: {
     summary: 'Retrieve webhook delivery log',
@@ -376,8 +362,7 @@ export const EN_OPERATION_COPY: Partial<Record<string, EnOperationOverride>> = {
   WebhooksController_findOne: {
     summary: 'Retrieve webhook',
     body: 'Returns one outbound subscription by ID for editing forms.',
-    whenToUse:
-      'Use before rotating secrets or changing the event filter.',
+    whenToUse: 'Use before rotating secrets or changing the event filter.',
   },
   WebhooksController_update: {
     summary: 'Update webhook',
