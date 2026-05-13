@@ -138,20 +138,23 @@ export class CheckoutSessionsService {
   }
 
   async findOne(id: string, user: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('checkout_sessions')
-      .select('*')
-      .eq('checkout_session_id', id)
-      .eq('organization_id', user.organizationId)
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_checkout_session_api' as any,
+      {
+        p_checkout_session_id: id,
+        p_organization_id: user.organizationId,
+      } as any,
+    );
 
-    if (error || !data) {
+    const dataArray = Array.isArray(data) ? data : [data];
+    const session = dataArray[0];
+
+    if (error || !session) {
       throw new NotFoundException(
         `Checkout session with ID ${id} not found or access denied`,
       );
     }
 
-    return data;
+    return session;
   }
 }

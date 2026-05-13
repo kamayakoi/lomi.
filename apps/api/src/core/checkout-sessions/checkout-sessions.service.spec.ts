@@ -5,25 +5,10 @@ import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 
-function chainCheckoutSessionFindSingle(result: {
-  data: unknown;
-  error: unknown;
-}) {
-  return {
-    select: jest.fn(() => ({
-      eq: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn().mockResolvedValue(result),
-        })),
-      })),
-    })),
-  };
-}
-
 describe('CheckoutSessionsService', () => {
   let service: CheckoutSessionsService;
   let mockSupabaseService: { getClient: jest.Mock; rpc: jest.Mock };
-  let mockSupabaseClient: { from: jest.Mock };
+  let mockSupabaseClient: { rpc: jest.Mock };
 
   const mockUser = {
     merchantId: 'test-merchant-id',
@@ -33,12 +18,9 @@ describe('CheckoutSessionsService', () => {
 
   beforeEach(async () => {
     mockSupabaseClient = {
-      from: jest.fn(() =>
-        chainCheckoutSessionFindSingle({
-          data: null,
-          error: { message: 'not found' },
-        }),
-      ),
+      rpc: jest
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: 'not found' } }),
     };
 
     mockSupabaseService = {
@@ -218,23 +200,28 @@ describe('CheckoutSessionsService', () => {
       organization_id: mockUser.organizationId,
       amount: 100,
     };
-    mockSupabaseClient.from.mockReturnValue(
-      chainCheckoutSessionFindSingle({ data: row, error: null }),
-    );
+    mockSupabaseClient.rpc.mockResolvedValue({
+      data: [row],
+      error: null,
+    });
 
     const result = await service.findOne('cs-1', mockUser as AuthContext);
 
     expect(result).toEqual(row);
-    expect(mockSupabaseClient.from).toHaveBeenCalledWith('checkout_sessions');
+    expect(mockSupabaseClient.rpc).toHaveBeenCalledWith(
+      'get_checkout_session_api',
+      {
+        p_checkout_session_id: 'cs-1',
+        p_organization_id: mockUser.organizationId,
+      },
+    );
   });
 
   it('should findOne throw NotFoundException when missing or wrong org', async () => {
-    mockSupabaseClient.from.mockReturnValue(
-      chainCheckoutSessionFindSingle({
-        data: null,
-        error: { message: 'not found' },
-      }),
-    );
+    mockSupabaseClient.rpc.mockResolvedValue({
+      data: [],
+      error: null,
+    });
 
     await expect(
       service.findOne('missing', mockUser as AuthContext),
