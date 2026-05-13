@@ -111,20 +111,23 @@ export class BeneficiaryPayoutsService {
       throw new NotFoundException('Beneficiary payout ID is required');
     }
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('beneficiary_payouts')
-      .select('*')
-      .eq('payout_id', id)
-      .eq('organization_id', user.organizationId)
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_beneficiary_payout_api' as any,
+      {
+        p_payout_id: id,
+        p_organization_id: user.organizationId,
+      } as any,
+    );
 
-    if (error || !data) {
+    const dataArray = Array.isArray(data) ? data : [data];
+    const payout = dataArray[0];
+
+    if (error || !payout) {
       throw new NotFoundException(
         `Beneficiary payout with ID ${id} not found or access denied`,
       );
     }
 
-    return data;
+    return payout;
   }
 }

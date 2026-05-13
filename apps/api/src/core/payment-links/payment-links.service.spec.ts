@@ -9,7 +9,6 @@ describe('PaymentLinksService', () => {
   let service: PaymentLinksService;
   let mockServiceRpc: jest.Mock;
   let mockClientRpc: jest.Mock;
-  let mockFromChain: { single: jest.Mock };
 
   const user: AuthContext = {
     merchantId: 'merch_1',
@@ -20,19 +19,11 @@ describe('PaymentLinksService', () => {
   beforeEach(async () => {
     mockServiceRpc = jest.fn();
     mockClientRpc = jest.fn();
-    mockFromChain = { single: jest.fn() };
 
     const mockSupabase = {
       rpc: mockServiceRpc,
       getClient: jest.fn(() => ({
         rpc: mockClientRpc,
-        from: jest.fn(() => ({
-          select: jest.fn(() => ({
-            eq: jest.fn(() => ({
-              eq: jest.fn(() => mockFromChain),
-            })),
-          })),
-        })),
       })),
     };
 
@@ -98,7 +89,7 @@ describe('PaymentLinksService', () => {
         data: null,
         error: { message: 'nope' },
       });
-      mockFromChain.single.mockResolvedValueOnce({ data: row, error: null });
+      mockClientRpc.mockResolvedValueOnce({ data: [row], error: null });
 
       const result = await service.create(dto, user);
 
@@ -153,16 +144,20 @@ describe('PaymentLinksService', () => {
   describe('findOne', () => {
     it('returns row when found', async () => {
       const row = { link_id: 'l1' };
-      mockFromChain.single.mockResolvedValue({ data: row, error: null });
+      mockClientRpc.mockResolvedValue({ data: [row], error: null });
 
       await expect(service.findOne('l1', user)).resolves.toEqual(row);
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'get_payment_link_api',
+        expect.objectContaining({
+          p_link_id: 'l1',
+          p_organization_id: user.organizationId,
+        }),
+      );
     });
 
     it('throws NotFound when missing', async () => {
-      mockFromChain.single.mockResolvedValue({
-        data: null,
-        error: { message: 'missing' },
-      });
+      mockClientRpc.mockResolvedValue({ data: [], error: null });
 
       await expect(service.findOne('nope', user)).rejects.toBeInstanceOf(
         NotFoundException,

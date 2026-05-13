@@ -43,13 +43,12 @@ export class OrganizationsService {
       throw new NotFoundException('Organization not found or access denied');
     }
 
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('organizations')
-      .select('*')
-      .eq('organization_id', id)
-      .eq('is_deleted', false)
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      'list_organizations' as any,
+      {
+        p_organization_id: id,
+      } as any,
+    );
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -57,7 +56,13 @@ export class OrganizationsService {
       }
       throw new Error(error.message);
     }
-    return data;
+
+    const dataArray = (data as any[]) || [];
+    if (dataArray.length === 0) {
+      throw new NotFoundException(`Organization with ID ${id} not found`);
+    }
+
+    return dataArray[0];
   }
 
   /**

@@ -100,20 +100,23 @@ export class PaymentLinksService {
    * Get single payment link by ID
    */
   async findOne(id: string, user: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('payment_links')
-      .select('*')
-      .eq('link_id', id)
-      .eq('organization_id', user.organizationId)
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_payment_link_api' as any,
+      {
+        p_link_id: id,
+        p_organization_id: user.organizationId,
+      } as any,
+    );
 
-    if (error || !data) {
+    const dataArray = Array.isArray(data) ? data : [data];
+    const link = dataArray[0];
+
+    if (error || !link) {
       throw new NotFoundException(
         `Payment link with ID ${id} not found or access denied`,
       );
     }
 
-    return data;
+    return link;
   }
 }

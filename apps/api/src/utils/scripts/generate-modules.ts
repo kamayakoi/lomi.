@@ -168,6 +168,11 @@ function generateServiceContent(
     ? tableName.slice(0, -1)
     : tableName;
   const kebabSingular = toKebabCase(singularName);
+  const createRpcName = `create_${singularName}`;
+  const listRpcName = `list_${tableName}`;
+  const getRpcName = `get_${singularName}`;
+  const updateRpcName = `update_${singularName}`;
+  const deleteRpcName = `delete_${singularName}`;
 
   const imports = [
     `import { Injectable } from '@nestjs/common';`,
@@ -195,18 +200,17 @@ function generateServiceContent(
   if (operations?.create) {
     methods.push(`
   async create(createDto: ${dtoName}, ${userParam}: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('${tableName}')
-      .insert({
+    const { data, error } = await this.supabase.getClient().rpc(
+      '${createRpcName}' as any,
+      {
         ...createDto,
         ${insertAugmentation}
-      } as any)
-      .select()
-      .single();
+      } as any,
+    );
 
     if (error) throw new Error(error.message);
-    return data;
+    const rows = Array.isArray(data) ? data : [data];
+    return rows[0];
   }`);
   }
 
@@ -214,14 +218,15 @@ function generateServiceContent(
   if (operations?.list) {
     methods.push(`
   async findAll(${userParam}: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('${tableName}')
-      .select('*')
-      ${tenancyFilter};
+    const { data, error } = await this.supabase.getClient().rpc(
+      '${listRpcName}' as any,
+      {
+        ${insertAugmentation}
+      } as any,
+    );
 
     if (error) throw new Error(error.message);
-    return data;
+    return data || [];
   }`);
   }
 
@@ -229,16 +234,17 @@ function generateServiceContent(
   if (operations?.get) {
     methods.push(`
   async findOne(id: string, ${userParam}: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('${tableName}')
-      .select('*')
-      .eq('${idField}', id)
-      ${tenancyFilter}
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      '${getRpcName}' as any,
+      {
+        p_${idField}: id,
+        ${insertAugmentation}
+      } as any,
+    );
 
     if (error) throw new Error(error.message);
-    return data;
+    const rows = Array.isArray(data) ? data : [data];
+    return rows[0];
   }`);
   }
 
@@ -246,17 +252,18 @@ function generateServiceContent(
   if (operations?.update) {
     methods.push(`
   async update(id: string, updateDto: ${updateDtoName}, ${userParam}: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('${tableName}')
-      .update(updateDto as any)
-      .eq('${idField}', id)
-      ${tenancyFilter}
-      .select()
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      '${updateRpcName}' as any,
+      {
+        p_${idField}: id,
+        ...updateDto,
+        ${insertAugmentation}
+      } as any,
+    );
 
     if (error) throw new Error(error.message);
-    return data;
+    const rows = Array.isArray(data) ? data : [data];
+    return rows[0];
   }`);
   }
 
@@ -264,17 +271,17 @@ function generateServiceContent(
   if (operations?.delete) {
     methods.push(`
   async remove(id: string, ${userParam}: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('${tableName}')
-      .delete()
-      .eq('${idField}', id)
-      ${tenancyFilter}
-      .select()
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      '${deleteRpcName}' as any,
+      {
+        p_${idField}: id,
+        ${insertAugmentation}
+      } as any,
+    );
 
     if (error) throw new Error(error.message);
-    return data;
+    const rows = Array.isArray(data) ? data : [data];
+    return rows[0];
   }`);
   }
 

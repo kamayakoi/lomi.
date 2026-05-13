@@ -120,20 +120,23 @@ export class PaymentRequestsService {
    * Get single payment request by ID
    */
   async findOne(id: string, user: AuthContext) {
-    const { data, error } = await this.supabase
-      .getClient()
-      .from('payment_requests')
-      .select('*')
-      .eq('request_id', id)
-      .eq('organization_id', user.organizationId)
-      .single();
+    const { data, error } = await this.supabase.getClient().rpc(
+      'get_payment_request_api' as any,
+      {
+        p_request_id: id,
+        p_organization_id: user.organizationId,
+      } as any,
+    );
 
-    if (error || !data) {
+    const dataArray = Array.isArray(data) ? data : [data];
+    const request = dataArray[0];
+
+    if (error || !request) {
       throw new NotFoundException(
         `Payment request with ID ${id} not found or access denied`,
       );
     }
 
-    return data;
+    return request;
   }
 }

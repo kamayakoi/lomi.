@@ -13,7 +13,6 @@ import { AuthContext } from '../common/decorators/current-user.decorator';
 describe('PaymentRequestsService', () => {
   let service: PaymentRequestsService;
   let mockClientRpc: jest.Mock;
-  let mockFromChain: { single: jest.Mock };
 
   const user: AuthContext = {
     merchantId: 'merch_1',
@@ -23,20 +22,10 @@ describe('PaymentRequestsService', () => {
 
   beforeEach(async () => {
     mockClientRpc = jest.fn();
-    mockFromChain = {
-      single: jest.fn(),
-    };
 
     const mockSupabase = {
       getClient: jest.fn(() => ({
         rpc: mockClientRpc,
-        from: jest.fn(() => ({
-          select: jest.fn(() => ({
-            eq: jest.fn(() => ({
-              eq: jest.fn(() => mockFromChain),
-            })),
-          })),
-        })),
       })),
     };
 
@@ -210,18 +199,22 @@ describe('PaymentRequestsService', () => {
   describe('findOne', () => {
     it('returns row when found', async () => {
       const row = { request_id: 'pr_1' };
-      mockFromChain.single.mockResolvedValue({ data: row, error: null });
+      mockClientRpc.mockResolvedValue({ data: [row], error: null });
 
       const result = await service.findOne('pr_1', user);
 
       expect(result).toEqual(row);
+      expect(mockClientRpc).toHaveBeenCalledWith(
+        'get_payment_request_api',
+        expect.objectContaining({
+          p_request_id: 'pr_1',
+          p_organization_id: user.organizationId,
+        }),
+      );
     });
 
     it('throws NotFound when missing', async () => {
-      mockFromChain.single.mockResolvedValue({
-        data: null,
-        error: { message: 'nope' },
-      });
+      mockClientRpc.mockResolvedValue({ data: [], error: null });
 
       await expect(service.findOne('missing', user)).rejects.toBeInstanceOf(
         NotFoundException,
