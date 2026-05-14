@@ -20,7 +20,9 @@ export class WebhookListener {
     this.logger.log(
       `Handling PAYMENT_SUCCEEDED event for transaction ${payload.id}`,
     );
-    sanitizeMerchantWebhookTransactionPayload(payload as Record<string, unknown>);
+    sanitizeMerchantWebhookTransactionPayload(
+      payload as Record<string, unknown>,
+    );
     await this.queueWebhook(
       payload.organization_id,
       'PAYMENT_SUCCEEDED',
@@ -33,7 +35,9 @@ export class WebhookListener {
     this.logger.log(
       `Handling PAYMENT_FAILED event for transaction ${payload.id}`,
     );
-    sanitizeMerchantWebhookTransactionPayload(payload as Record<string, unknown>);
+    sanitizeMerchantWebhookTransactionPayload(
+      payload as Record<string, unknown>,
+    );
     await this.queueWebhook(payload.organization_id, 'PAYMENT_FAILED', payload);
   }
 
