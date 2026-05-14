@@ -27,6 +27,8 @@ Pour garantir l’authenticité et l’intégrité des événements, lomi. signe
 2.  **Secret webhook :** à la création d’un webhook via l’API, un `` `secret` `` (préfixe `` `whsec_` ``) est renvoyé. **Conservez ce secret en lieu sûr : il ne sera plus affiché.**
 3.  **Vérification :** votre point de terminaison doit recalculer un hachage `` `HMAC-SHA256` `` du corps brut de la requête avec ce secret et le comparer à la valeur de l’en-tête.
 
+**Livraison sortante :** les requêtes de **lomi. vers votre URL** ne s’authentifient pas avec `` `Authorization` `` / `` `X-API-Key` `` — seule la signature compte. Un middleware qui impose Bearer ou clé API sur **tous** les POST renverra souvent `` `401` `` ([détails](/core/advanced-guides/handling-webhooks#webhook-signing-vs-authorization)).
+
 Voir le guide [Vérification de signature des webhooks](/core/advanced-guides/handling-webhooks) pour des exemples d’implémentation.
 
 ## Événements webhook
@@ -222,12 +224,15 @@ lomi. journalise chaque tentative et expose des endpoints pour consulter les jou
 
 **Point de terminaison :** `` `POST /webhooks/{webhook_id}/logs/{log_id}/retry` ``
 
-**Nouvelles tentatives automatiques :** lomi. relance automatiquement les livraisons en échec avec un recul exponentiel pendant environ six heures avant de marquer un échec définitif.
+**Nouvelles tentatives automatiques :** lorsque votre point de terminaison rejette une livraison (réponse **non‑`2xx`**), franchit le délai d’expiration côté lomi ou subit une panne transitoire, la plateforme enregistre l’échec et peut planifier **d’autres essais**, selon la sémantique HTTP et le chemin technique. Ces relances sont **bornées** : elles suivent des politiques de **backoff exponentiel** sur l’infrastructure webhook, pas une boucle infinie.
+
+En général les **erreurs client `4xx`** sont **terminales** pour la séquence automatique (corriger la configuration côté destinataire), tandis que les **erreurs transitoires** (**`5xx`**, timeouts, défauts réseau ponctuels) peuvent être rejouées jusqu’à un plafond qui dépend du chemin **synchrone** ou **mis en file** (worker/outbox). Pour le détail chiffré — timeout HTTP **≈ quatre secondes**, jusqu’à **quatre** essais synchrone, **cinq** exécutions de job lorsque Bull est utilisé, sens de **`lomi_environment`** — voir **[Fiabilité des webhooks — Délais et tentatives](/core/advanced-guides/webhook-reliability#timeouts-retries-and-client-errors)**.
 
 ## Bonnes pratiques
 
+- **Route sans auth API globale :** vérifiez `` `X-Lomi-Signature` `` sur un chemin webhook dédié ; n’imposez pas `` `Authorization` `` / `` `X-API-Key` `` sur le même POST ([pourquoi](/core/advanced-guides/handling-webhooks#webhook-signing-vs-authorization)).
 - **Vérifier les signatures :** vérifiez toujours `` `X-Lomi-Signature``.
-- **Répondre vite :** renvoyez un statut `` `2xx` `` en quelques secondes ; déportez le travail long en arrière-plan.
+- **Répondre vite :** renvoyez `` `2xx` `` sans attendre — lomi n’attend **qu’environ 4 secondes** par tentative de POST avant timeout ; déportez le travail long en arrière-plan.
 - **Anticiper les relances :** lomi peut renvoyer un événement si votre endpoint échoue ou dépasse le délai.
 - **Idempotence :** le traitement doit tolérer les doublons.
 - **Protéger le secret :** stockez-le via variables d’environnement ou gestionnaire de secrets.

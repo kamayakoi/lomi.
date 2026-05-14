@@ -109,17 +109,39 @@ function verifySignature(
 }
 ```
 
+<h2 id="webhook-signing-vs-authorization">Secret de signature et en-tête Authorization (éviter les 401)</h2>
+
+La gestion des webhooks dans l’API utilise votre **clé API marchande** (`X-API-Key`) — mais **lomi. n’envoie pas cette clé** (ni `Authorization: Bearer …`) **lors de la livraison des événements vers votre URL.**
+
+Pour les requêtes **sortantes** (lomi. → votre serveur), attendez-vous surtout à :
+
+| En-tête | Rôle |
+| ------- | ---- |
+| `Content-Type` | `application/json` |
+| `X-Lomi-Signature` | HMAC-SHA256 (**hexadécimal**) du corps JSON **brut**, avec le secret de signature du point de terminaison |
+| `X-Lomi-Event` | Même valeur que la propriété `"event"` à la racine du JSON |
+| `User-Agent` | `Lomi-Webhook/1.0` |
+
+Le secret **`whsec_…`** sert à **vérifier** `X-Lomi-Signature` sur le corps brut — ce n’est **pas** un jeton que lomi. place dans `Authorization`.
+
+Si les journaux de livraison indiquent un **HTTP 401**, ou un corps du type « Authentication required », la réponse vient presque toujours **de votre serveur ou proxy** (middleware d’authentification Express/Nest/etc., passerelle API, Cloudflare Access, règle Bearer globale…) **avant** que votre gestionnaire webhook ne s’exécute.
+
+**À faire côté intégration :** exposer une **route dédiée** au webhook (chemin ou sous-domaine) **sans** middleware global exigeant clé API ou Bearer ; vérifier d’abord `X-Lomi-Signature`, puis répondre `2xx`. Vos autres routes peuvent garder Bearer / clés API comme d’habitude.
+
+Voir aussi [les journaux de livraison](/reference/platform/webhook-delivery-logs) : lomi. enregistre le code HTTP et le corps renvoyé par **votre** point de terminaison.
+
 ## Traiter les événements
 
 Une fois la signature vérifiée, vous pouvez traiter le corps de l’événement en toute sécurité.
 
 ```typescript filename="Traitement des événements webhook"
 interface LomiWebhookEvent {
-  id: string;
+  id: string; // UUID — idempotence / dédoublonnage
   event: string; // ex. 'PAYMENT_SUCCEEDED'
   timestamp: string;
   data: any; // Structure selon le type d’événement
-  lomi_environment: 'live' | 'test';
+  /** Reprend le `NODE_ENV` de l’hôte expéditeur (p. ex. `production`, `development`) — pas un drapeau bac à sable checkout */
+  lomi_environment: string;
 }
 
 async function processWebhookEvent(event: LomiWebhookEvent): Promise<void> {
@@ -180,7 +202,9 @@ async function markEventAsProcessed(eventId: string): Promise<void> {
 
 ### Répondre rapidement
 
-Accusez réception du webhook avec un statut `2xx` (par ex. `200`) immédiatement. Reportez tout traitement complexe ou appel externe à une file d’attente en arrière-plan.
+**Accusé‑réception d’abord :** voyez le `` `POST` `` webhook comme un transport minimal. Validez `` `X-Lomi-Signature` ``, conservez ou enfilez l’essentiel pour ne pas perdre la charge utile, puis renvoyez tout de suite un **`200`** / **`204`** à lomi. Tout ce qui touche à des tiers, à une base lourde ou à des sagas multi‑étapes doit s’exécuter **après** que la boucle HTTP a réussi aux yeux de lomi.
+
+Répondez en **quelques secondes tout au plus** dans les cas extrêmes, mais visez **sous une seconde** en usage courant : chaque envoi HTTP sortant côté lomi est cadencé par un timeout de lecture **d’environ quatre secondes** ; le dépasser fait échouer la tentative et peut consommer une partie de vos relances automatiques ([matrice détaillée](/core/advanced-guides/webhook-reliability#timeouts-retries-and-client-errors)). Le travail lourd passe ensuite dans **votre** file interne.
 
 ```typescript filename="Réponse rapide et traitement asynchrone"
 async function handleWebhook(req: express.Request, res: express.Response) {
@@ -200,9 +224,9 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 ### Gérer les doublons (idempotence)
 
-Les problèmes réseau ou les nouvelles tentatives peuvent provoquer des livraisons en double. Rendez votre traitement idempotent.
+Les problèmes réseau, les relances automatiques, les **rejeux manuels** depuis le tableau de bord et les garde‑fous d’idempotence côté plateforme font qu’il faut **attendre plusieurs POST** dans le temps pour un même événement logique : c’est le fonctionnement normal — intégrez la déduplication dès la conception de votre schéma, pas comme bug rare.
 
-- **Vérifier l’identifiant d’événement :** conservez le `id` (`evt_...`) des événements déjà traités. Avant traitement, si l’identifiant est déjà connu, ignorez-le.
+- **Vérifier l’identifiant de charge :** conservez le champ racine `` `id` `` (UUID). Si déjà traité, faites un no-op.
 - **Contraintes en base :** utilisez des contraintes d’unicité lorsque c’est pertinent (par ex. sur une mise à jour de commande liée à l’ID de transaction) pour éviter les doublons au niveau données.
 
 ```typescript filename="Exemple de vérification d’idempotence"

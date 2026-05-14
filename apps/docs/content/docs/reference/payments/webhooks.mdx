@@ -27,6 +27,8 @@ To ensure the security and integrity of webhook events, lomi. signs each request
 2.  **Webhook Secret:** When you create a webhook endpoint via the API, a `` `secret` `` (prefixed with `` `whsec_` ``) is returned. **Store this secret securely, as it will not be shown again.**
 3.  **Verification:** Your endpoint should verify the signature by computing an `` `HMAC-SHA256` `` hash of the raw request body using the webhook secret and comparing it to the signature provided in the header.
 
+**Outbound delivery:** Requests from lomi. to **your** URL are **not** authenticated with `` `Authorization` `` / `` `X-API-Key` `` — only signature verification applies. Putting the signing secret in an `` `Authorization` `` header on your expectation side will not help; middleware that requires Bearer or API-key auth on **every** POST will typically return `` `401` `` ([details](/core/advanced-guides/handling-webhooks#webhook-signing-vs-authorization)).
+
 Refer to the [Webhook Signature Verification](/core/advanced-guides/handling-webhooks) guide for detailed implementation examples in various languages.
 
 ## Webhook events
@@ -286,12 +288,15 @@ curl -X POST "https://api.lomi.africa/webhooks/YOUR_WEBHOOK_ID/logs/YOUR_LOG_ID/
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
-**Automatic retries:** lomi. automatically retries failed deliveries using an exponential backoff strategy over approximately 6 hours before marking the delivery as permanently failed.
+**Automatic retries:** When your endpoint rejects a delivery (`non-2xx`), times out from lomi.’s viewpoint, or a transient fault occurs mid-flight, the platform records the failure and may schedule additional attempts depending on HTTP semantics and plumbing. **Retries are bounded** — they follow exponential backoff policies on the webhook infrastructure — rather than indefinite “fire until success” loops.
+
+Roughly speaking: **`4xx` client errors are usually terminal** for that automated sequence (misconfiguration should be corrected on your side), while **transient failures** (`5xx`, timeouts, certain network faults) may be retried up to a ceiling that depends on whether the webhook was dispatched **synchronously** or through the **queued** worker/outbox pipeline. Older documentation sometimes overstated calendar duration; treat the authoritative breakdown as **[Webhook reliability — Timeouts and retries](/core/advanced-guides/webhook-reliability#timeouts-retries-and-client-errors)**, where we document the approximate **~4 second** outbound HTTP timer, **four** synchronous attempts at most on retryable errors, **five** queue attempts where Bull is in play, and the meaning of **`lomi_environment`**.
 
 ## Best practices
 
+- **Route without global API auth:** Apply `X-Lomi-Signature` verification on a dedicated webhook path; do not require `Authorization` / `X-API-Key` on the same POST ([why](/core/advanced-guides/handling-webhooks#webhook-signing-vs-authorization)).
 - **Verify signatures:** Always verify the `` `X-Lomi-Signature` `` to ensure the request is from lomi.
-- **Respond quickly:** Your endpoint should return a `` `2xx` `` status code within a few seconds. Offload longer processing to background jobs.
+- **Respond quickly:** Return `` `2xx` `` promptly — lomi waits only **about 4 seconds** per POST attempt before timing out. Offload heavier work after you respond.
 - **Handle retries:** Be prepared for lomi. to retry sending events if your endpoint fails or times out.
 - **Idempotency:** Design your event processing logic to handle duplicate events gracefully.
 - **Secure your secret:** Store your webhook secret securely using environment variables or a secrets manager.
