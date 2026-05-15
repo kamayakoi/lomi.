@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { CreatePortalLaunchSessionDto } from './dto/create-portal-launch-session.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Database } from '../../utils/types/api';
 
@@ -291,5 +292,103 @@ export class CustomersService {
     if (error) throw new Error(error.message);
 
     return data || [];
+  }
+
+  /**
+   * Create a one-time hosted customer portal launch session for a customer.
+   * This is intended to be called from merchant-owned apps via API key auth.
+   */
+  async createPortalLaunchSession(
+    id: string,
+    input: CreatePortalLaunchSessionDto,
+    user: AuthContext,
+  ) {
+    // First verify customer ownership in the merchant organization.
+    await this.findOne(id, user);
+
+    const normalizedFlowType = input.flow_type ?? 'portal_home';
+    const { data, error } = await this.supabase.getClient().rpc(
+      'create_customer_portal_launch_session' as any,
+      {
+        p_merchant_id: user.merchantId,
+        p_organization_id: user.organizationId,
+        p_customer_id: id,
+        p_environment: user.environment || 'live',
+        p_return_url: input.return_url || null,
+        p_flow_type: normalizedFlowType,
+        p_flow_subscription_id: input.flow_subscription_id || null,
+        p_flow_after_completion_url: input.flow_after_completion_url || null,
+      } as any,
+    );
+
+    if (error) throw new Error(error.message);
+
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { launch_token?: string }
+      | null
+      | undefined;
+    const launchToken = row?.launch_token;
+
+    if (!launchToken) {
+      throw new Error('Failed to create portal launch token');
+    }
+
+    const baseUrl = 'https://customers.lomi.africa';
+    const launchUrl = `${baseUrl}/launch?token=${encodeURIComponent(launchToken)}`;
+
+    return {
+      customer_id: id,
+      organization_id: user.organizationId,
+      launch_token: launchToken,
+      launch_url: launchUrl,
+      expires_in_seconds: 900,
+      flow_type: normalizedFlowType,
+      flow_subscription_id: input.flow_subscription_id || null,
+      return_url: input.return_url || null,
+      flow_after_completion_url: input.flow_after_completion_url || null,
+    };
+  }
+
+  /**
+   * Merchant-scoped hosted customer portal audit events (challenge, session, subscription actions).
+   */
+  async getPortalAudit(
+    id: string,
+    user: AuthContext,
+    page: number = 1,
+    pageSize: number = 50,
+    eventType?: string,
+  ) {
+    await this.findOne(id, user);
+    const limit = Math.min(Math.max(pageSize, 1), 200);
+    const safePage = Math.max(page, 1);
+    const offset = (safePage - 1) * limit;
+
+    const { data, error } = await this.supabase.getClient().rpc(
+      'merchant_list_customer_portal_audit_events' as any,
+      {
+        p_merchant_id: user.merchantId,
+        p_organization_id: user.organizationId,
+        p_customer_id: id,
+        p_limit: limit,
+        p_offset: offset,
+        p_event_type: eventType?.trim() || null,
+      } as any,
+    );
+
+    if (error) throw new Error(error.message);
+
+    const rows = (data as any[]) ?? [];
+    const total = rows.length > 0 ? Number(rows[0].total_count ?? 0) : 0;
+
+    return {
+      events: rows.map(({ total_count: _tc, ...rest }) => rest),
+      pagination: {
+        page: safePage,
+        pageSize: limit,
+        totalCount: total,
+        totalPages: limit > 0 ? Math.ceil(total / limit) : 0,
+      },
+    };
   }
 }

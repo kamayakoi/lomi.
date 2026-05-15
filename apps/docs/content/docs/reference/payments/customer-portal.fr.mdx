@@ -1,0 +1,118 @@
+---
+title: Portail client
+description: Intégrez un portail client hébergé avec sessions de lancement, auth OTP/magic link et accès limité au périmètre client.
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Le portail client lomi. est un espace de compte hébergé sur `customers.lomi.africa` où vos utilisateurs finaux peuvent :
+
+- Consulter l'historique des paiements
+- Voir et gérer leurs abonnements (pause / reprise / annulation selon le statut)
+
+Ce guide décrit l'intégration recommandée en production.
+
+## Architecture (recommandée)
+
+1. Votre backend marchand crée une session de lancement du portail à usage unique.
+2. Vous redirigez ou ouvrez l'`launch_url` renvoyée.
+3. Le portail hébergé consomme le jeton une fois et demande au client de se vérifier via :
+   - Lien magique e-mail, ou
+   - OTP SMS
+4. Une session portail est créée, bornée à `(organization_id, customer_id, environment)`.
+5. Le client ne voit que ses propres enregistrements.
+
+<Callout type="warn">
+  Ne créez pas de sessions de lancement depuis le navigateur. Appelez l’API depuis votre backend uniquement.
+</Callout>
+
+## Créer une session de lancement
+
+Utilisez `POST /customers/{id}/portal-launch-session` :
+
+- `return_url` (optionnel)
+- `flow_type` (optionnel) : `portal_home`, `subscription_cancel`, `subscription_manage`
+- `flow_subscription_id` (optionnel, obligatoire pour `subscription_cancel`)
+- `flow_after_completion_url` (optionnel)
+
+Les détails du point de terminaison et des exemples de charge utile figurent dans [Customers](/reference/platform/customers#create-customer-portal-launch-session).
+
+## Modèle d'éligibilité
+
+Un client peut accéder au portail uniquement si :
+
+1. Il appartient à votre organisation dans l'environnement demandé, et
+2. Il possède au moins un enregistrement de facturation (transaction ou abonnement).
+
+Cela évite d’exposer un portail vide à des contacts qui n’ont jamais payé.
+
+## Exemple de bout en bout
+
+<Tabs items={["TypeScript", "cURL"]}>
+<Tab value="TypeScript">
+```typescript
+import axios from "axios";
+
+const apiKey = process.env.LOMI_API_KEY!;
+const customerId = "2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265";
+
+const { data } = await axios.post(
+  `https://api.lomi.africa/customers/${customerId}/portal-launch-session`,
+  {
+    return_url: "https://merchant.example.com/account",
+    flow_type: "subscription_cancel",
+    flow_subscription_id: "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    flow_after_completion_url:
+      "https://merchant.example.com/account/subscription-canceled",
+  },
+  {
+    headers: {
+      "X-API-KEY": apiKey,
+      "Content-Type": "application/json",
+    },
+  },
+);
+
+// Rediriger le client vers le portail hébergé
+return data.launch_url;
+```
+</Tab>
+<Tab value="cURL">
+```bash
+curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f743bb265/portal-launch-session" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "return_url": "https://merchant.example.com/account",
+    "flow_type": "subscription_cancel",
+    "flow_subscription_id": "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-canceled"
+  }'
+```
+</Tab>
+</Tabs>
+
+## Contrôles de sécurité
+
+- Les jetons de lancement sont à usage unique et de courte durée (15 min)
+- Les jetons sont hachés au repos
+- Les challenges OTP / lien magique sont hachés, expirants et limités en tentatives
+- Les sessions portail sont hachées, révocables et prolongées à l’activité
+- Les requêtes sont bornées organisation / client au niveau des fonctions SQL
+- Des événements d’audit couvrent lancement, challenge, session et actions sur abonnements
+
+## Checklist production
+
+- Définir `CUSTOMER_PORTAL_BASE_URL` dans l'environnement de votre API.
+- Garantir que la clé API reste côté serveur marchand.
+- Utiliser des URL HTTPS pour `return_url` et `flow_after_completion_url`.
+- Surveiller les échecs de lancement / session / challenge et les abus.
+- Harmoniser la normalisation téléphone / e-mail avec votre CRM.
+
+## Dépannage
+
+- **404 client introuvable** : mauvais ID client ou organisation incorrecte.
+- **400 flux invalide** : `flow_type` non supporté ou `flow_subscription_id` manquant.
+- **URL de lancement expirée** : jeton réutilisé ou expiré.
+- **Blocage après saisie du contact** : aucun enregistrement de facturation éligible.

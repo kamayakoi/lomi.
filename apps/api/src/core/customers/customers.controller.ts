@@ -24,8 +24,10 @@ import {
 } from '@nestjs/swagger';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { CreatePortalLaunchSessionDto } from './dto/create-portal-launch-session.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CustomerResponseDto } from './dto/customer-response.dto';
+import { PortalLaunchSessionResponseDto } from './dto/portal-launch-session-response.dto';
 import { TransactionResponseDto } from '../transactions/dto/transaction-response.dto';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import {
@@ -35,7 +37,11 @@ import {
 
 @ApiTags('Clients')
 @ApiSecurity('api-key')
-@ApiExtraModels(CustomerResponseDto, TransactionResponseDto)
+@ApiExtraModels(
+  CustomerResponseDto,
+  TransactionResponseDto,
+  PortalLaunchSessionResponseDto,
+)
 @UseGuards(ApiKeyGuard)
 @Controller('customers')
 export class CustomersController {
@@ -293,6 +299,56 @@ export class CustomersController {
     return this.customersService.remove(id, user);
   }
 
+  @Get(':id/portal-audit')
+  @ApiOperation({
+    summary: 'Hosted customer portal audit',
+    description:
+      'Liste les évènements portal (sessions, OTP, souscriptions self-service) pour ce client.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID du client',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    example: 50,
+  })
+  @ApiQuery({
+    name: 'eventType',
+    required: false,
+    description: 'Filtre sur customer_portal_audit_events.event_type',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Chronologie paginée des évènements portal',
+  })
+  getPortalAudit(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthContext,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('pageSize', new DefaultValuePipe(50), ParseIntPipe)
+    pageSize?: number,
+    @Query('eventType') eventType?: string,
+  ) {
+    return this.customersService.getPortalAudit(
+      id,
+      user,
+      page,
+      pageSize,
+      eventType,
+    );
+  }
+
   @Get(':id/transactions')
   @ApiOperation({
     summary: 'Transactions du client',
@@ -322,5 +378,52 @@ export class CustomersController {
   })
   getTransactions(@Param('id') id: string, @CurrentUser() user: AuthContext) {
     return this.customersService.getTransactions(id, user);
+  }
+
+  @Post(':id/portal-launch-session')
+  @ApiOperation({
+    summary: 'Créer une session de lancement du portail client',
+    description:
+      "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID du client',
+    type: String,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Session de lancement créée',
+    type: PortalLaunchSessionResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Client introuvable ou accès refusé',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Clé API invalide ou manquante',
+  })
+  @ApiBody({
+    required: false,
+    schema: {
+      type: 'object',
+      properties: {
+        return_url: { type: 'string', format: 'uri' },
+        flow_type: {
+          type: 'string',
+          enum: ['portal_home', 'subscription_cancel', 'subscription_manage'],
+        },
+        flow_subscription_id: { type: 'string', format: 'uuid' },
+        flow_after_completion_url: { type: 'string', format: 'uri' },
+      },
+    },
+  })
+  createPortalLaunchSession(
+    @Param('id') id: string,
+    @Body() body: CreatePortalLaunchSessionDto = {},
+    @CurrentUser() user: AuthContext,
+  ) {
+    return this.customersService.createPortalLaunchSession(id, body, user);
   }
 }
