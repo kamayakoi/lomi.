@@ -64,7 +64,7 @@ const { data } = await axios.post(
     flow_type: "subscription_cancel",
     flow_subscription_id: "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
     flow_after_completion_url:
-      "https://merchant.example.com/account/subscription-canceled",
+      "https://merchant.example.com/account/subscription-cancelled",
   },
   {
     headers: {
@@ -87,7 +87,7 @@ curl -sS -X POST "https://api.lomi.africa/customers/2d8f4f8b-1ea8-4de9-9fd8-f52f
     "return_url": "https://merchant.example.com/account",
     "flow_type": "subscription_cancel",
     "flow_subscription_id": "3d6236f9-2c3e-4f0c-b00d-e2d73d3f0d24",
-    "flow_after_completion_url": "https://merchant.example.com/account/subscription-canceled"
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
   }'
 ```
 </Tab>

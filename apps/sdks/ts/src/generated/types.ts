@@ -2822,7 +2822,7 @@ export type Database = {
         | 'REFUND_FAILED'
         | 'SUBSCRIPTION_CREATED'
         | 'SUBSCRIPTION_RENEWED'
-        | 'SUBSCRIPTION_CANCELED';
+        | 'SUBSCRIPTION_CANCELLED';
     };
   };
 };

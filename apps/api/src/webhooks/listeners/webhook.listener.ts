@@ -87,14 +87,14 @@ export class WebhookListener {
     );
   }
 
-  @OnEvent('SUBSCRIPTION_CANCELED')
+  @OnEvent('SUBSCRIPTION_CANCELLED')
   async handleSubscriptionCanceled(payload: any) {
     this.logger.log(
-      `Handling SUBSCRIPTION_CANCELED event for subscription ${payload.id}`,
+      `Handling SUBSCRIPTION_CANCELLED event for subscription ${payload.id}`,
     );
     await this.queueWebhook(
       payload.organization_id,
-      'SUBSCRIPTION_CANCELED',
+      'SUBSCRIPTION_CANCELLED',
       payload,
     );
   }

@@ -54,7 +54,7 @@ export class PortalLaunchSessionResponseDto {
   return_url: string | null;
 
   @ApiProperty({
-    example: 'https://merchant.example.com/account/subscription-canceled',
+    example: 'https://merchant.example.com/account/subscription-cancelled',
     nullable: true,
     description: 'Redirect destination after successful completion of deep-link flow',
   })

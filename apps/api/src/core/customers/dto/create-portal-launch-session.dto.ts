@@ -40,7 +40,7 @@ export class CreatePortalLaunchSessionDto {
   @ApiPropertyOptional({
     description:
       'Optional URL to redirect after successful completion of targeted flow.',
-    example: 'https://merchant.example.com/account/subscription-canceled',
+    example: 'https://merchant.example.com/account/subscription-cancelled',
   })
   @IsOptional()
   @IsUrl({ require_tld: true, require_protocol: true })

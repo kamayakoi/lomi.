@@ -332,7 +332,7 @@ const { data: launch } = await axios.post(
     flow_type: 'subscription_cancel',
     flow_subscription_id: 'sub_abc123...',
     flow_after_completion_url:
-      'https://merchant.example.com/account/subscription-canceled',
+      'https://merchant.example.com/account/subscription-cancelled',
   },
   {
     headers: {
@@ -355,7 +355,7 @@ curl -X POST "https://api.lomi.africa/customers/cus_abc123.../portal-launch-sess
     "return_url": "https://merchant.example.com/account",
     "flow_type": "subscription_cancel",
     "flow_subscription_id": "sub_abc123...",
-    "flow_after_completion_url": "https://merchant.example.com/account/subscription-canceled"
+    "flow_after_completion_url": "https://merchant.example.com/account/subscription-cancelled"
   }'
 ```
 </Tab>
