@@ -25,3 +25,6 @@
 [submodule "apps/jumbo"]
 	path = apps/jumbo
 	url = https://github.com/lomiafrica/jumbo.git
+[submodule "apps/customers"]
+	path = apps/customers
+	url = https://github.com/lomiafrica/customers.git
