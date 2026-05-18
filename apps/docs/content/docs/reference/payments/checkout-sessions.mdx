@@ -16,6 +16,11 @@ The Checkout Sessions API allows you to create secure, temporary sessions for cu
   Checkout sessions expire after **60 minutes** by default.
 </Callout>
 
+<Callout type="warning">
+  **Do not use checkout redirects as webhook endpoints.** `` `success_url` `` and `` `cancel_url` `` are browser redirect destinations for your customer.  
+  Webhooks must point to a dedicated server route like `` `https://your-domain.com/api/lomi/webhook` `` that accepts unauthenticated `` `POST` `` requests and verifies `` `X-Lomi-Signature` ``.
+</Callout>
+
 ## Create a checkout session
 
 Creates a new checkout session and returns a URL to redirect your customer to.
