@@ -4,8 +4,7 @@ export type LomiPaymentEnvironment = 'live' | 'test';
 export function normalizePaymentEnvironment(
   value: unknown,
 ): LomiPaymentEnvironment {
-  return typeof value === 'string' &&
-    value.toLowerCase().trim() === 'test'
+  return typeof value === 'string' && value.toLowerCase().trim() === 'test'
     ? 'test'
     : 'live';
 }

@@ -7,7 +7,8 @@ import {
 export type { LomiPaymentEnvironment } from '../payment-environment';
 export { normalizePaymentEnvironment } from '../payment-environment';
 
-const STRIPE_API_VERSION = '2025-11-17.clover' as Stripe.StripeConfig['apiVersion'];
+const STRIPE_API_VERSION =
+  '2025-11-17.clover' as Stripe.StripeConfig['apiVersion'];
 
 /**
  * Aligns with dashboard edge `resolveStripeSecretKey`: test mode prefers

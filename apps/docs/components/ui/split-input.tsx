@@ -3,8 +3,10 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils/cn';
 
-interface SplitInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
+interface SplitInputProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'prefix'
+> {
   prefix: string;
   className?: string;
 }

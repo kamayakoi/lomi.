@@ -336,10 +336,11 @@ export default function PricingDetails() {
                                   ) => (
                                     <div
                                       key={rowIdx}
-                                      className={`flex flex-col sm:flex-row sm:justify-between sm:items-center px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm gap-1 sm:gap-0 ${rowIdx !== sub.table.length - 1
-                                        ? 'border-b border-border'
-                                        : ''
-                                        }`}
+                                      className={`flex flex-col sm:flex-row sm:justify-between sm:items-center px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm gap-1 sm:gap-0 ${
+                                        rowIdx !== sub.table.length - 1
+                                          ? 'border-b border-border'
+                                          : ''
+                                      }`}
                                     >
                                       <span className="text-muted-foreground">
                                         {row.label}
@@ -352,7 +353,6 @@ export default function PricingDetails() {
                                 )}
                               </div>
                             )}
-
                           </div>
                         );
                       })}

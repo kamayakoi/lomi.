@@ -11,9 +11,9 @@ describe('payment-environment', () => {
   });
 
   it('resolveMerchantWebhookRelayEnvironment reads payload environment', () => {
-    expect(resolveMerchantWebhookRelayEnvironment({ environment: 'test' })).toBe(
-      'test',
-    );
+    expect(
+      resolveMerchantWebhookRelayEnvironment({ environment: 'test' }),
+    ).toBe('test');
     expect(
       resolveMerchantWebhookRelayEnvironment({ environment: 'TEST' }),
     ).toBe('test');

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import type Stripe from 'stripe';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { normalizePaymentEnvironment } from '../../utils/payment-environment';

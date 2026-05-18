@@ -52,9 +52,7 @@ export class StripeClientsService {
     try {
       return this.getClient(paymentEnv);
     } catch {
-      this.logger.warn(
-        `Stripe secret not configured for livemode=${livemode}`,
-      );
+      this.logger.warn(`Stripe secret not configured for livemode=${livemode}`);
       return undefined;
     }
   }

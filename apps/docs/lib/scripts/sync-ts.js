@@ -1,6 +1,5 @@
-/* @proprietary license */
-
 #!/usr/bin/env node
+/* @proprietary license */
 
 import fs from 'fs';
 import path from 'path';

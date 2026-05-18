@@ -37,14 +37,14 @@ describe('stripe-keys', () => {
   it('resolveStripeWebhookSecrets dedupes live and test secrets', () => {
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_live';
     process.env.STRIPE_WEBHOOK_SECRET_TEST = 'whsec_test';
-    expect(resolveStripeWebhookSecrets()).toEqual([
-      'whsec_live',
-      'whsec_test',
-    ]);
+    expect(resolveStripeWebhookSecrets()).toEqual(['whsec_live', 'whsec_test']);
   });
 
   it('constructStripeWebhookEvent verifies with matching secret', () => {
-    const payload = JSON.stringify({ id: 'evt_1', type: 'payment_intent.succeeded' });
+    const payload = JSON.stringify({
+      id: 'evt_1',
+      type: 'payment_intent.succeeded',
+    });
     const secret = 'whsec_test_construct';
     process.env.STRIPE_WEBHOOK_SECRET = secret;
     delete process.env.STRIPE_WEBHOOK_SECRET_TEST;
