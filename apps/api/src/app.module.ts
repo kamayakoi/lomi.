@@ -10,6 +10,7 @@ import { GlobalJsonExceptionFilter } from './core/filters/json-exception.filter'
 import { THROTTLE_LIMIT, THROTTLE_TTL_MS } from './config/http.constants';
 import { AgentModule } from './agent/agent.module';
 import { SupabaseModule } from './utils/supabase/supabase.module';
+import { StripeModule } from './utils/stripe/stripe.module';
 import { TransactionsModule } from './core/transactions/transactions.module';
 import { AccountsModule } from './core/accounts/accounts.module';
 import { OrganizationsModule } from './core/organizations/organizations.module';
@@ -115,6 +116,7 @@ const logger = new Logger('RedisConfig');
       },
     }),
     SupabaseModule,
+    StripeModule,
     AccountsModule,
     OrganizationsModule,
     TransactionsModule,

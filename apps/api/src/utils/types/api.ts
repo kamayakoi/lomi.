@@ -2801,6 +2801,7 @@ export type Database = {
         | 'FREE';
       payout_status: 'pending' | 'processing' | 'completed' | 'failed';
       pricing_model: 'standard' | 'pay_what_you_want' | 'tiered' | 'volume';
+      pricing_plan_type: 'fixed' | 'volume_tiered' | 'custom';
       product_type: 'one_time' | 'recurring' | 'usage_based';
       provider_code:
         | 'WAVE'

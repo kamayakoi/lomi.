@@ -52,7 +52,7 @@ export class WebhooksService {
         p_event: null,
         p_is_active: null,
         p_search_term: null,
-        p_environment: 'live',
+        p_environment: user.environment || 'live',
       },
     );
 

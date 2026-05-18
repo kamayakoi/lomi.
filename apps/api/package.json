@@ -6,6 +6,7 @@
   "private": true,
   "license": "AGPL-3.0",
   "scripts": {
+    "build": "nest build",
     "build:local": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -24,8 +25,6 @@
     "generate:all": "npm run verify:all && npm run generate:types && npm run generate:client",
     "generate:docs": "npx @redocly/cli build-docs openapi/spec.yaml --config redocly.yaml -o docs/index.html --title \"lomi. — API Reference\" --theme.openapi.disableSearch=false --theme.openapi.hideLoading=true",
     "generate:llm-docs": "node scripts/generate-llm-docs.js",
-    "lint": "eslint . --ext .ts",
-    "format": "prettier --write .",
     "prepublishOnly": "npm run build"  },
   "keywords": [
     "lomi",
@@ -139,6 +138,7 @@
       }
     },
     "testEnvironment": "node",
+    "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1",
       "^@core/(.*)$": "<rootDir>/core/$1",

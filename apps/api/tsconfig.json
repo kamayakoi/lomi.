@@ -4,8 +4,10 @@
     "module": "commonjs",
     "lib": ["ES2020"],
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "src",
     "strict": true,
+    "strictPropertyInitialization": false,
+    "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -13,12 +15,14 @@
     "sourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "typeRoots": ["./node_modules/@types"],
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["node", "express"]
+    "types": ["node", "express", "jest"]
   },
-  "include": ["src/**/*", "scripts/**/*", "openapi/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
 }

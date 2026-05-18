@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 const stripeMockGlobal = globalThis as {
   __paymentIntentsStripeMock?: { paymentIntents: { create: jest.Mock } };
 };
@@ -20,6 +18,7 @@ import {
 } from '@nestjs/common';
 import { PaymentIntentsService } from './payment-intents.service';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 
@@ -46,6 +45,7 @@ describe('PaymentIntentsService', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         PaymentIntentsService,
+        StripeClientsService,
         {
           provide: SupabaseService,
           useValue: supabase,
@@ -142,7 +142,7 @@ describe('PaymentIntentsService', () => {
     );
 
     const txCall = rpcMock.mock.calls.find(
-      (c) => c[0] === 'create_stripe_transaction',
+      (c: [string, ...unknown[]]) => c[0] === 'create_stripe_transaction',
     );
     expect(txCall).toBeDefined();
     expect(txCall![1]).toMatchObject({
@@ -151,10 +151,11 @@ describe('PaymentIntentsService', () => {
       p_currency_code: 'XOF',
       p_quantity: 2,
       p_metadata: { order: 'ORD-9' },
+      p_environment: 'test',
     });
 
     const custCalls = rpcMock.mock.calls.filter(
-      (c) => c[0] === 'create_or_update_customer',
+      (c: [string, ...unknown[]]) => c[0] === 'create_or_update_customer',
     );
     expect(custCalls).toHaveLength(0);
   });
@@ -170,7 +171,7 @@ describe('PaymentIntentsService', () => {
     await service.create(dto, user);
 
     const custCall = rpcMock.mock.calls.find(
-      (c) => c[0] === 'create_or_update_customer',
+      (c: [string, ...unknown[]]) => c[0] === 'create_or_update_customer',
     );
     expect(custCall).toBeDefined();
     expect(custCall![1]).toMatchObject({
@@ -179,7 +180,7 @@ describe('PaymentIntentsService', () => {
     });
 
     const txCall = rpcMock.mock.calls.find(
-      (c) => c[0] === 'create_stripe_transaction',
+      (c: [string, ...unknown[]]) => c[0] === 'create_stripe_transaction',
     );
     expect(txCall![1].p_customer_id).toBe('cust_via_rpc');
   });
@@ -280,6 +281,7 @@ describe('PaymentIntentsService', () => {
       const mod = await Test.createTestingModule({
         providers: [
           PaymentIntentsService,
+          StripeClientsService,
           { provide: SupabaseService, useValue: supabaseOnly },
         ],
       }).compile();
