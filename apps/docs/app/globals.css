@@ -153,6 +153,8 @@
 
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     /* font-family: var(--font-sans);
     font-weight: 300;
     font-feature-settings:
