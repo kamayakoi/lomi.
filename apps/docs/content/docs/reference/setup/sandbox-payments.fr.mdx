@@ -216,7 +216,7 @@ Pour les numéros autorisés en bac à sable MTN, voir le [portail développeur 
 
 ```bash
 curl -sS \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   "https://sandbox.api.lomi.africa/accounts"
 ```
 
@@ -226,7 +226,7 @@ curl -sS \
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,
@@ -245,7 +245,7 @@ Ouvrez le `checkout_url` retourné et payez avec une carte de test ou le mobile 
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,

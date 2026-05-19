@@ -216,7 +216,7 @@ For sandbox phone numbers allowed by MTN, see the [MTN MoMo developer portal](ht
 
 ```bash
 curl -sS \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   "https://sandbox.api.lomi.africa/accounts"
 ```
 
@@ -226,7 +226,7 @@ curl -sS \
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/checkout-sessions" \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,
@@ -245,7 +245,7 @@ Open the returned `checkout_url` and pay with a test card or mobile money method
 
 ```bash
 curl -sS -X POST "https://sandbox.api.lomi.africa/payment-intents" \
-  -H "X-API-Key: $LOMI_SK_TEST" \
+  -H "X-API-Key: $LOMI_SECRET_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "amount": 1000,
