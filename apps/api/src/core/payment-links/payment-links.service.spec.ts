@@ -68,7 +68,7 @@ describe('PaymentLinksService', () => {
           p_currency_code: dto.currency_code,
           p_price: dto.amount,
           p_created_by: user.merchantId,
-          p_environment: 'live',
+          p_environment: 'test',
         }),
       );
       expect(mockClientRpc).toHaveBeenCalledWith(

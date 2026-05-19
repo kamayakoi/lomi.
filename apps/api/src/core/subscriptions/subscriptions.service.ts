@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
 
 @Injectable()
@@ -19,7 +20,7 @@ export class SubscriptionsService {
         p_merchant_id: user.merchantId,
         p_page: page,
         p_page_size: pageSize,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 
@@ -124,7 +125,7 @@ export class SubscriptionsService {
       'fetch_subscriptions_for_customer' as any,
       {
         p_customer_id: customerId,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 

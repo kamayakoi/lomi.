@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { CreateDiscountCouponDto } from './dto/create-discount-coupon.dto';
 
 @Injectable()
@@ -20,7 +21,7 @@ export class DiscountCouponsService {
       'get_organization_coupons' as any,
       {
         p_organization_id: user.organizationId,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 

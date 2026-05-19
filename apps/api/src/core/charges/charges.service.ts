@@ -7,6 +7,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreateWaveChargeDto } from './dto/create-charge.dto';
+import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -18,7 +20,10 @@ export class ChargesService {
     private readonly supabaseService: SupabaseService,
   ) {}
 
-  async createWaveCharge(createChargeDto: CreateWaveChargeDto) {
+  async createWaveCharge(
+    createChargeDto: CreateWaveChargeDto,
+    user: AuthContext,
+  ) {
     const {
       amount,
       currency,
@@ -28,8 +33,8 @@ export class ChargesService {
       description,
       successUrl,
       errorUrl,
-      environment: _environment = 'live',
     } = createChargeDto;
+    const paymentEnvironment = environmentFromAuth(user);
 
     try {
       this.logger.log(
@@ -112,6 +117,7 @@ export class ChargesService {
               metadata: {
                 source: 'api_direct_charge',
               },
+              paymentEnvironment,
             },
           },
         });

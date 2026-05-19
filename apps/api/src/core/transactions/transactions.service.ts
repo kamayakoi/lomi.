@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 
 @Injectable()
 export class TransactionsService {
@@ -37,7 +38,7 @@ export class TransactionsService {
         p_start_date: startDate || null,
         p_end_date: endDate || null,
         p_is_pos: isPos !== undefined ? isPos : null,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 

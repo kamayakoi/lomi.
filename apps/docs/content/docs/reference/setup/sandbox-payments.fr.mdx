@@ -28,16 +28,16 @@ L’environnement est déterminé par votre **clé API**, pas par le nom d’hô
 
 ## Comment le mode test est choisi
 
-```mermaid
-flowchart TD
-  apiKey[Cle_API_test_ou_live] --> env[environment_test_ou_live]
-  link[Lien_ou_session_checkout] --> env
-  env --> ledger[Solde_test_vs_comptes_live]
-  env --> method{Moyen_de_paiement}
-  method --> cards[Paiements_carte]
-  method --> wave[Wave]
-  method --> mtn[MTN_MoMo]
-```
+<Mermaid
+  chart={`flowchart TD
+  apiKey["Clé API test ou live"] --> env["environment : test ou live"]
+  link["Lien de paiement ou session checkout"] --> env
+  env --> ledger["Solde test vs comptes live"]
+  env --> method{"Moyen de paiement"}
+  method --> cards["Paiements carte"]
+  method --> wave["Wave"]
+  method --> mtn["MTN MoMo"]`}
+/>
 
 **API REST**
 
@@ -288,7 +288,7 @@ Voir **[Webhooks](/reference/payments/webhooks)**. Pour l’automatisation, voir
 | Données live dans les réponses API | Utilisation de `lomi_sk_live_…` | Passer à `lomi_sk_test_…` et `https://sandbox.api.lomi.africa` |
 | Échec carte immédiat | Numéro de refus ou règle CVC | Utiliser `4242…`, expiration future, CVC à 3 chiffres |
 | Carte OK mais pas de solde de test | Webhook absent ; mauvais environnement sur la session | Lien/session en test ; statut transaction dans le tableau de bord |
-| Clé de test mais checkout « live » | Lien créé en mode **Live** | Recréer le lien en **Test** |
+| Clé de test mais checkout « live » | Lien créé en mode **Live** | Recréer le lien en mode **Test** (tableau de bord ou clé API de test) |
 | Wave/MTN OK, solde inchangé | Consultation du solde **live** au lieu du **test** | Basculer le tableau de bord en Test |
 | Erreurs bac à sable MTN | MSISDN ou identifiants invalides | Numéros documentés par MTN pour votre pays |
 | Pas d’e-mail client | Normal en test | Notifications désactivées en test |

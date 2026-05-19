@@ -39,6 +39,6 @@ export class ChargesController {
   ) {
     createChargeDto.organizationId = user.organizationId;
     createChargeDto.merchantId = user.merchantId;
-    return this.chargesService.createWaveCharge(createChargeDto);
+    return this.chargesService.createWaveCharge(createChargeDto, user);
   }
 }

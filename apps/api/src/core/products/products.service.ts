@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { CreateProductDto } from './dto/create-product.dto';
 import { AddPriceDto } from './dto/add-price.dto';
 import { Database } from '../../utils/types/api';
@@ -29,7 +30,7 @@ export class ProductsService {
         p_is_active: isActive,
         p_limit: limit,
         p_offset: offset,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 
@@ -121,7 +122,7 @@ export class ProductsService {
         p_prices: createProductDto.prices,
         p_metadata: createProductDto.metadata || null,
         p_fee_type_ids: createProductDto.fee_type_ids || null,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
         p_failed_payment_action: createProductDto.failed_payment_action || null,
         p_charge_day: createProductDto.charge_day || null,
         p_first_payment_type: createProductDto.first_payment_type || 'initial',

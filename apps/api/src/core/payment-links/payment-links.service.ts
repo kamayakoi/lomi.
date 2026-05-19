@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { CreatePaymentLinkDto } from './dto/create-payment-link.dto';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { LinkType, CurrencyCode } from '../../utils/types/api';
 
 @Injectable()
@@ -29,7 +30,7 @@ export class PaymentLinksService {
       p_product_id: createDto.product_id || null,
       p_price_id: createDto.price_id || null,
       p_created_by: user.merchantId,
-      p_environment: 'live',
+      p_environment: environmentFromAuth(user),
     });
 
     if (error) throw new Error(error.message);

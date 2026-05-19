@@ -70,7 +70,7 @@ describe('TransactionsService', () => {
           p_start_date: '2024-01-01T00:00:00Z',
           p_end_date: '2024-12-31T23:59:59Z',
           p_is_pos: true,
-          p_environment: 'live',
+          p_environment: 'test',
         }),
       );
     });

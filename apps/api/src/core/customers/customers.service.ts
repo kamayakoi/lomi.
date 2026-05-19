@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
+import { environmentFromAuth } from '../common/auth-environment';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CreatePortalLaunchSessionDto } from './dto/create-portal-launch-session.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -38,7 +39,7 @@ export class CustomersService {
         p_activity_status: activityStatus || 'all',
         p_offset: offset,
         p_limit: pageSize,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 
@@ -64,7 +65,7 @@ export class CustomersService {
         postal_code: c.postal_code,
         is_business: c.is_business,
         metadata: null, // RPC doesn't return metadata
-        environment: 'live',
+        environment: c.environment,
         created_at: c.created_at,
         updated_at: c.updated_at,
       })),
@@ -152,7 +153,7 @@ export class CustomersService {
         p_address: createDto.address || '',
         p_postal_code: createDto.postal_code || '',
         p_is_business: createDto.is_business || false,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 
@@ -285,7 +286,7 @@ export class CustomersService {
       'fetch_customer_transactions' as any,
       {
         p_customer_id: id,
-        p_environment: 'live',
+        p_environment: environmentFromAuth(user),
       } as any,
     );
 

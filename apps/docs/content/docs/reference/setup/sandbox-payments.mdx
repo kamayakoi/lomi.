@@ -28,16 +28,16 @@ Environment is determined by your **API key**, not the hostname: a test key alwa
 
 ## How test mode is chosen
 
-```mermaid
-flowchart TD
-  apiKey[Test_or_live_API_key] --> env[environment_test_or_live]
-  link[Payment_link_or_checkout_session] --> env
-  env --> ledger[Test_balance_vs_live_accounts]
-  env --> method{Payment_method}
-  method --> cards[Card_payments]
-  method --> wave[Wave]
-  method --> mtn[MTN_MoMo]
-```
+<Mermaid
+  chart={`flowchart TD
+  apiKey["Test or live API key"] --> env["environment: test or live"]
+  link["Payment link or checkout session"] --> env
+  env --> ledger["Test balance vs live accounts"]
+  env --> method{"Payment method"}
+  method --> cards["Card payments"]
+  method --> wave["Wave"]
+  method --> mtn["MTN MoMo"]`}
+/>
 
 **REST API**
 
@@ -288,7 +288,7 @@ See **[Webhooks](/reference/payments/webhooks)** for subscription management and
 | Live data in API responses | Using `lomi_sk_live_…` | Switch to `lomi_sk_test_…` and `https://sandbox.api.lomi.africa` |
 | Card payment fails immediately | Decline test number or wrong CVC rule | Use `4242…` with any future expiry and any 3-digit CVC |
 | Card confirms but no test balance | Webhook not reaching your stack; wrong environment on session | Ensure test link/session; check dashboard transaction status |
-| Test key but checkout feels “live” | Payment link created in **Live** mode | Recreate link in **Test** mode |
+| Test key but checkout feels “live” | Payment link created in **Live** mode | Recreate link in **Test** mode (dashboard or with a test API key) |
 | Wave/MTN shows success, balance unchanged | Viewing **live** balance instead of **test** | Toggle dashboard to Test |
 | MTN sandbox errors | Invalid sandbox MSISDN or credentials | Use numbers from MTN developer docs for your country |
 | No customer email | Expected in test | Notifications are disabled for test transactions |
