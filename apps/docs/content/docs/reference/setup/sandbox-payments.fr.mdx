@@ -28,16 +28,11 @@ L’environnement est déterminé par votre **clé API**, pas par le nom d’hô
 
 ## Comment le mode test est choisi
 
-<Mermaid
-  chart={`flowchart TD
-  apiKey["Clé API test ou live"] --> env["environment : test ou live"]
-  link["Lien de paiement ou session checkout"] --> env
-  env --> ledger["Solde test vs comptes live"]
-  env --> method{"Moyen de paiement"}
-  method --> cards["Paiements carte"]
-  method --> wave["Wave"]
-  method --> mtn["MTN MoMo"]`}
-/>
+| Ce qui fixe l’environnement | Conséquence |
+| --- | --- |
+| **Clé API test ou live** | Les ressources portent `"environment": "test"` ou `"live"` |
+| **Lien de paiement ou session checkout** | Le checkout hébergé suit l’environnement de ce lien ou de cette session |
+| **Même environnement partout** | **Solde test** vs comptes live ; paiements **carte**, **Wave** ou **MTN MoMo** dans cet environnement |
 
 **API REST**
 

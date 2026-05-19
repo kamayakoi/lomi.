@@ -12,7 +12,6 @@ import { source } from '@/lib/utils/source';
 import { getDocsLocale } from '@/lib/utils/docs-locale';
 import type { Language } from '@/lib/i18n/config';
 import { Wrapper } from '@/components/preview/wrapper';
-import { Mermaid } from '@/components/preview/mermaid';
 import { getMDXComponents } from '@/mdx-components';
 import Link from 'fumadocs-core/link';
 import { AutoTypeTable } from 'fumadocs-typescript/ui';
@@ -135,7 +134,6 @@ export default async function Page({
               );
             },
             Banner,
-            Mermaid,
             TypeTable,
             AutoTypeTable: (props) => (
               <AutoTypeTable generator={generator} {...props} />
