@@ -7,9 +7,11 @@
 [submodule "apps/sdks/php"]
 	path = apps/sdks/php
 	url = https://github.com/lomiafrica/lomi-php-sdk.git
+	branch = main
 [submodule "apps/sdks/python"]
 	path = apps/sdks/python
 	url = https://github.com/lomiafrica/lomi-python-sdk.git
+	branch = main
 [submodule "apps/storefront"]
 	path = apps/storefront
 	url = https://github.com/lomiafrica/storefront.git
