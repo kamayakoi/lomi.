@@ -1,6 +1,6 @@
 ---
-title: 'Authentification'
-description: "All lomi. requests are authentified using API keys. Any request that doesn't include a valid API key will return an authentication error."
+title: 'Authentication'
+description: "All lomi. requests are authenticated using API keys. Any request that doesn't include a valid API key will return an authentication error."
 ---
 
 For a guided path from your first `curl` to the OpenAPI pages, SDKs, and webhook caveats, see **[API integration](/reference/setup/integration)**.
@@ -32,7 +32,7 @@ lomi. provides two distinct environments to separate development and testing fro
 Use the test environment to develop and test your integration without processing real transactions or affecting live data. It mirrors the functionality of the live environment.
 
 - **API Keys:** Test API keys start with `` `lomi_sk_test_` ``.
-- **Base URL:** `` `https://sandbox.api.lomi.africa/v1` ``
+- **Base URL:** `` `https://sandbox.api.lomi.africa` ``
 - **Rate Limits:** 120 requests per minute / 20,000 requests per day.
 - **Data:** Uses simulated data. Responses may include environment flags like `` `"environment": "test"` ``.
 
@@ -41,7 +41,7 @@ Use the test environment to develop and test your integration without processing
 Use the live environment for production operations involving real transactions.
 
 - **API Keys:** Live API keys start with `` `lomi_sk_live_` ``.
-- **Base URL:** `` `https://api.lomi.africa/v1` ``
+- **Base URL:** `` `https://api.lomi.africa` ``
 - **Rate Limits:** 60 requests per minute / 10,000 requests per day.
 - **Data:** Processes real data. Responses may include environment flags like `` `"environment": "live"` ``.
 

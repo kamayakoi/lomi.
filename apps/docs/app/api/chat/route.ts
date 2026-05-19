@@ -1,6 +1,6 @@
 /* @proprietary license */
 
-import { ProvideLinksToolSchema } from '@/lib/chat/inkeep-qa-schema';
+import { ProvideLinksToolSchema } from '@/lib/utils/inkeep-qa-schema';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { convertToModelMessages, streamText } from 'ai';
 

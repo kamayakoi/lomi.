@@ -27,12 +27,11 @@ const lomi = new LomiSDK({ apiKey: process.env.LOMI_API_KEY! });
 const idempotencyKey = uuidv4(); // e.g., 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
 
 try {
-  const session = await lomi.checkoutSessions.create(
+  const session = await lomi.checkoutSessions.createCheckoutSession(
     {
       merchant_id: 'your_merchant_id',
       amount: 1000,
       currency_code: 'XOF',
-      allowed_providers: ['WAVE'],
       success_url: 'https://example.com/success',
       cancel_url: 'https://example.com/cancel',
       // ... other params
@@ -143,6 +142,6 @@ Specific idempotency-related errors (though less common if using UUIDs correctly
 
 ## Next steps
 
-- [Error handling](/docs/core/advanced-guides/error-handling)
-- [Handling webhooks](/docs/core/advanced-guides/handling-webhooks)
-- [API Reference](/docs/reference)
+- [Error handling](/core/advanced-guides/error-handling)
+- [Handling webhooks](/core/advanced-guides/handling-webhooks)
+- [API Reference](/reference/setup/overview)

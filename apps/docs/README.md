@@ -1,6 +1,6 @@
 # Documentation
 
-Welcome to the documentation of [lomi.](https://lomi.africa), the open-source payment processing platform powering francophone West African businesses. This repository contains the code for the lomi. website, docs, and blog. Everything is built on top of Next.js, Sanity, and Fumadocs.
+Welcome to the documentation of [lomi.](https://lomi.africa), the open-source payment processing platform powering francophone West African businesses. This repository contains the code for lomi. documentation.
 
 ## Getting started
 

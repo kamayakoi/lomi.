@@ -21,10 +21,11 @@ import {
 import { ChevronDown } from 'lucide-react';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
 import { cn } from '@/lib/utils/cn';
-import { useTranslation } from '@/lib/contexts/translation-context';
+import { useTranslation } from '@/lib/utils/translation-context';
 import { t as translate } from '@/lib/i18n/translations';
 import { orama } from '@/lib/orama/client';
-import type { SortedResult } from 'fumadocs-core/server';
+import type { OramaCloudSearchParams } from '@orama/core';
+import type { SortedResult } from 'fumadocs-core/search';
 
 // Define types for Orama search results
 interface OramaHit {
@@ -80,16 +81,16 @@ export default function CustomSearchDialog(props: SharedProps) {
 
       setIsLoading(true);
       try {
-        // Check if Orama is properly configured
         const apiKey = process.env.NEXT_PUBLIC_ORAMA_API_KEY;
-        const endpoint = process.env.NEXT_PUBLIC_ORAMA_ENDPOINT;
+        const projectId = process.env.NEXT_PUBLIC_ORAMA_PROJECT_ID;
+        const datasourceId = process.env.NEXT_PUBLIC_ORAMA_DATASOURCE_ID;
 
-        if (!apiKey || !endpoint) {
+        if (!apiKey || !projectId) {
           console.error(
             'Orama search is not configured. Missing environment variables:',
             {
               hasApiKey: !!apiKey,
-              hasEndpoint: !!endpoint,
+              hasProjectId: !!projectId,
             },
           );
           setResults([]);
@@ -97,10 +98,14 @@ export default function CustomSearchDialog(props: SharedProps) {
           return;
         }
 
-        const searchOptions: Record<string, unknown> = {
+        const searchOptions: OramaCloudSearchParams = {
           term: search,
           limit: 10,
         };
+
+        if (datasourceId) {
+          searchOptions.datasources = [datasourceId];
+        }
 
         // Add tag filter if specified
         if (tag) {

@@ -72,9 +72,6 @@ Validate data on your server **before** sending it to the lomi. API.
     const CheckoutSessionInputSchema = z.object({
       amount: z.number().positive('Amount must be positive'),
       currency_code: z.enum(['XOF']), // Adjust allowed currencies
-      allowed_providers: z
-        .array(z.string())
-        .min(1, 'At least one provider required'),
       merchant_id: z.string().uuid('Invalid merchant ID'),
       success_url: z.string().url('Invalid success URL'),
       cancel_url: z.string().url('Invalid cancel URL'),
@@ -251,6 +248,6 @@ const apiClient = axios.create({
 
 ## Next steps
 
-- [Error handling](/docs/core/advanced-guides/error-handling)
-- [Idempotency keys](/docs/core/advanced-guides/idempotency-keys)
-- [API Reference](/docs/reference)
+- [Error handling](/core/advanced-guides/error-handling)
+- [Idempotency keys](/core/advanced-guides/idempotency-keys)
+- [API Reference](/reference/setup/overview)

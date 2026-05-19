@@ -6,10 +6,15 @@ import { Body } from '@/app/layout.client';
 import { Provider } from './provider';
 import type { ReactNode } from 'react';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
+import { getDocsLocale } from '@/lib/utils/docs-locale';
 
-const title = "lomi. | West Africa's Payment Processing Platform";
+const docsOrigin = getDocsSiteOrigin();
+
+const title = 'lomi.';
 const description =
-  'lomi. is a suite of APIs powering online payment processing and e-commerce solutions in West Africa. Accept payments, send payouts, and automate financial workflows with ease.';
+  "Suite d'API pour le traitement des paiements en ligne et le commerce en Afrique de l'Ouest francophone. Encaissez, versez et automatisez vos flux financiers.";
 
 export const metadata: Metadata = {
   title: {
@@ -73,32 +78,22 @@ export const metadata: Metadata = {
     'paiement sans friction',
     'paiement sécurisé',
   ],
-  metadataBase: new URL('https://lomi.africa'),
+  metadataBase: new URL(`${docsOrigin}/`),
   verification: {
     google: 'fD_UOOSaZDjO5rdngNSUYtYQK-sfA5DhMyiUNW7GyAs',
   },
   robots: 'index, follow',
   authors: [{ name: 'Babacar Diop', url: 'https://github.com/lomiafrica/' }],
   alternates: {
-    canonical: 'https://lomi.africa',
+    canonical: docsOrigin,
     languages: {
-      en: 'https://lomi.africa',
-      'x-default': 'https://lomi.africa',
+      en: docsOrigin,
+      'x-default': docsOrigin,
     },
   },
-  icons: [
-    {
-      rel: 'icon',
-      url: '/favicon.ico',
-    },
-    {
-      rel: 'apple-touch-icon',
-      url: '/apple-touch-icon.png',
-    },
-  ],
   openGraph: {
     type: 'website',
-    url: 'https://lomi.africa/',
+    url: `${docsOrigin}/`,
     title,
     description,
     siteName: 'lomi.',
@@ -133,7 +128,6 @@ export const metadata: Metadata = {
     'twitter:description[fr]':
       "lomi. est une suite d'APIs qui facilitent le traitement des paiements en ligne et les solutions e-commerce en Afrique de l'Ouest. Acceptez des paiements, effectuez des versements et automatisez vos flux financiers en toute simplicité.",
     'msapplication-TileColor': '#da532c',
-    preconnect: ['https://api.producthunt.com', 'https://res.cloudinary.com'],
   },
 };
 
@@ -165,30 +159,11 @@ export default async function RootLayout({
   const htmlLang = initialLanguage === 'fr' ? 'fr' : 'en';
 
   return (
-    <html lang="en" className={`${font.variable}`} suppressHydrationWarning>
-      <head>
-        {/* Preconnect to critical origins for better performance */}
-        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="" />
-        <link
-          rel="preconnect"
-          href="https://mdswvokxrnfggrujsfjd.supabase.co"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://res.cloudinary.com"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://api.producthunt.com"
-          crossOrigin=""
-        />
-        <link rel="dns-prefetch" href="//cdn.sanity.io" />
-        <link rel="dns-prefetch" href="//mdswvokxrnfggrujsfjd.supabase.co" />
-        <link rel="dns-prefetch" href="//res.cloudinary.com" />
-        <link rel="dns-prefetch" href="//api.producthunt.com" />
-      </head>
+    <html
+      lang={htmlLang}
+      className={`${font.variable}`}
+      suppressHydrationWarning
+    >
       <Body>
         <Provider initialLanguage={initialLanguage}>{children}</Provider>
         <Analytics />

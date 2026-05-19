@@ -195,21 +195,46 @@ Represents a customer profile associated with a merchant account. Returned by cu
 
 Represents a product or service that can be purchased. Returned by product endpoints (`` `GET /products` ``, `` `POST /products` ``, etc.). Amounts use the **smallest currency unit** (same as transactions).
 
-| Property                      | Type                   | Description                                                                       |
-| ----------------------------- | ---------------------- | --------------------------------------------------------------------------------- |
-| `` `product_id` ``            | `` `string` ``         | Unique identifier for the product (UUID).                                         |
-| `` `merchant_id` ``           | `` `string` ``         | Identifier for the merchant this product belongs to.                              |
-| `` `organization_id` ``       | `` `string` ``         | Identifier for the organization this product belongs to.                          |
-| `` `name` ``                  | `` `string` ``         | Name of the product.                                                              |
-| `` `description` ``           | `` `string` ``         | Description of the product (nullable).                                            |
-| `` `price` ``                 | `` `number` ``         | Price of the product (in the specified currency).                                 |
-| `` `currency_code` ``         | `` `string` ``         | Currency code for the price (e.g., `` `"XOF"` ``, `` `"USD"` ``).                 |
-| `` `image_url` ``             | `` `string` ``         | URL for the product image (nullable).                                             |
-| `` `is_active` ``             | `` `boolean` ``        | Whether the product is currently active and can be purchased.                     |
-| `` `display_on_storefront` `` | `` `boolean` ``        | Whether the product should be displayed on a merchant storefront (if applicable). |
-| `` `fee_type_ids` ``          | `` `array (string)` `` | Array of UUIDs for associated organization fee types (may not be present).        |
-| `` `created_at` ``            | `` `string` ``         | Timestamp (ISO 8601) indicating when the product was created.                     |
-| `` `updated_at` ``            | `` `string` ``         | Timestamp (ISO 8601) indicating when the product was last updated.                |
+| Property                      | Type                   | Description                                                                 |
+| ----------------------------- | ---------------------- | --------------------------------------------------------------------------- |
+| `` `product_id` ``            | `` `string` ``         | Unique identifier for the product.                                          |
+| `` `organization_id` ``     | `` `string` ``         | Owning organization.                                                        |
+| `` `name` ``                 | `` `string` ``         | Product name.                                                               |
+| `` `description` ``         | `` `string` `` \| null | Product description.                                                        |
+| `` `product_type` ``        | `` `string` ``         | `` `one_time` ``, `` `recurring` ``, or `` `usage_based` ``.                |
+| `` `images` ``               | `` `array (string)` `` \| null | Image URLs.                                                         |
+| `` `is_active` ``            | `` `boolean` ``        | Whether the product can be sold.                                          |
+| `` `display_on_storefront` ``| `` `boolean` ``        | Storefront visibility.                                                    |
+| `` `metadata` ``             | `` `object` `` \| null | Custom metadata.                                                          |
+| `` `environment` ``         | `` `string` ``         | `` `test` `` or `` `live` ``.                                               |
+| `` `prices` ``               | `` `array` ``          | Embedded **price** objects (see below).                                     |
+| `` `fees` ``                 | `` `array` ``          | Associated fee rows when returned by the API.                               |
+| `` `failed_payment_action` ``| `` `string` `` \| null | Recurring: `` `pause` ``, `` `cancel` ``, `` `retry` ``.                    |
+| `` `charge_day` ``           | `` `number` `` \| null | Day of month to charge (1–31) for recurring.                                |
+| `` `first_payment_type` ``   | `` `string` `` \| null | `` `initial` ``, `` `non_initial` ``, `` `prorated` ``.                     |
+| `` `trial_enabled` ``        | `` `boolean` ``        | Trial enabled.                                                              |
+| `` `trial_period_days` ``    | `` `number` `` \| null | Trial length in days.                                                       |
+| `` `usage_aggregation` ``   | `` `string` `` \| null | Usage-based: `` `sum` ``, `` `max` ``, etc.                                |
+| `` `usage_unit` ``          | `` `string` `` \| null | Usage-based unit label.                                                     |
+| `` `created_at` ``          | `` `string` ``         | Created at (ISO 8601).                                                      |
+| `` `updated_at` ``          | `` `string` ``         | Updated at (ISO 8601).                                                      |
+
+### Price object (embedded in `prices[]`)
+
+| Property               | Type                   | Description                                                                 |
+| ---------------------- | ---------------------- | --------------------------------------------------------------------------- |
+| `` `price_id` ``       | `` `string` ``         | Unique price id.                                                            |
+| `` `amount` ``         | `` `number` ``         | Amount in smallest currency unit.                                           |
+| `` `currency_code` `` | `` `string` ``         | `` `XOF` ``, `` `USD` ``, `` `EUR` ``.                         |
+| `` `billing_interval` `` | `` `string` `` \| null | `` `day` ``, `` `week` ``, `` `month` ``, `` `year` `` for recurring.   |
+| `` `pricing_model` ``  | `` `string` ``         | `` `standard` ``, `` `pay_what_you_want` ``, `` `tiered` ``.               |
+| `` `minimum_amount` `` | `` `number` `` \| null | Lower bound for pay-what-you-want.                                          |
+| `` `maximum_amount` `` | `` `number` `` \| null | Upper bound for pay-what-you-want.                                          |
+| `` `is_active` ``      | `` `boolean` ``        | Whether the price is active.                                                |
+| `` `is_default` ``     | `` `boolean` ``        | Default price for checkout when multiple exist.                             |
+| `` `metadata` ``       | `` `object` `` \| null | Price metadata.                                                             |
+| `` `created_at` ``    | `` `string` ``         | Created at.                                                                 |
+| `` `updated_at` ``    | `` `string` ``         | Updated at.                                                                 |
 
 **Example:**
 
@@ -260,7 +285,7 @@ Represents an available payment provider and its connection status for your acco
 
 | Property                | Type                   | Description                                                                               |
 | ----------------------- | ---------------------- | ----------------------------------------------------------------------------------------- |
-| `` `code` ``            | `` `string` ``         | Unique identifier for the payment provider (e.g., `` `"ORANGE"` ``).                      |
+| `` `code` ``            | `` `string` ``         | Unique identifier for the payment provider (e.g., `` `"WAVE"` ``).                        |
 | `` `name` ``            | `` `string` ``         | Display name of the payment provider (e.g., `` `"Orange Money"` ``).                      |
 | `` `description` ``     | `` `string` ``         | Brief description of the payment provider.                                                |
 | `` `payment_methods` `` | `` `array (string)` `` | List of payment method types supported by this provider (e.g., `` `["mobile_money"]` ``). |
@@ -284,16 +309,14 @@ Represents a configured webhook endpoint for receiving event notifications. Retu
 
 | Property                | Type                   | Description                                                                                        |
 | ----------------------- | ---------------------- | -------------------------------------------------------------------------------------------------- |
-| `` `webhook_id` ``      | `` `string` ``         | Unique identifier for the webhook endpoint (UUID).                                                 |
-| `` `merchant_id` ``     | `` `string` ``         | Identifier for the merchant account this webhook belongs to.                                       |
-| `` `organization_id` `` | `` `string` ``         | Identifier for the organization this webhook belongs to.                                           |
-| `` `url` ``             | `` `string` ``         | The HTTPS URL where event notifications will be sent.                                              |
-| `` `description` ``     | `` `string` ``         | Optional description for the webhook endpoint.                                                     |
-| `` `event_types` ``     | `` `array (string)` `` | List of event types this endpoint is subscribed to (e.g., `` `["transaction.succeeded"]` ``).      |
-| `` `is_active` ``       | `` `boolean` ``        | Whether the webhook endpoint is currently active and receiving events.                             |
-| `` `secret` ``          | `` `string` ``         | The secret key used to sign webhook events (used to verify the sender). Returned only on creation. |
-| `` `created_at` ``      | `` `string` ``         | Timestamp (ISO 8601) indicating when the webhook was created.                                      |
-| `` `updated_at` ``      | `` `string` ``         | Timestamp (ISO 8601) indicating when the webhook was last updated.                                 |
+| `` `id` ``              | `` `string` ``         | Webhook endpoint id (e.g. `` `wh_…` ``).                                                          |
+| `` `organization_id` `` | `` `string` ``         | Owning organization.                                                                               |
+| `` `url` ``             | `` `string` ``         | HTTPS delivery URL.                                                                                |
+| `` `authorized_events` `` | `` `array (string)` `` | Subscribed event enums (e.g. `` `["PAYMENT_SUCCEEDED"]` ``). See [Webhooks](/reference/payments/webhooks). |
+| `` `is_active` ``       | `` `boolean` ``        | Whether deliveries are active.                                                                     |
+| `` `secret` ``          | `` `string` ``         | Signing secret (`` `whsec_…` ``). Returned only on creation in some flows.                        |
+| `` `created_at` ``      | `` `string` ``         | Created at (ISO 8601).                                                                             |
+| `` `updated_at` ``      | `` `string` ``         | Updated at (ISO 8601).                                                                             |
 
 **Example (on creation):**
 
@@ -302,8 +325,7 @@ Represents a configured webhook endpoint for receiving event notifications. Retu
   "id": "wh_abc123...",
   "organization_id": "org_abc123...",
   "url": "https://your-server.com/webhook-handler",
-  "description": "Primary webhook for payment events",
-  "event_types": ["transaction.succeeded", "transaction.failed"],
+  "authorized_events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"],
   "is_active": true,
   "secret": "whsec_...",
   "created_at": "2023-10-27T12:00:00Z",
@@ -318,8 +340,7 @@ Represents a configured webhook endpoint for receiving event notifications. Retu
   "id": "wh_abc123...",
   "organization_id": "org_abc123...",
   "url": "https://your-server.com/webhook-handler",
-  "description": "Primary webhook for payment events",
-  "event_types": ["transaction.succeeded", "transaction.failed"],
+  "authorized_events": ["PAYMENT_SUCCEEDED", "PAYMENT_FAILED"],
   "is_active": true,
   "created_at": "2023-10-27T12:00:00Z",
   "updated_at": "2023-10-27T12:15:00Z"
@@ -348,3 +369,13 @@ See the [Errors](/reference/reference/errors) guide for more details on status c
   }
 }
 ```
+
+## Pricing model note
+
+Organization-level **fee** pricing (how much lomi. charges you on payments) is described by mode and configuration in product/dashboard terms, not always as a single field on every API object:
+
+- **Modes:** `volume_tiered`, `fixed`, and `custom` (see [Pricing](/core/merchant-of-record/pricing) and [Organizations — Pricing configuration](/reference/platform/organizations#pricing-configuration)).
+- **Resolution:** `volume_tiered` uses current processed-volume tiers; `fixed` and `custom` use configured fee schedules.
+- **API contract:** the `GET /organizations` response shape is defined in the API schema (`` `OrganizationResponseDto` ``); treat the [API reference](/api/index) as canonical for which fields are returned on each endpoint.
+
+Additional scenario-based fees (refunds, disputes, method surcharges) can still apply depending on active configuration.

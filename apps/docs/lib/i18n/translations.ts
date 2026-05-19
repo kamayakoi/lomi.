@@ -1,137 +1,113 @@
 /* @proprietary license */
 
 import type { Language } from './config';
-import enTranslations from './locales/en.json';
-import frTranslations from './locales/fr.json';
-import esTranslations from './locales/es.json';
-import zhTranslations from './locales/zh.json';
 
-// Define a more specific type for translation values
-export type TranslationValue =
-  | string
-  | number
-  | { [key: string]: TranslationValue }
-  | TranslationValue[];
-
-const translations: { [key in Language]: Record<string, TranslationValue> } = {
-  en: enTranslations as unknown as Record<string, TranslationValue>,
-  fr: frTranslations as unknown as Record<string, TranslationValue>,
-  es: esTranslations as unknown as Record<string, TranslationValue>,
-  zh: zhTranslations as unknown as Record<string, TranslationValue>,
+const STRINGS: Record<Language, Record<string, string>> = {
+  en: {
+    'search.all': 'All',
+    'search.core': 'Core',
+    'search.fundamentalsDescription': 'Introduction and fundamentals',
+    'search.apiReference': 'API reference',
+    'search.apiReferenceDescription': 'REST guides and resources',
+    'search.filter': 'Filter',
+    'search.search': 'Search',
+    'ui.searchNoResult': 'No results found',
+    'ui.toc': 'On this page',
+    'ui.tocNoHeadings': 'No headings',
+    'ui.lastUpdate': 'Last updated on',
+    'ui.chooseLanguage': 'Choose a language',
+    'ui.nextPage': 'Next page',
+    'ui.previousPage': 'Previous page',
+    'ui.chooseTheme': 'Theme',
+    'ui.editOnGithub': 'Edit on GitHub',
+    'ui.notFound': 'NOT FOUND',
+    'section.firstSteps': 'First steps',
+    'section.apiReference': 'API Reference',
+    'section.restApi': 'REST API',
+    'section.basics': 'Basics',
+    'section.implementation': 'Implementation',
+    'section.community': 'Community',
+    'section.management': 'Management',
+    'sectionDescription.firstSteps':
+      'Developers use lomi. to reliably accept payments in West Africa.',
+    'sectionDescription.apiReference':
+      'Complete reference to building with lomi. API.',
+    'sectionDescription.restApi': 'Payment and commerce endpoints.',
+    'footer.company_disclaimer':
+      '<p>This documentation describes the lomi. merchant API and related products.</p>\n\n<p>Integration behavior can change; use the generated OpenAPI reference and your dashboard for authoritative details.</p>',
+    'components.business_outreach.message':
+      'Building payments for West Africa? Book a short call with the team.',
+    'components.business_outreach.reach_out': 'Schedule a call',
+    'components.business_outreach.dismiss': 'Dismiss',
+  },
+  fr: {
+    'search.all': 'Tout',
+    'search.core': 'Socle',
+    'search.fundamentalsDescription': 'Introduction et fondamentaux',
+    'search.apiReference': 'Référence API',
+    'search.apiReferenceDescription': 'Guides et ressources REST',
+    'search.filter': 'Filtrer',
+    'search.search': 'Rechercher',
+    'ui.searchNoResult': 'Aucun résultat',
+    'ui.toc': 'Sur cette page',
+    'ui.tocNoHeadings': 'Aucun titre',
+    'ui.lastUpdate': 'Dernière mise à jour le',
+    'ui.chooseLanguage': 'Choisir la langue',
+    'ui.nextPage': 'Page suivante',
+    'ui.previousPage': 'Page précédente',
+    'ui.chooseTheme': 'Thème',
+    'ui.editOnGithub': 'Modifier sur GitHub',
+    'ui.notFound': 'PAGE INTROUVABLE',
+    'section.firstSteps': 'Premiers pas',
+    'section.apiReference': 'Référence API',
+    'section.restApi': 'API REST',
+    'section.basics': 'Bases',
+    'section.implementation': 'Mise en œuvre',
+    'section.community': 'Communauté',
+    'section.management': 'Gestion',
+    'sectionDescription.firstSteps':
+      "Les développeurs utilisent lomi. pour encaisser des paiements en toute fiabilité en Afrique de l'Ouest.",
+    'sectionDescription.apiReference':
+      "Référence complète pour intégrer l'API lomi.",
+    'sectionDescription.restApi':
+      'Points de terminaison pour paiements et commerce.',
+    'footer.company_disclaimer':
+      "<p>Cette documentation décrit l'API marchande lomi. et les produits associés.</p>\n\n<p>Le comportement d'intégration peut évoluer ; consultez l'OpenAPI générée et votre tableau de bord pour les détails de référence.</p>",
+    'components.business_outreach.message':
+      'Vous construisez des paiements en Afrique de l’Ouest ? Prenez un court rendez-vous avec l’équipe.',
+    'components.business_outreach.reach_out': 'Planifier un appel',
+    'components.business_outreach.dismiss': 'Fermer',
+  },
 };
 
-export const getTranslations = (
-  lang: Language,
-): Record<string, TranslationValue> => {
-  return translations[lang] || translations.en;
-};
+function interpolate(
+  template: string,
+  values?: Record<string, string | number | undefined>,
+): string {
+  if (!values) return template;
+  return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
+    values[key] !== undefined && values[key] !== null
+      ? String(values[key])
+      : '',
+  );
+}
 
-export const t = (
+export function translate(
   key: string,
-  lang: Language = 'en',
+  lang: Language,
   values?: Record<string, string | number | undefined>,
-): TranslationValue => {
-  try {
-    const keys = key.split('.');
-    let currentVal: TranslationValue | undefined = getTranslations(lang);
-    let found = true;
+): string {
+  const primary = STRINGS[lang]?.[key];
+  const fallback = STRINGS.en[key];
+  const raw = primary ?? fallback ?? key;
+  return interpolate(raw, values);
+}
 
-    for (const k of keys) {
-      if (currentVal && typeof currentVal === 'object') {
-        if (Array.isArray(currentVal)) {
-          // Handle array indexing (e.g., "sections.0")
-          const index = parseInt(k, 10);
-          if (!isNaN(index) && index >= 0 && index < currentVal.length) {
-            currentVal = currentVal[index];
-          } else {
-            found = false;
-            break;
-          }
-        } else if (k in currentVal) {
-          // Handle object property access
-          currentVal = currentVal[k];
-        } else {
-          found = false;
-          break;
-        }
-      } else {
-        found = false;
-        break;
-      }
-    }
-
-    if (!found) {
-      console.warn(
-        `Translation missing for key: ${key}, lang: ${lang}. Falling back.`,
-      );
-      const fallbackValue = getFallbackValue(keys, translations.en, values);
-      return fallbackValue !== undefined ? fallbackValue : key;
-    }
-
-    if (typeof currentVal === 'string') {
-      if (values) {
-        return currentVal.replace(
-          /\{(\w+)\}|\[\[(\w+)\]\]/g,
-          (match, p1, p2) => {
-            const placeholderKey = p1 || p2;
-            const replacement = values[placeholderKey];
-            return replacement !== undefined ? String(replacement) : match;
-          },
-        );
-      }
-      return currentVal;
-    }
-
-    if (currentVal !== undefined) {
-      return currentVal;
-    }
-
-    return key; // Fallback to key if not found
-  } catch (error) {
-    console.error(`Translation error for key: ${key}`, error);
-    return key;
-  }
-};
-
-// Helper function to get a deeply nested value and perform interpolation
-function getFallbackValue(
-  keys: string[],
-  obj: Record<string, TranslationValue>,
+/** @deprecated Prefer `translate`; kept for call sites that pass `(key, lang)`. */
+export function t(
+  key: string,
+  lang: Language,
   values?: Record<string, string | number | undefined>,
-): TranslationValue | undefined {
-  let currentVal: TranslationValue | undefined = obj;
-
-  for (const keyPart of keys) {
-    if (currentVal && typeof currentVal === 'object') {
-      if (Array.isArray(currentVal)) {
-        // Handle array indexing (e.g., "sections.0")
-        const index = parseInt(keyPart, 10);
-        if (!isNaN(index) && index >= 0 && index < currentVal.length) {
-          currentVal = currentVal[index];
-        } else {
-          return undefined;
-        }
-      } else if (keyPart in currentVal) {
-        // Handle object property access
-        currentVal = currentVal[keyPart];
-      } else {
-        return undefined; // Key not found
-      }
-    } else {
-      return undefined; // Not an object or array
-    }
-  }
-
-  if (typeof currentVal === 'string') {
-    if (values) {
-      return currentVal.replace(/\{(\w+)\}|\[\[(\w+)\]\]/g, (match, p1, p2) => {
-        const placeholderKey = p1 || p2;
-        const replacement = values[placeholderKey];
-        return replacement !== undefined ? String(replacement) : match;
-      });
-    }
-    return currentVal;
-  }
-
-  return currentVal;
+): string {
+  return translate(key, lang, values);
 }

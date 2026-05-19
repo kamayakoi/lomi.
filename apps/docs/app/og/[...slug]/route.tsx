@@ -24,10 +24,7 @@ export async function GET(
 export function generateStaticParams(): {
   slug: string[];
 }[] {
-  const params = source.generateParams();
-  const paramsArray = Array.isArray(params) ? params : [];
-  return paramsArray.map((page) => ({
-    ...page,
-    slug: [...page.slug, 'image.png'],
+  return source.getPages('en').map((page) => ({
+    slug: [...page.slugs, 'image.png'],
   }));
 }

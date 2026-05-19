@@ -1,6 +1,6 @@
 ---
-title: 'Products'
-description: 'The Products API allows you to create, list, retrieve, update (active status only), and delete products associated with your merchant account.'
+title: Products
+description: Manage products, prices, and subscription configurations.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -38,16 +38,10 @@ Create a new product with one or more prices. At least one price is required.
 
 **Usage-Based Product Fields:**
 
-| Parameter                     | Type                   | Required | Description                                                      |
-| ----------------------------- | ---------------------- | -------- | ---------------------------------------------------------------- |
-| `` `name` ``                  | `` `string` ``         | Yes      | Name of the product.                                             |
-| `` `description` ``           | `` `string` ``         | No       | Optional description.                                            |
-| `` `price` ``                 | `` `number` ``         | Yes      | Price of the product (must be positive).                         |
-| `` `currency_code` ``         | `` `string` ``         | Yes      | Currency code (e.g., `` `"XOF"` ``, `` `"USD"` ``).              |
-| `` `is_active` ``             | `` `boolean` ``        | No       | Whether the product is active (defaults to `` `true` ``).        |
-| `` `image_url` ``             | `` `string` ``         | No       | URL for the product image (must be a valid URL).                 |
-| `` `display_on_storefront` `` | `` `boolean` ``        | No       | Whether to display on the storefront (defaults to `` `true` ``). |
-| `` `fee_type_ids` ``          | `` `array (string)` `` | No       | Array of UUIDs for associated organization-level fee types.      |
+| Field | Type | Description |
+|-------|------|-------------|
+| `usage_aggregation` | `string` | `sum`, `max`, `last_during_period`, `last_ever` |
+| `usage_unit` | `string` | Unit of measurement (e.g., `api_calls`) |
 
 ### Price Object
 
@@ -77,34 +71,17 @@ const lomi = new LomiSDK({
   environment: 'live',
 });
 
-**Endpoint:** `` `GET /products` ``
-
-**Query parameters:**
-
-| Parameter         | Type            | Required | Default | Description                                                       |
-| ----------------- | --------------- | -------- | ------- | ----------------------------------------------------------------- |
-| `` `limit` ``     | `` `integer` `` | No       | 20      | Maximum number of products to return.                             |
-| `` `offset` ``    | `` `integer` `` | No       | 0       | Number of products to skip for pagination.                        |
-| `` `is_active` `` | `` `boolean` `` | No       | (all)   | Filter products by active status (`` `true` `` or `` `false` ``). |
-
-**Example response (200 OK):**
-
-```json filename="GET /products response"
-{
-  "data": [
+// One-time product
+const product = await lomi.products.create({
+  name: 'E-book Bundle',
+  description: 'Complete guide collection',
+  product_type: 'one_time',
+  prices: [
     {
-      "product_id": "uuid-product-1",
-      // ... other product fields
-      "is_active": true
-      // ...
+      amount: 25000,
+      currency_code: 'XOF',
+      is_default: true,
     },
-    {
-      "product_id": "uuid-product-2",
-      // ... other product fields
-      "is_active": false
-      // ...
-    }
-    // ... more products
   ],
   display_on_storefront: true,
 });
@@ -156,40 +133,7 @@ product = client.products.create({
     "display_on_storefront": True
 })
 
-**Path parameters:**
-
-| Parameter  | Type           | Required | Description                                                       |
-| ---------- | -------------- | -------- | ----------------------------------------------------------------- |
-| `` `id` `` | `` `string` `` | Yes      | The unique identifier (UUID) of the product (`` `product_id` ``). |
-
-**Example response (200 OK):**
-
-_(Response structure is the same as the `Create product` response)_
-
-### Update product
-
-Updates the `` `is_active` `` status of a specific product. Other product details (name, price, etc.) cannot be changed after creation.
-
-**Endpoint:** `` `PATCH /products/{id}` ``
-
-**Path parameters:**
-
-| Parameter  | Type           | Required | Description                                                       |
-| ---------- | -------------- | -------- | ----------------------------------------------------------------- |
-| `` `id` `` | `` `string` `` | Yes      | The unique identifier (UUID) of the product (`` `product_id` ``). |
-
-**Request body parameters:**
-
-| Parameter         | Type            | Required | Description                                                |
-| ----------------- | --------------- | -------- | ---------------------------------------------------------- |
-| `` `is_active` `` | `` `boolean` `` | Yes      | Set `` `true` `` to activate, `` `false` `` to deactivate. |
-
-**Example request:**
-
-```json filename="PATCH /products/{id} request"
-{
-  "is_active": false
-}
+print(f"Product created: {product['product_id']}")
 ```
 </Tab>
 
@@ -214,4 +158,192 @@ curl -X POST "https://api.lomi.africa/products" \
 ```
 </Tab>
 
-\*(Response structure is the same as the `Create product` response, showing the updated `` `is_active` `` value and `` `updated_at`
+</Tabs>
+
+---
+
+## List products
+
+Retrieve all products with optional filtering.
+
+### Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `isActive` | `boolean` | Filter by active status |
+| `limit` | `number` | Results per page (default: `15`) |
+| `offset` | `number` | Pagination offset (default: `0`) |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const products = await lomi.products.list({
+  isActive: true,
+  limit: 20,
+});
+```
+</Tab>
+
+<Tab value="Python">
+```python
+products = client.products.list(isActive=True, limit=20)
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/products?isActive=true&limit=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Get a product
+
+Retrieve product details including all prices.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const product = await lomi.products.get('prod_abc123...');
+console.log(`Default price: ${product.prices.find(p => p.is_default)?.amount}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+product = client.products.get('prod_abc123...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/products/prod_abc123..." \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Add a price to a product
+
+Add a new price option to an existing product.
+
+<Callout type="warning">
+  Products can have a maximum of **3 active prices**. You cannot modify existing prices—create a new one instead.
+</Callout>
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const price = await lomi.products.addPrice('prod_abc123...', {
+  amount: 50000,
+  currency_code: 'XOF',
+  billing_interval: 'year',
+});
+
+console.log(`New price added: ${price.price_id}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+price = client.products.add_price('prod_abc123...', {
+    "amount": 50000,
+    "currency_code": "XOF",
+    "billing_interval": "year"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "currency_code": "XOF",
+    "billing_interval": "year"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Set default price
+
+Set a specific price as the default for a product.
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+const product = await lomi.products.setDefaultPrice('prod_abc123...', 'price_def456...');
+```
+</Tab>
+
+<Tab value="Python">
+```python
+product = client.products.set_default_price('prod_abc123...', 'price_def456...')
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/products/prod_abc123.../prices/price_def456.../set-default" \
+  -H "X-API-KEY: $LOMI_API_KEY"
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Product Object
+
+Returned shapes match the API product resource (see OpenAPI **Products**). Common fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `product_id` | `string` | Unique product identifier |
+| `organization_id` | `string` | Owning organization |
+| `name` | `string` | Product name |
+| `description` | `string` \| `null` | Product description |
+| `product_type` | `string` | `one_time`, `recurring`, `usage_based` |
+| `images` | `array` \| `null` | Product image URLs |
+| `is_active` | `boolean` | Active status |
+| `display_on_storefront` | `boolean` | Storefront visibility |
+| `prices` | `array` | Price objects (`price_id`, `amount`, `currency_code`, `billing_interval`, `pricing_model`, `minimum_amount`, `maximum_amount`, `is_active`, `is_default`, `metadata`, timestamps) |
+| `fees` | `array` | Associated fee rows (when present) |
+| `environment` | `string` | `test` or `live` |
+| `failed_payment_action` | `string` \| `null` | Recurring: `pause`, `cancel`, `retry` |
+| `charge_day` | `number` \| `null` | Recurring charge day (1–31) |
+| `first_payment_type` | `string` \| `null` | `initial`, `non_initial`, `prorated` |
+| `trial_enabled` | `boolean` | Trial enabled |
+| `trial_period_days` | `number` \| `null` | Trial length |
+| `usage_aggregation` | `string` \| `null` | Usage-based products |
+| `usage_unit` | `string` \| `null` | Usage-based products |
+| `metadata` | `object` \| `null` | Custom metadata |
+| `created_at` | `string` | Creation timestamp |
+| `updated_at` | `string` | Last update timestamp |
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | Invalid input or max prices exceeded |
+| `401` | Invalid or missing API key |
+| `404` | Product or price not found |

@@ -6,6 +6,7 @@ import remarkMdx from 'remark-mdx';
 import { remarkAutoTypeTable } from 'fumadocs-typescript';
 import { remarkInclude } from 'fumadocs-mdx/config';
 import { type Page } from '@/lib/utils/source';
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { remarkNpm } from 'fumadocs-core/mdx-plugins';
 import fs from 'node:fs/promises';
 

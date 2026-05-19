@@ -226,7 +226,7 @@ async function handleWebhook(req: express.Request, res: express.Response) {
 
 Network issues, automatic retries, manual replays from the dashboard, and idempotency safeguards on lomi.’s side all mean you should expect **duplicate POSTs over time**. That is normal rather than exceptional — bake deduplication into your schema and workflows from day one rather than treating it as a rare bug.
 
-- **Check Event ID:** Store the `id` (`evt_...`) of processed events. Before processing a new event, check if its ID has already been processed. If so, skip processing.
+- **Check payload `id`:** Store the top-level `id` (UUID) of processed deliveries. Skip if already handled.
 - **Database Constraints:** Use unique constraints in your database where appropriate (e.g., on an order update based on the transaction ID) to prevent duplicate operations at the data layer.
 
 ```typescript filename="Idempotency check example"
@@ -289,6 +289,6 @@ Use the lomi. Dashboard (**Developers -> Webhooks**) to monitor delivery attempt
 
 ## Next steps
 
-- [Security best practices](/docs/core/advanced-guides/security-best-practices)
-- [Error handling](/docs/core/advanced-guides/error-handling)
-- [API Reference](/docs/reference)
+- [Security best practices](/core/advanced-guides/security-best-practices)
+- [Error handling](/core/advanced-guides/error-handling)
+- [API Reference](/reference/setup/overview)

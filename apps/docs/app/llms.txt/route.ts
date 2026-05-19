@@ -1,5 +1,7 @@
 /* @proprietary license */
 
+import { REST_API_SECTION_ORDER } from '@/lib/scripts/manual-api/constants';
+import { getDocsSiteOrigin } from '@/lib/utils/metadata';
 import { source } from '@/lib/utils/source';
 
 export const revalidate = false;

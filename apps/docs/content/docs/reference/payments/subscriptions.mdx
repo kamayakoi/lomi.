@@ -1,6 +1,6 @@
 ---
-title: 'Subscription plans'
-description: 'The Subscription Plans API allows you to create and manage reusable billing plans for your merchant account. These plans define the pricing, currency, and billing frequency for recurring payments.'
+title: Subscriptions
+description: Manage recurring customer subscriptions.
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -29,39 +29,19 @@ Retrieve all subscriptions for your organization.
 ```typescript
 import { LomiSDK } from '@lomi./sdk';
 
-**(Note:** The `` `{merchant_id}` `` in the path is typically handled by API gateway/middleware based on your `` `X-API-Key` ``; you usually don't need to include it explicitly if using the standard base URL.)\*
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_API_KEY!,
+  environment: 'live',
+});
 
 const subscriptions = await lomi.subscriptions.list({
   page: 1,
   pageSize: 20,
 });
 
-| Parameter                     | Type            | Required | Description                                                                                                                                                                    |
-| ----------------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `` `name` ``                  | `` `string` ``  | Yes      | The name of the plan (e.g., "Gold Tier Monthly").                                                                                                                              |
-| `` `amount` ``                | `` `number` ``  | Yes      | Amount to be charged per billing cycle, in the smallest currency unit (e.g., cents for USD). Must be positive.                                                                 |
-| `` `currency_code` ``         | `` `string` ``  | Yes      | Three-letter ISO currency code (e.g., `` `"XOF"` ``, `` `"USD"` ``).                                                                                                           |
-| `` `billing_frequency` ``     | `` `string` ``  | Yes      | How often the subscription renews. Valid values: `` `monthly` ``, `` `yearly` ``, `` `weekly` ``, `` `bi-weekly` ``, `` `quarterly` ``, `` `semi-annual` ``, `` `one-time` ``. |
-| `` `description` ``           | `` `string` ``  | No       | Optional description of the plan.                                                                                                                                              |
-| `` `failed_payment_action` `` | `` `string` ``  | No       | Action to take on failed recurring payments (e.g., `` `cancel` ``, `` `pause` ``). Defaults vary.                                                                              |
-| `` `charge_day` ``            | `` `integer` `` | No       | Specific day for charging (e.g., day of month for `` `monthly` ``). Depends on `` `billing_frequency` ``.                                                                      |
-| `` `metadata` ``              | `` `object` ``  | No       | Key-value pairs for storing additional information.                                                                                                                            |
-| `` `is_active` ``             | `` `boolean` `` | No       | Whether the plan can be used to create new subscriptions (defaults to `` `true` ``).                                                                                           |
-| `` `first_payment_type` ``    | `` `string` ``  | No       | Type of the first payment (e.g., `` `initial` ``, `` `prorated` ``). Defaults vary.                                                                                            |
-
-**Example request:**
-
-```json filename="POST /merchants/{id}/subscriptions request"
-{
-  "name": "Pro Monthly Plan",
-  "amount": 15000,
-  "currency_code": "XOF",
-  "billing_frequency": "monthly",
-  "description": "Access to all pro features, billed monthly.",
-  "metadata": {
-    "internal_code": "PRO_M"
-  }
-}
+subscriptions.forEach(sub => {
+  console.log(`${sub.id}: ${sub.status} - ${sub.amount} ${sub.currency_code}`);
+});
 ```
 </Tab>
 
@@ -82,35 +62,10 @@ for sub in subscriptions:
 ```
 </Tab>
 
-### List subscription plans
-
-Retrieves a list of subscription plans belonging to your merchant account.
-
-**Endpoint:** `` `GET /merchants/{merchant_id}/subscriptions` ``
-
-**(Note:** The `` `{merchant_id}` `` path parameter is typically handled based on your API key.)\*
-
-**Query parameters:**
-
-| Parameter      | Type            | Required | Default | Description                             |
-| -------------- | --------------- | -------- | ------- | --------------------------------------- |
-| `` `limit` ``  | `` `integer` `` | No       | 20      | Maximum number of plans to return.      |
-| `` `offset` `` | `` `integer` `` | No       | 0       | Number of plans to skip for pagination. |
-
-**Example response (200 OK):**
-
-```json filename="GET /merchants/{id}/subscriptions response"
-{
-  "success": true,
-  "data": [
-    {
-      "plan_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-      "merchant_id": "904d003c-3736-41d4-90a5-9de74d404fd7"
-      // ... other plan fields
-    }
-    // ... more plans
-  ]
-}
+<Tab value="cURL">
+```bash
+curl -X GET "https://api.lomi.africa/subscriptions?page=1&pageSize=20" \
+  -H "X-API-KEY: $LOMI_API_KEY"
 ```
 </Tab>
 
@@ -120,56 +75,19 @@ Retrieves a list of subscription plans belonging to your merchant account.
 
 ## Get subscriptions for a customer
 
-**(Note:** The `` `{merchant_id}` `` path parameter is typically handled based on your API key.)\*
+Retrieve all subscriptions for a specific customer.
 
 <Tabs items={["TypeScript", "Python", "cURL"]}>
 
-| Parameter       | Type           | Required | Description                                          |
-| --------------- | -------------- | -------- | ---------------------------------------------------- |
-| `` `plan_id` `` | `` `string` `` | Yes      | The unique identifier of the plan (`` `plan_id` ``). |
-
-**Example response (200 OK):**
-
-```json filename="GET /merchants/{id}/subscriptions/{plan_id} response"
-{
-  "success": true,
-  "data": {
-    "plan_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-    // ... all other plan fields
-  }
-}
+<Tab value="TypeScript">
+```typescript
+const customerSubs = await lomi.subscriptions.findByCustomer('cus_abc123...');
 ```
 </Tab>
 
-### Update subscription plan
-
-Updates the `` `is_active` `` status and/or `` `metadata` `` of a specific subscription plan. Core details like amount, currency, and frequency cannot be changed via the API after creation.
-
-**Endpoint:** `` `PATCH /merchants/{merchant_id}/subscriptions/{plan_id}` ``
-
-**(Note:** The `` `{merchant_id}` `` path parameter is typically handled based on your API key.)\*
-
-**Path parameters:**
-
-| Parameter       | Type           | Required | Description                                          |
-| --------------- | -------------- | -------- | ---------------------------------------------------- |
-| `` `plan_id` `` | `` `string` `` | Yes      | The unique identifier of the plan (`` `plan_id` ``). |
-
-**Request body parameters:**
-
-_(Include at least one of the following optional fields)_
-
-| Parameter         | Type            | Description                                                                    |
-| ----------------- | --------------- | ------------------------------------------------------------------------------ |
-| `` `is_active` `` | `` `boolean` `` | Set `` `true` `` to make the plan active, `` `false` `` to deactivate it.      |
-| `` `metadata` ``  | `` `object` ``  | Updates/adds key-value pairs to the plan's metadata. Existing keys are merged. |
-
-**Example request (deactivate):**
-
-```json filename="PATCH /merchants/{id}/subscriptions/{plan_id} request (Deactivate)"
-{
-  "is_active": false
-}
+<Tab value="Python">
+```python
+customer_subs = client.subscriptions.get_by_customer('cus_abc123...')
 ```
 </Tab>
 
@@ -180,7 +98,7 @@ curl -X GET "https://api.lomi.africa/subscriptions/customer/cus_abc123..." \
 ```
 </Tab>
 
-_(Response structure is the same as the `Get subscription plan details` response, showing updated values and `` `updated_at` `` timestamp)_
+</Tabs>
 
 ---
 
@@ -188,7 +106,7 @@ _(Response structure is the same as the `Get subscription plan details` response
 
 Retrieve details of a specific subscription.
 
-**(Note:** The `` `{merchant_id}` `` path parameter is typically handled based on your API key.)\*
+<Tabs items={["TypeScript", "Python", "cURL"]}>
 
 <Tab value="TypeScript">
 ```typescript
@@ -198,9 +116,12 @@ console.log(`Next billing: ${subscription.current_period_end}`);
 ```
 </Tab>
 
-| Parameter       | Type           | Required | Description                                          |
-| --------------- | -------------- | -------- | ---------------------------------------------------- |
-| `` `plan_id` `` | `` `string` `` | Yes      | The unique identifier of the plan (`` `plan_id` ``). |
+<Tab value="Python">
+```python
+subscription = client.subscriptions.get('sub_abc123...')
+print(f"Status: {subscription['status']}")
+```
+</Tab>
 
 <Tab value="cURL">
 ```bash
@@ -209,8 +130,104 @@ curl -X GET "https://api.lomi.africa/subscriptions/sub_abc123..." \
 ```
 </Tab>
 
-_(No response body)_
+</Tabs>
 
 ---
 
-Common errors include `` `400 Bad Request` `` for validation failures, `` `401 Unauthorized` ``, `` `404 Not Found` `` if the plan ID doesn't exist for the merchant, `` `409 Conflict` `` if attempting to delete a plan in use, and `` `500 Internal Server Error` ``. Refer to the [Errors](/docs/reference/reference/errors) guide.
+## Cancel a subscription
+
+Cancel an active subscription. This is the **only** modification allowed.
+
+### Request Body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cancel_at_period_end` | `boolean` | No | If `true`, cancel at end of billing period. If `false`, cancel immediately (default). |
+| `reason` | `string` | No | Cancellation reason |
+
+<Tabs items={["TypeScript", "Python", "cURL"]}>
+
+<Tab value="TypeScript">
+```typescript
+// Cancel immediately
+const cancelled = await lomi.subscriptions.cancel('sub_abc123...');
+
+// Cancel at period end
+const scheduledCancel = await lomi.subscriptions.cancel('sub_abc123...', {
+  cancel_at_period_end: true,
+  reason: 'Customer requested cancellation',
+});
+
+console.log(`Subscription will cancel at: ${scheduledCancel.cancel_at}`);
+```
+</Tab>
+
+<Tab value="Python">
+```python
+# Cancel immediately
+cancelled = client.subscriptions.cancel('sub_abc123...')
+
+# Cancel at period end
+scheduled_cancel = client.subscriptions.cancel('sub_abc123...', {
+    "cancel_at_period_end": True,
+    "reason": "Customer requested cancellation"
+})
+```
+</Tab>
+
+<Tab value="cURL">
+```bash
+curl -X POST "https://api.lomi.africa/subscriptions/sub_abc123.../cancel" \
+  -H "X-API-KEY: $LOMI_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cancel_at_period_end": true,
+    "reason": "Customer requested cancellation"
+  }'
+```
+</Tab>
+
+</Tabs>
+
+---
+
+## Subscription Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique subscription identifier |
+| `customer_id` | `string` | Associated customer |
+| `product_id` | `string` | Associated product |
+| `price_id` | `string` | Associated price |
+| `status` | `string` | `active`, `past_due`, `cancelled`, `trialing` |
+| `amount` | `number` | Recurring amount |
+| `currency_code` | `string` | Currency |
+| `billing_interval` | `string` | `day`, `week`, `month`, `year` |
+| `current_period_start` | `string` | Current period start |
+| `current_period_end` | `string` | Current period end (next billing date) |
+| `cancel_at_period_end` | `boolean` | Scheduled for cancellation |
+| `cancel_at` | `string` | Scheduled cancellation date |
+| `cancelled_at` | `string` | Actual cancellation timestamp |
+| `trial_start` | `string` | Trial start date |
+| `trial_end` | `string` | Trial end date |
+| `created_at` | `string` | Creation timestamp |
+
+---
+
+## Webhooks
+
+| Event | Description |
+|-------|-------------|
+| `subscription.created` | New subscription created |
+| `subscription.updated` | Subscription renewed or updated |
+| `subscription.cancelled` | Subscription cancelled |
+| `subscription.payment_failed` | Recurring payment failed |
+
+---
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `401` | Invalid or missing API key |
+| `404` | Subscription or customer not found |
