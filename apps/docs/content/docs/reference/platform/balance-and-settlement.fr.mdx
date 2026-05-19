@@ -5,6 +5,10 @@ description: Fonctionnement des soldes marchands, des frais et de la disponibili
 
 Les soldes sont mis à jour lorsqu’une transaction passe en **`completed`**. Cette page décrit le modèle implémenté dans la logique de mise à jour des soldes (y compris la normalisation XOF pour la trésorerie).
 
+<Callout type="info">
+  En environnement **test**, les paiements complétés créditent uniquement votre **solde de test** du tableau de bord—pas le solde retirable live ni la trésorerie plateforme. Voir **[Paiements en bac à sable](/reference/setup/sandbox-payments)**.
+</Callout>
+
 ## Quand les soldes changent
 
 - Le **solde net dû au marchand** augmente du montant **net** de la transaction (brut moins frais de plateforme).

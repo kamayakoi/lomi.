@@ -37,6 +37,10 @@ export const testConfig = {
 };
 ```
 
+## Payment simulation
+
+For **test card numbers**, **Wave** and **MTN MoMo** sandbox behavior, test balances, and manual QA on hosted checkout, see **[Sandbox payments](/reference/setup/sandbox-payments)**. That guide is the canonical reference for payment simulation; this page focuses on automation, webhooks, and CI.
+
 ## Integration tests
 
 Write automated tests that interact with the lomi. **sandbox** API.
@@ -206,8 +210,8 @@ Your E2E test script would typically:
 
 1.  Navigate through your application to initiate a payment.
 2.  Trigger the creation of a lomi. Checkout Session via your backend.
-3.  **(Challenge)** Interact with the lomi. Sandbox Checkout page. This is often difficult/flaky in automated E2E tests. Consider:
-    - Using specific test phone numbers/methods provided by lomi. sandbox that automatically succeed or fail.
+3.  **(Challenge)** Interact with the lomi. sandbox checkout page. This is often difficult/flaky in automated E2E tests. Consider:
+    - Using the [sandbox test card numbers and mobile money rules](/reference/setup/sandbox-payments) for manual or semi-automated flows.
     - Having a dedicated API endpoint in your _test environment_ that simulates the webhook callback lomi. would send upon completion (bypassing the actual sandbox UI interaction). This is often more reliable for automation.
 4.  Wait for and verify that your application receives the expected webhook (`PAYMENT_SUCCEEDED`).
 5.  Verify that your application state updated correctly (e.g., order marked as paid, service provisioned).

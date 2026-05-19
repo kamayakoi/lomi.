@@ -6,6 +6,10 @@ description: Create card-payment client secrets for embedded payment forms.
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
+<Callout type="info">
+  Use **`lomi_sk_test_…`** and **`lomi_pk_test_…`** with `https://sandbox.api.lomi.africa` for development. See **[Sandbox payments](/reference/setup/sandbox-payments)** for test card numbers and expected behavior.
+</Callout>
+
 The Payment Intents API is used for **card-form-only** integrations where your app renders card fields (for example with `@lomi./sdk`) and confirms payment client-side.
 
 <Callout type="info">

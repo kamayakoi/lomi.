@@ -6,6 +6,10 @@ description: Créez des client secrets pour formulaires carte embarqués.
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Callout } from 'fumadocs-ui/components/callout';
 
+<Callout type="info">
+  Utilisez **`lomi_sk_test_…`** et **`lomi_pk_test_…`** avec `https://sandbox.api.lomi.africa` en développement. Voir **[Paiements en bac à sable](/reference/setup/sandbox-payments)** pour les numéros de carte de test et le comportement attendu.
+</Callout>
+
 L'API Payment Intents est utilisée pour les intégrations **formulaire carte uniquement**, où votre application affiche les champs carte (ex. `@lomi./sdk`) puis confirme le paiement côté client.
 
 <Callout type="info">

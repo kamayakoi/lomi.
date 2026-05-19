@@ -37,6 +37,10 @@ export const testConfig = {
 };
 ```
 
+## Simulation de paiement
+
+Pour les **numéros de carte de test**, le comportement **Wave** et **MTN MoMo** en bac à sable, les soldes de test et la QA manuelle sur le checkout hébergé, voir **[Paiements en bac à sable](/reference/setup/sandbox-payments)**. Ce guide est la référence pour la simulation de paiement ; cette page couvre l’automatisation, les webhooks et la CI.
+
 ## Tests d’intégration
 
 Réalisez des tests automatisés contre l’API **bac à sable** lomi..
@@ -206,8 +210,8 @@ Un script E2E fait typiquement :
 
 1.  Parcourir l’application pour lancer un paiement ;
 2.  Déclencher la création d’une session de paiement lomi. via votre backend ;
-3.  **Point délicat :** interagir avec la page Checkout bac à sable lomi.. Souvent instable en E2E. Pistes :
-    - Utiliser les numéros ou méthodes de test du bac à sable qui réussissent ou échouent automatiquement ;
+3.  **Point délicat :** interagir avec la page checkout bac à sable lomi.. Souvent instable en E2E. Pistes :
+    - Utiliser les [numéros de carte de test et règles mobile money](/reference/setup/sandbox-payments) pour des flux manuels ou semi-automatisés ;
     - Exposer un point de terminaison dans votre **environnement de test** qui simule le webhook qu’envoierait lomi. à la fin (contourner l’UI bac à sable) — souvent plus fiable pour l’automatisation ;
 4.  Attendre et vérifier la réception du webhook attendu (`PAYMENT_SUCCEEDED`) ;
 5.  Vérifier que l’état applicatif est correct (commande payée, service provisionné, etc.).

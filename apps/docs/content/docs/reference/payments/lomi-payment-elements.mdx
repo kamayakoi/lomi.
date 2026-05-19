@@ -237,14 +237,6 @@ See [Webhooks Documentation](/reference/payments/webhooks) for setup details.
 
 ## Testing
 
-Use your test API keys (`lomi_pk_test_...` and `lomi_sk_test_...`) to test payments without processing real transactions.
+Use your test API keys (`lomi_pk_test_...` and `lomi_sk_test_...`) against `https://sandbox.api.lomi.africa` to test payments without processing real transactions.
 
-**Test Card Numbers:**
-
-| Card                    | Number                |
-| ----------------------- | --------------------- |
-| Successful payment      | `4242 4242 4242 4242` |
-| Declined                | `4000 0000 0000 0002` |
-| Requires authentication | `4000 0025 0000 3155` |
-
-Use any future expiry date and any 3-digit CVC.
+For sandbox test card numbers, mobile money (Wave, MTN MoMo), hosted checkout QA, and test balances, see **[Sandbox payments](/reference/setup/sandbox-payments)**.

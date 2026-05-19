@@ -16,6 +16,10 @@ The Checkout Sessions API allows you to create secure, temporary sessions for cu
   Checkout sessions expire after **60 minutes** by default.
 </Callout>
 
+<Callout type="info">
+  Sessions created with a **test** API key (or linked to a test payment link) run in test mode. For manual QA—test cards, Wave, MTN MoMo—see **[Sandbox payments](/reference/setup/sandbox-payments)**.
+</Callout>
+
 ## Create a checkout session
 
 Creates a new checkout session and returns a URL to redirect your customer to.

@@ -1,4 +1,4 @@
 {
   "title": "Setup",
-  "pages": ["integration", "authentication", "overview"]
+  "pages": ["integration", "authentication", "sandbox-payments", "overview"]
 }
