@@ -1,11 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import Stripe from 'stripe';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import type Stripe from 'stripe';
 import { SupabaseService } from '../../utils/supabase/supabase.service';
+import { normalizePaymentEnvironment } from '../../utils/payment-environment';
+import { StripeClientsService } from '../../utils/stripe/stripe-clients.service';
 import { AuthContext } from '../common/decorators/current-user.decorator';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import {
@@ -37,29 +34,15 @@ function toLomiTheme(
 @Injectable()
 export class PaymentIntentsService {
   private readonly logger = new Logger(PaymentIntentsService.name);
-  private readonly stripe?: Stripe;
 
-  constructor(private readonly supabase: SupabaseService) {
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-    if (!stripeSecretKey) {
-      this.logger.warn(
-        'STRIPE_SECRET_KEY is not configured - payment-intents endpoint disabled',
-      );
-      return;
-    }
-
-    this.stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2025-11-17.clover' as any,
-    });
-  }
+  constructor(
+    private readonly supabase: SupabaseService,
+    private readonly stripeClients: StripeClientsService,
+  ) {}
 
   async create(createDto: CreatePaymentIntentDto, user: AuthContext) {
-    if (!this.stripe) {
-      throw new ServiceUnavailableException(
-        'Stripe is not configured for this API instance',
-      );
-    }
+    const stripe = this.stripeClients.getClient(user.environment);
+    const paymentEnv = normalizePaymentEnvironment(user.environment);
 
     assertPaymentIntentReconciliationInput(createDto);
     assertOptionalUuid('product_id', createDto.product_id);
@@ -148,7 +131,7 @@ export class PaymentIntentsService {
       converted,
     );
 
-    const paymentIntent = await this.stripe.paymentIntents.create({
+    const paymentIntent = await stripe.paymentIntents.create({
       amount: converted.stripe_amount_cents,
       currency: converted.stripe_currency,
       payment_method_types: ['card'],
@@ -159,6 +142,7 @@ export class PaymentIntentsService {
     await this.createPendingTransaction(
       createDto,
       user,
+      paymentEnv,
       sourceCurrency,
       amount,
       resolvedCustomerId,
@@ -323,6 +307,7 @@ export class PaymentIntentsService {
   private async createPendingTransaction(
     createDto: CreatePaymentIntentDto,
     user: AuthContext,
+    paymentEnv: ReturnType<typeof normalizePaymentEnvironment>,
     sourceCurrency: string,
     merchantChargeAmount: number,
     customerId: string,
@@ -344,6 +329,7 @@ export class PaymentIntentsService {
           p_metadata: createDto.metadata ?? null,
           p_quantity: createDto.quantity ?? 1,
           p_checkout_session_id: null,
+          p_environment: paymentEnv,
         } as any,
       );
 
