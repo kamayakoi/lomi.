@@ -5223,9 +5223,9 @@
           },
           "appearance_theme": {
             "type": "string",
-            "example": "stripe",
-            "enum": ["light", "dark", "flat", "stripe", "night"],
-            "description": "Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility."
+            "example": "light",
+            "enum": ["light", "dark", "flat"],
+            "description": "Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`."
           },
           "appearance_border_radius": {
             "type": "number",

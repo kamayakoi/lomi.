@@ -71,7 +71,7 @@ export class PaymentIntentsService {
       )
     ) {
       throw new BadRequestException(
-        "appearance_theme must be one of 'light', 'dark', 'flat', 'stripe', or 'night'",
+        "appearance_theme must be one of 'light', 'dark', or 'flat'",
       );
     }
 

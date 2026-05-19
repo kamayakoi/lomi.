@@ -65,7 +65,7 @@ Schéma: `CreatePaymentIntentDto`
 | `subscription_id` | Non | `string` | Optional subscription UUID for metadata and reconciliation |
 | `quantity` | Non | `number` | Optional quantity for internal reconciliation |
 | `metadata` | Non | `object` | Custom metadata merged into provider metadata |
-| `appearance_theme` | Non | `enum ("light", "dark", "flat", ...)` | Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility. |
+| `appearance_theme` | Non | `enum ("light", "dark", "flat")` | Thème optionnel de l’interface carte côté client : `light`, `dark` ou `flat`. |
 | `appearance_border_radius` | Non | `number` | Optional Payment Element border radius (px) returned for client-side rendering. |
 | `appearance_billing_address` | Non | `enum ("auto", "never")` | Optional Payment Element billing address collection mode. Use `never` to hide country/address selector in Payment Element UI. |
 

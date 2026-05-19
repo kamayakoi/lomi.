@@ -175,14 +175,72 @@ const DOCS_FORBIDDEN_INGRESS_SNIPPETS: readonly string[] = [
 
 const DOCS_FORBIDDEN_PROSE: { re: RegExp; hint: string }[] = [
   {
-    re: /\bStripe\b/,
+    re: /\bStripe\b/i,
     hint: 'Public docs must not name the underlying card processor; describe card payments generically.',
   },
   {
     re: /stripe\.com/i,
     hint: 'Remove vendor-specific links or hostnames from public docs.',
   },
+  {
+    re: /\bSTRIPE_[A-Z0-9_]+\b/,
+    hint: 'Do not document internal card-processor env vars or secrets in public docs.',
+  },
+  {
+    re: /stripe\|night/i,
+    hint: 'Use lomi theme names (`light`, `dark`, `flat`) only — not legacy processor theme aliases.',
+  },
 ];
+
+/** Any string value in the committed public OpenAPI contract. */
+const OPENAPI_FORBIDDEN_STRING: { test: RegExp; hint: string }[] = [
+  {
+    test: /\bStripe\b/i,
+    hint: 'OpenAPI must not name the card processor; use generic card-payment wording.',
+  },
+  {
+    test: /stripe\.com/i,
+    hint: 'Remove vendor hostnames from OpenAPI.',
+  },
+  {
+    test: /\bSTRIPE_[A-Z0-9_]+\b/,
+    hint: 'OpenAPI must not reference card-processor env var names.',
+  },
+  {
+    test: /stripe\|night/i,
+    hint: 'Document only `light`, `dark`, `flat` theme values.',
+  },
+  {
+    test: /"stripe"/,
+    hint: 'Remove legacy processor theme enum values from the public schema.',
+  },
+];
+
+function collectOpenApiForbiddenStrings(
+  value: unknown,
+  jsonPath: string,
+  errors: string[],
+): void {
+  if (typeof value === 'string') {
+    for (const { test, hint } of OPENAPI_FORBIDDEN_STRING) {
+      if (test.test(value)) {
+        errors.push(`openapi.json ${jsonPath}: ${hint}`);
+      }
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, i) =>
+      collectOpenApiForbiddenStrings(item, `${jsonPath}[${i}]`, errors),
+    );
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+      collectOpenApiForbiddenStrings(child, `${jsonPath}.${key}`, errors);
+    }
+  }
+}
 
 function stripMarkdownCodeFences(content: string): string {
   return content.replace(/```[\s\S]*?```/g, '');
@@ -377,6 +435,7 @@ async function checkOpenApiDocs(): Promise<void> {
   const errors: string[] = [];
   collectOpenApiSecurityErrors(spec, errors);
   collectForbiddenProviderIngressOpenApiPaths(spec, errors);
+  collectOpenApiForbiddenStrings(spec, 'openapi.json', errors);
   collectOpenApiTextErrors(spec, errors);
   collectOpenApiEnglishResidual(spec, errors);
   if (errors.length > 0) {

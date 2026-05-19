@@ -107,10 +107,10 @@ export class CreatePaymentIntentDto {
 
   @ApiPropertyOptional({
     type: String,
-    example: 'stripe',
-    enum: ['light', 'dark', 'flat', 'stripe', 'night'],
+    example: 'light',
+    enum: ['light', 'dark', 'flat'],
     description:
-      'Optional Payment Element theme hint returned for client-side rendering. `light|dark|flat` are preferred aliases; `stripe|night` remain for backward compatibility.',
+      'Optional Payment Element theme for client-side card UI: `light`, `dark`, or `flat`.',
   })
   appearance_theme?: 'light' | 'dark' | 'flat' | 'stripe' | 'night';
 
