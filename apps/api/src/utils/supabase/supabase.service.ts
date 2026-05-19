@@ -7,8 +7,7 @@ type DatabaseFunctions = Database['public']['Functions'];
 
 @Injectable()
 export class SupabaseService implements OnModuleInit {
-  /** Set in `onModuleInit` after env/config is available. */
-  private client!: SupabaseClient<Database>;
+  private client: SupabaseClient<Database>;
 
   constructor(private configService: ConfigService) {}
 

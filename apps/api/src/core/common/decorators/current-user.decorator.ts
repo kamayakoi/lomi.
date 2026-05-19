@@ -1,10 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { LomiPaymentEnvironment } from '../../../utils/payment-environment';
 
 export interface AuthContext {
   merchantId: string;
   organizationId: string;
-  environment: LomiPaymentEnvironment;
+  environment: string;
 }
 
 export const CurrentUser = createParamDecorator(

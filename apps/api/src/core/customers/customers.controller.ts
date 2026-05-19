@@ -384,7 +384,7 @@ export class CustomersController {
   @ApiOperation({
     summary: 'Créer une session de lancement du portail client',
     description:
-      'Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.',
+      "Génère un lien hébergé à usage unique vers le portail client pour un client de votre organisation. Destiné aux applications marchandes (backend) via clé API.",
   })
   @ApiParam({
     name: 'id',

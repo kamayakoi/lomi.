@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from '../../../utils/supabase/supabase.service';
-import { normalizePaymentEnvironment } from '../../../utils/payment-environment';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
@@ -34,7 +33,7 @@ export class ApiKeyGuard implements CanActivate {
     request.user = {
       merchantId: data[0].merchant_id,
       organizationId: data[0].organization_id,
-      environment: normalizePaymentEnvironment(data[0].environment),
+      environment: data[0].environment,
     };
 
     // Validate Environment

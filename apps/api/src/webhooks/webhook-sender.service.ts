@@ -3,7 +3,6 @@ import { SupabaseService } from '../utils/supabase/supabase.service';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { WebhookEvent } from '../utils/types/api';
-import { resolveMerchantWebhookRelayEnvironment } from '../utils/payment-environment';
 import { Queue } from 'bullmq';
 
 export interface Webhook {
@@ -156,7 +155,7 @@ export class WebhookSenderService {
             typeof response.data === 'string'
               ? response.data
               : JSON.stringify(response.data),
-          p_error_message: '',
+          p_error_message: null,
           p_request_duration_ms: durationMs,
         });
       }
@@ -219,7 +218,7 @@ export class WebhookSenderService {
         await this.supabase.rpc('record_webhook_delivery_attempt', {
           p_dispatch_id: context.dispatchId,
           p_attempt_number: context.attemptNumber,
-          p_response_status: status ?? 0,
+          p_response_status: status ?? null,
           p_response_body:
             typeof respBody === 'string' ? respBody : JSON.stringify(respBody),
           p_error_message: error.message ?? 'request_failed',
@@ -351,8 +350,6 @@ export class WebhookSenderService {
       return;
     }
 
-    const relayEnv = resolveMerchantWebhookRelayEnvironment(data);
-
     const { data: webhooks, error } = await this.supabase.rpc(
       'fetch_organization_webhooks',
       {
@@ -361,7 +358,7 @@ export class WebhookSenderService {
         p_event: event,
         p_is_active: true,
         p_search_term: null,
-        p_environment: relayEnv,
+        p_environment: 'live',
       },
     );
 
@@ -473,7 +470,7 @@ export class WebhookSenderService {
     }
 
     this.logger.log(
-      `Queued ${relevantWebhooks.length} webhook jobs for org ${organizationId} (relayEnv=${relayEnv}, outbox=${useOutbox})`,
+      `Queued ${relevantWebhooks.length} webhook jobs for org ${organizationId} (outbox=${useOutbox})`,
     );
   }
 
@@ -496,8 +493,6 @@ export class WebhookSenderService {
       return;
     }
 
-    const relayEnv = resolveMerchantWebhookRelayEnvironment(data);
-
     const { data: webhooks, error } = await this.supabase.rpc(
       'fetch_organization_webhooks',
       {
@@ -506,7 +501,7 @@ export class WebhookSenderService {
         p_event: event,
         p_is_active: true,
         p_search_term: null,
-        p_environment: relayEnv,
+        p_environment: 'live',
       },
     );
 

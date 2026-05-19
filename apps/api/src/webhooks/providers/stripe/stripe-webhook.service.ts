@@ -4,23 +4,38 @@ import { WebhookSenderService } from '../../webhook-sender.service';
 import { sanitizeMerchantWebhookTransactionPayload } from '../../sanitize-merchant-webhook-transaction-payload';
 import { WebhookEvent } from '../../../utils/types/api';
 import Stripe from 'stripe';
-import { constructStripeWebhookEvent } from '../../../utils/stripe/stripe-keys';
-import { StripeClientsService } from '../../../utils/stripe/stripe-clients.service';
 
 @Injectable()
 export class StripeWebhookService {
   private readonly logger = new Logger(StripeWebhookService.name);
+  private readonly webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  private readonly stripe: Stripe | undefined;
 
   constructor(
     private readonly supabase: SupabaseService,
     private readonly webhookSender: WebhookSenderService,
-    private readonly stripeClients: StripeClientsService,
-  ) {}
+  ) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!stripeSecretKey) {
+      this.logger.warn(
+        'STRIPE_SECRET_KEY is not configured - Stripe functionality disabled',
+      );
+    } else {
+      this.stripe = new Stripe(stripeSecretKey, {
+        apiVersion: '2025-11-17.clover' as any,
+      });
+    }
+  }
 
   /**
    * Main webhook handler
    */
   async handleWebhook(signature: string, rawBody: Buffer | string) {
+    if (!this.stripe) {
+      throw new BadRequestException('Stripe configuration missing');
+    }
+
     const event = this.verifyWebhook(signature, rawBody);
 
     const { data: claimed, error: claimError } = await this.supabase.rpc(
@@ -142,31 +157,36 @@ export class StripeWebhookService {
     signature: string,
     rawBody: Buffer | string,
   ): Stripe.Event {
-    try {
-      const event = constructStripeWebhookEvent(rawBody, signature);
-      this.logger.log({
-        message: 'stripe_signature_verified',
-        livemode: event.livemode,
-        event_type: event.type,
-      });
-      return event;
-    } catch (error) {
-      if (process.env.NODE_ENV !== 'production') {
-        this.logger.warn(
-          'Stripe webhook secret verification failed - ACCEPTING PARSED BODY IN DEV MODE',
-        );
-        try {
-          const bodyString = rawBody.toString();
-          return JSON.parse(bodyString) as Stripe.Event;
-        } catch {
-          // fall through
-        }
+    if (!this.webhookSecret || !this.stripe) {
+      this.logger.warn(
+        'Stripe webhook secret not configured - ACCEPTING ALL REQUESTS IN DEV MODE',
+      );
+
+      if (process.env.NODE_ENV === 'production') {
+        throw new BadRequestException('Webhook secret not configured');
       }
 
+      // In dev mode, try to parse the body as JSON
+      try {
+        const bodyString = rawBody.toString();
+        return JSON.parse(bodyString) as Stripe.Event;
+      } catch {
+        throw new BadRequestException('Invalid webhook payload');
+      }
+    }
+
+    try {
+      const event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        this.webhookSecret,
+      );
+
+      this.logger.log('Stripe signature verification successful');
+      return event;
+    } catch (error) {
       this.logger.error('Stripe signature verification failed:', error);
-      const message =
-        error instanceof Error ? error.message : 'Verification failed';
-      throw new BadRequestException(`Webhook Error: ${message}`);
+      throw new BadRequestException(`Webhook Error: ${error.message}`);
     }
   }
 
@@ -197,13 +217,10 @@ export class StripeWebhookService {
     // Otherwise the balance gets credited with the pre-intl-fee amount (e.g. 11,150 XOF)
     // while the transaction shows post-intl-fee net (e.g. 10,910 XOF), causing
     // "En cours" to display the wrong (higher) amount.
-    const stripe = this.stripeClients.getClientForStripeLivemode(
-      paymentIntent.livemode,
-    );
-    if (paymentMethodId && stripe) {
+    if (paymentMethodId && this.stripe) {
       try {
         const paymentMethod =
-          await stripe.paymentMethods.retrieve(paymentMethodId);
+          await this.stripe.paymentMethods.retrieve(paymentMethodId);
         const cardCountry = paymentMethod.card?.country;
 
         // "International" = NOT France (FR). User's policy: only France is domestic.
@@ -375,14 +392,13 @@ export class StripeWebhookService {
    */
   private async handleDisputeCreated(dispute: Stripe.Dispute) {
     try {
-      const stripe = this.stripeClients.getClientForStripeLivemode(
-        dispute.livemode,
-      );
-      if (!stripe) {
+      if (!this.stripe) {
         throw new Error('Stripe client not initialized');
       }
 
-      const charge = await stripe.charges.retrieve(dispute.charge as string);
+      const charge = await this.stripe.charges.retrieve(
+        dispute.charge as string,
+      );
       const paymentIntentId = charge.payment_intent as string;
 
       const { error } = await (this.supabase.getClient() as any).rpc(
