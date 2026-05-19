@@ -111,7 +111,7 @@
         "question": "Quels méthodes de paiement supportez-vous?"
       },
       "pricing": {
-        "answer": "lomi. offre un prix transparent sans frais cachés. Nous chargeons une simple taxe de 2.9% par transaction plus une petite taxe fixe en fonction de la devise. Il n'y a pas de frais d'installation, de frais mensuels ou de frais cachés.",
+        "answer": "lomi. utilise une tarification dynamique selon votre volume mensuel. Plus vos revenus augmentent, plus vous montez de palier et vos taux baissent. Les paliers se recalculent chaque mois. Pas de frais d'installation, mensuels ni cachés. Grilles complètes dans notre [documentation tarifs](/docs/core/merchant-of-record/pricing).",
         "question": "Comment fonctionne le pricing de lomi.?"
       },
       "security": {
@@ -240,7 +240,7 @@
             "subtitle": "Le MoR le moins cher du marché",
             "items": [
               {
-                "text": "lomi. est tarifé 20% moins cher que d'autres plateformes de paiement en Afrique de l'Ouest francophone. 2% et 200 F CFA par transaction pour le mobile money."
+                "text": "lomi. est tarifé environ 20% moins cher que d'autres MoR en Afrique de l'Ouest francophone. Les tarifs dépendent du volume mensuel : Mobile Money et cartes baissent à chaque palier, recalculé chaque mois."
               }
             ]
           },
@@ -258,13 +258,13 @@
         "title": "Frais de transaction",
         "sections": [
           {
-            "subtitle": "2% + 200 F CFA par transaction",
+            "subtitle": "Tarifs selon le volume (recalculés chaque mois)",
             "items": [
               {
-                "text": "lomi. est actuellement construit sur SPI pour le traitement des paiements d'argent mobile, et notre structure tarifaire est conçue pour couvrir les frais d'infrastructure de 1% à 1.5% avec les nôtres."
+                "text": "lomi. s'appuie sur le SPI pour le Mobile Money. Votre pourcentage et forfait dépendent du palier mensuel (Démarrage, Croissance, Professionnel, Entreprise). Exemple : Croissance = 2,5% + 150 F CFA sur Mobile Money."
               },
               {
-                "text": "Pour le traitement des paiements par carte de crédit, nous couvrons les frais de traitement sous-jacents en facturant 3.5% + 0.40 $ par transaction. Cependant, des frais supplémentaires peuvent s'appliquer pour certaines transactions que nous devons transmettre."
+                "text": "Plus votre palier augmente, plus les taux cartes baissent — par ex. Démarrage 5% + 250 F CFA, Croissance 4,5% + 250 F CFA, Professionnel 4% + 250 F CFA, Entreprise 3,5% + 250 F CFA. +2% sur cartes internationales et +0,5% sur abonnements."
               }
             ]
           }
@@ -274,7 +274,7 @@
         "title": "Frais supplémentaires",
         "sections": [
           {
-            "subtitle": "+1.5% pour les cartes internationales"
+            "subtitle": "+2% pour les cartes internationales"
           },
           {
             "subtitle": "+0.5% pour les paiements d'abonnement"
@@ -288,7 +288,7 @@
             "subtitle": "Répartition des paiements pour un abonnement de 20 000 F CFA en Côte d'Ivoire",
             "items": [
               {
-                "text": "Regardons un exemple de répartition avec nos tarifs appliqués. Voici un paiement d'un abonnement de 20 000 F CFA en Côte d'Ivoire utilisant l'argent mobile."
+                "text": "Exemple : abonnement de 20 000 F CFA via Mobile Money, tarifs du palier Croissance (2,5% + 150 F CFA)."
               }
             ],
             "table": [
@@ -298,17 +298,17 @@
                 "value": "20 000 F CFA"
               },
               {
-                "label": "Frais de transaction (2% + 200 XOF)",
-                "value": "600 F CFA"
+                "label": "Frais de transaction (2,5% + 150 F CFA)",
+                "value": "650 F CFA"
               },
-              { "label": "Montant que vous recevez", "value": "19 400 F CFA" }
+              { "label": "Montant que vous recevez", "value": "19 350 F CFA" }
             ]
           },
           {
             "subtitle": "Répartition des paiements pour un abonnement de 30 $ par mois",
             "items": [
               {
-                "text": "Voici le même abonnement payé cette fois en USD en utilisant une carte de crédit."
+                "text": "Le même abonnement payé en USD par carte, aux tarifs cartes USD standard (4,5% + 0,40 $) et le supplément abonnement +0,5%."
               }
             ],
             "table": [
@@ -316,11 +316,11 @@
               { "label": "TVA (20%)", "value": "6 $" },
               { "label": "Valeur totale de la transaction", "value": "36 $" },
               {
-                "label": "Frais de transaction (3.5% + 0.40 $)",
-                "value": "1.66 $"
+                "label": "Frais de transaction (4,5% + 0,40 $)",
+                "value": "2,02 $"
               },
-              { "label": "Frais d'abonnement (0.5%)", "value": "0.18 $" },
-              { "label": "Total des frais", "value": "1.84 $" }
+              { "label": "Frais d'abonnement (0,5%)", "value": "0,18 $" },
+              { "label": "Total des frais", "value": "2,20 $" }
             ]
           }
         ]

@@ -14,7 +14,7 @@ import { playClickSound } from '@/lib/utils/sound';
 export function EarlyMemberPricing() {
   const { currentLanguage } = useTranslation();
   const [titleNumber, setTitleNumber] = useState(0);
-  const prices = useMemo(() => ['200 F CFA', '0.30 USD', '0.30 EUR'], []);
+  const prices = useMemo(() => ['200 F CFA', '0.40 USD', '0.40 EUR'], []);
 
   // Handle price animation
   useEffect(() => {
@@ -42,7 +42,7 @@ export function EarlyMemberPricing() {
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4 flex flex-col items-center">
                   <div className="flex flex-wrap items-baseline justify-center translate-x-[4px]">
                     <span className="inline-flex whitespace-nowrap mr-2 text-3xl md:text-4xl lg:text-6xl">
-                      2% +
+                      2.9% +
                     </span>
                     <div className="relative inline-flex items-center h-16 sm:h-20 md:h-24 min-w-[200px] sm:min-w-[250px] w-auto">
                       <AnimatePresence mode="wait">

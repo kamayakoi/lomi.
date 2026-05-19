@@ -111,7 +111,7 @@
         "question": "¿Qué métodos de pago soportas?"
       },
       "pricing": {
-        "answer": "lomi. ofrece precios transparentes con tarifas ocultas. Cargamos una tarifa simple del 2.9% por transacción más una pequeña tarifa fija dependiendo de la moneda. No hay tarifas de configuración, tarifas mensuales o cargos ocultos.",
+        "answer": "lomi. utiliza precios dinámicos según tu volumen mensual procesado. A medida que aumentan tus ingresos, subes de tramo y tus tarifas bajan. Los tramos se recalculan cada mes. Sin cuotas de alta, costes mensuales ni cargos ocultos. Grillas completas en nuestra [documentación de precios](/docs/core/merchant-of-record/pricing).",
         "question": "¿Cómo funciona el pricing de lomi.?"
       },
       "security": {
@@ -240,7 +240,7 @@
             "subtitle": "El MoR más barato del mercado",
             "items": [
               {
-                "text": "lomi. tiene un precio 20% más barato que otros proveedores de registro de comerciantes en África Occidental francófona. 2% y 200 F CFA por transacción para dinero móvil."
+                "text": "lomi. cuesta aproximadamente un 20% menos que otros MoR en África Occidental francófona. Las tarifas dependen del volumen mensual en F CFA: dinero móvil y tarjetas bajan en cada tramo, recalculado cada mes."
               }
             ]
           },
@@ -258,13 +258,13 @@
         "title": "Tarifas de transacción",
         "sections": [
           {
-            "subtitle": "2% + 200 F CFA por transacción",
+            "subtitle": "Tarifas según volumen (recalculadas cada mes)",
             "items": [
               {
-                "text": "lomi. está construido actualmente sobre SPI para el procesamiento de pagos con dinero móvil, y nuestra estructura de precios está diseñada para cubrir la tarifa de infraestructura del 1% al 1.5% con la nuestra."
+                "text": "lomi. usa SPI para dinero móvil. El porcentaje y la cuota fija dependen de tu tramo mensual en F CFA (Inicial, Crecimiento, Profesional, Empresa). Ejemplo: Crecimiento = 2,5% + 150 F CFA en móvil."
               },
               {
-                "text": "Para el procesamiento de pagos con tarjeta de crédito, cubrimos las tarifas de procesamiento subyacentes cobrando 3.5% + 0.40 $ por transacción. Sin embargo, pueden aplicarse tarifas adicionales por ciertas transacciones que necesitamos pasar."
+                "text": "A medida que subes de tramo, las tarifas de tarjeta bajan — por ejemplo Inicial 5% + 250 F CFA, Crecimiento 4,5% + 250 F CFA, Profesional 4% + 250 F CFA, Empresa 3,5% + 250 F CFA. +2% en tarjetas internacionales y +0,5% en suscripciones."
               }
             ]
           }
@@ -274,7 +274,7 @@
         "title": "Tarifas adicionales",
         "sections": [
           {
-            "subtitle": "+1.5% para tarjetas internacionales"
+            "subtitle": "+2% para tarjetas internacionales"
           },
           {
             "subtitle": "+0.5% para pagos de suscripción"
@@ -288,7 +288,7 @@
             "subtitle": "Desglose de pago para una suscripción de 20 000 F CFA en Côte d'Ivoire",
             "items": [
               {
-                "text": "Veamos un desglose de ejemplo con nuestros precios aplicados. A continuación hay un pago de una suscripción de 20 000 F CFA en Côte d'Ivoire usando dinero móvil."
+                "text": "Ejemplo: suscripción de 20 000 F CFA con dinero móvil, tarifas del tramo Crecimiento (2,5% + 150 F CFA)."
               }
             ],
             "table": [
@@ -298,17 +298,17 @@
                 "value": "20 000 F CFA"
               },
               {
-                "label": "Tarifa de transacción (2% + 200 XOF)",
-                "value": "600 F CFA"
+                "label": "Tarifa de transacción (2,5% + 150 F CFA)",
+                "value": "650 F CFA"
               },
-              { "label": "Monto que recibes", "value": "19 400 F CFA" }
+              { "label": "Monto que recibes", "value": "19 350 F CFA" }
             ]
           },
           {
             "subtitle": "Desglose de pago para una suscripción de 30 $ al mes",
             "items": [
               {
-                "text": "Aquí está la misma suscripción pagada esta vez en USD usando una tarjeta de crédito."
+                "text": "La misma suscripción pagada en USD con tarjeta, tarifas estándar USD (4,5% + 0,4 $) y suplemento de suscripción +0,5%."
               }
             ],
             "table": [
@@ -316,11 +316,11 @@
               { "label": "IVA (20%)", "value": "6 $" },
               { "label": "Valor total de la transacción", "value": "36 $" },
               {
-                "label": "Tarifa de transacción (3.5% + 0.40 $)",
-                "value": "1.66 $"
+                "label": "Tarifa de transacción (4,5% + 0,4 $)",
+                "value": "2,02 $"
               },
-              { "label": "Tarifa de suscripción (0.5%)", "value": "0.18 $" },
-              { "label": "Total de tarifas", "value": "1.84 $" }
+              { "label": "Tarifa de suscripción (0,5%)", "value": "0,18 $" },
+              { "label": "Total de tarifas", "value": "2,20 $" }
             ]
           }
         ]

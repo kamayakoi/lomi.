@@ -3,102 +3,173 @@ title: 'Tarification'
 description: 'Des frais transparents avec 20 % de réduction par rapport à la concurrence.'
 ---
 
-lomi. propose trois modes de tarification pour les organisations :
+La tarification **fixe (standard)** repose sur une grille stable — par ex. **2,9 % + 200 F CFA** sur Mobile Money et **4,5 % + 250 F CFA** sur cartes en Afrique de l’Ouest. Les paiements carte en USD/EUR utilisent **4,5 % + 0,40 $ ou €**. Les taux exacts figurent dans **Facturation → Tarification** et peuvent varier selon le moyen de paiement et le prestataire.
 
-- **Dynamique (par paliers de volume) :** les taux diminuent automatiquement à mesure que votre volume mensuel traité augmente.
-- **Fixe :** une grille de frais stable, indépendante du volume mensuel.
-- **Sur mesure :** tarification négociée selon le modèle économique, le profil de risque ou les besoins de fort volume.
+- **Dynamique (par paliers de volume) :** vous commencez au palier **Starter**, puis les taux baissent automatiquement à mesure que votre volume mensuel augmente (Growth, Professional, Enterprise).
+- **Fixe (standard) :** grille stable quel que soit le volume — idéal pour une prévision financière.
+- **Sur mesure :** tarification négociée selon le modèle économique, le profil de risque ou les volumes.
 
-Les montants de frais visibles pour votre organisation proviennent de votre configuration de tarification active dans lomi. et peuvent varier selon la devise, le moyen de paiement et les contraintes des prestataires.
+Le palier Starter dynamique est en général configuré **au moins au niveau** du standard fixe. Comparez les deux modes dans **Facturation → Tarification** avant de changer.
 
 ## Fonctionnement de la tarification dynamique
 
-Avec la tarification dynamique, votre organisation est affectée à un palier selon le volume traité sur la période. À mesure que le volume augmente, vos taux de transaction diminuent automatiquement.
+Avec la tarification dynamique, votre palier est basé sur le volume **F CFA** du **dernier mois clos** (toutes devises converties — pas les ventes du jour). Plus le volume augmente, plus vos taux baissent.
 
-- Les paliers sont évalués à partir du chiffre d’affaires traité.
-- Les frais paliers s’appliquent aux frais de traitement des paiements (par ex. Mobile Money et cartes).
-- Des frais non paliers peuvent encore s’appliquer (remises en cause, litiges, surfacturations cartes internationales ou options liées aux abonnements).
+- L’attribution du palier repose sur le **volume total traité converti en F CFA** — les ventes en XOF, USD et EUR comptent toutes dans votre palier mensuel.
+- Les taux par palier s’appliquent à l’ensemble du traitement (Mobile Money, cartes, TPE) et à certains frais de virement/autres.
+- Des frais hors paliers peuvent s’appliquer (remboursements, litiges, cartes internationales, abonnements).
 
-Pour les seuils de paliers et les taux en vigueur, consultez la vue tarifs du tableau de bord ou la page publique [lomi.africa/pricing](https://lomi.africa/pricing).
+## Paliers de volume (revenu mensuel F CFA)
+
+| **Palier** | **Volume mensuel (F CFA)** |
+| :--------- | :----------------------- |
+| **Enterprise** | 8 594 661 et plus |
+| **Professional** | 4 297 320 – 8 594 660 |
+| **Growth** | 2 148 660 – 4 297 319 |
+| **Starter** | 0 – 2 148 659 |
+
+## Frais par palier
+
+Les taux ci-dessous s’appliquent en plan **volume-tiered** selon votre palier actuel.
+
+| | **Starter** | **Growth** | **Professional** | **Enterprise** |
+| :-- | :-- | :-- | :-- | :-- |
+| **Mobile Money** | 3,2 % + 200 F CFA | 2,5 % + 150 F CFA | 2 % + 150 F CFA | 1,5 % + 100 F CFA |
+| **Cartes** | 5 % + 250 F CFA | 4,5 % + 250 F CFA | 4 % + 250 F CFA | 3,5 % + 250 F CFA |
+| **Tap to Pay (TPE cartes)** | 5 % + 200 F CFA | 4,5 % + 200 F CFA | 4 % + 100 F CFA | 3,5 % + 0 F CFA |
+| **TPE (Mobile Money)** | 2 % + 0 F CFA | 1,5 % + 0 F CFA | 1 % + 0 F CFA | 0 % + 0 F CFA |
+| **Versement bénéficiaire (MM)** | 2 % + 0 | 1,8 % + 0 | 1,5 % + 0 | 1,2 % + 0 |
+| **Retrait marchand (MM)** | Gratuit | Gratuit | Gratuit | Gratuit |
+
+Pour les seuils et taux en vigueur, consultez le tableau de bord ou [lomi.africa/pricing](https://lomi.africa/pricing).
+
+## Grille fixe par défaut
+
+Ces taux s’appliquent au plan **fixe**.
+
+### F CFA
+
+| **Catégorie** | **Frais** |
+| :------------ | :-------- |
+| Mobile Money | 2,9 % + 200 F CFA |
+| Cartes bancaires | 4,5 % + 250 F CFA |
+| Tap to Pay (TPE cartes) | 4,5 % + 250 F CFA |
+| TPE (Mobile Money) | 1,5 % + 0 F CFA |
+| BNPL (traitement marchand) | 8 % + 500 F CFA |
+| Virement bancaire local (UEMOA) | 0 % + 1 500 F CFA |
+| Virement bancaire international | 1 % + 3 500 F CFA |
+| Virement bancaire bénéficiaire | 2 % + 0 |
+| Retrait Mobile Money marchand | Gratuit |
+| Versement Mobile Money bénéficiaire | 2 % + 0 |
+| Remboursement total / partiel | 2 % + 0 |
+| Rétrofacturation | 0 % + 10 000 F CFA |
+| Cartes internationales (supplément) | +2 % |
+| Paiements d’abonnement (supplément) | +0,5 % |
+| Conversion de devise | 3 % + 0 |
+| Intérêts BNPL | 4 % + 0 |
+
+### USD et EUR
+
+| **Catégorie** | **Frais** |
+| :------------ | :-------- |
+| Cartes bancaires | 4,5 % + 0,40 $ ou € |
+| Virement bancaire international | 1 % + 5 $ ou € |
+| Remboursement total / partiel | 2 % + 0 |
+| Rétrofacturation | 0 % + 15 $ ou € |
+| Cartes internationales (supplément) | +2 % |
+| Paiements d’abonnement (supplément) | +0,5 % |
+
+Les opérateurs Mobile Money (Orange, MTN, Wave, Moov, Airtel) suivent la même structure pourcentage + fixe selon votre plan et palier actifs.
+
+### Exemple — plan fixe (30 000 F CFA Mobile Money)
+
+Abonnement de **30 000 F CFA** en Côte d’Ivoire (TVA 0 %) :
+
+| **Poste** | **Montant** |
+| :-------- | :---------- |
+| Prix de l’abonnement | 30 000 F CFA |
+| Montant payé par le client | 30 000 F CFA |
+| Frais de transaction (2,9 % + 200 F CFA) | 1 070 F CFA |
+| Montant net perçu | 28 930 F CFA |
+
+### Exemple — plan dynamique (20 000 F CFA, palier Growth)
+
+| **Poste** | **Montant** |
+| :-------- | :---------- |
+| Prix du produit | 20 000 F CFA |
+| Montant de la transaction | 20 000 F CFA |
+| Frais de transaction (2,5 % + 150 F CFA) | 650 F CFA |
+| Montant net perçu | 19 350 F CFA |
+
+### Exemple — carte USD
+
+Abonnement **30 $/mois** payé en USD par carte (TVA 20 %), avec supplément abonnement +0,5 % :
+
+| **Poste** | **Montant** |
+| :-------- | :---------- |
+| Prix du produit | 30 $ |
+| TVA (20 %) | 6 $ |
+| Montant total de la transaction | 36 $ |
+| Frais de transaction (4,5 % + 0,40 $) | 2,02 $ |
+| Frais d’abonnement (0,5 %) | 0,18 $ |
+| Total des frais | 2,20 $ |
+
+&nbsp;
 
 <Callout type="info">
-  La tarification dynamique récompense la croissance. Si votre activité augmente vite, votre taux effectif peut s’améliorer sans migration manuelle de tarification.
+  Vous pouvez ajouter remises ou frais additionnels (livraison, taxes, etc.)
+  depuis le tableau de bord marchand.
 </Callout>
 
 ## Tarification fixe et sur mesure
 
-Toutes les entreprises ne doivent pas être en tarification au volume :
-
-- Le mode **fixe** convient lorsque vous voulez des frais prévisibles pour la planification financière.
-- Le mode **sur mesure** convient lorsque votre mix de paiements, votre panier moyen, la géographie ou la conformité exigent une grille adaptée.
-
-La tarification sur mesure peut combiner pourcentage et partie fixe au cas par cas, et varier selon le moyen de paiement et la devise.
+- **Fixe** : frais prévisibles pour la planification financière.
+- **Sur mesure** : mix de paiements, ticket moyen, géographie ou conformité nécessitant une grille adaptée.
 
 Contactez [hello@lomi.africa](mailto:hello@lomi.africa) pour une mise en place sur mesure.
 
-## Frais de transaction
+## Remboursements et litiges
 
-Les frais de transaction sont calculés ainsi :
+| **Poste** | **Montant** |
+| :-------- | :---------- |
+| Frais de remboursement (total ou partiel) | 2 % |
+| Litige / rétrofacturation carte | 15 $ ou 10 000 F CFA |
+
+&nbsp;
+
+<Callout type="info">
+  lomi. peut émettre un remboursement à sa discrétion dans les 60 jours suivant
+  l’achat afin de réduire proactivement les litiges et rétrofacturations.
+</Callout>
+
+Formule :
 
 `frais de transaction = (pourcentage × montant) + montant fixe`
 
-Selon votre mode tarifaire et le moyen de paiement, les frais peuvent inclure :
+**Points importants :**
 
-- frais de traitement de base (Mobile Money, cartes, TPE le cas échéant)
-- ajustements propres au prestataire ou au moyen
-- options (par ex. option de paiement d’abonnement)
+- Les réseaux de cartes surveillent les taux de rétrofacturation élevés (~0,7 % et plus).
+- Nous monitorons et gérons ces taux pour rester dans les normes du secteur.
+- En cas de hausse, une intervention ou suspension peut être nécessaire.
 
-Pour certains petits montants, seule la partie en pourcentage peut s’appliquer selon la configuration des frais de votre organisation.
-
-## Frais complémentaires
-
-Certains frais sont liés à des situations précises et non à chaque paiement :
-
-- **surcoût carte internationale** (le cas échéant)
-- **option de paiement d’abonnement** (le cas échéant)
-- **frais de traitement des remboursements** (remboursements total ou partiel)
-- **frais de rétrofacturation / litige** (fixés par les réseaux ou prestataires sous-jacents)
-
-Ils ne s’appliquent que lorsque l’événement correspondant se produit.
-
-## Remboursements et litiges
-
-Vous pouvez effectuer des remboursements totaux ou partiels.
-
-- Les frais de traitement initiaux ne sont en général pas remboursables, car les prestataires les facturent au moment du paiement.
-- Des frais propres aux remboursements peuvent s’appliquer selon votre grille active.
-- Les litiges cartes sont facturés par les réseaux sous-jacents et répercutés.
-
-Pour les valeurs à jour (XOF/USD/EUR et options), consultez votre configuration tarifaire en direct dans le tableau de bord et [lomi.africa/pricing](https://lomi.africa/pricing).
+Sur certains petits montants, seule la part en pourcentage peut s’appliquer selon votre configuration.
 
 ## Frais de virement
 
-lomi. vise une tarification des virements transparente et alignée sur les prestataires :
+| **Moyen** | **Frais** | **Délai** |
+| :-------- | :-------- | :-------- |
+| Virement bancaire international | 1 % + 3 500 F CFA (ou 5 $ / €) | 1–7 jours ouvrés |
+| Virement bancaire local (UEMOA) | 0 % + 1 500 F CFA | 1–2 jours ouvrés |
+| Retrait Mobile Money marchand | Gratuit | Instantané |
+| Versement Mobile Money bénéficiaire | Voir palier ou grille fixe ci-dessus | Instantané |
 
-- certaines routes de virement sont gratuites dans certains contextes ;
-- d’autres incluent des frais en pourcentage et/ou fixes selon le prestataire ;
-- les virements internationaux peuvent être tarifés différemment des virements locaux.
+&nbsp;
 
-Les délais et disponibilités varient selon le rail de virement, le prestataire et le corridor de destination.
+<Callout type="info">
+  lomi. n’ajoute pas de marge sur les retraits marchands lorsque le frais
+  plateforme est nul. Des frais opérateurs tiers peuvent toutefois s’appliquer.
+</Callout>
 
-## Exemples concrets
+Pour les valeurs à jour (F CFA/USD/EUR), consultez votre configuration en direct dans le tableau de bord et [lomi.africa/pricing](https://lomi.africa/pricing).
 
-### Exemple A : tarification dynamique (palier)
-
-Une organisation en tarification au volume traite davantage ce mois-ci et passe à un meilleur palier. Les nouveaux paiements utilisent automatiquement la grille du palier amélioré.
-
-### Exemple B : tarification fixe
-
-Une organisation en tarification fixe conserve les mêmes taux cartes/Mobile Money configurés sur le mois, quelle que soit l’évolution du volume.
-
-### Exemple C : tarification sur mesure
-
-Une organisation en tarification sur mesure a négocié des taux pour certains moyens (par ex. cartes locales, cartes internationales ou routes de virement sélectionnées).
-
-## Choisir le bon mode
-
-- **Dynamique** si vous voulez des améliorations automatiques de taux à mesure de la croissance.
-- **Fixe** si vous privilégiez la stabilité et la prévision.
-- **Sur mesure** si votre modèle nécessite des conditions négociées.
-
-En cas de doute, commencez par le mode dynamique et examinez vos coûts effectifs chaque mois.
+> Contactez [hello@lomi.africa](mailto:hello@lomi.africa) pour une **tarification sur mesure**.

@@ -111,7 +111,7 @@
         "question": "What payment methods do you support?"
       },
       "pricing": {
-        "answer": "lomi. offers transparent pricing with no hidden fees. We charge a simple 2.9% fee per transaction plus a small fixed fee depending on the currency. There are no setup fees, monthly fees, or hidden charges.",
+        "answer": "lomi. uses dynamic pricing based on your monthly processed volume. As your revenue increases, you move through volume tiers and your rates decrease automatically. Tiers refresh every month. There are no setup fees, no monthly fees, and no hidden charges. Full schedules are in our [pricing documentation](/docs/core/merchant-of-record/pricing).",
         "question": "How does lomi. pricing work?"
       },
       "security": {
@@ -240,7 +240,7 @@
             "subtitle": "Cheapest MoR on the market",
             "items": [
               {
-                "text": "lomi. is priced 20% cheaper than other merchant of record in francophone West Africa. 2% and 200 F CFA per transaction for mobile money."
+                "text": "lomi. is priced about 20% cheaper than other merchants of record in francophone West Africa. Fees are volume-based on monthly processed volume: Mobile Money and card rates decrease as your tier improves, refreshed every month."
               }
             ]
           },
@@ -258,13 +258,13 @@
         "title": "Transaction fees",
         "sections": [
           {
-            "subtitle": "2% + 200 F CFA per transaction",
+            "subtitle": "Volume-based rates (refreshed monthly)",
             "items": [
               {
-                "text": "lomi. is currently built on top of SPI for mobile money payment processing, and our pricing structure is made to cover the infrastructure 1% to 1.5% fee with ours."
+                "text": "lomi. is built on SPI for Mobile Money. Your percentage and fixed fee depend on your monthly volume tier (Starter, Growth, Professional, Enterprise). For example, Growth uses 2.5% + 150 F CFA on Mobile Money."
               },
               {
-                "text": "For credit card payment processing, we cover the underlying processing fees by charging 3.5% + 0.40 $ per transaction. However, additional fees may apply for certain transactions that we need to pass on."
+                "text": "As your tier improves, card rates decrease — for example Starter 5% + 250 F CFA, Growth 4.5% + 250 F CFA, Professional 4% + 250 F CFA, and Enterprise 3.5% + 250 F CFA. +2% may apply for international cards and +0.5% on subscription payments."
               }
             ]
           }
@@ -274,7 +274,7 @@
         "title": "Additional fees",
         "sections": [
           {
-            "subtitle": "+1.5% for international cards"
+            "subtitle": "+2% for international cards"
           },
           {
             "subtitle": "+0.5% for subscription payments"
@@ -288,33 +288,33 @@
             "subtitle": "Payment breakdown for a 20 000 F CFA subscription in Côte d'Ivoire",
             "items": [
               {
-                "text": "Let's look at an example breakdown with our pricing applied. Below is a payment of a 20 000 F CFA subscription in Côte d'Ivoire using mobile money."
+                "text": "Below is a 20 000 F CFA subscription paid with Mobile Money, using Growth tier rates (2.5% + 150 F CFA)."
               }
             ],
             "table": [
               { "label": "Product Price", "value": "20 000 F CFA" },
               { "label": "Total Transaction Value", "value": "20 000 F CFA" },
               {
-                "label": "Transaction Fee (2% + 200 XOF)",
-                "value": "600 F CFA"
+                "label": "Transaction Fee (2.5% + 150 F CFA)",
+                "value": "650 F CFA"
               },
-              { "label": "Amount you receive", "value": "19 400 F CFA" }
+              { "label": "Amount you receive", "value": "19 350 F CFA" }
             ]
           },
           {
             "subtitle": "Payment breakdown for a subscription priced 30 $ per month",
             "items": [
               {
-                "text": "Here's the same subscription paid this time in USD using a credit card."
+                "text": "The same 30 $/month subscription, paid in USD with a card, using standard USD card rates (4.5% + 0.4 $) and the +0.5% subscription add-on."
               }
             ],
             "table": [
               { "label": "Product Price", "value": "30 $" },
               { "label": "VAT (20%)", "value": "6 $" },
               { "label": "Total Transaction Value", "value": "36 $" },
-              { "label": "Transaction Fee (3.5% + 0.40 $)", "value": "1.66 $" },
+              { "label": "Transaction Fee (4.5% + 0.4 $)", "value": "2.02 $" },
               { "label": "Subscription Fee (0.5%)", "value": "0.18 $" },
-              { "label": "Total Fees", "value": "1.84 $" }
+              { "label": "Total Fees", "value": "2.20 $" }
             ]
           }
         ]
