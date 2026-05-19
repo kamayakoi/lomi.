@@ -46,4 +46,3 @@ export class CreatePortalLaunchSessionDto {
   @IsUrl({ require_tld: true, require_protocol: true })
   flow_after_completion_url?: string;
 }
-
