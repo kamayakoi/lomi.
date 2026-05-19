@@ -1,115 +1,43 @@
-/* generated using openapi-typescript-codegen -- do not edit */
-/* istanbul ignore file */
-/* tslint:disable */
-/* eslint-disable */
-import type { beneficiary_payouts } from '../models/beneficiary_payouts.js';
-import type { beneficiary_payouts_create } from '../models/beneficiary_payouts_create.js';
-import type { CancelablePromise } from '../core/CancelablePromise.js';
-import { OpenAPI } from '../core/OpenAPI.js';
-import { request as __request } from '../core/request.js';
+/**
+ * BeneficiaryPayoutsService
+ * AUTO-GENERATED — public merchant surface from filtered OpenAPI
+ */
+
+import { request } from '../core/request.js';
+
 export class BeneficiaryPayoutsService {
     /**
-     * List beneficiary payouts
-     * Beneficiary payouts - track individual payout transfers
-     * @returns any Successful response with paginated data
-     * @throws ApiError
+     * OpenAPI operationId: `BeneficiaryPayoutsController_create`.
+     * Lancer un paiement vers un bénéficiaire
      */
-    public static listBeneficiaryPayouts({
-        limit = 20,
-        offset,
-        sort,
-    }: {
-        /**
-         * Maximum number of items to return (1-100)
-         */
-        limit?: number,
-        /**
-         * Number of items to skip for pagination
-         */
-        offset?: number,
-        /**
-         * Sort order. Format: `field:direction` (e.g., `created_at:desc`)
-         */
-        sort?: string,
-    }): CancelablePromise<{
-        data?: Array<beneficiary_payouts>;
-        pagination?: {
-            /**
-             * Number of items per page
-             */
-            limit?: number;
-            /**
-             * Number of items skipped
-             */
-            offset?: number;
-            /**
-             * Total number of items available
-             */
-            total?: number;
-        };
-    }> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/beneficiary_payouts',
-            query: {
-                'limit': limit,
-                'offset': offset,
-                'sort': sort,
-            },
-            errors: {
-                401: `Unauthorized - Invalid or missing API key`,
-                500: `Internal server error`,
-            },
-        });
-    }
-    /**
-     * Create beneficiary payout
-     * Beneficiary payouts - track individual payout transfers
-     * @returns beneficiary_payouts Beneficiary_payout successfully created
-     * @throws ApiError
-     */
-    public static createBeneficiaryPayout({
-        requestBody,
-    }: {
-        requestBody: beneficiary_payouts_create,
-    }): CancelablePromise<beneficiary_payouts> {
-        return __request(OpenAPI, {
+    public static async create(): Promise<any> {
+        return await request<any>({
             method: 'POST',
-            url: '/beneficiary_payouts',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad request - Invalid input`,
-                401: `Unauthorized - Invalid or missing API key`,
-                500: `Internal server error`,
-            },
+            url: '/beneficiary-payouts',
         });
     }
+
     /**
-     * Retrieve beneficiary payout
-     * Retrieve a specific beneficiary payout by its unique identifier.
-     * @returns beneficiary_payouts Beneficiary_payout retrieved successfully
-     * @throws ApiError
+     * OpenAPI operationId: `BeneficiaryPayoutsController_findOne`.
+     * Obtenir un paiement bénéficiaire par ID
      */
-    public static retrieveBeneficiaryPayout({
-        payoutId,
-    }: {
-        /**
-         * Unique identifier for the beneficiary payout
-         */
-        payoutId: string,
-    }): CancelablePromise<beneficiary_payouts> {
-        return __request(OpenAPI, {
+    public static async get(id: string): Promise<any> {
+        return await request<any>({
             method: 'GET',
-            url: '/beneficiary_payouts/{payout_id}',
-            path: {
-                'payout_id': payoutId,
-            },
-            errors: {
-                401: `Unauthorized - Invalid or missing API key`,
-                404: `Not found - Resource does not exist`,
-                500: `Internal server error`,
-            },
+            url: '/beneficiary-payouts/{id}',
+            path: { id: id },
+        });
+    }
+
+    /**
+     * OpenAPI operationId: `BeneficiaryPayoutsController_findAll`.
+     * Lister les paiements vers bénéficiaires
+     */
+    public static async list(options?: Record<string, unknown>): Promise<any> {
+        return await request<any>({
+            method: 'GET',
+            url: '/beneficiary-payouts',
+            query: options,
         });
     }
 }

@@ -51,7 +51,7 @@ command
       spinner.fail(
         chalk.red('Internal CLI Error: Authentication URL is not configured.'),
       );
-      console.error('Please contact Lomi support.');
+      console.error('Please contact lomi. support.');
       process.exit(1);
     }
 

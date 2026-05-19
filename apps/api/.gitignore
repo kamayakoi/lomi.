@@ -4,7 +4,7 @@ node_modules/
 # Build
 dist/
 build/
-/openapi/functions/
+coverage/
 
 # Environment
 .env

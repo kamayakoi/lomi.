@@ -11,7 +11,8 @@
     "generate:python": "node scripts/python-generate.js",
     "generate:go": "node scripts/go-generate.js",
     "generate:php": "node scripts/php-generate.js",
-    "generate:nextjs": "node scripts/nextjs-generate.js"
+    "verify:sdk-parity": "node scripts/verify-sdk-surface-parity.js"
+
   },
   "keywords": [
     "lomi",

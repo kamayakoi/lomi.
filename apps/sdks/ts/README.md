@@ -1,64 +1,57 @@
 # lomi. TypeScript SDK
 
-Official Node.js SDK for interacting with the lomi. payment processing API.
+Official JavaScript SDK for the lomi. REST API (`@lomi./sdk`). Works in Node 18+, Bun, and modern browsers **when you only embed publishable keys** (Payment Elements flows). Merchant secret keys belong on servers.
 
 ## Installation
 
 ```bash
-# Using pnpm
 pnpm add @lomi./sdk
-
-# Using npm
-npm install @lomi./sdk
-
-# Using yarn
-yarn add @lomi./sdk
+# npm install @lomi./sdk / yarn add @lomi./sdk
 ```
 
-## Usage
-
-Import the OpenAPI client and configure it with your API key. Then access the different API services.
+## Quick start
 
 ```typescript
-import { OpenAPI, CustomersService, CreateCustomer, type Customer } from '@lomi./sdk';
+import { LomiSDK } from '@lomi./sdk';
 
-// Configure your API key (obtainable from your lomi. dashboard)
-OpenAPI.HEADERS = {
-  'X-API-KEY': 'YOUR_LOMI_API_KEY',
-};
+const lomi = new LomiSDK({
+  apiKey: process.env.LOMI_SECRET_KEY!,
+  environment: 'test',
+});
 
-// Optionally configure the base URL if not using the default production URL
-// OpenAPI.BASE = 'https://sandbox.api.lomi.africa/v1';
+async function bootstrap() {
+  const page = await lomi.customers.list({ page: 1, pageSize: 20 });
+  console.log('- Customers page payload:', page);
 
-async function createNewCustomer() {
-  try {
-    const customerData: CreateCustomer = {
-      name: 'Test customer',
-      email: 'customer@example.com',
-      phone_number: '+225021234567',
-    };
+  await lomi.payouts.createWavePayout({
+    amount: 10000,
+    currency: 'XOF',
+    beneficiary: { name: 'Test User', phoneNumber: '+221771234567' },
+  });
 
-    const newCustomer: Customer = await CustomersService.createCustomer(customerData);
-    console.log('Customer created:', newCustomer);
-
-  } catch (error) {
-    console.error('Error creating customer:', error);
-  }
+  console.log(await lomi.refunds.createWaveRefund({
+    transactionId: '123e4567-e89b-12d3-a456-426614174000',
+    amount: 1000,
+    reason: 'duplicate_charge',
+  }));
 }
 
-createNewCustomer();
+bootstrap().catch(console.error);
 ```
 
-Refer to the `src/generated/services` directory and the [lomi. API documentation](https://docs.lomi.africa/docs) for details on available services and methods.
+All methods map 1:1 to the curated public merchant OpenAPI routes (see docs `openapi.json` + `sdk-public-methods.json` inside `src/generated` after running codegen).
 
-## Contributing
+Docs: **[https://docs.lomi.africa](https://docs.lomi.africa)** • Type guide: **[`/reference/sdks/typescript`](https://docs.lomi.africa/reference/sdks/typescript)**
 
-Please refer to the main `CONTRIBUTING.md` in the monorepo.
+## Generation
 
-## Support
+Codegen lives under `apps/sdks/scripts/generate-types-sdk.js`. Run `node scripts/typescript-generate.js` from `apps/sdks` whenever `apps/docs/openapi.json` or `apps/docs/lib/scripts/manual-api/_expected-public-operations.json` changes.
 
-Contact **hello@lomi.africa** or visit our [support center](https://lomi.africa/support).
+## Contributing & support
+
+- Monorepo `CONTRIBUTING.md`
+- **[hello@lomi.africa](mailto:hello@lomi.africa)**
 
 ## License
 
-This project is licensed under the MIT License.
+MIT

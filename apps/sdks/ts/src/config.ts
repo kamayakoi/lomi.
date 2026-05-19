@@ -11,7 +11,7 @@ export interface LomiConfig {
 
   /**
    * Base URL for the API
-   * @default 'https://api.lomi.africa/v1'
+   * @default 'https://api.lomi.africa'
    */
   baseUrl?: string;
 
@@ -34,7 +34,7 @@ export interface LomiConfig {
 }
 
 export const DEFAULT_CONFIG = {
-  baseUrl: 'https://api.lomi.africa/v1',
+  baseUrl: 'https://api.lomi.africa',
   timeout: 30000,
   environment: 'live' as const,
 };

@@ -361,8 +361,8 @@ command
       // envContent = envContent.replace('whsec_your_webhook_secret_here', 'YOUR_SECRET_HERE'); // Maybe don't prompt for secret?
       if (answers.environment === 'sandbox') {
         envContent = envContent.replace(
-          'https://api.lomi.africa/v1',
-          'https://sandbox.api.lomi.africa/v1',
+          'https://api.lomi.africa',
+          'https://sandbox.api.lomi.africa',
         );
       }
       try {

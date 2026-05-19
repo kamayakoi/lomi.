@@ -1,6 +1,3 @@
-module github.com/lomiafrica/lomi-go-sdk
+module github.com/lomiafrica/lomi-go
 
-go 1.23
-
-require (
-)
+go 1.24
